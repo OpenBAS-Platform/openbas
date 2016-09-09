@@ -1,11 +1,9 @@
-api:
-    resource: "@APIBundle/Controller/DefaultController.php"
+frontend:
+    resource: "@FrontendBundle/Controller/DefaultController.php"
+    prefix:   /
     type:     annotation
 
-users:
+api:
+    resource: "routing_api.yml"
+    prefix:   /api
     type:     rest
-    resource: APIBundle\Controller\UserController
-
-exercises:
-    type:     rest
-    resource: APIBundle\Controller\ExerciseController

@@ -73,8 +73,10 @@ fos_rest:
         include_format: false
     view:
         view_response_listener: true
+        default_engine: twig
     format_listener:
         rules:
-            - { path: '^/', priorities: ['json'], fallback_format: 'json', prefer_extension: false }
+            - { path: '^/api', priorities: ['json'], fallback_format: 'json', prefer_extension: false }
+            - { path: '^/', priorities: ['html'], fallback_format: 'html', prefer_extension: false }
     body_listener:
         enabled: true

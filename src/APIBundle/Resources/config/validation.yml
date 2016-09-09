@@ -1,0 +1,29 @@
+APIBundle\Entity\Exercise:
+    properties:
+        name:
+            - NotBlank: ~
+            - Type: string
+        description:
+            - NotBlank: ~
+            - Type: string
+        startDate:
+            - DateTime: ~
+        endDate:
+            - DateTime: ~
+        status:
+            - NotBlank: ~
+            - Type: integer
+
+APIBundle\Entity\User:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: email
+    properties:
+        firstname:
+            - NotBlank: ~
+            - Type: string
+        lastname:
+            - NotBlank: ~
+            - Type: string
+        email:
+            - NotBlank: ~
+            - Email: ~

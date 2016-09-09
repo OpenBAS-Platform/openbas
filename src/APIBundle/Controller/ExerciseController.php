@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\ViewHandler;
 use FOS\RestBundle\View\View;
+use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
 
 class ExerciseController extends Controller
@@ -54,17 +55,31 @@ class ExerciseController extends Controller
     public function postExercisesAction(Request $request)
     {
         $exercise = new Exercise();
-        $exercise
-            ->setName($request->get('name'))
-            ->setDescription($request->get('description'))
-            ->setStartDate($request->get('startDate'))
-            ->setEndDate($request->get('endDate'))
-            ->setStatus($request->get('status'));
+        $form = $this->createForm(ExerciseType::class, $exercise);
+        $form->submit($request->request->all());
 
+        if ($form->isValid()) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($exercise);
+            $em->flush();
+            return $exercise;
+        } else {
+            return $form;
+        }
+    }
+
+    /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("/exercise/{id}")
+     */
+    public function removeExerciseAction(Request $request)
+    {
         $em = $this->get('doctrine.orm.entity_manager');
-        $em->persist($exercise);
-        $em->flush();
+        $exercise = $em->getRepository('APIBundle:Exercise')
+            ->find($request->get('id'));
+        /* @var $exercise Exercise */
 
-        return $exercise;
+        $em->remove($exercize);
+        $em->flush();
     }
 }

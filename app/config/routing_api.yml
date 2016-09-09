@@ -1,0 +1,7 @@
+users:
+    type:     rest
+    resource: APIBundle\Controller\UserController
+
+exercises:
+    type:     rest
+    resource: APIBundle\Controller\ExerciseController
