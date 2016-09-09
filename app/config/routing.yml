@@ -1,0 +1,11 @@
+api:
+    resource: "@APIBundle/Controller/DefaultController.php"
+    type:     annotation
+
+users:
+    type:     rest
+    resource: APIBundle\Controller\UserController
+
+exercises:
+    type:     rest
+    resource: APIBundle\Controller\ExerciseController
