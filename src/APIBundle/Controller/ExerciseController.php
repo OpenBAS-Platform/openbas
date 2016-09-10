@@ -17,7 +17,7 @@ use APIBundle\Entity\Exercise;
 class ExerciseController extends Controller
 {
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises")
      */
     public function getExercisesAction(Request $request)
@@ -31,7 +31,7 @@ class ExerciseController extends Controller
     }
 
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises/{exercise_id}")
      */
     public function getExerciseAction(Request $request)
@@ -49,7 +49,7 @@ class ExerciseController extends Controller
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"exercise"})
      * @Rest\Post("/exercises")
      */
     public function postExercisesAction(Request $request)
@@ -69,7 +69,7 @@ class ExerciseController extends Controller
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"exercise"})
      * @Rest\Delete("/exercises/{exercise_id}")
      */
     public function removeExerciseAction(Request $request)
@@ -86,7 +86,7 @@ class ExerciseController extends Controller
     }
 
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Put("/exercises/{exercise_id}")
      */
     public function updateExerciseAction(Request $request)
@@ -95,7 +95,7 @@ class ExerciseController extends Controller
     }
 
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Patch("/exercises/{exercise_id}")
      */
     public function patchExerciseAction(Request $request)

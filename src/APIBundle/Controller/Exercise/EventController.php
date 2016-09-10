@@ -14,7 +14,7 @@ use APIBundle\Entity\Event;
 class EventController extends Controller
 {
     /**
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"event"})
      * @Rest\Get("/exercises/{exercise_id}/events")
      */
     public function getEventsAction(Request $request)
@@ -32,10 +32,10 @@ class EventController extends Controller
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"event"})
      * @Rest\Post("/exercises/{exercise_id}/events")
      */
-    public function postExercisesAction(Request $request)
+    public function postEventsAction(Request $request)
     {
         $exercise = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Exercise')

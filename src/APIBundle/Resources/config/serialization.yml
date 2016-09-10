@@ -1,0 +1,29 @@
+APIBundle\Entity\Exercise:
+    attributes:
+        exercise_id:
+            groups: ['exercise', 'event']
+        exercise_name:
+            groups: ['exercise', 'event']
+        exercise_description:
+            groups: ['exercise', 'event']
+        exercise_start_date:
+            groups: ['exercise', 'event']
+        exercise_end_date:
+            groups: ['exercise', 'event']
+        exercise_status:
+            groups: ['exercise', 'event']
+        exercise_events:
+            groups: ['exercise']
+
+APIBundle\Entity\Event:
+    attributes:
+        event_id:
+            groups: ['exercise', 'event']
+        event_title:
+            groups: ['exercise', 'event']
+        event_description:
+            groups: ['exercise', 'event']
+        event_status:
+            groups: ['exercise', 'event']
+        event_exercise:
+            groups: ['event']
