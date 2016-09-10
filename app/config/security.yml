@@ -1,7 +1,10 @@
 # To get started with security, check out the documentation:
 # http://symfony.com/doc/current/book/security.html
 security:
-
+    encoders:
+        APIBundle\Entity\User:
+            algorithm: bcrypt
+            cost: 12
     # http://symfony.com/doc/current/book/security.html#where-do-users-come-from-user-providers
     providers:
         in_memory:

@@ -1,3 +1,27 @@
+AppBundle\Entity\User:
+    attributes:
+        user_id:
+            groups: ['user', 'preference', 'token']
+        user_firstname:
+            groups: ['user', 'preference', 'token']
+        user_lastname:
+            groups: ['user', 'preference', 'token']
+        user_email:
+            groups: ['user', 'preference', 'token']
+        user_preferences:
+            groups: ['user']
+
+AppBundle\Entity\Token:
+    attributes:
+        token_id:
+            groups: ['token']
+        token_value:
+            groups: ['token']
+        token_created_at:
+            groups: ['token']
+        token_user:
+            groups: ['token']
+
 APIBundle\Entity\Exercise:
     attributes:
         exercise_id:

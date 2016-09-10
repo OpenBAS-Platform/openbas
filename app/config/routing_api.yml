@@ -2,6 +2,10 @@ users:
     type:     rest
     resource: APIBundle\Controller\UserController
 
+tokens:
+    type:     rest
+    resource: APIBundle\Controller\TokenController
+
 exercises:
     type:     rest
     resource: APIBundle\Controller\ExerciseController

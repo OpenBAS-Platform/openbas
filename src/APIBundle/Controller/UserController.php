@@ -60,6 +60,10 @@ class UserController extends Controller
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+            $encoder = $this->get('security.password_encoder');
+            $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
+            $user->setUserPassword($encoded);
+
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($user);
             $em->flush();
@@ -113,6 +117,12 @@ class UserController extends Controller
 
         if (empty($user)) {
             return $this->userNotFound();
+        }
+
+        if ($clearMissing) {
+            $options = ['validation_groups'=>['Default', 'FullUpdate']];
+        } else {
+            $options = [];
         }
 
         $form = $this->createForm(UserType::class, $user);

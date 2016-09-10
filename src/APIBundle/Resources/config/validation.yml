@@ -1,3 +1,32 @@
+APIBundle\Entity\User:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: user_email
+    properties:
+        user_firstname:
+            - NotBlank: ~
+            - Type: string
+        user_lastname:
+            - NotBlank: ~
+            - Type: string
+        user_email:
+            - NotBlank: ~
+            - Email: ~
+        user_plain_password:
+            - NotBlank: { groups: [New, FullUpdate] }
+            - Type: string
+            - Length:
+                min: 4
+                max: 50
+
+APIBundle\Entity\Credentials:
+    properties:
+        login:
+            - NotBlank: ~
+            - Type: string
+        password:
+            - NotBlank: ~
+            - Type: string
+
 APIBundle\Entity\Exercise:
     properties:
         exercise_name:
@@ -13,20 +42,6 @@ APIBundle\Entity\Exercise:
         exercise_status:
             - NotBlank: ~
             - Type: integer
-
-APIBundle\Entity\User:
-    constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: user_email
-    properties:
-        user_firstname:
-            - NotBlank: ~
-            - Type: string
-        user_lastname:
-            - NotBlank: ~
-            - Type: string
-        user_email:
-            - NotBlank: ~
-            - Email: ~
 
 APIBundle\Entity\Event:
     properties:
