@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\ViewHandler;
 use FOS\RestBundle\View\View;
+use APIBundle\Form\Type\UserType;
 use APIBundle\Entity\User;
 
 class UserController extends Controller
@@ -31,7 +32,7 @@ class UserController extends Controller
 
     /**
      * @Rest\View()
-     * @Rest\Get("/users/{exercise_id}")
+     * @Rest\Get("/users/{user_id}")
      */
     public function getUserAction(Request $request)
     {
@@ -41,7 +42,7 @@ class UserController extends Controller
         /* @var $user User */
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+            return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
         return $user;
@@ -57,6 +58,65 @@ class UserController extends Controller
         $form = $this->createForm(UserType::class, $user);
 
         $form->submit($request->request->all());
+
+        if ($form->isValid()) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($user);
+            $em->flush();
+            return $user;
+        } else {
+            return $form;
+        }
+    }
+
+    /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("/users/{user_id}")
+     */
+    public function removeUserAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $em->getRepository('APIBundle:User')
+            ->find($request->get('user_id'));
+        /* @var $user User */
+
+        if ($user) {
+            $em->remove($user);
+            $em->flush();
+        }
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Put("/users/{user_id}")
+     */
+    public function updateUserAction(Request $request)
+    {
+        return $this->updateUser($request, true);
+    }
+
+    /**
+     * @Rest\View()
+     * @Rest\Patch("/users/{user_id}")
+     */
+    public function patchUserAction(Request $request)
+    {
+        return $this->updateUser($request, false);
+    }
+
+    private function updateUser(Request $request, $clearMissing)
+    {
+        $user = $this->get('doctrine.orm.entity_manager')
+            ->getRepository('APIBundle:User')
+            ->find($request->get('user_id'));
+        /* @var $user User */
+
+        if (empty($user)) {
+            return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $form = $this->createForm(UserType::class, $user);
+        $form->submit($request->request->all(), $clearMissing);
 
         if ($form->isValid()) {
             $em = $this->get('doctrine.orm.entity_manager');
