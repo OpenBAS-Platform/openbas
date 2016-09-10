@@ -42,7 +42,7 @@ class UserController extends Controller
         /* @var $user User */
 
         if (empty($user)) {
-            return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+            return $this->userNotFound();
         }
 
         return $user;
@@ -112,7 +112,7 @@ class UserController extends Controller
         /* @var $user User */
 
         if (empty($user)) {
-            return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+            return $this->userNotFound();
         }
 
         $form = $this->createForm(UserType::class, $user);
@@ -126,5 +126,10 @@ class UserController extends Controller
         } else {
             return $form;
         }
+    }
+
+    private function userNotFound()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
     }
 }

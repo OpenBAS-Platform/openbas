@@ -42,7 +42,7 @@ class ExerciseController extends Controller
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {
-            return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+            return $this->exerciseNotFound();
         }
 
         return $exercise;
@@ -111,7 +111,7 @@ class ExerciseController extends Controller
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {
-            return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+            return $this->exerciseNotFound();
         }
 
         $form = $this->createForm(ExerciseType::class, $exercise);
@@ -125,5 +125,10 @@ class ExerciseController extends Controller
         } else {
             return $form;
         }
+    }
+
+    private function exerciseNotFound()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 }

@@ -5,3 +5,7 @@ users:
 exercises:
     type:     rest
     resource: APIBundle\Controller\ExerciseController
+
+events:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\EventController

@@ -16,7 +16,7 @@ class Exercise
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
      */
-    protected $exercise_id;
+    protected $id;
 
     /**
      * @ORM\Column(type="string")
@@ -54,14 +54,14 @@ class Exercise
         $this->exercise_events = new ArrayCollection();
     }
 
-    public function getExerciseId()
+    public function getId()
     {
-        return $this->exercise_id;
+        return $this->id;
     }
 
-    public function setExerciseId($id)
+    public function setId($id)
     {
-        $this->exercise_id = $id;
+        $this->id = $id;
         return $this;
     }
 
@@ -117,6 +117,17 @@ class Exercise
     public function setExerciseStatus($status)
     {
         $this->exercise_status = $status;
+        return $this;
+    }
+
+    public function getExerciseEvents()
+    {
+        return $this->exercise_events;
+    }
+
+    public function setExerciseEvents($events)
+    {
+        $this->exercise_events = $events;
         return $this;
     }
 }
