@@ -15,7 +15,7 @@ class Event
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
      */
-    protected $id;
+    protected $event_id;
 
     /**
      * @ORM\Column(type="string")
@@ -34,19 +34,19 @@ class Event
 
     /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="events")
-     * @ORM\JoinColumn(name="event_exercise", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="event_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */
     protected $event_exercise;
 
-    public function getId()
+    public function getEventId()
     {
-        return $this->id;
+        return $this->event_id;
     }
 
-    public function setId($id)
+    public function setEventId($id)
     {
-        $this->id = $id;
+        $this->event_id = $id;
         return $this;
     }
 

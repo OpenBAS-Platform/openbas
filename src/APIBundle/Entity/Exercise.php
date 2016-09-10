@@ -16,7 +16,7 @@ class Exercise
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
      */
-    protected $id;
+    protected $exercise_id;
 
     /**
      * @ORM\Column(type="string")
@@ -44,7 +44,7 @@ class Exercise
     protected $exercise_status;
 
     /**
-     * @ORM\OneToMany(targetEntity="Event", mappedBy="exercise")
+     * @ORM\OneToMany(targetEntity="Event", mappedBy="event_exercise")
      * @var Event[]
      */
     protected $exercise_events;
@@ -54,14 +54,14 @@ class Exercise
         $this->exercise_events = new ArrayCollection();
     }
 
-    public function getId()
+    public function getExerciseId()
     {
-        return $this->id;
+        return $this->exercise_id;
     }
 
-    public function setId($id)
+    public function setExerciseId($id)
     {
-        $this->id = $id;
+        $this->exercise_id = $id;
         return $this;
     }
 

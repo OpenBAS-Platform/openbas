@@ -2,10 +2,10 @@ users:
     type:     rest
     resource: APIBundle\Controller\UserController
 
-exercises:
-    type:     rest
-    resource: APIBundle\Controller\ExerciseController
-
 events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController
+
+exercises:
+    type:     rest
+    resource: APIBundle\Controller\ExerciseController
