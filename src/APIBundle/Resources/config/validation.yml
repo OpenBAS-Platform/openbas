@@ -1,29 +1,38 @@
 APIBundle\Entity\Exercise:
     properties:
-        name:
+        exercise_name:
             - NotBlank: ~
             - Type: string
-        description:
+        exercise_description:
             - NotBlank: ~
             - Type: string
-        startDate:
+        exercise_start_date:
             - DateTime: ~
-        endDate:
+        exercise_end_date:
             - DateTime: ~
-        status:
+        exercise_status:
             - NotBlank: ~
             - Type: integer
 
 APIBundle\Entity\User:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: email
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: user_email
     properties:
-        firstname:
+        user_firstname:
             - NotBlank: ~
             - Type: string
-        lastname:
+        user_lastname:
             - NotBlank: ~
             - Type: string
-        email:
+        user_email:
             - NotBlank: ~
             - Email: ~
+
+APIBundle\Entity\Event:
+    properties:
+        event_title:
+            - NotBlank: ~
+            - Type: string
+        event_description:
+            - NotBlank: ~
+            - Type: string

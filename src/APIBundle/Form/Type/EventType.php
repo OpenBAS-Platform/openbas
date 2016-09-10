@@ -5,21 +5,21 @@ namespace APIBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class UserType extends AbstractType
+class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('user_firstname');
-        $builder->add('user_lastname');
-        $builder->add('user_email', EmailType::class);
+        $builder->add('event_title');
+        $builder->add('event_description');
+        $builder->add('event_status');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'APIBundle\Entity\User',
+            'data_class' => 'APIBundle\Entity\Event',
             'csrf_protection' => false
         ]);
     }

@@ -6,8 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="users",
- *      uniqueConstraints={@ORM\UniqueConstraint(name="users_email_unique",columns={"email"})}
+ * @ORM\Table(name="users", uniqueConstraints={@ORM\UniqueConstraint(name="users_email_unique",columns={"user_email"})})
  */
 class User
 {
@@ -16,60 +15,60 @@ class User
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
      */
-    protected $id;
+    protected $user_id;
 
     /**
      * @ORM\Column(type="string")
      */
-    protected $firstname;
+    protected $user_firstname;
 
     /**
      * @ORM\Column(type="string")
      */
-    protected $lastname;
+    protected $user_lastname;
 
     /**
      * @ORM\Column(type="string")
      */
-    protected $email;
+    protected $user_email;
 
-    public function getId()
+    public function getUserId()
     {
-        return $this->id;
+        return $this->user_id;
     }
 
-    public function setId($id)
+    public function setUserId($id)
     {
-        $this->id = $id;
+        $this->user_id = $id;
     }
 
-    public function getFirstname()
+    public function getUserFirstname()
     {
-        return $this->firstname;
+        return $this->user_firstname;
     }
 
-    public function setFirstname($firstname)
+    public function setUserFirstname($firstname)
     {
-        $this->firstname = $firstname;
+        $this->user_firstname = $firstname;
     }
 
-    public function getLastname()
+    public function getUserLastname()
     {
-        return $this->lastname;
+        return $this->user_lastname;
     }
 
-    public function setLastname($lastname)
+    public function setUserLastname($lastname)
     {
-        $this->lastname = $lastname;
+        $this->user_lastname = $lastname;
     }
 
-    public function getEmail()
+    public function getUserEmail()
     {
-        return $this->email;
+        return $this->user_email;
     }
 
-    public function setEmail($email)
+    public function setUserEmail($email)
     {
-        $this->email = $email;
+        $this->user_email = $email;
     }
 }

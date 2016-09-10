@@ -2,6 +2,7 @@
 
 namespace APIBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -15,96 +16,107 @@ class Exercise
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
      */
-    protected $id;
+    protected $exercise_id;
 
     /**
      * @ORM\Column(type="string")
      */
-    protected $name;
+    protected $exercise_name;
 
     /**
      * @ORM\Column(type="string")
      */
-    protected $description;
+    protected $exercise_description;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    protected $startDate;
+    protected $exercise_start_date;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    protected $endDate;
+    protected $exercise_end_date;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    protected $status;
+    protected $exercise_status;
 
-    public function getId()
+    /**
+     * @ORM\OneToMany(targetEntity="Event", mappedBy="exercise")
+     * @var Event[]
+     */
+    protected $exercise_events;
+
+    public function __construct()
     {
-        return $this->id;
+        $this->exercise_events = new ArrayCollection();
     }
 
-    public function getName()
+    public function getExerciseId()
     {
-        return $this->name;
+        return $this->exercise_id;
     }
 
-    public function getDescription()
+    public function setExerciseId($id)
     {
-        return $this->description;
-    }
-
-    public function getStartDate()
-    {
-        return $this->startDate;
-    }
-
-    public function getEndDate()
-    {
-        return $this->endDate;
-    }
-
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
+        $this->exercise_id = $id;
         return $this;
     }
 
-    public function setName($name)
+    public function getExerciseName()
     {
-        $this->name = $name;
+        return $this->exercise_name;
+    }
+
+    public function setExerciseName($name)
+    {
+        $this->exercise_name = $name;
         return $this;
     }
 
-    public function setDescription($description)
+    public function getExerciseDescription()
     {
-        $this->description = $description;
+        return $this->exercise_description;
+    }
+
+    public function setExerciseDescription($description)
+    {
+        $this->exercise_description = $description;
         return $this;
     }
 
-    public function setStartDate($startDate)
+    public function getExerciseStartDate()
     {
-        $this->startDate = $startDate;
+        return $this->exercise_start_date;
+    }
+
+    public function setExerciseStartDate($startDate)
+    {
+        $this->exercise_start_date = $startDate;
         return $this;
     }
 
-    public function setEndDate($endDate)
+    public function getExerciseEndDate()
     {
-        $this->endDate = $endDate;
+        return $this->exercise_end_date;
+    }
+
+    public function setExerciseEndDate($endDate)
+    {
+        $this->exercise_end_date = $endDate;
         return $this;
     }
 
-    public function setStatus($status)
+    public function getExerciseStatus()
     {
-        $this->status = $status;
+        return $this->exercise_status;
+    }
+
+    public function setExerciseStatus($status)
+    {
+        $this->exercise_status = $status;
         return $this;
     }
 }

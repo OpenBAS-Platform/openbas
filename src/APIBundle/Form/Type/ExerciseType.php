@@ -11,18 +11,17 @@ class ExerciseType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('name');
-        $builder->add('description');
-        $builder->add('description');
-        $builder->add('startDate', DateTimeType::class, array(
+        $builder->add('exercise_name');
+        $builder->add('exercise_description');
+        $builder->add('exercise_start_date', DateTimeType::class, array(
             'widget' => 'single_text',
             'input' => 'datetime'
         ));
-        $builder->add('endDate', DateTimeType::class, array(
+        $builder->add('exercise_end_date', DateTimeType::class, array(
             'widget' => 'single_text',
             'input' => 'datetime'
         ));
-        $builder->add('status');
+        $builder->add('exercise_status');
     }
 
     public function configureOptions(OptionsResolver $resolver)
