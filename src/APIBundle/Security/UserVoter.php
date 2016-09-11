@@ -66,10 +66,6 @@ class UserVoter extends Voter
             }
         }
 
-        if( $targetUser->getGrants() == $user->getUserId() ) {
-            return true;
-        }
-
         return false;
     }
 

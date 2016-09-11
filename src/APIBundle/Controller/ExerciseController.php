@@ -26,8 +26,6 @@ class ExerciseController extends Controller
      *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises")
-     * @QueryParam(name="offset", requirements="\d+", default="", description="Start index")
-     * @QueryParam(name="limit", requirements="\d+", default="", description="End index")
      */
     public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
     {

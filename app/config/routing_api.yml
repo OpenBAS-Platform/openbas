@@ -26,10 +26,6 @@ exercises_groups:
     type:     rest
     resource: APIBundle\Controller\Exercise\ExerciseGroupController
 
-exercises_groups_users:
-    type:     rest
-    resource: APIBundle\Controller\Exercise\Group\ExerciseGroupUserController
-
 exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\ExerciseEventController
