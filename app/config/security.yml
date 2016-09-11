@@ -9,19 +9,22 @@ security:
     providers:
         in_memory:
             memory: ~
+        token_user_provider:
+            id: token_user_provider
 
     firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        main:
+        api:
+            pattern: ^/api
+            stateless: true
+            simple_preauth:
+                authenticator: token_authenticator
+            provider: token_user_provider
             anonymous: ~
-            # activate different ways to authenticate
 
-            # http_basic: ~
-            # http://symfony.com/doc/current/book/security.html#a-configuring-how-your-users-will-authenticate
-
-            # form_login: ~
-            # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
+        frontend:
+            pattern: ^/
+            security: false

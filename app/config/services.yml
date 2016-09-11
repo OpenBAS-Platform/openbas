@@ -4,6 +4,22 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    token_user_provider:
+        class: APIBundle\Security\TokenUserProvider
+        arguments: ["@token_repository", "@user_repository"]
+        public:    false
+
+    token_repository:
+        class:   Doctrine\ORM\EntityManager
+        factory: ["@doctrine.orm.entity_manager", "getRepository"]
+        arguments: ["APIBundle:Token"]
+
+    user_repository:
+        class:   Doctrine\ORM\EntityManager
+        factory: ["@doctrine.orm.entity_manager", "getRepository"]
+        arguments: ["APIBundle:User"]
+
+    token_authenticator:
+        class:     APIBundle\Security\TokenAuthenticator
+        arguments: ["@security.http_utils"]
+        public:    false
