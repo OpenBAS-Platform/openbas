@@ -31,7 +31,8 @@ class ExerciseController extends Controller
      */
     public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $this->denyAccessUnlessGranted('select_all', new Exercise());
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
         $exercises = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Exercise')
@@ -75,9 +76,10 @@ class ExerciseController extends Controller
      */
     public function postExercisesAction(Request $request)
     {
-        $exercise = new Exercise();
-        $this->denyAccessUnlessGranted('insert', $exercise);
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
+        $exercise = new Exercise();
         $form = $this->createForm(ExerciseType::class, $exercise);
         $form->submit($request->request->all());
 

@@ -28,6 +28,9 @@ class GroupController extends Controller
      */
     public function getGroupsAction(Request $request)
     {
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
         $groups = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Group')
             ->findAll();
@@ -55,6 +58,7 @@ class GroupController extends Controller
             return $this->groupNotFound();
         }
 
+        $this->denyAccessUnlessGranted('select', $group);
         return $group;
     }
 

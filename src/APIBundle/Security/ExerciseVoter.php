@@ -9,15 +9,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ExerciseVoter extends Voter
 {
-    const SELECT_ALL = 'select_all';
     const SELECT = 'select';
-    const INSERT = 'insert';
     const UPDATE = 'update';
     const DELETE = 'delete';
 
     protected function supports($attribute, $exercise)
     {
-        if (!in_array($attribute, array(self::SELECT_ALL, self::SELECT, self::INSERT, self::UPDATE, self::DELETE))) {
+        if (!in_array($attribute, array(self::SELECT, self::UPDATE, self::DELETE))) {
             return false;
         }
 
@@ -36,13 +34,13 @@ class ExerciseVoter extends Voter
             return false;
         }
 
+        if( $user->isAdmin() ) {
+            return true;
+        }
+
         switch ($attribute) {
-            case self::SELECT_ALL:
-                return $this->canSelectAll($exercise, $user);
             case self::SELECT:
                 return $this->canSelect($exercise, $user);
-            case self::INSERT:
-                return $this->canInsert($exercise, $user);
             case self::UPDATE:
                 return $this->canUpdate($exercise, $user);
             case self::DELETE:
@@ -52,27 +50,11 @@ class ExerciseVoter extends Voter
         throw new \LogicException('This code should not be reached!');
     }
 
-    private function canSelectAll(Exercise $exercise, User $user)
-    {
-        if( $user->isAdmin() )
-            return true;
-
-        return false;
-    }
-
     private function canSelect(Exercise $exercise, User $user)
     {
         if( in_array($this->findGrant($exercise, $user), array('ADMIN', 'PLANNER', 'PLAYER', 'OBSERVER')) ) {
             return true;
         }
-
-        return false;
-    }
-
-    private function canInsert(Exercise $exercise, User $user)
-    {
-        if( $user->isAdmin() )
-            return true;
 
         return false;
     }

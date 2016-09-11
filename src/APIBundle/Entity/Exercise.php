@@ -50,6 +50,12 @@ class Exercise
     protected $exercise_status;
 
     /**
+     * @ORM\OneToMany(targetEntity="Grant", mappedBy="grant_exercise")
+     * @var Grant[]
+     */
+    protected $exercise_grants;
+
+    /**
      * @ORM\OneToMany(targetEntity="Event", mappedBy="event_exercise")
      * @var Event[]
      */
@@ -57,6 +63,7 @@ class Exercise
 
     public function __construct()
     {
+        $this->exercise_grants = new ArrayCollection();
         $this->exercise_events = new ArrayCollection();
     }
 
@@ -134,6 +141,17 @@ class Exercise
     public function setExerciseStatus($status)
     {
         $this->exercise_status = $status;
+        return $this;
+    }
+
+    public function getExerciseGrants()
+    {
+        return $this->exercise_grants;
+    }
+
+    public function setExerciseGrants($grants)
+    {
+        $this->exercise_grants = $grants;
         return $this;
     }
 

@@ -11,7 +11,7 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Form\Type\EventType;
 use APIBundle\Entity\Event;
 
-class EventController extends Controller
+class ExerciseEventController extends Controller
 {
     /**
      * @Rest\View(serializerGroups={"event"})

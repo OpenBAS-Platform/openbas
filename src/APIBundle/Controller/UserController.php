@@ -28,6 +28,9 @@ class UserController extends Controller
      */
     public function getUsersAction(Request $request)
     {
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
         $users = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:User')
             ->findAll();
@@ -55,6 +58,7 @@ class UserController extends Controller
             return $this->userNotFound();
         }
 
+        $this->denyAccessUnlessGranted('select', $user);
         return $user;
     }
 
@@ -69,6 +73,9 @@ class UserController extends Controller
      */
     public function postUsersAction(Request $request)
     {
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
 
@@ -104,6 +111,7 @@ class UserController extends Controller
         /* @var $user User */
 
         if ($user) {
+            $this->denyAccessUnlessGranted('delete', $user);
             $em->remove($user);
             $em->flush();
         }
@@ -147,6 +155,8 @@ class UserController extends Controller
         if (empty($user)) {
             return $this->userNotFound();
         }
+
+        $this->denyAccessUnlessGranted('update', $user);
 
         if ($clearMissing) {
             $options = ['validation_groups'=>['Default', 'FullUpdate']];
