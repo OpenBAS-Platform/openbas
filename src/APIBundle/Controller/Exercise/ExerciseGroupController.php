@@ -14,6 +14,7 @@ use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Exercise;
 use APIBundle\Entity\Group;
+use APIBundle\Entity\Grant;
 use APIBundle\Entity\User;
 use APIBundle\Form\Type\GroupType;
 
@@ -25,7 +26,7 @@ class ExerciseGroupController extends Controller
      * )
      *
      * @Rest\View(serializerGroups={"group"})
-     * @Rest\Get("/exercise/{exercise_id}/groups")
+     * @Rest\Get("/exercises/{exercise_id}/groups")
      */
     public function getGroupsAction(Request $request)
     {
@@ -41,9 +42,14 @@ class ExerciseGroupController extends Controller
         $this->denyAccessUnlessGranted('select', $exercise);
 
         $groups = [];
+        /* @var $groups Group[] */
         $grants = $exercise->getExerciseGrants();
+        /* @var $grants Grant[] */
         foreach( $grants as $grant ) {
-            $groups[] = $grant->getGrantGroup();
+            $group = $grant->getGrantGroup();
+            /* @var $group Group */
+            $group->setGroupGrantInExercise($grant->getGrantName());
+            $groups[] = $group;
         }
 
         return $groups;

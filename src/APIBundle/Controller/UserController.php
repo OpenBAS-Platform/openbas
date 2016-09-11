@@ -64,7 +64,7 @@ class UserController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Create a new user",
+     *    description="Create a user",
      *   input={"class"=UserType::class, "name"=""}
      * )
      *

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\CredentialsType;
 use APIBundle\Entity\Token;
 use APIBundle\Entity\Credentials;
@@ -14,6 +15,11 @@ use APIBundle\Entity\Credentials;
 class TokenController extends Controller
 {
     /**
+     * @ApiDoc(
+     *    description="Create a token",
+     *   input={"class"=CredentialsType::class, "name"=""}
+     * )
+     *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"token"})
      * @Rest\Post("/tokens")
      */
@@ -54,6 +60,10 @@ class TokenController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Delete a token",
+     * )
+     *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"token"})
      * @Rest\Delete("/tokens/{token_id}")
      */

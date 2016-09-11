@@ -64,7 +64,7 @@ class GroupController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Create a new group",
+     *    description="Create a group",
      *   input={"class"=GroupType::class, "name"=""}
      * )
      *

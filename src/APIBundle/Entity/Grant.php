@@ -32,7 +32,7 @@ class Grant
     protected $grant_exercise;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", columnDefinition="ENUM('ADMIN', 'PLANNER', 'PLAYER', 'OBSERVER')")
      */
     protected $grant_name;
 
@@ -49,7 +49,7 @@ class Grant
 
     public function getGrantGroup()
     {
-        return $this->grant_name;
+        return $this->grant_group;
     }
 
     public function setGrantGroup($group)

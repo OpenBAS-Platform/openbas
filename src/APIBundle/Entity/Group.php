@@ -35,6 +35,8 @@ class Group
      */
     protected $group_grants;
 
+    protected $group_grant_in_exercise;
+
     public function __construct()
     {
         $this->group_users = new ArrayCollection();
@@ -82,6 +84,17 @@ class Group
     public function setGroupGrants($grants)
     {
         $this->group_grants = $grants;
+        return $this;
+    }
+
+    public function getGroupGrantInExercise()
+    {
+        return $this->group_grant_in_exercise;
+    }
+
+    public function setGroupGrantInExercise($grant)
+    {
+        $this->group_grant_in_exercise = $grant;
         return $this;
     }
 }

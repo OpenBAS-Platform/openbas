@@ -2,12 +2,12 @@ APIBundle\Entity\User:
     exclusion_policy: none
     properties:
         user_id:
-            groups: ['user', 'group']
+            groups: ['user']
         user_firstname:
-            groups: ['user', 'group']
+            groups: ['user']
         user_lastname:
-            groups: ['user', 'group']
+            groups: ['user']
         user_email:
-            groups: ['user', 'group']
+            groups: ['user']
         user_groups:
             groups: ['user']

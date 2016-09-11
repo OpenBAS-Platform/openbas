@@ -47,6 +47,9 @@ class GrantController extends Controller
      */
     public function postGroupsGrantsAction(Request $request)
     {
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
         $group = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Group')
             ->find($request->get('group_id'));
@@ -77,6 +80,9 @@ class GrantController extends Controller
      */
     public function removeGroupsGrantAction(Request $request)
     {
+        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
         $em = $this->get('doctrine.orm.entity_manager');
         $grant = $em->getRepository('Grant.php')
             ->find($request->get('grant_id'));

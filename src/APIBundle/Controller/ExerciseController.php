@@ -67,7 +67,7 @@ class ExerciseController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Create a new exercise",
+     *    description="Create an exercise",
      *    input={"class"=ExerciseType::class, "name"=""}
      * )
      *
