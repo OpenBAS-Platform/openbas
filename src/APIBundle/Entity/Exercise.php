@@ -40,7 +40,7 @@ class Exercise
 
     /**
      * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
+     * @ORM\JoinColumn(name="exercise_owner", referencedColumnName="user_id")
      */
     protected $exercise_owner;
 

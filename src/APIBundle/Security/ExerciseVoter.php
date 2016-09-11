@@ -6,11 +6,19 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
 class ExerciseVoter extends Voter
 {
     const VIEW = 'view';
     const EDIT = 'edit';
+
+    private $decisionManager;
+
+    public function __construct(AccessDecisionManagerInterface $decisionManager)
+    {
+        $this->decisionManager = $decisionManager;
+    }
 
     protected function supports($attribute, $subject)
     {
@@ -36,29 +44,36 @@ class ExerciseVoter extends Voter
         /** @var Exercise $exercise */
         $exercise = $subject;
 
+        if ($this->decisionManager->decide($token, array('ROLE_' . $exercise->getExerciseId() . '_ADMIN')))
+            return true;
+
         switch ($attribute) {
             case self::VIEW:
-                return $this->canView($exercise, $user);
+                return $this->canView($exercise, $token);
             case self::EDIT:
-                return $this->canEdit($exercise, $user);
+                return $this->canEdit($exercise, $token);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
-    private function canView(Exercise $exercise, User $user)
+    private function canView(Exercise $exercise, TokenInterface $token)
     {
-        if ($this->canEdit($exercise, $user)) {
+        if ($this->canEdit($exercise, $token)) {
             return true;
         }
 
-        return !$exercise->isPrivate();
+        if ($this->decisionManager->decide($token, array('ROLE_' . $exercise->getExerciseId() . '_PLAYER', 'ROLE_' . $exercise->getExerciseId() . '_OBSERVER'))) {
+            return true;
+        }
+
+        return false;
     }
 
-    private function canEdit(Exercise $exercise, User $user)
+    private function canEdit(Exercise $exercise, TokenInterface $token)
     {
-        // this assumes that the data object has a getOwner() method
-        // to get the entity of the user who owns this data object
-        return $user === $exercise->getOwner();
+        if ($this->decisionManager->decide($token, array('ROLE_' . $exercise->getExerciseId() . '_PLANNER'))) {
+            return true;
+        }
     }
 }

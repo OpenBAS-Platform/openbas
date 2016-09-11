@@ -8,4 +8,4 @@ APIBundle\Entity\Group:
         group_users:
             groups: ['group', 'role']
         group_roles:
-            groups: ['group']
+            groups: ['group', 'user']

@@ -178,8 +178,4 @@ class ExerciseController extends Controller
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
-
-    private function notAllowed() {
-        return \FOS\RestBundle\View\View::create(['message' => 'You are not allowed to do this'], Response::HTTP_UNAUTHORIZED);
-    }
 }
