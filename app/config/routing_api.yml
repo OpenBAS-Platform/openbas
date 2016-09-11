@@ -6,6 +6,14 @@ groups:
     type:     rest
     resource: APIBundle\Controller\GroupController
 
+groups_roles:
+    type:     rest
+    resource: APIBundle\Controller\Group\RoleController
+
+groups_users:
+    type:     rest
+    resource: APIBundle\Controller\Group\UserController
+
 tokens:
     type:     rest
     resource: APIBundle\Controller\TokenController
@@ -14,6 +22,6 @@ exercises:
     type:     rest
     resource: APIBundle\Controller\ExerciseController
 
-events:
+exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController

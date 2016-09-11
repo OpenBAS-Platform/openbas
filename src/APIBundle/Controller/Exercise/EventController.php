@@ -17,7 +17,7 @@ class EventController extends Controller
      * @Rest\View(serializerGroups={"event"})
      * @Rest\Get("/exercises/{exercise_id}/events")
      */
-    public function getEventsAction(Request $request)
+    public function getExercisesEventsAction(Request $request)
     {
         $exercise = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Exercise')
@@ -35,7 +35,7 @@ class EventController extends Controller
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"event"})
      * @Rest\Post("/exercises/{exercise_id}/events")
      */
-    public function postEventsAction(Request $request)
+    public function postExercisesEventsAction(Request $request)
     {
         $exercise = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Exercise')

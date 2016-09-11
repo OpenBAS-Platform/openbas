@@ -20,7 +20,7 @@ class Role
     /**
      * @ORM\ManyToOne(targetEntity="Group")
      * @ORM\JoinColumn(name="role_group", referencedColumnName="group_id", onDelete="CASCADE")
-     * @var Exercise
+     * @var Group
      */
     protected $role_group;
 

@@ -24,13 +24,13 @@ class Group
     protected $group_name;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="groups")
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="user_groups")
      * @var User[]
      */
     protected $group_users;
 
     /**
-     * @ORM\OneToMany(targetEntity="Role", mappedBy="groups")
+     * @ORM\OneToMany(targetEntity="Role", mappedBy="role_group")
      * @var Role[]
      */
     protected $group_roles;

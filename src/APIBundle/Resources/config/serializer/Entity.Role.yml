@@ -1,0 +1,11 @@
+APIBundle\Entity\Role:
+    exclusion_policy: none
+    properties:
+        role_id:
+            groups: ['role', 'group', 'user', 'exercise']
+        role_group:
+            groups: ['role', 'user', 'exercise']
+        role_exercise:
+            groups: ['role', 'user', 'group']
+        role_name:
+            groups: ['role', 'group', 'user', 'exercise']

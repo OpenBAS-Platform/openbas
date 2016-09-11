@@ -13,6 +13,7 @@ use FOS\RestBundle\View\ViewHandler;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Group;
+use APIBundle\Entity\User;
 use APIBundle\Form\Type\GroupType;
 
 class GroupController extends Controller

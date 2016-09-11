@@ -33,7 +33,7 @@ class Event
     protected $event_status;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="events")
+     * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_events")
      * @ORM\JoinColumn(name="event_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */

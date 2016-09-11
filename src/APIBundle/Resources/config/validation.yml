@@ -18,6 +18,21 @@ APIBundle\Entity\User:
                 min: 4
                 max: 50
 
+APIBundle\Entity\Group:
+    properties:
+        group_name:
+            - NotBlank: ~
+            - Type: string
+
+APIBundle\Entity\Role:
+    properties:
+        role_name:
+            - NotBlank: ~
+            - Type: string
+        role_exercise:
+            - NotBlank: ~
+            - Type: integer
+
 APIBundle\Entity\Credentials:
     properties:
         login:

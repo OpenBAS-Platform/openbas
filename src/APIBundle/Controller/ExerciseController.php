@@ -16,7 +16,6 @@ use FOS\RestBundle\Request\ParamFetcher;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
-use APIBundle\Entity\ExercisesGroupsRoles;
 
 class ExerciseController extends Controller
 {

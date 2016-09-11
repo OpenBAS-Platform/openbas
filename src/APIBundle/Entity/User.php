@@ -42,7 +42,7 @@ class User implements UserInterface
     protected $user_plain_password;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
+     * @ORM\ManyToMany(targetEntity="Group", inversedBy="group_users")
      * @ORM\JoinTable(name="users_groups",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="group_id", onDelete="CASCADE")}
@@ -190,5 +190,9 @@ class User implements UserInterface
     public function eraseCredentials()
     {
         $this->user_plain_password = null;
+    }
+
+    public function isAdmin() {
+        return $this->user_admin;
     }
 }

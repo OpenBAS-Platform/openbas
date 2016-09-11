@@ -39,7 +39,6 @@ class Exercise
     protected $exercise_end_date;
 
     /**
-     * @ORM\Column(type="integer")
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
      */

@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class TokenAuthenticator implements SimplePreAuthenticatorInterface, AuthenticationFailureHandlerInterface
 {
-    const TOKEN_VALIDITY_DURATION = 24 * 3600;
+    const TOKEN_VALIDITY_DURATION = 3600 * 24 * 365;
     protected $httpUtils;
 
     public function __construct(HttpUtils $httpUtils)
