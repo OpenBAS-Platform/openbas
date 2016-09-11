@@ -53,6 +53,27 @@ class TokenController extends Controller
         return $token;
     }
 
+    /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("/tokens/{token_id}")
+     */
+    public function removeTokenAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $token = $em->getRepository('APIBundle:Token')
+            ->find($request->get('token_id'));
+        /* @var $token Token */
+
+        $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+
+        if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId()) {
+            $em->remove($token);
+            $em->flush();
+        } else {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
+        }
+    }
+
     private function invalidCredentials()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);

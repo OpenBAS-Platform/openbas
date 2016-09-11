@@ -66,7 +66,7 @@ class TokenAuthenticator implements SimplePreAuthenticatorInterface, Authenticat
             $user,
             $tokenHeader,
             $providerKey,
-            $user->getUserRoles()
+            $user->getRoles()
         );
 
         $pre->setAuthenticated(true);
