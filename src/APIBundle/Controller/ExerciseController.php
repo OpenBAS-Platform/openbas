@@ -90,15 +90,11 @@ class ExerciseController extends Controller
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+            $user_id = $this->get('security.token_storage')->getToken()->getUser()->getUserId();
+
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($exercise);
             $em->flush();
-
-            $user_id = $this->get('security.token_storage')->getToken()->getUser()->getUserId();
-            $egr = new ExercisesGroupsRoles();
-            $egr->setExerciseId($exercise->getExerciseId());
-
-            $egr->setGroupId();
 
             return $exercise;
         } else {
@@ -182,5 +178,9 @@ class ExerciseController extends Controller
     private function exerciseNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function notAllowed() {
+        return \FOS\RestBundle\View\View::create(['message' => 'You are not allowed to do this'], Response::HTTP_UNAUTHORIZED);
     }
 }

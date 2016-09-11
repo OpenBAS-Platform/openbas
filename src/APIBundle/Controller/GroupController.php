@@ -106,7 +106,7 @@ class GroupController extends Controller
     /**
      * @ApiDoc(
      *    description="Replace a group",
-     *   input={"class"=UserType::class, "name"=""}
+     *   input={"class"=GroupType::class, "name"=""}
      * )
      *
      * @Rest\View(serializerGroups={"group"})
@@ -119,8 +119,8 @@ class GroupController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Update a user",
-     *   input={"class"=UserType::class, "name"=""}
+     *    description="Update a group",
+     *   input={"class"=GroupType::class, "name"=""}
      * )
      *
      * @Rest\View(serializerGroups={"group"})

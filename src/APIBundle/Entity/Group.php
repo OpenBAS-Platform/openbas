@@ -2,6 +2,7 @@
 
 namespace APIBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -21,6 +22,17 @@ class Group
      * @ORM\Column(type="string")
      */
     protected $group_name;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="group_name")
+     * @var User[]
+     */
+    protected $group_users;
+
+    public function __construct()
+    {
+        $this->group_users = new ArrayCollection();
+    }
 
     public function getGroupId()
     {
@@ -44,5 +56,14 @@ class Group
         return $this;
     }
 
+    public function getGroupUsers()
+    {
+        return $this->group_users;
+    }
 
+    public function setGroupUsers($users)
+    {
+        $this->group_users = $users;
+        return $this;
+    }
 }

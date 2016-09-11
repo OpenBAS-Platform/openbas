@@ -7,7 +7,7 @@ use APIBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
-class PostVoter extends Voter
+class ExerciseVoter extends Voter
 {
     const VIEW = 'view';
     const EDIT = 'edit';

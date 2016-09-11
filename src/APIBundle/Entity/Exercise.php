@@ -39,6 +39,13 @@ class Exercise
     protected $exercise_end_date;
 
     /**
+     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="user_id")
+     */
+    protected $exercise_owner;
+
+    /**
      * @ORM\Column(type="smallint")
      */
     protected $exercise_status;
@@ -106,6 +113,17 @@ class Exercise
     public function setExerciseEndDate($endDate)
     {
         $this->exercise_end_date = $endDate;
+        return $this;
+    }
+
+    public function getExerciseOwner()
+    {
+        return $this->exercise_owner;
+    }
+
+    public function setExerciseOwner($owner)
+    {
+        $this->exercise_owner = $owner;
         return $this;
     }
 
