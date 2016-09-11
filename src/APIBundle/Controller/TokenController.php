@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\Annotations as Rest; // alias pour toutes les annotations
+use FOS\RestBundle\Controller\Annotations as Rest;
 use APIBundle\Form\Type\CredentialsType;
 use APIBundle\Entity\Token;
 use APIBundle\Entity\Credentials;
@@ -29,10 +29,9 @@ class TokenController extends Controller
         }
 
         $em = $this->get('doctrine.orm.entity_manager');
+        $user = $em->getRepository('APIBundle:User')->findOneBy(['user_email' => $credentials->getLogin()]);
 
-        $user = $em->getRepository('APIBundle:User')->findBy(["user_email" => $credentials->getLogin()]);
-
-        if (!$user) { // L'utilisateur n'existe pas
+        if (!$user) {
             return $this->invalidCredentials();
         }
 
@@ -43,15 +42,15 @@ class TokenController extends Controller
             return $this->invalidCredentials();
         }
 
-        $authToken = new Token();
-        $authToken->setTokenValue(base64_encode(random_bytes(50)));
-        $authToken->setTokenCreatedAt(new \DateTime('now'));
-        $authToken->setTokenUser($user);
+        $token = new Token();
+        $token->setTokenValue(base64_encode(random_bytes(50)));
+        $token->setTokenCreatedAt(new \DateTime('now'));
+        $token->setTokenUser($user);
 
-        $em->persist($authToken);
+        $em->persist($token);
         $em->flush();
 
-        return $authToken;
+        return $token;
     }
 
     private function invalidCredentials()

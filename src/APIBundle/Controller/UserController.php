@@ -129,6 +129,11 @@ class UserController extends Controller
         $form->submit($request->request->all(), $clearMissing);
 
         if ($form->isValid()) {
+            if (!empty($user->getUserPlainPassword())) {
+                $encoder = $this->get('security.password_encoder');
+                $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
+                $user->setUserPassword($encoded);
+            }
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($user);
             $em->flush();

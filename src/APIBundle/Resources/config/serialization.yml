@@ -1,4 +1,4 @@
-AppBundle\Entity\User:
+APIBundle\Entity\User:
     attributes:
         user_id:
             groups: ['user', 'preference', 'token']
@@ -11,7 +11,7 @@ AppBundle\Entity\User:
         user_preferences:
             groups: ['user']
 
-AppBundle\Entity\Token:
+APIBundle\Entity\Token:
     attributes:
         token_id:
             groups: ['token']

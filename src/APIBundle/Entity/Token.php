@@ -54,7 +54,7 @@ class Token
 
     public function setTokenValue($value)
     {
-        $this->value = $value;
+        $this->token_value = $value;
         return $this;
     }
 
@@ -76,7 +76,7 @@ class Token
 
     public function setTokenUser(User $user)
     {
-        $this->user = $user;
+        $this->token_user = $user;
         return $this;
     }
 }

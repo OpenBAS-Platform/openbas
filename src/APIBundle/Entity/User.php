@@ -129,6 +129,6 @@ class User implements UserInterface
 
     public function eraseCredentials()
     {
-        $this->user_plainPassword = null;
+        $this->user_plain_password = null;
     }
 }
