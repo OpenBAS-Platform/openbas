@@ -31,22 +31,12 @@ class ExerciseController extends Controller
      */
     public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $offset = $paramFetcher->get('offset');
-        $limit = $paramFetcher->get('limit');
+        $this->denyAccessUnlessGranted('select_all', new Exercise());
 
-        $qb = $this->get('doctrine.orm.entity_manager')->createQueryBuilder();
-        $qb->select('p')
-            ->from('APIBundle:Exercise', 'p');
-
-        if ($offset != "") {
-            $qb->setFirstResult($offset);
-        }
-
-        if ($limit != "") {
-            $qb->setMaxResults($limit);
-        }
-
-        $exercises = $qb->getQuery()->getResult();
+        $exercises = $this->get('doctrine.orm.entity_manager')
+            ->getRepository('APIBundle:Exercise')
+            ->findAll();
+        /* @var $exercises Exercise[] */
 
         return $exercises;
     }
@@ -70,6 +60,7 @@ class ExerciseController extends Controller
             return $this->exerciseNotFound();
         }
 
+        $this->denyAccessUnlessGranted('select', $exercise);
         return $exercise;
     }
 
@@ -85,6 +76,8 @@ class ExerciseController extends Controller
     public function postExercisesAction(Request $request)
     {
         $exercise = new Exercise();
+        $this->denyAccessUnlessGranted('insert', $exercise);
+
         $form = $this->createForm(ExerciseType::class, $exercise);
         $form->submit($request->request->all());
 
@@ -117,6 +110,7 @@ class ExerciseController extends Controller
         /* @var $exercise Exercise */
 
         if ($exercise) {
+            $this->denyAccessUnlessGranted('delete', $exercise);
             $em->remove($exercise);
             $em->flush();
         }
@@ -160,6 +154,7 @@ class ExerciseController extends Controller
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
+        $this->denyAccessUnlessGranted('update', $exercise);
 
         $form = $this->createForm(ExerciseType::class, $exercise);
         $form->submit($request->request->all(), $clearMissing);

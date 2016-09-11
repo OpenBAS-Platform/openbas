@@ -9,20 +9,20 @@ use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Group;
-use APIBundle\Entity\Role;
-use APIBundle\Form\Type\RoleType;
+use APIBundle\Entity\Grant;
+use APIBundle\Form\Type\GrantType;
 
-class RoleController extends Controller
+class GrantController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List roles of a group"
+     *    description="List grants of a group"
      * )
      *
-     * @Rest\View(serializerGroups={"role"})
-     * @Rest\Get("/groups/{group_id}/roles")
+     * @Rest\View(serializerGroups={"grant"})
+     * @Rest\Get("/groups/{group_id}/grants")
      */
-    public function getGroupsRolesAction(Request $request)
+    public function getGroupsGrantsAction(Request $request)
     {
         $group = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Group')
@@ -33,19 +33,19 @@ class RoleController extends Controller
             return $this->groupNotFound();
         }
 
-        return $group->getGroupRoles();
+        return $group->getGroupGrants();
     }
 
     /**
      * @ApiDoc(
-     *    description="Add a role to a group",
-     *   input={"class"=RoleType::class, "name"=""}
+     *    description="Add a grant to a group",
+     *   input={"class"=GrantType::class, "name"=""}
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"role"})
-     * @Rest\Post("/groups/{group_id}/roles")
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"grant"})
+     * @Rest\Post("/groups/{group_id}/grants")
      */
-    public function postGroupsRolesAction(Request $request)
+    public function postGroupsGrantsAction(Request $request)
     {
         $group = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Group')
@@ -56,34 +56,34 @@ class RoleController extends Controller
             return $this->groupNotFound();
         }
 
-        $role = new Role();
-        $role->setRoleGroup($group);
-        $form = $this->createForm(RoleType::class, $role);
+        $grant = new Grant();
+        $grant->setGrantGroup($group);
+        $form = $this->createForm(GrantType::class, $grant);
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
             $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($role);
+            $em->persist($grant);
             $em->flush();
-            return $role;
+            return $grant;
         } else {
             return $form;
         }
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"role"})
-     * @Rest\Delete("/groups/{group_id}/roles/{role_id}")
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"grant"})
+     * @Rest\Delete("/groups/{group_id}/grants/{grant_id}")
      */
-    public function removeGroupsRoleAction(Request $request)
+    public function removeGroupsGrantAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $role = $em->getRepository('APIBundle:Role')
-            ->find($request->get('role_id'));
-        /* @var $role Role */
+        $grant = $em->getRepository('Grant.php')
+            ->find($request->get('grant_id'));
+        /* @var $grant Grant */
 
-        if ($role) {
-            $em->remove($role);
+        if ($grant) {
+            $em->remove($grant);
             $em->flush();
         }
     }

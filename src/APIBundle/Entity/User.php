@@ -166,13 +166,22 @@ class User implements UserInterface
 
     public function getRoles()
     {
-        $roles = array();
-        foreach( $this->user_groups as $group ) {
-            foreach( $group->getGroupRoles() as $role ) {
-                $roles[] = 'ROLE_' . $role->getRoleExercise()->getExerciseId() . '_' . $role->getRoleName();
-            }
+        $roles = ['ROLE_USER'];
+        if( $this->isAdmin() ) {
+            $roles[] = 'ROLE_ADMIN';
         }
+
         return $roles;
+    }
+
+    public function getGrants() {
+        $grants = array();
+        foreach( $this->user_groups as $group ) {
+            foreach( $group->getGroupGrants() as $grant ) {
+                $grants[$grant->getGrantExercise()->getExerciseId()] = $grant->getGrantName();
+                }
+            }
+            return $grants;
     }
 
     public function getSalt()

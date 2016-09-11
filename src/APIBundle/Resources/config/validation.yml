@@ -24,12 +24,12 @@ APIBundle\Entity\Group:
             - NotBlank: ~
             - Type: string
 
-APIBundle\Entity\Role:
+APIBundle\Entity\Grant:
     properties:
-        role_name:
+        grant_name:
             - NotBlank: ~
             - Type: string
-        role_exercise:
+        grant_exercise:
             - NotBlank: ~
             - Type: integer
 

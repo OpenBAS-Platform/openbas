@@ -30,15 +30,15 @@ class Group
     protected $group_users;
 
     /**
-     * @ORM\OneToMany(targetEntity="Role", mappedBy="role_group")
-     * @var Role[]
+     * @ORM\OneToMany(targetEntity="Grant", mappedBy="grant_group")
+     * @var Grant[]
      */
-    protected $group_roles;
+    protected $group_grants;
 
     public function __construct()
     {
         $this->group_users = new ArrayCollection();
-        $this->group_roles = new ArrayCollection();
+        $this->group_grants = new ArrayCollection();
     }
 
     public function getGroupId()
@@ -74,14 +74,14 @@ class Group
         return $this;
     }
 
-    public function getGroupRoles()
+    public function getGroupGrants()
     {
-        return $this->group_roles;
+        return $this->group_grants;
     }
 
-    public function setGroupRoles($roles)
+    public function setGroupGrants($grants)
     {
-        $this->group_roles = $roles;
+        $this->group_grants = $grants;
         return $this;
     }
 }

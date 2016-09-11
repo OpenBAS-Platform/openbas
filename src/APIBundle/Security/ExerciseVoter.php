@@ -6,34 +6,29 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
 class ExerciseVoter extends Voter
 {
-    const VIEW = 'view';
-    const EDIT = 'edit';
+    const SELECT_ALL = 'select_all';
+    const SELECT = 'select';
+    const INSERT = 'insert';
+    const UPDATE = 'update';
+    const DELETE = 'delete';
 
-    private $decisionManager;
-
-    public function __construct(AccessDecisionManagerInterface $decisionManager)
+    protected function supports($attribute, $exercise)
     {
-        $this->decisionManager = $decisionManager;
-    }
-
-    protected function supports($attribute, $subject)
-    {
-        if (!in_array($attribute, array(self::VIEW, self::EDIT))) {
+        if (!in_array($attribute, array(self::SELECT_ALL, self::SELECT, self::INSERT, self::UPDATE, self::DELETE))) {
             return false;
         }
 
-        if (!$subject instanceof Exercise) {
+        if (!$exercise instanceof Exercise) {
             return false;
         }
 
         return true;
     }
 
-    protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $exercise, TokenInterface $token)
     {
         $user = $token->getUser();
 
@@ -41,39 +36,71 @@ class ExerciseVoter extends Voter
             return false;
         }
 
-        /** @var Exercise $exercise */
-        $exercise = $subject;
-
-        if ($this->decisionManager->decide($token, array('ROLE_' . $exercise->getExerciseId() . '_ADMIN')))
-            return true;
-
         switch ($attribute) {
-            case self::VIEW:
-                return $this->canView($exercise, $token);
-            case self::EDIT:
-                return $this->canEdit($exercise, $token);
+            case self::SELECT_ALL:
+                return $this->canSelectAll($exercise, $user);
+            case self::SELECT:
+                return $this->canSelect($exercise, $user);
+            case self::INSERT:
+                return $this->canInsert($exercise, $user);
+            case self::UPDATE:
+                return $this->canUpdate($exercise, $user);
+            case self::DELETE:
+                return $this->canDelete($exercise, $user);
         }
 
         throw new \LogicException('This code should not be reached!');
     }
 
-    private function canView(Exercise $exercise, TokenInterface $token)
+    private function canSelectAll(Exercise $exercise, User $user)
     {
-        if ($this->canEdit($exercise, $token)) {
+        if( $user->isAdmin() )
             return true;
-        }
 
-        if ($this->decisionManager->decide($token, array('ROLE_' . $exercise->getExerciseId() . '_PLAYER', 'ROLE_' . $exercise->getExerciseId() . '_OBSERVER'))) {
+        return false;
+    }
+
+    private function canSelect(Exercise $exercise, User $user)
+    {
+        if( in_array($this->findGrant($exercise, $user), array('ADMIN', 'PLANNER', 'PLAYER', 'OBSERVER')) ) {
             return true;
         }
 
         return false;
     }
 
-    private function canEdit(Exercise $exercise, TokenInterface $token)
+    private function canInsert(Exercise $exercise, User $user)
     {
-        if ($this->decisionManager->decide($token, array('ROLE_' . $exercise->getExerciseId() . '_PLANNER'))) {
+        if( $user->isAdmin() )
             return true;
+
+        return false;
+    }
+
+    private function canUpdate(Exercise $exercise, User $user)
+    {
+        if( in_array($this->findGrant($exercise, $user), array('ADMIN', 'PLANNER')) ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function canDelete(Exercise $exercise, User $user)
+    {
+        if( in_array($this->findGrant($exercise, $user), array('ADMIN')) ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function findGrant(Exercise $exercise, User $user) {
+        $grants = $user->getGrants();
+        if( isset($grants[$exercise->getExerciseId()]) ) {
+            return $grants[$exercise->getExerciseId()];
+        } else {
+            return 'DENIED';
         }
     }
 }

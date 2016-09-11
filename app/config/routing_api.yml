@@ -6,9 +6,9 @@ groups:
     type:     rest
     resource: APIBundle\Controller\GroupController
 
-groups_roles:
+groups_grants:
     type:     rest
-    resource: APIBundle\Controller\Group\RoleController
+    resource: APIBundle\Controller\Group\GrantController
 
 groups_users:
     type:     rest

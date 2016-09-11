@@ -7,18 +7,18 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
-class RoleType extends AbstractType
+class GrantType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('role_name');
-        $builder->add('role_exercise');
+        $builder->add('grant_name');
+        $builder->add('grant_exercise');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'APIBundle\Entity\Role',
+            'data_class' => 'APIBundle\Entity\Grant',
             'csrf_protection' => false
         ]);
     }

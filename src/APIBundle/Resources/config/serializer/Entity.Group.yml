@@ -2,10 +2,10 @@ APIBundle\Entity\Group:
     exclusion_policy: none
     properties:
         group_id:
-            groups: ['group', 'user', 'role']
+            groups: ['group', 'user', 'grant']
         group_name:
-            groups: ['group', 'user', 'role']
+            groups: ['group', 'user', 'grant']
         group_users:
-            groups: ['group', 'role']
+            groups: ['group', 'grant']
         group_roles:
             groups: ['group', 'user']
