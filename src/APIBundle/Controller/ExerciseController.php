@@ -16,6 +16,7 @@ use FOS\RestBundle\Request\ParamFetcher;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
+use APIBundle\Entity\ExercisesGroupsRoles;
 
 class ExerciseController extends Controller
 {
@@ -94,7 +95,10 @@ class ExerciseController extends Controller
             $em->flush();
 
             $user_id = $this->get('security.token_storage')->getToken()->getUser()->getUserId();
-            
+            $egr = new ExercisesGroupsRoles();
+            $egr->setExerciseId($exercise->getExerciseId());
+
+            $egr->setGroupId();
 
             return $exercise;
         } else {

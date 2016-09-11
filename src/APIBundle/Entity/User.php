@@ -41,9 +41,28 @@ class User implements UserInterface
 
     protected $user_plain_password;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Group")
+     * @ORM\JoinTable(name="users_groups",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="group_id", onDelete="CASCADE")}
+     *      )
+     */
+    protected $user_groups;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    protected $user_admin = 0;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    protected $user_status = 1;
+
     public function __construct()
     {
-        $this->user_exercises = new ArrayCollection();
+        $this->user_groups = new ArrayCollection();
     }
 
     public function getUserId()
@@ -112,14 +131,36 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getUserExercises()
+    public function getUserGroups()
     {
-        return $this->user_exercises;
+        return $this->user_groups;
     }
 
-    public function setUserExercises($exercises)
+    public function setUserGroups($groups)
     {
-        $this->user_exercises = $exercises;
+        $this->user_groups = $groups;
+        return $this;
+    }
+
+    public function getUserAdmin()
+    {
+        return $this->user_admin;
+    }
+
+    public function setUserAdmin($admin)
+    {
+        $this->user_admin = $admin;
+        return $this;
+    }
+
+    public function getUserStatus()
+    {
+        return $this->user_status;
+    }
+
+    public function setUserStatus($status)
+    {
+        $this->user_status = $status;
         return $this;
     }
 

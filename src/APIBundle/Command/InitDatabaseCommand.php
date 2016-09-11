@@ -35,6 +35,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $user->setUserFirstname('Admin');
         $user->setUserLastname('CEP');
         $user->setUserEmail('admin');
+        $user->setUserAdmin(1);
+        $user->setUserStatus(1);
         $password = 'admin';
         $encoder = $this->getContainer()->get('security.password_encoder');
         $encoded = $encoder->encodePassword($user, $password);
@@ -59,28 +61,18 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('');
         $output->writeln('Creating default roles');
 
-        $roleAdmin = new Token();
-        $token->setTokenValue(base64_encode(random_bytes(50)));
-        $token->setTokenCreatedAt(new \DateTime('now'));
-        $token->setTokenUser($user);
-        $em->persist($token);
-        $em->flush();
-
         $roleAdmin = new Role();
         $roleAdmin->setRoleName('ROLE_ADMIN');
         $em->persist($roleAdmin);
         $em->flush();
-
         $rolePlanner = new Role();
         $rolePlanner->setRoleName('ROLE_PLANNER');
         $em->persist($rolePlanner);
         $em->flush();
-
         $rolePlayer = new Role();
         $rolePlayer->setRoleName('ROLE_PLAYER');
         $em->persist($rolePlayer);
         $em->flush();
-
         $roleObserver = new Role();
         $roleObserver->setRoleName('ROLE_OBSERVER');
         $em->persist($roleObserver);

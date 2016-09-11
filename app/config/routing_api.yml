@@ -2,6 +2,10 @@ users:
     type:     rest
     resource: APIBundle\Controller\UserController
 
+groups:
+    type:     rest
+    resource: APIBundle\Controller\GroupController
+
 tokens:
     type:     rest
     resource: APIBundle\Controller\TokenController

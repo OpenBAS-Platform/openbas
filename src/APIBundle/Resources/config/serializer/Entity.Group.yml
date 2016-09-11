@@ -1,0 +1,7 @@
+APIBundle\Entity\Group:
+    exclusion_policy: none
+    properties:
+        group_id:
+            groups: ['group']
+        group_name:
+            groups: ['group']
