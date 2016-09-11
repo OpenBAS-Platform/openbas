@@ -35,8 +35,10 @@ You will need the following softwares:
 
 Perform the following steps:
 ```
-    git clone https://github.com/SamuelHassine/CEP
+    git clone https://bitbucket.org/balize/cep-api.git
     composer install
-    
+    php bin/console doctrine:schema:update --dump-sql --force
+    php bin/console app:db-init
 ```
 
+Enjoy!

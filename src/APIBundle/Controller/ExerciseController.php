@@ -92,6 +92,10 @@ class ExerciseController extends Controller
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($exercise);
             $em->flush();
+
+            $user_id = $this->get('security.token_storage')->getToken()->getUser()->getUserId();
+            
+
             return $exercise;
         } else {
             return $form;

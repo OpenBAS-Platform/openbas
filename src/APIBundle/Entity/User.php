@@ -41,6 +41,11 @@ class User implements UserInterface
 
     protected $user_plain_password;
 
+    public function __construct()
+    {
+        $this->user_exercises = new ArrayCollection();
+    }
+
     public function getUserId()
     {
         return $this->user_id;
@@ -104,6 +109,17 @@ class User implements UserInterface
     public function setUserPlainPassword($password)
     {
         $this->user_plain_password = $password;
+        return $this;
+    }
+
+    public function getUserExercises()
+    {
+        return $this->user_exercises;
+    }
+
+    public function setUserExercises($exercises)
+    {
+        $this->user_exercises = $exercises;
         return $this;
     }
 

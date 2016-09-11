@@ -36,7 +36,7 @@ class UserController extends Controller
     }
 
     /**
-     *  @ApiDoc(
+     * @ApiDoc(
      *    description="Read a user"
      * )
      *
@@ -88,7 +88,7 @@ class UserController extends Controller
     }
 
     /**
-     *  @ApiDoc(
+     * @ApiDoc(
      *    description="Delete a user"
      * )
      *
@@ -109,7 +109,7 @@ class UserController extends Controller
     }
 
     /**
-     *  @ApiDoc(
+     * @ApiDoc(
      *    description="Replace a user",
      *   input={"class"=UserType::class, "name"=""}
      * )
@@ -123,7 +123,7 @@ class UserController extends Controller
     }
 
     /**
-     *  @ApiDoc(
+     * @ApiDoc(
      *    description="Update a user",
      *   input={"class"=UserType::class, "name"=""}
      * )
