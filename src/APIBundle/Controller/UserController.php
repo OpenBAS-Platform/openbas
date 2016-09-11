@@ -11,12 +11,17 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\ViewHandler;
 use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\UserType;
 use APIBundle\Entity\User;
 
 class UserController extends Controller
 {
     /**
+     * @ApiDoc(
+     *    description="List users"
+     * )
+     *
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/users")
      */
@@ -31,6 +36,10 @@ class UserController extends Controller
     }
 
     /**
+     *  @ApiDoc(
+     *    description="Read a user"
+     * )
+     *
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/users/{user_id}")
      */
@@ -49,6 +58,11 @@ class UserController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Create a new user",
+     *   input={"class"=UserType::class, "name"=""}
+     * )
+     *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
      * @Rest\Post("/users")
      */
@@ -74,6 +88,10 @@ class UserController extends Controller
     }
 
     /**
+     *  @ApiDoc(
+     *    description="Delete a user"
+     * )
+     *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"user"})
      * @Rest\Delete("/users/{user_id}")
      */
@@ -91,6 +109,11 @@ class UserController extends Controller
     }
 
     /**
+     *  @ApiDoc(
+     *    description="Replace a user",
+     *   input={"class"=UserType::class, "name"=""}
+     * )
+     *
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Put("/users/{user_id}")
      */
@@ -100,6 +123,11 @@ class UserController extends Controller
     }
 
     /**
+     *  @ApiDoc(
+     *    description="Update a user",
+     *   input={"class"=UserType::class, "name"=""}
+     * )
+     *
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Patch("/users/{user_id}")
      */

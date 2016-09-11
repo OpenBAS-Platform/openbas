@@ -13,12 +13,17 @@ use FOS\RestBundle\View\ViewHandler;
 use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Request\ParamFetcher;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
 
 class ExerciseController extends Controller
 {
     /**
+     * @ApiDoc(
+     *    description="List exercises"
+     * )
+     *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises")
      * @QueryParam(name="offset", requirements="\d+", default="", description="Start index")
@@ -47,6 +52,10 @@ class ExerciseController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Read an exercise"
+     * )
+     *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises/{exercise_id}")
      */
@@ -65,6 +74,11 @@ class ExerciseController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Create a new exercise",
+     *    input={"class"=ExerciseType::class, "name"=""}
+     * )
+     *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"exercise"})
      * @Rest\Post("/exercises")
      */
@@ -85,6 +99,10 @@ class ExerciseController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Delete an exercise"
+     * )
+     *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"exercise"})
      * @Rest\Delete("/exercises/{exercise_id}")
      */
@@ -102,6 +120,11 @@ class ExerciseController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Replace an exercise",
+     *   input={"class"=ExerciseType::class, "name"=""}
+     * )
+     *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Put("/exercises/{exercise_id}")
      */
@@ -111,6 +134,11 @@ class ExerciseController extends Controller
     }
 
     /**
+     * @ApiDoc(
+     *    description="Update an exercise",
+     *    input={"class"=ExerciseType::class, "name"=""}
+     * )
+     *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Patch("/exercises/{exercise_id}")
      */
