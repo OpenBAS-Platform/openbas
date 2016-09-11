@@ -1,0 +1,11 @@
+APIBundle\Entity\User:
+    exclusion_policy: none
+    properties:
+        user_id:
+            groups: ['user', 'token']
+        user_firstname:
+            groups: ['user', 'token']
+        user_lastname:
+            groups: ['user', 'token']
+        user_email:
+            groups: ['user', 'token']

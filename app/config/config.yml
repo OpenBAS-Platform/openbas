@@ -3,10 +3,9 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: en
+    jms_serializer.camel_case_naming_strategy.class: JMS\Serializer\Naming\IdenticalPropertyNamingStrategy
 
 framework:
     #esi:             ~
@@ -19,26 +18,23 @@ framework:
     csrf_protection: ~
     validation:      { enable_annotations: true }
     serializer:
-        enabled: true
+        enabled: false
     templating:
         engines: ['twig']
     default_locale:  "%locale%"
     trusted_hosts:   ~
     trusted_proxies: ~
     session:
-        # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         handler_id:  session.handler.native_file
         save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
     fragments:       ~
     http_method_override: true
     assets: ~
 
-# Twig Configuration
 twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
-# Doctrine Configuration
 doctrine:
     dbal:
         driver:   pdo_mysql
@@ -48,19 +44,12 @@ doctrine:
         user:     "%database_user%"
         password: "%database_password%"
         charset:  UTF8
-        # if using pdo_sqlite as your database driver:
-        #   1. add the path in parameters.yml
-        #     e.g. database_path: "%kernel.root_dir%/data/data.db3"
-        #   2. Uncomment database_path in parameters.yml.dist
-        #   3. Uncomment next line:
-        #     path:     "%database_path%"
 
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
 
-# Swiftmailer Configuration
 swiftmailer:
     transport: "%mailer_transport%"
     host:      "%mailer_host%"
@@ -69,6 +58,8 @@ swiftmailer:
     spool:     { type: memory }
 
 fos_rest:
+    serializer:
+        serialize_null: true
     routing_loader:
         include_format: false
     view:
@@ -92,3 +83,9 @@ fos_rest:
             'Symfony\Component\Security\Core\Exception\BadCredentialsException': true
         codes:
             'Symfony\Component\Security\Core\Exception\BadCredentialsException': 401
+
+jms_serializer:
+    handlers:
+        datetime:
+            default_format: '"Y-m-d\\TH:i:sP"'
+            default_timezone: "UTC"

@@ -1,0 +1,13 @@
+APIBundle\Entity\Event:
+    exclusion_policy: none
+    properties:
+        event_id:
+            groups: ['exercise', 'event']
+        event_title:
+            groups: ['exercise', 'event']
+        event_description:
+            groups: ['exercise', 'event']
+        event_status:
+            groups: ['exercise', 'event']
+        event_exercise:
+            groups: ['event']

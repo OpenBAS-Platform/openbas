@@ -1,0 +1,11 @@
+APIBundle\Entity\Token:
+    exclusion_policy: none
+    properties:
+        token_id:
+            groups: ['token']
+        token_value:
+            groups: ['token']
+        token_created_at:
+            groups: ['token']
+        token_user:
+            groups: ['token']

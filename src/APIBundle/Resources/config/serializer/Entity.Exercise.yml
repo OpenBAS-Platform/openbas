@@ -1,0 +1,17 @@
+APIBundle\Entity\Exercise:
+    exclusion_policy: none
+    properties:
+        exercise_id:
+            groups: ['exercise', 'event']
+        exercise_name:
+            groups: ['exercise', 'event']
+        exercise_description:
+            groups: ['exercise', 'event']
+        exercise_start_date:
+            groups: ['exercise', 'event']
+        exercise_end_date:
+            groups: ['exercise', 'event']
+        exercise_status:
+            groups: ['exercise', 'event']
+        exercise_events:
+            groups: ['exercise']
