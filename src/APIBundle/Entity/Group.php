@@ -24,14 +24,21 @@ class Group
     protected $group_name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", mappedBy="group_name")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="groups")
      * @var User[]
      */
     protected $group_users;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Role", mappedBy="groups")
+     * @var Role[]
+     */
+    protected $group_roles;
+
     public function __construct()
     {
         $this->group_users = new ArrayCollection();
+        $this->group_roles = new ArrayCollection();
     }
 
     public function getGroupId()
@@ -64,6 +71,17 @@ class Group
     public function setGroupUsers($users)
     {
         $this->group_users = $users;
+        return $this;
+    }
+
+    public function getGroupRoles()
+    {
+        return $this->group_roles;
+    }
+
+    public function setGroupRoles($roles)
+    {
+        $this->group_roles = $roles;
         return $this;
     }
 }

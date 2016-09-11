@@ -166,6 +166,9 @@ class User implements UserInterface
 
     public function getRoles()
     {
+        foreach( $this->user_groups as $group ) {
+
+        }
         return [];
     }
 

@@ -91,7 +91,7 @@ class ExerciseController extends Controller
 
         if ($form->isValid()) {
             $user_id = $this->get('security.token_storage')->getToken()->getUser()->getUserId();
-
+            $exercise->setExerciseOwner($user_id);
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($exercise);
             $em->flush();

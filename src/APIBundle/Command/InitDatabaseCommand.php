@@ -59,26 +59,5 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Token: ' . $token->getTokenValue());
         $output->writeln('============');
         $output->writeln('');
-        $output->writeln('Creating default roles');
-
-        $roleAdmin = new Role();
-        $roleAdmin->setRoleName('ROLE_ADMIN');
-        $em->persist($roleAdmin);
-        $em->flush();
-        $rolePlanner = new Role();
-        $rolePlanner->setRoleName('ROLE_PLANNER');
-        $em->persist($rolePlanner);
-        $em->flush();
-        $rolePlayer = new Role();
-        $rolePlayer->setRoleName('ROLE_PLAYER');
-        $em->persist($rolePlayer);
-        $em->flush();
-        $roleObserver = new Role();
-        $roleObserver->setRoleName('ROLE_OBSERVER');
-        $em->persist($roleObserver);
-        $em->flush();
-
-        $output->writeln('Default roles: ADMIN, PLANNER, PLAYER, OBSERVER');
-        $output->writeln('============');
     }
 }
