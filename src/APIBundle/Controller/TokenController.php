@@ -54,7 +54,7 @@ class TokenController extends Controller
     }
 
     /**
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"token"})
      * @Rest\Delete("/tokens/{token_id}")
      */
     public function removeTokenAction(Request $request)

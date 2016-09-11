@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\ViewHandler;
 use FOS\RestBundle\View\View;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Request\ParamFetcher;
 use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
 
@@ -19,13 +21,27 @@ class ExerciseController extends Controller
     /**
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises")
+     * @QueryParam(name="offset", requirements="\d+", default="", description="Start index")
+     * @QueryParam(name="limit", requirements="\d+", default="", description="End index")
      */
-    public function getExercisesAction(Request $request)
+    public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
     {
-        $exercises = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->findAll();
-        /* @var $exercises Exercise[] */
+        $offset = $paramFetcher->get('offset');
+        $limit = $paramFetcher->get('limit');
+
+        $qb = $this->get('doctrine.orm.entity_manager')->createQueryBuilder();
+        $qb->select('p')
+            ->from('APIBundle:Exercise', 'p');
+
+        if ($offset != "") {
+            $qb->setFirstResult($offset);
+        }
+
+        if ($limit != "") {
+            $qb->setMaxResults($limit);
+        }
+
+        $exercises = $qb->getQuery()->getResult();
 
         return $exercises;
     }

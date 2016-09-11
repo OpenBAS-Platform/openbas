@@ -83,6 +83,8 @@ fos_rest:
             - { path: '^/', priorities: ['html'], fallback_format: 'html', prefer_extension: false }
     body_listener:
         enabled: true
+    param_fetcher_listener:
+        enabled: true
     exception:
         enabled: true
         messages:

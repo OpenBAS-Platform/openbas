@@ -25,7 +25,7 @@ class TokenAuthenticator implements SimplePreAuthenticatorInterface, Authenticat
 
     public function createToken(Request $request, $providerKey)
     {
-        $targetUrl = '/auth-tokens';
+        $targetUrl = '/api/tokens';
         if ($request->getMethod() === "POST" && $this->httpUtils->checkRequestPath($request, $targetUrl)) {
             return;
         }
