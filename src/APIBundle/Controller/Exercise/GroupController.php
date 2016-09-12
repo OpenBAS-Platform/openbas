@@ -30,9 +30,8 @@ class GroupController extends Controller
      */
     public function getExercisesGroupsAction(Request $request)
     {
-        $exercise = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->find($request->get('exercise_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {

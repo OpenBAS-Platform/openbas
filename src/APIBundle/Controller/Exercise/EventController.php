@@ -19,9 +19,8 @@ class EventController extends Controller
      */
     public function getExercisesEventsAction(Request $request)
     {
-        $exercise = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->find($request->get('exercise_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {
@@ -39,9 +38,8 @@ class EventController extends Controller
      */
     public function postExercisesEventsAction(Request $request)
     {
-        $exercise = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->find($request->get('exercise_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {
@@ -56,7 +54,6 @@ class EventController extends Controller
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($event);
             $em->flush();
             return $event;
