@@ -104,12 +104,13 @@ class GroupController extends Controller
     public function removeGroupAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $user = $em->getRepository('APIBundle:User')
-            ->find($request->get('user_id'));
-        /* @var $user User */
+        $group = $em->getRepository('APIBundle:Group')
+            ->find($request->get('group_id'));
+        /* @var $group Group */
 
-        if ($user) {
-            $em->remove($user);
+        if ($group) {
+            $this->denyAccessUnlessGranted('delete', $group);
+            $em->remove($group);
             $em->flush();
         }
     }
@@ -152,6 +153,8 @@ class GroupController extends Controller
         if (empty($group)) {
             return $this->groupNotFound();
         }
+
+        $this->denyAccessUnlessGranted('update', $group);
 
         $form = $this->createForm(GroupType::class, $group);
         $form->submit($request->request->all());
