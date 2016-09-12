@@ -84,7 +84,7 @@ class GrantController extends Controller
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
         $em = $this->get('doctrine.orm.entity_manager');
-        $grant = $em->getRepository('Grant.php')
+        $grant = $em->getRepository('APIBundle:Grant')
             ->find($request->get('grant_id'));
         /* @var $grant Grant */
 

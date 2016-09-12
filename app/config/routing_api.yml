@@ -24,8 +24,8 @@ exercises:
 
 exercises_groups:
     type:     rest
-    resource: APIBundle\Controller\Exercise\ExerciseGroupController
+    resource: APIBundle\Controller\Exercise\GroupController
 
 exercises_events:
     type:     rest
-    resource: APIBundle\Controller\Exercise\ExerciseEventController
+    resource: APIBundle\Controller\Exercise\EventController

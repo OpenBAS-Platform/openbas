@@ -18,7 +18,7 @@ use APIBundle\Entity\Grant;
 use APIBundle\Entity\User;
 use APIBundle\Form\Type\GroupType;
 
-class ExerciseGroupController extends Controller
+class GroupController extends Controller
 {
     /**
      * @ApiDoc(
