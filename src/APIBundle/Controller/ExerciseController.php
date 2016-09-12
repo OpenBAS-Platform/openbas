@@ -16,6 +16,7 @@ use FOS\RestBundle\Request\ParamFetcher;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
+use APIBundle\Entity\Grant;
 
 class ExerciseController extends Controller
 {
@@ -29,13 +30,18 @@ class ExerciseController extends Controller
      */
     public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
-
-        $exercises = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->findAll();
-        /* @var $exercises Exercise[] */
+        if( $this->get('security.token_storage')->getToken()->getUser()->isAdmin() ) {
+            $exercises = $this->get('doctrine.orm.entity_manager')
+                ->getRepository('APIBundle:Exercise')
+                ->findAll();
+        } else {
+            $grants = $this->get('security.token_storage')->getToken()->getUser()->getUserGrants();
+            /* @var $grants Grant[] */
+            $exercises = [];
+            foreach( $grants as $grant ) {
+                $exercises[] = $grant->getGrantExercise();
+            }
+        }
 
         return $exercises;
     }

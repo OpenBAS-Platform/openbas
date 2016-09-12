@@ -15,6 +15,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Group;
 use APIBundle\Entity\User;
 use APIBundle\Form\Type\GroupType;
+use APIBundle\Entity\Grant;
 
 class GroupController extends Controller
 {
@@ -28,13 +29,18 @@ class GroupController extends Controller
      */
     public function getGroupsAction(Request $request)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
-
-        $groups = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Group')
-            ->findAll();
-        /* @var $groups Group[] */
+        if( $this->get('security.token_storage')->getToken()->getUser()->isAdmin() ) {
+            $groups = $this->get('doctrine.orm.entity_manager')
+                ->getRepository('APIBundle:Group')
+                ->findAll();
+        } else {
+            $grants = $this->get('security.token_storage')->getToken()->getUser()->getUserGrants();
+            /* @var $grants Grant[] */
+            $groups = [];
+            foreach( $grants as $grant ) {
+                $groups[] = $grant->getGrantGroup();
+            }
+        }
 
         return $groups;
     }

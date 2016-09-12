@@ -28,7 +28,7 @@ class GroupController extends Controller
      * @Rest\View(serializerGroups={"group"})
      * @Rest\Get("/exercises/{exercise_id}/groups")
      */
-    public function getGroupsAction(Request $request)
+    public function getExercisesGroupsAction(Request $request)
     {
         $exercise = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:Exercise')

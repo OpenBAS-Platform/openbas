@@ -29,7 +29,7 @@ class UserController extends Controller
     public function getUsersAction(Request $request)
     {
         if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
 
         $users = $this->get('doctrine.orm.entity_manager')
             ->getRepository('APIBundle:User')

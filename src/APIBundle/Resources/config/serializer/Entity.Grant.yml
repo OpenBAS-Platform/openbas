@@ -2,10 +2,10 @@ APIBundle\Entity\Grant:
     exclusion_policy: none
     properties:
         grant_id:
-            groups: ['grant']
+            groups: ['grant', 'group', 'user', 'exercise']
         grant_group:
-            groups: ['grant']
+            groups: ['grant', 'user', 'exercise']
         grant_exercise:
-            groups: ['grant']
+            groups: ['grant', 'user', 'group']
         grant_name:
-            groups: ['grant']
+            groups: ['grant', 'group', 'user', 'exercise']

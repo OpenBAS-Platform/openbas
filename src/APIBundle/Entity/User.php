@@ -5,6 +5,7 @@ namespace APIBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use APIBundle\Entity\Grant;
 
 /**
  * @ORM\Entity()
@@ -162,6 +163,16 @@ class User implements UserInterface
     {
         $this->user_status = $status;
         return $this;
+    }
+
+    public function getUserGrants() {
+        $grants = [];
+        foreach( $this->user_groups as $group ) {
+            foreach( $group->getGroupGrants() as $grant ) {
+                $grants[] = $grant;
+            }
+        }
+        return $grants;
     }
 
     public function getRoles()
