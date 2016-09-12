@@ -37,3 +37,10 @@ services:
         public: false
         tags:
             - { name: security.voter }
+
+    group_voter:
+        class: APIBundle\Security\GroupVoter
+        arguments: ['@security.access.decision_manager']
+        public: false
+        tags:
+            - { name: security.voter }

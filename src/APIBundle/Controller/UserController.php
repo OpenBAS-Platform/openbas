@@ -28,12 +28,11 @@ class UserController extends Controller
      */
     public function getUsersAction(Request $request)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+        if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
 
-        $users = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:User')
-            ->findAll();
+        $em = $this->get('doctrine.orm.entity_manager');
+        $users = $em->getRepository('APIBundle:User')->findAll();
         /* @var $users User[] */
 
         return $users;
@@ -49,9 +48,8 @@ class UserController extends Controller
      */
     public function getUserAction(Request $request)
     {
-        $user = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:User')
-            ->find($request->get('user_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
         /* @var $user User */
 
         if (empty($user)) {
@@ -144,9 +142,8 @@ class UserController extends Controller
 
     private function updateUser(Request $request, $clearMissing)
     {
-        $user = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:User')
-            ->find($request->get('user_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
         /* @var $user User */
 
         if (empty($user)) {
@@ -156,12 +153,12 @@ class UserController extends Controller
         $this->denyAccessUnlessGranted('update', $user);
 
         if ($clearMissing) {
-            $options = ['validation_groups'=>['Default', 'FullUpdate']];
+            $options = ['validation_groups' => ['Default', 'FullUpdate']];
         } else {
             $options = [];
         }
 
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, $options);
         $form->submit($request->request->all(), $clearMissing);
 
         if ($form->isValid()) {
@@ -170,7 +167,6 @@ class UserController extends Controller
                 $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
                 $user->setUserPassword($encoded);
             }
-            $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($user);
             $em->flush();
             return $user;

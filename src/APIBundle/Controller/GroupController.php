@@ -145,9 +145,8 @@ class GroupController extends Controller
 
     private function updateGroup(Request $request, $clearMissing)
     {
-        $group = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Group')
-            ->find($request->get('group_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
         if (empty($group)) {
@@ -157,10 +156,9 @@ class GroupController extends Controller
         $this->denyAccessUnlessGranted('update', $group);
 
         $form = $this->createForm(GroupType::class, $group);
-        $form->submit($request->request->all());
+        $form->submit($request->request->all(), $clearMissing);
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($group);
             $em->flush();
             return $group;

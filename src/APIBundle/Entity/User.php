@@ -218,4 +218,14 @@ class User implements UserInterface
     public function isAdmin() {
         return $this->user_admin;
     }
+
+    public function joinGroup($group) {
+        $this->user_groups->add($group);
+        return $this;
+    }
+
+    public function leaveGroup($group) {
+        $this->user_groups->removeElement($group);
+        return $this;
+    }
 }

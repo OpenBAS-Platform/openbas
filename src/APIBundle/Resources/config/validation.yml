@@ -30,7 +30,6 @@ APIBundle\Entity\Grant:
             - NotBlank: ~
             - Type: string
 
-
 APIBundle\Entity\Credentials:
     properties:
         login:
