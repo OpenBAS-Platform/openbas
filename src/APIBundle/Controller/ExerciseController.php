@@ -30,7 +30,7 @@ class ExerciseController extends Controller
      */
     public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
     {
-        if( $this->get('security.token_storage')->getToken()->getUser()->isAdmin() ) {
+        if ($this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
             $exercises = $this->get('doctrine.orm.entity_manager')
                 ->getRepository('APIBundle:Exercise')
                 ->findAll();
@@ -38,7 +38,7 @@ class ExerciseController extends Controller
             $grants = $this->get('security.token_storage')->getToken()->getUser()->getUserGrants();
             /* @var $grants Grant[] */
             $exercises = [];
-            foreach( $grants as $grant ) {
+            foreach ($grants as $grant) {
                 $exercises[] = $grant->getGrantExercise();
             }
         }
@@ -56,9 +56,8 @@ class ExerciseController extends Controller
      */
     public function getExerciseAction(Request $request)
     {
-        $exercise = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->find($request->get('exercise_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {
@@ -80,7 +79,10 @@ class ExerciseController extends Controller
      */
     public function postExercisesAction(Request $request)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        if (!$user->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
         $exercise = new Exercise();
@@ -88,12 +90,9 @@ class ExerciseController extends Controller
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $currentUser = $this->get('security.token_storage')->getToken()->getUser();
-            $exercise->setExerciseOwner($currentUser    );
-            $em = $this->get('doctrine.orm.entity_manager');
+            $exercise->setExerciseOwner($user);
             $em->persist($exercise);
             $em->flush();
-
             return $exercise;
         } else {
             return $form;
@@ -111,8 +110,7 @@ class ExerciseController extends Controller
     public function removeExerciseAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $exercise = $em->getRepository('APIBundle:Exercise')
-            ->find($request->get('exercise_id'));
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
         if ($exercise) {
@@ -152,21 +150,20 @@ class ExerciseController extends Controller
 
     private function updateExercise(Request $request, $clearMissing)
     {
-        $exercise = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Exercise')
-            ->find($request->get('exercise_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
+
         $this->denyAccessUnlessGranted('update', $exercise);
 
         $form = $this->createForm(ExerciseType::class, $exercise);
         $form->submit($request->request->all(), $clearMissing);
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($exercise);
             $em->flush();
             return $exercise;

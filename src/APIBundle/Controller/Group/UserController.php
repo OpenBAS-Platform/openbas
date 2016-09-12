@@ -24,14 +24,15 @@ class UserController extends Controller
      */
     public function getGroupsUsersAction(Request $request)
     {
-        $group = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Group')
-            ->find($request->get('group_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
         if (empty($group)) {
             return $this->groupNotFound();
         }
+
+        $this->denyAccessUnlessGranted('select', $group);
 
         return $group->getGroupUsers();
     }
@@ -56,6 +57,8 @@ class UserController extends Controller
         if (empty($group)) {
             return $this->groupNotFound();
         }
+
+        $this->denyAccessUnlessGranted('update', $group);
 
         $user = $em->getRepository('APIBundle:User')->find($request->request->get('user_id'));
         /* @var $user User */
@@ -88,6 +91,8 @@ class UserController extends Controller
         if (empty($group)) {
             return $this->groupNotFound();
         }
+
+        $this->denyAccessUnlessGranted('update', $group);
 
         $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
         /* @var $user User */

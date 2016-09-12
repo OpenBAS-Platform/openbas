@@ -28,6 +28,8 @@ class EventController extends Controller
             return $this->exerciseNotFound();
         }
 
+        $this->denyAccessUnlessGranted('select', $exercise);
+
         return $exercise->getExerciseEvents();
     }
 
@@ -45,6 +47,8 @@ class EventController extends Controller
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
+
+        $this->denyAccessUnlessGranted('update', $exercise);
 
         $event = new Event();
         $event->setEventExercise($exercise);

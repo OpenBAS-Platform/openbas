@@ -101,8 +101,7 @@ class UserController extends Controller
     public function removeUserAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $user = $em->getRepository('APIBundle:User')
-            ->find($request->get('user_id'));
+        $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
         /* @var $user User */
 
         if ($user) {

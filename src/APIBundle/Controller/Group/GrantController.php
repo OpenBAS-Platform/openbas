@@ -24,14 +24,15 @@ class GrantController extends Controller
      */
     public function getGroupsGrantsAction(Request $request)
     {
-        $group = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Group')
-            ->find($request->get('group_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
         if (empty($group)) {
             return $this->groupNotFound();
         }
+
+        $this->denyAccessUnlessGranted('select', $group);
 
         return $group->getGroupGrants();
     }
@@ -47,12 +48,13 @@ class GrantController extends Controller
      */
     public function postGroupsGrantsAction(Request $request)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        if (!$user->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
-        $group = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Group')
-            ->find($request->get('group_id'));
+        $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
         if (empty($group)) {
@@ -65,7 +67,6 @@ class GrantController extends Controller
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($grant);
             $em->flush();
             return $grant;
@@ -80,12 +81,13 @@ class GrantController extends Controller
      */
     public function removeGroupsGrantAction(Request $request)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        if (!$user->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
-        $em = $this->get('doctrine.orm.entity_manager');
-        $grant = $em->getRepository('APIBundle:Grant')
-            ->find($request->get('grant_id'));
+        $grant = $em->getRepository('APIBundle:Grant')->find($request->get('grant_id'));
         /* @var $grant Grant */
 
         if ($grant) {
