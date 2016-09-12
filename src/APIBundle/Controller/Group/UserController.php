@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Group;
 use APIBundle\Entity\Role;
 use APIBundle\Form\Type\RoleType;
@@ -14,6 +15,10 @@ use APIBundle\Form\Type\RoleType;
 class UserController extends Controller
 {
     /**
+     * @ApiDoc(
+     *    description="List users of a group"
+     * )
+     *
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/groups/{group_id}/users")
      */

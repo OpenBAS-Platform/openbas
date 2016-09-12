@@ -29,9 +29,7 @@ APIBundle\Entity\Grant:
         grant_name:
             - NotBlank: ~
             - Type: string
-        grant_exercise:
-            - NotBlank: ~
-            - Type: integer
+
 
 APIBundle\Entity\Credentials:
     properties:

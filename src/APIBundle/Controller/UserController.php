@@ -73,9 +73,6 @@ class UserController extends Controller
      */
     public function postUsersAction(Request $request)
     {
-        if( !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() )
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
-
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
 

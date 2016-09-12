@@ -35,7 +35,7 @@ class UserVoter extends Voter
             return false;
         }
 
-        if( $user->isAdmin() ) {
+        if ($user->isAdmin()) {
             return true;
         }
 
@@ -53,17 +53,12 @@ class UserVoter extends Voter
 
     private function canSelect(User $targetUser, User $user)
     {
-        if( $targetUser->getUserId() == $user->getUserId() ) {
+        if ($targetUser->getUserId() == $user->getUserId()) {
             return true;
         }
 
-        $grants = $targetUser->getGrants();
-        /* @var $grants Grant[] */
-
-        foreach( $grants as $grant ) {
-            if( $grant->getGrantExercise() ) {
-
-            }
+        if ($this->computeIntersection($targetUser, $user, 'ANY')) {
+            return true;
         }
 
         return false;
@@ -71,7 +66,15 @@ class UserVoter extends Voter
 
     private function canUpdate(User $targetUser, User $user)
     {
-        if( $targetUser->getUserId() == $user->getUserId() ) {
+        if ($targetUser->getUserId() == $user->getUserId()) {
+            return true;
+        }
+
+        if ($this->computeIntersection($targetUser, $user, 'PLANNER')) {
+            return true;
+        }
+
+        if ($this->computeIntersection($targetUser, $user, 'ADMIN')) {
             return true;
         }
 
@@ -80,10 +83,41 @@ class UserVoter extends Voter
 
     private function canDelete(User $targetUser, User $user)
     {
-        if( $targetUser->getUserId() == $user->getUserId() ) {
-            return true;
+        return false;
+    }
+
+    private function computeIntersection(User $targetUser, User $user, $grantName)
+    {
+        $targetUserExercises = [];
+        $userExercises = [];
+
+        $targetUserGrants = $targetUser->getGrants();
+        /* @var $targetUserGrants Grant[] */
+        $userGrants = $user->getGrants();
+        /* @var $userGrants Grant[] */
+
+        foreach ($targetUserGrants as $grant) {
+            $targetUserExercises[] = $grant->getGrantExercise()->getExerciseId();
         }
 
-        return false;
+        if ($grantName == 'ANY') {
+            foreach ($userGrants as $grant) {
+                $userExercises[] = $grant->getGrantExercise()->getExerciseId();
+            }
+        } else {
+            foreach ($userGrants as $grant) {
+                if ($grant->getGrantName() == $grantName) {
+                    $userExercises[] = $grant->getGrantExercise()->getExerciseId();
+                }
+            }
+        }
+
+        $intersection = array_intersect($targetUserExercises, $userExercises);
+
+        if (count($intersection) > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
