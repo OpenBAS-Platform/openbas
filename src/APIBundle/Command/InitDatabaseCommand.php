@@ -74,8 +74,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('ACHIEVED / SEMI-ACHIEVED / NOT ACHIEVED');
         $output->writeln('============');
         $output->writeln('');
-        $output->writeln('Creating default results');
+        $output->writeln('Creating default inject types');
 
-
+        $output->writeln('WEB / MAIL / PHONE / SMS / HANGOUT');
+        $output->writeln('============');
+        $output->writeln('');
     }
 }

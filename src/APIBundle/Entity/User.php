@@ -52,7 +52,7 @@ class User implements UserInterface
     protected $user_groups;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
     protected $user_admin = 0;
 

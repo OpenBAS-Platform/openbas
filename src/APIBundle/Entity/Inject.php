@@ -44,10 +44,29 @@ class Inject
     protected $inject_sender;
 
     /**
-     * @ORM\OneToMany(targetEntity="Event", mappedBy="event_exercise")
-     * @var Event[]
+     * @ORM\OneToMany(targetEntity="Audience", mappedBy="audience_exercise")
+     * @var Audience[]
      */
-    protected $exercise_events;
+    protected $inject_audiences;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="InjectType", inversedBy="type_injects")
+     * @ORM\JoinColumn(name="inject_type", referencedColumnName="type_id", onDelete="CASCADE")
+     * @var InjectType
+     */
+    protected $inject_type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_injects")
+     * @ORM\JoinColumn(name="inject_incident", referencedColumnName="incident_id", onDelete="CASCADE")
+     * @var Incident
+     */
+    protected $inject_incident;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $inject_automatic;
 
     /**
      * @ORM\ManyToOne(targetEntity="Status")
@@ -55,109 +74,129 @@ class Inject
      */
     protected $inject_status;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Event", inversedBy="event_incidents")
-     * @ORM\JoinColumn(name="incident_event", referencedColumnName="event_id", onDelete="CASCADE")
-     * @var Event
-     */
-    protected $incident_event;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Objective", mappedBy="objective_events")
-     * @var Objective[]
-     */
-    protected $incident_objectives;
-
     public function __construct()
     {
-        $this->incident_objectives = new ArrayCollection();
+        $this->incident_audiences = new ArrayCollection();
     }
 
-    public function getIncidentId()
+    public function getInjectId()
     {
-        return $this->incident_id;
+        return $this->inject_id;
     }
 
-    public function setIncidentId($id)
+    public function setInjectId($id)
     {
-        $this->incident_id = $id;
+        $this->inject_id = $id;
         return $this;
     }
 
-    public function getIncidentTitle()
+    public function getInjectTitle()
     {
-        return $this->incident_title;
+        return $this->inject_title;
     }
 
-    public function setIncidentTitle($title)
+    public function setInjectTitle($title)
     {
-        $this->incident_title = $title;
+        $this->inject_title = $title;
         return $this;
     }
 
-    public function getIncidentStory()
+    public function getInjectDescription()
     {
-        return $this->incident_story;
+        return $this->inject_description;
     }
 
-    public function setIncidentStory($story)
+    public function setInjectDescription($description)
     {
-        $this->incident_story = $story;
+        $this->inject_description = $description;
         return $this;
     }
 
-    public function getIncidentStartDate()
+    public function getInjectContent()
     {
-        return $this->incident_start_date;
+        return $this->inject_content;
     }
 
-    public function setIncidentStartDate($startDate)
+    public function setInjectContent($content)
     {
-        $this->incident_start_date = $startDate;
+        $this->inject_content = $content;
         return $this;
     }
 
-    public function getIncidentEndDate()
+    public function getInjectDate()
     {
-        return $this->incident_end_date;
+        return $this->inject_date;
     }
 
-    public function setIncidentEndDate($endDate)
+    public function setInjectDate($date)
     {
-        $this->incident_end_date = $endDate;
+        $this->inject_date = $date;
         return $this;
     }
 
-    public function getIncidentStatus()
+    public function getInjectSender()
     {
-        return $this->incident_status;
+        return $this->inject_sender;
     }
 
-    public function setIncidentStatus($status)
+    public function setInjectSender($sender)
     {
-        $this->incident_status = $status;
+        $this->inject_sender = $sender;
         return $this;
     }
 
-    public function getIncidentEvent()
+    public function getInjectAudiences()
     {
-        return $this->incident_event;
+        return $this->inject_audiences;
     }
 
-    public function setIncidentEvent($event)
+    public function setInjectAudiences($audiences)
     {
-        $this->incident_event = $event;
+        $this->inject_audiences = $audiences;
         return $this;
     }
 
-    public function getIncidentObjectives()
+    public function getInjectType()
     {
-        return $this->incident_objectives;
+        return $this->inject_type;
     }
 
-    public function setIncidentObjectives($objectives)
+    public function setInjectType($type)
     {
-        $this->incident_objectives = $objectives;
+        $this->inject_type = $type;
+        return $this;
+    }
+
+    public function getInjectIncident()
+    {
+        return $this->inject_incident;
+    }
+
+    public function setInjectIncident($incident)
+    {
+        $this->inject_incident = $incident;
+        return $this;
+    }
+
+    public function getInjectAutomatic()
+    {
+        return $this->inject_automatic;
+    }
+
+    public function setInjectAutomatic($automatic)
+    {
+        $this->inject_automatic = $automatic;
+        return $this;
+    }
+
+    public function getInjectStatus()
+    {
+        return $this->inject_status;
+    }
+
+    public function setInjectStatus($type)
+    {
+        $this->inject_status = $type;
         return $this;
     }
 }

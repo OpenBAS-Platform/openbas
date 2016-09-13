@@ -35,7 +35,8 @@ class Outcome
     protected $outcome_incident;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\ManyToOne(targetEntity="State")
+     * @ORM\JoinColumn(name="outcome_state", referencedColumnName="state_id")
      */
     protected $outcome_state;
 
@@ -66,42 +67,31 @@ class Outcome
         return $this->outcome_description;
     }
 
-    public function setObjectiveDescription($description)
+    public function setOutcomeDescription($description)
     {
-        $this->objective_description = $description;
+        $this->outcome_description = $description;
         return $this;
     }
 
-    public function getObjectivePriority()
+    public function getOutcomeIncident()
     {
-        return $this->objective_priority;
+        return $this->outcome_incident;
     }
 
-    public function setObjectivePriority($priority)
+    public function setOutcomeIncident($incident)
     {
-        $this->objective_priority = $priority;
+        $this->outcome_incident = $incident;
         return $this;
     }
 
-    public function getObjectiveExercise()
+    public function getOutcomeState()
     {
-        return $this->objective_exercise;
+        return $this->outcome_state;
     }
 
-    public function setEventExercise($exercise)
+    public function setOutcomeState($state)
     {
-        $this->objective_exercise = $exercise;
-        return $this;
-    }
-
-    public function getObjectiveIncidents()
-    {
-        return $this->objective_incidents;
-    }
-
-    public function setObjectiveIncidents($incidents)
-    {
-        $this->objective_incidents = $incidents;
+        $this->outcome_state = $state;
         return $this;
     }
 }
