@@ -58,4 +58,4 @@ class GroupController extends Controller
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
-}
+}   

@@ -2,6 +2,7 @@
 
 namespace APIBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -38,6 +39,17 @@ class Event
      * @var Exercise
      */
     protected $event_exercise;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Incident", mappedBy="incident_event")
+     * @var Incident[]
+     */
+    protected $event_incidents;
+
+    public function __construct()
+    {
+        $this->event_incidents = new ArrayCollection();
+    }
 
     public function getEventId()
     {
