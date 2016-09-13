@@ -24,7 +24,7 @@ class Exercise
     protected $exercise_name;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="text")
      */
     protected $exercise_description;
 
@@ -45,7 +45,8 @@ class Exercise
     protected $exercise_owner;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\ManyToOne(targetEntity="Status")
+     * @ORM\JoinColumn(name="exercise_status", referencedColumnName="status_id")
      */
     protected $exercise_status;
 

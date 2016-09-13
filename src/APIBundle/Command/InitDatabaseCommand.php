@@ -59,5 +59,23 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Token: ' . $token->getTokenValue());
         $output->writeln('============');
         $output->writeln('');
+        $output->writeln('Creating default statuses');
+
+        $output->writeln('DRAFT / TO BE REVIEWED / FINAL / DISABLED');
+        $output->writeln('============');
+        $output->writeln('');
+        $output->writeln('Creating default states');
+
+        $output->writeln('PENDING / SENT');
+        $output->writeln('============');
+        $output->writeln('');
+        $output->writeln('Creating default results');
+
+        $output->writeln('ACHIEVED / SEMI-ACHIEVED / NOT ACHIEVED');
+        $output->writeln('============');
+        $output->writeln('');
+        $output->writeln('Creating default results');
+
+
     }
 }

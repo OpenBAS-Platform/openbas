@@ -1,4 +1,4 @@
-Crisis Exercises Platform
+# OpenEx - Open crisis management exercises platform 
 =============
 
 The Crisis Excercises Platform (CEP) is a global open source platform allowing organizations to plan, schedule and execute crisis management exercises.

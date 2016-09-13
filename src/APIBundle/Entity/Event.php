@@ -29,7 +29,8 @@ class Event
     protected $event_description;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\ManyToOne(targetEntity="Status")
+     * @ORM\JoinColumn(name="event_status", referencedColumnName="status_id")
      */
     protected $event_status;
 
