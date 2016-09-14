@@ -45,7 +45,7 @@ class EventController extends Controller
      * @Rest\View(serializerGroups={"event"})
      * @Rest\Get("/exercises/{exercise_id}/events/{event_id}")
      */
-    public function getExerciseAction(Request $request)
+    public function getExerciseEventsAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));

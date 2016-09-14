@@ -33,7 +33,7 @@ class ExerciseController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
-        if (!$user->isAdmin()) {
+        if ($user->isAdmin()) {
             $exercises = $em->getRepository('APIBundle:Exercise')->findAll();
         } else {
             $grants = $user->getUserGrants();

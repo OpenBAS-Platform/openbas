@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller\Exercise\Event\Incident;
 
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,6 +12,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Exercise;
 use APIBundle\Form\Type\InjectType;
 use APIBundle\Entity\Event;
+use APIBundle\Entity\Incident;
 use APIBundle\Entity\Inject;
 
 class InjectController extends Controller
@@ -21,7 +23,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}injects")
+     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
      */
     public function getExercisesEventsIncidentsInjectsAction(Request $request)
     {
@@ -42,15 +44,14 @@ class InjectController extends Controller
             return $this->eventNotFound();
         }
 
-
-        $event = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
+        $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
         /* @var $incident Incident */
 
         if (empty($incident)) {
             return $this->incidentNotFound();
         }
 
-        $injects = $em->getRepository('APIBundle:Inject')->findBy(['inject_event' => $event]);
+        $injects = $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]);
 
         return $injects;
     }
@@ -62,7 +63,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"inject"})
-     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}injects")
+     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
      */
     public function postExercisesEventsIncidentsInjectsAction(Request $request)
     {
@@ -83,8 +84,15 @@ class InjectController extends Controller
             return $this->eventNotFound();
         }
 
+        $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
+        /* @var $incident Incident */
+
+        if (empty($incident)) {
+            return $this->incidentNotFound();
+        }
+
         $inject = new Inject();
-        $inject->setInjectEvent($event);
+        $inject->setInjectIncident($incident);
         $form = $this->createForm(InjectType::class, $inject);
         $form->submit($request->request->all());
 
@@ -103,7 +111,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"inject"})
-     * @Rest\Delete("/exercises/{exercise_id}/events/{event_id}/injects/{inject_id}")
+     * @Rest\Delete("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
     public function removeExercisesEventsIncidentsInjectAction(Request $request)
     {
@@ -124,6 +132,13 @@ class InjectController extends Controller
             return $this->eventNotFound();
         }
 
+        $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
+        /* @var $incident Incident */
+
+        if (empty($incident)) {
+            return $this->incidentNotFound();
+        }
+
         $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
         /* @var $inject Inject */
 
@@ -142,7 +157,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/injects/{inject_id}")
+     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
     public function updateExercisesEventsInjectAction(Request $request)
     {
@@ -156,7 +171,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}/injects/{inject_id}")
+     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
     public function patchExercisesEventsIncidentsInjectAction(Request $request)
     {
@@ -180,6 +195,13 @@ class InjectController extends Controller
 
         if (empty($event)) {
             return $this->eventNotFound();
+        }
+
+        $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
+        /* @var $incident Incident */
+
+        if (empty($incident)) {
+            return $this->incidentNotFound();
         }
 
         $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
@@ -211,7 +233,7 @@ class InjectController extends Controller
         return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 
-    private function incidenttNotFound()
+    private function incidentNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
     }
