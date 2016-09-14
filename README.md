@@ -1,12 +1,12 @@
-# OpenEx - Open crisis management exercises platform 
-=============
+# OpenEx - Open Crisis Management Exercise Platform 
 
-The Crisis Excercises Platform (CEP) is a global open source platform allowing organizations to plan, schedule and execute crisis management exercises.
+Website: http://openex.io
 
-Features
---------------
+OpenEx is a global open source platform allowing organizations to plan, schedule and execute crisis management exercises. This product is freely inspired by the NATO Joint Exercise Management Module (JEMM) . OpenEx uses the last technologies and focuses on user experience, for both planners and players.
 
-The CEP includes the following features:
+## Features
+
+OpenEx includes the following features:
 
 - Multi-exercises and multi-organizations;
 - Training objectives and key processes;
@@ -17,12 +17,18 @@ The CEP includes the following features:
 - Statistics, reports and results;
 - Lesson learned process and roadmap follow-up.
 
-Also, the CEP provides a RESTFul API to allow interaction with other applications.
+Also, OpenEx provides a RESTFul API to allow interaction with other applications.
 
-Installation
---------------
+## Status
 
-#### Softwares
+Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on Junuary 2017, anyway you can find the product roadmap here: https://projets.luatix.org/OpenEx.
+
+## Quick start
+
+OpenEx uses an other open source tool for the scheduling and the automation. Indeed, OpenEx developers are focusing on the exercises features and all the very specific needs of the crisis management processes. 
+
+1. Clone the repository
+`git clone `
 
 You will need the following softwares:
 

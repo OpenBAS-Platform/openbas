@@ -85,14 +85,14 @@ class Outcome
         return $this;
     }
 
-    public function getOutcomeState()
+    public function getOutcomeResult()
     {
-        return $this->outcome_state;
+        return $this->outcome_result;
     }
 
-    public function setOutcomeState($state)
+    public function setOutComeResult($result)
     {
-        $this->outcome_state = $state;
+        $this->outcome_result = $result;
         return $this;
     }
 }
