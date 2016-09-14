@@ -103,7 +103,7 @@ class Objective
         return $this->objective_exercise;
     }
 
-    public function setEventExercise($exercise)
+    public function setObjectiveExercise($exercise)
     {
         $this->objective_exercise = $exercise;
         return $this;

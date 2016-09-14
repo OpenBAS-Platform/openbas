@@ -2,7 +2,6 @@
 
 namespace APIBundle\Controller\Exercise\Event\Incident;
 
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;

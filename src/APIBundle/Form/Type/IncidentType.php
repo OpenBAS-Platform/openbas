@@ -16,7 +16,6 @@ class IncidentType extends AbstractType
         $builder->add('incident_start_date');
         $builder->add('incident_end_date');
         $builder->add('incident_type');
-        $builder->add('incident_event');
         $builder->add('incident_staus');
     }
 

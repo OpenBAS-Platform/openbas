@@ -63,3 +63,19 @@ APIBundle\Entity\Event:
         event_description:
             - NotBlank: ~
             - Type: string
+
+APIBundle\Entity\Incident:
+    properties:
+        incident_title:
+            - NotBlank: ~
+            - Type: string
+        incident_story:
+            - NotBlank: ~
+            - Type: string
+        incident_start_date:
+            - DateTime: ~
+        incident_end_date:
+            - DateTime: ~
+        incident_status:
+            - NotBlank: ~
+            - Type: integer

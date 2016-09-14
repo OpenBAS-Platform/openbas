@@ -52,6 +52,15 @@ class User implements UserInterface
     protected $user_groups;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Audience", inversedBy="audience_users")
+     * @ORM\JoinTable(name="users_audiences",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="audience_id", referencedColumnName="audience_id", onDelete="CASCADE")}
+     *      )
+     */
+    protected $user_audiences;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     protected $user_admin = 0;

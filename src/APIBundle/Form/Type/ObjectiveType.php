@@ -7,25 +7,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class InjectType extends AbstractType
+class EventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('inject_title');
-        $builder->add('inject_description');
-        $builder->add('inject_content');
-        $builder->add('inject_date');
-        $builder->add('inject_sender');
-        $builder->add('inject_audiences');
-        $builder->add('inject_type');
-        $builder->add('inject_automatic');
-        $builder->add('inject_status');
+        $builder->add('objective_title');
+        $builder->add('objective_description');
+        $builder->add('objective_priority');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'APIBundle\Entity\Inject',
+            'data_class' => 'APIBundle\Entity\Event',
             'csrf_protection' => false
         ]);
     }
