@@ -35,30 +35,23 @@ Prerequisites:
 
 ## Quick start
 
-To easily deploy the OpenEx platform, [Composer](https://getcomposer.org) is strongly recommanded.
+First of all, you have to install the framework and the dependencies:
 
-1. Clone the repository
 
-`git clone https://github.com/Luatix/OpenEx.git`
+```bash
+$ git clone https://github.com/Luatix/OpenEx.git
+$ cd OpenEx
+$ composer install --no-interaction
+```
 
-3. Create the database
-4. Rename the file *parameters.yml.dist* in *parameters.yml* (in *app/config*)
-5. Change the parameters of the MySQL database in the file
+Create your database and rename the file *parameters.yml.dist* in *parameters.yml* (in *app/config*). Change the parameters of the MySQL database in the file and then:
 
-6. Install the framework and the dependencies
+```bash
+php bin/console doctrine:schema:update --dump-sql`
+php bin/console app:db-init 
+```
 
-`composer install`
-
-7. Create the database schema
-
-`php bin/console doctrine:schema:update --dump-sql`
- 
-8. Initialize the database
-
-`php bin/console app:db-init` 
-
-Enjoy!
-
+Enjoy the platform!
 
 ## Documentation
 
