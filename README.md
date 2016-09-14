@@ -21,7 +21,7 @@ OpenEx includes the following features:
 
 Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. You wilk find the product roadmap here: https://projets.luatix.org/OpenEx.
 
-## Softwares
+## Softwares    
 
 OpenEx works with an external scheduler ([Dkron](http://dkron.io)) for injects automation. Indeed, OpenEx developers are focusing on the exercises features, the user experience and all the very specific needs of crisis management processes.
  
@@ -35,20 +35,19 @@ Prerequisites:
 
 ## Quick start
 
-First of all, you have to install the framework and the dependencies:
-
+Create the database for OpenEx and start the deployment:
 
 ```bash
 $ git clone https://github.com/Luatix/OpenEx.git
 $ cd OpenEx
-$ composer install --no-interaction
+$ composer install
 ```
 
-Create your database and rename the file *parameters.yml.dist* in *parameters.yml* (in *app/config*). Change the parameters of the MySQL database in the file and then:
+Once the platform has been deployed, initialize the database:
 
 ```bash
-php bin/console doctrine:schema:update --dump-sql`
-php bin/console app:db-init 
+php bin/console doctrine:schema:create
+php bin/console app:db-init
 ```
 
 Enjoy the platform!
