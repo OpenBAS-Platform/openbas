@@ -29,16 +29,17 @@ class Outcome
     protected $outcome_description;
 
     /**
-     * @ORM\OneToMany(targetEntity="Incident", mappedBy="incident_outcome")
-     * @var Incident[]
+     * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_outcomes")
+     * @ORM\JoinColumn(name="outcome_incident", referencedColumnName="incident_id", onDelete="CASCADE")
+     * @var Incident
      */
     protected $outcome_incident;
 
     /**
-     * @ORM\ManyToOne(targetEntity="State")
-     * @ORM\JoinColumn(name="outcome_state", referencedColumnName="state_id")
+     * @ORM\ManyToOne(targetEntity="Result")
+     * @ORM\JoinColumn(name="outcome_result", referencedColumnName="result_id")
      */
-    protected $outcome_state;
+    protected $outcome_result;
 
     public function getOutcomeId()
     {

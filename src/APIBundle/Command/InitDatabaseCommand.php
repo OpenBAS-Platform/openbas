@@ -76,6 +76,12 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $tokenJerry = $this->createToken($userJerry);
         $output->writeln('Creating token for user jerry: ' . $tokenJerry->getTokenValue());
 
+        $userSam = $this->createUser('sam', 'sam', 'Sam', 'Doe', true);
+        $output->writeln('Creating user sam with password sam');
+
+        $tokenSam = $this->createToken($userSam);
+        $output->writeln('Creating token for user sam: ' . $tokenSam->getTokenValue());
+
         $exercisePotatoes = $this->createExercise(
             'Potatoes attack',
             'A massive potatoes attack, this is crisis.',
@@ -127,10 +133,13 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Jane is joining group \'Cockroach players\'');
 
         $this->joinGroup($userJerry, $groupPotatoesPlayers);
-        $output->writeln('Jane is joining group \'Potatoes players\'');
+        $output->writeln('Jerry is joining group \'Potatoes players\'');
 
         $this->joinGroup($userJerry, $groupCockroachPlanners);
-        $output->writeln('Jane is joining group \'Cockroach planners\'');
+        $output->writeln('Jerry is joining group \'Cockroach planners\'');
+
+        $this->joinGroup($userSam, $groupCockroachPlayers);
+        $output->writeln('Sam is joining group \'Cockroach players\'');
     }
 
     private function createStatus($name) {
