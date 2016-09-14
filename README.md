@@ -15,7 +15,7 @@ OpenEx includes the following features:
 - Scenarios scripting and automatic execution;
 - Documents and files sharing;
 - Statistics, reports and results;
-- Lesson learned process and roadmap follow-up.
+- Lessons learned process and roadmap follow-up.
 
 ## Status
 

@@ -29,3 +29,11 @@ exercises_groups:
 exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController
+
+exercises_events_incidents:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Event\IncidentController
+
+exercises_events_incidents_injects:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Event\Incident\InjectController
