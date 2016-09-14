@@ -1,4 +1,4 @@
-# OpenEx - Open Crisis Management Exercise Platform 
+# OpenEx - Open Crisis Management Exercise Platform [![Build Status](https://api.travis-ci.org/Luatix/OpenEx.svg?branch=master)](https://travis-ci.org/Luatix/OpenEx)
 
 Website: http://openex.io
 
@@ -21,7 +21,7 @@ OpenEx includes the following features:
 
 Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. You wilk find the product roadmap here: https://projets.luatix.org/OpenEx.
 
-## Softwares    
+## Softwares
 
 OpenEx works with an external scheduler ([Dkron](http://dkron.io)) for injects automation. Indeed, OpenEx developers are focusing on the exercises features, the user experience and all the very specific needs of crisis management processes.
  
