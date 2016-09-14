@@ -28,14 +28,15 @@ class ExerciseController extends Controller
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/exercises")
      */
-    public function getExercisesAction(Request $request, ParamFetcher $paramFetcher)
+    public function getExercisesAction(Request $request)
     {
-        if ($this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            $exercises = $this->get('doctrine.orm.entity_manager')
-                ->getRepository('APIBundle:Exercise')
-                ->findAll();
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        if (!$user->isAdmin()) {
+            $exercises = $em->getRepository('APIBundle:Exercise')->findAll();
         } else {
-            $grants = $this->get('security.token_storage')->getToken()->getUser()->getUserGrants();
+            $grants = $user->getUserGrants();
             /* @var $grants Grant[] */
             $exercises = [];
             foreach ($grants as $grant) {

@@ -29,10 +29,9 @@ class GroupController extends Controller
      */
     public function getGroupsAction(Request $request)
     {
+        $em = $this->get('doctrine.orm.entity_manager');
         if ($this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            $groups = $this->get('doctrine.orm.entity_manager')
-                ->getRepository('APIBundle:Group')
-                ->findAll();
+            $groups = $em->getRepository('APIBundle:Group')->findAll();
         } else {
             $grants = $this->get('security.token_storage')->getToken()->getUser()->getUserGrants();
             /* @var $grants Grant[] */
@@ -55,9 +54,8 @@ class GroupController extends Controller
      */
     public function getGroupAction(Request $request)
     {
-        $group = $this->get('doctrine.orm.entity_manager')
-            ->getRepository('APIBundle:Group')
-            ->find($request->get('group_id'));
+        $em = $this->get('doctrine.orm.entity_manager');
+        $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
         if (empty($group)) {

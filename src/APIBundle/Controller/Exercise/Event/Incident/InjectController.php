@@ -21,7 +21,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/injects")
+     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}injects")
      */
     public function getExercisesEventsIncidentsInjectsAction(Request $request)
     {
@@ -62,7 +62,7 @@ class InjectController extends Controller
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"inject"})
-     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/injects")
+     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}injects")
      */
     public function postExercisesEventsIncidentsInjectsAction(Request $request)
     {

@@ -39,6 +39,36 @@ class EventController extends Controller
 
     /**
      * @ApiDoc(
+     *    description="Read an event"
+     * )
+     *
+     * @Rest\View(serializerGroups={"event"})
+     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}")
+     */
+    public function getExerciseAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        $this->denyAccessUnlessGranted('select', $exercise);
+
+        $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
+        /* @var $event Event */
+
+        if (empty($event)) {
+            return $this->eventNotFound();
+        }
+
+        return $event;
+    }
+
+    /**
+     * @ApiDoc(
      *    description="Create an event",
      *    input={"class"=EventType::class, "name"=""}
      * )
