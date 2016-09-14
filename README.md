@@ -19,7 +19,7 @@ OpenEx includes the following features:
 
 ## Status
 
-Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. You wilk find the product roadmap here: https://projets.luatix.org/OpenEx.
+Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. You can find the product roadmap here: https://projets.luatix.org/OpenEx.
 
 ## Softwares
 
