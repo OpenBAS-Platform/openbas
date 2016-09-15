@@ -21,6 +21,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
+  "proxy": "http://dev.openex.com/",
   "eslintConfig": {
     "extends": "./node_modules/react-scripts/config/eslint.js"
   }

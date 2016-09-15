@@ -8,10 +8,14 @@ import axios from 'axios';
 export const askToken = (username, password) => (dispatch) => {
   dispatch({type: APPLICATION_LOGIN_SUBMITTED});
   return axios({
-    url: '/api/token',
+    url: '/api/tokens',
     timeout: 20000,
-    method: 'get',
-    responseType: 'json'
+    method: 'post',
+    responseType: 'json',
+    data: {
+      login: username,
+      password: password
+    }
   }).then(function (response) {
     dispatch({
       type: APPLICATION_LOGIN_SUCCESS,
