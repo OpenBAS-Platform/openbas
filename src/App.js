@@ -13,10 +13,8 @@ import Login from './components/Login';
 import OpenEx from './containers/OpenEx';
 
 const initialState = {
-  //test: 0,
-  //some: "value",
+  application: Map(),
   counter: Map({
-    application: Map(),
     count: 0,
     lines: List()
   })

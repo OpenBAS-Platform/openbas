@@ -9,7 +9,7 @@ class Root extends Component {
       <div className="App">
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo"/>
-          <h2>Welcome to CEP</h2>
+          <h2>Welcome to OpenEx</h2>
         </div>
         <Link to="home">Home</Link>
         <br/>
