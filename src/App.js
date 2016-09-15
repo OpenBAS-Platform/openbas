@@ -1,25 +1,31 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-import {createStore} from 'redux';
+import {createStore, applyMiddleware, compose} from 'redux';
+import thunk from 'redux-thunk';
 import rootReducer from './reducers';
-import OpenEx from './containers/OpenEx';
+import Root from './containers/Root';
 import {Provider} from 'react-redux';
+import {Router, Route, browserHistory} from 'react-router';
 import {Map, List} from 'immutable';
+
+import Login from './components/Login';
+import OpenEx from './containers/OpenEx';
 
 const initialState = {
   //test: 0,
   //some: "value",
   counter: Map({
+    application: Map(),
     count: 0,
     lines: List()
   })
 };
 
-const store = createStore(rootReducer, initialState,
+const store = createStore(rootReducer, initialState, compose(
+  applyMiddleware(thunk),
   window.devToolsExtension && window.devToolsExtension()
-);
+));
 
 //Hot reload reducers in dev
 if (process.env.NODE_ENV === 'development' && module.hot) {
@@ -32,13 +38,12 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <div className="App">
-          <div className="App-header">
-            <img src={logo} className="App-logo" alt="logo"/>
-            <h2>Welcome to CEP</h2>
-          </div>
-          <OpenEx/>
-        </div>
+        <Router history={browserHistory}>
+          <Route path='/' component={Root}>
+            <Route path='/home' component={OpenEx}/>
+            <Route path='/login' component={Login}/>
+          </Route>
+        </Router>
       </Provider>
     );
   }
