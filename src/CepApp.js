@@ -1,21 +1,22 @@
 import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import Counter from './components/Counter';
+import CounterElem from './components/Counter';
 import * as CounterActions from './actions/CounterActions';
 
 class CepApp extends Component {
   render() {
-    const {counter, dispatch} = this.props;
+    const {count, lines, dispatch} = this.props;
     return (
-      <Counter counter={counter} {...bindActionCreators(CounterActions, dispatch)} />
+      <CounterElem count={count} lines={lines} {...bindActionCreators(CounterActions, dispatch)} />
     );
   }
 }
 
 function select(state) {
   return {
-    counter: state.counter
+    count: state.get('counter').get('count'),
+    lines: state.get('counter').get('lines')
   };
 }
 

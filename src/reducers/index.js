@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from 'redux-immutable';
 import counter from './Counter';
 
 const rootReducer = combineReducers({

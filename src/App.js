@@ -6,8 +6,18 @@ import {createStore} from 'redux';
 import rootReducer from './reducers';
 import CepApp from './CepApp';
 import {Provider} from 'react-redux';
+import {Map, List} from 'immutable';
 
-const store = createStore(rootReducer);
+const initialState = Map({
+  counter: Map({
+    count: 0,
+    lines: List()
+  }),
+});
+
+const store = createStore(rootReducer, initialState,
+  window.devToolsExtension && window.devToolsExtension()
+);
 
 class App extends Component {
   render() {

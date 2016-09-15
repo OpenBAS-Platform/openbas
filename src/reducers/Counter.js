@@ -1,11 +1,23 @@
 import {INCREMENT_COUNTER, DECREMENT_COUNTER} from '../constants/ActionTypes';
 
-export default function counter(state = 0, action) {
+export default function counter(state, action) {
   switch (action.type) {
     case INCREMENT_COUNTER:
-      return state + 1;
+      var incrementState = state.withMutations(function (state) {
+        state.set('count', state.get('count') + 1)
+        state.updateIn(['lines'], list => list.push('new line ' + state.get('count')));
+      });
+      console.log(incrementState);
+      return incrementState;
+
     case DECREMENT_COUNTER:
-      return state - 1;
+      var decrementState = state.withMutations(function (state) {
+        state.set('count', state.get('count') - 1)
+        state.updateIn(['lines'], list => list.pop());
+      });
+      console.log(decrementState);
+      return decrementState;
+
     default:
       return state;
   }
