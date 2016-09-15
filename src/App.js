@@ -19,6 +19,13 @@ const store = createStore(rootReducer, initialState,
   window.devToolsExtension && window.devToolsExtension()
 );
 
+//Hot reload reducers in dev
+if (process.env.NODE_ENV === 'development' && module.hot) {
+  module.hot.accept('./reducers', () =>
+    store.replaceReducer(require('./reducers').default)
+  );
+}
+
 class App extends Component {
   render() {
     return (
