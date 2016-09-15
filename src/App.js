@@ -4,16 +4,18 @@ import './App.css';
 
 import {createStore} from 'redux';
 import rootReducer from './reducers';
-import CepApp from './CepApp';
+import OpenEx from './containers/OpenEx';
 import {Provider} from 'react-redux';
 import {Map, List} from 'immutable';
 
-const initialState = Map({
+const initialState = {
+  //test: 0,
+  //some: "value",
   counter: Map({
     count: 0,
     lines: List()
-  }),
-});
+  })
+};
 
 const store = createStore(rootReducer, initialState,
   window.devToolsExtension && window.devToolsExtension()
@@ -35,7 +37,7 @@ class App extends Component {
             <img src={logo} className="App-logo" alt="logo"/>
             <h2>Welcome to CEP</h2>
           </div>
-          <CepApp/>
+          <OpenEx/>
         </div>
       </Provider>
     );

@@ -1,18 +1,19 @@
 import React, {Component, PropTypes} from 'react';
 
-export default class CounterElem extends Component {
+export default class Counter extends Component {
   static propTypes = {
     increment: PropTypes.func.isRequired,
-    decrement: PropTypes.func.isRequired
+    decrement: PropTypes.func.isRequired,
+    counter: PropTypes.object
   };
 
   render() {
-    const {increment, decrement, count, lines} = this.props;
+    const {increment, decrement, counter} = this.props;
     return (
       <div>
-        Clicked: {count} times
+        Clicked: {counter.get('count')} times
         <ul>
-          {lines.map(function(val, i){
+          {counter.get('lines').map(function(val, i){
             return <li key={i}>{val}</li>;
           })}
         </ul>

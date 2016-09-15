@@ -1,6 +1,8 @@
 import {INCREMENT_COUNTER, DECREMENT_COUNTER} from '../constants/ActionTypes';
+import {Map} from 'immutable';
 
-export default function counter(state, action) {
+export const counter = (state = Map(), action) => {
+
   switch (action.type) {
     case INCREMENT_COUNTER:
       var incrementState = state.withMutations(function (state) {
@@ -22,3 +24,5 @@ export default function counter(state, action) {
       return state;
   }
 }
+
+export default counter;
