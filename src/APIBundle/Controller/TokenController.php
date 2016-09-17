@@ -33,7 +33,7 @@ class TokenController extends Controller
         if (!$form->isValid()) {
             return $form;
         }
-
+;
         $em = $this->get('doctrine.orm.entity_manager');
         $user = $em->getRepository('APIBundle:User')->findOneBy(['user_email' => $credentials->getLogin()]);
 
