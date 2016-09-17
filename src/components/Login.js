@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {routerActions} from 'react-router-redux'
 import {askToken} from '../actions/Application';
 
 class Login extends Component {
@@ -18,6 +19,25 @@ class Login extends Component {
     this.props.askToken(this.state.username, this.state.password);
   }
 
+  //region handle login state
+
+  componentWillMount() {
+    const {isAuthenticated, replace, redirect} = this.props
+    if (isAuthenticated) {
+      replace(redirect)
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {isAuthenticated, redirect} = nextProps
+    const {isAuthenticated: wasAuthenticated, replace} = this.props
+    if (!wasAuthenticated && isAuthenticated) {
+      replace(redirect)
+    }
+  }
+
+  //endregion
+
   render() {
     return (
       <div className="Login">
@@ -35,16 +55,13 @@ class Login extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {}
-}
-
-const mapDispatchToProps = (dispatch) => {
+const select = (state, ownProps) => {
+  const isAuthenticated = state.application.hasIn(['token', 'token_user']) || false
+  const redirect = ownProps.location.query.redirect || '/'
   return {
-    askToken: (username, password) => {
-      dispatch(askToken(username, password))
-    }
+    isAuthenticated,
+    redirect
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(select, {askToken, replace: routerActions.replace})(Login);
