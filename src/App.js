@@ -13,6 +13,7 @@ import {Map, List, fromJS} from 'immutable';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Login from './components/Login';
 import OpenEx from './containers/OpenEx';
+import {logger} from './middlewares/Logger'
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
@@ -35,7 +36,7 @@ const initialState = {
 const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)
 const store = createStore(rootReducer, initialState, compose(
-  applyMiddleware(routingMiddleware, thunk),
+  applyMiddleware(routingMiddleware, thunk, logger),
   window.devToolsExtension && window.devToolsExtension()
 ));
 
