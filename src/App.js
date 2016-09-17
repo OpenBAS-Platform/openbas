@@ -9,7 +9,7 @@ import {Provider} from 'react-redux';
 import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
-import {Map, List, fromJS} from 'immutable';
+import {Map, fromJS} from 'immutable';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Login from './containers/Login';
 import Home from './containers/Home';
