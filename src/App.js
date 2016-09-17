@@ -14,6 +14,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Login from './components/Login';
 import OpenEx from './containers/OpenEx';
 import {logger} from './middlewares/Logger'
+import { normalize } from 'normalizr'
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
@@ -21,11 +22,13 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 //Auth token
-const token = localStorage.getItem('token');
-const immutableToken = fromJS(JSON.parse(token));
+const localToken = localStorage.getItem('token');
+const data = JSON.parse(localToken);
+var token = data ? fromJS(data.entities.tokens[data.result]) : null;
+var user = data ? fromJS(data.entities.users[token.get('token_user')]) : null;
 
 const initialState = {
-  application: Map({token: immutableToken}),
+  application: Map({token, user}),
   counter: Map({
     count: 0,
     lines: List()
@@ -40,9 +43,12 @@ const store = createStore(rootReducer, initialState, compose(
   window.devToolsExtension && window.devToolsExtension()
 ));
 
-export const api = () => {
+export const api = (schema) => {
   return axios.create({
     responseType: 'json',
+    transformResponse: [function (data) {
+      return schema ?  normalize(data, schema) : data;
+    }],
     headers: {'X-Auth-Token': store.getState().application.getIn(['token', 'token_value'])}
   })
 }
@@ -58,7 +64,7 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 const history = syncHistoryWithStore(baseHistory, store)
 
 const UserIsAuthenticated = UserAuthWrapper({
-  authSelector: state => state.application.getIn(['token', 'token_user']),
+  authSelector: state => state.application.getIn(['user']),
   redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsAuthenticated'
 })

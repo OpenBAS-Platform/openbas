@@ -9,6 +9,7 @@
     "axios": "^0.14.0",
     "immutable": "^3.8.1",
     "material-ui": "^0.15.4",
+    "normalizr": "^2.2.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-redux": "^4.4.5",

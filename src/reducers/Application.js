@@ -7,11 +7,17 @@ export const application = (state = Map(), action) => {
     case Constants.APPLICATION_LOGIN_SUBMITTED:
       return state;
     case Constants.APPLICATION_LOGIN_SUCCESS:
-      return state.set('token', fromJS(action.payload));
+      var data = action.payload;
+      var token = fromJS(data.entities.tokens[data.result]);
+      var user = fromJS(data.entities.users[token.get('token_user')]);
+      return state.withMutations(function(state) {
+        state.set('token', token)
+        state.set('user', user)
+      })
     case Constants.APPLICATION_LOGIN_ERROR:
-      return state.clear('token');
+      return state.clear('token').clear('user');
     case Constants.APPLICATION_LOGOUT_SUCCESS:
-      return state.clear('token');
+      return state.clear('token').clear('user');
     default:
       return state;
   }
