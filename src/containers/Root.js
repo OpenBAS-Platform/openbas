@@ -21,7 +21,7 @@ class Root extends Component {
       <div className="App">
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo"/>
-          <h2>Welcome to OpenEx {this.props.username}</h2>
+          <h2>Welcome to OpenEx {this.props.user_firstname}</h2>
         </div>
         <LinkButton label="Home" to="home"/>
         <br/>
@@ -35,11 +35,12 @@ class Root extends Component {
 }
 
 const select = (state, ownProps) => {
-  const isAuthenticated = state.application.hasIn(['token', 'token_user']) || false
-  var user_firstname = state.application.getIn(['token', 'token_user', 'user_firstname']);
+  var app = state.application;
+  const isAuthenticated = app.hasIn(['token', 'token_id']) || false
+  var user_firstname = app.getIn(['user', 'user_firstname']);
   return {
     isAuthenticated,
-    username: user_firstname
+    user_firstname
   }
 }
 
