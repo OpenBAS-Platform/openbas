@@ -2,8 +2,8 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {routerActions} from 'react-router-redux'
 import {askToken} from '../actions/Application'
-import {Button} from './Button'
-import {Field} from './Field'
+import {Button} from '../components/Button'
+import {Field} from '../components/Field'
 
 class Login extends Component {
 

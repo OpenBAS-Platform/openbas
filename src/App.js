@@ -6,13 +6,14 @@ import thunk from 'redux-thunk';
 import rootReducer from './reducers';
 import Root from './containers/Root';
 import {Provider} from 'react-redux';
-import {Router, Route, browserHistory} from 'react-router';
+import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
 import {Map, List, fromJS} from 'immutable';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Login from './components/Login';
-import OpenEx from './containers/OpenEx';
+import Login from './containers/Login';
+import Home from './containers/Home';
+import Index from './containers/Index';
 import {logger} from './middlewares/Logger'
 import { normalize } from 'normalizr'
 
@@ -28,11 +29,7 @@ var token = data ? fromJS(data.entities.tokens[data.result]) : null;
 var user = data ? fromJS(data.entities.users[token.get('token_user')]) : null;
 
 const initialState = {
-  application: Map({token, user}),
-  counter: Map({
-    count: 0,
-    lines: List()
-  })
+  application: Map({token, user})
 };
 
 
@@ -76,7 +73,8 @@ class App extends Component {
         <Provider store={store}>
           <Router history={history}>
             <Route path='/' component={Root}>
-              <Route path='/home' component={UserIsAuthenticated(OpenEx)}/>
+              <IndexRoute component={Index}/>
+              <Route path='/home' component={UserIsAuthenticated(Home)}/>
               <Route path='/login' component={Login}/>
             </Route>
           </Router>

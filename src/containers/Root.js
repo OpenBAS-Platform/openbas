@@ -12,9 +12,11 @@ class Root extends Component {
   }
 
   render() {
-    let logoutButton;
+    let loginButton, logoutButton;
     if (this.props.isAuthenticated) {
       logoutButton = <Button label="Logout" onClick={this.logoutClick.bind(this)}/>
+    } else {
+      loginButton = <LinkButton label="Login" to="login"/>
     }
 
     return (
@@ -23,12 +25,15 @@ class Root extends Component {
           <img src={logo} className="App-logo" alt="logo"/>
           <h2>Welcome to OpenEx {this.props.user_firstname}</h2>
         </div>
-        <LinkButton label="Home" to="home"/>
-        <br/>
-        <LinkButton label="Login" to="login"/>
-        <br/>
-        { logoutButton }
-        {this.props.children}
+        <div>
+          <LinkButton label="Index" to="/"/>
+          <LinkButton label="Home" to="home"/>
+          { loginButton }
+          { logoutButton }
+        </div>
+        <div>
+          {this.props.children}
+        </div>
       </div>
     )
   }
