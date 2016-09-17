@@ -7,6 +7,8 @@ import rootReducer from './reducers';
 import Root from './containers/Root';
 import {Provider} from 'react-redux';
 import {Router, Route, browserHistory} from 'react-router';
+import {syncHistoryWithStore} from 'react-router-redux'
+
 import {Map, List} from 'immutable';
 
 import Login from './components/Login';
@@ -32,11 +34,14 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
   );
 }
 
+// Create an enhanced history that syncs navigation events with the store
+const history = syncHistoryWithStore(browserHistory, store)
+
 class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <Router history={browserHistory}>
+        <Router history={history}>
           <Route path='/' component={Root}>
             <Route path='/home' component={OpenEx}/>
             <Route path='/login' component={Login}/>
