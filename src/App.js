@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-
+import axios from 'axios';
 import {createStore, applyMiddleware, compose} from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from './reducers';
@@ -8,15 +8,17 @@ import Root from './containers/Root';
 import {Provider} from 'react-redux';
 import {Router, Route, browserHistory} from 'react-router';
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
-import { UserAuthWrapper } from 'redux-auth-wrapper'
+import {UserAuthWrapper} from 'redux-auth-wrapper'
 
 import {Map, List, fromJS} from 'immutable';
 
 import Login from './components/Login';
 import OpenEx from './containers/OpenEx';
 
+//Auth token
 const token = localStorage.getItem('token');
 const immutableToken = fromJS(JSON.parse(token));
+
 const initialState = {
   application: Map({token: immutableToken}),
   counter: Map({
@@ -25,13 +27,20 @@ const initialState = {
   })
 };
 
-console.log(initialState);
+
 const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)
 const store = createStore(rootReducer, initialState, compose(
-  applyMiddleware(thunk, routingMiddleware),
+  applyMiddleware(routingMiddleware, thunk),
   window.devToolsExtension && window.devToolsExtension()
 ));
+
+export const api = () => {
+  return axios.create({
+    responseType: 'json',
+    headers: {'X-Auth-Token': store.getState().application.getIn(['token', 'token_value'])}
+  })
+}
 
 //Hot reload reducers in dev
 if (process.env.NODE_ENV === 'development' && module.hot) {

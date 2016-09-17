@@ -1,13 +1,10 @@
 import * as Constants from '../constants/ActionTypes';
-import axios from 'axios';
+import {api} from '../App';
 
 export const askToken = (username, password) => (dispatch) => {
-  console.log('Login ' + username + "/" + password);
   dispatch({type: Constants.APPLICATION_LOGIN_SUBMITTED});
-  return axios.post('/api/tokens', {
-    login: username,
-    password: password
-  }).then(function (response) {
+  var data = {login: username, password: password};
+  return api().post('/api/tokens', data).then(function (response) {
     //Set the localStorage token and dispatch LOGIN SUCCESS
     localStorage.setItem('token', JSON.stringify(response.data))
     dispatch({
@@ -25,14 +22,9 @@ export const askToken = (username, password) => (dispatch) => {
 }
 
 export const logout = () => (dispatch, getState) => {
-  var app = getState().application;
-  let token_id = app.getIn(['token', 'token_id']);
-  let token_value = app.getIn(['token', 'token_value']);
-  console.log('Logout ' + token_value)
+  let token_id = getState().application.getIn(['token', 'token_id']);
   dispatch({type: Constants.APPLICATION_LOGOUT_SUBMITTED});
-  return axios.delete('/api/tokens/' + token_id, {
-    headers: {'X-Auth-Token': token_value}
-  }).then(function (response) {
+  return api().delete('/api/tokens/' + token_id).then(function (response) {
     //Set the localStorage token and dispatch LOGIN SUCCESS
     localStorage.removeItem('token');
     dispatch({
