@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router';
 import {connect} from 'react-redux';
 import logo from '../logo.svg';
 import {logout} from '../actions/Application';
+import {Button, LinkButton} from '../components/Button'
 
 class Root extends Component {
 
@@ -14,10 +14,7 @@ class Root extends Component {
   render() {
     let logoutButton;
     if (this.props.isAuthenticated) {
-      logoutButton = <div>
-        <br/>
-        <span onClick={this.logoutClick.bind(this)}>Logout</span>
-      </div>
+      logoutButton = <Button label="Logout" onClick={this.logoutClick.bind(this)}/>
     }
 
     return (
@@ -26,9 +23,10 @@ class Root extends Component {
           <img src={logo} className="App-logo" alt="logo"/>
           <h2>Welcome to OpenEx {this.props.username}</h2>
         </div>
-        <Link to="home">Home</Link>
+        <LinkButton label="Home" to="home"/>
         <br/>
-        <Link to="login">Login</Link>
+        <LinkButton label="Login" to="login"/>
+        <br/>
         { logoutButton }
         {this.props.children}
       </div>

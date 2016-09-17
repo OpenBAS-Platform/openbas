@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import {Button} from './Button';
 
 export default class Counter extends Component {
   static propTypes = {
@@ -18,9 +19,9 @@ export default class Counter extends Component {
           })}
         </ul>
         {' '}
-        <button onClick={increment}>+</button>
+        <Button label="+" onClick={increment}/>
         {' '}
-        <button onClick={decrement}>-</button>
+        <Button label="-" onClick={decrement}/>
       </div>
     );
   }

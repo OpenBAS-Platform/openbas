@@ -9,7 +9,6 @@ export const counter = (state = Map(), action) => {
         state.set('count', state.get('count') + 1)
         state.updateIn(['lines'], list => list.push('new line ' + state.get('count')));
       });
-      console.log(incrementState);
       return incrementState;
 
     case DECREMENT_COUNTER:
@@ -17,7 +16,6 @@ export const counter = (state = Map(), action) => {
         state.set('count', state.get('count') - 1)
         state.updateIn(['lines'], list => list.pop());
       });
-      console.log(decrementState);
       return decrementState;
 
     default:

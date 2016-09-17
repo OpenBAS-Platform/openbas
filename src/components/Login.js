@@ -1,7 +1,9 @@
-import React, {Component} from 'react';
-import {connect} from 'react-redux';
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
 import {routerActions} from 'react-router-redux'
-import {askToken} from '../actions/Application';
+import {askToken} from '../actions/Application'
+import {Button} from './Button'
+import {Field} from './Field'
 
 class Login extends Component {
 
@@ -42,13 +44,16 @@ class Login extends Component {
     return (
       <div className="Login">
         <form className="loginForm" onSubmit={this.handleSubmit.bind(this)}>
-          <input name="username" type="text" value={this.state.username}
-                 onChange={this.handleChange.bind(this)}
-                 placeholder="Your name"/>
-          <input name="password" type="password" value={this.state.password}
-                 onChange={this.handleChange.bind(this)}
-                 placeholder="Your password"/>
-          <input type="submit" value="Login"/>
+          <Field name="username" label="Username" hint="Your name"
+                 value={this.state.username}
+                 onChange={this.handleChange.bind(this)}/>
+          <br/>
+
+          <Field name="password" type="password" label="Password" hint="Your password"
+                 value={this.state.password}
+                 onChange={this.handleChange.bind(this)}/>
+          <br/>
+          <Button type="submit" label="Login"/>
         </form>
       </div>
     )

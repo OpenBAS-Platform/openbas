@@ -14,7 +14,6 @@ class OpenEx extends Component {
 }
 
 const select = (state) => {
-  console.log(state)
   return {
     counter: state.counter
   }
