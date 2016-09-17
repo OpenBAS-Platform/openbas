@@ -1,6 +1,6 @@
 import * as Constants from '../constants/ActionTypes';
 import {api} from '../App';
-import * as schema from '../Schema'
+import * as schema from './Schema'
 
 export const askToken = (username, password) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_LOGIN_SUBMITTED});
