@@ -29,9 +29,9 @@ var token = data ? fromJS(data.entities.tokens[data.result]) : null;
 var user = data ? fromJS(data.entities.users[token.get('token_user')]) : null;
 
 const initialState = {
-  application: Map({token, user})
+  application: Map({token, user}),
+  users: Map({data: Map(), loading: false})
 };
-
 
 const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)

@@ -42,6 +42,7 @@
       "plugin:react/recommended"
     ],
     "globals": {
+      "it": true,
       "window": true,
       "document": true,
       "console": true,

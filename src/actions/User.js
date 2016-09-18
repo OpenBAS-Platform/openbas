@@ -4,7 +4,7 @@ import * as schema from './Schema'
 
 export const fetchUsers = () => (dispatch) => {
   dispatch({type: Constants.USERS_FETCH_SUBMITTED});
-  return api(schema.users).get('/api/users').then(function (response) {
+  return api(schema.arrayOfUsers).get('/api/users').then(function (response) {
     dispatch({
       type: Constants.USERS_FETCH_SUCCESS,
       payload: response.data

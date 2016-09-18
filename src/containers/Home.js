@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {fetchUsers} from '../actions/User';
+import CircularProgress from 'material-ui/CircularProgress';
 
 class Home extends Component {
   componentDidMount() {
@@ -8,26 +9,34 @@ class Home extends Component {
   }
 
   render() {
+    let loading;
+    if (this.props.loading) {
+      loading = <CircularProgress />
+    }
+
     return (
       <div>
-        Welcome {this.props.user_firstname}
+        { loading }
+        {this.props.users.toList().map(user => {
+          return (
+            <div key={user.get('user_id')}>User : {user.get('user_firstname')}</div>
+          )
+        })}
       </div>
     );
   }
 }
 
 Home.propTypes = {
-  user_firstname: PropTypes.string,
+  loading: PropTypes.bool.isRequired,
+  users: PropTypes.object,
   fetchUsers: PropTypes.func.isRequired
 }
 
 const select = (state) => {
-  var app = state.application;
-  const isAuthenticated = app.hasIn(['token', 'token_id']) || false
-  var user_firstname = app.getIn(['user', 'user_firstname']);
   return {
-    isAuthenticated,
-    user_firstname
+    users: state.users.get('data'),
+    loading: state.users.get('loading')
   }
 }
 
