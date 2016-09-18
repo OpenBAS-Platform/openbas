@@ -17,7 +17,7 @@ export const askToken = (username, password) => (dispatch) => {
     localStorage.removeItem('token');
     dispatch({
       type: Constants.APPLICATION_LOGIN_ERROR,
-      payload: null
+      payload: response.data
     });
   })
 }

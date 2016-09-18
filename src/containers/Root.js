@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import logo from '../logo.svg';
 import {logout} from '../actions/Application';
@@ -8,7 +8,6 @@ class Root extends Component {
 
   logoutClick() {
     this.props.logout();
-    return false;
   }
 
   render() {
@@ -39,7 +38,14 @@ class Root extends Component {
   }
 }
 
-const select = (state, ownProps) => {
+Root.propTypes = {
+  logout: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  user_firstname: PropTypes.string,
+  children: React.PropTypes.node
+}
+
+const select = (state) => {
   var app = state.application;
   const isAuthenticated = app.hasIn(['token', 'token_id']) || false
   var user_firstname = app.getIn(['user', 'user_firstname']);

@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {routerActions} from 'react-router-redux'
 import {askToken} from '../actions/Application'
@@ -21,8 +21,6 @@ class Login extends Component {
     this.props.askToken(this.state.username, this.state.password);
   }
 
-  //region handle login state
-
   componentWillMount() {
     const {isAuthenticated, replace, redirect} = this.props
     if (isAuthenticated) {
@@ -37,8 +35,6 @@ class Login extends Component {
       replace(redirect)
     }
   }
-
-  //endregion
 
   render() {
     return (
@@ -58,6 +54,13 @@ class Login extends Component {
       </div>
     )
   }
+}
+
+Login.propTypes = {
+  askToken: PropTypes.func.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  replace: PropTypes.func.isRequired,
+  redirect: PropTypes.func.isRequired
 }
 
 const select = (state, ownProps) => {

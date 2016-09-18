@@ -28,6 +28,29 @@
   },
   "proxy": "http://dev.openex.com/",
   "eslintConfig": {
-    "extends": "./node_modules/react-scripts/config/eslint.js"
+    "plugins": [
+      "react"
+    ],
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
+    "globals": {
+      "window": true,
+      "document": true,
+      "console": true,
+      "localStorage": true,
+      "module": true,
+      "process": true
+    },
+    "rules": {
+      "no-console": 0
+    }
   }
 }
