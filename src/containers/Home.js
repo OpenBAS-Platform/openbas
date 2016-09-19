@@ -35,8 +35,8 @@ Home.propTypes = {
 
 const select = (state) => {
   return {
-    users: state.users.get('data'),
-    loading: state.users.get('loading')
+    users: state.application.getIn(['entities', 'users']),
+    loading: state.home.get('loading')
   }
 }
 

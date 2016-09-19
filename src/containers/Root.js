@@ -47,7 +47,7 @@ Root.propTypes = {
 
 const select = (state) => {
   var app = state.application;
-  const isAuthenticated = app.hasIn(['token', 'token_id']) || false
+  const isAuthenticated = app.get('token') !== undefined
   var user_firstname = app.getIn(['user', 'user_firstname']);
   return {
     isAuthenticated,

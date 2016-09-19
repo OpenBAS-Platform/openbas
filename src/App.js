@@ -23,14 +23,24 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
 //Auth token
-const localToken = localStorage.getItem('token');
-const data = JSON.parse(localToken);
-var token = data ? fromJS(data.entities.tokens[data.result]) : null;
-var user = data ? fromJS(data.entities.users[token.get('token_user')]) : null;
+const data = fromJS(JSON.parse(localStorage.getItem('token')));
+var tokens = data ? data.getIn(['entities', 'tokens']) : null;
+var token = data ? data.get('result') : null;
+var users = data ? data.getIn(['entities', 'users']) : null;
+var user = tokens ? tokens.get(token.toString()).get('token_user') : null;
 
 const initialState = {
-  application: Map({token, user}),
-  users: Map({data: Map(), loading: false})
+  application: Map({
+    user: user.toString(),
+    token: token.toString(),
+    entities: Map({
+      users: users,
+      tokens: tokens
+    })
+  }),
+  home: Map({
+    loading: false
+  })
 };
 
 const baseHistory = browserHistory
@@ -41,12 +51,14 @@ const store = createStore(rootReducer, initialState, compose(
 ));
 
 export const api = (schema) => {
+  const app = store.getState().application;
+  const authToken = app.getIn(['entities', 'tokens', app.get('token'), 'token_value'])
   return axios.create({
     responseType: 'json',
     transformResponse: [function (data) {
       return schema ?  normalize(data, schema) : data;
     }],
-    headers: {'X-Auth-Token': store.getState().application.getIn(['token', 'token_value'])}
+    headers: {'X-Auth-Token': authToken}
   })
 }
 
@@ -61,7 +73,10 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 const history = syncHistoryWithStore(baseHistory, store)
 
 const UserIsAuthenticated = UserAuthWrapper({
-  authSelector: state => state.application.getIn(['user']),
+  authSelector: state => {
+    const tokens = state.application.getIn(['entities', 'tokens'])
+    return tokens.get(state.application.get('token'))
+  },
   redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsAuthenticated'
 })

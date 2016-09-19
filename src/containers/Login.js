@@ -60,11 +60,11 @@ Login.propTypes = {
   askToken: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
   replace: PropTypes.func.isRequired,
-  redirect: PropTypes.func.isRequired
+  redirect: PropTypes.string.isRequired
 }
 
 const select = (state, ownProps) => {
-  const isAuthenticated = state.application.hasIn(['token', 'token_user']) || false
+  const isAuthenticated = state.application.get('token') !== undefined
   const redirect = ownProps.location.query.redirect || '/'
   return {
     isAuthenticated,
