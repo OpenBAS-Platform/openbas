@@ -64,7 +64,7 @@ Login.propTypes = {
 }
 
 const select = (state, ownProps) => {
-  const isAuthenticated = state.application.get('token') !== undefined
+  const isAuthenticated = state.application.get('token') !== null
   const redirect = ownProps.location.query.redirect || '/'
   return {
     isAuthenticated,

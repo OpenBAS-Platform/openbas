@@ -7,7 +7,7 @@ export const askToken = (username, password) => (dispatch) => {
   var data = {login: username, password: password};
   return api(schema.token).post('/api/tokens', data).then(function (response) {
     //Set the localStorage token and dispatch LOGIN SUCCESS
-    localStorage.setItem('token', JSON.stringify(response.data))
+    localStorage.setItem('token', JSON.stringify(response.data.toJS()))
     dispatch({
       type: Constants.APPLICATION_LOGIN_SUCCESS,
       payload: response.data
@@ -23,15 +23,12 @@ export const askToken = (username, password) => (dispatch) => {
 }
 
 export const logout = () => (dispatch, getState) => {
-  let token_id = getState().application.getIn(['token', 'token_id']);
+  let token_id = getState().application.get('token');
   dispatch({type: Constants.APPLICATION_LOGOUT_SUBMITTED});
-  return api().delete('/api/tokens/' + token_id).then(function (response) {
+  return api().delete('/api/tokens/' + token_id).then(function () {
     //Set the localStorage token and dispatch LOGIN SUCCESS
     localStorage.removeItem('token');
-    dispatch({
-      type: Constants.APPLICATION_LOGOUT_SUCCESS,
-      payload: response.data
-    });
+    dispatch({type: Constants.APPLICATION_LOGOUT_SUCCESS});
   }).catch(function (response) {
     dispatch({
       type: Constants.APPLICATION_LOGOUT_ERROR,

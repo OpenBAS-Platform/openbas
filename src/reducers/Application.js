@@ -1,17 +1,17 @@
 import * as Constants from '../constants/ActionTypes';
-import {Map, fromJS} from 'immutable';
+import {Map} from 'immutable';
 
 export const application = (state = Map(), action) => {
 
   function mergeUsers() {
     const users = state.getIn(['entities', 'users']) || Map()
-    const mergedUsers = users.mergeDeep(fromJS(action.payload.entities.users))
+    const mergedUsers = users.mergeDeep(action.payload.getIn(['entities', 'users']))
     return mergedUsers;
   }
 
   function mergeTokens() {
     const tokens = state.getIn(['entities', 'tokens']) || Map()
-    const mergedTokens = tokens.mergeDeep(fromJS(action.payload.entities.tokens))
+    const mergedTokens = tokens.mergeDeep(action.payload.getIn(['entities', 'tokens']))
     return mergedTokens;
   }
 
@@ -20,9 +20,10 @@ export const application = (state = Map(), action) => {
       return state;
 
     case Constants.APPLICATION_LOGIN_SUCCESS: {
-      var token = fromJS(action.payload.entities.tokens[action.payload.result]);
+      var result = action.payload.get('result').toString();
+      var token = action.payload.getIn(['entities', 'tokens', result]);
       return state.withMutations(function (state) {
-        state.set('token', action.payload.result.toString())
+        state.set('token', result)
         state.set('user', token.get('token_user').toString())
         state.setIn(['entities', 'users'], mergeUsers())
         state.setIn(['entities', 'tokens'], mergeTokens())
@@ -30,10 +31,10 @@ export const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_LOGIN_ERROR:
-      return state.clear('token').clear('user');
+      return state.set('token', null);
 
     case Constants.APPLICATION_LOGOUT_SUCCESS:
-      return state.clear('token').clear('user');
+      return state.set('token', null);
 
     case Constants.USERS_FETCH_SUCCESS: {
       return state.setIn(['entities', 'users'], mergeUsers())

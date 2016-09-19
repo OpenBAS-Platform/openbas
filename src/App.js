@@ -15,7 +15,7 @@ import Login from './containers/Login';
 import Home from './containers/Home';
 import Index from './containers/Index';
 import {logger} from './middlewares/Logger'
-import { normalize } from 'normalizr'
+import {normalize} from 'normalizr'
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
@@ -31,8 +31,8 @@ var user = tokens ? tokens.get(token.toString()).get('token_user') : null;
 
 const initialState = {
   application: Map({
-    user: user.toString(),
-    token: token.toString(),
+    user: user && user.toString(),
+    token: token && token.toString(),
     entities: Map({
       users: users,
       tokens: tokens
@@ -56,7 +56,7 @@ export const api = (schema) => {
   return axios.create({
     responseType: 'json',
     transformResponse: [function (data) {
-      return schema ?  normalize(data, schema) : data;
+      return fromJS(schema ? normalize(data, schema) : data)
     }],
     headers: {'X-Auth-Token': authToken}
   })
@@ -74,11 +74,12 @@ const history = syncHistoryWithStore(baseHistory, store)
 
 const UserIsAuthenticated = UserAuthWrapper({
   authSelector: state => {
-    const tokens = state.application.getIn(['entities', 'tokens'])
-    return tokens.get(state.application.get('token'))
+    var app = state.application;
+    return app.getIn(['entities', 'tokens', app.get('token')])
   },
   redirectAction: routerActions.replace,
-  wrapperDisplayName: 'UserIsAuthenticated'
+  wrapperDisplayName: 'UserIsAuthenticated',
+  //TODO check validity token | predicate: token => token
 })
 
 class App extends Component {
