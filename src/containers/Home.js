@@ -1,14 +1,19 @@
 import React, {Component, PropTypes} from 'react';
+import createImmutableSelector from '../utils/ImmutableSelect'
 import {connect} from 'react-redux';
 import {fetchUsers} from '../actions/User';
 import CircularProgress from 'material-ui/CircularProgress';
+import {fromJS} from 'immutable';
+import R from 'ramda'
 
 class Home extends Component {
   componentDidMount() {
+    console.log("=== Home componentDidMount()===")
     this.props.fetchUsers();
   }
 
   render() {
+    console.log("=== Home render() ===")
     let loading;
     if (this.props.loading) {
       loading = <CircularProgress />
@@ -33,10 +38,18 @@ Home.propTypes = {
   fetchUsers: PropTypes.func.isRequired
 }
 
+//Users selector extract only the fields use to render the Home Page.
+const usersSelector = state => {
+  const users = state.application.getIn(['entities', 'users']).toJS()
+  var fields = R.compose(R.dissoc('user_email'), R.dissoc('user_groups'), R.dissoc('user_lastname'));
+  return fromJS(R.map(fields, users))
+}
+const cleanedUsers = createImmutableSelector(usersSelector, users => users)
+
 const select = (state) => {
   return {
-    users: state.application.getIn(['entities', 'users']),
-    loading: state.home.get('loading')
+    users: cleanedUsers(state),
+    loading: state.home.get('loading') //Don't need a selector. Each change will trigger a refresh
   }
 }
 

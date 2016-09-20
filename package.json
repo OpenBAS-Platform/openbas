@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "0.4.1"
+    "react-scripts": "0.4.1",
+    "immutablediff": "^0.4.3"
   },
   "dependencies": {
     "axios": "^0.14.0",
     "immutable": "^3.8.1",
     "material-ui": "^0.15.4",
     "normalizr": "^2.2.1",
+    "ramda": "^0.22.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
     "react-redux": "^4.4.5",
@@ -18,7 +20,8 @@
     "react-tap-event-plugin": "^1.0.0",
     "redux": "^3.6.0",
     "redux-auth-wrapper": "^0.8.0",
-    "redux-thunk": "^2.1.0"
+    "redux-thunk": "^2.1.0",
+    "reselect": "^2.5.4"
   },
   "scripts": {
     "start": "react-scripts start",

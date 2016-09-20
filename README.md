@@ -11,3 +11,8 @@ $ git clone https://github.com/Luatix/openex-react
 $ npm install
 $ npm start
 ```
+
+Interesting lib to use
+https://github.com/FezVrasta/popper.js
+https://github.com/bvaughn/react-virtualized
+https://github.com/Khan/aphrodite

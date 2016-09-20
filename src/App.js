@@ -1,19 +1,19 @@
-import React, {Component} from 'react';
-import './App.css';
-import axios from 'axios';
-import {createStore, applyMiddleware, compose} from 'redux';
-import thunk from 'redux-thunk';
-import rootReducer from './reducers';
-import Root from './containers/Root';
-import {Provider} from 'react-redux';
-import {Router, Route, IndexRoute, browserHistory} from 'react-router';
+import React, {Component} from 'react'
+import './App.css'
+import axios from 'axios'
+import {createStore, applyMiddleware, compose} from 'redux'
+import thunk from 'redux-thunk'
+import rootReducer from './reducers'
+import Root from './containers/Root'
+import {Provider} from 'react-redux'
+import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
-import {Map, fromJS} from 'immutable';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Login from './containers/Login';
-import Home from './containers/Home';
-import Index from './containers/Index';
+import {Map, fromJS} from 'immutable'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import Login from './containers/Login'
+import Home from './containers/Home'
+import Index from './containers/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 
