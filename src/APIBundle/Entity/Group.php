@@ -13,8 +13,8 @@ class Group
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
+     * @ORM\Column(type="string")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $group_id;
 

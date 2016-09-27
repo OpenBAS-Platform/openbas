@@ -12,8 +12,8 @@ class Grant
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
+     * @ORM\Column(type="string")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $grant_id;
 

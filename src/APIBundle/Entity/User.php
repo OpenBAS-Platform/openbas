@@ -15,8 +15,8 @@ class User implements UserInterface
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue
+     * @ORM\Column(type="string")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $user_id;
 
