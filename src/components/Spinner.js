@@ -9,7 +9,7 @@ const spinnerStyle = (props) => {
             position: 'relative'
         },
         circularSpinner: {
-            display: props.show === true  ? "block" : "none",
+            display: props.show === true ? "block" : "none",
             textAlign: "center"
         }
     }
@@ -26,7 +26,7 @@ RoundSpinner.propTypes = {
 
 export const CircularSpinner = (props) => (
     <div style={spinnerStyle(props).circularSpinner}>
-        <CircularProgress size={props.size} />
+        <CircularProgress size={props.size}/>
     </div>
 )
 

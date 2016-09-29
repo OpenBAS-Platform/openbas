@@ -12,8 +12,8 @@ import {UserAuthWrapper} from 'redux-auth-wrapper'
 import {Map, fromJS} from 'immutable'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Login from './containers/Login'
-import Home from './containers/Home/Home'
 import Index from './containers/Index'
+import PanelIndex from './containers/panel/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
@@ -32,74 +32,74 @@ var users = data ? data.getIn(['entities', 'users']) : null;
 var user = tokens ? tokens.get(token.toString()).get('token_user') : null;
 
 const initialState = {
-  application: Map({
-    user: user && user.toString(),
-    token: token && token.toString(),
-    entities: Map({
-      users: users,
-      tokens: tokens
+    application: Map({
+        user: user && user.toString(),
+        token: token && token.toString(),
+        entities: Map({
+            users: users,
+            tokens: tokens
+        })
+    }),
+    home: Map({
+        loading: false
     })
-  }),
-  home: Map({
-    loading: false
-  })
 };
 
 const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)
 const store = createStore(rootReducer, initialState, compose(
-  applyMiddleware(routingMiddleware, thunk, logger),
-  window.devToolsExtension && window.devToolsExtension()
+    applyMiddleware(routingMiddleware, thunk, logger),
+    window.devToolsExtension && window.devToolsExtension()
 ));
 
 export const api = (schema) => {
-  const app = store.getState().application;
-  const authToken = app.getIn(['entities', 'tokens', app.get('token'), 'token_value'])
-  return axios.create({
-    responseType: 'json',
-    transformResponse: [function (data) {
-      return fromJS(schema ? normalize(data, schema) : data)
-    }],
-    headers: {'X-Auth-Token': authToken}
-  })
+    const app = store.getState().application;
+    const authToken = app.getIn(['entities', 'tokens', app.get('token'), 'token_value'])
+    return axios.create({
+        responseType: 'json',
+        transformResponse: [function (data) {
+            return fromJS(schema ? normalize(data, schema) : data)
+        }],
+        headers: {'X-Auth-Token': authToken}
+    })
 }
 
 //Hot reload reducers in dev
 if (process.env.NODE_ENV === 'development' && module.hot) {
-  module.hot.accept('./reducers', () =>
-    store.replaceReducer(rootReducer)
-  );
+    module.hot.accept('./reducers', () =>
+        store.replaceReducer(rootReducer)
+    );
 }
 
 // Create an enhanced history that syncs navigation events with the store
 const history = syncHistoryWithStore(baseHistory, store)
 
 const UserIsAuthenticated = UserAuthWrapper({
-  authSelector: state => {
-    var app = state.application;
-    return app.getIn(['entities', 'tokens', app.get('token')])
-  },
-  redirectAction: routerActions.replace,
-  wrapperDisplayName: 'UserIsAuthenticated',
-  //TODO check validity token | predicate: token => token
+    authSelector: state => {
+        var app = state.application;
+        return app.getIn(['entities', 'tokens', app.get('token')])
+    },
+    redirectAction: routerActions.replace,
+    wrapperDisplayName: 'UserIsAuthenticated',
+    //TODO check validity token | predicate: token => token
 })
 
 class App extends Component {
-  render() {
-    return (
-      <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
-        <Provider store={store}>
-          <Router history={history}>
-            <Route path='/' component={Root}>
-              <IndexRoute component={Index}/>
-              <Route path='/home' component={UserIsAuthenticated(Home)}/>
-              <Route path='/login' component={Login}/>
-            </Route>
-          </Router>
-        </Provider>
-      </MuiThemeProvider>
-    );
-  }
+    render() {
+        return (
+            <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
+                <Provider store={store}>
+                    <Router history={history}>
+                        <Route path='/' component={Root}>
+                            <IndexRoute component={Index}/>
+                            <Route path='/home' component={UserIsAuthenticated(PanelIndex)}/>
+                            <Route path='/login' component={Login}/>
+                        </Route>
+                    </Router>
+                </Provider>
+            </MuiThemeProvider>
+        );
+    }
 }
 
 export default App;

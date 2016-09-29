@@ -3,16 +3,16 @@ import {api} from '../App';
 import * as schema from './Schema'
 
 export const fetchUsers = () => (dispatch) => {
-  dispatch({type: Constants.USERS_FETCH_SUBMITTED});
-  return api(schema.arrayOfUsers).get('/api/users').then(function (response) {
-    dispatch({
-      type: Constants.USERS_FETCH_SUCCESS,
-      payload: response.data
-    });
-  }).catch(function (response) {
-    dispatch({
-      type: Constants.USERS_FETCH_ERROR,
-      payload: response.data
-    });
-  })
+    dispatch({type: Constants.USERS_FETCH_SUBMITTED});
+    return api(schema.arrayOfUsers).get('/api/users').then(function (response) {
+        dispatch({
+            type: Constants.USERS_FETCH_SUCCESS,
+            payload: response.data
+        });
+    }).catch(function (response) {
+        dispatch({
+            type: Constants.USERS_FETCH_ERROR,
+            payload: response.data
+        });
+    })
 }

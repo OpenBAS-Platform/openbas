@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
-class Index extends Component {
-  render() {
-    return (
-      <div>
-        Landing page
-      </div>
-    );
-  }
+class IndexAuth extends Component {
+    render() {
+        return (
+            <div>
+                Index
+            </div>
+        );
+    }
 }
 
-export default Index;
+export default IndexAuth;

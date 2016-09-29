@@ -2,12 +2,12 @@
 
 Website: http://openex.io
 
-This repository is used for the OpenEx frontend development. To deploy the OpenEx platform, please refer to the main repository https://github.com/Luatix/OpenEx.
+This repository is used for the OpenEx frontend development. To deploy the OpenEx platform, please refer to the main repository https://github.com/LuatixHQ/OpenEx.
 
 ## Hacking
 
 ```bash
-$ git clone https://github.com/Luatix/openex-react
+$ git clone https://github.com/LuatixHQ/openex-react
 $ npm install
 $ npm start
 ```

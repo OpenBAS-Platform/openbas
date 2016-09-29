@@ -1,12 +1,12 @@
 import React, {Component, PropTypes} from 'react';
-import {logout} from '../actions/Application';
-import {Popover} from '../components/Popover';
+import {logout} from '../../actions/Application';
+import {Popover} from '../../components/Popover';
 import * as MaterialMenu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-import {RoundSpinner} from '../components/Spinner';
+import {RoundSpinner} from '../../components/Spinner';
 import {connect} from 'react-redux';
-import {userInfo} from '../actions/Application';
-import * as Constants from '../constants/ComponentTypes';
+import {userInfo} from '../../actions/Application';
+import * as Constants from '../../constants/ComponentTypes';
 
 class Menu extends Component {
 

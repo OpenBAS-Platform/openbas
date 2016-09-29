@@ -1,4 +1,5 @@
 import {
+    blueGrey700, blueGrey600,
     indigo500, indigo700,
     pinkA200,
     grey100, grey300, grey400, grey500,
@@ -11,8 +12,8 @@ export default {
     spacing: spacing,
     fontFamily: 'Roboto, sans-serif',
     palette: {
-        primary1Color: indigo500,
-        primary2Color: indigo700,
+        primary1Color: blueGrey700,
+        primary2Color: blueGrey600,
         primary3Color: grey400,
         accent1Color: pinkA200,
         accent2Color: grey100,
