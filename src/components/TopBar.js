@@ -1,11 +1,13 @@
 import React, {PropTypes, Component} from 'react';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
-import {LinkButton} from '../components/Button'
+import {List, ListItem} from 'material-ui/List';
+import FontIcon from 'material-ui/FontIcon';
+import {red500, yellow500, blue500} from 'material-ui/styles/colors';
 
 const style = {
     menu: {
-        width: 280
+        width: 200
     },
     overlay: {
         backgroundColor: "#ffffff",
@@ -31,13 +33,12 @@ class TopBar extends Component {
     render() {
         return (
             <div>
-                <AppBar title={this.props.title} iconElementLeft={this.props.left} iconElementRight={this.props.right}
-                        onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
-                <Drawer docked={false} width={style.menu.width} open={this.state.open}
-                        onRequestChange={(open) => this.setState({open})} overlayStyle={style.overlay}>
-                    <LinkButton onTouchTap={this.handleClose.bind(this)} label="Index" to="/"/>
-                    <br/>
-                    <LinkButton onTouchTap={this.handleClose.bind(this)} label="Domains" to="domains"/>
+                <AppBar/>
+                <Drawer docked={false} width={style.menu.width} open={true} overlayStyle={style.overlay}>
+                    <AppBar iconElementLeft={<img src="images/logo.png" />} />
+                    <List>
+                        <ListItem primaryText="Home" leftIcon={<FontIcon className="material-icons">home</FontIcon>} />
+                    </List>
                 </Drawer>
             </div>
         );
