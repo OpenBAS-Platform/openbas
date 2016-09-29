@@ -3,6 +3,8 @@ import {connect} from 'react-redux';
 import logo from '../logo.svg';
 import {logout} from '../actions/Application';
 import {Button, LinkButton} from '../components/Button'
+import Menu from './Menu'
+import TopBar from '../components/TopBar'
 
 class Root extends Component {
 
@@ -20,6 +22,7 @@ class Root extends Component {
 
     return (
       <div className="App">
+        <TopBar title="OpenEx" right={<Menu/>}/>
         <div className="App-header">
           <img src={logo} className="App-logo" alt="logo"/>
           <h2>Welcome to OpenEx {this.props.user_firstname}</h2>

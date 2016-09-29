@@ -12,10 +12,12 @@ import {UserAuthWrapper} from 'redux-auth-wrapper'
 import {Map, fromJS} from 'immutable'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Login from './containers/Login'
-import Home from './containers/Home'
+import Home from './containers/Home/Home'
 import Index from './containers/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
+import theme from './components/Theme'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
@@ -85,7 +87,7 @@ const UserIsAuthenticated = UserAuthWrapper({
 class App extends Component {
   render() {
     return (
-      <MuiThemeProvider>
+      <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
         <Provider store={store}>
           <Router history={history}>
             <Route path='/' component={Root}>
