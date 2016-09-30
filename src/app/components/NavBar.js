@@ -7,7 +7,6 @@ import AppBar from 'material-ui/AppBar';
 import {connect} from 'react-redux';
 import {toggleLeftBar} from '../actions/Application'
 
-
 class NavBar extends Component {
 
   leftClick() {
