@@ -8,7 +8,7 @@ import {AppBar} from '../../components/AppBar'
 import {Drawer} from '../../components/Drawer'
 import UserPopover from './user/UserPopover'
 import {List} from '../../components/List'
-import {ListItemLink} from "../../components/list/ListItem"
+import {IconListItemLink} from "../../components/list/ListItem"
 import LeftBar from '../../components/LeftBar'
 
 const styles = {
@@ -36,14 +36,20 @@ class RootAuthenticated extends Component {
   render() {
     return (
       <div>
-        <AppBar title="OpenEx"
+        <AppBar
+          title="OpenEx"
           titleStyle={styles.title}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}/>
-        <Drawer width={65} docked={true} open={true} style={{zIndex: zIndex.drawer - 50}}>
+        <Drawer
+          width={65}
+          docked={true}
+          open={true}
+          style={{zIndex: zIndex.drawer - 50}}
+        >
           <AppBar onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}/>
           <List>
-            <ListItemLink leftIcon={<LocalMovies />}/>
+            <IconListItemLink to="/exercises" leftIcon={<LocalMovies style={{margin: 0, padding: 0, left: 19, top: 4}} />}/>
           </List>
         </Drawer>
         <LeftBar />

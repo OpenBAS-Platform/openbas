@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import * as Constants from '../../../constants/ComponentTypes'
 import {Popover} from '../../../components/Popover';
 import {Avatar} from '../../../components/Avatar';
 import {Menu} from '../../../components/Menu'
@@ -32,7 +33,11 @@ class UserPopover extends Component {
   render() {
     return (
       <div>
-        <Avatar src={this.props.userGravatar} onTouchTap={this.handleOpen.bind(this)}/>
+        <Avatar
+          src={this.props.userGravatar}
+          onTouchTap={this.handleOpen.bind(this)}
+          type={Constants.AVATAR_TYPE_TOPBAR}
+        />
         <Popover open={this.state.open}
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handleClose.bind(this)}>

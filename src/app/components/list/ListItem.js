@@ -5,14 +5,13 @@ import {injectIntl} from 'react-intl'
 const ListItemLinkIntl = (props) => (
   <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
-    linkButton={true}
     href={props.to}
     disabled={props.disabled}/>
 );
 export const ListItemLink = injectIntl(ListItemLinkIntl)
 
 ListItemLinkIntl.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   intl: PropTypes.object,
   to: PropTypes.string,
   disabled: PropTypes.bool
@@ -33,5 +32,17 @@ ListItemButtonIntl.propTypes = {
   onClick: PropTypes.func
 }
 
+export const IconListItemLink = (props) => (
+  <MUIListItem
+    href={props.to}
+    disabled={props.disabled}
+    leftIcon={props.leftIcon}
+    innerDivStyle={{padding: '16px 10px 16px 10px'}}/>
+);
 
-
+IconListItemLink.propTypes = {
+  intl: PropTypes.object,
+  to: PropTypes.string,
+  leftIcon: PropTypes.element,
+  disabled: PropTypes.bool
+}
