@@ -36,6 +36,7 @@ class TokenController extends Controller
 ;
         $em = $this->get('doctrine.orm.entity_manager');
         $user = $em->getRepository('APIBundle:User')->findOneBy(['user_email' => $credentials->getLogin()]);
+        $user->setUserGravatar();
 
         if (!$user) {
             return $this->invalidCredentials();

@@ -10,6 +10,6 @@ APIBundle\Entity\User:
         user_email:
             groups: ['user', 'token']
         user_gravatar:
-            groups: ['user']
+            groups: ['user', 'token']
         user_groups:
             groups: ['user']
