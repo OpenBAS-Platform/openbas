@@ -1,11 +1,12 @@
-import React, {PropTypes} from 'react';
-import MUIListItem from 'material-ui/List/ListItem';
+import React, {PropTypes} from 'react'
+import MUIListItem from 'material-ui/List/ListItem'
 import {injectIntl} from 'react-intl'
+import {Link} from 'react-router'
 
 const ListItemLinkIntl = (props) => (
   <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
-    href={props.to}
+    containerElement={<Link to={props.to}/>}
     leftIcon={props.leftIcon}
     disabled={props.disabled}/>
 );
@@ -36,7 +37,7 @@ ListItemButtonIntl.propTypes = {
 
 export const IconListItemLink = (props) => (
   <MUIListItem
-    href={props.to}
+    containerElement={<Link to={props.to}/>}
     disabled={props.disabled}
     leftIcon={props.leftIcon}
     innerDivStyle={{padding: '20px 10px 20px 10px'}}/>

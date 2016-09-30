@@ -1,11 +1,12 @@
-import React, {PropTypes} from 'react';
-import MUIMenuItem from 'material-ui/MenuItem';
+import React, {PropTypes} from 'react'
+import {Link} from 'react-router'
+import MUIMenuItem from 'material-ui/MenuItem'
 import {injectIntl} from 'react-intl'
 
 const MenuItemLinkIntl = (props) => (
   <MUIMenuItem
     primaryText={props.intl.formatMessage({id: props.label})}
-    href={props.to}
+    containerElement={<Link to={props.to}/>}
     disabled={props.disabled}/>
 );
 export const MenuItemLink = injectIntl(MenuItemLinkIntl)
