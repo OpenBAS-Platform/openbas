@@ -31,14 +31,9 @@ export class UserPopover extends Component {
   render() {
     return (
       <div>
-        <Avatar
-          src={this.props.userGravatar}
-          onTouchTap={this.handleOpen.bind(this)}
-        />
-        <Popover
-          open={this.state.open}
-          anchorEl={this.state.anchorEl}
-          onRequestClose={this.handleClose.bind(this)}>
+        <Avatar src={this.props.userGravatar} onTouchTap={this.handleOpen.bind(this)}/>
+        <Popover open={this.state.open} anchorEl={this.state.anchorEl}
+                 onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Profile" to="/profile"/>
             <MenuItemButton label="Sign out" onClick={this.logout.bind(this)}/>

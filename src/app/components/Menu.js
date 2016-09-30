@@ -2,11 +2,10 @@ import React, {PropTypes} from 'react';
 import MUIMenu from 'material-ui/Menu';
 
 export const Menu = (props) => (
-  <MUIMenu
-    multiple={props.multiple}
-  />
+  <MUIMenu multiple={props.multiple}>{props.children}</MUIMenu>
 )
 
 Menu.propTypes = {
+  children: PropTypes.node,
   multiple: PropTypes.bool
 }
