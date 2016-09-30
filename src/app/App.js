@@ -17,7 +17,11 @@ import IndexExercise from './containers/authenticated/exercise/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
+import {addLocaleData, IntlProvider} from 'react-intl'
+import enLocaleData from 'react-intl/locale-data/en'
+import frLocaleData from 'react-intl/locale-data/fr'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
+import {i18n} from './utils/Messages'
 
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
@@ -32,6 +36,7 @@ const initialState = {
   application: Map({
     user: user,
     token: token,
+    locale: navigator.language,
     entities: Map({
       users: users,
       tokens: tokens
@@ -87,19 +92,23 @@ const UserIsAuthenticated = (Component, FailureComponent = undefined) => UserAut
   FailureComponent
 })(Component)
 
+addLocaleData([...enLocaleData, ...frLocaleData]);
 class App extends Component {
   render() {
+    var locale = store.getState().application.get('locale')
     return (
-      <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
-        <Provider store={store}>
-          <Router history={history}>
-            <Route path='/' component={UserIsAuthenticated(RootAuthenticated, RootAnonymous)}>
-              <IndexRoute component={UserIsAuthenticated(IndexAuthenticated, Login)}/>
-              <Route path='/exercises' component={UserIsAuthenticated(IndexExercise)}/>
-            </Route>
-          </Router>
-        </Provider>
-      </MuiThemeProvider>
+      <IntlProvider locale={locale} key={locale} messages={i18n.messages[locale]}>
+        <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
+          <Provider store={store}>
+            <Router history={history}>
+              <Route path='/' component={UserIsAuthenticated(RootAuthenticated, RootAnonymous)}>
+                <IndexRoute component={UserIsAuthenticated(IndexAuthenticated, Login)}/>
+                <Route path='/exercises' component={UserIsAuthenticated(IndexExercise)}/>
+              </Route>
+            </Router>
+          </Provider>
+        </MuiThemeProvider>
+      </IntlProvider>
     );
   }
 }

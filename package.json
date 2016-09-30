@@ -14,6 +14,7 @@
     "ramda": "^0.22.1",
     "react": "^15.3.1",
     "react-dom": "^15.3.1",
+    "react-intl": "^2.1.5",
     "react-redux": "^4.4.5",
     "react-router": "^2.8.1",
     "react-router-redux": "^4.0.5",
@@ -48,6 +49,7 @@
     "globals": {
       "it": true,
       "window": true,
+      "navigator": true,
       "document": true,
       "console": true,
       "localStorage": true,
