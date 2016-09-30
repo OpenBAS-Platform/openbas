@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 const style = {
   margin: 5,
-};
+}
 
 export const Button = (props) => (
   <RaisedButton primary={true}
@@ -13,7 +13,7 @@ export const Button = (props) => (
                 disabled={props.disabled}
                 onClick={props.onClick}
                 style={style}/>
-);
+)
 
 Button.propTypes = {
   label: PropTypes.string.isRequired,
