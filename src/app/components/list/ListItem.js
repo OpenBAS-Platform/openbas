@@ -1,32 +1,32 @@
 import React, {PropTypes} from 'react';
-import MUIMenuItem from 'material-ui/MenuItem';
+import MUIListItem from 'material-ui/List/ListItem';
 import {injectIntl} from 'react-intl'
 
-const MenuItemLinkIntl = (props) => (
-  <MUIMenuItem
+const ListItemLinkIntl = (props) => (
+  <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
     linkButton={true}
     href={props.to}
     disabled={props.disabled}/>
 );
-export const MenuItemLink = injectIntl(MenuItemLinkIntl)
+export const ListItemLink = injectIntl(ListItemLinkIntl)
 
-MenuItemLinkIntl.propTypes = {
+ListItemLinkIntl.propTypes = {
   label: PropTypes.string.isRequired,
   intl: PropTypes.object,
   to: PropTypes.string,
   disabled: PropTypes.bool
 }
 
-const MenuItemButtonIntl = (props) => (
-  <MUIMenuItem
+const ListItemButtonIntl = (props) => (
+  <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
     onTouchTap={props.onClick}
     disabled={props.disabled}/>
 );
-export const MenuItemButton = injectIntl(MenuItemButtonIntl)
+export const ListItemButton = injectIntl(ListItemButtonIntl)
 
-MenuItemButtonIntl.propTypes = {
+ListItemButtonIntl.propTypes = {
   label: PropTypes.string.isRequired,
   intl: PropTypes.object,
   disabled: PropTypes.bool,

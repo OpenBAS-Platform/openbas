@@ -1,13 +1,17 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
+import {zIndex} from 'material-ui/styles';
+import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
+
 import {toggleLeftBar, logout} from '../../actions/Application'
 import {AppBar} from '../../components/AppBar'
+import {Drawer} from '../../components/Drawer'
 import {Avatar} from '../../components/Avatar'
 import {Popover} from '../../components/Popover'
 import {Menu} from '../../components/Menu'
 import {MenuItemLink, MenuItemButton} from "../../components/menu/MenuItem"
-
-import NavBar from '../../components/NavBar'
+import {List} from '../../components/List'
+import {ListItemLink, ListItemButton} from "../../components/list/ListItem"
 import LeftBar from '../../components/LeftBar'
 
 const styles = {
@@ -84,7 +88,14 @@ class RootAuthenticated extends Component {
             </div>
           }
         />
-        <NavBar />
+        <Drawer width={65} docked={true} open={true} style={{zIndex: zIndex.drawer - 50}}>
+          <AppBar
+            onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
+          />
+          <List>
+            <ListItemLink leftIcon={<LocalMovies />}/>
+          </List>
+        </Drawer>
         <LeftBar />
         <div style={styles.root}>
           {this.props.children}
