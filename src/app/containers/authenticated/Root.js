@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
+
 import {logout} from '../../actions/Application';
 import TopBar from '../../components/TopBar'
 import NavBar from '../../components/NavBar'
