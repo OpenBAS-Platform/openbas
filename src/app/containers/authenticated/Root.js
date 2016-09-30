@@ -1,27 +1,17 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 import {logout} from '../../actions/Application';
-import {Button, LinkButton} from '../../components/Button'
-import Menu from './Menu'
 import TopBar from '../../components/TopBar'
+import NavBar from '../../components/NavBar'
+import LeftBar from '../../components/LeftBar'
 
 class RootAuthenticated extends Component {
-  logoutClick() {
-    this.props.logout();
-  }
-
   render() {
     return (
-      <div className="App">
-        <TopBar title="OpenEx" right={<Menu/>}/>
-        <div className="App-header">
-          <h2>Welcome to OpenEx {this.props.userFirstname}</h2>
-        </div>
-        <div>
-          <LinkButton label="Index" to="/"/>
-          <LinkButton label="Home" to="home"/>
-          <Button label="Logout" onClick={this.logoutClick.bind(this)}/>
-        </div>
+      <div>
+        <TopBar />
+        <NavBar />
+        <LeftBar />
         <div>
           {this.props.children}
         </div>
@@ -31,7 +21,6 @@ class RootAuthenticated extends Component {
 }
 
 RootAuthenticated.propTypes = {
-  logout: PropTypes.func.isRequired,
   userFirstname: PropTypes.string,
   children: React.PropTypes.node
 }

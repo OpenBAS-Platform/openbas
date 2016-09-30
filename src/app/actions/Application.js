@@ -48,3 +48,7 @@ export const userInfo = () => (dispatch, getState) => {
     dispatch({type: Constants.APPLICATION_FETCH_USER_ERROR});
   })
 }
+
+export const toggleLeftBar = () => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED});
+}

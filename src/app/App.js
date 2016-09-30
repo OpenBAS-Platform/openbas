@@ -12,19 +12,16 @@ import {UserAuthWrapper} from 'redux-auth-wrapper'
 import {Map, fromJS} from 'immutable'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Login from './containers/anonymous/login/Login'
-import IndexAuthenticated from './containers/authenticated/index/Index'
-import PanelIndex from './containers/authenticated/home/Index'
+import IndexAuthenticated from './containers/authenticated/Index'
+import IndexExercise from './containers/authenticated/exercise/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 
-// Needed for onTouchTap
-// http://stackoverflow.com/a/34015469/988941
 import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
-//Auth token
 const data = fromJS(JSON.parse(localStorage.getItem('token')));
 var tokens = data ? data.getIn(['entities', 'tokens']) : null;
 var token = data ? data.get('result') : null;
@@ -38,6 +35,10 @@ const initialState = {
     entities: Map({
       users: users,
       tokens: tokens
+    }),
+    ui: Map({
+      navbar_left_open: false,
+      navbar_right_open: true
     })
   }),
   home: Map({
@@ -94,7 +95,7 @@ class App extends Component {
           <Router history={history}>
             <Route path='/' component={UserIsAuthenticated(RootAuthenticated, RootAnonymous)}>
               <IndexRoute component={UserIsAuthenticated(IndexAuthenticated, Login)}/>
-              <Route path='/home' component={UserIsAuthenticated(PanelIndex)}/>
+              <Route path='/exercises' component={UserIsAuthenticated(IndexExercise)}/>
             </Route>
           </Router>
         </Provider>

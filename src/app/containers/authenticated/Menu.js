@@ -9,7 +9,6 @@ import {userInfo} from '../../actions/Application';
 import * as Constants from '../../constants/ComponentTypes';
 
 class Menu extends Component {
-
     componentDidMount() {
         const {firstname} = this.props
         if (!firstname) {
@@ -50,6 +49,7 @@ const select = (state) => {
         firstname: firstname ? firstname.slice(0, 1).toUpperCase() : null
     }
 }
+
 export default connect(select, {logout, userInfo})(Menu);
 
 
