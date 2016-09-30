@@ -70,6 +70,8 @@ class User implements UserInterface
      */
     protected $user_status = 1;
 
+    protected $user_gravatar;
+
     public function __construct()
     {
         $this->user_groups = new ArrayCollection();
@@ -171,6 +173,15 @@ class User implements UserInterface
     public function setUserStatus($status)
     {
         $this->user_status = $status;
+        return $this;
+    }
+
+    public function getUserGravatar() {
+        return $this->user_gravatar;
+    }
+
+    public function setUserGravatar() {
+        $this->user_gravatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user_email)));
         return $this;
     }
 

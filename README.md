@@ -1,4 +1,4 @@
-# OpenEx - Open Crisis Management Exercise Platform [![Build Status](https://api.travis-ci.org/Luatix/OpenEx.svg?branch=master)](https://travis-ci.org/Luatix/OpenEx)
+# OpenEx - Open Crisis Management Exercise Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/OpenEx.svg?branch=master)](https://travis-ci.org/LuatixHQ/OpenEx)
 
 Website: http://openex.io
 
@@ -15,11 +15,11 @@ OpenEx includes the following features:
 - Scenarios scripting and automatic execution;
 - Documents and files sharing;
 - Statistics, reports and results;
-- Lessons learned process and roadmap follow-up.
+- Lessons learne    d process and roadmap follow-up.
 
-## Status
+## Status & Bugs
 
-Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. You can find the product roadmap here: https://projets.luatix.org/OpenEx.
+Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. If you wish to report bugs or ask for new features, you can find the product project management here: https://projects.luatix.org/projects/openex.
 
 ## Softwares
 

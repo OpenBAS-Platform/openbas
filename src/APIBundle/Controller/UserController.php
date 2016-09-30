@@ -35,6 +35,10 @@ class UserController extends Controller
         $users = $em->getRepository('APIBundle:User')->findAll();
         /* @var $users User[] */
 
+        foreach( $users as &$user ) {
+            $user->setUserGravatar();
+        }
+        
         return $users;
     }
 
@@ -56,6 +60,7 @@ class UserController extends Controller
             return $this->userNotFound();
         }
 
+        $user->setUserGravatar();
         $this->denyAccessUnlessGranted('select', $user);
         return $user;
     }
