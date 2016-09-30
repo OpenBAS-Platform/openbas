@@ -2,9 +2,8 @@ import {fromJS} from 'immutable'
 
 export const i18n = {
   messages: {
-    fr: {
-      'Sign out': 'Déconnexion'
-    }
+    fr: {},
+    en: {}
   }
 }
 export const i18nRegister = (data) => {
