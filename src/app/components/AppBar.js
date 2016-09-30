@@ -12,7 +12,7 @@ export const AppBar = (props) => (
 
 AppBar.propTypes = {
   title: PropTypes.string,
-  titleStyle: PropTypes.func,
+  titleStyle: PropTypes.object,
   onLeftIconButtonTouchTap: PropTypes.func,
   iconElementRight: PropTypes.element
 }

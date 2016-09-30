@@ -14,5 +14,5 @@ Drawer.propTypes = {
   width: PropTypes.number,
   docked: PropTypes.bool,
   open: PropTypes.bool,
-  style: PropTypes.func
+  style: PropTypes.object
 }
