@@ -1,5 +1,4 @@
 import React, {Component} from 'react'
-import './App.css'
 import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'

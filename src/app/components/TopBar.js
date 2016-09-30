@@ -4,7 +4,7 @@ import Drawer from 'material-ui/Drawer';
 import {List, ListItem} from 'material-ui/List';
 import FontIcon from 'material-ui/FontIcon';
 import {red500, yellow500, blue500} from 'material-ui/styles/colors';
-import logo from '../images/logo.png';
+import logo from '../../www/images/logo.png';
 
 const style = {
   menu: {

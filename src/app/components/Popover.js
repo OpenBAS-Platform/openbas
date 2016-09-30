@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import * as MUI from 'material-ui/Popover';
 import Avatar from 'material-ui/Avatar';
-import {Button} from '../components/Button'
+import {Button} from './Button'
 import * as Constants from '../constants/ComponentTypes';
 
 export class Popover extends Component {

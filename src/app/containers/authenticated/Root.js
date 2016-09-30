@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
-import logo from '../../logo.svg';
 import {logout} from '../../actions/Application';
 import {Button, LinkButton} from '../../components/Button'
 import Menu from './Menu'
@@ -16,7 +15,6 @@ class RootAuthenticated extends Component {
       <div className="App">
         <TopBar title="OpenEx" right={<Menu/>}/>
         <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo"/>
           <h2>Welcome to OpenEx {this.props.userFirstname}</h2>
         </div>
         <div>
