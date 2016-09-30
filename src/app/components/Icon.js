@@ -18,13 +18,15 @@ export const Icon = (props) => {
     case Constants.ICON_NAME_LOCAL_MOVIES:
       return (<LocalMovies style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_HARDWARE_COMPUTER:
-      return (<HardwareComputer style={iconStyle[props.type]} />)
+      return (<HardwareComputer style={mergeStyle} color={props.color} />)
     default:
-      return (<HardwareComputer style={iconStyle[props.type]} />)
+      return (<HardwareComputer style={mergeStyle} color={props.color} />)
   }
 }
 
 Icon.propTypes = {
   name: PropTypes.string,
-  type: PropTypes.string
+  type: PropTypes.string,
+  style: PropTypes.object,
+  color: PropTypes.string
 }
