@@ -6,10 +6,10 @@ import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
 import {toggleLeftBar} from '../../actions/Application'
 import {AppBar} from '../../components/AppBar'
 import {Drawer} from '../../components/Drawer'
-import UserPopover from './user/UserPopover'
 import {List} from '../../components/List'
 import {IconListItemLink} from "../../components/list/ListItem"
-import LeftBar from '../../components/LeftBar'
+import UserPopover from './user/UserPopover'
+import LeftBar from './nav/LeftBar'
 
 const styles = {
   root: {
@@ -49,7 +49,7 @@ class RootAuthenticated extends Component {
         >
           <AppBar onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}/>
           <List>
-            <IconListItemLink to="/exercises" leftIcon={<LocalMovies style={{margin: 0, padding: 0, left: 19, top: 4}} />}/>
+            <IconListItemLink to="/exercises" leftIcon={<LocalMovies style={{margin: 0, padding: 0, left: 19, top: 8}} />}/>
           </List>
         </Drawer>
         <LeftBar />
@@ -62,6 +62,7 @@ class RootAuthenticated extends Component {
 }
 
 RootAuthenticated.propTypes = {
+  leftBarOpen: PropTypes.bool,
   userFirstname: PropTypes.string,
   userGravatar: PropTypes.string,
   toggleLeftBar: PropTypes.func,

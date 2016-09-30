@@ -6,6 +6,7 @@ const ListItemLinkIntl = (props) => (
   <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
     href={props.to}
+    leftIcon={props.leftIcon}
     disabled={props.disabled}/>
 );
 export const ListItemLink = injectIntl(ListItemLinkIntl)
@@ -14,6 +15,7 @@ ListItemLinkIntl.propTypes = {
   label: PropTypes.string,
   intl: PropTypes.object,
   to: PropTypes.string,
+  leftIcon: PropTypes.element,
   disabled: PropTypes.bool
 }
 
@@ -37,7 +39,7 @@ export const IconListItemLink = (props) => (
     href={props.to}
     disabled={props.disabled}
     leftIcon={props.leftIcon}
-    innerDivStyle={{padding: '16px 10px 16px 10px'}}/>
+    innerDivStyle={{padding: '20px 10px 20px 10px'}}/>
 );
 
 IconListItemLink.propTypes = {
