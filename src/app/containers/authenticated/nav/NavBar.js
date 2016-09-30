@@ -1,12 +1,11 @@
-import React, {PropTypes, Component} from 'react';
-import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
-import {zIndex} from 'material-ui/styles';
-import {connect} from 'react-redux';
-
-import {Drawer} from '../../../components/Drawer';
-import {List} from '../../../components/List';
-import {IconListItemLink} from '../../../components/list/ListItem';
-import {AppBar} from '../../../components/AppBar';
+import React, {PropTypes, Component} from 'react'
+import {connect} from 'react-redux'
+import * as Constants from '../../../constants/ComponentTypes'
+import {Drawer} from '../../../components/Drawer'
+import {List} from '../../../components/List'
+import {IconListItemLink} from '../../../components/list/ListItem'
+import {Icon} from '../../../components/Icon'
+import {AppBar} from '../../../components/AppBar'
 import {toggleLeftBar} from '../../../actions/Application'
 
 class NavBar extends Component {
@@ -14,18 +13,15 @@ class NavBar extends Component {
   handleToggle() {
     this.props.toggleLeftBar()
   }
-  
+
   render() {
     return (
-      <Drawer
-        width={65}
-        docked={true}
-        open={true}
-        style={{zIndex: zIndex.drawer - 50}}
-      >
+      <Drawer width={65} docked={true} open={true} zindex={50}>
         <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <IconListItemLink to="/exercises" leftIcon={<LocalMovies style={{margin: 0, padding: 0, left: 19, top: 8}} />}/>
+          <IconListItemLink
+            to="/exercises"
+            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR} name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
         </List>
       </Drawer>
     );

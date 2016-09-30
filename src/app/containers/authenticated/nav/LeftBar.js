@@ -1,12 +1,11 @@
 import React, {PropTypes, Component} from 'react';
-import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
-import {zIndex} from 'material-ui/styles';
 import {connect} from 'react-redux';
-
+import * as Constants from '../../../constants/ComponentTypes'
 import {Drawer} from '../../../components/Drawer';
 import {List} from '../../../components/List';
 import {ListItemLink} from '../../../components/list/ListItem';
 import {AppBar} from '../../../components/AppBar';
+import {Icon} from '../../../components/Icon'
 import {toggleLeftBar} from '../../../actions/Application'
 import {i18nRegister} from '../../../utils/Messages'
 
@@ -24,19 +23,12 @@ class LeftBar extends Component {
 
   render() {
     return (
-      <Drawer
-        width={200}
-        docked={false}
-        open={this.props.open}
-        style={{zIndex: zIndex.drawer - 100}}
-        onRequestChange={this.handleToggle.bind(this)}
-      >
-        <AppBar
-          title="OpenEx"
-          onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-        />
+      <Drawer width={200} docked={false} open={this.props.open} zindex={100}
+              onRequestChange={this.handleToggle.bind(this)}>
+        <AppBar title="OpenEx" onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercises" label="Exercises" leftIcon={<LocalMovies />}/>
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercises" label="Exercises"
+                        leftIcon={<Icon name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
         </List>
       </Drawer>
     );
