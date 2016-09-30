@@ -7,6 +7,7 @@ import AppBar from 'material-ui/AppBar';
 import {connect} from 'react-redux';
 import {toggleLeftBar} from '../actions/Application'
 
+
 class NavBar extends Component {
 
   leftClick() {
@@ -15,7 +16,7 @@ class NavBar extends Component {
 
   render() {
     return (
-      <Drawer width="65" docked={true} open={true} style={{zIndex: zIndex.drawer - 50}}>
+      <Drawer width={65} docked={true} open={true} style={{zIndex: zIndex.drawer - 50}}>
         <AppBar
           onLeftIconButtonTouchTap={this.leftClick.bind(this)}
         />
@@ -31,4 +32,4 @@ NavBar.propTypes = {
   toggleLeftBar: PropTypes.func
 }
 
-export default connect(null, {toggleLeftBar})(NavBar);
+export default connect(null, {toggleLeftBar})(NavBar)

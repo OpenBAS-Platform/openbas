@@ -2,7 +2,7 @@ import React, {PropTypes, Component} from 'react';
 import Drawer from 'material-ui/Drawer';
 import {List, ListItem} from 'material-ui/List';
 import {zIndex} from 'material-ui/styles';
-import FontIcon from 'material-ui/FontIcon';
+import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
 import {connect} from 'react-redux';
 import AppBar from 'material-ui/AppBar';
 import {toggleLeftBar} from '../actions/Application'
@@ -15,13 +15,13 @@ class LeftBar extends Component {
 
   render() {
     return (
-      <Drawer width="200" docked={true} open={this.props.open} style={{zIndex: zIndex.drawer - 100}}>
+      <Drawer width={200} docked={true} open={this.props.open} style={{zIndex: zIndex.drawer - 100}}>
         <AppBar
           title="OpenEx"
           onLeftIconButtonTouchTap={this.leftClick.bind(this)}
         />
         <List>
-          <ListItem primaryText="Exercises" leftIcon={<FontIcon className="material-icons">movie</FontIcon>}/>
+          <ListItem primaryText="Exercises" leftIcon={<LocalMovies />}/>
         </List>
       </Drawer>
     );
@@ -39,4 +39,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {toggleLeftBar})(LeftBar);
+export default connect(select, {toggleLeftBar})(LeftBar)

@@ -8,11 +8,11 @@ export const fetchUsers = () => (dispatch) => {
     dispatch({
       type: Constants.APPLICATION_USERS_FETCH_SUCCESS,
       payload: response.data
-    });
+    })
   }).catch(function (response) {
     dispatch({
       type: Constants.APPLICATION_USERS_FETCH_ERROR,
       payload: response.data
-    });
+    })
   })
 }

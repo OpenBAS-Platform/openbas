@@ -13,7 +13,8 @@ const spinnerStyle = (props) => {
       textAlign: "center"
     }
   }
-};
+}
+
 export const RoundSpinner = (props) => (
   <div style={spinnerStyle(props).roundSpinner}>
     <RefreshIndicator size={40} left={0} top={0} status="loading"/>

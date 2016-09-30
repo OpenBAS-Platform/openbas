@@ -1,9 +1,16 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
+import spacing from 'material-ui/styles/spacing';
 import {logout} from '../../actions/Application';
 import TopBar from '../../components/TopBar'
 import NavBar from '../../components/NavBar'
 import LeftBar from '../../components/LeftBar'
+
+const styles = {
+  content: {
+    margin: spacing.desktopGutter,
+  }
+}
 
 class RootAuthenticated extends Component {
   render() {
@@ -12,7 +19,7 @@ class RootAuthenticated extends Component {
         <TopBar />
         <NavBar />
         <LeftBar />
-        <div>
+        <div style={styles.content}>
           {this.props.children}
         </div>
       </div>

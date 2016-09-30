@@ -7,7 +7,7 @@ const styles = {
   title: {
     marginLeft: 20
   }
-};
+}
 
 class TopBar extends Component {
 
@@ -22,7 +22,7 @@ class TopBar extends Component {
         titleStyle={styles.title}
         onLeftIconButtonTouchTap={this.leftClick.bind(this)}
         />
-    );
+    )
   }
 }
 
@@ -30,4 +30,4 @@ TopBar.propTypes = {
   toggleLeftBar: PropTypes.func
 }
 
-export default connect(null, {toggleLeftBar})(TopBar);
+export default connect(null, {toggleLeftBar})(TopBar)

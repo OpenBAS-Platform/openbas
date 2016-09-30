@@ -1,6 +1,6 @@
 import {
   blueGrey700, blueGrey600,
-  indigo500, indigo700,
+  indigo500,
   pinkA200,
   grey100, grey300, grey400, grey500,
   white, darkBlack, fullBlack,
@@ -26,5 +26,5 @@ export default {
     pickerHeaderColor: indigo500,
     clockCircleColor: fade(darkBlack, 0.07),
     shadowColor: fullBlack,
-  },
-};
+  }
+}
