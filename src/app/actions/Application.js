@@ -2,6 +2,7 @@ import * as Constants from '../constants/ActionTypes'
 import {api} from '../App'
 import * as schema from './Schema'
 import { SubmissionError } from 'redux-form'
+import { push } from 'react-router-redux'
 
 export const askToken = (username, password) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_LOGIN_SUBMITTED});
@@ -51,4 +52,8 @@ export const userInfo = () => (dispatch, getState) => {
 
 export const toggleLeftBar = () => (dispatch) => {
   dispatch({type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED});
+}
+
+export const redirectToHome  = () => (dispatch) => {
+  dispatch(push('/'))
 }

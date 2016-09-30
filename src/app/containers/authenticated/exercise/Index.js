@@ -2,8 +2,8 @@ import React, {Component, PropTypes} from 'react'
 import createImmutableSelector from '../../../utils/ImmutableSelect'
 import {connect} from 'react-redux'
 import {fetchUsers} from '../../../actions/User'
-import CircularProgress from 'material-ui/CircularProgress'
-import {fromJS} from 'immutable';
+import {CircularSpinner} from '../../../components/Spinner'
+import {fromJS} from 'immutable'
 import R from 'ramda'
 
 class Index extends Component {
@@ -16,7 +16,7 @@ class Index extends Component {
     console.log("=== Index render() ===")
     let loading;
     if (this.props.loading) {
-      loading = <CircularProgress />
+      loading = <CircularSpinner />
     }
 
     return (
