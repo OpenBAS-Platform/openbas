@@ -4,6 +4,7 @@ import Drawer from 'material-ui/Drawer';
 import {List, ListItem} from 'material-ui/List';
 import FontIcon from 'material-ui/FontIcon';
 import {red500, yellow500, blue500} from 'material-ui/styles/colors';
+import logo from '../images/logo.png';
 
 const style = {
   menu: {
@@ -12,6 +13,10 @@ const style = {
   overlay: {
     backgroundColor: "#ffffff",
     opacity: 0
+  },
+  logo: {
+    width: 170,
+    marginTop: 5
   }
 };
 
@@ -35,7 +40,7 @@ class TopBar extends Component {
       <div>
         <AppBar/>
         <Drawer docked={false} width={style.menu.width} open={true} overlayStyle={style.overlay}>
-          <AppBar iconElementLeft={<img src="images/logo.png"/>}/>
+          <AppBar iconElementLeft={<img src={logo} style={style.logo} alt="logo"/>}/>
           <List>
             <ListItem primaryText="Home" leftIcon={<FontIcon className="material-icons">home</FontIcon>}/>
           </List>
