@@ -8,6 +8,7 @@ const ListItemLinkIntl = (props) => (
     primaryText={props.intl.formatMessage({id: props.label})}
     containerElement={<Link to={props.to}/>}
     leftIcon={props.leftIcon}
+    onTouchTap={props.onClick}
     disabled={props.disabled}/>
 );
 export const ListItemLink = injectIntl(ListItemLinkIntl)
@@ -17,6 +18,7 @@ ListItemLinkIntl.propTypes = {
   intl: PropTypes.object,
   to: PropTypes.string,
   leftIcon: PropTypes.element,
+  onClick: PropTypes.func,
   disabled: PropTypes.bool
 }
 

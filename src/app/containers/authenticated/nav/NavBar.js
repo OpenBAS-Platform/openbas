@@ -5,45 +5,34 @@ import {connect} from 'react-redux';
 
 import {Drawer} from '../../../components/Drawer';
 import {List} from '../../../components/List';
-import {ListItemLink} from '../../../components/list/ListItem';
+import {IconListItemLink} from '../../../components/list/ListItem';
 import {AppBar} from '../../../components/AppBar';
 import {toggleLeftBar} from '../../../actions/Application'
-import {i18nRegister} from '../../../utils/Messages'
 
-i18nRegister({
-  fr: {
-    'Exercises': 'Exercices'
-  }
-})
-
-class LeftBar extends Component {
+class NavBar extends Component {
 
   handleToggle() {
     this.props.toggleLeftBar()
   }
-
+  
   render() {
     return (
       <Drawer
-        width={200}
-        docked={false}
-        open={this.props.open}
-        style={{zIndex: zIndex.drawer - 100}}
-        onRequestChange={this.handleToggle.bind(this)}
+        width={65}
+        docked={true}
+        open={true}
+        style={{zIndex: zIndex.drawer - 50}}
       >
-        <AppBar
-          title="OpenEx"
-          onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-        />
+        <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercises" label="Exercises" leftIcon={<LocalMovies />}/>
+          <IconListItemLink to="/exercises" leftIcon={<LocalMovies style={{margin: 0, padding: 0, left: 19, top: 8}} />}/>
         </List>
       </Drawer>
     );
   }
 }
 
-LeftBar.propTypes = {
+NavBar.propTypes = {
   toggleLeftBar: PropTypes.func,
   open: PropTypes.bool
 }
@@ -54,4 +43,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {toggleLeftBar})(LeftBar)
+export default connect(select, {toggleLeftBar})(NavBar)
