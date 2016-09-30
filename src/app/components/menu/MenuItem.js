@@ -5,7 +5,6 @@ import {injectIntl} from 'react-intl'
 const MenuItemLinkIntl = (props) => (
   <MUIMenuItem
     primaryText={props.intl.formatMessage({id: props.label})}
-    linkButton={true}
     href={props.to}
     disabled={props.disabled}/>
 );

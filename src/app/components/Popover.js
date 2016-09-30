@@ -2,7 +2,12 @@ import React, {PropTypes} from 'react';
 import MUIPopover from 'material-ui/Popover';
 
 export const Popover = (props) => (
-  <MUIPopover open={props.open} anchorEl={props.anchorEl} onRequestClose={props.onRequestClose}>
+  <MUIPopover
+    open={props.open}
+    anchorEl={props.anchorEl}
+    anchorOrigin={props.anchorOrigin}
+    targetOrigin={props.targetOrigin}
+    onRequestClose={props.onRequestClose}>
     {props.children}
   </MUIPopover>
 )
@@ -10,6 +15,8 @@ export const Popover = (props) => (
 Popover.propTypes = {
   open: PropTypes.bool,
   anchorEl: PropTypes.object,
+  anchorOrigin: PropTypes.object,
+  targetOrigin: PropTypes.object,
   onRequestClose: PropTypes.func,
   children: PropTypes.node
 }

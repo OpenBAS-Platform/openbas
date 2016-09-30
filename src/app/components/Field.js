@@ -1,6 +1,7 @@
-import React, {PropTypes} from 'react';
-import TextField from 'material-ui/TextField';
+import React, {PropTypes} from 'react'
+import TextField from 'material-ui/TextField'
 import {Field} from 'redux-form'
+import {injectIntl} from 'react-intl'
 
 const renderTextField = ({input, label, hint, meta: {touched, error}}) => (
   <TextField hintText={hint}
@@ -19,13 +20,20 @@ renderTextField.propTypes = {
   meta: PropTypes.object
 }
 
-export const FormField = (props) => (
-  <Field name={props.name} label={props.label} hint={props.hint} type={props.type} component={renderTextField}/>
+export const FormFieldIntl = (props) => (
+  <Field name={props.name}
+         label={props.intl.formatMessage({id: props.label})}
+         hint={props.intl.formatMessage({id: props.hint})}
+         type={props.type}
+         component={renderTextField}/>
 )
 
-FormField.propTypes = {
+export const FormField = injectIntl(FormFieldIntl)
+
+FormFieldIntl.propTypes = {
   hint: PropTypes.string,
   label: PropTypes.string,
+  intl: PropTypes.object,
   name: PropTypes.string.isRequired,
   type: PropTypes.string
 }

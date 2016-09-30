@@ -6,7 +6,7 @@ import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
 import {toggleLeftBar} from '../../actions/Application'
 import {AppBar} from '../../components/AppBar'
 import {Drawer} from '../../components/Drawer'
-import {UserPopover} from './user/UserPopover'
+import UserPopover from './user/UserPopover'
 import {List} from '../../components/List'
 import {ListItemLink} from "../../components/list/ListItem"
 import LeftBar from '../../components/LeftBar'

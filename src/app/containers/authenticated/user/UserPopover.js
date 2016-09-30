@@ -6,7 +6,7 @@ import {Menu} from '../../../components/Menu'
 import {MenuItemLink, MenuItemButton} from "../../../components/menu/MenuItem"
 import {logout} from '../../../actions/Application'
 
-export class UserPopover extends Component {
+class UserPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {open: false}
@@ -24,7 +24,8 @@ export class UserPopover extends Component {
     this.setState({open: false})
   }
 
-  logout() {
+  logoutClick() {
+    console.log(this.props)
     this.props.logout()
   }
 
@@ -32,11 +33,12 @@ export class UserPopover extends Component {
     return (
       <div>
         <Avatar src={this.props.userGravatar} onTouchTap={this.handleOpen.bind(this)}/>
-        <Popover open={this.state.open} anchorEl={this.state.anchorEl}
+        <Popover open={this.state.open}
+                 anchorEl={this.state.anchorEl}
                  onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Profile" to="/profile"/>
-            <MenuItemButton label="Sign out" onClick={this.logout.bind(this)}/>
+            <MenuItemButton label="Sign out" onClick={this.logoutClick.bind(this)}/>
           </Menu>
         </Popover>
       </div>

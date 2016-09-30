@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
-import {Link} from 'react-router';
-import RaisedButton from 'material-ui/RaisedButton';
+import React, {PropTypes} from 'react'
+import {Link} from 'react-router'
+import RaisedButton from 'material-ui/RaisedButton'
 import {injectIntl} from 'react-intl'
 
 const style = {
