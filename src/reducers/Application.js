@@ -36,7 +36,7 @@ export const application = (state = Map(), action) => {
     case Constants.APPLICATION_LOGOUT_SUCCESS:
       return state.set('token', null);
 
-    case Constants.USERS_FETCH_SUCCESS: {
+    case Constants.APPLICATION_USERS_FETCH_SUCCESS: {
       return state.setIn(['entities', 'users'], mergeUsers())
     }
 

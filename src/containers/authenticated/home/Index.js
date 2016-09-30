@@ -1,14 +1,14 @@
-import React, {Component, PropTypes} from 'react';
-import createImmutableSelector from '../../utils/ImmutableSelect'
-import {connect} from 'react-redux';
-import {fetchUsers} from '../../actions/User';
-import CircularProgress from 'material-ui/CircularProgress';
+import React, {Component, PropTypes} from 'react'
+import createImmutableSelector from '../../../utils/ImmutableSelect'
+import {connect} from 'react-redux'
+import {fetchUsers} from '../../../actions/User'
+import CircularProgress from 'material-ui/CircularProgress'
 import {fromJS} from 'immutable';
 import R from 'ramda'
 
 class Index extends Component {
   componentDidMount() {
-    console.log("=== Index componentDidMount()===")
+    console.log("=== Home Index componentDidMount()===")
     this.props.fetchUsers();
   }
 
