@@ -4,7 +4,7 @@ class IndexAuthenticated extends Component {
   render() {
     return (
       <div>
-        Index
+        IndexdsdddddddddddddddIndexdsdddddddddddddddIndexdsdddddddddddddddIndexdsddddddddddddddd
       </div>
     );
   }
