@@ -3,7 +3,7 @@ import {fromJS} from 'immutable'
 export const i18n = {
   messages: {
     fr: {
-      'Logout': 'Bye'
+      'Sign out': 'Déconnexion'
     }
   }
 }

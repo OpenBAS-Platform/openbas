@@ -1,11 +1,11 @@
 import React, {PropTypes, Component} from 'react';
 import AppBar from 'material-ui/AppBar';
 import {connect} from 'react-redux';
-import {toggleLeftBar} from '../actions/Application'
+import {toggleLeftBar, logout} from '../actions/Application'
 import Avatar from "material-ui/Avatar"
 import Popover from "material-ui/Popover"
 import Menu from "material-ui/Menu"
-import MenuItem from "material-ui/MenuItem"
+import {MenuItemLink, MenuItemButton} from "../components/menu/MenuItem"
 
 const styles = {
   title: {
@@ -25,6 +25,10 @@ class TopBar extends Component {
     this.state = {
       open: false,
     }
+  }
+
+  logoutClick() {
+    this.props.logout()
   }
 
   avatarClick(event) {
@@ -60,11 +64,10 @@ class TopBar extends Component {
               anchorEl={this.state.anchorEl}
               anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
               targetOrigin={{horizontal: 'left', vertical: 'top'}}
-              onRequestClose={this.requestClose.bind(this)}
-            >
+              onRequestClose={this.requestClose.bind(this)}>
               <Menu>
-                <MenuItem primaryText="Profile"/>
-                <MenuItem primaryText="Sign out"/>
+                <MenuItemLink label="Profile" to="/profile"/>
+                <MenuItemButton label="Sign out" onClick={this.logoutClick.bind(this)}/>
               </Menu>
             </Popover>
           </div>
@@ -75,6 +78,7 @@ class TopBar extends Component {
 }
 
 TopBar.propTypes = {
+  logout: PropTypes.func,
   toggleLeftBar: PropTypes.func,
   userGravatar: PropTypes.string
 }
@@ -87,4 +91,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {toggleLeftBar})(TopBar)
+export default connect(select, {toggleLeftBar, logout})(TopBar)
