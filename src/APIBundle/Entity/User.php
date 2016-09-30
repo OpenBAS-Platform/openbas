@@ -181,7 +181,7 @@ class User implements UserInterface
     }
 
     public function setUserGravatar() {
-        $this->user_gravatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user_email)));
+        $this->user_gravatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user_email))) . '?d=mm';
         return $this;
     }
 
