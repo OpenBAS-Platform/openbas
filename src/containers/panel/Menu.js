@@ -10,45 +10,45 @@ import * as Constants from '../../constants/ComponentTypes';
 
 class Menu extends Component {
 
-    componentDidMount() {
-        const {firstname} = this.props
-        if (!firstname) {
-            this.props.userInfo()
-        }
+  componentDidMount() {
+    const {firstname} = this.props
+    if (!firstname) {
+      this.props.userInfo()
     }
+  }
 
-    logoutClick() {
-        this.props.logout();
-    }
+  logoutClick() {
+    this.props.logout();
+  }
 
-    render() {
-        if (this.props.firstname) {
-            return (
-                <div>
-                    <Popover type={Constants.POPOVER_TYPE_AVATAR} avatar={this.props.firstname}>
-                        <MaterialMenu.Menu>
-                            <MenuItem onClick={this.logoutClick.bind(this)} primaryText="Sign out"/>
-                        </MaterialMenu.Menu>
-                    </Popover>
-                </div>
-            )
-        } else {
-            return <RoundSpinner/>
-        }
+  render() {
+    if (this.props.firstname) {
+      return (
+        <div>
+          <Popover type={Constants.POPOVER_TYPE_AVATAR} avatar={this.props.firstname}>
+            <MaterialMenu.Menu>
+              <MenuItem onClick={this.logoutClick.bind(this)} primaryText="Sign out"/>
+            </MaterialMenu.Menu>
+          </Popover>
+        </div>
+      )
+    } else {
+      return <RoundSpinner/>
     }
+  }
 }
 
 Menu.propTypes = {
-    logout: PropTypes.func.isRequired,
-    userInfo: PropTypes.func.isRequired,
-    firstname: PropTypes.string
+  logout: PropTypes.func.isRequired,
+  userInfo: PropTypes.func.isRequired,
+  firstname: PropTypes.string
 }
 
 const select = (state) => {
-    var firstname = state.application.getIn(['entities', 'users', 'me', 'firstname']);
-    return {
-        firstname: firstname ? firstname.slice(0, 1).toUpperCase() : null
-    }
+  var firstname = state.application.getIn(['entities', 'users', 'me', 'firstname']);
+  return {
+    firstname: firstname ? firstname.slice(0, 1).toUpperCase() : null
+  }
 }
 export default connect(select, {logout, userInfo})(Menu);
 

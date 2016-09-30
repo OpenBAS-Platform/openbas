@@ -7,5 +7,5 @@ export const user = new Schema('users', {idAttribute: 'user_id'})
 export const arrayOfUsers = arrayOf(user)
 
 token.define({
-    token_user: user
+  token_user: user
 })
