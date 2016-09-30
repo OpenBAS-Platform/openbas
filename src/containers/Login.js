@@ -2,24 +2,9 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {routerActions} from 'react-router-redux'
 import {askToken} from '../actions/Application'
-import {Button} from '../components/Button'
-import {Field} from '../components/Field'
+import LoginForm from '../forms/LoginForm'
 
 class Login extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {username: '', password: ''};
-  }
-
-  handleChange(event) {
-    this.setState({[event.target.name]: event.target.value});
-  }
-
-  handleSubmit(e) {
-    e.preventDefault();
-    this.props.askToken(this.state.username, this.state.password);
-  }
 
   componentWillMount() {
     const {isAuthenticated, replace, redirect} = this.props
@@ -36,21 +21,14 @@ class Login extends Component {
     }
   }
 
+  onSubmit(data) {
+    return this.props.askToken(data.username, data.password)
+  }
+
   render() {
     return (
       <div className="Login">
-        <form className="loginForm" onSubmit={this.handleSubmit.bind(this)}>
-          <Field name="username" label="Username" hint="Your name"
-                 value={this.state.username}
-                 onChange={this.handleChange.bind(this)}/>
-          <br/>
-
-          <Field name="password" type="password" label="Password" hint="Your password"
-                 value={this.state.password}
-                 onChange={this.handleChange.bind(this)}/>
-          <br/>
-          <Button type="submit" label="Login"/>
-        </form>
+        <LoginForm onSubmit={this.onSubmit.bind(this)}/>
       </div>
     )
   }
@@ -65,7 +43,7 @@ Login.propTypes = {
 
 const select = (state, ownProps) => {
   const isAuthenticated = state.application.get('token') !== null
-  const redirect = ownProps.location.query.redirect || '/'
+  const redirect = ownProps.location.query.redirect || '/';
   return {
     isAuthenticated,
     redirect

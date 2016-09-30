@@ -1,21 +1,31 @@
 import React, {PropTypes} from 'react';
 import TextField from 'material-ui/TextField';
+import {Field} from 'redux-form'
 
-export const Field = (props) => (
-  <TextField
-    hintText={props.hint}
-    floatingLabelText={props.label}
-    name={props.name}
-    type={props.type}
-    onChange={props.onChange}
-    floatingLabelFixed={true}
+const renderTextField = ({input, label, hint, meta: {touched, error}}) => (
+  <TextField hintText={hint}
+             floatingLabelText={label}
+             floatingLabelFixed={true}
+             errorText={touched && error}
+             {...input}
   />
 )
 
-Field.propTypes = {
+renderTextField.propTypes = {
+  input: PropTypes.object,
   hint: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
-  type: PropTypes.string,
-  onChange: PropTypes.func.isRequired
+  meta: PropTypes.object
+}
+
+export const FormField = (props) => (
+  <Field name={props.name} label={props.label} hint={props.hint} type={props.type} component={renderTextField}/>
+)
+
+FormField.propTypes = {
+  hint: PropTypes.string,
+  label: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  type: PropTypes.string
 }

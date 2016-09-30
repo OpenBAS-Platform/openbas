@@ -1,6 +1,7 @@
-import * as Constants from '../constants/ActionTypes';
-import {api} from '../App';
+import * as Constants from '../constants/ActionTypes'
+import {api} from '../App'
 import * as schema from './Schema'
+import { SubmissionError } from 'redux-form'
 
 export const askToken = (username, password) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_LOGIN_SUBMITTED});
@@ -12,13 +13,10 @@ export const askToken = (username, password) => (dispatch) => {
       type: Constants.APPLICATION_LOGIN_SUCCESS,
       payload: response.data
     });
-  }).catch(function (response) {
+  }).catch(function () {
     //Remove the token from local storage and dispatch LOGIN ERROR
     localStorage.removeItem('token');
-    dispatch({
-      type: Constants.APPLICATION_LOGIN_ERROR,
-      payload: response.data
-    });
+    throw new SubmissionError({_error: 'Login failed!'})
   })
 }
 

@@ -29,12 +29,12 @@ const data = fromJS(JSON.parse(localStorage.getItem('token')));
 var tokens = data ? data.getIn(['entities', 'tokens']) : null;
 var token = data ? data.get('result') : null;
 var users = data ? data.getIn(['entities', 'users']) : null;
-var user = tokens ? tokens.get(token.toString()).get('token_user') : null;
+var user = tokens ? tokens.get(token).get('token_user') : null;
 
 const initialState = {
   application: Map({
-    user: user && user.toString(),
-    token: token && token.toString(),
+    user: user,
+    token: token,
     entities: Map({
       users: users,
       tokens: tokens
