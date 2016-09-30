@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-class IndexAuth extends Component {
+class IndexAuthenticated extends Component {
   render() {
     return (
       <div>
@@ -10,4 +10,4 @@ class IndexAuth extends Component {
   }
 }
 
-export default IndexAuth;
+export default IndexAuthenticated;

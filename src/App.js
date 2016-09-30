@@ -4,16 +4,17 @@ import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import rootReducer from './reducers'
-import Root from './containers/Root'
+import RootAuthenticated from './containers/authenticated/Root'
+import RootAnonymous from './containers/anonymous/Root'
 import {Provider} from 'react-redux'
 import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
 import {Map, fromJS} from 'immutable'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import Login from './containers/Login'
-import Index from './containers/Index'
-import PanelIndex from './containers/panel/Index'
+import Login from './containers/anonymous/login/Login'
+import IndexAuthenticated from './containers/authenticated/index/Index'
+import PanelIndex from './containers/authenticated/home/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
@@ -74,15 +75,17 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 // Create an enhanced history that syncs navigation events with the store
 const history = syncHistoryWithStore(baseHistory, store)
 
-const UserIsAuthenticated = UserAuthWrapper({
+const UserIsAuthenticated = (Component, FailureComponent = undefined) => UserAuthWrapper({
   authSelector: state => {
     var app = state.application;
     return app.getIn(['entities', 'tokens', app.get('token')])
   },
   redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsAuthenticated',
-  //TODO check validity token | predicate: token => token
-})
+  failureRedirectPath: '/',
+  //predicate: token => token != null && //TODO test token validity
+  FailureComponent
+})(Component)
 
 class App extends Component {
   render() {
@@ -90,10 +93,9 @@ class App extends Component {
       <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
         <Provider store={store}>
           <Router history={history}>
-            <Route path='/' component={Root}>
-              <IndexRoute component={Index}/>
+            <Route path='/' component={UserIsAuthenticated(RootAuthenticated, RootAnonymous)}>
+              <IndexRoute component={UserIsAuthenticated(IndexAuthenticated, Login)}/>
               <Route path='/home' component={UserIsAuthenticated(PanelIndex)}/>
-              <Route path='/login' component={Login}/>
             </Route>
           </Router>
         </Provider>

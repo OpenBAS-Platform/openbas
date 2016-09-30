@@ -1,7 +1,7 @@
 import React, {PropTypes} from 'react'
 import {reduxForm} from 'redux-form'
-import {FormField} from '../components/Field'
-import {Button} from '../components/Button'
+import {FormField} from '../../../components/Field'
+import {Button} from '../../../components/Button'
 
 const validate = values => {
   const errors = {}
