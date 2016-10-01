@@ -32,3 +32,9 @@ body {
     transform: rotate(360deg);
   }
 }
+
+input:-webkit-autofill {
+  background-color: #ffffff !important;
+  background-image:none !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+}

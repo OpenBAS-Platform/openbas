@@ -15,13 +15,6 @@ i18nRegister({
   }
 })
 
-
-const styles = {
-  title: {
-    cursor: 'pointer'
-  }
-}
-
 class LeftBar extends Component {
 
   handleToggle() {
@@ -37,7 +30,7 @@ class LeftBar extends Component {
     return (
       <Drawer width={200} docked={false} open={this.props.open} zindex={100}
               onRequestChange={this.handleToggle.bind(this)}>
-        <AppBar title="OpenEx" titleStyle={styles.title}  onTitleTouchTap={this.redirectToHome.bind(this)}
+        <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_LEFTBAR} onTitleTouchTap={this.redirectToHome.bind(this)}
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
           <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercises" label="Exercises"

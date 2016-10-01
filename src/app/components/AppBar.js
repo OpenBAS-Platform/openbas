@@ -6,7 +6,10 @@ const appBarTitleStyle = {
   [ Constants.APPBAR_TYPE_TOPBAR ]: {
     marginLeft: 20,
     cursor: 'pointer'
-  }
+  },
+  [ Constants.APPBAR_TYPE_LEFTBAR ]: {
+    cursor: 'pointer'
+  },
 }
 
 export const AppBar = (props) => (
