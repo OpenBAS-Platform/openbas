@@ -1,12 +1,12 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import * as Constants from '../../../constants/ComponentTypes'
-import {Popover} from '../../../components/Popover';
-import {Avatar} from '../../../components/Avatar';
-import {Menu} from '../../../components/Menu'
-import {MenuItemLink, MenuItemButton} from "../../../components/menu/MenuItem"
-import {logout} from '../../../actions/Application'
-import {i18nRegister} from '../../../utils/Messages'
+import * as Constants from '../../constants/ComponentTypes'
+import {Popover} from '../../components/Popover';
+import {Avatar} from '../../components/Avatar';
+import {Menu} from '../../components/Menu'
+import {MenuItemLink, MenuItemButton} from "../../components/menu/MenuItem"
+import {logout} from '../../actions/Application'
+import {i18nRegister} from '../../utils/Messages'
 
 i18nRegister({
   fr: {

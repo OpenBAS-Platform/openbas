@@ -11,7 +11,8 @@ import {i18nRegister} from '../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'Exercises': 'Exercices'
+    'Exercises': 'Exercices',
+    'Users': 'Utilisateurs'
   }
 })
 
@@ -35,6 +36,8 @@ class LeftBar extends Component {
         <List>
           <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercises" label="Exercises"
                         leftIcon={<Icon name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/users" label="Users"
+                        leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
         </List>
       </Drawer>
     );

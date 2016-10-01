@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
-import UserPopover from './user/UserPopover'
+import UserPopover from './UserPopover'
 import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
 

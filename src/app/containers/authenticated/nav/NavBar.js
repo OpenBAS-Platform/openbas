@@ -19,8 +19,10 @@ class NavBar extends Component {
       <Drawer width={65} docked={true} open={true} zindex={50}>
         <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <IconListItemLink to="/exercises"
-            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR} name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
+          <IconListItemLink to="/exercises" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                                                            name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
+          <IconListItemLink to="/users" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                                                        name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
         </List>
       </Drawer>
     )

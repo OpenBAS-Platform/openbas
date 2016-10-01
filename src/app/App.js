@@ -14,6 +14,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Login from './containers/anonymous/login/Login'
 import IndexAuthenticated from './containers/authenticated/Index'
 import IndexExercise from './containers/authenticated/exercise/Index'
+import IndexUser from './containers/authenticated/user/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
@@ -104,6 +105,7 @@ class App extends Component {
               <Route path='/' component={UserIsAuthenticated(RootAuthenticated, RootAnonymous)}>
                 <IndexRoute component={UserIsAuthenticated(IndexAuthenticated, Login)}/>
                 <Route path='/exercises' component={UserIsAuthenticated(IndexExercise)}/>
+                <Route path='/users' component={UserIsAuthenticated(IndexUser)}/>
               </Route>
             </Router>
           </Provider>
