@@ -6,12 +6,19 @@ export const RoundSpinner = () => (
     <RefreshIndicator size={40} left={0} top={0} status="loading"/>
 )
 
+const style = {
+  margin: '0 auto',
+  marginTop: '50vh',
+  transform: 'translateY(-60%)',
+  textAlign: 'center'
+}
+
 RoundSpinner.propTypes = {
   show: PropTypes.bool
 }
 
 export const CircularSpinner = (props) => (
-    <CircularProgress size={props.size}/>
+    <CircularProgress style={style} size={props.size}/>
 )
 
 CircularSpinner.propTypes = {
