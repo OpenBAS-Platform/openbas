@@ -13,5 +13,9 @@ export const ICON_NAME_HARDWARE_COMPUTER = 'ICON_NAME_HARDWARE_COMPUTER';
 
 //region APPBAR
 export const APPBAR_TYPE_TOPBAR = 'APPBAR_TYPE_TOPBAR';
-export const APPBAR_TYPE_LOGIN = 'APPBAR_TYPE_LOGIN';
+//endregion
+
+//region APPBAR
+export const TOOLBAR_TYPE_DARK = 'TOOLBAR_TYPE_DARK';
+export const TOOLBAR_TYPE_LIGHT = 'TOOLBAR_TYPE_LIGHT';
 //endregion

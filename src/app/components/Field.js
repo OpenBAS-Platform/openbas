@@ -15,7 +15,6 @@ const styles = {
 const renderTextField = ({input, label, hint, meta: {touched, error}, ...custom}) => (
   <TextField hintText={hint}
              floatingLabelText={label}
-             floatingLabelFixed={true}
              errorText={touched && error}
              style={styles.global}
              inputStyle={styles.input}

@@ -4,6 +4,7 @@ import {askToken} from '../../../actions/Application'
 import {MyToolbar, MyToolbarGroup, MyToolbarTitle} from '../../../components/Toolbar'
 import LoginForm from './LoginForm'
 import {i18nRegister} from '../../../utils/Messages'
+import * as Constants from '../../../constants/ComponentTypes'
 
 i18nRegister({
   fr: {
@@ -15,9 +16,9 @@ const styles = {
   login: {
     margin: '0 auto',
     marginTop: '50vh',
-    transform: 'translateY(-50%)',
+    transform: 'translateY(-60%)',
     textAlign: 'center',
-    width: 500,
+    width: 400,
     border: '1px solid #ddd',
     paddingBottom: 20
   }
@@ -32,9 +33,9 @@ class Login extends Component {
   render() {
     return (
       <div style={styles.login}>
-        <MyToolbar>
+        <MyToolbar type={Constants.TOOLBAR_TYPE_DARK}>
           <MyToolbarGroup>
-            <MyToolbarTitle text="Login"/>
+            <MyToolbarTitle text="Login" type={Constants.TOOLBAR_TYPE_DARK}/>
           </MyToolbarGroup>
         </MyToolbar>
         <LoginForm onSubmit={this.onSubmit.bind(this)}/>
