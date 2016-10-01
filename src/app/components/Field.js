@@ -12,19 +12,21 @@ const styles = {
   }
 }
 
-const renderTextField = ({input, label, hint, meta: {touched, error}, ...custom}) => (
+const renderTextField = ({input, label, fullWidth, type, hint, meta: {touched, error}}) => (
   <TextField hintText={hint}
              floatingLabelText={label}
              errorText={touched && error}
              style={styles.global}
              inputStyle={styles.input}
+             fullWidth={fullWidth}
+             type={type}
              {...input}
-             {...custom}
-  />
-)
+  />)
 
 renderTextField.propTypes = {
   input: PropTypes.object,
+  fullWidth: PropTypes.number,
+  type: PropTypes.string,
   hint: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
