@@ -16,6 +16,5 @@ export const APPBAR_TYPE_TOPBAR = 'APPBAR_TYPE_TOPBAR';
 //endregion
 
 //region APPBAR
-export const TOOLBAR_TYPE_DARK = 'TOOLBAR_TYPE_DARK';
-export const TOOLBAR_TYPE_LIGHT = 'TOOLBAR_TYPE_LIGHT';
+export const TOOLBAR_TYPE_LOGIN = 'TOOLBAR_TYPE_LOGIN';
 //endregion

@@ -20,6 +20,7 @@ const styles = {
     textAlign: 'center',
     width: 400,
     border: '1px solid #ddd',
+    borderRadius: 10,
     paddingBottom: 20
   }
 }
@@ -33,9 +34,9 @@ class Login extends Component {
   render() {
     return (
       <div style={styles.login}>
-        <MyToolbar type={Constants.TOOLBAR_TYPE_DARK}>
+        <MyToolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
           <MyToolbarGroup>
-            <MyToolbarTitle text="Login" type={Constants.TOOLBAR_TYPE_DARK}/>
+            <MyToolbarTitle text="Login"/>
           </MyToolbarGroup>
         </MyToolbar>
         <LoginForm onSubmit={this.onSubmit.bind(this)}/>

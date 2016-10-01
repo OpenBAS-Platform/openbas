@@ -2,8 +2,15 @@ import React, {PropTypes} from 'react';
 import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
 import * as Constants from '../constants/ComponentTypes'
 
+const toolbarStyle = {
+  [ Constants.TOOLBAR_TYPE_LOGIN ]: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10
+  }
+}
+
 export const MyToolbar = (props) => (
-  <Toolbar>{props.children}</Toolbar>
+  <Toolbar style={toolbarStyle[props.type]}>{props.children}</Toolbar>
 )
 
 MyToolbar.propTypes = {
@@ -19,7 +26,7 @@ MyToolbarGroup.propTypes = {
 }
 
 export const MyToolbarSeparator = (props) => (
-  <ToolbarSeparator style={props.style} />
+  <ToolbarSeparator style={props.style}/>
 )
 
 MyToolbarSeparator.propTypes = {
@@ -27,13 +34,11 @@ MyToolbarSeparator.propTypes = {
 }
 
 const toolbarTitleStyle = {
-  [ Constants.TOOLBAR_TYPE_DARK ]: {
-    color: '#ffffff'
-  }
+  color: '#ffffff'
 }
 
 export const MyToolbarTitle = (props) => (
-  <ToolbarTitle text={props.text} style={toolbarTitleStyle[props.type]} />
+  <ToolbarTitle text={props.text} style={toolbarTitleStyle}/>
 )
 
 MyToolbarTitle.propTypes = {
