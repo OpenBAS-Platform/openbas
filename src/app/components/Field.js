@@ -3,12 +3,24 @@ import TextField from 'material-ui/TextField'
 import {Field} from 'redux-form'
 import {injectIntl} from 'react-intl'
 
-const renderTextField = ({input, label, hint, meta: {touched, error}}) => (
+const styles = {
+  global: {
+    marginBottom: 10,
+  },
+  input: {
+    borderRadius: 5
+  }
+}
+
+const renderTextField = ({input, label, hint, meta: {touched, error}, ...custom}) => (
   <TextField hintText={hint}
              floatingLabelText={label}
              floatingLabelFixed={true}
              errorText={touched && error}
+             style={styles.global}
+             inputStyle={styles.input}
              {...input}
+             {...custom}
   />
 )
 
@@ -36,4 +48,22 @@ FormFieldIntl.propTypes = {
   intl: PropTypes.object,
   name: PropTypes.string.isRequired,
   type: PropTypes.string
+}
+
+export const SimpleFormFieldIntl = (props) => (
+  <Field name={props.name}
+         hint={props.intl.formatMessage({id: props.hint})}
+         type={props.type}
+         fullWidth={props.fullWidth}
+         component={renderTextField}/>
+)
+
+export const SimpleFormField = injectIntl(SimpleFormFieldIntl)
+
+SimpleFormFieldIntl.propTypes = {
+  hint: PropTypes.string,
+  intl: PropTypes.object,
+  name: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  fullWidth: PropTypes.bool
 }

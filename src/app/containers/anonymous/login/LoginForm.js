@@ -1,22 +1,24 @@
 import React, {PropTypes} from 'react'
 import {reduxForm} from 'redux-form'
-import {FormField} from '../../../components/Field'
+import {SimpleFormField} from '../../../components/Field'
 import {Button} from '../../../components/Button'
 import {i18nRegister} from '../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'Email': 'Utilisateur / Email',
-    'Your email': 'Votre addresse email',
+    'Email address': 'Adresse email',
     'Password': 'Mot de passe',
-    'Your password': 'Votre mot de passe',
-    'Login': 'Connectez vous'
+    'Sign in': 'Se connecter'
   }
 })
 
+const style = {
+  marginTop: 20
+}
+
 const validate = values => {
   const errors = {}
-  const requiredFields = ['username', 'password']
+  const requiredFields = []
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = 'Required'
@@ -28,13 +30,13 @@ const validate = values => {
 const LoginForm = (props) => {
   const {error, onSubmit, handleSubmit, pristine, submitting} = props
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} style={style}>
       {error && <div><strong>{error}</strong><br/></div>}
-      <FormField name="username" type="text" label="Email" hint="Your email"/>
+      <SimpleFormField name="username" type="text" hint="Email address"/>
       <br/>
-      <FormField name="password" type="password" label="Password" hint="Your password"/>
+      <SimpleFormField name="password" type="text" hint="Password"/>
       <br/>
-      <Button type="submit" disabled={pristine || submitting} label="Login"/>
+      <Button type="submit" disabled={pristine || submitting} label="Sign in"/>
     </form>
   )
 }
@@ -48,6 +50,6 @@ LoginForm.propTypes = {
 }
 
 export default reduxForm({
-  form: 'LoginForm',  // a unique identifier for this form
+  form: 'LoginForm',
   validate
 })(LoginForm)

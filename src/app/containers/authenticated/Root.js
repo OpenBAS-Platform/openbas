@@ -1,11 +1,11 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {redirectToHome, toggleLeftBar} from '../../actions/Application'
+import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import UserPopover from './user/UserPopover'
 import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
-
 
 const styles = {
   root: {
@@ -38,7 +38,7 @@ class RootAuthenticated extends Component {
       <div>
         <AppBar
           title="OpenEx"
-          titleStyle={styles.title}
+          type={Constants.APPBAR_TYPE_TOPBAR}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}/>

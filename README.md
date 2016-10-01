@@ -2,7 +2,7 @@
 
 Website: http://openex.io
 
-This repository is used for the OpenEx frontend development. To deploy the OpenEx platform, please refer to the main repository https://github.com/LuatixHQ/OpenEx.
+This repository is used for the OpenEx frontend development. To deploy the OpenEx platform, please refer to the main repository https://github.com/LuatixHQ/openex.
 
 ## Hacking
 
