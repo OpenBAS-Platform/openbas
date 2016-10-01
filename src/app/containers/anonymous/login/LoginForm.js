@@ -33,9 +33,7 @@ const LoginForm = (props) => {
     <form onSubmit={handleSubmit(onSubmit)} style={style}>
       {error && <div><strong>{error}</strong><br/></div>}
       <SimpleFormField name="username" type="text" hint="Email address"/>
-      <br/>
-      <SimpleFormField name="password" type="text" hint="Password"/>
-      <br/>
+      <SimpleFormField name="password" type="password" hint="Password"/>
       <Button type="submit" disabled={pristine || submitting} label="Sign in"/>
     </form>
   )
