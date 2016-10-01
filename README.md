@@ -1,4 +1,4 @@
-# OpenEx - Open Crisis Management Exercise Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/OpenEx.svg?branch=master)](https://travis-ci.org/LuatixHQ/OpenEx)
+# OpenEx - Open Crisis Management Exercise Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex)
 
 Website: http://openex.io
 
@@ -15,7 +15,7 @@ OpenEx includes the following features:
 - Scenarios scripting and automatic execution;
 - Documents and files sharing;
 - Statistics, reports and results;
-- Lessons learne    d process and roadmap follow-up.
+- Lessons learned process and roadmap follow-up.
 
 ## Status & Bugs
 
@@ -26,7 +26,7 @@ Currently OpenEx is under heavy development, no release has been published yet. 
 OpenEx works with an external scheduler ([Dkron](http://dkron.io)) for injects automation. Indeed, OpenEx developers are focusing on the exercises features, the user experience and all the very specific needs of crisis management processes.
  
 As OpenEx has been built with the [Symfony framework](https://symfony.com) on top of an SQL database, you will need a PHP/MySQL stack.
-
+    
 Prerequisites:
  
 - Install Dkron, follow instructions here http://dkron.io/docs/getting-started

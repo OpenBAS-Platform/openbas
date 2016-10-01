@@ -11,5 +11,7 @@ APIBundle\Entity\User:
             groups: ['user', 'token']
         user_gravatar:
             groups: ['user', 'token']
+        user_admin:
+            groups: ['user', 'token']
         user_groups:
             groups: ['user']
