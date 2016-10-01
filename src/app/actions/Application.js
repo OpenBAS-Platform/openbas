@@ -9,6 +9,7 @@ export const askToken = (username, password) => (dispatch) => {
   var data = {login: username, password: password};
   return api(schema.token).post('/api/tokens', data).then(function (response) {
     //Set the localStorage token and dispatch LOGIN SUCCESS
+    console.log("=============== STORE ")
     localStorage.setItem('token', JSON.stringify(response.data.toJS()))
     dispatch({
       type: Constants.APPLICATION_LOGIN_SUCCESS,

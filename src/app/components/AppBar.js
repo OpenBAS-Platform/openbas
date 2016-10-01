@@ -2,12 +2,10 @@ import React, {PropTypes} from 'react';
 import MUIAppBar from 'material-ui/AppBar';
 import * as Constants from '../constants/ComponentTypes'
 
-const appBarStyle = {
+const appBarTitleStyle = {
   [ Constants.APPBAR_TYPE_TOPBAR ]: {
-    title: {
-      marginLeft: 20,
-      cursor: 'pointer'
-    }
+    marginLeft: 20,
+    cursor: 'pointer'
   }
 }
 
@@ -18,8 +16,7 @@ export const AppBar = (props) => (
     onLeftIconButtonTouchTap={props.onLeftIconButtonTouchTap}
     iconElementRight={props.iconElementRight}
     showMenuIconButton={props.showMenuIconButton}
-    style={appBarStyle[props.type]['appbar']}
-    titleStyle={appBarStyle[props.type]['title']}
+    titleStyle={appBarTitleStyle[props.type]}
   />
 )
 
