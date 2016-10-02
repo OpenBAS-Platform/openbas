@@ -1,52 +1,59 @@
 import React, {PropTypes} from 'react';
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import {
+  Table as MUITable,
+  TableBody as MUITableBody,
+  TableHeader as MUITableHeader,
+  TableHeaderColumn as MUITableHeaderColumn,
+  TableRow as MUITableRow,
+  TableRowColumn as MUITableRowColumn
+} from 'material-ui/Table';
 
-export const MyTable = (props) => (
-  <Table selectable={props.selectable} multiSelectable={props.multiSelectable}>{props.children}</Table>
+export const Table = (props) => (
+  <MUITable selectable={props.selectable} multiSelectable={props.multiSelectable} {...props}>{props.children}</MUITable>
 )
 
-MyTable.propTypes = {
+Table.propTypes = {
   children: PropTypes.node,
   selectable: PropTypes.bool,
   multiSelectable: PropTypes.bool
 }
 
-export const MyTableBody = (props) => (
-  <TableBody>{props.children}</TableBody>
+export const TableBody = (props) => (
+  <MUITableBody {...props}>{props.children}</MUITableBody>
 )
 
-MyTableBody.propTypes = {
+TableBody.propTypes = {
   children: PropTypes.node,
 }
 
-export const MyTableHeader = (props) => (
-  <TableHeader>{props.children}</TableHeader>
+export const TableHeader = (props) => (
+  <MUITableHeader {...props}>{props.children}</MUITableHeader>
 )
 
-MyTableHeader.propTypes = {
+TableHeader.propTypes = {
   children: PropTypes.node,
 }
 
-export const MyTableHeaderColumn = (props) => (
-  <TableHeaderColumn>{props.children}</TableHeaderColumn>
+export const TableHeaderColumn = (props) => (
+  <MUITableHeaderColumn {...props}>{props.children}</MUITableHeaderColumn>
 )
 
-MyTableHeaderColumn.propTypes = {
+TableHeaderColumn.propTypes = {
   children: PropTypes.node,
 }
 
-export const MyTableRow = (props) => (
-  <TableRow hovered={true}>{props.children}</TableRow>
+export const TableRow = (props) => (
+  <MUITableRow hovered={true} {...props}>{props.children}</MUITableRow>
 )
 
-MyTableRow.propTypes = {
+TableRow.propTypes = {
   children: PropTypes.node
 }
 
-export const MyTableRowColumn = (props) => (
-  <TableRowColumn>{props.children}</TableRowColumn>
+export const TableRowColumn = (props) => (
+  <MUITableRowColumn {...props}>{props.children}</MUITableRowColumn>
 )
 
-MyTableRowColumn.propTypes = {
+TableRowColumn.propTypes = {
   children: PropTypes.node,
 }

@@ -1,5 +1,10 @@
 import React, {PropTypes} from 'react';
-import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui/Toolbar';
+import {
+  Toolbar as MUIToolbar,
+  ToolbarGroup as MUIToolbarGroup,
+  ToolbarSeparator as MUIToolbarSeparator,
+  ToolbarTitle as MUIToolbarTitle
+} from 'material-ui/Toolbar';
 import * as Constants from '../constants/ComponentTypes'
 import {blueGrey700} from 'material-ui/styles/colors';
 
@@ -11,27 +16,27 @@ const toolbarStyle = {
   }
 }
 
-export const MyToolbar = (props) => (
-  <Toolbar style={toolbarStyle[props.type]}>{props.children}</Toolbar>
+export const Toolbar = (props) => (
+  <MUIToolbar style={toolbarStyle[props.type]}>{props.children}</MUIToolbar>
 )
 
-MyToolbar.propTypes = {
+Toolbar.propTypes = {
   children: PropTypes.node,
 }
 
-export const MyToolbarGroup = (props) => (
-  <ToolbarGroup>{props.children}</ToolbarGroup>
+export const ToolbarGroup = (props) => (
+  <MUIToolbarGroup>{props.children}</MUIToolbarGroup>
 )
 
-MyToolbarGroup.propTypes = {
+ToolbarGroup.propTypes = {
   children: PropTypes.node,
 }
 
-export const MyToolbarSeparator = (props) => (
-  <ToolbarSeparator style={props.style}/>
+export const ToolbarSeparator = (props) => (
+  <MUIToolbarSeparator style={props.style}/>
 )
 
-MyToolbarSeparator.propTypes = {
+ToolbarSeparator.propTypes = {
   style: PropTypes.object,
 }
 
@@ -39,11 +44,11 @@ const toolbarTitleStyle = {
   color: '#ffffff'
 }
 
-export const MyToolbarTitle = (props) => (
-  <ToolbarTitle text={props.text} style={toolbarTitleStyle}/>
+export const ToolbarTitle = (props) => (
+  <MUIToolbarTitle text={props.text} style={toolbarTitleStyle}/>
 )
 
-MyToolbarTitle.propTypes = {
+ToolbarTitle.propTypes = {
   text: PropTypes.string,
   type: PropTypes.string
 }

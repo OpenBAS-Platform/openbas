@@ -5,7 +5,7 @@ import {fromJS} from 'immutable'
 import R from 'ramda'
 import {fetchUsers} from '../../../actions/User'
 import {CircularSpinner} from '../../../components/Spinner'
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from '../../../components/Table'
 import {Avatar} from '../../../components/Avatar';
 
 class Index extends Component {

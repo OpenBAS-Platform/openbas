@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {askToken} from '../../../actions/Application'
-import {MyToolbar, MyToolbarGroup, MyToolbarTitle} from '../../../components/Toolbar'
+import {Toolbar, ToolbarGroup, ToolbarTitle} from '../../../components/Toolbar'
 import LoginForm from './LoginForm'
 import {i18nRegister} from '../../../utils/Messages'
 import * as Constants from '../../../constants/ComponentTypes'
@@ -34,11 +34,11 @@ class Login extends Component {
   render() {
     return (
       <div style={styles.login}>
-        <MyToolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
-          <MyToolbarGroup>
-            <MyToolbarTitle text="Login"/>
-          </MyToolbarGroup>
-        </MyToolbar>
+        <Toolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
+          <ToolbarGroup>
+            <ToolbarTitle text="Login"/>
+          </ToolbarGroup>
+        </Toolbar>
         <LoginForm onSubmit={this.onSubmit.bind(this)}/>
       </div>
     )
