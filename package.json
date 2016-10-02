@@ -32,7 +32,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://demo.openex.io/",
+  "proxy": "http://demo.local.openex.io/",
   "eslintConfig": {
     "plugins": [
       "react"
@@ -54,6 +54,7 @@
       "document": true,
       "console": true,
       "localStorage": true,
+      "Promise": true,
       "module": true,
       "process": true
     },
