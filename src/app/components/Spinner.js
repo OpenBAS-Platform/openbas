@@ -8,8 +8,6 @@ export const RoundSpinner = () => (
 
 const style = {
   margin: '0 auto',
-  marginTop: '50vh',
-  transform: 'translateY(-60%)',
   textAlign: 'center'
 }
 
@@ -18,7 +16,7 @@ RoundSpinner.propTypes = {
 }
 
 export const CircularSpinner = (props) => (
-    <CircularProgress style={style} size={props.size}/>
+    <div style={style}><CircularProgress size={props.size}/></div>
 )
 
 CircularSpinner.propTypes = {
