@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "react-scripts": "0.4.1",
-    "immutablediff": "^0.4.3"
+    "immutablediff": "^0.4.3",
+    "jest": "^15.1.1",
+    "react-scripts": "0.6.1"
   },
   "dependencies": {
     "axios": "^0.14.0",
@@ -12,12 +13,12 @@
     "material-ui": "^0.15.4",
     "normalizr": "^2.2.1",
     "ramda": "^0.22.1",
-    "react": "^15.3.1",
-    "react-dom": "^15.3.1",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
     "react-intl": "^2.1.5",
     "react-redux": "^4.4.5",
     "react-router": "^2.8.1",
-    "react-router-redux": "^4.0.5",
+    "react-router-redux": "^4.0.6",
     "react-tap-event-plugin": "^1.0.0",
     "redux": "^3.6.0",
     "redux-auth-wrapper": "^0.8.0",
