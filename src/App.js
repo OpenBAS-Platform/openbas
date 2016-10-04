@@ -33,7 +33,6 @@ var tokens = data ? data.getIn(['entities', 'tokens']) : null;
 var token = data ? data.get('result') : null;
 var users = data ? data.getIn(['entities', 'users']) : null;
 var user = tokens ? tokens.get(token).get('token_user') : null;
-var exercises = data ? data.getIn(['entities', 'exercises']) : null;
 
 //Default application state
 const initialState = {
@@ -44,7 +43,9 @@ const initialState = {
     entities: Map({
       users: users,
       tokens: tokens,
-      exercises: exercises
+      exercises: Map(),
+      events: Map(),
+      audiences: Map()
     }),
     ui: Map({
       navbar_left_open: false,

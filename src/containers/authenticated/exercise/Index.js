@@ -1,10 +1,12 @@
 import React, {Component, PropTypes} from 'react'
-import createImmutableSelector from '../../../utils/ImmutableSelect'
 import {connect} from 'react-redux'
-import {fetchExercises} from '../../../actions/Exercise'
-import {CircularSpinner} from '../../../components/Spinner'
 import {fromJS} from 'immutable'
 import R from 'ramda'
+import createImmutableSelector from '../../../utils/ImmutableSelect'
+import {fetchExercises} from '../../../actions/Exercise'
+import {CircularSpinner} from '../../../components/Spinner'
+import NavBar from './nav/NavBar'
+import LeftBar from './nav/LeftBar'
 
 class Index extends Component {
   componentDidMount() {
@@ -21,12 +23,10 @@ class Index extends Component {
 
     return (
       <div>
-        { loading }
-        {this.props.users.toList().map(user => {
-          return (
-            <div key={user.get('user_id')}>User : {user.get('user_firstname')}</div>
-          )
-        })}
+        <NavBar />
+        <LeftBar />
+        <h1>Title</h1>
+
       </div>
     );
   }

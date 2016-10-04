@@ -4,8 +4,6 @@ import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import UserPopover from './UserPopover'
-import NavBar from './nav/NavBar'
-import LeftBar from './nav/LeftBar'
 
 const styles = {
   root: {
@@ -35,8 +33,6 @@ class RootAuthenticated extends Component {
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}/>
-        <NavBar />
-        <LeftBar />
         <div style={styles.root}>
           {this.props.children}
         </div>

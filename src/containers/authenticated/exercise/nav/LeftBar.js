@@ -34,10 +34,16 @@ class LeftBar extends Component {
         <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_LEFTBAR} onTitleTouchTap={this.redirectToHome.bind(this)}
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercises" label="Exercises"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercise/world" label="World"
+                        leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercise/objectives" label="Objectives"
+                        leftIcon={<Icon name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercise/scenario" label="Scenario"
                         leftIcon={<Icon name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to="/users" label="Users"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercise/audience" label="Audience"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
+          <ListItemLink onClick={this.handleToggle.bind(this)} to="/exercise/calendar" label="Calendar"
+                        leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
         </List>
       </Drawer>
     );
