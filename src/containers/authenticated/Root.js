@@ -18,13 +18,6 @@ const styles = {
 }
 
 class RootAuthenticated extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      menu_right_open: false,
-    }
-  }
-
   toggleLeftBar() {
     this.props.toggleLeftBar()
   }

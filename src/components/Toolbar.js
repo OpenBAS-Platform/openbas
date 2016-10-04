@@ -17,11 +17,12 @@ const toolbarStyle = {
 }
 
 export const Toolbar = (props) => (
-  <MUIToolbar style={toolbarStyle[props.type]}>{props.children}</MUIToolbar>
+  <MUIToolbar style={toolbarStyle[props.type]} {...props}>{props.children}</MUIToolbar>
 )
 
 Toolbar.propTypes = {
   children: PropTypes.node,
+  type: PropTypes.string
 }
 
 export const ToolbarGroup = (props) => (
