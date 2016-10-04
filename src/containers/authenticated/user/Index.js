@@ -10,12 +10,10 @@ import {Avatar} from '../../../components/Avatar';
 
 class Index extends Component {
   componentDidMount() {
-    console.log("=== Home Index componentDidMount()===")
     this.props.fetchUsers();
   }
 
   render() {
-    console.log("=== Index render() ===")
     let loading;
     if (this.props.loading) {
       loading = <CircularSpinner />

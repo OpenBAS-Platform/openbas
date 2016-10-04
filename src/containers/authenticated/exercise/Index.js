@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import createImmutableSelector from '../../../utils/ImmutableSelect'
 import {connect} from 'react-redux'
-import {fetchUsers} from '../../../actions/User'
+import {fetchExercises} from '../../../actions/Exercise'
 import {CircularSpinner} from '../../../components/Spinner'
 import {fromJS} from 'immutable'
 import R from 'ramda'
@@ -53,4 +53,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchUsers})(Index);
+export default connect(select, {fetchExercises})(Index);

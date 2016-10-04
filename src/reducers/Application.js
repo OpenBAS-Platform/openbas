@@ -40,6 +40,10 @@ export const application = (state = Map(), action) => {
       return state.setIn(['entities', 'users'], mergeUsers())
     }
 
+    case Constants.APPLICATION_EXERCISES_FETCH_SUCCESS: {
+      return state.setIn(['entities', 'exercises'], action.payload.getIn(['entities', 'exercises']))
+    }
+
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
       return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))
     }

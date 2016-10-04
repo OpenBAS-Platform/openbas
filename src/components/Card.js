@@ -9,12 +9,16 @@ import {
   CardText as MUICardText
 } from 'material-ui/Card';
 
+const cardStyle = {
+  width: 400
+}
+
 export const Card = (props) => (
-  <MUICard>{props.children}</MUICard>
+  <MUICard style={cardStyle}>{props.children}</MUICard>
 )
 
 Card.propTypes = {
-  chilfren: PropTypes.node
+  children: PropTypes.node
 }
 
 export const CardHeader = (props) => (
@@ -42,14 +46,15 @@ CardMedia.propTypes = {
   children: PropTypes.node
 }
 
-
 export const CardTitle = (props) => (
-  <MUICardTitle title={props.title} subtitle={props.subtitle} />
+  <MUICardTitle title={props.title} titleColor={props.titleColor} subtitle={props.subtitle} subtitleColor={props.subtitleColor} />
 )
 
 CardTitle.propTypes = {
   title: PropTypes.string,
-  subtitle: PropTypes.string
+  titleColor: PropTypes.string,
+  subtitle: PropTypes.string,
+  subtitleColor: PropTypes.string
 }
 
 export const CardText = (props) => (

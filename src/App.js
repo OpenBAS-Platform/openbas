@@ -14,7 +14,8 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Login from './containers/anonymous/login/Login'
 import IndexAuthenticated from './containers/authenticated/Index'
 import IndexExercise from './containers/authenticated/exercise/Index'
-import IndexUser from './containers/authenticated/user/Index'
+import IndexDocument from './containers/authenticated/exercise/Index'
+import IndexHelp from './containers/authenticated/exercise/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
@@ -32,6 +33,7 @@ var tokens = data ? data.getIn(['entities', 'tokens']) : null;
 var token = data ? data.get('result') : null;
 var users = data ? data.getIn(['entities', 'users']) : null;
 var user = tokens ? tokens.get(token).get('token_user') : null;
+var exercises = data ? data.getIn(['entities', 'exercises']) : null;
 
 //Default application state
 const initialState = {
@@ -41,7 +43,8 @@ const initialState = {
     locale: navigator.language,
     entities: Map({
       users: users,
-      tokens: tokens
+      tokens: tokens,
+      exercises: exercises
     }),
     ui: Map({
       navbar_left_open: false,
@@ -128,8 +131,16 @@ class App extends Component {
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
-                <Route path='/users' component={IndexUser}/>
-                <Route path='/exercises' component={IndexExercise}/>
+                <Route path='/documents' component={IndexDocument}/>
+                <Route path='/help' component={IndexHelp}/>
+                <Route path='/exercises' component={IndexExercise}>
+                  <Route path='/exercise' component={IndexExercise} />
+                  <Route path='/exercise/world' component={IndexExercise} />
+                  <Route path='/exercise/objectives' component={IndexExercise} />
+                  <Route path='/exercise/scenario' component={IndexExercise} />
+                  <Route path='/exercise/audience' component={IndexExercise} />
+                  <Route path='/exercise/calendar' component={IndexExercise} />
+                </Route>
               </Route>
             </Router>
           </Provider>
