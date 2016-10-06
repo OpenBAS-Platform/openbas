@@ -19,15 +19,15 @@ class NavBar extends Component {
       <Drawer width={65} docked={true} open={true} zindex={50}>
         <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <IconListItemLink to="/exercise/world" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/world'} leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                                             name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
-          <IconListItemLink to="/exercise/objectives" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/world'} leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                                         name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
-          <IconListItemLink to="/exercise/scenario" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
-                                                        name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
-          <IconListItemLink to="/exercise/audience" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/world'} leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                                                        name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
+          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/world'} leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                                         name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
-          <IconListItemLink to="/exercise/calendar" leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/world'} leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                                         name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
         </List>
       </Drawer>
@@ -37,6 +37,7 @@ class NavBar extends Component {
 
 NavBar.propTypes = {
   toggleLeftBar: PropTypes.func,
+  params: PropTypes.object.isRequired,
   open: PropTypes.bool
 }
 

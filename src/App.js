@@ -44,8 +44,10 @@ const initialState = {
       users: users,
       tokens: tokens,
       exercises: Map(),
+      audiences: Map(),
       events: Map(),
-      audiences: Map()
+      incidents: Map(),
+      injects: Map()
     }),
     ui: Map({
       navbar_left_open: false,

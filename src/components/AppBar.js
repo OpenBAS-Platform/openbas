@@ -3,8 +3,12 @@ import MUIAppBar from 'material-ui/AppBar';
 import * as Constants from '../constants/ComponentTypes'
 
 const appBarTitleStyle = {
-  [ Constants.APPBAR_TYPE_TOPBAR ]: {
+  [ Constants.APPBAR_TYPE_TOPBAR_NOICON ]: {
     marginLeft: -10,
+    cursor: 'pointer'
+  },
+  [ Constants.APPBAR_TYPE_TOPBAR ]: {
+    marginLeft: 60,
     cursor: 'pointer'
   },
   [ Constants.APPBAR_TYPE_LEFTBAR ]: {

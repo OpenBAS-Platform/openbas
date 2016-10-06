@@ -4,37 +4,20 @@ body {
   font-family: sans-serif;
 }
 
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 input:-webkit-autofill {
   background-color: #ffffff !important;
   background-image:none !important;
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: 600;
+  color: #616161;
+}
+
+h2 {
+  font-size: 25px;
+  font-weight: 500;
+  color: #616161;
 }

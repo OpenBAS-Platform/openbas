@@ -58,3 +58,7 @@ export const toggleLeftBar = () => (dispatch) => {
 export const redirectToHome  = () => (dispatch) => {
   dispatch(push('/'))
 }
+
+export const redirectToExercises  = () => (dispatch) => {
+  dispatch(push('/'))
+}
