@@ -27,6 +27,10 @@ export const APPBAR_TYPE_TOPBAR = 'APPBAR_TYPE_TOPBAR';
 export const APPBAR_TYPE_LEFTBAR = 'APPBAR_TYPE_LEFTBAR';
 //endregion
 
-//region APPBAR
+//region TOOLBAR
 export const TOOLBAR_TYPE_LOGIN = 'TOOLBAR_TYPE_LOGIN';
+//endregion
+
+//region PAPER
+export const PAPER_TYPE_EXERCISE = 'PAPER_TYPE_EXERCISE';
 //endregion

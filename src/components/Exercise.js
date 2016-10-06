@@ -1,35 +1,51 @@
 import React, {PropTypes} from 'react';
+import * as Constants from "../constants/ComponentTypes";
+import {Paper} from './Paper'
 
 const styles = {
-  exercise: {
-    display: 'inline-block',
-    border: '1px solid #e6e6e6',
-    margin: 20,
-    width: 400,
-    height: 300,
-    borderRadius: 2,
-    cubicBezier: '(0.23, 1, 0.32, 1) 0ms',
-    boxSizing: 'border-box',
-    boxShadow: 'rgba(0, 0, 0, .5)'
-  },
   header: {
     width: '100%',
     borderBottom: '1px solid #e6e6e6',
-    fontSize: 13,
+    fontWeight: 400,
     padding: '10px 0 10px 0',
-    color: '#616161'
+    color: '#616161',
   },
-  body: {
-
+  body: function (image) {
+    return {
+      textAlign: 'left',
+      backgroundImage: 'url("' + image + '")',
+      height: 150,
+      position: 'relative'
+    }
+  },
+  hover: {
+    position: 'absolute',
+    bottom: 0,
+    padding: 10,
+    backgroundColor: 'rgba(0, 0, 0, .6)',
+    height: 30
+  },
+  description: {
+    padding: 0,
+    margin: 0,
+    color: '#ffffff',
+    fontWeight: 400,
+    fontSize: 14
   }
 }
 
 export const Exercise = (props) => (
-  <div style={styles.exercise}>
+  <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE}>
     <div style={styles.header}>
-      {props.organizer}
+      <h3>{props.name}</h3>
+      <h5>{props.subtitle}</h5>
     </div>
-  </div>
+    <div style={styles.body(props.image)}>
+      <div style={styles.hover}>
+        <p style={styles.description}>{props.description}</p>
+      </div>
+    </div>
+  </Paper>
 )
 
 Exercise.propTypes = {

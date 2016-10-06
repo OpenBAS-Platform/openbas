@@ -6,7 +6,7 @@ body {
 
 input:-webkit-autofill {
   background-color: #ffffff !important;
-  background-image:none !important;
+  background-image: none !important;
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
 }
 
@@ -17,7 +17,35 @@ h1 {
 }
 
 h2 {
+  margin: 5px 0 5px 0;
   font-size: 25px;
   font-weight: 500;
   color: #616161;
+}
+
+h3 {
+  margin: 5px 0 5px 0;
+  font-size: 25px;
+  font-weight: 600;
+  color: #616161;
+  font-variant: small-caps;
+}
+
+h4 {
+  margin: 5px 0 5px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #616161;
+}
+
+h5 {
+  margin: 5px 0 5px 0;
+  font-size: 13px;
+  font-weight: 300;
+  color: #808080;
+  font-style: italic;
+}
+
+div.exercise:hover {
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 6px, rgba(0, 0, 0, 0.3) 0px 1px 4px !important;
 }

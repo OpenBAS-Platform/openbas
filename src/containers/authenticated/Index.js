@@ -1,10 +1,12 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {Link} from 'react-router'
 import {fetchExercises} from '../../actions/Exercise'
 import {CircularSpinner} from '../../components/Spinner'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
+import {FloatingActionsButtonCreate} from '../../components/Button'
 import UserPopover from './UserPopover'
 import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 
@@ -38,28 +40,27 @@ class IndexAuthenticated extends Component {
       <div style={styles.container}>
         <AppBar
           title="OpenEx"
-          type={Constants.APPBAR_TYPE_TOPBAR}
+          type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}
           showMenuIconButton={false}/>
         { loading }
         {this.props.exercises.toList().map(exercise => {
-          console.log(exercise)
           return (
-            <a href={'/private/exercise/' + exercise.get('exercise_id')}>
+            <Link to={'/private/exercise/' + exercise.get('exercise_id')} key={exercise.get('exercise_id')}>
               <Exercise
-                key={exercise.get('exercise_id')}
                 name={exercise.get('exercise_name')}
                 subtitle={exercise.get('exercise_subtitle')}
                 description={exercise.get('exercise_description')}
                 organizer={exercise.get('exercise_organizer')}
                 organizerLogo="images/sgdsn.png"
-                image="images/secnuc16.jpg"
+                image={'images/' + exercise.get('exercise_id') + '.png'}
               />
-          </a>
+          </Link>
           )
         })}
+        <FloatingActionsButtonCreate />
       </div>
     );
   }
