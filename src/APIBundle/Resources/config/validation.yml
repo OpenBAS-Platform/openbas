@@ -44,7 +44,13 @@ APIBundle\Entity\Exercise:
         exercise_name:
             - NotBlank: ~
             - Type: string
+        exercise_subtitle:
+            - NotBlank: ~
+            - Type: string
         exercise_description:
+            - NotBlank: ~
+            - Type: string
+        exercise_organizer:
             - NotBlank: ~
             - Type: string
         exercise_start_date:
@@ -53,7 +59,6 @@ APIBundle\Entity\Exercise:
             - DateTime: ~
         exercise_status:
             - NotBlank: ~
-            - Type: integer
 
 APIBundle\Entity\Event:
     properties:

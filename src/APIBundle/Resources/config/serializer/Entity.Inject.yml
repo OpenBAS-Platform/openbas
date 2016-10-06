@@ -2,18 +2,16 @@ APIBundle\Entity\Inject:
     exclusion_policy: none
     properties:
         inject_id:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_title:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_description:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_content:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_date:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_sender:
-            groups: ['inject', 'incident']
-        incident_event:
-            groups: ['incident']
-        incident_status:
-            groups: ['inject', 'incident', 'event', 'exercise']
+            groups: ['inject']
+        inject_status:
+            groups: ['inject']
