@@ -3,14 +3,26 @@ import {connect} from 'react-redux'
 import {fetchExercises} from '../../actions/Exercise'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from '../../components/Card';
 import {CircularSpinner} from '../../components/Spinner'
-import NavBar from './nav/NavBar'
-import LeftBar from './nav/LeftBar'
+import * as Constants from '../../constants/ComponentTypes'
+import {AppBar} from '../../components/AppBar'
+import UserPopover from './UserPopover'
+import {connect} from 'react-redux'
+import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 
 const cardMediaStyle = {
   height: 150
 }
 
 class IndexAuthenticated extends Component {
+  toggleLeftBar() {
+    this.props.toggleLeftBar()
+  }
+
+  redirectToHome() {
+    this.props.redirectToHome()
+  }
+
+
   componentDidMount() {
     this.props.fetchExercises();
   }
@@ -23,8 +35,14 @@ class IndexAuthenticated extends Component {
 
     return (
       <div>
-        <NavBar />
-        <LeftBar />
+        <AppBar
+          title="OpenEx"
+          type={Constants.APPBAR_TYPE_TOPBAR}
+          onTitleTouchTap={this.redirectToHome.bind(this)}
+          onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
+          iconElementRight={<UserPopover/>}
+          showMenuIconButton={false}/>
+
         { loading }
         {this.props.exercises.toList().map(exercise => {
           return (
@@ -48,7 +66,10 @@ class IndexAuthenticated extends Component {
 IndexAuthenticated.propTypes = {
   loading: PropTypes.bool.isRequired,
   exercises: PropTypes.object,
-  fetchExercises: PropTypes.func.isRequired
+  fetchExercises: PropTypes.func.isRequired,
+  toggleLeftBar: PropTypes.func,
+  logout: PropTypes.func,
+  redirectToHome: PropTypes.func,
 }
 
 const select = (state) => {
@@ -58,4 +79,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchExercises})(IndexAuthenticated);
+export default connect(select, {redirectToHome, toggleLeftBar, fetchExercises})(IndexAuthenticated);

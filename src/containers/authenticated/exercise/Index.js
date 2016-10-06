@@ -23,8 +23,6 @@ class Index extends Component {
 
     return (
       <div>
-        <NavBar />
-        <LeftBar />
         <h1>Title</h1>
 
       </div>

@@ -3,19 +3,12 @@ import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import rootReducer from './reducers'
-import RootAuthenticated from './containers/authenticated/Root'
-import RootAnonymous from './containers/anonymous/Root'
 import {Provider} from 'react-redux'
 import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
 import {Map, fromJS} from 'immutable'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import Login from './containers/anonymous/login/Login'
-import IndexAuthenticated from './containers/authenticated/Index'
-import IndexExercise from './containers/authenticated/exercise/Index'
-import IndexDocument from './containers/authenticated/exercise/Index'
-import IndexHelp from './containers/authenticated/exercise/Index'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
@@ -26,6 +19,13 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import {i18n} from './utils/Messages'
 import * as Constants from './constants/ActionTypes'
 import injectTapEventPlugin from 'react-tap-event-plugin'
+import RootAnonymous from './containers/anonymous/Root'
+import Login from './containers/anonymous/login/Login'
+import RootAuthenticated from './containers/authenticated/Root'
+import IndexAuthenticated from './containers/authenticated/Index'
+import RootExercise from './containers/authenticated/exercise/Root'
+import IndexExercise from './containers/authenticated/exercise/Index'
+
 injectTapEventPlugin()
 
 const data = fromJS(JSON.parse(localStorage.getItem('token')));
@@ -132,15 +132,14 @@ class App extends Component {
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
-                <Route path='/documents' component={IndexDocument}/>
-                <Route path='/help' component={IndexHelp}/>
-                <Route path='/exercises' component={IndexExercise}>
-                  <Route path='/exercise' component={IndexExercise} />
-                  <Route path='/exercise/world' component={IndexExercise} />
-                  <Route path='/exercise/objectives' component={IndexExercise} />
-                  <Route path='/exercise/scenario' component={IndexExercise} />
-                  <Route path='/exercise/audience' component={IndexExercise} />
-                  <Route path='/exercise/calendar' component={IndexExercise} />
+                <Route path='exercise/:exerciseId' component={RootExercise}>
+                  <IndexRoute component={IndexExercise} />
+                  <Route path='world' component={IndexExercise} />
+                  <Route path='objectives' component={IndexExercise} />
+                  <Route path='scenario' component={IndexExercise} />
+                  <Route path='audience' component={IndexExercise} />
+                  <Route path='audience' component={IndexExercise} />
+                  <Route path='calendar' component={IndexExercise} />*/
                 </Route>
               </Route>
             </Router>

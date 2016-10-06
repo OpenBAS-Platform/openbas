@@ -9,12 +9,8 @@ import {
   CardText as MUICardText
 } from 'material-ui/Card';
 
-const cardStyle = {
-  width: 400
-}
-
 export const Card = (props) => (
-  <MUICard style={cardStyle}>{props.children}</MUICard>
+  <MUICard>{props.children}</MUICard>
 )
 
 Card.propTypes = {

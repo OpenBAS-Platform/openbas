@@ -15,6 +15,7 @@
     "ramda": "^0.22.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
+    "react-flexbox-grid": "^0.10.2",
     "react-intl": "^2.1.5",
     "react-redux": "^4.4.5",
     "react-router": "^2.8.1",

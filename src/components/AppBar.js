@@ -4,7 +4,7 @@ import * as Constants from '../constants/ComponentTypes'
 
 const appBarTitleStyle = {
   [ Constants.APPBAR_TYPE_TOPBAR ]: {
-    marginLeft: 20,
+    marginLeft: -10,
     cursor: 'pointer'
   },
   [ Constants.APPBAR_TYPE_LEFTBAR ]: {
