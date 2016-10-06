@@ -6,7 +6,7 @@ import {CircularSpinner} from '../../components/Spinner'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
-import {FloatingActionsButtonCreate} from '../../components/Button'
+import CreateExercise from './CreateExercise'
 import UserPopover from './UserPopover'
 import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 
@@ -60,7 +60,7 @@ class IndexAuthenticated extends Component {
           </Link>
           )
         })}
-        <FloatingActionsButtonCreate />
+        <CreateExercise />
       </div>
     );
   }

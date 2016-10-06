@@ -10,9 +10,19 @@ const styles = {
     padding: '10px 0 10px 0',
     color: '#616161',
   },
+  title: {
+    margin: '5px 0 5px 0',
+    fontSize: 25,
+    fontWeight: 600,
+    fontVariant: 'small-caps',
+  },
+  subtitle: {
+    fontSize: 14,
+    fontWeight: 300,
+    color: '#808080'
+  },
   body: function (image) {
     return {
-      textAlign: 'left',
       backgroundImage: 'url("' + image + '")',
       height: 150,
       position: 'relative'
@@ -37,11 +47,11 @@ const styles = {
 export const Exercise = (props) => (
   <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE}>
     <div style={styles.header}>
-      <h3>{props.name}</h3>
-      <h5>{props.subtitle}</h5>
+      <div style={styles.title}>{props.name}</div>
+      <div style={styles.subtitle}>{props.subtitle}</div>
     </div>
     <div style={styles.body(props.image)}>
-      <div style={styles.hover}>
+      <div className="exerciseHover" style={styles.hover}>
         <p style={styles.description}>{props.description}</p>
       </div>
     </div>

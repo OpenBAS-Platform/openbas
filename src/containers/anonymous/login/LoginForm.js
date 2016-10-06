@@ -13,7 +13,7 @@ i18nRegister({
 })
 
 const style = {
-  marginTop: 20
+  padding: 20
 }
 
 const validate = values => {
@@ -32,10 +32,8 @@ const LoginForm = (props) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={style}>
       {error && <div><strong>{error}</strong><br/></div>}
-      <SimpleFormField name="username" type="text" hint="Email address"/>
-      <br/>
-      <SimpleFormField name="password" type="password" hint="Password"/>
-      <br/>
+      <SimpleFormField name="username" type="text" hint="Email address" fullWidth={true}/>
+      <SimpleFormField name="password" type="password" hint="Password" fullWidth={true}/>
       <Button type="submit" disabled={pristine || submitting} label="Sign in"/>
     </form>
   )

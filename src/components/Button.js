@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react'
 import {Link} from 'react-router'
 import MUIRaisedButton from 'material-ui/RaisedButton'
 import MUIFloatingActionButton from 'material-ui/FloatingActionButton';
+import MUIFlatButton from 'material-ui/FlatButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import {injectIntl} from 'react-intl'
 
@@ -10,7 +11,7 @@ const style = {
 }
 
 const ButtonIntl = (props) => (
-  <MUIRaisedButton primary={true}
+  <MUIRaisedButton secondary={true}
                    label={props.intl.formatMessage({id: props.label})}
                    type={props.type}
                    disabled={props.disabled}
@@ -25,6 +26,26 @@ ButtonIntl.propTypes = {
   intl: PropTypes.object,
   disabled: PropTypes.bool,
   onClick: PropTypes.func
+}
+
+const FlatButtonIntl = (props) => (
+  <MUIFlatButton secondary={true}
+                 label={props.intl.formatMessage({id: props.label})}
+                 type={props.type}
+                 disabled={props.disabled}
+                 onClick={props.onClick}
+                 onTouchTap={props.onTouchTap}
+  />
+)
+export const FlatButton = injectIntl(FlatButtonIntl)
+
+FlatButtonIntl.propTypes = {
+  label: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  intl: PropTypes.object,
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  onTouchTap: PropTypes.func
 }
 
 export const LinkButtonIntl = (props) => (
@@ -44,7 +65,7 @@ LinkButtonIntl.propTypes = {
 }
 
 const styleFloatingActionsButton = {
-  position: 'absolute',
+  position: 'fixed',
   bottom: 30,
   right: 30
 }

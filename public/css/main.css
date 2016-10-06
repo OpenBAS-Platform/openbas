@@ -10,42 +10,22 @@ input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
 }
 
-h1 {
-  font-size: 30px;
-  font-weight: 600;
-  color: #616161;
-}
-
-h2 {
-  margin: 5px 0 5px 0;
-  font-size: 25px;
-  font-weight: 500;
-  color: #616161;
-}
-
 h3 {
-  margin: 5px 0 5px 0;
-  font-size: 25px;
-  font-weight: 600;
-  color: #616161;
-  font-variant: small-caps;
-}
-
-h4 {
-  margin: 5px 0 5px 0;
-  font-size: 15px;
-  font-weight: 500;
-  color: #616161;
-}
-
-h5 {
-  margin: 5px 0 5px 0;
-  font-size: 13px;
-  font-weight: 300;
-  color: #808080;
-  font-style: italic;
+  padding: 24px 24px 5px 21px !important;
 }
 
 div.exercise:hover {
   box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 6px, rgba(0, 0, 0, 0.3) 0px 1px 4px !important;
+}
+
+div.exercise div.exerciseHover {
+  opacity: 0;
+}
+
+div.exercise:hover div.exerciseHover {
+  -webkit-transition: opacity .3s ease-in-out;
+  -moz-transition: opacity .3s ease-in-out;
+  -ms-transition: opacity .3s ease-in-out;
+  -o-transition: opacity .3s ease-in-out;
+  opacity: 1;
 }

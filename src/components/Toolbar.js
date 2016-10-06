@@ -5,14 +5,14 @@ import {
   ToolbarSeparator as MUIToolbarSeparator,
   ToolbarTitle as MUIToolbarTitle
 } from 'material-ui/Toolbar';
+import Theme from './Theme'
 import * as Constants from '../constants/ComponentTypes'
-import {blueGrey700} from 'material-ui/styles/colors';
 
 const toolbarStyle = {
   [ Constants.TOOLBAR_TYPE_LOGIN ]: {
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: blueGrey700
+    backgroundColor: Theme.palette.primary1Color
   }
 }
 
