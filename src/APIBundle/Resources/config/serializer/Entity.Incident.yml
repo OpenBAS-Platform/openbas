@@ -2,18 +2,16 @@ APIBundle\Entity\Incident:
     exclusion_policy: none
     properties:
         incident_id:
-            groups: ['incident', 'event']
+            groups: ['incident']
         incident_title:
-            groups: ['incident', 'event']
+            groups: ['incident']
         incident_story:
-            groups: ['incident', 'event']
+            groups: ['incident']
         incident_start_date:
-            groups: ['incident', 'event']
+            groups: ['incident']
         incident_end_date:
-            groups: ['incident', 'event']
+            groups: ['incident']
         incident_type:
-            groups: ['incident', 'event']
-        incident_event:
             groups: ['incident']
         incident_status:
-            groups: ['incident', 'event']
+            groups: ['incident']

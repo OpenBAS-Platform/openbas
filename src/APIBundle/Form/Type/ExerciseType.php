@@ -12,6 +12,8 @@ class ExerciseType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('exercise_name');
+        $builder->add('exercise_subtitle');
+        $builder->add('exercise_organizer');
         $builder->add('exercise_description');
         $builder->add('exercise_start_date', DateTimeType::class, array(
             'widget' => 'single_text',

@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+input:-webkit-autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+}
+
+h3 {
+  padding: 24px 24px 5px 21px !important;
+}
+
+div.exercise:hover {
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 6px, rgba(0, 0, 0, 0.3) 0px 1px 4px !important;
+}
+
+div.exercise div.exerciseHover {
+  opacity: 0;
+}
+
+div.exercise:hover div.exerciseHover {
+  -webkit-transition: opacity .3s ease-in-out;
+  -moz-transition: opacity .3s ease-in-out;
+  -ms-transition: opacity .3s ease-in-out;
+  -o-transition: opacity .3s ease-in-out;
+  opacity: 1;
+}

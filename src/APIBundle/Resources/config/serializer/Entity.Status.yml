@@ -1,0 +1,7 @@
+APIBundle\Entity\Status:
+    exclusion_policy: none
+    properties:
+        status_id:
+            groups: ['exercise', 'event', 'incident', 'inject']
+        status_name:
+            groups: ['exercise', 'event', 'incident', 'inject']

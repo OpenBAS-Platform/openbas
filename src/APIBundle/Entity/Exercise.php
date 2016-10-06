@@ -26,6 +26,16 @@ class Exercise
     /**
      * @ORM\Column(type="text")
      */
+    protected $exercise_subtitle;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $exercise_organizer;
+
+    /**
+     * @ORM\Column(type="text")
+     */
     protected $exercise_description;
 
     /**
@@ -90,6 +100,17 @@ class Exercise
         return $this;
     }
 
+    public function getExerciseSubtitle()
+    {
+        return $this->exercise_subtitle;
+    }
+
+    public function setExerciseSubtitle($subtitle)
+    {
+        $this->exercise_subtitle = $subtitle;
+        return $this;
+    }
+
     public function getExerciseDescription()
     {
         return $this->exercise_description;
@@ -98,6 +119,17 @@ class Exercise
     public function setExerciseDescription($description)
     {
         $this->exercise_description = $description;
+        return $this;
+    }
+
+    public function getExerciseOrganizer()
+    {
+        return $this->exercise_organizer;
+    }
+
+    public function setExerciseOrganizer($organizer)
+    {
+        $this->exercise_organizer = $organizer;
         return $this;
     }
 

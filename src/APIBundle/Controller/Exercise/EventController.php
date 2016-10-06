@@ -34,7 +34,9 @@ class EventController extends Controller
 
         $this->denyAccessUnlessGranted('select', $exercise);
 
-        return $exercise->getExerciseEvents();
+        $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+
+        return $events;
     }
 
     /**
@@ -45,7 +47,7 @@ class EventController extends Controller
      * @Rest\View(serializerGroups={"event"})
      * @Rest\Get("/exercises/{exercise_id}/events/{event_id}")
      */
-    public function getExerciseEventsAction(Request $request)
+    public function getExerciseEventAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));

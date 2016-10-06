@@ -2,12 +2,10 @@ APIBundle\Entity\Event:
     exclusion_policy: none
     properties:
         event_id:
-            groups: ['event', 'exercise']
+            groups: ['event']
         event_title:
-            groups: ['event', 'exercise']
+            groups: ['event']
         event_description:
-            groups: ['event', 'exercise']
+            groups: ['event']
         event_status:
-            groups: ['event', 'exercise']
-        event_exercise:
             groups: ['event']

@@ -2,16 +2,18 @@ APIBundle\Entity\Exercise:
     exclusion_policy: none
     properties:
         exercise_id:
-            groups: ['exercise', 'event', 'group', 'user', 'grant']
+            groups: ['exercise']
         exercise_name:
-            groups: ['exercise', 'event', 'group', 'user', 'grant']
+            groups: ['exercise']
+        exercise_subtitle:
+            groups: ['exercise']
         exercise_description:
-            groups: ['exercise', 'event', 'group', 'user', 'grant']
+            groups: ['exercise']
+        exercise_organizer:
+            groups: ['exercise']
         exercise_start_date:
-            groups: ['exercise', 'event']
+            groups: ['exercise']
         exercise_end_date:
-            groups: ['exercise', 'event']
+            groups: ['exercise']
         exercise_status:
-            groups: ['exercise', 'event']
-        exercise_events:
             groups: ['exercise']
