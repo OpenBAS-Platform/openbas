@@ -28,11 +28,11 @@ import IndexExercise from './containers/authenticated/exercise/Index'
 
 injectTapEventPlugin()
 
-const data = fromJS(JSON.parse(localStorage.getItem('token')));
-var tokens = data ? data.getIn(['entities', 'tokens']) : null;
-var token = data ? data.get('result') : null;
-var users = data ? data.getIn(['entities', 'users']) : null;
-var user = tokens ? tokens.get(token).get('token_user') : null;
+const data = fromJS(JSON.parse(localStorage.getItem('token')))
+var tokens = data ? data.getIn(['entities', 'tokens']) : null
+var token = data ? data.get('result') : null
+var users = data ? data.getIn(['entities', 'users']) : null
+var user = tokens ? tokens.get(token).get('token_user') : null
 
 //Default application state
 const initialState = {
@@ -59,12 +59,19 @@ const initialState = {
   })
 };
 
+let store
 const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)
-const store = createStore(rootReducer, initialState, compose(
-  applyMiddleware(routingMiddleware, thunk, logger),
-  window.devToolsExtension && window.devToolsExtension()
-));
+//Only compose the store if devTools are available
+if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
+  store = createStore(rootReducer, initialState, compose(
+    applyMiddleware(routingMiddleware, thunk, logger),
+    window.devToolsExtension && window.devToolsExtension()
+  ))
+} else {
+  store = createStore(rootReducer, initialState,
+    applyMiddleware(routingMiddleware, thunk, logger))
+}
 
 //Axios API
 export const api = (schema) => {
@@ -135,13 +142,13 @@ class App extends Component {
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
                 <Route path='exercise/:exerciseId' component={RootExercise}>
-                  <IndexRoute component={IndexExercise} />
-                  <Route path='world' component={IndexExercise} />
-                  <Route path='objectives' component={IndexExercise} />
-                  <Route path='scenario' component={IndexExercise} />
-                  <Route path='audience' component={IndexExercise} />
-                  <Route path='audience' component={IndexExercise} />
-                  <Route path='calendar' component={IndexExercise} />*/
+                  <IndexRoute component={IndexExercise}/>
+                  <Route path='world' component={IndexExercise}/>
+                  <Route path='objectives' component={IndexExercise}/>
+                  <Route path='scenario' component={IndexExercise}/>
+                  <Route path='audience' component={IndexExercise}/>
+                  <Route path='audience' component={IndexExercise}/>
+                  <Route path='calendar' component={IndexExercise}/>*/
                 </Route>
               </Route>
             </Router>
