@@ -1,6 +1,6 @@
 import {combineReducers} from 'redux';
 import application from './Application';
-import home from './Home';
+import home from './Audience';
 import {routerReducer} from 'react-router-redux'
 import {reducer as formReducer} from 'redux-form'
 

@@ -68,7 +68,7 @@ const cleanedUsers = createImmutableSelector(usersSelector, users => users)
 const select = (state) => {
   return {
     users: cleanedUsers(state),
-    loading: state.home.get('loading') //Don't need a selector. Each change will trigger a refresh
+    loading: state.audience.get('loading') //Don't need a selector. Each change will trigger a refresh
   }
 }
 

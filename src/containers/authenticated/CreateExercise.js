@@ -1,4 +1,6 @@
-import React, {Component} from 'react'
+import React, {Component, PropTypes} from 'react'
+import {connect} from 'react-redux'
+import {addExercise} from '../../actions/Exercise'
 import {Dialog} from '../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../components/Button';
 
@@ -19,7 +21,7 @@ class CreateExercise extends Component {
   }
 
   onSubmit(data) {
-    return this.props.createExercise(data)
+    this.props.addExercise(data)
   }
 
   render() {
@@ -32,8 +34,7 @@ class CreateExercise extends Component {
       <FlatButton
         label="Create"
         primary={true}
-        disabled={true}
-        onTouchTap={this.handleClose.bind(this)}
+        onTouchTap={this.onSubmit.bind(this)}
       />,
     ];
 
@@ -54,4 +55,8 @@ class CreateExercise extends Component {
   }
 }
 
-export default CreateExercise
+CreateExercise.propTypes = {
+  addExercise: PropTypes.func
+}
+
+export default connect(null, {addExercise})(CreateExercise);

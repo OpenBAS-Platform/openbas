@@ -36,11 +36,11 @@ export const application = (state = Map(), action) => {
     case Constants.APPLICATION_LOGOUT_SUCCESS:
       return state.set('token', null);
 
-    case Constants.APPLICATION_USERS_FETCH_SUCCESS: {
+    case Constants.APPLICATION_FETCH_USERS_SUCCESS: {
       return state.setIn(['entities', 'users'], mergeUsers())
     }
 
-    case Constants.APPLICATION_EXERCISES_FETCH_SUCCESS: {
+    case Constants.APPLICATION_FETCH_EXERCISES_SUCCESS: {
       return state.setIn(['entities', 'exercises'], action.payload.getIn(['entities', 'exercises']))
     }
 
