@@ -33,7 +33,8 @@ const styles = {
     bottom: 0,
     padding: 10,
     backgroundColor: 'rgba(0, 0, 0, .6)',
-    height: 30
+    height: 30,
+    width: 380
   },
   description: {
     padding: 0,

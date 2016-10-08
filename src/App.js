@@ -91,6 +91,8 @@ export const api = (schema) => {
     } else if (res.status === 503 && err.config && !err.config.__isRetryRequest) {
       err.config.__isRetryRequest = true;
       return axios(err.config);
+    } else {
+      return Promise.reject(err);
     }
   })
   return instance

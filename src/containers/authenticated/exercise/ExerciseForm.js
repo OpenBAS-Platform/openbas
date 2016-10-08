@@ -29,23 +29,6 @@ const validate = values => {
 }
 
 class ExerciseForm extends Component {
-
-  handleStartDateChange(event, date) {
-    this.props.change('startDate', date)
-  }
-
-  handleStartTimeChange(event, time) {
-    this.props.change('startTime', time)
-  }
-
-  handleEndDateChange(event, date) {
-    this.props.change('endDate', date)
-  }
-
-  handleEndTimeChange(event, time) {
-    this.props.change('endTime', time)
-  }
-
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
@@ -56,12 +39,12 @@ class ExerciseForm extends Component {
         <FormField name="description" fullWidth={true} multiLine={true} rows={3} type="text" hint=" "
                    label="Description"/>
         <div style={styleLine}>
-          <DatePicker name="startDate" hintText="Start date" onChange={this.handleStartDateChange.bind(this)} />
-          <TimePicker name="startTime" hintText="Start time"  onChange={this.handleStartTimeChange.bind(this)} />
+          <DatePicker name="startDate" floatingLabelText="Start date" />
+          <TimePicker name="startTime" floatingLabelText="Start time" />
         </div>
         <div style={styleLine}>
-          <DatePicker name="endDate" hintText="End date" onChange={this.handleEndDateChange.bind(this)}/>
-          <TimePicker name="endTime" hintText="End time" onChange={this.handleEndTimeChange.bind(this)}/>
+          <DatePicker name="endDate" floatingLabelText="End date"/>
+          <TimePicker name="endTime" floatingLabelText="End time"/>
         </div>
       </form>
     )

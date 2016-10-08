@@ -90,6 +90,13 @@ export const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], false)
     }
 
+    case Constants.APPLICATION_ADD_EXERCISE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'exercises'], mergeExercises())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
       return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))
     }

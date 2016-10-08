@@ -12,7 +12,7 @@ const styles = {
   }
 }
 
-const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, value, meta: {touched, error}}) => (
+const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, meta: {touched, error}}) => (
   <TextField hintText={hint}
              floatingLabelText={label}
              floatingLabelFixed={false}
@@ -23,7 +23,6 @@ const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, 
              multiLine={multiLine}
              rows={rows}
              type={type}
-             value="test"
              {...input}
   />)
 
@@ -37,7 +36,6 @@ renderTextField.propTypes = {
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
-  value: PropTypes.string
 }
 
 export const FormFieldIntl = (props) => (
@@ -48,7 +46,6 @@ export const FormFieldIntl = (props) => (
          multiLine={props.multiLine}
          rows={props.rows}
          type={props.type}
-         value={props.value}
          component={renderTextField}/>
 )
 
@@ -63,5 +60,4 @@ FormFieldIntl.propTypes = {
   fullWidth: PropTypes.bool,
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
-  value: PropTypes.string
 }

@@ -25,7 +25,8 @@ class CreateExercise extends Component {
   }
 
   submitForm() {
-    this.refs.exerciseForm.submit();
+    this.refs.exerciseForm.submit()
+    this.handleClose()
   }
 
   render() {
