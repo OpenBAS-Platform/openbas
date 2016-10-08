@@ -24,6 +24,10 @@ class CreateExercise extends Component {
     this.props.addExercise(data)
   }
 
+  submitForm() {
+    this.refs.exerciseForm.submit();
+  }
+
   render() {
     const actions = [
       <FlatButton
@@ -34,7 +38,7 @@ class CreateExercise extends Component {
       <FlatButton
         label="Create"
         primary={true}
-        onTouchTap={this.onSubmit.bind(this)}
+        onTouchTap={this.submitForm.bind(this)}
       />,
     ];
 
@@ -48,7 +52,7 @@ class CreateExercise extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
-          <ExerciseForm onSubmit={this.onSubmit.bind(this)} />
+          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)} />
         </Dialog>
       </div>
     );

@@ -44,7 +44,7 @@ export const addExercise = (data) => (dispatch) => {
   };
   console.log("POSTDATA: ")
   console.log(postData)
-  return api(schema.token).post('/api/exercises', postData).then(function (response) {
+  return api(schema.exercise).post('/api/exercises', postData).then(function (response) {
     // add the result in the entities
 
     dispatch({

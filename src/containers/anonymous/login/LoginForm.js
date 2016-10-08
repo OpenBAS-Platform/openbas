@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react'
 import {reduxForm} from 'redux-form'
-import {SimpleFormField} from '../../../components/Field'
+import {FormField} from '../../../components/Field'
 import {Button} from '../../../components/Button'
 import {i18nRegister} from '../../../utils/Messages'
 
@@ -32,8 +32,8 @@ const LoginForm = (props) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={style}>
       {error && <div><strong>{error}</strong><br/></div>}
-      <SimpleFormField name="username" type="text" hint="Email address" fullWidth={true}/>
-      <SimpleFormField name="password" type="password" hint="Password" fullWidth={true}/>
+      <FormField name="username" type="text" hint="Email address" fullWidth={true}/>
+      <FormField name="password" type="password" hint="Password" fullWidth={true}/>
       <Button type="submit" disabled={pristine || submitting} label="Sign in"/>
     </form>
   )

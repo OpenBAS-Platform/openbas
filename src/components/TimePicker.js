@@ -7,11 +7,12 @@ const style = {
 }
 
 export const TimePickerIntl = (props) => (
-  <MUITimePicker hintText={props.intl.formatMessage({id: props.hintText})} style={style} />
+  <MUITimePicker hintText={props.intl.formatMessage({id: props.hintText})} onChange={props.onChange} style={style} />
 )
 export const TimePicker = injectIntl(TimePickerIntl)
 
 TimePickerIntl.propTypes = {
   hintText: PropTypes.string,
+  onChange: PropTypes.func,
   intl: PropTypes.object
 }

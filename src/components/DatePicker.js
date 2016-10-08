@@ -7,11 +7,12 @@ const style = {
 }
 
 export const DatePickerIntl = (props) => (
-  <MUIDatePicker hintText={props.intl.formatMessage({id: props.hintText})} style={style}/>
+  <MUIDatePicker hintText={props.intl.formatMessage({id: props.hintText})}  onChange={props.onChange} style={style}/>
 )
 export const DatePicker = injectIntl(DatePickerIntl)
 
 DatePickerIntl.propTypes = {
   hintText: PropTypes.string,
+  onChange: PropTypes.func,
   intl: PropTypes.object
 }
