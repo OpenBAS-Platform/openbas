@@ -18,8 +18,7 @@ const styles = {
 
 class RootAuthenticated extends Component {
   componentDidMount() {
-
-    this.props.fetchExercise();
+    this.props.fetchExercise(this.props.id);
   }
 
   toggleLeftBar() {
@@ -31,10 +30,11 @@ class RootAuthenticated extends Component {
   }
 
   render() {
+    let title = this.props.exercise ? ' - ' + this.props.exercise.get('exercise_name') : ''
     return (
       <div>
         <AppBar
-          title="OpenEx"
+          title={'OpenEx' + title}
           type={Constants.APPBAR_TYPE_TOPBAR}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
@@ -60,10 +60,12 @@ RootAuthenticated.propTypes = {
   params: PropTypes.object
 }
 
-const select = (state) => {
+const select = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
   return {
-    exercise: state.application.getIn(['exercise']),
-    loading: state.application.getIn(['ui', 'loading'])
+    loading: state.application.getIn(['ui', 'loading']),
+    id: exerciseId,
+    exercise: state.application.getIn(['entities', 'exercises', exerciseId])
   }
 }
 

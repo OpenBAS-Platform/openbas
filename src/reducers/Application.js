@@ -15,6 +15,12 @@ export const application = (state = Map(), action) => {
     return mergedTokens;
   }
 
+  function mergeExercises() {
+    const exercises = state.getIn(['entities', 'exercises']) || Map()
+    const mergedExercises = exercises.mergeDeep(action.payload.getIn(['entities', 'exercises']))
+    return mergedExercises;
+  }
+
   switch (action.type) {
     case Constants.APPLICATION_LOGIN_SUBMITTED: {
       return state;
@@ -60,7 +66,7 @@ export const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_EXERCISES_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercises'], action.payload.getIn(['entities', 'exercises']))
+        state.setIn(['entities', 'exercises'], mergeExercises())
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -74,7 +80,10 @@ export const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_FETCH_EXERCISE_SUCCESS: {
-      return state.setIn(['ui', 'loading'], false)
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'exercises'], mergeExercises())
+        state.setIn(['ui', 'loading'], false)
+      })
     }
 
     case Constants.APPLICATION_FETCH_EXERCISE_ERROR: {

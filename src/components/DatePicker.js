@@ -12,6 +12,7 @@ export const DatePickerIntl = (props) => (
 export const DatePicker = injectIntl(DatePickerIntl)
 
 DatePickerIntl.propTypes = {
+  name: PropTypes.string,
   hintText: PropTypes.string,
   onChange: PropTypes.func,
   intl: PropTypes.object

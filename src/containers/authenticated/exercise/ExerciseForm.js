@@ -56,12 +56,12 @@ class ExerciseForm extends Component {
         <FormField name="description" fullWidth={true} multiLine={true} rows={3} type="text" hint=" "
                    label="Description"/>
         <div style={styleLine}>
-          <DatePicker hintText="Start date" onChange={this.handleStartDateChange.bind(this)} />
-          <TimePicker hintText="Start time"  onChange={this.handleStartTimeChange.bind(this)} />
+          <DatePicker name="startDate" hintText="Start date" onChange={this.handleStartDateChange.bind(this)} />
+          <TimePicker name="startTime" hintText="Start time"  onChange={this.handleStartTimeChange.bind(this)} />
         </div>
         <div style={styleLine}>
-          <DatePicker hintText="End date" onChange={this.handleEndDateChange.bind(this)}/>
-          <TimePicker hintText="End time" onChange={this.handleEndTimeChange.bind(this)}/>
+          <DatePicker name="endDate" hintText="End date" onChange={this.handleEndDateChange.bind(this)}/>
+          <TimePicker name="endTime" hintText="End time" onChange={this.handleEndTimeChange.bind(this)}/>
         </div>
       </form>
     )

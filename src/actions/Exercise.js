@@ -18,17 +18,17 @@ export const fetchExercises = () => (dispatch) => {
   })
 }
 
-export const fetchExercise = () => (dispatch, getState) => {
-  let exercise_id = getState().application.get('exercise');
+export const fetchExercise = (exerciseId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED});
-  return api().get('/api/exercises/' + exercise_id).then(function (response) {
+  return api().get('/api/exercises/' + exerciseId).then(function (response) {
+    console.log('DATA:', response.data)
     dispatch({
-      type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED,
+      type: Constants.APPLICATION_FETCH_EXERCISE_SUCCESS,
       payload: response.data
     });
   }).catch(function (response) {
     console.error(response)
-    dispatch({type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED});
+    dispatch({type: Constants.APPLICATION_FETCH_EXERCISE_ERROR});
   })
 }
 
@@ -45,8 +45,6 @@ export const addExercise = (data) => (dispatch) => {
   console.log("POSTDATA: ")
   console.log(postData)
   return api(schema.exercise).post('/api/exercises', postData).then(function (response) {
-    // add the result in the entities
-
     dispatch({
       type: Constants.APPLICATION_ADD_EXERCISE_SUCCESS,
       payload: response.data
