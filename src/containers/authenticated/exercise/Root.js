@@ -4,6 +4,7 @@ import {redirectToHome, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
 import UserPopover from './../UserPopover'
+import {fetchExercise} from '../../../actions/Exercise'
 
 const styles = {
   root: {
@@ -16,6 +17,11 @@ const styles = {
 }
 
 class RootAuthenticated extends Component {
+  componentDidMount() {
+
+    this.props.fetchExercise();
+  }
+
   toggleLeftBar() {
     this.props.toggleLeftBar()
   }
@@ -49,7 +55,16 @@ RootAuthenticated.propTypes = {
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
-  children: React.PropTypes.node
+  children: React.PropTypes.node,
+  fetchExercise: PropTypes.func.isRequired,
+  params: PropTypes.object
 }
 
-export default connect(null, {redirectToHome, toggleLeftBar})(RootAuthenticated)
+const select = (state) => {
+  return {
+    exercise: state.application.getIn(['exercise']),
+    loading: state.application.getIn(['ui', 'loading'])
+  }
+}
+
+export default connect(select, {redirectToHome, toggleLeftBar, fetchExercise})(RootAuthenticated)

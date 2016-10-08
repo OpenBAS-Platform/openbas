@@ -16,8 +16,9 @@ export const application = (state = Map(), action) => {
   }
 
   switch (action.type) {
-    case Constants.APPLICATION_LOGIN_SUBMITTED:
+    case Constants.APPLICATION_LOGIN_SUBMITTED: {
       return state;
+    }
 
     case Constants.APPLICATION_LOGIN_SUCCESS: {
       var result = action.payload.get('result').toString();
@@ -30,18 +31,54 @@ export const application = (state = Map(), action) => {
       })
     }
 
-    case Constants.APPLICATION_LOGIN_ERROR:
+    case Constants.APPLICATION_LOGIN_ERROR: {
       return state.set('token', null);
+    }
 
-    case Constants.APPLICATION_LOGOUT_SUCCESS:
+    case Constants.APPLICATION_LOGOUT_SUCCESS: {
       return state.set('token', null);
+    }
+
+    case Constants.APPLICATION_FETCH_USERS_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
 
     case Constants.APPLICATION_FETCH_USERS_SUCCESS: {
-      return state.setIn(['entities', 'users'], mergeUsers())
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'users'], mergeUsers())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_USERS_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
     }
 
     case Constants.APPLICATION_FETCH_EXERCISES_SUCCESS: {
-      return state.setIn(['entities', 'exercises'], action.payload.getIn(['entities', 'exercises']))
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'exercises'], action.payload.getIn(['entities', 'exercises']))
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISES_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISE_SUCCESS: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
     }
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
@@ -52,8 +89,9 @@ export const application = (state = Map(), action) => {
       return state.setIn(['ui', 'navbar_right_open'], !state.getIn(['ui', 'navbar_right_open']))
     }
 
-    default:
+    default: {
       return state;
+    }
   }
 }
 

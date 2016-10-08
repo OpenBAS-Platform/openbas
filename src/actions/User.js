@@ -16,3 +16,17 @@ export const fetchUsers = () => (dispatch) => {
     })
   })
 }
+
+export const fetchUser = () => (dispatch, getState) => {
+  let user_id = getState().application.get('user');
+  dispatch({type: Constants.APPLICATION_FETCH_USER_SUBMITTED});
+  return api().get('/api/users/' + user_id).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_FETCH_USER_SUCCESS,
+      payload: response.data
+    });
+  }).catch(function (response) {
+    console.error(response)
+    dispatch({type: Constants.APPLICATION_FETCH_USER_ERROR});
+  })
+}

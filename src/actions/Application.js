@@ -37,20 +37,6 @@ export const logout = () => (dispatch, getState) => {
   })
 }
 
-export const userInfo = () => (dispatch, getState) => {
-  let user_id = getState().application.get('user');
-  dispatch({type: Constants.APPLICATION_FETCH_USER_SUBMITTED});
-  return api().get('/api/user/' + user_id).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_USER_SUCCESS,
-      payload: response.data
-    });
-  }).catch(function (response) {
-    console.error(response)
-    dispatch({type: Constants.APPLICATION_FETCH_USER_ERROR});
-  })
-}
-
 export const toggleLeftBar = () => (dispatch) => {
   dispatch({type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED});
 }

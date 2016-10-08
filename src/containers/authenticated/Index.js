@@ -17,17 +17,16 @@ const styles = {
 }
 
 class IndexAuthenticated extends Component {
+  componentDidMount() {
+    this.props.fetchExercises();
+  }
+
   toggleLeftBar() {
     this.props.toggleLeftBar()
   }
 
   redirectToHome() {
     this.props.redirectToHome()
-  }
-
-
-  componentDidMount() {
-    this.props.fetchExercises();
   }
 
   render() {
@@ -57,7 +56,7 @@ class IndexAuthenticated extends Component {
                 organizerLogo="images/sgdsn.png"
                 image={'images/' + exercise.get('exercise_id') + '.png'}
               />
-          </Link>
+            </Link>
           )
         })}
         <CreateExercise />
@@ -78,7 +77,7 @@ IndexAuthenticated.propTypes = {
 const select = (state) => {
   return {
     exercises: state.application.getIn(['entities', 'exercises']),
-    loading: state.home.get('loading')
+    loading: state.application.getIn(['ui', 'loading'])
   }
 }
 

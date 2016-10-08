@@ -37,9 +37,10 @@ var user = tokens ? tokens.get(token).get('token_user') : null
 //Default application state
 const initialState = {
   application: Map({
+    locale: navigator.language,
     user: user,
     token: token,
-    locale: navigator.language,
+    exercise: null,
     entities: Map({
       users: users,
       tokens: tokens,
@@ -51,11 +52,9 @@ const initialState = {
     }),
     ui: Map({
       navbar_left_open: false,
-      navbar_right_open: true
+      navbar_right_open: true,
+      loading: false
     })
-  }),
-  home: Map({
-    loading: false
   })
 };
 

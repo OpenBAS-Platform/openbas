@@ -18,6 +18,20 @@ export const fetchExercises = () => (dispatch) => {
   })
 }
 
+export const fetchExercise = () => (dispatch, getState) => {
+  let exercise_id = getState().application.get('exercise');
+  dispatch({type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED});
+  return api().get('/api/exercises/' + exercise_id).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED,
+      payload: response.data
+    });
+  }).catch(function (response) {
+    console.error(response)
+    dispatch({type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED});
+  })
+}
+
 export const addExercise = (data) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_ADD_EXERCISE_SUBMITTED});
   var postData = {
