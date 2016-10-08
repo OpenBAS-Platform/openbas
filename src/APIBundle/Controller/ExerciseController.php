@@ -86,7 +86,10 @@ class ExerciseController extends Controller
         if (!$user->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
+        $status = $em->getRepository('APIBundle:Status')->findOneBy(['status_name' => 'draft']);
+
         $exercise = new Exercise();
+        $exercise->setExerciseStatus($status);
         $form = $this->createForm(ExerciseType::class, $exercise);
         $form->submit($request->request->all());
 
