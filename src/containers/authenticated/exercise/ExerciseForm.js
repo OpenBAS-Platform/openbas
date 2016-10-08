@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react'
-import {reduxForm} from 'redux-form'
+import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../components/Field'
 import {DatePicker} from '../../../components/DatePicker'
 import {TimePicker} from '../../../components/TimePicker'
@@ -29,38 +29,21 @@ const validate = values => {
 }
 
 class ExerciseForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      startDateValue: '',
-      startTimeValue: '',
-      endDateValue: '',
-      endTimeValue: '',
-    }
-  }
 
   handleStartDateChange(event, date) {
-    this.setState({
-      startDateValue: date,
-    });
+    this.props.change('startDate', date)
   }
 
   handleStartTimeChange(event, time) {
-    this.setState({
-      startTimeValue: time,
-    });
+    this.props.change('startTime', time)
   }
 
   handleEndDateChange(event, date) {
-    this.setState({
-      endDateValue: date,
-    });
+    this.props.change('endDate', date)
   }
 
   handleEndTimeChange(event, time) {
-    this.setState({
-      endTimeValue: time,
-    });
+    this.props.change('endTime', time)
   }
 
   render() {
@@ -73,15 +56,13 @@ class ExerciseForm extends Component {
         <FormField name="description" fullWidth={true} multiLine={true} rows={3} type="text" hint=" "
                    label="Description"/>
         <div style={styleLine}>
-          <DatePicker hintText="Start date" onChange={this.handleStartDateChange.bind(this)} /> <TimePicker hintText="Start time"  onChange={this.handleStartTimeChange.bind(this)} />
+          <DatePicker hintText="Start date" onChange={this.handleStartDateChange.bind(this)} />
+          <TimePicker hintText="Start time"  onChange={this.handleStartTimeChange.bind(this)} />
         </div>
         <div style={styleLine}>
-          <DatePicker hintText="End date" onChange={this.handleEndDateChange.bind(this)}/> <TimePicker hintText="End time" onChange={this.handleEndTimeChange.bind(this)}/>
+          <DatePicker hintText="End date" onChange={this.handleEndDateChange.bind(this)}/>
+          <TimePicker hintText="End time" onChange={this.handleEndTimeChange.bind(this)}/>
         </div>
-        <FormField type="hidden" name="startDate" value="test"/>
-        <FormField type="hidden" name="startTime" value={this.state.startTimeValue}/>
-        <FormField type="hidden" name="endDate" value={this.state.endDateValue}/>
-        <FormField type="hidden" name="endTime" value={this.state.endTimeValue}/>
       </form>
     )
   }
@@ -91,11 +72,9 @@ ExerciseForm.propTypes = {
   error: PropTypes.string,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
+  change: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func
 }
 
-export default reduxForm({
-  form: 'ExerciseForm',
-  validate
-})(ExerciseForm)
+export default reduxForm({form: 'ExerciseForm', validate}, null, {change})(ExerciseForm)
