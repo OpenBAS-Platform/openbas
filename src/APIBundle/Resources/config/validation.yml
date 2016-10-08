@@ -55,8 +55,10 @@ APIBundle\Entity\Exercise:
             - Type: string
         exercise_start_date:
             - DateTime: ~
+            - NotBlank: ~
         exercise_end_date:
             - DateTime: ~
+            - NotBlank: ~
 
 APIBundle\Entity\Event:
     properties:
