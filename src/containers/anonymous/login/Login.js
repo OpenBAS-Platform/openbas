@@ -18,10 +18,10 @@ const styles = {
     marginTop: '50vh',
     transform: 'translateY(-60%)',
     textAlign: 'center',
-    width: 400,
+    width: '400px',
     border: '1px solid #ddd',
-    borderRadius: 10,
-    paddingBottom: 20
+    borderRadius: '10px',
+    paddingBottom: '20px'
   }
 }
 

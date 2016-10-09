@@ -4,19 +4,19 @@ import * as Constants from '../constants/ComponentTypes'
 
 const appBarStyle = {
   [ Constants.APPBAR_TYPE_TOPBAR_NOICON ]: {
-    marginBottom: 20
+    marginBottom: '20px'
   }
 }
 
 const appBarTitleStyle = {
   [ Constants.APPBAR_TYPE_TOPBAR_NOICON ]: {
     textAlign: 'left',
-    marginLeft: 10,
+    marginLeft: '10px',
     cursor: 'pointer'
   },
   [ Constants.APPBAR_TYPE_TOPBAR ]: {
     textAlign: 'left',
-    marginLeft: 60,
+    marginLeft: '60px',
     cursor: 'pointer'
   },
   [ Constants.APPBAR_TYPE_LEFTBAR ]: {

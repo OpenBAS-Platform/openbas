@@ -3,6 +3,8 @@ import {connect} from 'react-redux'
 import {redirectToHome, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
+import {Chip} from '../../../components/Chip'
+import Theme from '../../../components/Theme'
 import UserPopover from './../UserPopover'
 import {fetchExercise} from '../../../actions/Exercise'
 
@@ -11,9 +13,16 @@ const styles = {
     padding: '20px 20px 0 85px',
   },
   title: {
-    marginLeft: 20,
-    cursor: 'pointer'
+    fontVariant: 'small-caps',
+    display: 'block',
+    float: 'left'
   }
+}
+
+const statuses = {
+  DRAFT: 'Scheduled',
+  RUNNING: 'In exercise',
+  FINISHED: 'Finished'
 }
 
 class RootAuthenticated extends Component {
@@ -30,11 +39,12 @@ class RootAuthenticated extends Component {
   }
 
   render() {
-    let title = this.props.exercise ? ' - ' + this.props.exercise.get('exercise_name') : ''
+    let title = this.props.exercise ? this.props.exercise.get('exercise_name') : ''
+    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'Draft'
     return (
       <div>
         <AppBar
-          title={'OpenEx' + title}
+          title={<div><span style={styles.title}>{title}</span> <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}>{statuses[status]}</Chip></div>}
           type={Constants.APPBAR_TYPE_TOPBAR}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
@@ -50,6 +60,7 @@ class RootAuthenticated extends Component {
 
 RootAuthenticated.propTypes = {
   leftBarOpen: PropTypes.bool,
+  exercise: PropTypes.object,
   userFirstname: PropTypes.string,
   userGravatar: PropTypes.string,
   toggleLeftBar: PropTypes.func,

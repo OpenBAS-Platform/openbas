@@ -4,8 +4,8 @@ import MUIAvatar from 'material-ui/Avatar';
 
 const avatarStyle = {
   [ Constants.AVATAR_TYPE_TOPBAR ]: {
-    marginRight: 10,
-    marginTop: 5,
+    marginRight: '10px',
+    marginTop: '5px',
     cursor: 'pointer'
   }
 }

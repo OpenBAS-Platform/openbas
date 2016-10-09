@@ -5,10 +5,10 @@ import {injectIntl} from 'react-intl'
 
 const styles = {
   global: {
-    marginBottom: 10,
+    marginBottom: '10px',
   },
   input: {
-    borderRadius: 5
+    borderRadius: '5px'
   }
 }
 

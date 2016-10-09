@@ -16,8 +16,8 @@ const styles = {
     textAlign: 'center'
   },
   logo: {
-    width: 40,
-    marginTop: 4,
+    width: '40px',
+    marginTop: '4px',
     cursor: 'pointer'
   }
 }
@@ -49,7 +49,7 @@ class IndexAuthenticated extends Component {
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
           iconElementRight={<UserPopover/>}
-          iconElementLeft={<img src="images/logo_white.png" style={styles.logo} />}
+          iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo} />}
           />
         { loading }
         {this.props.exercises.toList().map(exercise => {

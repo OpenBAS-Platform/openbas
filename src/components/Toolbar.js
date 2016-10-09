@@ -10,8 +10,8 @@ import * as Constants from '../constants/ComponentTypes'
 
 const toolbarStyle = {
   [ Constants.TOOLBAR_TYPE_LOGIN ]: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: '10px',
+    borderTopRightRadius: '10px',
     backgroundColor: Theme.palette.primary1Color
   }
 }

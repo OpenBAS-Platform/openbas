@@ -7,8 +7,8 @@ const paperStyle = {
     display: 'inline-block',
     margin: '20px 20px 20px 20px',
     verticalAlign: 'top',
-    width: 400,
-    height: 256,
+    width: '400px',
+    height: '256px',
     cursor: 'pointer'
   }
 }

@@ -7,7 +7,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import {injectIntl} from 'react-intl'
 
 const style = {
-  margin: 5,
+  margin: '5px',
 }
 
 const ButtonIntl = (props) => (

@@ -34,3 +34,7 @@ export const TOOLBAR_TYPE_LOGIN = 'TOOLBAR_TYPE_LOGIN';
 //region PAPER
 export const PAPER_TYPE_EXERCISE = 'PAPER_TYPE_EXERCISE';
 //endregion
+
+//region CHIP
+export const CHIP_TYPE_FLOATING = 'CHIP_TYPE_FLOATING';
+//endregion

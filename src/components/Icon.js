@@ -18,8 +18,8 @@ const iconStyle = {
   [ Constants.ICON_TYPE_NAVBAR ]: {
     margin: 0,
     padding: 0,
-    left: 19,
-    top: 8
+    left: '19px',
+    top: '8px'
   }
 }
 

@@ -13,7 +13,7 @@ i18nRegister({
 })
 
 const style = {
-  padding: 20
+  padding: '20px'
 }
 
 const validate = values => {
