@@ -10,6 +10,12 @@ input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
 }
 
+h2 {
+  margin: 10px 0 10px 0 !important;
+  -webkit-margin-before: 0 !important;
+  -webkit-margin-after: 0 !important;
+}
+
 h3 {
   padding: 24px 24px 5px 21px !important;
 }

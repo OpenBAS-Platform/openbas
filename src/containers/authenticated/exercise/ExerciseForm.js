@@ -33,18 +33,17 @@ class ExerciseForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
-        <FormField name="name" fullWidth={true} type="text" hint=" " label="Name"/>
-        <FormField name="subtitle" fullWidth={true} type="text" hint=" " label="Subtitle"/>
-        <FormField name="organizer" fullWidth={true} type="text" hint=" " label="Organizer"/>
+        <FormField name="name" fullWidth={true} type="text" hint=" " label="Name" defaultValue={this.props.name}/>
+        <FormField name="subtitle" fullWidth={true} type="text" hint=" " label="Subtitle" defaultValue={this.props.subtitle}/>
         <FormField name="description" fullWidth={true} multiLine={true} rows={3} type="text" hint=" "
-                   label="Description"/>
+                   label="Description" defaultValue={this.props.description}/>
         <div style={styleLine}>
-          <DatePicker name="startDate" floatingLabelText="Start date" />
-          <TimePicker name="startTime" floatingLabelText="Start time" />
+          <DatePicker name="startDate" floatingLabelText="Start date" defaultDate={this.props.startDate}/>
+          <TimePicker name="startTime" floatingLabelText="Start time" defaultTime={this.props.startTime}/>
         </div>
         <div style={styleLine}>
-          <DatePicker name="endDate" floatingLabelText="End date"/>
-          <TimePicker name="endTime" floatingLabelText="End time"/>
+          <DatePicker name="endDate" floatingLabelText="End date" defaultDate={this.props.endDate}/>
+          <TimePicker name="endTime" floatingLabelText="End time" defaultTime={this.props.endTime}/>
         </div>
       </form>
     )
@@ -55,9 +54,15 @@ ExerciseForm.propTypes = {
   error: PropTypes.string,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
-  change: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func
+  handleSubmit: PropTypes.func,
+  name: PropTypes.string,
+  subtitle: PropTypes.string,
+  description: PropTypes.string,
+  startDate: PropTypes.object,
+  startTime: PropTypes.object,
+  endDate: PropTypes.object,
+  endTime: PropTypes.object
 }
 
 export default reduxForm({form: 'ExerciseForm', validate}, null, {change})(ExerciseForm)

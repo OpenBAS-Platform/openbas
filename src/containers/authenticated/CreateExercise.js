@@ -3,7 +3,6 @@ import {connect} from 'react-redux'
 import {addExercise} from '../../actions/Exercise'
 import {Dialog} from '../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../components/Button';
-
 import ExerciseForm from './exercise/ExerciseForm'
 
 class CreateExercise extends Component {

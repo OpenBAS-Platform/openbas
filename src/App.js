@@ -25,6 +25,7 @@ import RootAuthenticated from './containers/authenticated/Root'
 import IndexAuthenticated from './containers/authenticated/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
+import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
 
 injectTapEventPlugin()
 
@@ -148,7 +149,8 @@ class App extends Component {
                   <Route path='scenario' component={IndexExercise}/>
                   <Route path='audience' component={IndexExercise}/>
                   <Route path='audience' component={IndexExercise}/>
-                  <Route path='calendar' component={IndexExercise}/>*/
+                  <Route path='calendar' component={IndexExercise}/>
+                  <Route path='settings' component={IndexExerciseSettings}/>
                 </Route>
               </Route>
             </Router>

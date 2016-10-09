@@ -10,7 +10,11 @@ const paperStyle = {
     width: '400px',
     height: '256px',
     cursor: 'pointer'
-  }
+  },
+  [ Constants.PAPER_TYPE_SETTINGS ]: {
+    margin: '0 auto',
+    width: '600px'
+  },
 }
 
 export const Paper = (props) => (

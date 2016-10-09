@@ -5,10 +5,11 @@ import {injectIntl} from 'react-intl'
 import moment from 'moment'
 
 const style = {
-  float: 'right',
+  width: '50%',
+  display: 'inline-block'
 }
 
-const renderTimePicker = ({input, hintText, floatingLabelText, name, meta: {touched, error}}) => (
+const renderTimePicker = ({input, hintText, floatingLabelText, name, defaultTime, meta: {touched, error}}) => (
   <MUITimePicker
     hintText={hintText}
     floatingLabelText={floatingLabelText}
@@ -16,8 +17,10 @@ const renderTimePicker = ({input, hintText, floatingLabelText, name, meta: {touc
     name={name}
     autoOk={true}
     format="24hr"
+    defaultTime={defaultTime}
+    fullWidth={true}
     onChange={(e, val) => {input.onChange(moment(val).format('HH:mm:ss'))}}
-    textFieldStyle={style}
+    style={style}
   />
 )
 
@@ -34,6 +37,7 @@ export const FormTimePickerIntl = (props) => (
          hintText={props.hintText ? props.intl.formatMessage({id: props.hintText}) : ''}
          floatingLabelText={props.floatingLabelText ? props.intl.formatMessage({id: props.floatingLabelText}) : ''}
          onChange={props.onChange}
+         defaultTime={props.defaultTime}
          component={renderTimePicker}
   />
 )
@@ -46,4 +50,5 @@ FormTimePickerIntl.propTypes = {
   floatingLabelText: PropTypes.string,
   intl: PropTypes.object,
   onChange: PropTypes.func,
+  defaultTime: PropTypes.object
 }

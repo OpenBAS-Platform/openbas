@@ -33,6 +33,7 @@ export const TOOLBAR_TYPE_LOGIN = 'TOOLBAR_TYPE_LOGIN';
 
 //region PAPER
 export const PAPER_TYPE_EXERCISE = 'PAPER_TYPE_EXERCISE';
+export const PAPER_TYPE_SETTINGS = 'PAPER_TYPE_SETTINGS';
 //endregion
 
 //region CHIP

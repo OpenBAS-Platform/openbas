@@ -5,10 +5,11 @@ import {injectIntl} from 'react-intl'
 import moment from 'moment'
 
 const style = {
-  float: 'left',
+  width: '50%',
+  display: 'inline-block',
 }
 
-const renderDatePicker = ({input, hintText, floatingLabelText, name, meta: {touched, error}}) => (
+const renderDatePicker = ({input, hintText, floatingLabelText, name, defaultDate, meta: {touched, error}}) => (
   <MUIDatePicker
     hintText={hintText}
     floatingLabelText={floatingLabelText}
@@ -16,8 +17,10 @@ const renderDatePicker = ({input, hintText, floatingLabelText, name, meta: {touc
     name={name}
     autoOk={true}
     mode="landscape"
+    defaultDate={defaultDate}
+    fullWidth={true}
     onChange={(e, val) => {input.onChange(moment(val).format('YYYY-MM-DD'))}}
-    textFieldStyle={style}
+    style={style}
   />
 )
 
@@ -27,6 +30,7 @@ renderDatePicker.propTypes = {
   floatingLabelText: PropTypes.string,
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
+  defaultDate: PropTypes.object
 }
 
 export const FormDatePickerIntl = (props) => (
@@ -34,6 +38,7 @@ export const FormDatePickerIntl = (props) => (
          hintText={props.hintText ? props.intl.formatMessage({id: props.hintText}) : ''}
          floatingLabelText={props.floatingLabelText ? props.intl.formatMessage({id: props.floatingLabelText}) : ''}
          onChange={props.onChange}
+         defaultDate={props.defaultDate}
          component={renderDatePicker}
   />
 )
@@ -46,4 +51,5 @@ FormDatePickerIntl.propTypes = {
   floatingLabelText: PropTypes.string,
   intl: PropTypes.object,
   onChange: PropTypes.func,
+  defaultDate: PropTypes.object
 }

@@ -4,7 +4,8 @@ import {redirectToHome, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
 import {Chip} from '../../../components/Chip'
-import Theme from '../../../components/Theme'
+import NavBar from './nav/NavBar'
+import LeftBar from './nav/LeftBar'
 import UserPopover from './../UserPopover'
 import {fetchExercise} from '../../../actions/Exercise'
 
@@ -50,6 +51,8 @@ class RootAuthenticated extends Component {
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}
           showMenuIconButton={false}/>
+        <NavBar params={this.props.params}/>
+        <LeftBar params={this.props.params}/>
         <div style={styles.root}>
           {this.props.children}
         </div>
@@ -59,6 +62,7 @@ class RootAuthenticated extends Component {
 }
 
 RootAuthenticated.propTypes = {
+  id: PropTypes.string,
   leftBarOpen: PropTypes.bool,
   exercise: PropTypes.object,
   userFirstname: PropTypes.string,
