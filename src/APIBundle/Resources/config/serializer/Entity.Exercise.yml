@@ -9,8 +9,6 @@ APIBundle\Entity\Exercise:
             groups: ['exercise']
         exercise_description:
             groups: ['exercise']
-        exercise_organizer:
-            groups: ['exercise']
         exercise_start_date:
             groups: ['exercise']
         exercise_end_date:

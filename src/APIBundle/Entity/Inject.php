@@ -34,7 +34,7 @@ class Inject
     protected $inject_content;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="datetime")
      */
     protected $inject_date;
 

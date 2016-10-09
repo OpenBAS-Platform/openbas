@@ -31,20 +31,15 @@ class Exercise
     /**
      * @ORM\Column(type="text")
      */
-    protected $exercise_organizer;
-
-    /**
-     * @ORM\Column(type="text")
-     */
     protected $exercise_description;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="datetime")
      */
     protected $exercise_start_date;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="datetime")
      */
     protected $exercise_end_date;
 
@@ -123,18 +118,7 @@ class Exercise
         $this->exercise_description = $description;
         return $this;
     }
-
-    public function getExerciseOrganizer()
-    {
-        return $this->exercise_organizer;
-    }
-
-    public function setExerciseOrganizer($organizer)
-    {
-        $this->exercise_organizer = $organizer;
-        return $this;
-    }
-
+    
     public function getExerciseStartDate()
     {
         return $this->exercise_start_date;

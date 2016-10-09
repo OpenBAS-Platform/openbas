@@ -50,9 +50,6 @@ APIBundle\Entity\Exercise:
         exercise_description:
             - NotBlank: ~
             - Type: string
-        exercise_organizer:
-            - NotBlank: ~
-            - Type: string
         exercise_start_date:
             - DateTime: ~
             - NotBlank: ~
