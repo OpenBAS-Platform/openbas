@@ -10,6 +10,12 @@ const styles = {
     padding: '10px 0 10px 0',
     color: '#616161',
   },
+  subHeader: {
+    width: '100%',
+    fontWeight: 400,
+    color: '#616161',
+    height: 30
+  },
   title: {
     margin: '5px 0 5px 0',
     fontSize: 25,
@@ -32,7 +38,7 @@ const styles = {
     position: 'absolute',
     bottom: 0,
     padding: 10,
-    backgroundColor: 'rgba(0, 0, 0, .6)',
+    backgroundColor: 'rgba(0, 0, 0, .7)',
     height: 30,
     width: 380
   },
@@ -42,6 +48,21 @@ const styles = {
     color: '#ffffff',
     fontWeight: 400,
     fontSize: 14
+  },
+  line: {
+    position: 'relative',
+  },
+  dateLeft: {
+    fontSize: 13,
+    position: 'absolute',
+    top: 8,
+    left: 8
+  },
+  dateRight: {
+    fontSize: 13,
+    position: 'absolute',
+    top: 8,
+    right: 8
   }
 }
 
@@ -50,6 +71,19 @@ export const Exercise = (props) => (
     <div style={styles.header}>
       <div style={styles.title}>{props.name}</div>
       <div style={styles.subtitle}>{props.subtitle}</div>
+      </div>
+    <div style={styles.subHeader}>
+      <div style={styles.line}>
+        <div style={styles.dateLeft}>{props.startDate}</div>
+        <div className="line">
+          <ul>
+            <li></li>
+            <li></li>
+          </ul>
+        </div>
+        <div style={styles.dateRight}>{props.endDate}</div>
+        <div className="clearfix"></div>
+      </div>
     </div>
     <div style={styles.body(props.image)}>
       <div className="exerciseHover" style={styles.hover}>
@@ -65,5 +99,8 @@ Exercise.propTypes = {
   description: PropTypes.string,
   organizer: PropTypes.string,
   organizerLogo: PropTypes.string,
+  startDate: PropTypes.string,
+  endDate: PropTypes.string,
+  status: PropTypes.string,
   image: PropTypes.string
 }

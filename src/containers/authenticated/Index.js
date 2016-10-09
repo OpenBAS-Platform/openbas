@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
+import moment from 'moment';
 import {fetchExercises} from '../../actions/Exercise'
 import {CircularSpinner} from '../../components/Spinner'
 import * as Constants from '../../constants/ComponentTypes'
@@ -13,6 +14,11 @@ import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 const styles = {
   container: {
     textAlign: 'center'
+  },
+  logo: {
+    width: 40,
+    marginTop: 4,
+    cursor: 'pointer'
   }
 }
 
@@ -41,9 +47,10 @@ class IndexAuthenticated extends Component {
           title="OpenEx"
           type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
           onTitleTouchTap={this.redirectToHome.bind(this)}
-          onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
+          onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
           iconElementRight={<UserPopover/>}
-          showMenuIconButton={false}/>
+          iconElementLeft={<img src="images/logo_white.png" style={styles.logo} />}
+          />
         { loading }
         {this.props.exercises.toList().map(exercise => {
           return (
@@ -52,9 +59,11 @@ class IndexAuthenticated extends Component {
                 name={exercise.get('exercise_name')}
                 subtitle={exercise.get('exercise_subtitle')}
                 description={exercise.get('exercise_description')}
+                startDate={moment(exercise.get('exercise_start_date')).format('MMM D, YYYY')}
+                endDate={moment(exercise.get('exercise_end_date')).format('MMM D, YYYY')}
+                status={exercise.get('exercise_status').get('status_name')}
                 organizer={exercise.get('exercise_organizer')}
-                organizerLogo="images/sgdsn.png"
-                image={'images/' + exercise.get('exercise_id') + '.png'}
+                image={exercise.get('exercise_image')}
               />
             </Link>
           )

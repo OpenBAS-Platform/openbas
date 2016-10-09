@@ -40,7 +40,6 @@ const initialState = {
     locale: navigator.language,
     user: user,
     token: token,
-    exercise: null,
     entities: Map({
       users: users,
       tokens: tokens,

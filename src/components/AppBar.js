@@ -11,10 +11,11 @@ const appBarStyle = {
 const appBarTitleStyle = {
   [ Constants.APPBAR_TYPE_TOPBAR_NOICON ]: {
     textAlign: 'left',
-    marginLeft: -10,
+    marginLeft: 10,
     cursor: 'pointer'
   },
   [ Constants.APPBAR_TYPE_TOPBAR ]: {
+    textAlign: 'left',
     marginLeft: 60,
     cursor: 'pointer'
   },
@@ -29,6 +30,7 @@ export const AppBar = (props) => (
     onTitleTouchTap={props.onTitleTouchTap}
     onLeftIconButtonTouchTap={props.onLeftIconButtonTouchTap}
     iconElementRight={props.iconElementRight}
+    iconElementLeft={props.iconElementLeft}
     showMenuIconButton={props.showMenuIconButton}
     titleStyle={appBarTitleStyle[props.type]}
     style={appBarStyle[props.type]}
@@ -41,5 +43,6 @@ AppBar.propTypes = {
   onTitleTouchTap: PropTypes.func,
   onLeftIconButtonTouchTap: PropTypes.func,
   iconElementRight: PropTypes.element,
+  iconElementLeft: PropTypes.element,
   showMenuIconButton: PropTypes.bool
 }

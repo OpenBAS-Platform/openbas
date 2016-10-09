@@ -18,14 +18,66 @@ div.exercise:hover {
   box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 6px, rgba(0, 0, 0, 0.3) 0px 1px 4px !important;
 }
 
-div.exercise div.exerciseHover {
-  opacity: 0;
+div.line {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  margin-left: -110px;
 }
 
-div.exercise:hover div.exerciseHover {
-  -webkit-transition: opacity .3s ease-in-out;
-  -moz-transition: opacity .3s ease-in-out;
-  -ms-transition: opacity .3s ease-in-out;
-  -o-transition: opacity .3s ease-in-out;
-  opacity: 1;
+div.line ul {
+  margin: 0;
+  padding: 0;
+}
+
+div.line li {
+  width: 10px;
+  height: 10px;
+  text-align: center;
+  line-height: 5px;
+  border-radius: 5px;
+  background: #ff4081;
+  margin: 0 100px 0 100px;
+  display: inline-block;
+  color: white;
+  position: relative;
+}
+
+div.line li:first-child {
+  margin-left: 0;
+}
+
+div.line li:last-child {
+  margin-right: 0;
+}
+
+div.line li::before{
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -200px;
+  width: 200px;
+  height: 2px;
+  background: #ff4081;
+  z-index: 10;
+}
+
+div.line li:first-child::before {
+  display: none;
+}
+
+div.line .active {
+  background: #ff4081;
+}
+
+div.line .active ~ li {
+  background: #ff4081;
+}
+
+div.line .active ~ li::before {
+  background: #ff4081;
+}
+
+div.clearfix {
+  clear: both;
 }

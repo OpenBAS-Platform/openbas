@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import MUITimePicker from 'material-ui/TimePicker';
 import {Field} from 'redux-form'
 import {injectIntl} from 'react-intl'
-import moment from 'momentjs'
+import moment from 'moment'
 
 const style = {
   float: 'right',

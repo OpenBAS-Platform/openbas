@@ -8,7 +8,7 @@ const paperStyle = {
     margin: '20px 20px 20px 20px',
     verticalAlign: 'top',
     width: 400,
-    height: 226,
+    height: 256,
     cursor: 'pointer'
   }
 }

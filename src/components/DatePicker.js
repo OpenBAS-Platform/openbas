@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import MUIDatePicker from 'material-ui/DatePicker';
 import {Field} from 'redux-form'
 import {injectIntl} from 'react-intl'
-import moment from 'momentjs'
+import moment from 'moment'
 
 const style = {
   float: 'left',
