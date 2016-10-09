@@ -29,7 +29,7 @@ class Index extends Component {
             <ExerciseForm
               ref="exerciseForm"
               onSubmit={this.onUpdate.bind(this)}
-              initialValues={this.props.exercise ? this.props.exercise.toJS() : ''}
+              initialValues={this.props.exercise ? this.props.exercise.toJS() : undefined}
             />
             <br />
             <Button type="submit" label="Update"/>
@@ -41,7 +41,7 @@ class Index extends Component {
             <StatusForm
               ref="statusForm"
               onSubmit={this.onUpdate.bind(this)}
-              initialValues={this.props.exercise ? this.props.exercise.get('exercise_status').toJS() : ''}
+              initialValues={this.props.exercise ? this.props.exercise.get('exercise_status').toJS() : undefined}
             />
             <Button type="submit" label="Update"/>
           </div>
