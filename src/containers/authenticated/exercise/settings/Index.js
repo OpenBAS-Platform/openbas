@@ -21,9 +21,6 @@ class Index extends Component {
 
   render() {
     console.log('EXERCISE', this.props.exercise)
-    let startDate = this.props.exercise ? moment(this.props.exercise.get('exercise_start_date')).toDate() : null
-    let endDate = this.props.exercise ? moment(this.props.exercise.get('exercise_end_date')).toDate() : null
-    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'DRAFT'
     let image = this.props.exercise ? this.props.exercise.get('exercise_image') : ''
 
     return (
@@ -46,7 +43,7 @@ class Index extends Component {
             <StatusForm
               ref="statusForm"
               onSubmit={this.onUpdate.bind(this)}
-              status={status}
+              initialValues={this.props.exercise ? this.props.exercise.get('exercise_status').toJS() : ''}
             />
             <Button type="submit" label="Update"/>
           </div>

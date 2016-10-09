@@ -36,7 +36,7 @@ class StatusForm extends Component {
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <SelectField
           label="Exercise status"
-          name="status"
+          name="status_name"
           fullWidth={true}
           value={this.props.status}
         >
