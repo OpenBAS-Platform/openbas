@@ -1,6 +1,5 @@
 APIBundle\Entity\Token:
-    exclusion_policy: none
-    properties:
+    attributes:
         token_id:
             groups: ['token']
         token_value:

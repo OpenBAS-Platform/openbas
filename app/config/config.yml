@@ -18,7 +18,7 @@ framework:
     csrf_protection: ~
     validation:      { enable_annotations: true }
     serializer:
-        enabled: false
+        enabled: true
     templating:
         engines: ['twig']
     default_locale:  "%locale%"
@@ -84,9 +84,3 @@ fos_rest:
             'Symfony\Component\Security\Core\Exception\BadCredentialsException': true
         codes:
             'Symfony\Component\Security\Core\Exception\BadCredentialsException': 401
-
-jms_serializer:
-    handlers:
-        datetime:
-            default_format: 'Y-m-d H:i:s'
-            default_timezone: "UTC"
