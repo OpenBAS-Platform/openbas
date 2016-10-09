@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
+import {Link} from 'react-router'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Drawer} from '../../../../components/Drawer'
 import {List} from '../../../../components/List'
@@ -7,6 +8,14 @@ import {IconListItemLink} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {AppBar} from '../../../../components/AppBar'
 import {toggleLeftBar} from '../../../../actions/Application'
+
+const styles = {
+  exit: {
+    position: 'absolute',
+    bottom: '20px',
+    left: '20px'
+  }
+}
 
 class NavBar extends Component {
 
@@ -38,6 +47,11 @@ class NavBar extends Component {
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_ACTION_SETTINGS}/>}/>
         </List>
+        <div style={styles.exit}>
+          <Link to='/private' key='exit'>
+            <Icon name={Constants.ICON_NAME_ACTION_EXIT}/>
+          </Link>
+        </div>
       </Drawer>
     )
   }

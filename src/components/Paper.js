@@ -14,7 +14,8 @@ const paperStyle = {
   [ Constants.PAPER_TYPE_SETTINGS ]: {
     margin: '0 auto',
     marginBottom: '30px',
-    width: '600px'
+    maxWidth: '600px',
+    minWidth: '400px'
   },
 }
 

@@ -13,6 +13,9 @@ import ActionDelete from 'material-ui/svg-icons/action/delete'
 import ActionSettings from 'material-ui/svg-icons/action/settings'
 import ActionSchedule from 'material-ui/svg-icons/action/schedule'
 import ActionEvent from 'material-ui/svg-icons/action/event'
+import ActionExit from 'material-ui/svg-icons/action/exit-to-app'
+import FileFolder from 'material-ui/svg-icons/file/folder'
+import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
 
 const iconStyle = {
   [ Constants.ICON_TYPE_NAVBAR ]: {
@@ -52,6 +55,12 @@ export const Icon = (props) => {
       return (<ActionSchedule style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_EVENT:
       return (<ActionEvent style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_ACTION_EXIT:
+      return (<ActionExit style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_FILE_FOLDER:
+      return (<FileFolder style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_EDITOR_ATTACH_FILE:
+      return (<EditorAttachFile style={mergeStyle} color={props.color} />)
     default:
       return (<HardwareComputer style={mergeStyle} color={props.color} />)
   }
