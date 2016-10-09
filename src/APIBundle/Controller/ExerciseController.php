@@ -47,9 +47,9 @@ class ExerciseController extends Controller
         foreach( $exercises as &$exercise ) {
 
             if( file_exists($this->get('kernel')->getRootDir().'/../web/images/exercises/' . $exercise->getExerciseId() . '.png') ) {
-                $exercise->setExerciseImage('/images/exercises/' . $exercise->getExerciseId() . '.png');
+                $exercise->setExerciseImage($this->getParameter('protocol') . '://' . $this->getParameter('hostname') . '/images/exercises/' . $exercise->getExerciseId() . '.png');
             } else {
-                $exercise->setExerciseImage('/images/exercises/default.png');
+                $exercise->setExerciseImage($this->getParameter('protocol') . '://' . $this->getParameter('hostname') . '/images/exercises/default.png');
             }
         }
 
@@ -77,9 +77,9 @@ class ExerciseController extends Controller
         $this->denyAccessUnlessGranted('select', $exercise);
 
         if( file_exists($this->get('kernel')->getRootDir().'/../web/images/exercises/' . $exercise->getExerciseId() . '.png') ) {
-            $exercise->setExerciseImage('/images/exercises/' . $exercise->getExerciseId() . '.png');
+            $exercise->setExerciseImage($this->getParameter('protocol') . '://' . $this->getParameter('hostname') . '/images/exercises/' . $exercise->getExerciseId() . '.png');
         } else {
-            $exercise->setExerciseImage('/images/exercises/default.png');
+            $exercise->setExerciseImage($this->getParameter('protocol') . '://' . $this->getParameter('hostname') . '/images/exercises/default.png');
         }
 
         return $exercise;
