@@ -38,7 +38,7 @@ export const AppBar = (props) => (
 )
 
 AppBar.propTypes = {
-  title: PropTypes.string,
+  title: PropTypes.node,
   type: PropTypes.string,
   onTitleTouchTap: PropTypes.func,
   onLeftIconButtonTouchTap: PropTypes.func,
