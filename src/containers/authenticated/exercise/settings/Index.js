@@ -1,10 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import moment from 'moment'
 import {Paper} from '../../../../components/Paper'
 import {Button} from '../../../../components/Button'
 import * as Constants from '../../../../constants/ComponentTypes'
-import {fetchExercise} from '../../../../actions/Exercise'
 import ExerciseForm from '../ExerciseForm'
 import StatusForm from './StatusForm'
 
@@ -31,7 +29,7 @@ class Index extends Component {
             <ExerciseForm
               ref="exerciseForm"
               onSubmit={this.onUpdate.bind(this)}
-              initialValues={this.props.exercise ? this.props.exercise.toJS() : ''}
+              initialValues={this.props.exercise ? this.props.exercise.toJS() : {}}
             />
             <br />
             <Button type="submit" label="Update"/>
@@ -39,11 +37,11 @@ class Index extends Component {
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
-            <h2>Status</h2>
+            <h2>State</h2>
             <StatusForm
               ref="statusForm"
               onSubmit={this.onUpdate.bind(this)}
-              initialValues={this.props.exercise ? this.props.exercise.get('exercise_status').toJS() : ''}
+              initialValues={this.props.exercise ? this.props.exercise.get('exercise_status').toJS() : {}}
             />
             <Button type="submit" label="Update"/>
           </div>
@@ -52,7 +50,7 @@ class Index extends Component {
           <div style={styles.PaperContent}>
             <h2>Image</h2>
             <br />
-            <img src={image} alt="Image" />
+            <img src={image} alt="Exercise logo" />
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
@@ -72,7 +70,6 @@ Index.propTypes = {
   id: PropTypes.string,
   exercise: PropTypes.object,
   params: PropTypes.object,
-  fetchExercise: PropTypes.func.isRequired,
 }
 
 const select = (state, ownProps) => {

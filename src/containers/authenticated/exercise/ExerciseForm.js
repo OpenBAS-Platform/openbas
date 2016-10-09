@@ -11,10 +11,6 @@ i18nRegister({
   }
 })
 
-const styleLine = {
-  width: '100%'
-}
-
 const validate = values => {
   const errors = {}
   const requiredFields = []

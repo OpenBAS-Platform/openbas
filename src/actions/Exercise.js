@@ -33,14 +33,7 @@ export const fetchExercise = (exerciseId) => (dispatch) => {
 
 export const addExercise = (data) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_ADD_EXERCISE_SUBMITTED});
-  var postData = {
-    exercise_name: data.exercise_name,
-    exercise_subtitle: data.exercise_subtitle,
-    exercise_description: data.exercise_description,
-    exercise_start_date: data.startDate + ' ' + data.startTime,
-    exercise_end_date: data.endDate + ' ' + data.endTime,
-  };
-  return api(schema.exercise).post('/api/exercises', postData).then(function (response) {
+  return api(schema.exercise).post('/api/exercises', data).then(function (response) {
     dispatch({
       type: Constants.APPLICATION_ADD_EXERCISE_SUCCESS,
       payload: response.data
