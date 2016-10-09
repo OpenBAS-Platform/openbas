@@ -40,7 +40,7 @@ class RootAuthenticated extends Component {
 
   render() {
     let title = this.props.exercise ? this.props.exercise.get('exercise_name') : ''
-    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'Draft'
+    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'Scheduled'
     return (
       <div>
         <AppBar
