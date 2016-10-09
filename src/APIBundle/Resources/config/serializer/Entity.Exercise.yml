@@ -15,5 +15,7 @@ APIBundle\Entity\Exercise:
             groups: ['exercise']
         exercise_end_date:
             groups: ['exercise']
+        exercise_image:
+            groups: ['exercise']
         exercise_status:
             groups: ['exercise']

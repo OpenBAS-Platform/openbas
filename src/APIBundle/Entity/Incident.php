@@ -29,12 +29,12 @@ class Incident
     protected $incident_story;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="string")
      */
     protected $incident_start_date;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="string")
      */
     protected $incident_end_date;
 

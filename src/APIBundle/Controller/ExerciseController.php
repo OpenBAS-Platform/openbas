@@ -44,6 +44,15 @@ class ExerciseController extends Controller
             }
         }
 
+        foreach( $exercises as &$exercise ) {
+
+            if( file_exists($this->get('kernel')->getRootDir().'/../web/images/exercises/' . $exercise->getExerciseId() . '.png') ) {
+                $exercise->setExerciseImage('/images/exercises/' . $exercise->getExerciseId() . '.png');
+            } else {
+                $exercise->setExerciseImage('/images/exercises/default.png');
+            }
+        }
+
         return $exercises;
     }
 
@@ -66,6 +75,13 @@ class ExerciseController extends Controller
         }
 
         $this->denyAccessUnlessGranted('select', $exercise);
+
+        if( file_exists($this->get('kernel')->getRootDir().'/../web/images/exercises/' . $exercise->getExerciseId() . '.png') ) {
+            $exercise->setExerciseImage('/images/exercises/' . $exercise->getExerciseId() . '.png');
+        } else {
+            $exercise->setExerciseImage('/images/exercises/default.png');
+        }
+
         return $exercise;
     }
 
@@ -95,6 +111,8 @@ class ExerciseController extends Controller
 
         if ($form->isValid()) {
             $exercise->setExerciseOwner($user);
+            $exercise->setExerciseStartDate(date('c', strtotime($exercise->getExerciseStartDate())));
+            $exercise->setExerciseEndDate(date('c', strtotime($exercise->getExerciseEndDate())));
             $em->persist($exercise);
             $em->flush();
             return $exercise;

@@ -39,12 +39,12 @@ class Exercise
     protected $exercise_description;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="string")
      */
     protected $exercise_start_date;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="string")
      */
     protected $exercise_end_date;
 
@@ -71,6 +71,8 @@ class Exercise
      * @var Event[]
      */
     protected $exercise_events;
+
+    protected $exercise_image;
 
     public function __construct()
     {
@@ -196,6 +198,17 @@ class Exercise
     public function setExerciseEvents($events)
     {
         $this->exercise_events = $events;
+        return $this;
+    }
+
+    public function getExerciseImage()
+    {
+        return $this->exercise_image;
+    }
+
+    public function setExerciseImage($image)
+    {
+        $this->exercise_image = $image;
         return $this;
     }
 }
