@@ -118,7 +118,7 @@ class Exercise
         $this->exercise_description = $description;
         return $this;
     }
-    
+
     public function getExerciseStartDate()
     {
         return $this->exercise_start_date;
