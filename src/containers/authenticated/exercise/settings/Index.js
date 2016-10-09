@@ -15,21 +15,14 @@ const styles = {
 }
 
 class Index extends Component {
-  componentDidMount() {
-    this.props.fetchExercise(this.props.id);
-  }
-
   onUpdate(data) {
     this.props.updateExercise(data)
   }
 
   render() {
     console.log('EXERCISE', this.props.exercise)
-    let name = this.props.exercise ? this.props.exercise.get('exercise_name') : 'Name'
-    let subtitle = this.props.exercise ? this.props.exercise.get('exercise_subtitle') : 'Subtitle'
-    let description = this.props.exercise ? this.props.exercise.get('exercise_description') : 'Description'
-    let startDate = this.props.exercise ? moment(this.props.exercise.get('exercise_start_date')).toDate() : new Date(2016, 1, 1, 1, 0, 0)
-    let endDate = this.props.exercise ? moment(this.props.exercise.get('exercise_end_date')).toDate() : new Date(2016, 1, 1, 1, 0, 0)
+    let startDate = this.props.exercise ? moment(this.props.exercise.get('exercise_start_date')).toDate() : null
+    let endDate = this.props.exercise ? moment(this.props.exercise.get('exercise_end_date')).toDate() : null
     let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'DRAFT'
     let image = this.props.exercise ? this.props.exercise.get('exercise_image') : ''
 
@@ -41,13 +34,7 @@ class Index extends Component {
             <ExerciseForm
               ref="exerciseForm"
               onSubmit={this.onUpdate.bind(this)}
-              name="test"
-              subtitle="Subtitle test"
-              description="test"
-              startDate={startDate}
-              startTime={startDate}
-              endDate={endDate}
-              endTime={endDate}
+              initialValues={this.props.exercise ? this.props.exercise.toJS() : ''}
             />
             <br />
             <Button type="submit" label="Update"/>
@@ -100,4 +87,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {fetchExercise})(Index)
+export default connect(select, null)(Index)

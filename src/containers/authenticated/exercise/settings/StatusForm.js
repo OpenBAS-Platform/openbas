@@ -24,9 +24,9 @@ const validate = values => {
 }
 
 const items = [
-  <MenuItemLink key="DRAFT" value="DRAFT" label="Draft" />,
-  <MenuItemLink key="RUNNING" value="RUNNING" label="Running" />,
-  <MenuItemLink key="FINISHED" value="FINISHED" label="Scheduled" />,
+  <MenuItemLink key={1} value="DRAFT" label="Draft" />,
+  <MenuItemLink key={2} value="RUNNING" label="Running" />,
+  <MenuItemLink key={3} value="FINISHED" label="Scheduled" />,
 ];
 
 class StatusForm extends Component {
@@ -35,8 +35,7 @@ class StatusForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <SelectField
-          floatingLabelText="Exercise status"
-          floatingLabelFixed={true}
+          label="Exercise status"
           name="status"
           fullWidth={true}
           value={this.props.status}

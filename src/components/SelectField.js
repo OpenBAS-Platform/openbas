@@ -19,14 +19,13 @@ const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint
                   errorText={touched && error}
                   style={styles.global}
                   inputStyle={styles.input}
-                  defaultValue={defaultValue}
-                  value={value}
                   fullWidth={fullWidth}
                   multiLine={multiLine}
                   rows={rows}
                   type={type}
-                  children={children}
                   {...input}
+                  onChange={(event, index, value) => input.onChange(value)}
+                  children={children}
   />)
 
 renderSelectField.propTypes = {
