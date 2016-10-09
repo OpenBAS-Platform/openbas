@@ -14,6 +14,7 @@ h2 {
   margin: 10px 0 10px 0 !important;
   -webkit-margin-before: 0 !important;
   -webkit-margin-after: 0 !important;
+  font-size: 20px;
 }
 
 h3 {
@@ -21,7 +22,7 @@ h3 {
 }
 
 div.exercise:hover {
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 6px, rgba(0, 0, 0, 0.3) 0px 1px 4px !important;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 14px 60px, rgba(0, 0, 0, 0.3) 0px 10px 30px !important;
 }
 
 div.line {

@@ -1,5 +1,5 @@
 import React, {PropTypes} from 'react'
-import MUITextField from 'material-ui/TextField'
+import MUISelectField from 'material-ui/SelectField'
 import {Field} from 'redux-form'
 import {injectIntl} from 'react-intl'
 
@@ -12,23 +12,24 @@ const styles = {
   }
 }
 
-const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, defaultValue, value, meta: {touched, error}}) => (
-  <MUITextField hintText={hint}
-                floatingLabelText={label}
-                floatingLabelFixed={false}
-                errorText={touched && error}
-                style={styles.global}
-                inputStyle={styles.input}
-                defaultValue={defaultValue}
-                value={value}
-                fullWidth={fullWidth}
-                multiLine={multiLine}
-                rows={rows}
-                type={type}
-                {...input}
+const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint, defaultValue, children, meta: {touched, error}}) => (
+  <MUISelectField hintText={hint}
+                  floatingLabelText={label}
+                  floatingLabelFixed={false}
+                  errorText={touched && error}
+                  style={styles.global}
+                  inputStyle={styles.input}
+                  defaultValue={defaultValue}
+                  value={defaultValue}
+                  fullWidth={fullWidth}
+                  multiLine={multiLine}
+                  rows={rows}
+                  type={type}
+                  children={children}
+                  {...input}
   />)
 
-renderTextField.propTypes = {
+renderSelectField.propTypes = {
   input: PropTypes.object,
   fullWidth: PropTypes.bool,
   multiLine: PropTypes.bool,
@@ -39,10 +40,11 @@ renderTextField.propTypes = {
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
   defaultValue: PropTypes.string,
-  value: PropTypes.string
+  value: PropTypes.string,
+  children: PropTypes.node
 }
 
-export const FormFieldIntl = (props) => (
+export const SelectFieldIntl = (props) => (
   <Field name={props.name}
          label={props.label ? props.intl.formatMessage({id: props.label}) : ''}
          hint={props.hint ? props.intl.formatMessage({id: props.hint}) : ''}
@@ -51,13 +53,14 @@ export const FormFieldIntl = (props) => (
          rows={props.rows}
          type={props.type}
          defaultValue={props.defaultValue}
-         value={props.value}
-         component={renderTextField}/>
+         value={props.defaultValue}
+         children={props.children}
+         component={renderSelectField}/>
 )
 
-export const FormField = injectIntl(FormFieldIntl)
+export const SelectField = injectIntl(SelectFieldIntl)
 
-FormFieldIntl.propTypes = {
+SelectFieldIntl.propTypes = {
   hint: PropTypes.string,
   label: PropTypes.string,
   intl: PropTypes.object,
@@ -67,5 +70,5 @@ FormFieldIntl.propTypes = {
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
   defaultValue: PropTypes.string,
-  value: PropTypes.string
+  children: PropTypes.node
 }

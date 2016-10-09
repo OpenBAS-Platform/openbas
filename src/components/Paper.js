@@ -13,16 +13,18 @@ const paperStyle = {
   },
   [ Constants.PAPER_TYPE_SETTINGS ]: {
     margin: '0 auto',
+    marginBottom: '30px',
     width: '600px'
   },
 }
 
 export const Paper = (props) => (
-  <MUIPaper rounded={true} style={paperStyle[props.type]} className={props.className}>{props.children}</MUIPaper>
+  <MUIPaper rounded={true} zDepth={props.zDepth} style={paperStyle[props.type]} className={props.className}>{props.children}</MUIPaper>
 )
 
 Paper.propTypes = {
   type: PropTypes.string,
   className: PropTypes.string,
+  zDepth: PropTypes.number,
   children: PropTypes.node
 }

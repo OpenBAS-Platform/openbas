@@ -67,7 +67,7 @@ const styles = {
 }
 
 export const Exercise = (props) => (
-  <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE}>
+  <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE} zDepth={4}>
     <div style={styles.header}>
       <div style={styles.title}>{props.name}</div>
       <div style={styles.subtitle}>{props.subtitle}</div>

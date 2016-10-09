@@ -7,7 +7,9 @@ const MenuItemLinkIntl = (props) => (
   <MUIMenuItem
     primaryText={props.intl.formatMessage({id: props.label})}
     containerElement={<Link to={props.to}/>}
-    disabled={props.disabled}/>
+    disabled={props.disabled}
+    key={props.key}
+    value={props.value}/>
 );
 export const MenuItemLink = injectIntl(MenuItemLinkIntl)
 
@@ -15,7 +17,9 @@ MenuItemLinkIntl.propTypes = {
   label: PropTypes.string.isRequired,
   intl: PropTypes.object,
   to: PropTypes.string,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  key: PropTypes.string,
+  value: PropTypes.string
 }
 
 const MenuItemButtonIntl = (props) => (

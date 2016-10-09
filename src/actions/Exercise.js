@@ -21,7 +21,6 @@ export const fetchExercises = () => (dispatch) => {
 export const fetchExercise = (exerciseId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_EXERCISE_SUBMITTED});
   return api(schema.exercise).get('/api/exercises/' + exerciseId).then(function (response) {
-    console.log('DATA:', response.data)
     dispatch({
       type: Constants.APPLICATION_FETCH_EXERCISE_SUCCESS,
       payload: response.data

@@ -33,10 +33,10 @@ class ExerciseForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
-        <FormField name="name" fullWidth={true} type="text" hint=" " label="Name" defaultValue={this.props.name}/>
-        <FormField name="subtitle" fullWidth={true} type="text" hint=" " label="Subtitle" defaultValue={this.props.subtitle}/>
+        <FormField name="name" fullWidth={true} type="text" hint=" " label="Name" value={this.props.name}/>
+        <FormField name="subtitle" fullWidth={true} type="text" hint=" " label="Subtitle" value={this.props.subtitle}/>
         <FormField name="description" fullWidth={true} multiLine={true} rows={3} type="text" hint=" "
-                   label="Description" defaultValue={this.props.description}/>
+                   label="Description" value={this.props.description}/>
         <div style={styleLine}>
           <DatePicker name="startDate" floatingLabelText="Start date" defaultDate={this.props.startDate}/>
           <TimePicker name="startTime" floatingLabelText="Start time" defaultTime={this.props.startTime}/>
