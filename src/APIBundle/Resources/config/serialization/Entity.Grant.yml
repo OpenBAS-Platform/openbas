@@ -1,6 +1,5 @@
 APIBundle\Entity\Grant:
-    exclusion_policy: none
-    properties:
+    attributes:
         grant_id:
             groups: ['grant', 'group', 'user', 'exercise']
         grant_group:

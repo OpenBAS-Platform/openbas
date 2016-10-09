@@ -1,6 +1,5 @@
 APIBundle\Entity\Event:
-    exclusion_policy: none
-    properties:
+    attributes:
         event_id:
             groups: ['event']
         event_title:

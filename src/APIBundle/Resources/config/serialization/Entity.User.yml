@@ -1,6 +1,5 @@
 APIBundle\Entity\User:
-    exclusion_policy: none
-    properties:
+    attributes:
         user_id:
             groups: ['user', 'token']
         user_firstname:

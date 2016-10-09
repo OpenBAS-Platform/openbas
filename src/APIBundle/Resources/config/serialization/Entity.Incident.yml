@@ -1,6 +1,5 @@
 APIBundle\Entity\Incident:
-    exclusion_policy: none
-    properties:
+    attributes:
         incident_id:
             groups: ['incident']
         incident_title:

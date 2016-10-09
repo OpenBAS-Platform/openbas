@@ -1,6 +1,5 @@
 APIBundle\Entity\Inject:
-    exclusion_policy: none
-    properties:
+    attributes:
         inject_id:
             groups: ['inject']
         inject_title:

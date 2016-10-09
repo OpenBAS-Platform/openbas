@@ -1,6 +1,5 @@
 APIBundle\Entity\Exercise:
-    exclusion_policy: none
-    properties:
+    attributes:
         exercise_id:
             groups: ['exercise']
         exercise_name:
