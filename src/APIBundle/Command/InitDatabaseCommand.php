@@ -40,6 +40,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $statusDraft = $this->createStatus('DRAFT');
         $statusFinal = $this->createStatus('FINAL');
         $statusRunning = $this->createStatus('RUNNING');
+        $statusFinished = $this->createStatus('FINISHED');
         $statusDisabled = $this->createStatus('DISABLED');
         $output->writeln('Creating default statuses');
 
