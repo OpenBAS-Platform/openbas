@@ -30,13 +30,14 @@ class Index extends Component {
     let description = this.props.exercise ? this.props.exercise.get('exercise_description') : 'Description'
     let startDate = this.props.exercise ? moment(this.props.exercise.get('exercise_start_date')).toDate() : new Date(2016, 1, 1, 1, 0, 0)
     let endDate = this.props.exercise ? moment(this.props.exercise.get('exercise_end_date')).toDate() : new Date(2016, 1, 1, 1, 0, 0)
-    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'Scheduled'
+    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'DRAFT'
+    let image = this.props.exercise ? this.props.exercise.get('exercise_image') : ''
 
     return (
       <div>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
-            <h2>Exercise information</h2>
+            <h2>Information</h2>
             <ExerciseForm
               ref="exerciseForm"
               onSubmit={this.onUpdate.bind(this)}
@@ -54,11 +55,28 @@ class Index extends Component {
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
-            <h2>Exercise status</h2>
+            <h2>Status</h2>
             <StatusForm
               ref="statusForm"
               onSubmit={this.onUpdate.bind(this)}
-              />
+              status={status}
+            />
+            <Button type="submit" label="Update"/>
+          </div>
+        </Paper>
+        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+          <div style={styles.PaperContent}>
+            <h2>Image</h2>
+            <br />
+            <img src={image} alt="Image" />
+          </div>
+        </Paper>
+        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+          <div style={styles.PaperContent}>
+            <h2>Delete</h2>
+            <p>Deleting an exercise will result in deleting all the content of the exercise, including objectives, events, incidents, injects and audience groups. We do not recommend
+            you do this.</p>
+            <Button type="submit" label="Delete"/>
           </div>
         </Paper>
       </div>

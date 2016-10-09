@@ -2,6 +2,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  font-size: 14px;
+  font-weight: normal;
 }
 
 input:-webkit-autofill {
@@ -11,7 +13,7 @@ input:-webkit-autofill {
 }
 
 h2 {
-  margin: 10px 0 10px 0 !important;
+  margin: 10px 0 20px 0 !important;
   -webkit-margin-before: 0 !important;
   -webkit-margin-after: 0 !important;
   font-size: 20px;

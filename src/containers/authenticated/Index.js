@@ -13,6 +13,7 @@ import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 
 const styles = {
   container: {
+    padding: '90px 20px 0 85px',
     textAlign: 'center'
   },
   logo: {
@@ -42,32 +43,34 @@ class IndexAuthenticated extends Component {
     }
 
     return (
-      <div style={styles.container}>
+      <div>
         <AppBar
           title="OpenEx"
           type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
           iconElementRight={<UserPopover/>}
-          iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo} />}
-          />
-        { loading }
-        {this.props.exercises.toList().map(exercise => {
-          return (
-            <Link to={'/private/exercise/' + exercise.get('exercise_id')} key={exercise.get('exercise_id')}>
-              <Exercise
-                name={exercise.get('exercise_name')}
-                subtitle={exercise.get('exercise_subtitle')}
-                description={exercise.get('exercise_description')}
-                startDate={moment(exercise.get('exercise_start_date')).format('MMM D, YYYY')}
-                endDate={moment(exercise.get('exercise_end_date')).format('MMM D, YYYY')}
-                status={exercise.get('exercise_status').get('status_name')}
-                organizer={exercise.get('exercise_organizer')}
-                image={exercise.get('exercise_image')}
-              />
-            </Link>
-          )
-        })}
+          iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo}/>}
+        />
+        <div style={styles.container}>
+          { loading }
+          {this.props.exercises.toList().map(exercise => {
+            return (
+              <Link to={'/private/exercise/' + exercise.get('exercise_id')} key={exercise.get('exercise_id')}>
+                <Exercise
+                  name={exercise.get('exercise_name')}
+                  subtitle={exercise.get('exercise_subtitle')}
+                  description={exercise.get('exercise_description')}
+                  startDate={moment(exercise.get('exercise_start_date')).format('MMM D, YYYY')}
+                  endDate={moment(exercise.get('exercise_end_date')).format('MMM D, YYYY')}
+                  status={exercise.get('exercise_status').get('status_name')}
+                  organizer={exercise.get('exercise_organizer')}
+                  image={exercise.get('exercise_image')}
+                />
+              </Link>
+            )
+          })}
+        </div>
         <CreateExercise />
       </div>
     );

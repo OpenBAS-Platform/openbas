@@ -47,7 +47,7 @@ const styles = {
     margin: 0,
     color: '#ffffff',
     fontWeight: 400,
-    fontSize: '14px'
+    fontSize: '13px'
   },
   line: {
     position: 'relative',

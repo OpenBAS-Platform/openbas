@@ -19,7 +19,7 @@ export default {
     textColor: grey700,
     alternateTextColor: white,
     canvasColor: white,
-    borderColor: grey500,
+    borderColor: grey400,
     disabledColor: fade(darkBlack, 0.3),
     pickerHeaderColor: indigo500,
     clockCircleColor: fade(darkBlack, 0.07),

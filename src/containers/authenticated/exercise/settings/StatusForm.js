@@ -38,6 +38,8 @@ class StatusForm extends Component {
           floatingLabelText="Exercise status"
           floatingLabelFixed={true}
           name="status"
+          fullWidth={true}
+          value={this.props.status}
         >
           {items}
         </SelectField>

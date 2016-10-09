@@ -11,7 +11,7 @@ import {fetchExercise} from '../../../actions/Exercise'
 
 const styles = {
   root: {
-    padding: '20px 20px 0 85px',
+    padding: '90px 20px 0 85px',
   },
   title: {
     fontVariant: 'small-caps',
