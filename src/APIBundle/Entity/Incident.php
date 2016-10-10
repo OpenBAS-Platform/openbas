@@ -64,12 +64,6 @@ class Incident
      */
     protected $incident_outcomes;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Status")
-     * @ORM\JoinColumn(name="incident_status", referencedColumnName="status_id")
-     */
-    protected $incident_status;
-
     public function __construct()
     {
         $this->incident_objectives = new ArrayCollection();
@@ -172,17 +166,6 @@ class Incident
     public function setIncidentOutcomes($outcomes)
     {
         $this->incident_outcomes = $outcomes;
-        return $this;
-    }
-
-    public function getIncidentStatus()
-    {
-        return $this->incident_status;
-    }
-
-    public function setIncidentStatus($status)
-    {
-        $this->incident_status = $status;
         return $this;
     }
 }

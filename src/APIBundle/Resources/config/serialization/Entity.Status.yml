@@ -1,6 +1,0 @@
-APIBundle\Entity\Status:
-    attributes:
-        status_id:
-            groups: ['exercise', 'event', 'incident', 'inject']
-        status_name:
-            groups: ['exercise', 'event', 'incident', 'inject']

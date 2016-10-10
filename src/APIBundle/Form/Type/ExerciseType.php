@@ -22,6 +22,7 @@ class ExerciseType extends AbstractType
             'widget' => 'single_text',
             'input' => 'datetime'
         ));
+        $builder->add('exercise_status');
     }
 
     public function configureOptions(OptionsResolver $resolver)

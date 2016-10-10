@@ -1,0 +1,6 @@
+APIBundle\Entity\InjectStatus:
+    attributes:
+        status_id:
+            groups: ['injectStatus', 'inject']
+        status_name:
+            groups: ['injectStatus', 'inject']

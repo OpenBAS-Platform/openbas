@@ -18,6 +18,14 @@ tokens:
     type:     rest
     resource: APIBundle\Controller\TokenController
 
+exercise_statuses:
+    type:     rest
+    resource: APIBundle\Controller\ExerciseStatusController
+
+inject_statuses:
+    type:     rest
+    resource: APIBundle\Controller\InjectStatusController
+
 exercises:
     type:     rest
     resource: APIBundle\Controller\ExerciseController

@@ -6,5 +6,3 @@ APIBundle\Entity\Event:
             groups: ['event']
         event_description:
             groups: ['event']
-        event_status:
-            groups: ['event']

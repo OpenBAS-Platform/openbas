@@ -34,7 +34,7 @@ class Exercise
     protected $exercise_description;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime")*
      */
     protected $exercise_start_date;
 
@@ -50,7 +50,7 @@ class Exercise
     protected $exercise_owner;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Status")
+     * @ORM\ManyToOne(targetEntity="ExerciseStatus")
      * @ORM\JoinColumn(name="exercise_status", referencedColumnName="status_id")
      */
     protected $exercise_status;
@@ -194,5 +194,14 @@ class Exercise
     {
         $this->exercise_image = $image;
         return $this;
+    }
+
+    public function setImage($protocol, $hostname, $directory)
+    {
+        if (file_exists($directory . '/../web/images/exercises/' . $this->exercise_id . '.png')) {
+            $this->exercise_image = $protocol . '://' . $hostname . '/images/exercises/' . $this->exercise_id . '.png';
+        } else {
+            $this->exercise_image = $protocol . '://' . $hostname . '/images/exercises/default.png';
+        }
     }
 }

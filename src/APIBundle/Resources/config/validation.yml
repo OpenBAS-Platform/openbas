@@ -78,6 +78,17 @@ APIBundle\Entity\Incident:
             - DateTime: ~
         incident_end_date:
             - DateTime: ~
-        incident_status:
+
+APIBundle\Entity\Inject:
+    properties:
+        inject_title:
             - NotBlank: ~
-            - Type: integer
+            - Type: string
+        inject_description:
+            - NotBlank: ~
+            - Type: string
+        inject_content:
+            - Type: string
+        inject_date:
+            - NotBlank: ~
+            - DateTime: ~

@@ -7,9 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="status")
+ * @ORM\Table(name="inject_statuses")
  */
-class Status
+class InjectStatus
 {
     /**
      * @ORM\Id

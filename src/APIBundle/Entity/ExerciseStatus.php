@@ -7,41 +7,41 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="states")
+ * @ORM\Table(name="exercise_statuses")
  */
-class State
+class ExerciseStatus
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
-    protected $state_id;
+    protected $status_id;
 
     /**
      * @ORM\Column(type="string")
      */
-    protected $state_name;
+    protected $status_name;
 
-    public function getStateId()
+    public function getStatusId()
     {
-        return $this->state_id;
+        return $this->status_id;
     }
 
-    public function setStateId($id)
+    public function setStatusId($id)
     {
-        $this->state_id = $id;
+        $this->status_id = $id;
         return $this;
     }
 
-    public function getStateName()
+    public function getStatusName()
     {
-        return $this->state_name;
+        return $this->status_name;
     }
 
-    public function setStateName($name)
+    public function setStatusName($name)
     {
-        $this->state_name = $name;
+        $this->status_name = $name;
         return $this;
     }
 }

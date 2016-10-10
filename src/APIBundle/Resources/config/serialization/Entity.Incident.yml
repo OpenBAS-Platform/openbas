@@ -12,5 +12,3 @@ APIBundle\Entity\Incident:
             groups: ['incident']
         incident_type:
             groups: ['incident']
-        incident_status:
-            groups: ['incident']

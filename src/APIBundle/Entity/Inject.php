@@ -69,10 +69,16 @@ class Inject
     protected $inject_automatic;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Status")
+     * @ORM\ManyToOne(targetEntity="InjectStatus")
      * @ORM\JoinColumn(name="inject_status", referencedColumnName="status_id")
      */
     protected $inject_status;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="InjectState")
+     * @ORM\JoinColumn(name="inject_state", referencedColumnName="state_id")
+     */
+    protected $inject_state;
 
     public function __construct()
     {
@@ -194,9 +200,20 @@ class Inject
         return $this->inject_status;
     }
 
-    public function setInjectStatus($type)
+    public function setInjectStatus($status)
     {
-        $this->inject_status = $type;
+        $this->inject_status = $status;
+        return $this;
+    }
+
+    public function getInjectState()
+    {
+        return $this->inject_state;
+    }
+
+    public function setInjectState($state)
+    {
+        $this->inject_state = $state;
         return $this;
     }
 }
