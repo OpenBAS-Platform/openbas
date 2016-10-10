@@ -18,6 +18,7 @@ class DateTimePicker extends Component {
     super(props);
     this.state = {
       datetime: '',
+      finished: false
     }
   }
 
@@ -29,10 +30,13 @@ class DateTimePicker extends Component {
   }
 
   handleTimeChange(event, time) {
-    this.setState({
-      datetime: this.state.datetime + 'T' + moment(time).format('HH:mm:ssZ'),
-    })
-    this.props.handleResult(this.state.datetime)
+    if( !this.state.finished ) {
+      this.setState({
+        datetime: this.state.datetime + 'T' + moment(time).format('HH:mm:ssZ'),
+        finished: true
+      })
+      this.props.handleResult(this.state.datetime)
+    }
   }
 
   render() {
