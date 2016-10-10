@@ -12,7 +12,7 @@ const styles = {
   }
 }
 
-const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint, defaultValue, value, children, meta: {touched, error}}) => (
+const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint, children, meta: {touched, error}}) => (
   <MUISelectField hintText={hint}
                   floatingLabelText={label}
                   floatingLabelFixed={false}
@@ -38,8 +38,6 @@ renderSelectField.propTypes = {
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
-  defaultValue: PropTypes.string,
-  value: PropTypes.string,
   children: PropTypes.node
 }
 
@@ -51,8 +49,6 @@ export const SelectFieldIntl = (props) => (
          multiLine={props.multiLine}
          rows={props.rows}
          type={props.type}
-         defaultValue={props.defaultValue}
-         value={props.value}
          children={props.children}
          component={renderSelectField}/>
 )
@@ -68,7 +64,5 @@ SelectFieldIntl.propTypes = {
   fullWidth: PropTypes.bool,
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
-  defaultValue: PropTypes.string,
-  value: PropTypes.string,
   children: PropTypes.node
 }

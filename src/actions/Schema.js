@@ -1,5 +1,14 @@
 import {Schema, arrayOf} from 'normalizr'
 
+export const exerciseStatus = new Schema('exercise_statuses', {idAttribute: 'status_id'})
+export const arrayOfExercisesStatuses = arrayOf(exerciseStatus)
+
+export const injectStatus = new Schema('inject_statuses', {idAttribute: 'status_id'})
+export const arrayOfInjectStatuses = arrayOf(injectStatus)
+
+export const injectState = new Schema('inject_states', {idAttribute: 'state_id'})
+export const arrayOfInjectStates = arrayOf(injectState)
+
 export const token = new Schema('tokens', {idAttribute: 'token_id'})
 export const arrayOfTokens = arrayOf(token)
 

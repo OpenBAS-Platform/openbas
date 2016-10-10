@@ -42,3 +42,16 @@ export const addExercise = (data) => (dispatch) => {
     throw new SubmissionError({_error: 'Failed to add exercise!'})
   })
 }
+
+export const updateExercise = (exerciseId, data) => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_UPDATE_EXERCISE_SUBMITTED});
+  console.log('DATA', data)
+  return api(schema.exercise).put('/api/exercises/' + exerciseId, data).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_UPDATE_EXERCISE_SUCCESS,
+      payload: response.data
+    });
+  }).catch(function () {
+    throw new SubmissionError({_error: 'Failed to update exercise!'})
+  })
+}

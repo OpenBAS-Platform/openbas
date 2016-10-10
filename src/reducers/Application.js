@@ -2,6 +2,11 @@ import * as Constants from '../constants/ActionTypes';
 import {Map} from 'immutable';
 
 export const application = (state = Map(), action) => {
+  function mergeExerciseStatuses() {
+    const exercise_statuses = state.getIn(['entities', 'exercise_statuses']) || Map()
+    const mergedExerciseStatuses = exercise_statuses.mergeDeep(action.payload.getIn(['entities', 'exercise_statuses']))
+    return mergedExerciseStatuses;
+  }
 
   function mergeUsers() {
     const users = state.getIn(['entities', 'users']) || Map()
@@ -96,6 +101,21 @@ export const application = (state = Map(), action) => {
         state.setIn(['ui', 'loading'], false)
       })
     }
+
+    case Constants.APPLICATION_UPDATE_EXERCISE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'exercises'], mergeExercises())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
       return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))

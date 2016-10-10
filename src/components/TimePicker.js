@@ -9,7 +9,7 @@ const style = {
   display: 'inline-block'
 }
 
-const renderTimePicker = ({input, hintText, floatingLabelText, name, defaultTime, meta: {touched, error}}) => (
+const renderTimePicker = ({input, hintText, floatingLabelText, name, defaultTime, onChange, meta: {touched, error}}) => (
   <MUITimePicker
     hintText={hintText}
     floatingLabelText={floatingLabelText}
@@ -19,7 +19,10 @@ const renderTimePicker = ({input, hintText, floatingLabelText, name, defaultTime
     format="24hr"
     defaultTime={defaultTime}
     fullWidth={true}
-    onChange={(e, val) => {input.onChange(moment(val).format('HH:mm:ss'))}}
+    onChange={(e, val) => {
+      input.onChange(moment(val).format('HH:mm:ss'))
+      onChange(e, val)
+    }}
     style={style}
   />
 )
@@ -30,6 +33,8 @@ renderTimePicker.propTypes = {
   floatingLabelText: PropTypes.string,
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
+  defaultTime: PropTypes.object,
+  onCHange: PropTypes.func
 }
 
 export const FormTimePickerIntl = (props) => (

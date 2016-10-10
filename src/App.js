@@ -44,6 +44,9 @@ const initialState = {
     entities: Map({
       users: users,
       tokens: tokens,
+      exercise_statuses: Map(),
+      inject_statuses: Map(),
+      inject_states: Map(),
       exercises: Map(),
       audiences: Map(),
       events: Map(),

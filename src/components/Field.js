@@ -12,20 +12,20 @@ const styles = {
   }
 }
 
-const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, defaultValue, value, meta: {touched, error}}) => (
+const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, onFocus, onClick, meta: {touched, error}}) => (
   <MUITextField hintText={hint}
                 floatingLabelText={label}
                 floatingLabelFixed={false}
                 errorText={touched && error}
                 style={styles.global}
                 inputStyle={styles.input}
-                defaultValue={defaultValue}
-                value={value}
                 fullWidth={fullWidth}
                 multiLine={multiLine}
                 rows={rows}
                 type={type}
                 {...input}
+                onFocus={onFocus}
+                onClick={onClick}
   />)
 
 renderTextField.propTypes = {
@@ -38,8 +38,9 @@ renderTextField.propTypes = {
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
-  defaultValue: PropTypes.string,
-  value: PropTypes.string
+  onFocus: PropTypes.func,
+  onClick: PropTypes.func,
+  onChange: PropTypes.func
 }
 
 export const FormFieldIntl = (props) => (
@@ -50,8 +51,9 @@ export const FormFieldIntl = (props) => (
          multiLine={props.multiLine}
          rows={props.rows}
          type={props.type}
-         defaultValue={props.defaultValue}
-         value={props.value}
+         onFocus={props.onFocus}
+         onClick={props.onClick}
+         onChange={props.onChange}
          component={renderTextField}/>
 )
 
@@ -66,6 +68,7 @@ FormFieldIntl.propTypes = {
   fullWidth: PropTypes.bool,
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
-  defaultValue: PropTypes.string,
-  value: PropTypes.string
+  onFocus: PropTypes.func,
+  onClick: PropTypes.func,
+  onChange: PropTypes.func,
 }

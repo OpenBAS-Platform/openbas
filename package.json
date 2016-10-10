@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "^0.14.0",
     "immutable": "^3.8.1",
-    "material-ui": "^0.15.4",
+    "material-ui": "^0.16.0",
     "moment": "^2.15.1",
     "normalizr": "^2.2.1",
     "ramda": "^0.22.1",

@@ -1,7 +1,9 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {updateExercise} from '../../../../actions/Exercise'
 import {Paper} from '../../../../components/Paper'
 import {Button} from '../../../../components/Button'
+import {MenuItemLink} from '../../../../components/menu/MenuItem'
 import * as Constants from '../../../../constants/ComponentTypes'
 import ExerciseForm from '../ExerciseForm'
 import StatusForm from './StatusForm'
@@ -12,14 +14,43 @@ const styles = {
   }
 }
 
+const statusesNames = {
+  SCHEDULED: 'Scheduled',
+  RUNNING: 'Running',
+  FINISHED: 'Finished'
+}
+
 class Index extends Component {
   onUpdate(data) {
-    this.props.updateExercise(data)
+    this.props.updateExercise(this.props.id, data)
+  }
+
+  submitInformation() {
+    this.refs.informationForm.submit()
+  }
+
+  submitStatus() {
+    this.refs.statusForm.submit()
   }
 
   render() {
-    console.log('EXERCISE', this.props.exercise)
-    let image = this.props.exercise ? this.props.exercise.get('exercise_image') : ''
+    let initialInformation = undefined
+    let initialStatus = undefined
+    let image = undefined
+
+    if (this.props.exercise) {
+      initialInformation = {
+        exercise_name: this.props.exercise.get('exercise_name'),
+        exercise_subtitle: this.props.exercise.get('exercise_subtitle'),
+        exercise_description: this.props.exercise.get('exercise_description'),
+        exercise_start_date: this.props.exercise.get('exercise_start_date'),
+        exercise_end_date: this.props.exercise.get('exercise_end_date')
+      }
+      initialStatus = {
+        exercise_status: this.props.exercise.get('exercise_status').get('status_id')
+      }
+      image = this.props.exercise.get('exercise_image')
+    }
 
     return (
       <div>
@@ -27,12 +58,12 @@ class Index extends Component {
           <div style={styles.PaperContent}>
             <h2>Information</h2>
             <ExerciseForm
-              ref="exerciseForm"
+              ref="informationForm"
               onSubmit={this.onUpdate.bind(this)}
-              initialValues={this.props.exercise ? this.props.exercise.toJS() : undefined}
+              initialValues={initialInformation }
             />
             <br />
-            <Button type="submit" label="Update"/>
+            <Button type="submit" label="Update" onClick={this.submitInformation.bind(this)}/>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
@@ -41,23 +72,29 @@ class Index extends Component {
             <StatusForm
               ref="statusForm"
               onSubmit={this.onUpdate.bind(this)}
-              initialValues={this.props.exercise ? this.props.exercise.get('exercise_status').toJS() : undefined}
+              items={this.props.exercise_statuses.toList().map(status => {
+                return (
+                  <MenuItemLink key={status.get('status_id')} value={status.get('status_id')} label={statusesNames[status.get('status_name')]} />
+                )
+              })}
+              initialValues={initialStatus}
             />
-            <Button type="submit" label="Update"/>
+            <Button type="submit" label="Update" onClick={this.submitStatus.bind(this)}/>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2>Image</h2>
             <br />
-            <img src={image} alt="Exercise logo" />
+            <img src={image} alt="Exercise logo"/>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2>Delete</h2>
-            <p>Deleting an exercise will result in deleting all the content of the exercise, including objectives, events, incidents, injects and audience groups. We do not recommend
-            you do this.</p>
+            <p>Deleting an exercise will result in deleting all the content of the exercise, including objectives,
+              events, incidents, injects and audience groups. We do not recommend
+              you do this.</p>
             <Button type="submit" label="Delete"/>
           </div>
         </Paper>
@@ -69,7 +106,9 @@ class Index extends Component {
 Index.propTypes = {
   id: PropTypes.string,
   exercise: PropTypes.object,
+  exercise_statuses: PropTypes.object,
   params: PropTypes.object,
+  updateExercise: PropTypes.func
 }
 
 const select = (state, ownProps) => {
@@ -77,8 +116,9 @@ const select = (state, ownProps) => {
   return {
     loading: state.application.getIn(['ui', 'loading']),
     id: exerciseId,
-    exercise: state.application.getIn(['entities', 'exercises', exerciseId])
+    exercise: state.application.getIn(['entities', 'exercises', exerciseId]),
+    exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
   }
 }
 
-export default connect(select, null)(Index)
+export default connect(select, {updateExercise})(Index)

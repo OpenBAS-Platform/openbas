@@ -8,6 +8,7 @@ import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
 import UserPopover from './../UserPopover'
 import {fetchExercise} from '../../../actions/Exercise'
+import {fetchExerciseStatuses} from '../../../actions/ExerciseStatus'
 
 const styles = {
   root: {
@@ -20,15 +21,16 @@ const styles = {
   }
 }
 
-const statuses = {
-  DRAFT: 'Scheduled',
-  RUNNING: 'In exercise',
+const statusesNames = {
+  SCHEDULED: 'Scheduled',
+  RUNNING: 'Running',
   FINISHED: 'Finished'
 }
 
 class RootAuthenticated extends Component {
   componentDidMount() {
-    this.props.fetchExercise(this.props.id);
+    this.props.fetchExercise(this.props.id)
+    this.props.fetchExerciseStatuses()
   }
 
   toggleLeftBar() {
@@ -40,12 +42,26 @@ class RootAuthenticated extends Component {
   }
 
   render() {
-    let title = this.props.exercise ? this.props.exercise.get('exercise_name') : ''
-    let status = this.props.exercise ? this.props.exercise.get('exercise_status').get('status_name') : 'Scheduled'
+    let title = ''
+    let status = ''
+
+    if (this.props.exercise) {
+      title = this.props.exercise.get('exercise_name')
+    }
+
+    if (this.props.exercise_statuses && this.props.exercise) {
+      status = this.props.exercise_statuses.getIn([this.props.exercise.get('exercise_status').get('status_id')]).get('status_name')
+    }
+
     return (
       <div>
         <AppBar
-          title={<div><span style={styles.title}>{title}</span> <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}>{statuses[status]}</Chip></div>}
+          title={
+            <div>
+              <span style={styles.title}>{title}</span>
+              <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}>{statusesNames[status]}</Chip>
+            </div>
+          }
           type={Constants.APPBAR_TYPE_TOPBAR}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
@@ -65,13 +81,13 @@ RootAuthenticated.propTypes = {
   id: PropTypes.string,
   leftBarOpen: PropTypes.bool,
   exercise: PropTypes.object,
-  userFirstname: PropTypes.string,
-  userGravatar: PropTypes.string,
+  exercise_statuses: PropTypes.object,
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
   children: React.PropTypes.node,
   fetchExercise: PropTypes.func.isRequired,
+  fetchExerciseStatuses: PropTypes.func.isRequired,
   params: PropTypes.object
 }
 
@@ -80,8 +96,9 @@ const select = (state, ownProps) => {
   return {
     loading: state.application.getIn(['ui', 'loading']),
     id: exerciseId,
-    exercise: state.application.getIn(['entities', 'exercises', exerciseId])
+    exercise: state.application.getIn(['entities', 'exercises', exerciseId]),
+    exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
   }
 }
 
-export default connect(select, {redirectToHome, toggleLeftBar, fetchExercise})(RootAuthenticated)
+export default connect(select, {redirectToHome, toggleLeftBar, fetchExercise, fetchExerciseStatuses})(RootAuthenticated)

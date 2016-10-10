@@ -5,7 +5,7 @@ import * as Constants from '../constants/ComponentTypes'
 const chipStyle = {
   [ Constants.CHIP_TYPE_FLOATING ]: {
     float: 'left',
-    margin: '22px 0 0 10px',
+    margin: '24px 0 0 10px',
     height: '20px'
   }
 }

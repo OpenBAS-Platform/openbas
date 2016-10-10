@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import {SelectField} from '../../../../components/SelectField'
-import {MenuItemLink} from '../../../../components/menu/MenuItem'
 import {i18nRegister} from '../../../../utils/Messages'
 
 i18nRegister({
@@ -23,12 +22,6 @@ const validate = values => {
   return errors
 }
 
-const items = [
-  <MenuItemLink key={1} value="DRAFT" label="Draft" />,
-  <MenuItemLink key={2} value="RUNNING" label="Running" />,
-  <MenuItemLink key={3} value="FINISHED" label="Scheduled" />,
-];
-
 class StatusForm extends Component {
   render() {
     return (
@@ -36,11 +29,10 @@ class StatusForm extends Component {
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <SelectField
           label="Status"
-          name="status_name"
+          name="exercise_status"
           fullWidth={true}
-          value={this.props.status}
         >
-          {items}
+          {this.props.items}
         </SelectField>
       </form>
     )
@@ -53,7 +45,7 @@ StatusForm.propTypes = {
   submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
-  status: PropTypes.string,
+  items: PropTypes.node
 }
 
 export default reduxForm({form: 'StatusForm', validate}, null, {change})(StatusForm)
