@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class ExerciseType extends AbstractType
 {
@@ -23,6 +24,7 @@ class ExerciseType extends AbstractType
             'input' => 'datetime'
         ));
         $builder->add('exercise_status');
+        $builder->add('exercise_image');
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -3,6 +3,7 @@
 namespace APIBundle\Command;
 
 use APIBundle\Entity\Exercise;
+use APIBundle\Entity\File;
 use APIBundle\Entity\Grant;
 use APIBundle\Entity\Group;
 use APIBundle\Entity\InjectType;
@@ -43,7 +44,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $statusFinished = $this->createExerciseStatus('FINISHED');
 
         $statusDraft = $this->createInjectStatus('DRAFT');
-        $statusFinal = $this->createInjectStatus('FINAL');
+        $statusReady = $this->createInjectStatus('READY');
+        $statusDisabled = $this->createInjectStatus('DISABLED');
         $output->writeln('Creating default statuses');
 
         $statePending = $this->createInjectState('PENDING');
@@ -61,6 +63,9 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $typeSMS = $this->createInjectType('SMS');
         $typeHangout = $this->createInjectType('HANGOUT');
         $output->writeln('Creating default inject types');
+
+        $fileExercise = $this->createFile('default_exercise.png');
+        $output->writeln('Creating default files');
 
         $userAdmin = $this->createUser('admin', 'admin', 'John', 'Doe', true);
         $output->writeln('Creating user admin with password admin');
@@ -93,7 +98,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
             new \DateTime('2018-01-01 08:00:00'),
             new \DateTime('2018-01-10 18:00:00'),
             $userAdmin,
-            $statusScheduled
+            $statusScheduled,
+            $fileExercise
         );
         $output->writeln('Creating exercise \'Potatoes attack\'');
 
@@ -104,7 +110,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
             new \DateTime('2018-01-01 08:00:00'),
             new \DateTime('2018-01-10 18:00:00'),
             $userAdmin,
-            $statusScheduled
+            $statusScheduled,
+            $fileExercise
         );
         $output->writeln('Creating exercise \'Cockroach invasion\'');
 
@@ -220,7 +227,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $token;
     }
 
-    private function createExercise($name, $subtitle, $description, $startDate, $endDate, $owner, $status) {
+    private function createExercise($name, $subtitle, $description, $startDate, $endDate, $owner, $status, $image) {
         $exercise = new Exercise();
         $exercise->setExerciseName($name);
         $exercise->setExerciseSubtitle($subtitle);
@@ -229,6 +236,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $exercise->setExerciseEndDate($endDate);
         $exercise->setExerciseOwner($owner);
         $exercise->setExerciseStatus($status);
+        $exercise->setExerciseImage($image);
         $this->em->persist($exercise);
         $this->em->flush();
 
@@ -260,5 +268,14 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $user->joinGroup($group);
         $this->em->persist($user);
         $this->em->flush();
+    }
+
+    private function createFile($name) {
+        $file = new File();
+        $file->setFileName($name);
+        $this->em->persist($file);
+        $this->em->flush();
+
+        return $file;
     }
 }

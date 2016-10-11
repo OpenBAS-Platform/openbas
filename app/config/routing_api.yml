@@ -18,6 +18,10 @@ tokens:
     type:     rest
     resource: APIBundle\Controller\TokenController
 
+files:
+    type:     rest
+    resource: APIBundle\Controller\FileController
+
 exercise_statuses:
     type:     rest
     resource: APIBundle\Controller\ExerciseStatusController
