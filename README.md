@@ -50,7 +50,7 @@ php bin/console doctrine:schema:create
 php bin/console app:db-init
 ```
 
-Enjoy the platform!
+The API is now up and running. Check the [OpenEx frontend](https://github.com/LuatixHQ/openex-frontend) repository to deploy the ReactJS user interface.
 
 ## Documentation
 

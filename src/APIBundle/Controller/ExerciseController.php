@@ -2,21 +2,14 @@
 
 namespace APIBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
-use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Request\ParamFetcher;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use APIBundle\Form\Type\ExerciseType;
 use APIBundle\Entity\Exercise;
 use APIBundle\Entity\Grant;
+use APIBundle\Form\Type\ExerciseType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ExerciseController extends Controller
 {
@@ -44,6 +37,10 @@ class ExerciseController extends Controller
             }
         }
 
+        foreach ($exercises as &$exercise) {
+            $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
+        }
+
         return $exercises;
     }
 
@@ -66,6 +63,9 @@ class ExerciseController extends Controller
         }
 
         $this->denyAccessUnlessGranted('select', $exercise);
+
+        $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
+
         return $exercise;
     }
 
@@ -86,17 +86,17 @@ class ExerciseController extends Controller
         if (!$user->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 
-        $status = $em->getRepository('APIBundle:Status')->findOneBy(['status_name' => 'draft']);
-
         $exercise = new Exercise();
-        $exercise->setExerciseStatus($status);
         $form = $this->createForm(ExerciseType::class, $exercise);
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+            $status = $em->getRepository('APIBundle:ExerciseStatus')->findOneBy(['status_name' => 'SCHEDULED']);
             $exercise->setExerciseOwner($user);
+            $exercise->setExerciseStatus($status);
             $em->persist($exercise);
             $em->flush();
+            $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
             return $exercise;
         } else {
             return $form;
@@ -126,7 +126,7 @@ class ExerciseController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace an exercise",
+     *    description="Update an exercise",
      *   input={"class"=ExerciseType::class, "name"=""}
      * )
      *
@@ -134,25 +134,6 @@ class ExerciseController extends Controller
      * @Rest\Put("/exercises/{exercise_id}")
      */
     public function updateExerciseAction(Request $request)
-    {
-        return $this->updateExercise($request, true);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Update an exercise",
-     *    input={"class"=ExerciseType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"exercise"})
-     * @Rest\Patch("/exercises/{exercise_id}")
-     */
-    public function patchExerciseAction(Request $request)
-    {
-        return $this->updateExercise($request, false);
-    }
-
-    private function updateExercise(Request $request, $clearMissing)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -165,11 +146,11 @@ class ExerciseController extends Controller
         $this->denyAccessUnlessGranted('update', $exercise);
 
         $form = $this->createForm(ExerciseType::class, $exercise);
-        $form->submit($request->request->all(), $clearMissing);
-
+        $form->submit($request->request->all(), false);
         if ($form->isValid()) {
             $em->persist($exercise);
             $em->flush();
+            $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
             return $exercise;
         } else {
             return $form;
@@ -179,5 +160,10 @@ class ExerciseController extends Controller
     private function exerciseNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function statusNotFound()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'Status not found'], Response::HTTP_NOT_FOUND);
     }
 }

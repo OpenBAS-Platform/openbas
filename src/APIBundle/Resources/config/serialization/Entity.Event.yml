@@ -1,0 +1,8 @@
+APIBundle\Entity\Event:
+    attributes:
+        event_id:
+            groups: ['event']
+        event_title:
+            groups: ['event']
+        event_description:
+            groups: ['event']

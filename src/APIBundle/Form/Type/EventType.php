@@ -13,7 +13,6 @@ class EventType extends AbstractType
     {
         $builder->add('event_title');
         $builder->add('event_description');
-        $builder->add('event_status');
     }
 
     public function configureOptions(OptionsResolver $resolver)

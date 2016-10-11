@@ -50,13 +50,12 @@ APIBundle\Entity\Exercise:
         exercise_description:
             - NotBlank: ~
             - Type: string
-        exercise_organizer:
-            - NotBlank: ~
-            - Type: string
         exercise_start_date:
             - DateTime: ~
+            - NotBlank: ~
         exercise_end_date:
             - DateTime: ~
+            - NotBlank: ~
 
 APIBundle\Entity\Event:
     properties:
@@ -79,6 +78,17 @@ APIBundle\Entity\Incident:
             - DateTime: ~
         incident_end_date:
             - DateTime: ~
-        incident_status:
+
+APIBundle\Entity\Inject:
+    properties:
+        inject_title:
             - NotBlank: ~
-            - Type: integer
+            - Type: string
+        inject_description:
+            - NotBlank: ~
+            - Type: string
+        inject_content:
+            - Type: string
+        inject_date:
+            - NotBlank: ~
+            - DateTime: ~

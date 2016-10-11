@@ -13,7 +13,6 @@ class ExerciseType extends AbstractType
     {
         $builder->add('exercise_name');
         $builder->add('exercise_subtitle');
-        $builder->add('exercise_organizer');
         $builder->add('exercise_description');
         $builder->add('exercise_start_date', DateTimeType::class, array(
             'widget' => 'single_text',
@@ -23,6 +22,7 @@ class ExerciseType extends AbstractType
             'widget' => 'single_text',
             'input' => 'datetime'
         ));
+        $builder->add('exercise_status');
     }
 
     public function configureOptions(OptionsResolver $resolver)

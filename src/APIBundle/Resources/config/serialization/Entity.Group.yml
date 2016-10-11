@@ -1,0 +1,12 @@
+APIBundle\Entity\Group:
+    attributes:
+        group_id:
+            groups: ['group', 'user', 'grant']
+        group_name:
+            groups: ['group', 'user', 'grant']
+        group_users:
+            groups: ['group', 'grant']
+        group_grants:
+            groups: ['group', 'user']
+        group_grant_in_exercise:
+            groups: ['group', 'user']

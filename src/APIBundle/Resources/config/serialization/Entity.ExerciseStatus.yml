@@ -1,0 +1,6 @@
+APIBundle\Entity\ExerciseStatus:
+    attributes:
+        status_id:
+            groups: ['exerciseStatus', 'exercise']
+        status_name:
+            groups: ['exerciseStatus', 'exercise']

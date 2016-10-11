@@ -29,12 +29,6 @@ class Event
     protected $event_description;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Status")
-     * @ORM\JoinColumn(name="event_status", referencedColumnName="status_id")
-     */
-    protected $event_status;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_events")
      * @ORM\JoinColumn(name="event_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
@@ -82,17 +76,6 @@ class Event
     public function setEventDescription($description)
     {
         $this->event_description = $description;
-        return $this;
-    }
-
-    public function getEventStatus()
-    {
-        return $this->event_status;
-    }
-
-    public function setEventStatus($status)
-    {
-        $this->event_status = $status;
         return $this;
     }
 

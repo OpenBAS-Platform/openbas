@@ -7,8 +7,9 @@ use APIBundle\Entity\Grant;
 use APIBundle\Entity\Group;
 use APIBundle\Entity\InjectType;
 use APIBundle\Entity\Result;
-use APIBundle\Entity\State;
-use APIBundle\Entity\Status;
+use APIBundle\Entity\InjectState;
+use APIBundle\Entity\ExerciseStatus;
+use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Token;
 use APIBundle\Entity\User;
 use Symfony\Component\Console\Command\Command;
@@ -37,13 +38,16 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('============');
         $output->writeln('');
 
-        $statusDraft = $this->createStatus('DRAFT');
-        $statusFinal = $this->createStatus('FINAL');
-        $statusDisabled = $this->createStatus('DISABLED');
+        $statusScheduled = $this->createExerciseStatus('SCHEDULED');
+        $statusRunning = $this->createExerciseStatus('RUNNING');
+        $statusFinished = $this->createExerciseStatus('FINISHED');
+
+        $statusDraft = $this->createInjectStatus('DRAFT');
+        $statusFinal = $this->createInjectStatus('FINAL');
         $output->writeln('Creating default statuses');
 
-        $statePending = $this->createState('PENDING');
-        $stateSent = $this->createState('SENT');
+        $statePending = $this->createInjectState('PENDING');
+        $stateSent = $this->createInjectState('SENT');
         $output->writeln('Creating default states');
 
         $resultAchieved = $this->createResult('ACHIEVED');
@@ -84,21 +88,23 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
         $exercisePotatoes = $this->createExercise(
             'Potatoes attack',
+            'Major crisis exercise',
             'A massive potatoes attack, this is crisis.',
             new \DateTime('2018-01-01 08:00:00'),
             new \DateTime('2018-01-10 18:00:00'),
             $userAdmin,
-            $statusDraft
+            $statusScheduled
         );
         $output->writeln('Creating exercise \'Potatoes attack\'');
 
         $exerciseCockroach = $this->createExercise(
             'Cockroach invasion',
+            'Minor crisis exercise',
             'A massive cockroach invasion, this is crisis.',
             new \DateTime('2018-01-01 08:00:00'),
             new \DateTime('2018-01-10 18:00:00'),
             $userAdmin,
-            $statusDraft
+            $statusScheduled
         );
         $output->writeln('Creating exercise \'Cockroach invasion\'');
 
@@ -142,8 +148,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Sam is joining group \'Cockroach players\'');
     }
 
-    private function createStatus($name) {
-        $status = new Status();
+    private function createExerciseStatus($name) {
+        $status = new ExerciseStatus();
         $status->setStatusName($name);
         $this->em->persist($status);
         $this->em->flush();
@@ -151,8 +157,17 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $status;
     }
 
-    private function createState($name) {
-        $state = new State();
+    private function createInjectStatus($name) {
+        $status = new InjectStatus();
+        $status->setStatusName($name);
+        $this->em->persist($status);
+        $this->em->flush();
+
+        return $status;
+    }
+
+    private function createInjectState($name) {
+        $state = new InjectState();
         $state->setStateName($name);
         $this->em->persist($state);
         $this->em->flush();
@@ -205,9 +220,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $token;
     }
 
-    private function createExercise($name, $description, $startDate, $endDate, $owner, $status) {
+    private function createExercise($name, $subtitle, $description, $startDate, $endDate, $owner, $status) {
         $exercise = new Exercise();
         $exercise->setExerciseName($name);
+        $exercise->setExerciseSubtitle($subtitle);
         $exercise->setExerciseDescription($description);
         $exercise->setExerciseStartDate($startDate);
         $exercise->setExerciseEndDate($endDate);
