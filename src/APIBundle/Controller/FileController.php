@@ -59,7 +59,35 @@ class FileController extends Controller
                 break;
             }
 
+            $file->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
             return $file;
+        }
+    }
+
+
+    /**
+     * @ApiDoc(
+     *    description="Delete a file"
+     * )
+     *
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"exercise"})
+     * @Rest\Delete("/files/{file_id}")
+     */
+    public function removeFileAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $user = $this->get('security.token_storage')->getToken()->getUser();
+
+        if (!$user->isAdmin())
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+
+        $file = $em->getRepository('APIBundle:File')->find($request->get('file_id'));
+        /* @var $file File */
+
+        if ($file) {
+            unlink($this->get('kernel')->getRootDir() . '/../web/upload' . $file->getFileName());
+            $em->remove($file);
+            $em->flush();
         }
     }
 }

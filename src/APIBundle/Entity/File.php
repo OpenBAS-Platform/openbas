@@ -60,6 +60,6 @@ class File
 
     public function buildUrl($protocol, $hostname)
     {
-        $this->file_url = $protocol . '://' . $hostname . '/upload/' . $this->file_url;
+        $this->file_url = $protocol . '://' . $hostname . '/upload/' . $this->file_name;
     }
 }
