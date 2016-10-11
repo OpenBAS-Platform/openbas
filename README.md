@@ -10,16 +10,17 @@ OpenEx includes the following features:
 
 - Multi-exercises and multi-organizations;
 - Training objectives and key processes;
-- Story lines development;
-- Incidents and injects management;
+- Story lines, incidents and injects development;
 - Scenarios scripting and automatic execution;
+- Realtime vizualisation of the exercise;
+- Automatic communication check of players and planners;
 - Documents and files sharing;
 - Statistics, reports and results;
 - Lessons learned process and roadmap follow-up.
 
 ## Status & Bugs
 
-Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. If you wish to report bugs or ask for new features, you can find the product project management here: https://projects.luatix.org/projects/openex.
+Currently OpenEx is under heavy development, no release has been published yet. The first release will be available on January 2017. If you wish to report bugs or ask for new features, you can find the product bug tracker here: https://projects.luatix.org/projects/openex or directly use the Github issues module.
 
 ## Softwares
 
@@ -33,7 +34,11 @@ Prerequisites:
 - Install a webserver and PHP (>= 5.6)
 - Install MySQL (>= 5.5)
 
-## Quick start
+## Production deployment
+
+To deploy OpenEx in production, please download the [last realease](https://github.com/LuatixHQ/openex/releases) and follow this [documentation](http://www.openex.io).
+
+## Develomment
 
 Create the database for OpenEx and start the deployment:
 
