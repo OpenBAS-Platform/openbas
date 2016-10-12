@@ -92,7 +92,7 @@ class ExerciseController extends Controller
 
         if ($form->isValid()) {
             $status = $em->getRepository('APIBundle:ExerciseStatus')->findOneBy(['status_name' => 'SCHEDULED']);
-            $file = $em->getRepository('APIBundle:File')->findOneBy(['file_name' => 'default_exercise.png']);
+            $file = $em->getRepository('APIBundle:File')->findOneBy(['file_name' => 'Exercise default']);
             $exercise->setExerciseOwner($user);
             $exercise->setExerciseStatus($status);
             $exercise->setExerciseImage($file);

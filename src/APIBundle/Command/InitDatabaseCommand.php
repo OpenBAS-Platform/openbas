@@ -64,7 +64,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $typeHangout = $this->createInjectType('HANGOUT');
         $output->writeln('Creating default inject types');
 
-        $fileExercise = $this->createFile('default_exercise.png');
+        $fileExercise = $this->createFile('Exercise default', 'default_exercise.png');
         $output->writeln('Creating default files');
 
         $userAdmin = $this->createUser('admin', 'admin', 'John', 'Doe', true);
@@ -270,9 +270,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
     }
 
-    private function createFile($name) {
+    private function createFile($name, $path) {
         $file = new File();
         $file->setFileName($name);
+        $file->setFilePath($path);
         $this->em->persist($file);
         $this->em->flush();
 

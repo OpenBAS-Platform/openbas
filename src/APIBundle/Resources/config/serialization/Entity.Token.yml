@@ -1,8 +1,10 @@
-APIBundle\Entity\File:
+APIBundle\Entity\Token:
     attributes:
-        file_id:
-            groups: ['file', 'exercise', 'inject']
-        file_name:
-            groups: ['file', 'exercise', 'inject']
-        file_url:
-            groups: ['file', 'exercise', 'inject']
+        token_id:
+            groups: ['token']
+        token_value:
+            groups: ['token']
+        token_created_at:
+            groups: ['token']
+        token_user:
+            groups: ['token']

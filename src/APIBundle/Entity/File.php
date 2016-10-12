@@ -23,6 +23,17 @@ class File
      */
     protected $file_name;
 
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $file_path;
+
+    /**
+     * @ORM\OneToMany(targetEntity="FileTag", mappedBy="tag_file")
+     * @var FileTag[]
+     */
+    protected $file_tags;
+
     protected $file_url;
 
     public function getFileId()
@@ -47,6 +58,17 @@ class File
         return $this;
     }
 
+    public function getFilePath()
+    {
+        return $this->file_path;
+    }
+
+    public function setFilePath($path)
+    {
+        $this->file_path = $path;
+        return $this;
+    }
+
     public function getFileUrl()
     {
         return $this->file_url;
@@ -58,8 +80,19 @@ class File
         return $this;
     }
 
+    public function getFileTags()
+    {
+        return $this->file_tags;
+    }
+
+    public function setFileTags($tags)
+    {
+        $this->file_tags = $tags;
+        return $this;
+    }
+
     public function buildUrl($protocol, $hostname)
     {
-        $this->file_url = $protocol . '://' . $hostname . '/upload/' . $this->file_name;
+        $this->file_url = $protocol . '://' . $hostname . '/upload/' . $this->file_path;
     }
 }
