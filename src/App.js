@@ -44,6 +44,7 @@ const initialState = {
     entities: Map({
       users: users,
       tokens: tokens,
+      files: Map(),
       exercise_statuses: Map(),
       inject_statuses: Map(),
       inject_states: Map(),
@@ -56,7 +57,7 @@ const initialState = {
     ui: Map({
       navbar_left_open: false,
       navbar_right_open: true,
-      loading: false
+      loading: false,
     })
   })
 };
@@ -79,7 +80,7 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 export const api = (schema) => {
   const app = store.getState().application;
   const authToken = app.getIn(['entities', 'tokens', app.get('token'), 'token_value'])
-  const instance = axios.create({responseType: 'json', headers: {'X-Auth-Token': authToken}})
+  const instance = axios.create({headers: {'X-Auth-Token': authToken}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     response.data = fromJS(schema ? normalize(response.data, schema) : response.data)

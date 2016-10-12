@@ -1,12 +1,16 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {updateExercise} from '../../../../actions/Exercise'
+import {updateExercise, deleteExercise} from '../../../../actions/Exercise'
+import {upload} from '../../../../actions/File'
 import {Paper} from '../../../../components/Paper'
-import {Button} from '../../../../components/Button'
+import {Button, FlatButton} from '../../../../components/Button'
+import {Dialog} from '../../../../components/Dialog'
 import {MenuItemLink} from '../../../../components/menu/MenuItem'
 import * as Constants from '../../../../constants/ComponentTypes'
 import ExerciseForm from '../ExerciseForm'
 import StatusForm from './StatusForm'
+import FileGallery from '../../FileGallery'
+import moment from 'moment'
 
 const styles = {
   PaperContent: {
@@ -21,6 +25,14 @@ const statusesNames = {
 }
 
 class Index extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      openDelete: false,
+      openGallery: false
+    }
+  }
+
   onUpdate(data) {
     this.props.updateExercise(this.props.id, data)
   }
@@ -33,7 +45,59 @@ class Index extends Component {
     this.refs.statusForm.submit()
   }
 
+  handleOpenDelete() {
+    this.setState({
+      openDelete: true
+    })
+  }
+
+  handleCloseDelete() {
+    this.setState({
+      openDelete: false
+    })
+  }
+
+  handleOpenGallery() {
+    this.setState({
+      openGallery: true
+    })
+  }
+
+  handleCloseGallery() {
+    this.setState({
+      openGallery: false
+    })
+  }
+
+  submitDelete() {
+    this.props.deleteExercise(this.props.id)
+    this.handleCloseDelete()
+  }
+
+  handleFileChange() {
+    var data = new FormData();
+    data.append('file', this.refs.fileUpload.files[0])
+    this.props.upload(data)
+  }
+
+  openFileDialog() {
+    this.refs.fileUpload.click()
+  }
+
   render() {
+    const deleteActions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.handleCloseDelete.bind(this)}
+      />,
+      <FlatButton
+        label="Delete"
+        primary={true}
+        onTouchTap={this.submitDelete.bind(this)}
+      />,
+    ];
+
     let initialInformation = undefined
     let initialStatus = undefined
     let image = undefined
@@ -43,13 +107,13 @@ class Index extends Component {
         exercise_name: this.props.exercise.get('exercise_name'),
         exercise_subtitle: this.props.exercise.get('exercise_subtitle'),
         exercise_description: this.props.exercise.get('exercise_description'),
-        exercise_start_date: this.props.exercise.get('exercise_start_date'),
-        exercise_end_date: this.props.exercise.get('exercise_end_date')
+        exercise_start_date: moment(this.props.exercise.get('exercise_start_date')).format('YYYY-MM-DD HH:mm:ss'),
+        exercise_end_date: moment(this.props.exercise.get('exercise_end_date')).format('YYYY-MM-DD HH:mm:ss')
       }
       initialStatus = {
         exercise_status: this.props.exercise.get('exercise_status').get('status_id')
       }
-      image = this.props.exercise.get('exercise_image')
+      image = this.props.exercise.get('exercise_image').get('file_url')
     }
 
     return (
@@ -74,7 +138,8 @@ class Index extends Component {
               onSubmit={this.onUpdate.bind(this)}
               items={this.props.exercise_statuses.toList().map(status => {
                 return (
-                  <MenuItemLink key={status.get('status_id')} value={status.get('status_id')} label={statusesNames[status.get('status_name')]} />
+                  <MenuItemLink key={status.get('status_id')} value={status.get('status_id')}
+                                label={statusesNames[status.get('status_name')]}/>
                 )
               })}
               initialValues={initialStatus}
@@ -87,6 +152,18 @@ class Index extends Component {
             <h2>Image</h2>
             <br />
             <img src={image} alt="Exercise logo"/>
+            <br /><br />
+            <Button
+              label='Change the image'
+              onClick={this.handleOpenGallery.bind(this)}
+            />
+            <Dialog
+              modal={false}
+              open={this.state.openGallery}
+              onRequestClose={this.handleCloseGallery.bind(this)}
+            >
+              <FileGallery />
+            </Dialog>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
@@ -95,7 +172,16 @@ class Index extends Component {
             <p>Deleting an exercise will result in deleting all the content of the exercise, including objectives,
               events, incidents, injects and audience groups. We do not recommend
               you do this.</p>
-            <Button type="submit" label="Delete"/>
+            <Button label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
+            <Dialog
+              title="Confirmation"
+              modal={false}
+              open={this.state.openDelete}
+              onRequestClose={this.handleCloseDelete.bind(this)}
+              actions={deleteActions}
+            >
+              Do you confirm the deletion of this exercise?
+            </Dialog>
           </div>
         </Paper>
       </div>
@@ -108,7 +194,9 @@ Index.propTypes = {
   exercise: PropTypes.object,
   exercise_statuses: PropTypes.object,
   params: PropTypes.object,
-  updateExercise: PropTypes.func
+  updateExercise: PropTypes.func,
+  deleteExercise: PropTypes.func,
+  upload: PropTypes.func
 }
 
 const select = (state, ownProps) => {
@@ -121,4 +209,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {updateExercise})(Index)
+export default connect(select, {updateExercise, deleteExercise, upload})(Index)

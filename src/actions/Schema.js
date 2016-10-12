@@ -1,5 +1,8 @@
 import {Schema, arrayOf} from 'normalizr'
 
+export const file = new Schema('files', {idAttribute: 'file_id'})
+export const arrayOfFiles = arrayOf(file)
+
 export const exerciseStatus = new Schema('exercise_statuses', {idAttribute: 'status_id'})
 export const arrayOfExercisesStatuses = arrayOf(exerciseStatus)
 

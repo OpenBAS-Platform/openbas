@@ -2,6 +2,7 @@ import * as Constants from '../constants/ActionTypes';
 import { SubmissionError } from 'redux-form'
 import {api} from '../App';
 import * as schema from './Schema'
+import { push } from 'react-router-redux'
 
 export const fetchExercises = () => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED});
@@ -45,7 +46,6 @@ export const addExercise = (data) => (dispatch) => {
 
 export const updateExercise = (exerciseId, data) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_UPDATE_EXERCISE_SUBMITTED});
-  console.log('DATA', data)
   return api(schema.exercise).put('/api/exercises/' + exerciseId, data).then(function (response) {
     dispatch({
       type: Constants.APPLICATION_UPDATE_EXERCISE_SUCCESS,
@@ -53,5 +53,18 @@ export const updateExercise = (exerciseId, data) => (dispatch) => {
     });
   }).catch(function () {
     throw new SubmissionError({_error: 'Failed to update exercise!'})
+  })
+}
+
+export const deleteExercise = (exerciseId) => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_DELETE_EXERCISE_SUBMITTED});
+  return api().delete('/api/exercises/' + exerciseId).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_DELETE_EXERCISE_SUCCESS,
+      payload: exerciseId
+    });
+    dispatch(push('/private'))
+  }).catch(function () {
+    throw new SubmissionError({_error: 'Failed to delete exercise!'})
   })
 }

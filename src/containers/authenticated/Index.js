@@ -65,7 +65,7 @@ class IndexAuthenticated extends Component {
                   endDate={moment(exercise.get('exercise_end_date')).format('MMM D, YYYY')}
                   status={exercise.get('exercise_status').get('status_name')}
                   organizer={exercise.get('exercise_organizer')}
-                  image={exercise.get('exercise_image')}
+                  image={exercise.get('exercise_image').get('file_url')}
                 />
               </Link>
             )

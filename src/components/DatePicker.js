@@ -41,8 +41,8 @@ renderDatePicker.propTypes = {
 
 export const FormDatePickerIntl = (props) => (
   <Field name={props.name}
-         hintText={props.hintText ? props.intl.formatMessage({id: props.hintText}) : ''}
-         floatingLabelText={props.floatingLabelText ? props.intl.formatMessage({id: props.floatingLabelText}) : ''}
+         hintText={props.hintText ? props.intl.formatMessage({id: props.hintText}) : undefined}
+         floatingLabelText={props.floatingLabelText ? props.intl.formatMessage({id: props.floatingLabelText}) : undefined}
          onChange={props.onChange}
          defaultDate={props.defaultDate}
          container={props.container}

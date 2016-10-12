@@ -43,8 +43,8 @@ renderSelectField.propTypes = {
 
 export const SelectFieldIntl = (props) => (
   <Field name={props.name}
-         label={props.label ? props.intl.formatMessage({id: props.label}) : ''}
-         hint={props.hint ? props.intl.formatMessage({id: props.hint}) : ''}
+         label={props.label ? props.intl.formatMessage({id: props.label}) : undefined}
+         hint={props.hint ? props.intl.formatMessage({id: props.hint}) : undefined}
          fullWidth={props.fullWidth}
          multiLine={props.multiLine}
          rows={props.rows}

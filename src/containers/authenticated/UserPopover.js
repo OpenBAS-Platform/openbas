@@ -34,7 +34,7 @@ class UserPopover extends Component {
   }
 
   logoutClick() {
-    console.log(this.props)
+    console.log("LOGOUT CLICKK!!!!")
     this.props.logout()
   }
 
@@ -51,7 +51,7 @@ class UserPopover extends Component {
                  onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Profile" to="/profile"/>
-            <MenuItemButton label="Sign out" onClick={this.logoutClick.bind(this)}/>
+            <MenuItemButton label="Sign out" onTouchTap={this.logoutClick.bind(this)}/>
           </Menu>
         </Popover>
       </div>

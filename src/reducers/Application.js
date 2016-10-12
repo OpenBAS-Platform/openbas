@@ -2,6 +2,12 @@ import * as Constants from '../constants/ActionTypes';
 import {Map} from 'immutable';
 
 export const application = (state = Map(), action) => {
+  function mergeFiles() {
+    const files = state.getIn(['entities', 'files']) || Map()
+    const mergedFiles = files.mergeDeep(action.payload.getIn(['entities', 'files']))
+    return mergedFiles;
+  }
+
   function mergeExerciseStatuses() {
     const exercise_statuses = state.getIn(['entities', 'exercise_statuses']) || Map()
     const mergedExerciseStatuses = exercise_statuses.mergeDeep(action.payload.getIn(['entities', 'exercise_statuses']))
@@ -109,6 +115,10 @@ export const application = (state = Map(), action) => {
       })
     }
 
+    case Constants.APPLICATION_DELETE_EXERCISE_SUCCESS: {
+        return state.deleteIn(['entities', 'exercises', action.payload])
+    }
+
     case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
       return state.withMutations(function (state) {
         state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
@@ -116,6 +126,12 @@ export const application = (state = Map(), action) => {
       })
     }
 
+    case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'files'], mergeFiles())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
       return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))

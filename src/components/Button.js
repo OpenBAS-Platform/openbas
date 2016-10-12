@@ -3,11 +3,12 @@ import {Link} from 'react-router'
 import MUIRaisedButton from 'material-ui/RaisedButton'
 import MUIFloatingActionButton from 'material-ui/FloatingActionButton';
 import MUIFlatButton from 'material-ui/FlatButton';
+import MUIIconButton from 'material-ui/IconButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import {injectIntl} from 'react-intl'
 
 const style = {
-  marginTop: '5px',
+  margin: '5px',
 }
 
 const ButtonIntl = (props) => (
@@ -16,7 +17,8 @@ const ButtonIntl = (props) => (
                    type={props.type}
                    disabled={props.disabled}
                    onClick={props.onClick}
-                   style={style}/>
+                   style={style}
+                   containerElement={props.containerElement}/>
 )
 export const Button = injectIntl(ButtonIntl)
 
@@ -25,7 +27,8 @@ ButtonIntl.propTypes = {
   type: PropTypes.string,
   intl: PropTypes.object,
   disabled: PropTypes.bool,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  containerElement: PropTypes.node
 }
 
 const FlatButtonIntl = (props) => (
@@ -83,4 +86,17 @@ export const FloatingActionsButtonCreate = (props) => (
 FloatingActionsButtonCreate.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func
+}
+
+export const IconButton = (props) => (
+  <MUIIconButton
+    disabled={props.disabled}
+  >
+    {props.children}
+  </MUIIconButton>
+)
+
+IconButton.propTypes = {
+  disabled: PropTypes.bool,
+  children: PropTypes.node
 }

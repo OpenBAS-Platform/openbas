@@ -49,7 +49,7 @@ class NavBar extends Component {
         </List>
         <div style={styles.exit}>
           <Link to='/private' key='exit'>
-            <Icon name={Constants.ICON_NAME_ACTION_EXIT}/>
+            <Icon name={Constants.ICON_NAME_ACTION_EXIT_TO_APP}/>
           </Link>
         </div>
       </Drawer>

@@ -6,8 +6,15 @@ This repository is used for the OpenEx frontend development. To deploy the OpenE
 
 ## Development
 
+Clone the repository and install the dependancies:
+
 ```bash
 $ git clone https://github.com/LuatixHQ/openex-frontend
 $ npm install
+```
+
+In the file package.json, replace the "proxy" by the URL of your API deployment and start:
+
+```bash
 $ npm start
 ```

@@ -4,7 +4,7 @@ import {injectIntl} from 'react-intl'
 
 export const DialogIntl = (props) => (
   <MUIDialog
-    title={props.intl.formatMessage({id: props.title})}
+    title={props.title ? props.intl.formatMessage({id: props.title}) : undefined}
     modal={props.modal}
     open={props.open}
     onRequestClose={props.onRequestClose}
