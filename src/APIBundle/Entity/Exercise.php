@@ -67,6 +67,10 @@ class Exercise
      */
     protected $exercise_events;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="File")
+     * @ORM\JoinColumn(name="exercise_image", referencedColumnName="file_id")
+     */
     protected $exercise_image;
 
     public function __construct()
@@ -194,14 +198,5 @@ class Exercise
     {
         $this->exercise_image = $image;
         return $this;
-    }
-
-    public function setImage($protocol, $hostname, $directory)
-    {
-        if (file_exists($directory . '/../web/images/exercises/' . $this->exercise_id . '.png')) {
-            $this->exercise_image = $protocol . '://' . $hostname . '/images/exercises/' . $this->exercise_id . '.png';
-        } else {
-            $this->exercise_image = $protocol . '://' . $hostname . '/images/exercises/default.png';
-        }
     }
 }

@@ -32,13 +32,14 @@ class ExerciseController extends Controller
             $grants = $user->getUserGrants();
             /* @var $grants Grant[] */
             $exercises = [];
+            /* @var $exercises Exercise[] */
             foreach ($grants as $grant) {
                 $exercises[] = $grant->getGrantExercise();
             }
         }
 
-        foreach ($exercises as &$exercise) {
-            $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
+        foreach( $exercises as &$exercise) {
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
         }
 
         return $exercises;
@@ -63,8 +64,7 @@ class ExerciseController extends Controller
         }
 
         $this->denyAccessUnlessGranted('select', $exercise);
-
-        $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
+        $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
 
         return $exercise;
     }
@@ -92,11 +92,14 @@ class ExerciseController extends Controller
 
         if ($form->isValid()) {
             $status = $em->getRepository('APIBundle:ExerciseStatus')->findOneBy(['status_name' => 'SCHEDULED']);
+            $file = $em->getRepository('APIBundle:File')->findOneBy(['file_name' => 'Exercise default']);
             $exercise->setExerciseOwner($user);
             $exercise->setExerciseStatus($status);
+            $exercise->setExerciseImage($file);
             $em->persist($exercise);
             $em->flush();
-            $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
+
             return $exercise;
         } else {
             return $form;
@@ -150,7 +153,8 @@ class ExerciseController extends Controller
         if ($form->isValid()) {
             $em->persist($exercise);
             $em->flush();
-            $exercise->setImage($this->getParameter('protocol'), $this->getParameter('hostname'), $this->get('kernel')->getRootDir());
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
+
             return $exercise;
         } else {
             return $form;

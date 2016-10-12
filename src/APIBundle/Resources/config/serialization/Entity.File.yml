@@ -1,0 +1,10 @@
+APIBundle\Entity\File:
+    attributes:
+        file_id:
+            groups: ['file', 'exercise', 'inject']
+        file_name:
+            groups: ['file', 'exercise', 'inject']
+        file_url:
+            groups: ['file', 'exercise', 'inject']
+        file_tags:
+            groups: ['file', 'exercise', 'inject']
