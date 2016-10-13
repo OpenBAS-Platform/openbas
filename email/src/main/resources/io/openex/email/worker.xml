@@ -1,0 +1,8 @@
+<worker>
+    <!-- data transform -->
+    <setBody>
+        <simple>Hello ${header.receivers}</simple>
+    </setBody>
+    <!-- optional consumer -->
+    <to uri="stream:out"/>
+</worker>

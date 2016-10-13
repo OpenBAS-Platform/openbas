@@ -1,0 +1,15 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route>
+        <from uri="timer:simple?period=5000"/>
+        <setHeader headerName="test">
+            <constant>email</constant>
+        </setHeader>
+        <setBody>
+            <constant>TEST</constant>
+        </setBody>
+        <dynamicRouter ignoreInvalidEndpoints="true">
+            <!-- use a method call on a bean as dynamic router -->
+            <method ref="schedulerRouter" method="forward"/>
+        </dynamicRouter>
+    </route>
+</routes>
