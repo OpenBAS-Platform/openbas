@@ -11,64 +11,27 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.openex</groupId>
+    <parent>
+        <groupId>io.openex</groupId>
+        <artifactId>worker</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>worker-scheduler</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <properties>
-        <camel.version>2.18.0</camel.version>
-        <scanPath>io.openex</scanPath>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>org.ops4j.pax.cdi</groupId>
-            <artifactId>pax-cdi-api</artifactId>
-            <version>0.5.0</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-core</artifactId>
-            <version>${camel.version}</version>
+            <groupId>io.openex</groupId>
+            <artifactId>worker-management</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.servicemix.bundles</groupId>
             <artifactId>org.apache.servicemix.bundles.jdom</artifactId>
             <version>2.0.6_1</version>
         </dependency>
-        <dependency>
-            <groupId>io.openex</groupId>
-            <artifactId>worker-management</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>3.0.1</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-						<_include>-bnd.bnd</_include>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
 

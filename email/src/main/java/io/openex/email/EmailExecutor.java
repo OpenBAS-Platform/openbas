@@ -11,23 +11,21 @@ import java.util.Map;
 
 @SuppressWarnings("PackageAccessibility")
 class EmailExecutor implements Executor {
-	@Override
+
 	public String name() {
 		return "email";
 	}
 	
-	@Override
 	public Contract exposeContract() {
 		return new EmailContract();
 	}
 	
-	@Override
 	public InputStream route() {
 		return getClass().getResourceAsStream("worker.xml");
 	}
-	
-	@Override
+
 	public Map<String, Component> components() {
-		return Collections.singletonMap("stream", new StreamComponent());
+		Component v = new StreamComponent();
+		return Collections.singletonMap("stream", v);
 	}
 }
