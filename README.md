@@ -1,4 +1,4 @@
-# OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex)
+# OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex-api.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex-api)
 
 Website: http://openex.io
 
@@ -25,11 +25,11 @@ The frontend is the user interface of the product, built with the [ReactJS frame
 #### Worker [[openeex-worker](https://github.com/LuatixHQ/openex-worker)]
 
 The worker is the executor that send incidents and injects, built with the [Camel framework](http://camel.apache.org).
- 
+
 ## Development
- 
+
 To contribute to the API development, please follow the next steps to deploy it.
-    
+
 *Prerequisites*:
  
 - Install Dkron, follow instructions here http://dkron.io/docs/getting-started
