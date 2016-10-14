@@ -14,8 +14,6 @@ Currently OpenEx is under heavy development, if you wish to report bugs or ask f
 
 ## Softwares
 
-OpenEx is composed of 3 components:
-
 #### API [[openex-api](https://github.com/LuatixHQ/openex-api)]
 
 The API is the link between the frontend, the database and the worker, built with the [Symfony framework](https://symfony.com).
