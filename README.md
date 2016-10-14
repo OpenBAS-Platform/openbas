@@ -22,7 +22,7 @@ The API is the link between the frontend, the database and the worker, built wit
 
 The frontend is the user interface of the product, built with the [ReactJS framework](https://facebook.github.io/react).
 
-#### Worker [[openeex-worker](https://github.com/LuatixHQ/openex-worker)]
+#### Worker [[openex-worker](https://github.com/LuatixHQ/openex-worker)]
 
 The worker is the executor that send incidents and injects, built with the [Camel framework](http://camel.apache.org).
  
