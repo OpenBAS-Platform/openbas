@@ -39,8 +39,8 @@ To contribute to the API development, please follow the next steps to deploy it.
 *Installation*:
 
 ```bash
-$ git clone https://github.com/Luatix/OpenEx.git
-$ cd OpenEx
+$ git clone https://github.com/Luatix/openex-api.git
+$ cd openex-api
 $ composer install
 ```
 
