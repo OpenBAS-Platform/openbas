@@ -1,7 +1,7 @@
 <worker>
     <!-- data transform -->
     <setBody>
-        <simple>Hello email: ${body[exercise_id]}</simple>
+        <simple>Hello SMS: ${body[exercise_id]}</simple>
     </setBody>
     <!-- optional consumer -->
     <to uri="stream:out"/>

@@ -1,4 +1,4 @@
-package io.openex.email;
+package io.openex.sms;
 
 import io.openex.management.Executor;
 import org.apache.camel.Component;
@@ -9,10 +9,10 @@ import java.util.Collections;
 import java.util.Map;
 
 @SuppressWarnings("PackageAccessibility")
-class EmailExecutor implements Executor {
-
+class SmsExecutor implements Executor {
+	
 	public String name() {
-		return "email";
+		return "sms";
 	}
 	
 	public InputStream contract() {return getClass().getResourceAsStream("contract.json");}
@@ -20,8 +20,9 @@ class EmailExecutor implements Executor {
 	public InputStream route() {
 		return getClass().getResourceAsStream("worker.xml");
 	}
-
+	
 	public Map<String, Component> components() {
-		return Collections.singletonMap("stream", new StreamComponent());
+		Component v = new StreamComponent();
+		return Collections.singletonMap("stream", v);
 	}
 }

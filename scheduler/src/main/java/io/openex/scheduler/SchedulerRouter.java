@@ -15,9 +15,10 @@ public class SchedulerRouter {
 						  @Headers Map<String, Object> headers,
 						  @Properties Map<String, Object> properties,
 						  @Header(Exchange.SLIP_ENDPOINT) String previous) {
-
+		
 		if (previous == null) {
-			return "direct:email";
+			Object routing = headers.get("router-header");
+			return routing != null ? ("direct:" + routing) : null;
 		}
 		
 		// no more so return null

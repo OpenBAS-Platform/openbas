@@ -32,19 +32,15 @@
     </properties>
 
     <modules>
+        <module>distribution</module>
         <module>features</module>
         <module>management</module>
         <module>email</module>
+        <module>sms</module>
         <module>scheduler</module>
     </modules>
 
     <dependencies>
-        <dependency>
-            <groupId>org.ops4j.pax.cdi</groupId>
-            <artifactId>pax-cdi-api</artifactId>
-            <version>0.5.0</version>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>

@@ -1,0 +1,19 @@
+{
+  "_audience_": "user_email",
+  "subject": "Text",
+  "body": "Text",
+  "attachments": "Files"
+}
+
+
+{
+    audience: ["toto1@gmail.com", "toto2.gmail.com"],
+    data: {
+      "subject": "My subject",
+      "body": "My body",
+      "attachments": [
+        {"type": "file1.pdf", "url": "http://file1.pdf"},
+        {"type": "file2.pdf", "url": "http://file2.pdf"},
+      }
+    }
+}

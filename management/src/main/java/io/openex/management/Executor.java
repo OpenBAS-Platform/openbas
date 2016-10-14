@@ -1,6 +1,5 @@
 package io.openex.management;
 
-import io.openex.management.contract.Contract;
 import org.apache.camel.Component;
 
 import java.io.InputStream;
@@ -14,7 +13,7 @@ public interface Executor {
 	
 	String name();
 	
-	Contract exposeContract();
+	InputStream contract();
 	
 	InputStream route();
 	

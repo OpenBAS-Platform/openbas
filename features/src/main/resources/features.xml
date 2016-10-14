@@ -4,23 +4,27 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0"
     name="worker">
+
     <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
-    <feature name="openex-worker" version="${pom.version}">
+    <repository>mvn:org.apache.cxf.dosgi/cxf-dosgi/2.0.0/xml/features</repository>
+
+    <feature name="worker-features" version="${pom.version}">
         <feature>scr</feature>
         <feature>camel</feature>
         <feature>camel-stream</feature>
-        <bundle dependency="true">mvn:javax.interceptor/javax.interceptor-api/1.2</bundle>
-        <bundle dependency="true">mvn:javax.el/javax.el-api/3.0.0</bundle>
-        <bundle dependency="true">mvn:javax.enterprise/cdi-api/1.2</bundle>
+        <feature>camel-http4</feature>
+        <feature>camel-gson</feature>
+        <feature>cxf-dosgi-provider-rs</feature>
+
+        <!--<bundle dependency="true">mvn:javax.ws.rs/javax.ws.rs-api/2.0.1</bundle>-->
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/2.0.6_1</bundle>
+        <bundle dependency="true">mvn:commons-io/commons-io/2.5</bundle>
         <!-- Must be at begin -->
-        <bundle>mvn:io.openex/worker-management/${pom.version}</bundle>
-
+        <bundle start-level="80">mvn:io.openex/worker-management/${pom.version}</bundle>
         <!-- Workers definition -->
-        <bundle>mvn:io.openex/worker-email/${pom.version}</bundle>
-
+        <bundle start-level="81">mvn:io.openex/worker-email/${pom.version}</bundle>
+        <bundle start-level="81">mvn:io.openex/worker-sms/${pom.version}</bundle>
         <!-- Must be at end -->
-        <bundle>mvn:io.openex/worker-scheduler/${pom.version}</bundle>
+        <bundle start-level="85">mvn:io.openex/worker-scheduler/${pom.version}</bundle>
     </feature>
-   
 </features>
