@@ -2,7 +2,7 @@
 
 Website: http://openex.io
 
-OpenEx is a global open source platform allowing organizations to plan, schedule and execute crisis management exercises. OpenEx tries  OpenEx has been designed as a modern product including a RESTFul API and is built for a better user experience, for both planners and players.
+OpenEx is a global open source platform allowing organizations to plan, schedule and conduct exercises. OpenEx is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and a UX oriented frontend.
 
 ## Releases download
 
