@@ -47,6 +47,7 @@
                 <configuration>
                     <startLevel>80</startLevel>
                     <aggregateFeatures>true</aggregateFeatures>
+                    <includeTransitiveDependency>false</includeTransitiveDependency>
                 </configuration>
             </plugin>
         </plugins>

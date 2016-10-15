@@ -15,16 +15,7 @@
         <feature>camel-http4</feature>
         <feature>camel-gson</feature>
         <feature>cxf-dosgi-provider-rs</feature>
-
-        <!--<bundle dependency="true">mvn:javax.ws.rs/javax.ws.rs-api/2.0.1</bundle>-->
         <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/2.0.6_1</bundle>
         <bundle dependency="true">mvn:commons-io/commons-io/2.5</bundle>
-        <!-- Must be at begin -->
-        <bundle start-level="80">mvn:io.openex/worker-management/${pom.version}</bundle>
-        <!-- Workers definition -->
-        <bundle start-level="81">mvn:io.openex/worker-email/${pom.version}</bundle>
-        <bundle start-level="81">mvn:io.openex/worker-sms/${pom.version}</bundle>
-        <!-- Must be at end -->
-        <bundle start-level="85">mvn:io.openex/worker-scheduler/${pom.version}</bundle>
     </feature>
 </features>

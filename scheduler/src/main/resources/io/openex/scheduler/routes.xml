@@ -2,9 +2,9 @@
     <route>
         <from uri="timer:simple?period=5000"/>
         <setHeader headerName="X-Auth-Token">
-            <constant>AwLb6hfb3vO0ycijxg/Wg1w1ENqexWzeeqlkBehA51aMpaYyfN9ZbQo/zlMlLbm5Urg=</constant>
+            <constant>{{openex_token}}</constant>
         </setHeader>
-        <to uri="http://demo.local.openex.io/api/exercises"/>
+        <to uri="{{openex_inject_fetch}}"/>
         <unmarshal>
             <json library="Gson" unmarshalTypeName="java.lang.Object"/>
         </unmarshal>

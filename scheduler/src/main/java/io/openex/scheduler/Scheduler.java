@@ -107,8 +107,7 @@ public class Scheduler {
 		return callback.from("direct:callback")
 				.setHeader(Exchange.CONTENT_TYPE, Builder.constant("application/json"))
 				.setHeader(Exchange.HTTP_METHOD, Builder.constant("{{callback_mode}}"))
-				.to("{{callback_uri}}")
-				.to("stream:out");
+				.to("{{callback_uri}}");
 	}
 	
 	private List<RouteDefinition> createRoute(CamelContext context, Executor executor) throws Exception {

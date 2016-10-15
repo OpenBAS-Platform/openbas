@@ -87,7 +87,6 @@
                 <configuration>
                     <bootFeatures>
                         <feature>standard</feature>
-                        <feature>shell</feature>
                         <feature>worker-features</feature>
                     </bootFeatures>
                 </configuration>
