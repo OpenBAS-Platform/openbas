@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route>
-        <from uri="direct:email" id="openex-email"/>
+    <route id="openex-email">
+        <from uri="direct:email"/>
         <setBody>
             <simple>Hello email test: ${body[exercise_id]}</simple>
         </setBody>

@@ -20,14 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 @Path("")
-@Component(service = ContractRest.class,
+@Component(service = WorkerRest.class,
 		property = {
 				"service.exported.interfaces=*",
 				"service.exported.configs=org.apache.cxf.rs",
 				"org.apache.cxf.rs.address=/"
 		})
 @SuppressWarnings({"PackageAccessibility", "unused"})
-public class ContractRest {
+public class WorkerRest {
 	
 	private IWorkerRegistry workerRegistry;
 	private IOpenexContext openexContext;

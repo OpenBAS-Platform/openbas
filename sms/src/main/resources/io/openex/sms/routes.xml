@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
-    <route>
-        <from uri="direct:sms" id="openex-sms"/>
+    <route id="openex-sms">
+        <from uri="direct:sms"/>
         <setBody>
             <simple>Hello SMS: ${body[exercise_id]}</simple>
         </setBody>
