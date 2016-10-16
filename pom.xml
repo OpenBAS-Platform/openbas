@@ -27,7 +27,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <camel.version>2.16.2</camel.version>
+        <camel.version>2.18.0</camel.version>
         <scanPath>io.openex</scanPath>
     </properties>
 
@@ -57,11 +57,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

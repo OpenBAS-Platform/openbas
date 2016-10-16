@@ -3,19 +3,20 @@
     xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0"
-    name="worker">
+    name="worker-features">
 
-    <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
     <repository>mvn:org.apache.cxf.dosgi/cxf-dosgi/2.0.0/xml/features</repository>
+    <repository>mvn:io.openex/worker-management/${pom.version}/xml/features</repository>
+    <repository>mvn:io.openex/worker-scheduler/${pom.version}/xml/features</repository>
+    <repository>mvn:io.openex/worker-email/${pom.version}/xml/features</repository>
+    <repository>mvn:io.openex/worker-sms/${pom.version}/xml/features</repository>
 
     <feature name="worker-features" version="${pom.version}">
         <feature>scr</feature>
-        <feature>camel</feature>
-        <feature>camel-stream</feature>
-        <feature>camel-http4</feature>
-        <feature>camel-gson</feature>
         <feature>cxf-dosgi-provider-rs</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jdom/2.0.6_1</bundle>
-        <bundle dependency="true">mvn:commons-io/commons-io/2.5</bundle>
+        <feature>worker-management</feature>
+        <feature>worker-scheduler</feature>
+        <feature>worker-email</feature>
+        <feature>worker-sms</feature>
     </feature>
 </features>

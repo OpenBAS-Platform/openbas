@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features
+    xmlns="http://karaf.apache.org/xmlns/features/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0"
+    name="worker-management">
+
+    <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
+    <repository>mvn:org.apache.cxf.dosgi/cxf-dosgi/2.0.0/xml/features</repository>
+
+    <feature name="worker-management" version="${pom.version}">
+        <feature>camel-core</feature>
+    </feature>
+</features>
