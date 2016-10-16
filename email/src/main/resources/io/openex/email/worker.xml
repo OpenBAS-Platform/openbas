@@ -2,7 +2,7 @@
     <route>
         <from uri="direct:email" id="openex-email"/>
         <setBody>
-            <simple>Hello email: ${body[exercise_id]}</simple>
+            <simple>Hello email test: ${body[exercise_id]}</simple>
         </setBody>
         <to uri="stream:out"/>
     </route>
