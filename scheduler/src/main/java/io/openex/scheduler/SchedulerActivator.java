@@ -1,4 +1,4 @@
-package io.openex.email;
+package io.openex.scheduler;
 
 import io.openex.management.registry.IWorkerRegistry;
 import org.osgi.service.component.annotations.Activate;
@@ -6,18 +6,15 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-/**
- * Created by Julien on 13/10/2016.
- */
-@Component(name = "EmailActivator")
-public class EmailActivator {
+@Component(name = "SchedulerActivator")
+public class SchedulerActivator {
 	
 	private IWorkerRegistry workerRegistry;
 	
-	private final EmailExecutor executor;
+	private final SchedulerExecutor executor;
 	
-	public EmailActivator() {
-		this.executor = new EmailExecutor();
+	public SchedulerActivator() {
+		this.executor = new SchedulerExecutor();
 	}
 	
 	@Activate

@@ -1,6 +1,6 @@
 package io.openex.sms;
 
-import io.openex.management.registry.WorkerRegistry;
+import io.openex.management.registry.IWorkerRegistry;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -12,7 +12,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(name = "SmsActivator")
 public class SmsActivator {
 	
-	private WorkerRegistry workerRegistry;
+	private IWorkerRegistry workerRegistry;
 	
 	private final SmsExecutor executor;
 	
@@ -31,7 +31,7 @@ public class SmsActivator {
 	}
 	
 	@Reference
-	public void setWorkerRegistry(WorkerRegistry workerRegistry) {
+	public void setWorkerRegistry(IWorkerRegistry workerRegistry) {
 		this.workerRegistry = workerRegistry;
 	}
 }

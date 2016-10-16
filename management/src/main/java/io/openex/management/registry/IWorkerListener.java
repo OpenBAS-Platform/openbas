@@ -5,7 +5,7 @@ import io.openex.management.Executor;
 /**
  * Created by Julien on 15/10/2016.
  */
-public interface WorkerListener {
+public interface IWorkerListener {
 	void onWorkerAdded(Executor executor) throws Exception;
 	
 	void onWorkerRemoved(Executor executor) throws Exception;

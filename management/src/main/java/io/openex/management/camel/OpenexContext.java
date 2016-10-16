@@ -1,64 +1,50 @@
-package io.openex.scheduler;
+package io.openex.management.camel;
 
 import io.openex.management.Executor;
-import io.openex.management.registry.WorkerListener;
-import io.openex.management.registry.WorkerRegistry;
-import org.apache.camel.CamelContext;
-import org.apache.camel.Exchange;
+import io.openex.management.registry.IWorkerListener;
+import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.ThreadPoolRejectedPolicy;
-import org.apache.camel.component.gson.GsonDataFormat;
-import org.apache.camel.component.http4.HttpComponent;
 import org.apache.camel.component.properties.PropertiesComponent;
-import org.apache.camel.http.common.HttpOperationFailedException;
 import org.apache.camel.impl.DefaultCamelContext;
+import org.apache.camel.impl.PropertyPlaceholderDelegateRegistry;
 import org.apache.camel.impl.SimpleRegistry;
-import org.apache.camel.model.ProcessorDefinition;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.model.dataformat.JsonDataFormat;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.spi.Registry;
 import org.apache.camel.spi.ThreadPoolProfile;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.XMLOutputter;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import org.apache.camel.builder.Builder;
-
 @Component
 @SuppressWarnings("PackageAccessibility")
-public class Scheduler {
+public class OpenexContext implements IOpenexContext {
 	
-	private static final String SCHEDULER_KEY = "scheduler";
-	private WorkerRegistry workerRegistry;
-	private CamelContext context;
+	private static final String OPENEX_CONTEXT_KEY = "OpenexContext";
+	private DefaultCamelContext context = new DefaultCamelContext();
+	private IWorkerRegistry workerRegistry;
 	
 	@Activate
 	private void starter() throws Exception {
-		System.out.println(">>>>>>>>>>>>> Scheduler starter");
-		workerRegistry.addListener(SCHEDULER_KEY, new WorkerListener() {
+		System.out.println("START [OpenexContext]");
+		workerRegistry.addListener(OPENEX_CONTEXT_KEY, new IWorkerListener() {
 			@Override
 			public void onWorkerAdded(Executor executor) throws Exception {
-				System.out.println(">>>>>>>>>>>>> onWorkerAdded: " + executor.name());
+				System.out.println("ON WORKER ADDED [" + executor.name() + "]");
 				registerExecutorComponent(executor);
-				context.addRouteDefinitions(createRouteFromExecutor(executor));
+				context.addRouteDefinitions(context.loadRoutesDefinition(executor.routes()).getRoutes());
 			}
 			
 			@Override
 			public void onWorkerRemoved(Executor executor) throws Exception {
-				System.out.println(">>>>>>>>>>>>> onWorkerRemoved: " + executor.name());
+				System.out.println("ON WORKER REMOVED [" + executor.name() + "]");
 				unregisterExecutorComponent(executor);
-				context.removeRouteDefinitions(createRouteFromExecutor(executor));
+				context.removeRouteDefinitions(context.loadRoutesDefinition(executor.routes()).getRoutes());
 			}
 		});
 		createContext();
@@ -66,14 +52,28 @@ public class Scheduler {
 	
 	@Deactivate
 	public void stop() throws Exception {
-		System.out.println(">>>>>>>>>>>>> Route stopping");
+		System.out.println("STOP [OpenexContext]");
 		workerRegistry.removeLister("scheduler");
 		context.stop();
 	}
 	
 	//region utils
+	@SuppressWarnings("Convert2streamapi")
 	private void unregisterExecutorComponent(Executor... executors) {
 		for (Executor executor : executors) {
+			//unregister beans
+			Registry registry = context.getRegistry();
+			if (registry instanceof PropertyPlaceholderDelegateRegistry) {
+				registry = ((PropertyPlaceholderDelegateRegistry) registry).getRegistry();
+			}
+			SimpleRegistry openexRegistry = (SimpleRegistry) registry;
+			Set<Map.Entry<String, Object>> beansEntries = executor.beans().entrySet();
+			for (Map.Entry<String, Object> beansEntry : beansEntries) {
+				if(openexRegistry.containsKey(beansEntry.getKey())) {
+					openexRegistry.remove(beansEntry.getKey());
+				}
+			}
+			//unregister components
 			Set<String> keys = executor.components().keySet();
 			for (String key : keys) {
 				if (context.getComponentNames().contains(key)) {
@@ -83,8 +83,22 @@ public class Scheduler {
 		}
 	}
 	
+	@SuppressWarnings("Convert2streamapi")
 	private void registerExecutorComponent(Executor... executors) {
 		for (Executor executor : executors) {
+			//register beans
+			Registry registry = context.getRegistry();
+			if (registry instanceof PropertyPlaceholderDelegateRegistry) {
+				registry = ((PropertyPlaceholderDelegateRegistry) registry).getRegistry();
+			}
+			SimpleRegistry openexRegistry = (SimpleRegistry) registry;
+			Set<Map.Entry<String, Object>> beansEntries = executor.beans().entrySet();
+			for (Map.Entry<String, Object> beansEntry : beansEntries) {
+				if(!openexRegistry.containsKey(beansEntry.getKey())) {
+					openexRegistry.put(beansEntry.getKey(), beansEntry.getValue());
+				}
+			}
+			//register components
 			Set<Map.Entry<String, org.apache.camel.Component>> components = executor.components().entrySet();
 			for (Map.Entry<String, org.apache.camel.Component> entry : components) {
 				if (!context.getComponentNames().contains(entry.getKey())) {
@@ -104,27 +118,11 @@ public class Scheduler {
 		threadPoolProfile.setRejectedPolicy(ThreadPoolRejectedPolicy.CallerRuns);
 		return threadPoolProfile;
 	}
-	
-	private List<RouteDefinition> createRouteFromExecutor(Executor executor) throws Exception {
-		SAXBuilder sxb = new SAXBuilder();
-		Document document = sxb.build(executor.route());
-		Element routeElement = document.getRootElement().getChildren().iterator().next();
-		Element to = new Element("to");
-		to.setAttribute("uri", "direct:callback");
-		routeElement.addContent(to);
-		String route = new XMLOutputter().outputString(document);
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(route.getBytes("UTF-8"));
-		return context.loadRoutesDefinition(inputStream).getRoutes();
-		
-	}
 	//endregion
 	
 	private void createContext() throws Exception {
 		SimpleRegistry registry = new SimpleRegistry();
-		registry.put("schedulerRouter", new SchedulerRouter());
-		registry.put("http", new HttpComponent());
-		registry.put("json-gson", new GsonDataFormat());
-		context = new DefaultCamelContext(registry);
+		context.setRegistry(registry);
 		context.addComponent("properties", new PropertiesComponent("file:${karaf.home}/etc/openex.properties"));
 		context.getExecutorServiceManager().registerThreadPoolProfile(profile());
 		context.setTracing(true);
@@ -132,28 +130,28 @@ public class Scheduler {
 		Collection<Executor> declaredWorkers = workerRegistry.workers().values();
 		List<RouteDefinition> definitions = new ArrayList<>();
 		for (Executor executor : declaredWorkers) {
-			System.out.println(">>>>>>>>>>>>> ROUTE STARTING: " + executor.name());
-			List<RouteDefinition> routes = createRouteFromExecutor(executor);
+			List<RouteDefinition> routes = context.loadRoutesDefinition(executor.routes()).getRoutes();
 			definitions.addAll(routes);
 		}
 		//Populate data formats
 		JsonDataFormat jsonDataFormat = new JsonDataFormat(JsonLibrary.Gson);
 		jsonDataFormat.setUseList(true);
+		context.setDataFormats(Collections.singletonMap("json", jsonDataFormat));
 		//Populate components
 		registerExecutorComponent(declaredWorkers.toArray(new Executor[declaredWorkers.size()]));
-		context.setDataFormats(Collections.singletonMap("json", jsonDataFormat));
 		//Populate routes
-		InputStream defaultRoutesStream = getClass().getResourceAsStream("routes.xml");
-		List<RouteDefinition> initRoutes = context.loadRoutesDefinition(defaultRoutesStream).getRoutes();
-		definitions.addAll(initRoutes);
 		context.addRouteDefinitions(definitions);
 		//Starting context
 		context.start();
 	}
 	
+	public DefaultCamelContext getContext() {
+		return context;
+	}
+	
 	@Reference
 	@SuppressWarnings("unused")
-	public void setWorkerRegistry(WorkerRegistry workerRegistry) {
+	public void setWorkerRegistry(IWorkerRegistry workerRegistry) {
 		this.workerRegistry = workerRegistry;
 	}
 }

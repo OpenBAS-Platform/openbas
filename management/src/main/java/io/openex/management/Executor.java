@@ -15,7 +15,9 @@ public interface Executor {
 	
 	InputStream contract();
 	
-	InputStream route();
+	InputStream routes();
 	
 	Map<String, Component> components();
+	
+	Map<String, Object> beans();
 }

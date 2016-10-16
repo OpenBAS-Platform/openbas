@@ -37,11 +37,6 @@
             <artifactId>camel-gson</artifactId>
             <version>${camel.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.jdom</artifactId>
-            <version>2.0.6_1</version>
-        </dependency>
     </dependencies>
 </project>
 

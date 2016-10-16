@@ -2,19 +2,15 @@ package io.openex.management.rest;
 
 import com.google.gson.Gson;
 import io.openex.management.Executor;
-import io.openex.management.registry.WorkerRegistry;
-import org.apache.camel.CamelContext;
+import io.openex.management.camel.IOpenexContext;
+import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.builder.ProxyBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.camel.model.RouteDefinition;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -22,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Path("")
 @Component(service = ContractRest.class,
@@ -31,10 +26,11 @@ import java.util.Set;
 				"service.exported.configs=org.apache.cxf.rs",
 				"org.apache.cxf.rs.address=/"
 		})
-@SuppressWarnings("PackageAccessibility")
+@SuppressWarnings({"PackageAccessibility", "unused"})
 public class ContractRest {
 	
-	private WorkerRegistry workerRegistry;
+	private IWorkerRegistry workerRegistry;
+	private IOpenexContext openexContext;
 	
 	@Context
 	UriInfo uri;
@@ -46,46 +42,36 @@ public class ContractRest {
 		List<RestContract> contracts = new ArrayList<>();
 		Map<String, Executor> workers = workerRegistry.workers();
 		for (Map.Entry<String, Executor> entry : workers.entrySet()) {
-			RestContract restContract = new RestContract();
-			restContract.setType(entry.getKey());
-			restContract.setDefinition(IOUtils.toString(entry.getValue().contract(), "UTF-8"));
-			contracts.add(restContract);
+			if (entry.getValue().contract() != null) {
+				RestContract restContract = new RestContract();
+				restContract.setType(entry.getKey());
+				restContract.setDefinition(IOUtils.toString(entry.getValue().contract(), "UTF-8"));
+				contracts.add(restContract);
+			}
 		}
 		return contracts;
 	}
 	
-	@GET
+	@POST
 	@Path("/worker/{id}")
-	public String executeWorker(@PathParam("id") String id) throws Exception {
-		//Build context
-		Executor executor = workerRegistry.workers().get(id);
-		CamelContext context = new DefaultCamelContext();
-		registerExecutorComponent(context, executor);
-		List<RouteDefinition> routes = context.loadRoutesDefinition(executor.route()).getRoutes();
-		context.addRouteDefinitions(routes);
-		context.start();
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String executeWorker(@PathParam("id") String id, String jsonRequest) throws Exception {
+		Gson gson = new Gson();
+		DefaultCamelContext context = openexContext.getContext();
 		//Audit result
-		AuditWorker auditWorker = new ProxyBuilder(context).endpoint("direct:"+id).build(AuditWorker.class);
-		Map anotherStr = new Gson().fromJson("{\"exercise_id\": \"test\"}", Map.class);
-		String coucou = auditWorker.auditMessage(anotherStr);
-		//Stopping and return result.
-		context.stop();
-		return coucou;
-	}
-	
-	private void registerExecutorComponent(CamelContext context, Executor... executors) {
-		for (Executor executor : executors) {
-			Set<Map.Entry<String, org.apache.camel.Component>> components = executor.components().entrySet();
-			for (Map.Entry<String, org.apache.camel.Component> entry : components) {
-				if (!context.getComponentNames().contains(entry.getKey())) {
-					context.addComponent(entry.getKey(), entry.getValue());
-				}
-			}
-		}
+		AuditWorker auditWorker = new ProxyBuilder(context).endpoint("direct:" + id).build(AuditWorker.class);
+		Map jsonToCamelMap = gson.fromJson(jsonRequest, Map.class);
+		return gson.toJson(auditWorker.auditMessage(jsonToCamelMap));
 	}
 	
 	@Reference
-	public void setWorkerRegistry(WorkerRegistry workerRegistry) {
+	public void setWorkerRegistry(IWorkerRegistry workerRegistry) {
 		this.workerRegistry = workerRegistry;
+	}
+	
+	@Reference
+	public void setOpenexContext(IOpenexContext openexContext) {
+		this.openexContext = openexContext;
 	}
 }
