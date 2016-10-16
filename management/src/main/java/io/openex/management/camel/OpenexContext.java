@@ -107,7 +107,19 @@ public class OpenexContext implements IOpenexContext {
 		}
 	}
 	
-	private ThreadPoolProfile profile() {
+	private ThreadPoolProfile threadPoolProfileContext() {
+		//Define custom thread pool profile
+		ThreadPoolProfile threadPoolProfile = new ThreadPoolProfile("openex-default");
+		threadPoolProfile.setPoolSize(10);
+		threadPoolProfile.setMaxPoolSize(20);
+		threadPoolProfile.setMaxQueueSize(500);
+		threadPoolProfile.setAllowCoreThreadTimeOut(false);
+		threadPoolProfile.setDefaultProfile(true);
+		threadPoolProfile.setRejectedPolicy(ThreadPoolRejectedPolicy.Discard);
+		return threadPoolProfile;
+	}
+	
+	private ThreadPoolProfile threadPoolProfileExecutor() {
 		//Define custom thread pool profile
 		ThreadPoolProfile threadPoolProfile = new ThreadPoolProfile("openex-worker-thread-profile");
 		threadPoolProfile.setPoolSize(20);
@@ -123,7 +135,8 @@ public class OpenexContext implements IOpenexContext {
 		SimpleRegistry registry = new SimpleRegistry();
 		context.setRegistry(registry);
 		context.addComponent("properties", new PropertiesComponent("file:${karaf.home}/etc/openex.properties"));
-		context.getExecutorServiceManager().registerThreadPoolProfile(profile());
+		context.getExecutorServiceManager().setDefaultThreadPoolProfile(threadPoolProfileContext());
+		context.getExecutorServiceManager().registerThreadPoolProfile(threadPoolProfileExecutor());
 		context.setTracing(true);
 		//Building routes
 		Collection<Executor> declaredWorkers = workerRegistry.workers().values();
