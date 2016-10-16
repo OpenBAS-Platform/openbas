@@ -3,6 +3,7 @@ package io.openex.management;
 import org.apache.camel.Component;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -13,11 +14,19 @@ public interface Executor {
 	
 	String name();
 	
-	InputStream contract();
+	default InputStream contract() {
+		return getClass().getResourceAsStream("contract.json");
+	}
 	
-	InputStream routes();
+	default InputStream routes() {
+		return getClass().getResourceAsStream("routes.xml");
+	}
 	
-	Map<String, Component> components();
+	default Map<String, Component> components() {
+		return Collections.emptyMap();
+	}
 	
-	Map<String, Object> beans();
+	default Map<String, Object> beans() {
+		return Collections.emptyMap();
+	}
 }

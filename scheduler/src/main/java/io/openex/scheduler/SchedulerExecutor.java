@@ -21,10 +21,6 @@ class SchedulerExecutor implements Executor {
 		return null;
 	}
 	
-	public InputStream routes() {
-		return getClass().getResourceAsStream("routes.xml");
-	}
-	
 	public Map<String, Component> components() {
 		return Collections.singletonMap("http", new HttpComponent());
 	}

@@ -16,19 +16,7 @@ class SmsExecutor implements Executor {
 		return "sms";
 	}
 	
-	public InputStream contract() {
-		return getClass().getResourceAsStream("contract.json");
-	}
-	
-	public InputStream routes() {
-		return getClass().getResourceAsStream("worker.xml");
-	}
-	
 	public Map<String, Component> components() {
 		return Collections.singletonMap("stream", new StreamComponent());
-	}
-	
-	public Map<String, Object> beans() {
-		return new HashMap<>();
 	}
 }
