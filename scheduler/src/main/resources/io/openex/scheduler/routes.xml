@@ -13,9 +13,31 @@
             <setHeader headerName="router-header">
                 <simple>${body[exercise_name]}</simple>
             </setHeader>
-            <dynamicRouter ignoreInvalidEndpoints="true">
-                <method ref="schedulerRouter" method="forward"/>
-            </dynamicRouter>
+            <doTry>
+                <dynamicRouter ignoreInvalidEndpoints="true">
+                    <method ref="schedulerRouter" method="forward"/>
+                </dynamicRouter>
+                <doCatch>
+                    <exception>org.apache.camel.component.direct.DirectConsumerNotAvailableException</exception>
+                    <to uri="mock:routing_error"/>
+                </doCatch>
+            </doTry>
         </split>
+    </route>
+    <route>
+        <from uri="direct:callback"/>
+        <setHeader headerName="Content-Type">
+            <constant>application/json</constant>
+        </setHeader>
+        <setHeader headerName="CamelHttpMethod">
+            <constant>{{callback_mode}}</constant>
+        </setHeader>
+        <doTry>
+            <to uri="{{callback_uri}}"/>
+            <doCatch>
+                <exception>java.lang.Exception</exception>
+                <to uri="mock:callback_error"/>
+            </doCatch>
+        </doTry>
     </route>
 </routes>

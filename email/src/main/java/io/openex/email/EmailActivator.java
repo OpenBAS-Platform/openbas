@@ -22,11 +22,13 @@ public class EmailActivator {
 	
 	@Activate
 	public void start() throws Exception {
+		System.out.println(">>>>>>>>> start EmailActivator");
 		workerRegistry.addWorker(executor);
 	}
 	
 	@Deactivate
 	public void stop() throws Exception {
+		System.out.println(">>>>>>>>> stop EmailActivator");
 		workerRegistry.removeWorker(executor);
 	}
 	
