@@ -22,7 +22,6 @@ class SmsExecutor implements Executor {
 	}
 	
 	public Map<String, Component> components() {
-		Component v = new StreamComponent();
-		return Collections.singletonMap("stream", v);
+		return Collections.singletonMap("stream", new StreamComponent());
 	}
 }

@@ -1,8 +1,9 @@
-<worker>
-    <!-- data transform -->
-    <setBody>
-        <simple>Hello SMS: ${body[exercise_id]}</simple>
-    </setBody>
-    <!-- optional consumer -->
-    <to uri="stream:out"/>
-</worker>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route>
+        <from uri="direct:sms" id="openex-sms"/>
+        <setBody>
+            <simple>Hello SMS: ${body[exercise_id]}</simple>
+        </setBody>
+        <to uri="stream:out"/>
+    </route>
+</routes>

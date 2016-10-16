@@ -1,8 +1,9 @@
-<worker>
-    <!-- data transform -->
-    <setBody>
-        <simple>Hello email: ${body[exercise_id]}</simple>
-    </setBody>
-    <!-- optional consumer -->
-    <to uri="stream:out"/>
-</worker>
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route>
+        <from uri="direct:email" id="openex-email"/>
+        <setBody>
+            <simple>Hello email: ${body[exercise_id]}</simple>
+        </setBody>
+        <to uri="stream:out"/>
+    </route>
+</routes>

@@ -19,6 +19,7 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.spi.ThreadPoolProfile;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
@@ -28,6 +29,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -74,7 +76,7 @@ public class Scheduler {
 		for (Executor executor : executors) {
 			Set<String> keys = executor.components().keySet();
 			for (String key : keys) {
-				if(context.getComponentNames().contains(key)) {
+				if (context.getComponentNames().contains(key)) {
 					context.removeComponent(key);
 				}
 			}
@@ -85,7 +87,7 @@ public class Scheduler {
 		for (Executor executor : executors) {
 			Set<Map.Entry<String, org.apache.camel.Component>> components = executor.components().entrySet();
 			for (Map.Entry<String, org.apache.camel.Component> entry : components) {
-				if(!context.getComponentNames().contains(entry.getKey())) {
+				if (!context.getComponentNames().contains(entry.getKey())) {
 					context.addComponent(entry.getKey(), entry.getValue());
 				}
 			}
@@ -103,32 +105,17 @@ public class Scheduler {
 		return threadPoolProfile;
 	}
 	
-	private List<RouteDefinition> createRouteFromExecutor(Executor executor) {
-		try {
-			Element routes = new Element("routes", Namespace.getNamespace("http://camel.apache.org/schema/spring"));
-			Element routeElement = new Element("route", Namespace.NO_NAMESPACE);
-			routeElement.setAttribute("id", executor.name());
-			Element from = new Element("from");
-			from.setAttribute("uri", "direct:" + executor.name());
-			routeElement.addContent(from);
-			
-			SAXBuilder sxb = new SAXBuilder();
-			Document document = sxb.build(executor.route());
-			List<Element> processingElement = document.getRootElement().getChildren();
-			for (Element element : processingElement) {
-				routeElement.addContent(element.clone().detach());
-			}
-			Element to = new Element("to");
-			to.setAttribute("uri", "direct:callback");
-			routeElement.addContent(to);
-			routes.addContent(routeElement);
-			
-			String route = new XMLOutputter().outputString(routes);
-			ByteArrayInputStream inputStream = new ByteArrayInputStream(route.getBytes("UTF-8"));
-			return context.loadRoutesDefinition(inputStream).getRoutes();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+	private List<RouteDefinition> createRouteFromExecutor(Executor executor) throws Exception {
+		SAXBuilder sxb = new SAXBuilder();
+		Document document = sxb.build(executor.route());
+		Element routeElement = document.getRootElement().getChildren().iterator().next();
+		Element to = new Element("to");
+		to.setAttribute("uri", "direct:callback");
+		routeElement.addContent(to);
+		String route = new XMLOutputter().outputString(document);
+		ByteArrayInputStream inputStream = new ByteArrayInputStream(route.getBytes("UTF-8"));
+		return context.loadRoutesDefinition(inputStream).getRoutes();
+		
 	}
 	//endregion
 	
