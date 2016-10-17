@@ -14,3 +14,7 @@ mvn install
 unzip distribution\target\worker-distribution-1.0.0-SNAPSHOT.zip
 modify etc\openex.properties
 start karaf executable
+
+# REST SERVICES
+GET http://localhost:8181/cxf/contracts
+POST {json} http://localhost:8181/cxf/worker/{worker_ident}
