@@ -1,0 +1,15 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route>
+        <from uri="direct:remote"/>
+        <log message="Received ${body}:${threadName}"/>
+        <threads executorServiceRef="openex-remote-thread-profile">
+            <log message="Processing ${body}:${threadName}"/>
+            <setHeader headerName="router-header">
+                <simple>${body[route-id]}</simple>
+            </setHeader>
+            <dynamicRouter ignoreInvalidEndpoints="true">
+                <method ref="schedulerRouter" method="forward"/>
+            </dynamicRouter>
+        </threads>
+    </route>
+</routes>

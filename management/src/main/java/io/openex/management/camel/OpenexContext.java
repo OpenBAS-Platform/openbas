@@ -18,6 +18,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import java.io.InputStream;
 import java.util.*;
 
 @Component
@@ -107,14 +108,13 @@ public class OpenexContext implements IOpenexContext {
 		}
 	}
 	
-	private ThreadPoolProfile threadPoolProfileContext() {
+	private ThreadPoolProfile threadPoolProfileRemote() {
 		//Define custom thread pool profile
-		ThreadPoolProfile threadPoolProfile = new ThreadPoolProfile("openex-default");
+		ThreadPoolProfile threadPoolProfile = new ThreadPoolProfile("openex-remote-thread-profile");
 		threadPoolProfile.setPoolSize(10);
 		threadPoolProfile.setMaxPoolSize(20);
 		threadPoolProfile.setMaxQueueSize(500);
 		threadPoolProfile.setAllowCoreThreadTimeOut(false);
-		threadPoolProfile.setDefaultProfile(true);
 		threadPoolProfile.setRejectedPolicy(ThreadPoolRejectedPolicy.Discard);
 		return threadPoolProfile;
 	}
@@ -135,7 +135,7 @@ public class OpenexContext implements IOpenexContext {
 		SimpleRegistry registry = new SimpleRegistry();
 		context.setRegistry(registry);
 		context.addComponent("properties", new PropertiesComponent("file:${karaf.home}/etc/openex.properties"));
-		context.getExecutorServiceManager().setDefaultThreadPoolProfile(threadPoolProfileContext());
+		context.getExecutorServiceManager().registerThreadPoolProfile(threadPoolProfileRemote());
 		context.getExecutorServiceManager().registerThreadPoolProfile(threadPoolProfileExecutor());
 		context.setTracing(true);
 		//Building routes
@@ -152,6 +152,9 @@ public class OpenexContext implements IOpenexContext {
 		//Populate components
 		registerExecutorComponent(declaredWorkers.toArray(new Executor[declaredWorkers.size()]));
 		//Populate routes
+		InputStream defaultRoutesStream = getClass().getResourceAsStream("routes.xml");
+		List<RouteDefinition> initRoutes = context.loadRoutesDefinition(defaultRoutesStream).getRoutes();
+		definitions.addAll(initRoutes);
 		context.addRouteDefinitions(definitions);
 		//Starting context
 		context.start();
