@@ -34,17 +34,17 @@ class LeftBar extends Component {
         <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_LEFTBAR} onTitleTouchTap={this.redirectToHome.bind(this)}
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.params.exerciseId + '/world'} label="World"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/world'} label="World"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.params.exerciseId + '/objectives'} label="Objectives"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/objectives'} label="Objectives"
                         leftIcon={<Icon name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.params.exerciseId + '/scenario'} label="Scenario"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/scenario'} label="Scenario"
                         leftIcon={<Icon name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.params.exerciseId + '/audience'} label="Audience"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/audience'} label="Audience"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.params.exerciseId + '/calendar'} label="Calendar"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/calendar'} label="Calendar"
                         leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
-          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.params.exerciseId + '/settings'} label="Settings"
+          <ListItemLink onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/settings'} label="Settings"
                         leftIcon={<Icon name={Constants.ICON_NAME_ACTION_SETTINGS}/>}/>
         </List>
       </Drawer>
@@ -53,10 +53,10 @@ class LeftBar extends Component {
 }
 
 LeftBar.propTypes = {
+  id: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
   open: PropTypes.bool,
   redirectToHome: PropTypes.func,
-  params: PropTypes.object.isRequired
 }
 
 const select = (state) => {

@@ -28,22 +28,22 @@ class NavBar extends Component {
       <Drawer width={65} docked={true} open={true} zindex={50}>
         <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/world'}
+          <IconListItemLink to={'/private/exercise/' + this.props.id + '/world'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
-          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/objectives'}
+          <IconListItemLink to={'/private/exercise/' + this.props.id + '/objectives'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
-          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/scenario'}
+          <IconListItemLink to={'/private/exercise/' + this.props.id + '/scenario'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
-          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/audience'}
+          <IconListItemLink to={'/private/exercise/' + this.props.id + '/audience'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
-          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/calendar'}
+          <IconListItemLink to={'/private/exercise/' + this.props.id + '/calendar'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
-          <IconListItemLink to={'/private/exercise/' + this.props.params.exerciseId + '/settings'}
+          <IconListItemLink to={'/private/exercise/' + this.props.id + '/settings'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_ACTION_SETTINGS}/>}/>
         </List>
@@ -58,8 +58,8 @@ class NavBar extends Component {
 }
 
 NavBar.propTypes = {
+  id: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
-  params: PropTypes.object.isRequired,
   open: PropTypes.bool
 }
 

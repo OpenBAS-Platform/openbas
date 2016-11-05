@@ -6,7 +6,7 @@ import {fetchExercises} from '../../actions/Exercise'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
-import CreateExercise from './CreateExercise'
+import CreateExercise from './exercise/CreateExercise'
 import UserPopover from './UserPopover'
 import {redirectToHome, toggleLeftBar} from '../../actions/Application'
 
@@ -72,6 +72,7 @@ class IndexAuthenticated extends Component {
 
 IndexAuthenticated.propTypes = {
   exercises: PropTypes.object,
+  exercise_statuses: PropTypes.object,
   fetchExercises: PropTypes.func.isRequired,
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,

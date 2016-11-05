@@ -21,10 +21,18 @@ export const arrayOfUsers = arrayOf(user)
 export const exercise = new Schema('exercises', {idAttribute: 'exercise_id'})
 export const arrayOfExercises = arrayOf(exercise)
 
+export const audience = new Schema('audiences', {idAttribute: 'audience_id'})
+export const arrayOfAudiences = arrayOf(audience)
+
 token.define({
   token_user: user
 })
 
 exercise.define({
   exercise_status: exerciseStatus
+})
+
+audience.define({
+  audience_users: arrayOfUsers,
+  audience_exercise: exercise
 })

@@ -1,21 +1,29 @@
 import React, {Component, PropTypes} from 'react'
-import createImmutableSelector from '../../../utils/ImmutableSelect'
 import {connect} from 'react-redux'
-import {fromJS} from 'immutable'
-import R from 'ramda'
-import {fetchUsers} from '../../../actions/User'
-import {CircularSpinner} from '../../../components/Spinner'
+import {fetchUsers} from '../../../../actions/User'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import {Avatar} from '../../../components/Avatar';
+import {Avatar} from '../../../../components/Avatar';
+import AudienceNav from './AudienceNav';
+
+const styles = {
+  'container': {
+    paddingRight: '300px',
+  }
+}
 
 class Index extends Component {
   componentDidMount() {
     this.props.fetchUsers();
   }
 
+  changeAudience(audience) {
+    this.setState({audience: audience})
+  }
+
   render() {
     return (
-      <div>
+      <div style={styles.container}>
+        <AudienceNav id={this.props.id}/>
         <Table selectable={true} multiSelectable={true}>
           <TableHeader>
             <TableRow>
@@ -26,18 +34,7 @@ class Index extends Component {
             </TableRow>
           </TableHeader>
           <TableBody showRowHover={true}>
-            {this.props.users.toList().map(user => {
-              return (
-                <TableRow hover={true} hoverable={true} key={user.get('user_id')}>
-                  <TableRowColumn>{user.get('user_firstname')} {user.get('user_lastname')}</TableRowColumn>
-                  <TableRowColumn>{user.get('user_email')}</TableRowColumn>
-                  <TableRowColumn>ANSSI</TableRowColumn>
-                  <TableRowColumn>
-                    <Avatar src={user.get('user_gravatar')}/>
-                  </TableRowColumn>
-                </TableRow>
-              )
-            })}
+
           </TableBody>
         </Table>
       </div>
@@ -46,21 +43,18 @@ class Index extends Component {
 }
 
 Index.propTypes = {
+  id: PropTypes.string,
   users: PropTypes.object,
-  fetchUsers: PropTypes.func.isRequired
+  audiences: PropTypes.object,
+  fetchUsers: PropTypes.func.isRequired,
 }
 
-//Users selector extract only the fields use to render the Home Page.
-const usersSelector = state => {
-  const users = state.application.getIn(['entities', 'users']).toJS()
-  var fields = R.compose(R.dissoc('user_groups'));
-  return fromJS(R.map(fields, users))
-}
-const cleanedUsers = createImmutableSelector(usersSelector, users => users)
-
-const select = (state) => {
+const select = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
   return {
-    users: cleanedUsers(state),
+    id: exerciseId,
+    users: state.application.getIn(['entities', 'users']),
+    audiences: state.application.getIn(['entities', 'audiences']),
   }
 }
 

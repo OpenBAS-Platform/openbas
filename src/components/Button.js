@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react'
 import {Link} from 'react-router'
+import * as Constants from '../constants/ComponentTypes'
 import MUIRaisedButton from 'material-ui/RaisedButton'
 import MUIFloatingActionButton from 'material-ui/FloatingActionButton';
 import MUIFlatButton from 'material-ui/FlatButton';
@@ -7,8 +8,16 @@ import MUIIconButton from 'material-ui/IconButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import {injectIntl} from 'react-intl'
 
-const style = {
-  margin: '5px',
+const styles = {
+  'RaisedButton': {
+    margin: '5px',
+  }
+}
+
+const buttonStyle = {
+  [ Constants.BUTTON_TYPE_STICKLEFT ]: {
+    marginLeft: '-5px'
+  }
 }
 
 const ButtonIntl = (props) => (
@@ -17,7 +26,7 @@ const ButtonIntl = (props) => (
                    type={props.type}
                    disabled={props.disabled}
                    onClick={props.onClick}
-                   style={style}
+                   style={styles.RaisedButton}
                    containerElement={props.containerElement}/>
 )
 export const Button = injectIntl(ButtonIntl)
@@ -56,7 +65,7 @@ export const LinkButtonIntl = (props) => (
                    containerElement={<Link to={props.to}/>}
                    disabled={props.disabled}
                    label={props.intl.formatMessage({id: props.label})}
-                   style={style}/>
+                   style={styles.RaisedButton}/>
 )
 export const LinkButton = injectIntl(LinkButtonIntl)
 
@@ -93,6 +102,7 @@ export const IconButton = (props) => (
   <MUIIconButton
     disabled={props.disabled}
     onClick={props.onClick}
+    style={buttonStyle[props.type]}
   >
     {props.children}
   </MUIIconButton>
@@ -101,5 +111,6 @@ export const IconButton = (props) => (
 IconButton.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  type: PropTypes.string
 }

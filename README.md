@@ -6,7 +6,7 @@ OpenEx is a global open source platform allowing organizations to plan, schedule
 
 ## Releases download
 
-The releases are available on the [OpenEx website](http://www.openex.io) in the [releases section](http://openex.io/releases). The website also provide a full [documentation](http://www.openex.io/documentation) about installation, usage and administration of the platform.   
+The releases are available on the [OpenEx website](http://www.openex.io) in the [releases section](http://openex.io/releases). The website also provides a full [documentation](http://www.openex.io/documentation) about installation, usage and administration of the platform.   
 
 ## Status & Bugs
 

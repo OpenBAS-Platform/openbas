@@ -2,12 +2,10 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import * as Constants from '../../constants/ComponentTypes'
 import {fetchFiles, addFile} from '../../actions/File'
-import {CircularSpinner} from '../../components/Spinner'
 import {IconButton} from '../../components/Button'
 import {GridList, GridTile} from '../../components/GridList'
 import {Icon} from '../../components/Icon'
 import {FloatingActionsButtonCreate} from '../../components/Button';
-import {Dialog} from '../../components/Dialog'
 
 const styles = {
   root: {

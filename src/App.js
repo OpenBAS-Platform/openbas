@@ -26,6 +26,7 @@ import IndexAuthenticated from './containers/authenticated/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
+import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 
 injectTapEventPlugin()
 
@@ -151,8 +152,7 @@ class App extends Component {
                   <Route path='world' component={IndexExercise}/>
                   <Route path='objectives' component={IndexExercise}/>
                   <Route path='scenario' component={IndexExercise}/>
-                  <Route path='audience' component={IndexExercise}/>
-                  <Route path='audience' component={IndexExercise}/>
+                  <Route path='audience' component={IndexExerciseAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>
                 </Route>

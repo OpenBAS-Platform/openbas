@@ -32,6 +32,30 @@ export const application = (state = Map(), action) => {
     return mergedExercises;
   }
 
+  function mergeAudiences() {
+    const audiences = state.getIn(['entities', 'audiences']) || Map()
+    const mergedAudiences = audiences.mergeDeep(action.payload.getIn(['entities', 'audiences']))
+    return mergedAudiences;
+  }
+
+  function mergeEvents() {
+    const events = state.getIn(['entities', 'events']) || Map()
+    const mergedEvents = events.mergeDeep(action.payload.getIn(['entities', 'events']))
+    return mergedEvents;
+  }
+
+  function mergeIncidents() {
+    const incidents = state.getIn(['entities', 'incidents']) || Map()
+    const mergedIncidents = incidents.mergeDeep(action.payload.getIn(['entities', 'incidents']))
+    return mergedIncidents;
+  }
+
+  function mergeInjects() {
+    const injects = state.getIn(['entities', 'injects']) || Map()
+    const mergedInjects = injects.mergeDeep(action.payload.getIn(['entities', 'injects']))
+    return mergedInjects;
+  }
+
   switch (action.type) {
     case Constants.APPLICATION_LOGIN_SUBMITTED: {
       return state;
@@ -54,6 +78,31 @@ export const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_LOGOUT_SUCCESS: {
       return state.set('token', null);
+    }
+
+    case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'files'], mergeFiles())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_ADD_FILE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_FILE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'files'], mergeFiles())
+        state.setIn(['ui', 'loading'], false)
+      })
     }
 
     case Constants.APPLICATION_FETCH_USERS_SUBMITTED: {
@@ -103,11 +152,19 @@ export const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], false)
     }
 
+    case Constants.APPLICATION_ADD_EXERCISE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
     case Constants.APPLICATION_ADD_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
         state.setIn(['entities', 'exercises'], mergeExercises())
         state.setIn(['ui', 'loading'], false)
       })
+    }
+
+    case Constants.APPLICATION_ADD_EXERCISE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
     }
 
     case Constants.APPLICATION_UPDATE_EXERCISE_SUBMITTED: {
@@ -121,33 +178,76 @@ export const application = (state = Map(), action) => {
       })
     }
 
+    case Constants.APPLICATION_UPDATE_EXERCISE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
     case Constants.APPLICATION_DELETE_EXERCISE_SUCCESS: {
-        return state.deleteIn(['entities', 'exercises', action.payload])
+      return state.deleteIn(['entities', 'exercises', action.payload])
     }
 
-    case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
-      return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
-        state.setIn(['ui', 'loading'], false)
-      })
-    }
-
-    case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
-      return state.withMutations(function (state) {
-        state.setIn(['entities', 'files'], mergeFiles())
-        state.setIn(['ui', 'loading'], false)
-      })
-    }
-
-    case Constants.APPLICATION_ADD_FILE_SUBMITTED: {
+    case Constants.APPLICATION_FETCH_AUDIENCES_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
 
-    case Constants.APPLICATION_ADD_FILE_SUCCESS: {
+    case Constants.APPLICATION_FETCH_AUDIENCES_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'files'], mergeFiles())
+        state.setIn(['entities', 'audiences'], mergeAudiences())
         state.setIn(['ui', 'loading'], false)
       })
+    }
+
+    case Constants.APPLICATION_FETCH_AUDIENCES_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_AUDIENCE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_AUDIENCE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'audiences'], mergeAudiences())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_AUDIENCE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_ADD_AUDIENCE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_AUDIENCE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'audiences'], mergeAudiences())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_ADD_AUDIENCE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_UPDATE_AUDIENCE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'audiences'], mergeAudiences())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_UPDATE_AUDIENCE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_DELETE_AUDIENCE_SUCCESS: {
+      return state.deleteIn(['entities', 'audiences', action.payload])
     }
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {

@@ -8,7 +8,6 @@ import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
 import UserPopover from './../UserPopover'
 import {fetchExercise} from '../../../actions/Exercise'
-import {fetchExerciseStatuses} from '../../../actions/ExerciseStatus'
 
 const styles = {
   root: {
@@ -66,8 +65,8 @@ class RootAuthenticated extends Component {
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}
           showMenuIconButton={false}/>
-        <NavBar params={this.props.params}/>
-        <LeftBar params={this.props.params}/>
+        <NavBar id={this.props.id}/>
+        <LeftBar id={this.props.id}/>
         <div style={styles.root}>
           {this.props.children}
         </div>
