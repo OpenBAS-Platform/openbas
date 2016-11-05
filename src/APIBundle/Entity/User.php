@@ -36,11 +36,23 @@ class User implements UserInterface
     protected $user_email;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone;
+
+    /**
      * @ORM\Column(type="string")
      */
     protected $user_password;
 
     protected $user_plain_password;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Organization", inversedBy="organization_users")
+     * @ORM\JoinColumn(name="user_organization", referencedColumnName="organization_id", onDelete="CASCADE")
+     * @var Organization
+     */
+    protected $user_organization;
 
     /**
      * @ORM\ManyToMany(targetEntity="Group", inversedBy="group_users")
@@ -118,6 +130,17 @@ class User implements UserInterface
     public function setUserEmail($email)
     {
         $this->user_email = $email;
+        return $this;
+    }
+
+    public function getUserPhone()
+    {
+        return $this->user_email;
+    }
+
+    public function setUserPhone($phone)
+    {
+        $this->user_phone = $phone;
         return $this;
     }
 

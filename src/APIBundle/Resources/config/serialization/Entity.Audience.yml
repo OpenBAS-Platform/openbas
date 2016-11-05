@@ -1,10 +1,10 @@
-APIBundle\Entity\Event:
+APIBundle\Entity\Audience:
     attributes:
-        event_id:
-            groups: ['event']
-        event_title:
-            groups: ['event']
-        event_description:
-            groups: ['event']
-        event_status:
-            groups: ['event']
+        audience_id:
+            groups: ['audience']
+        audience_name:
+            groups: ['audience']
+        audience_exercise:
+            groups: ['audience']
+        audience_users:
+            groups: ['audience']

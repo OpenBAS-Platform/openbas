@@ -38,6 +38,10 @@ exercises_groups:
     type:     rest
     resource: APIBundle\Controller\Exercise\GroupController
 
+exercises_audiences:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\AudienceController
+
 exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController

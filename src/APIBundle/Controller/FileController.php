@@ -24,7 +24,7 @@ class FileController extends Controller
     public function getFilesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $files = $em->getRepository('APIBundle:File')->findAll();
+        $files = $em->getRepository('APIBundle:File')->findBy(array(), array('file_id' => 'DESC'));
         /* @var $files File[] */
 
         foreach( $files as &$file) {
@@ -45,15 +45,16 @@ class FileController extends Controller
     public function postFilesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        if (count($_FILES) == 0) {
+        if (count($_FILES) == 0 ) {
             return \FOS\RestBundle\View\View::create(['message' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         } else {
             $file = new File();
             foreach ($_FILES as $f) {
                 $uploadedFile = new UploadedFile($f['tmp_name'], $f['name']);
-                $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
-                $uploadedFile->move($this->get('kernel')->getRootDir() . '/../web/upload', $fileName);
-                $file->setFileName($fileName);
+                $filePath = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
+                $uploadedFile->move($this->get('kernel')->getRootDir() . '/../web/upload', $filePath);
+                $file->setFileName($f['name']);
+                $file->setFilePath($filePath);
                 $em->persist($file);
                 $em->flush();
                 break;
@@ -63,7 +64,6 @@ class FileController extends Controller
             return $file;
         }
     }
-
 
     /**
      * @ApiDoc(

@@ -9,8 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Exercise;
-use APIBundle\Form\Type\EventType;
-use APIBundle\Entity\Event;
+use APIBundle\Form\Type\AudienceType;
+use APIBundle\Entity\Audience;
 
 class AudienceController extends Controller
 {
@@ -59,26 +59,26 @@ class AudienceController extends Controller
 
         $this->denyAccessUnlessGranted('select', $exercise);
 
-        $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
-        /* @var $event Event */
+        $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
+        /* @var $audience Audience */
 
-        if (empty($event)) {
-            return $this->eventNotFound();
+        if (empty($audience)) {
+            return $this->audienceNotFound();
         }
 
-        return $event;
+        return $audience;
     }
 
     /**
      * @ApiDoc(
      *    description="Create an audience",
-     *    input={"class"=EventType::class, "name"=""}
+     *    input={"class"=AudienceType::class, "name"=""}
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"event"})
-     * @Rest\Post("/exercises/{exercise_id}/events")
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"audience"})
+     * @Rest\Post("/exercises/{exercise_id}/audiences")
      */
-    public function postExercisesEventsAction(Request $request)
+    public function postExercisesAudiencesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -90,105 +90,15 @@ class AudienceController extends Controller
 
         $this->denyAccessUnlessGranted('update', $exercise);
 
-        $event = new Event();
-        $event->setEventExercise($exercise);
-        $form = $this->createForm(EventType::class, $event);
+        $audience = new Audience();
+        $form = $this->createForm(AudienceType::class, $audience);
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $em->persist($event);
+            $audience->setAudienceExercise($exercise);
+            $em->persist($audience);
             $em->flush();
-            return $event;
-        } else {
-            return $form;
-        }
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Delete an event"
-     * )
-     *
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"event"})
-     * @Rest\Delete("/exercises/{exercise_id}/events/{event_id}")
-     */
-    public function removeExercisesEventAction(Request $request)
-    {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
-        /* @var $exercise Exercise */
-
-        if (empty($exercise)) {
-            return $this->exerciseNotFound();
-        }
-
-        $this->denyAccessUnlessGranted('update', $exercise);
-
-        $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
-        /* @var $event Event */
-
-        if (empty($event)) {
-            return $this->eventNotFound();
-        }
-
-        $em->remove($event);
-        $em->flush();
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Replace an event",
-     *   input={"class"=EventType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"event"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}")
-     */
-    public function updateExercisesEventAction(Request $request)
-    {
-        return $this->updateEvent($request, true);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Update an event",
-     *    input={"class"=EventType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"event"})
-     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}")
-     */
-    public function patchExercisesEventAction(Request $request)
-    {
-        return $this->updateEvent($request, false);
-    }
-
-    private function updateEvent(Request $request, $clearMissing)
-    {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
-        /* @var $exercise Exercise */
-
-        if (empty($exercise)) {
-            return $this->exerciseNotFound();
-        }
-
-        $this->denyAccessUnlessGranted('update', $exercise);
-
-        $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
-        /* @var $event Event */
-
-        if (empty($event)) {
-            return $this->eventNotFound();
-        }
-
-        $form = $this->createForm(EventType::class, $event);
-        $form->submit($request->request->all(), $clearMissing);
-
-        if ($form->isValid()) {
-            $em->persist($event);
-            $em->flush();
-            return $event;
+            return $audience;
         } else {
             return $form;
         }
@@ -199,8 +109,8 @@ class AudienceController extends Controller
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
-    private function eventNotFound()
+    private function audienceNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        return \FOS\RestBundle\View\View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
     }
 }

@@ -1,9 +1,9 @@
 APIBundle\Entity\Exercise:
     attributes:
         exercise_id:
-            groups: ['exercise']
+            groups: ['exercise', 'audience']
         exercise_name:
-            groups: ['exercise']
+            groups: ['exercise', 'audience']
         exercise_subtitle:
             groups: ['exercise']
         exercise_description:
