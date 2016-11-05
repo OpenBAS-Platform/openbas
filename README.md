@@ -6,7 +6,7 @@ OpenEx is a global open source platform allowing organizations to plan, schedule
 
 ## Releases download
 
-The releases are available on the [OpenEx website](http://www.openex.io) in the [releases section](http://openex.io/releases). The website also provide a full [documentation](http://www.openex.io/documentation) about installation, usage and administration of the platform.   
+The releases are available on the [OpenEx website](http://www.openex.io) in the [releases section](http://openex.io/releases). The website also provides a full [documentation](http://www.openex.io/documentation) about installation, usage and administration of the platform.   
 
 ## Status & Bugs
 
@@ -31,8 +31,7 @@ The worker is the executor that send incidents and injects, built with the [Came
 To contribute to the API development, please follow the next steps to deploy it.
 
 *Prerequisites*:
- 
-- Install Dkron, follow instructions here http://dkron.io/docs/getting-started
+
 - Install a webserver and PHP (>= 5.6)
 - Install MySQL (>= 5.5)
 
