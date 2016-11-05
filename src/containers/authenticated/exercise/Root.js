@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {redirectToHome, toggleLeftBar} from '../../../actions/Application'
+import {redirectToExercise, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
 import {Chip} from '../../../components/Chip'
@@ -11,7 +11,7 @@ import {fetchExercise} from '../../../actions/Exercise'
 
 const styles = {
   root: {
-    padding: '90px 20px 0 85px',
+    padding: '80px 20px 0 85px',
   },
   title: {
     fontVariant: 'small-caps',
@@ -35,8 +35,8 @@ class RootAuthenticated extends Component {
     this.props.toggleLeftBar()
   }
 
-  redirectToHome() {
-    this.props.redirectToHome()
+  redirectToExercise() {
+    this.props.redirectToExercise(this.props.id)
   }
 
   render() {
@@ -61,12 +61,12 @@ class RootAuthenticated extends Component {
             </div>
           }
           type={Constants.APPBAR_TYPE_TOPBAR}
-          onTitleTouchTap={this.redirectToHome.bind(this)}
+          onTitleTouchTap={this.redirectToExercise.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
           iconElementRight={<UserPopover/>}
           showMenuIconButton={false}/>
-        <NavBar id={this.props.id}/>
-        <LeftBar id={this.props.id}/>
+        <NavBar id={this.props.id} pathname={this.props.pathname} />
+        <LeftBar id={this.props.id} pathname={this.props.pathname}/>
         <div style={styles.root}>
           {this.props.children}
         </div>
@@ -77,12 +77,13 @@ class RootAuthenticated extends Component {
 
 RootAuthenticated.propTypes = {
   id: PropTypes.string,
+  pathname: PropTypes.string,
   leftBarOpen: PropTypes.bool,
   exercise: PropTypes.object,
   exercise_statuses: PropTypes.object,
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
-  redirectToHome: PropTypes.func,
+  redirectToExercise: PropTypes.func,
   children: React.PropTypes.node,
   fetchExercise: PropTypes.func.isRequired,
   params: PropTypes.object
@@ -90,11 +91,13 @@ RootAuthenticated.propTypes = {
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
+  let pathname = ownProps.location.pathname
   return {
     id: exerciseId,
+    pathname,
     exercise: state.application.getIn(['entities', 'exercises', exerciseId]),
     exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
   }
 }
 
-export default connect(select, {redirectToHome, toggleLeftBar, fetchExercise})(RootAuthenticated)
+export default connect(select, {redirectToExercise, toggleLeftBar, fetchExercise})(RootAuthenticated)

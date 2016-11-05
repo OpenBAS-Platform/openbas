@@ -1,13 +1,11 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import * as Constants from '../../../../constants/ComponentTypes'
 import {addAudience} from '../../../../actions/Audience'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton} from '../../../../components/Button';
 import AudienceForm from './AudienceForm'
-import {IconButton} from '../../../../components/Button'
+import {ActionButtonCreate} from '../../../../components/Button'
 import {AppBar} from '../../../../components/AppBar'
-import {Icon} from '../../../../components/Icon'
 
 class CreateAudience extends Component {
   constructor(props) {
@@ -49,8 +47,9 @@ class CreateAudience extends Component {
     return (
       <div>
         <AppBar
-          iconElementLeft={<IconButton onClick={this.handleOpen.bind(this)} type={Constants.BUTTON_TYPE_STICKLEFT}><Icon
-            name={Constants.ICON_NAME_CONTENT_ADD} color="#FFFFFF"/></IconButton>}/>
+          title="Audiences"
+          showMenuIconButton={false}
+          iconElementRight={<ActionButtonCreate onClick={this.handleOpen.bind(this)} />}/>
         <Dialog
           title="Create a new audience"
           modal={false}

@@ -23,6 +23,10 @@ h3 {
   padding: 24px 24px 5px 21px !important;
 }
 
+h4 {
+  padding: 10px !important;
+}
+
 div.exercise:hover {
   box-shadow: rgba(0, 0, 0, 0.3) 0px 14px 60px, rgba(0, 0, 0, 0.3) 0px 10px 30px !important;
 }
@@ -90,3 +94,4 @@ div.line .active ~ li::before {
 div.clearfix {
   clear: both;
 }
+

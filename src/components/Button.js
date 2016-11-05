@@ -76,7 +76,7 @@ LinkButtonIntl.propTypes = {
   label: PropTypes.string.isRequired
 }
 
-const styleFloatingActionsButton = {
+const styleFloatingActionsButtonCreate = {
   position: 'fixed',
   bottom: 30,
   right: 30
@@ -87,12 +87,36 @@ export const FloatingActionsButtonCreate = (props) => (
     secondary={true}
     disabled={props.disabled}
     onClick={props.onClick}
-    style={styleFloatingActionsButton}>
+    style={styleFloatingActionsButtonCreate}>
     <ContentAdd />
   </MUIFloatingActionButton>
 )
 
 FloatingActionsButtonCreate.propTypes = {
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  children: PropTypes.node
+}
+
+const styleActionButtonCreate = {
+  position: 'fixed',
+  top: 12,
+  right: 15
+}
+
+export const ActionButtonCreate = (props) => (
+  <MUIFloatingActionButton
+    mini={true}
+    disabled={props.disabled}
+    onClick={props.onClick}
+    backgroundColor="#9FA8DA"
+    zDepth={0}
+    style={styleActionButtonCreate}>
+    <ContentAdd />
+  </MUIFloatingActionButton>
+)
+
+ActionButtonCreate.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func,
   children: PropTypes.node

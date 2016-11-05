@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react'
+import {Map} from 'immutable'
 import {connect} from 'react-redux'
 import {fetchUsers} from '../../../../actions/User'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
@@ -8,6 +9,16 @@ import AudienceNav from './AudienceNav';
 const styles = {
   'container': {
     paddingRight: '300px',
+  },
+  'title': {
+    float: 'left',
+    fontSize: '18px',
+    fontWeight: 600
+  },
+  'number': {
+    float: 'right',
+    color: '#9E9E9E',
+    fontSize: '12px',
   }
 }
 
@@ -16,14 +27,13 @@ class Index extends Component {
     this.props.fetchUsers();
   }
 
-  changeAudience(audience) {
-    this.setState({audience: audience})
-  }
-
   render() {
     return (
       <div style={styles.container}>
         <AudienceNav id={this.props.id}/>
+        <div style={styles.title}>{this.props.audience.get('audience_name')}</div>
+        <div style={styles.number}>{this.props.audience_users.count()} users</div>
+        <div className="clearfix"></div>
         <Table selectable={true} multiSelectable={true}>
           <TableHeader>
             <TableRow>
@@ -34,7 +44,19 @@ class Index extends Component {
             </TableRow>
           </TableHeader>
           <TableBody showRowHover={true}>
-
+            {this.props.audience_users.toList().map(userId => {
+              let user = this.props.users.get(userId)
+              return (
+                <TableRow hover={true} hoverable={true} key={user.get('user_id')}>
+                  <TableRowColumn>{user.get('user_firstname')} {user.get('user_lastname')}</TableRowColumn>
+                  <TableRowColumn>{user.get('user_email')}</TableRowColumn>
+                  <TableRowColumn>ANSSI</TableRowColumn>
+                  <TableRowColumn>
+                    <Avatar src={user.get('user_gravatar')}/>
+                  </TableRowColumn>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </div>
@@ -45,16 +67,23 @@ class Index extends Component {
 Index.propTypes = {
   id: PropTypes.string,
   users: PropTypes.object,
-  audiences: PropTypes.object,
+  audience: PropTypes.object,
+  audience_users: PropTypes.object,
   fetchUsers: PropTypes.func.isRequired,
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
+  let audiences = state.application.getIn(['entities', 'audiences'])
+  let currentAudience = state.application.getIn(['ui', 'states', 'current_audience'])
+  let audience = currentAudience ? audiences.get(currentAudience) : Map()
+  let audienceUsers = currentAudience ? audiences.get(currentAudience).get('audience_users') : Map()
+
   return {
     id: exerciseId,
     users: state.application.getIn(['entities', 'users']),
-    audiences: state.application.getIn(['entities', 'audiences']),
+    audience,
+    audience_users: audienceUsers
   }
 }
 

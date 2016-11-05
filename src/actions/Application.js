@@ -45,6 +45,6 @@ export const redirectToHome  = () => (dispatch) => {
   dispatch(push('/'))
 }
 
-export const redirectToExercises  = () => (dispatch) => {
-  dispatch(push('/'))
+export const redirectToExercise  = (exerciseId) => (dispatch) => {
+  dispatch(push('/private/exercise/' + exerciseId))
 }

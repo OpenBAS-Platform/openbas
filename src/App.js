@@ -59,6 +59,9 @@ const initialState = {
       navbar_left_open: false,
       navbar_right_open: true,
       loading: false,
+      states: Map({
+        current_audience: undefined
+      })
     })
   })
 };

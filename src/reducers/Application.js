@@ -250,6 +250,10 @@ export const application = (state = Map(), action) => {
       return state.deleteIn(['entities', 'audiences', action.payload])
     }
 
+    case Constants.APPLICATION_SELECT_AUDIENCE: {
+      return state.setIn(['ui', 'states', 'current_audience'], action.payload)
+    }
+
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
       return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))
     }
