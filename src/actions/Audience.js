@@ -39,7 +39,6 @@ export const addAudience = (exerciseId, data) => (dispatch) => {
 }
 
 export const selectAudience = (audienceId) => (dispatch) => {
-  console.log('SELECTAUDIENCE', audienceId)
   dispatch({
     type: Constants.APPLICATION_SELECT_AUDIENCE,
     payload: audienceId

@@ -14,6 +14,7 @@ import ActionSettings from 'material-ui/svg-icons/action/settings'
 import ActionSchedule from 'material-ui/svg-icons/action/schedule'
 import ActionEvent from 'material-ui/svg-icons/action/event'
 import ActionExitToApp from 'material-ui/svg-icons/action/exit-to-app'
+import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
 import ActionAssignmentTurnedIn from 'material-ui/svg-icons/action/assignment-turned-in'
 import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
@@ -60,6 +61,8 @@ export const Icon = (props) => {
       return (<ActionExitToApp style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN:
       return (<ActionAssignmentTurnedIn style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
+      return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_FILE_FOLDER:
       return (<FileFolder style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_EDITOR_ATTACH_FILE:

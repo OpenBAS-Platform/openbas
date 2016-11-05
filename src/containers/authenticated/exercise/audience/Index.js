@@ -5,6 +5,7 @@ import {fetchUsers} from '../../../../actions/User'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import {Avatar} from '../../../../components/Avatar';
 import AudienceNav from './AudienceNav';
+import AudiencePopover from './AudiencePopover';
 
 const styles = {
   'container': {
@@ -31,7 +32,7 @@ class Index extends Component {
     return (
       <div style={styles.container}>
         <AudienceNav id={this.props.id}/>
-        <div style={styles.title}>{this.props.audience.get('audience_name')}</div>
+        <div style={styles.title}>{this.props.audience.get('audience_name')}</div><AudiencePopover />
         <div style={styles.number}>{this.props.audience_users.count()} users</div>
         <div className="clearfix"></div>
         <Table selectable={true} multiSelectable={true}>

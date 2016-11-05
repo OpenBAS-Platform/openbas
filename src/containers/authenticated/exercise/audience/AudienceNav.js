@@ -27,7 +27,7 @@ class AudienceNav extends Component {
 
   render() {
     return (
-      <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={100}>
+      <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
         <CreateAudience id={this.props.id}/>
         <List>
           {this.props.audiences.toList().map(audience => {
