@@ -3,7 +3,6 @@ import {connect} from 'react-redux'
 import {Link} from 'react-router'
 import moment from 'moment';
 import {fetchExercises} from '../../actions/Exercise'
-import {CircularSpinner} from '../../components/Spinner'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
@@ -37,11 +36,6 @@ class IndexAuthenticated extends Component {
   }
 
   render() {
-    let loading;
-    if (this.props.loading) {
-      loading = <CircularSpinner />
-    }
-
     return (
       <div>
         <AppBar
@@ -53,7 +47,6 @@ class IndexAuthenticated extends Component {
           iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo}/>}
         />
         <div style={styles.container}>
-          { loading }
           {this.props.exercises.toList().map(exercise => {
             return (
               <Link to={'/private/exercise/' + exercise.get('exercise_id')} key={exercise.get('exercise_id')}>
@@ -63,7 +56,7 @@ class IndexAuthenticated extends Component {
                   description={exercise.get('exercise_description')}
                   startDate={moment(exercise.get('exercise_start_date')).format('MMM D, YYYY')}
                   endDate={moment(exercise.get('exercise_end_date')).format('MMM D, YYYY')}
-                  status={exercise.get('exercise_status').get('status_name')}
+                  status={this.props.exercise_statuses.getIn([exercise.get('exercise_status'), 'status_name'])}
                   organizer={exercise.get('exercise_organizer')}
                   image={exercise.get('exercise_image').get('file_url')}
                 />
@@ -78,7 +71,6 @@ class IndexAuthenticated extends Component {
 }
 
 IndexAuthenticated.propTypes = {
-  loading: PropTypes.bool.isRequired,
   exercises: PropTypes.object,
   fetchExercises: PropTypes.func.isRequired,
   toggleLeftBar: PropTypes.func,
@@ -89,7 +81,7 @@ IndexAuthenticated.propTypes = {
 const select = (state) => {
   return {
     exercises: state.application.getIn(['entities', 'exercises']),
-    loading: state.application.getIn(['ui', 'loading'])
+    exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
   }
 }
 

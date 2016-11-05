@@ -44,3 +44,11 @@ export const PAPER_TYPE_SETTINGS = 'PAPER_TYPE_SETTINGS';
 //region CHIP
 export const CHIP_TYPE_FLOATING = 'CHIP_TYPE_FLOATING';
 //endregion
+
+//region GRIDLIST
+export const GRIDLIST_TYPE_GALLERY = 'GRIDLIST_TYPE_GALLERY';
+//endregion
+
+//region SNACKBAR
+export const SNACKBAR_TYPE_LOADING = 'SNACKBAR_TYPE_LOADING';
+//endregion

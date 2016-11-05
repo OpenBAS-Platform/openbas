@@ -45,6 +45,7 @@ export const addExercise = (data) => (dispatch) => {
 }
 
 export const updateExercise = (exerciseId, data) => (dispatch) => {
+  console.log("DATA", data)
   dispatch({type: Constants.APPLICATION_UPDATE_EXERCISE_SUBMITTED});
   return api(schema.exercise).put('/api/exercises/' + exerciseId, data).then(function (response) {
     dispatch({

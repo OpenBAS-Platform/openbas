@@ -30,7 +30,6 @@ const statusesNames = {
 class RootAuthenticated extends Component {
   componentDidMount() {
     this.props.fetchExercise(this.props.id)
-    this.props.fetchExerciseStatuses()
   }
 
   toggleLeftBar() {
@@ -50,7 +49,7 @@ class RootAuthenticated extends Component {
     }
 
     if (this.props.exercise_statuses && this.props.exercise) {
-      status = this.props.exercise_statuses.getIn([this.props.exercise.get('exercise_status').get('status_id')]).get('status_name')
+      status = this.props.exercise_statuses.getIn([this.props.exercise.get('exercise_status'), 'status_name'])
     }
 
     return (
@@ -87,18 +86,16 @@ RootAuthenticated.propTypes = {
   redirectToHome: PropTypes.func,
   children: React.PropTypes.node,
   fetchExercise: PropTypes.func.isRequired,
-  fetchExerciseStatuses: PropTypes.func.isRequired,
   params: PropTypes.object
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   return {
-    loading: state.application.getIn(['ui', 'loading']),
     id: exerciseId,
     exercise: state.application.getIn(['entities', 'exercises', exerciseId]),
     exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
   }
 }
 
-export default connect(select, {redirectToHome, toggleLeftBar, fetchExercise, fetchExerciseStatuses})(RootAuthenticated)
+export default connect(select, {redirectToHome, toggleLeftBar, fetchExercise})(RootAuthenticated)

@@ -30,6 +30,7 @@ const styles = {
   body: function (image) {
     return {
       backgroundImage: 'url("' + image + '")',
+      backgroundSize: '100%',
       height: '150px',
       position: 'relative'
     }

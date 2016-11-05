@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {updateExercise, deleteExercise} from '../../../../actions/Exercise'
-import {upload} from '../../../../actions/File'
+import {fetchExerciseStatuses} from '../../../../actions/ExerciseStatus'
 import {Paper} from '../../../../components/Paper'
 import {Button, FlatButton} from '../../../../components/Button'
 import {Dialog} from '../../../../components/Dialog'
@@ -15,6 +15,9 @@ import moment from 'moment'
 const styles = {
   PaperContent: {
     padding: '20px'
+  },
+  image: {
+    width: '90%'
   }
 }
 
@@ -31,6 +34,10 @@ class Index extends Component {
       openDelete: false,
       openGallery: false
     }
+  }
+
+  componentDidMount() {
+    this.props.fetchExerciseStatuses();
   }
 
   onUpdate(data) {
@@ -74,14 +81,10 @@ class Index extends Component {
     this.handleCloseDelete()
   }
 
-  handleFileChange() {
-    var data = new FormData();
-    data.append('file', this.refs.fileUpload.files[0])
-    this.props.upload(data)
-  }
-
-  openFileDialog() {
-    this.refs.fileUpload.click()
+  handleImageSelection(file) {
+    let data = {"exercise_image": file.get('file_id')}
+    this.props.updateExercise(this.props.id, data)
+    this.handleCloseGallery()
   }
 
   render() {
@@ -108,10 +111,10 @@ class Index extends Component {
         exercise_subtitle: this.props.exercise.get('exercise_subtitle'),
         exercise_description: this.props.exercise.get('exercise_description'),
         exercise_start_date: moment(this.props.exercise.get('exercise_start_date')).format('YYYY-MM-DD HH:mm:ss'),
-        exercise_end_date: moment(this.props.exercise.get('exercise_end_date')).format('YYYY-MM-DD HH:mm:ss')
+        exercise_end_date: moment(this.props.exercise.get('exercise_end_date')).format('YYYY-MM-DD HH:mm:ss'),
       }
       initialStatus = {
-        exercise_status: this.props.exercise.get('exercise_status').get('status_id')
+        exercise_status: this.props.exercise.get('exercise_status')
       }
       image = this.props.exercise.get('exercise_image').get('file_url')
     }
@@ -151,7 +154,7 @@ class Index extends Component {
           <div style={styles.PaperContent}>
             <h2>Image</h2>
             <br />
-            <img src={image} alt="Exercise logo"/>
+            <img src={image} alt="Exercise logo" style={styles.image} />
             <br /><br />
             <Button
               label='Change the image'
@@ -162,7 +165,7 @@ class Index extends Component {
               open={this.state.openGallery}
               onRequestClose={this.handleCloseGallery.bind(this)}
             >
-              <FileGallery />
+              <FileGallery imageSelector={this.handleImageSelection.bind(this)} />
             </Dialog>
           </div>
         </Paper>
@@ -196,17 +199,16 @@ Index.propTypes = {
   params: PropTypes.object,
   updateExercise: PropTypes.func,
   deleteExercise: PropTypes.func,
-  upload: PropTypes.func
+  fetchExerciseStatuses: PropTypes.func
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   return {
-    loading: state.application.getIn(['ui', 'loading']),
     id: exerciseId,
     exercise: state.application.getIn(['entities', 'exercises', exerciseId]),
     exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
   }
 }
 
-export default connect(select, {updateExercise, deleteExercise, upload})(Index)
+export default connect(select, {updateExercise, deleteExercise, fetchExerciseStatuses})(Index)

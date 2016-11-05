@@ -85,12 +85,14 @@ export const FloatingActionsButtonCreate = (props) => (
 
 FloatingActionsButtonCreate.propTypes = {
   disabled: PropTypes.bool,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  children: PropTypes.node
 }
 
 export const IconButton = (props) => (
   <MUIIconButton
     disabled={props.disabled}
+    onClick={props.onClick}
   >
     {props.children}
   </MUIIconButton>
@@ -98,5 +100,6 @@ export const IconButton = (props) => (
 
 IconButton.propTypes = {
   disabled: PropTypes.bool,
-  children: PropTypes.node
+  children: PropTypes.node,
+  onClick: PropTypes.func
 }

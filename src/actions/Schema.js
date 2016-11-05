@@ -24,3 +24,7 @@ export const arrayOfExercises = arrayOf(exercise)
 token.define({
   token_user: user
 })
+
+exercise.define({
+  exercise_status: exerciseStatus
+})

@@ -14,14 +14,8 @@ class Index extends Component {
   }
 
   render() {
-    let loading;
-    if (this.props.loading) {
-      loading = <CircularSpinner />
-    }
-
     return (
       <div>
-        { loading }
         <Table selectable={true} multiSelectable={true}>
           <TableHeader>
             <TableRow>
@@ -52,7 +46,6 @@ class Index extends Component {
 }
 
 Index.propTypes = {
-  loading: PropTypes.bool.isRequired,
   users: PropTypes.object,
   fetchUsers: PropTypes.func.isRequired
 }
@@ -68,7 +61,6 @@ const cleanedUsers = createImmutableSelector(usersSelector, users => users)
 const select = (state) => {
   return {
     users: cleanedUsers(state),
-    loading: state.audience.get('loading') //Don't need a selector. Each change will trigger a refresh
   }
 }
 

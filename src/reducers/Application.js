@@ -78,6 +78,7 @@ export const application = (state = Map(), action) => {
     case Constants.APPLICATION_FETCH_EXERCISES_SUCCESS: {
       return state.withMutations(function (state) {
         state.setIn(['entities', 'exercises'], mergeExercises())
+        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -93,6 +94,7 @@ export const application = (state = Map(), action) => {
     case Constants.APPLICATION_FETCH_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
         state.setIn(['entities', 'exercises'], mergeExercises())
+        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -106,6 +108,10 @@ export const application = (state = Map(), action) => {
         state.setIn(['entities', 'exercises'], mergeExercises())
         state.setIn(['ui', 'loading'], false)
       })
+    }
+
+    case Constants.APPLICATION_UPDATE_EXERCISE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
     }
 
     case Constants.APPLICATION_UPDATE_EXERCISE_SUCCESS: {
@@ -127,6 +133,17 @@ export const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.setIn(['entities', 'files'], mergeFiles())
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_ADD_FILE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_FILE_SUCCESS: {
       return state.withMutations(function (state) {
         state.setIn(['entities', 'files'], mergeFiles())
         state.setIn(['ui', 'loading'], false)

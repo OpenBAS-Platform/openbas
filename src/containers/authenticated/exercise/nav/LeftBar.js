@@ -1,10 +1,10 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {PropTypes, Component} from 'react'
+import {connect} from 'react-redux'
 import * as Constants from '../../../../constants/ComponentTypes'
-import {Drawer} from '../../../../components/Drawer';
-import {List} from '../../../../components/List';
+import {Drawer} from '../../../../components/Drawer'
+import {List} from '../../../../components/List'
 import {ListItemLink} from '../../../../components/list/ListItem';
-import {AppBar} from '../../../../components/AppBar';
+import {AppBar} from '../../../../components/AppBar'
 import {Icon} from '../../../../components/Icon'
 import {redirectToHome, toggleLeftBar} from '../../../../actions/Application'
 import {i18nRegister} from '../../../../utils/Messages'
