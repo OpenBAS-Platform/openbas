@@ -8,6 +8,10 @@ APIBundle\Entity\User:
             groups: ['user', 'token']
         user_email:
             groups: ['user', 'token']
+        user_phone:
+            groups: ['user', 'token']
+        user_organization:
+            groups: ['user', 'token']
         user_gravatar:
             groups: ['user', 'token']
         user_admin:
