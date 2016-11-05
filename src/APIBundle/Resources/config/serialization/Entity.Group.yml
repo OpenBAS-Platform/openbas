@@ -7,6 +7,6 @@ APIBundle\Entity\Group:
         group_users:
             groups: ['group', 'grant']
         group_grants:
-            groups: ['group', 'user']
+            groups: ['group']
         group_grant_in_exercise:
-            groups: ['group', 'user']
+            groups: ['group']

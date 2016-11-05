@@ -49,7 +49,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="Organization", inversedBy="organization_users")
-     * @ORM\JoinColumn(name="user_organization", referencedColumnName="organization_id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="user_organization", referencedColumnName="organization_id", onDelete="RESTRICT")
      * @var Organization
      */
     protected $user_organization;
@@ -135,7 +135,7 @@ class User implements UserInterface
 
     public function getUserPhone()
     {
-        return $this->user_email;
+        return $this->user_phone;
     }
 
     public function setUserPhone($phone)
@@ -163,6 +163,17 @@ class User implements UserInterface
     public function setUserPlainPassword($password)
     {
         $this->user_plain_password = $password;
+        return $this;
+    }
+
+    public function getUserOrganization()
+    {
+        return $this->user_organization;
+    }
+
+    public function setUserOrganization($organization)
+    {
+        $this->user_organization = $organization;
         return $this;
     }
 

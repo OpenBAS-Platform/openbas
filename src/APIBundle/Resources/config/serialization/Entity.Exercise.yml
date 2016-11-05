@@ -3,7 +3,7 @@ APIBundle\Entity\Exercise:
         exercise_id:
             groups: ['exercise', 'audience']
         exercise_name:
-            groups: ['exercise', 'audience']
+            groups: ['exercise']
         exercise_subtitle:
             groups: ['exercise']
         exercise_description:

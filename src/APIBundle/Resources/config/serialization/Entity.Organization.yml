@@ -1,10 +1,10 @@
 APIBundle\Entity\Organization:
     attributes:
         organization_id:
-            groups: ['organization']
+            groups: ['organization', 'user']
         organization_name:
-            groups: ['organization']
+            groups: ['organization', 'user']
         organization_descrption:
-            groups: ['organization']
+            groups: ['organization', 'user']
         organization_users:
             groups: ['organization']
