@@ -15,8 +15,15 @@ const styles = {
 }
 
 const buttonStyle = {
-  [ Constants.BUTTON_TYPE_STICKLEFT ]: {
-    marginLeft: '-5px'
+  [ Constants.BUTTON_TYPE_FLOATING ]: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30
+  },
+  [ Constants.BUTTON_TYPE_FLOATING_PADDING ]: {
+    position: 'fixed',
+    bottom: 30,
+    right: 330
   }
 }
 
@@ -76,18 +83,12 @@ LinkButtonIntl.propTypes = {
   label: PropTypes.string.isRequired
 }
 
-const styleFloatingActionsButtonCreate = {
-  position: 'fixed',
-  bottom: 30,
-  right: 30
-}
-
 export const FloatingActionsButtonCreate = (props) => (
   <MUIFloatingActionButton
     secondary={true}
     disabled={props.disabled}
     onClick={props.onClick}
-    style={styleFloatingActionsButtonCreate}>
+    style={buttonStyle[props.type]}>
     <ContentAdd />
   </MUIFloatingActionButton>
 )
@@ -95,13 +96,8 @@ export const FloatingActionsButtonCreate = (props) => (
 FloatingActionsButtonCreate.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func,
-  children: PropTypes.node
-}
-
-const styleActionButtonCreate = {
-  position: 'fixed',
-  top: 12,
-  right: 15
+  children: PropTypes.node,
+  type: PropTypes.string
 }
 
 export const ActionButtonCreate = (props) => (
@@ -111,7 +107,7 @@ export const ActionButtonCreate = (props) => (
     onClick={props.onClick}
     backgroundColor="#9FA8DA"
     zDepth={0}
-    style={styleActionButtonCreate}>
+    style={buttonStyle[props.type]}>
     <ContentAdd />
   </MUIFloatingActionButton>
 )
@@ -119,7 +115,8 @@ export const ActionButtonCreate = (props) => (
 ActionButtonCreate.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func,
-  children: PropTypes.node
+  children: PropTypes.node,
+  type: PropTypes.string
 }
 
 export const IconButton = (props) => (

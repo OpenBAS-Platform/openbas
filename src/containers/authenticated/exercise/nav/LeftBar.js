@@ -33,8 +33,8 @@ class LeftBar extends Component {
         <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_LEFTBAR} onTitleTouchTap={this.redirectToHome.bind(this)}
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/world'}
-                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/world'}
+          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id}
+                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id}
                         label="World"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
           <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/objectives'}

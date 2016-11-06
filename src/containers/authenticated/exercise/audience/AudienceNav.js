@@ -9,16 +9,11 @@ import {Drawer} from '../../../../components/Drawer'
 import {List} from '../../../../components/List'
 import {ListItemLink} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
-
 import CreateAudience from './CreateAudience'
 
 class AudienceNav extends Component {
   componentDidMount() {
-    this.props.fetchAudiences(this.props.id);
-  }
-
-  handleOpenCreate() {
-    this.refs.createAudience.handleOpen()
+    this.props.fetchAudiences(this.props.exerciseId);
   }
 
   handleChangeAudience(audienceId) {
@@ -28,7 +23,7 @@ class AudienceNav extends Component {
   render() {
     return (
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
-        <CreateAudience id={this.props.id}/>
+        <CreateAudience exerciseId={this.props.exerciseId}/>
         <List>
           {this.props.audiences.toList().map(audience => {
             return (
@@ -48,17 +43,16 @@ class AudienceNav extends Component {
 }
 
 AudienceNav.propTypes = {
-  id: PropTypes.string,
+  exerciseId: PropTypes.string,
   currentAudience: PropTypes.string,
   audiences: PropTypes.object,
   fetchAudiences: PropTypes.func,
   selectAudience: PropTypes.func
 }
 
-//Users selector extract only the fields use to render the Home Page.
 const audiencesSelector = (state, props) => {
   const audiences = state.application.getIn(['entities', 'audiences']).toJS()
-  var filterByExercise = n => n.audience_exercise === props.id
+  var filterByExercise = n => n.audience_exercise === props.exerciseId
   var filteredAudiences = R.filter(filterByExercise, audiences)
   return fromJS(filteredAudiences)
 }

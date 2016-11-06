@@ -7,7 +7,10 @@ export const DialogIntl = (props) => (
     title={props.title ? props.intl.formatMessage({id: props.title}) : undefined}
     modal={props.modal}
     open={props.open}
+    contentStyle={props.contentStyle}
+    style={props.style}
     onRequestClose={props.onRequestClose}
+    autoScrollBodyContent={props.autoScrollBodyContent}
     actions={props.actions}
   >
     {props.children}
@@ -21,6 +24,9 @@ DialogIntl.propTypes = {
   open: PropTypes.bool,
   onRequestClose: PropTypes.func,
   intl: PropTypes.object,
+  autoScrollBodyContent: PropTypes.bool,
   actions: PropTypes.node,
-  children: PropTypes.node
+  children: PropTypes.node,
+  contentStyle: PropTypes.object,
+  style: PropTypes.object
 }

@@ -63,7 +63,7 @@ class FileGallery extends Component {
             )
           })}
         </GridList>
-        <FloatingActionsButtonCreate onClick={this.openFileDialog.bind(this)}/>
+        <FloatingActionsButtonCreate onClick={this.openFileDialog.bind(this)} type={Constants.BUTTON_TYPE_FLOATING} />
         <input type="file" ref="fileUpload" style={{"display" : "none"}}  onChange={this.handleFileChange.bind(this)} />
       </div>
     );

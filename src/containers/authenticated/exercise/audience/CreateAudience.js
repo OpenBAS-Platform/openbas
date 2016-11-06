@@ -10,24 +10,24 @@ import {AppBar} from '../../../../components/AppBar'
 class CreateAudience extends Component {
   constructor(props) {
     super(props);
-    this.state = {open: false}
+    this.state = {openCreate: false}
   }
 
-  handleOpen() {
-    this.setState({open: true})
+  handleOpenCreate() {
+    this.setState({openCreate: true})
   }
 
-  handleClose() {
-    this.setState({open: false})
+  handleCloseCreate() {
+    this.setState({openCreate: false})
   }
 
-  onSubmit(data) {
-    this.props.addAudience(this.props.id, data)
+  onSubmitCreate(data) {
+    this.props.addAudience(this.props.exerciseId, data)
   }
 
-  submitForm() {
+  submitFormCreate() {
     this.refs.audienceForm.submit()
-    this.handleClose()
+    this.handleCloseCreate()
   }
 
   render() {
@@ -35,12 +35,12 @@ class CreateAudience extends Component {
       <FlatButton
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleClose.bind(this)}
+        onTouchTap={this.handleCloseCreate.bind(this)}
       />,
       <FlatButton
         label="Create"
         primary={true}
-        onTouchTap={this.submitForm.bind(this)}
+        onTouchTap={this.submitFormCreate.bind(this)}
       />,
     ];
 
@@ -49,15 +49,15 @@ class CreateAudience extends Component {
         <AppBar
           title="Audiences"
           showMenuIconButton={false}
-          iconElementRight={<ActionButtonCreate onClick={this.handleOpen.bind(this)} />}/>
+          iconElementRight={<ActionButtonCreate onClick={this.handleOpenCreate.bind(this)} />}/>
         <Dialog
           title="Create a new audience"
           modal={false}
-          open={this.state.open}
-          onRequestClose={this.handleClose.bind(this)}
+          open={this.state.openCreate}
+          onRequestClose={this.handleCloseCreate.bind(this)}
           actions={actions}
         >
-          <AudienceForm ref="audienceForm" onSubmit={this.onSubmit.bind(this)} />
+          <AudienceForm ref="audienceForm" onSubmit={this.onSubmitCreate.bind(this)} />
         </Dialog>
       </div>
     );
@@ -65,7 +65,7 @@ class CreateAudience extends Component {
 }
 
 CreateAudience.propTypes = {
-  id: PropTypes.string,
+  exerciseId: PropTypes.string,
   addAudience: PropTypes.func
 }
 
