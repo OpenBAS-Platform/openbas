@@ -20,6 +20,12 @@ class AudienceNav extends Component {
     this.props.selectAudience(audienceId)
   }
 
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.audiences.count() > 0 && nextProps.currentAudience === undefined) {
+      this.props.selectAudience(nextProps.audiences.keySeq().first())
+    }
+  }
+
   render() {
     return (
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>

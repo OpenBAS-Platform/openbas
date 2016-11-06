@@ -71,7 +71,7 @@ class AddUsers extends Component {
 
   addUser(user) {
     this.setState({users: this.state.users.set(user.get('user_id'), user)})
-    if( this.state.users_ids.keyOf(user.get('user_id')) === undefined ) {
+    if (this.state.users_ids.keyOf(user.get('user_id')) === undefined) {
       this.setState({users_ids: this.state.users_ids.push(user.get('user_id'))})
     }
   }
@@ -146,8 +146,8 @@ class AddUsers extends Component {
             <List>
               {this.props.users.toList().map(user => {
                 let disabled = false
-                console.log("this.props.audienceUsersIds", this.props.audienceUsersIds)
-                if( this.state.users_ids.keyOf(user.get('user_id')) !== undefined || this.props.audienceUsersIds.keyOf(user.get('user_id')) !== undefined ) {
+                if (this.state.users_ids.keyOf(user.get('user_id')) !== undefined
+                  || this.props.audienceUsersIds.keyOf(user.get('user_id')) !== undefined) {
                   disabled = true
                 }
                 return (

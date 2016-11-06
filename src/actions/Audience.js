@@ -4,21 +4,13 @@ import {api} from '../App';
 import * as schema from './Schema'
 import {Map} from 'immutable'
 
-export const fetchAudiences = (exerciseId) => (dispatch, getState) => {
+export const fetchAudiences = (exerciseId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_AUDIENCES_SUBMITTED});
   return api(schema.arrayOfAudiences).get('/api/exercises/' + exerciseId + '/audiences').then(function (response) {
     dispatch({
       type: Constants.APPLICATION_FETCH_AUDIENCES_SUCCESS,
       payload: response.data
     })
-    let currentAudience = getState().application.getIn(['ui', 'states', 'current_audience']);
-    let result = response.data.get('result')
-    if (currentAudience === undefined && result.count() > 0) {
-      dispatch({
-        type: Constants.APPLICATION_SELECT_AUDIENCE,
-        payload: result.first()
-      })
-    }
   }).catch(function (response) {
     dispatch({
       type: Constants.APPLICATION_FETCH_AUDIENCES_ERROR,
