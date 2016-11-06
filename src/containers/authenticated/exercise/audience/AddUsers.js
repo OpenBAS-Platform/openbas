@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Map, fromJS} from 'immutable'
+import {Map, fromJS, List as iList} from 'immutable'
 import createImmutableSelector from '../../../../utils/ImmutableSelect'
 import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -41,6 +41,7 @@ class AddUsers extends Component {
       openAddUsers: false,
       openCreateUser: false,
       users: Map(),
+      users_ids: iList(),
     }
   }
 
@@ -70,20 +71,32 @@ class AddUsers extends Component {
 
   addUser(user) {
     this.setState({users: this.state.users.set(user.get('user_id'), user)})
+    if( this.state.users_ids.keyOf(user.get('user_id')) === undefined ) {
+      this.setState({users_ids: this.state.users_ids.push(user.get('user_id'))})
+    }
   }
 
   removeUser(user) {
-    this.setState({users: this.state.users.delete(user.get('user_id'))})
+    this.setState({
+      users: this.state.users.delete(user.get('user_id')),
+      users_ids: this.state.users_ids.delete(this.state.users_ids.keyOf(user.get('user_id')))
+    })
   }
 
   createUser() {
   }
 
   submitAddUsers() {
+    let userList = this.props.audienceUsersIds.concat(this.state.users_ids)
     let data = Map({
-      audience_users: this.state.users
+      audience_users: userList
     })
     this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
+    this.setState({
+      users: Map(),
+      users_ids: iList(),
+    })
+    this.handleCloseAddUsers()
   }
 
   render() {
@@ -133,6 +146,10 @@ class AddUsers extends Component {
             <List>
               {this.props.users.toList().map(user => {
                 let disabled = false
+                console.log("this.props.audienceUsersIds", this.props.audienceUsersIds)
+                if( this.state.users_ids.keyOf(user.get('user_id')) !== undefined || this.props.audienceUsersIds.keyOf(user.get('user_id')) !== undefined ) {
+                  disabled = true
+                }
                 return (
                   <AvatarListItemLink
                     key={user.get('user_id')}
@@ -146,7 +163,7 @@ class AddUsers extends Component {
               <AvatarListItemLink
                 key="create"
                 onClick={this.createUser.bind(this)}
-                label={<i>Create a new user</i>}
+                label="Create a new user"
                 leftAvatar={<Avatar type={Constants.AVATAR_TYPE_LIST}
                                     src="https://www.gravatar.com/avatar/00000000?d=mm&f=y"/>}
               />
@@ -165,7 +182,6 @@ const usersSelector = (state, props) => {
   var filteredUsers = R.filter(filterByKeyword, users)
   return fromJS(filteredUsers)
 }
-
 const filteredUsers = createImmutableSelector(usersSelector, users => users)
 
 AddUsers.propTypes = {
@@ -174,7 +190,8 @@ AddUsers.propTypes = {
   fetchUsers: PropTypes.func,
   searchUsers: PropTypes.func,
   updateAudience: PropTypes.func,
-  users: PropTypes.object
+  users: PropTypes.object,
+  audienceUsersIds: PropTypes.object
 }
 
 const select = (state, props) => {

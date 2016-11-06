@@ -1,9 +1,11 @@
 import React, {Component, PropTypes} from 'react'
-import {Map} from 'immutable'
+import {Map, List} from 'immutable'
 import {connect} from 'react-redux'
+import R from 'ramda'
 import {fetchUsers} from '../../../../actions/User'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import {Avatar} from '../../../../components/Avatar';
+import {Toolbar} from '../../../../components/Toolbar';
 import AudienceNav from './AudienceNav';
 import AudiencePopover from './AudiencePopover';
 import AddUsers from './AddUsers';
@@ -31,8 +33,35 @@ const styles = {
 }
 
 class Index extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedUsers: [],
+    }
+    this.selectedUsers = []
+  }
+
   componentDidMount() {
     this.props.fetchUsers();
+  }
+
+  handleRowSelection(rowList) {
+    console.log(rowList)
+    if( rowList === 'all' ) {
+      this.selectedUsers = this.props.audience_users_ids.toJS()
+    } else if( rowList === 'none') {
+      this.selectedUsers = []
+    } else {
+      this.selectedUsers = R.map(index => this.props.audience_users_ids.get(index), rowList)
+    }
+
+    if( this.selectedUsers.length > 0 ) {
+
+    }
+  }
+
+  handleDeletion() {
+
   }
 
   render() {
@@ -52,7 +81,7 @@ class Index extends Component {
         <AudiencePopover exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}/>
         <div style={styles.number}>{this.props.audience_users.count()} users</div>
         <div className="clearfix"></div>
-        <Table selectable={true} multiSelectable={true}>
+        <Table selectable={true} multiSelectable={true} onRowSelection={this.handleRowSelection.bind(this)}>
           <TableHeader>
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
@@ -61,11 +90,11 @@ class Index extends Component {
               <TableHeaderColumn>Avatar</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody showRowHover={true}>
+          <TableBody deselectOnClickaway={false} showRowHover={true} stripedRows={true}>
             {this.props.audience_users.toList().map(userId => {
               let user = this.props.users.get(userId)
               return (
-                <TableRow hover={true} hoverable={true} key={user.get('user_id')}>
+                <TableRow hoverable={true} key={user.get('user_id')}>
                   <TableRowColumn>{user.get('user_firstname')} {user.get('user_lastname')}</TableRowColumn>
                   <TableRowColumn>{user.get('user_email')}</TableRowColumn>
                   <TableRowColumn>ANSSI</TableRowColumn>
@@ -77,7 +106,8 @@ class Index extends Component {
             })}
           </TableBody>
         </Table>
-        <AddUsers exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')} />
+        <AddUsers exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}
+                  audienceUsersIds={this.props.audience_users_ids}/>
       </div>
     );
   }
@@ -88,6 +118,7 @@ Index.propTypes = {
   users: PropTypes.object,
   audience: PropTypes.object,
   audience_users: PropTypes.object,
+  audience_users_ids: PropTypes.object,
   fetchUsers: PropTypes.func,
 }
 
@@ -97,12 +128,14 @@ const select = (state, ownProps) => {
   let currentAudience = state.application.getIn(['ui', 'states', 'current_audience'])
   let audience = currentAudience ? audiences.get(currentAudience) : Map()
   let audienceUsers = currentAudience ? audiences.get(currentAudience).get('audience_users') : Map()
+  let audienceUsersIds = audienceUsers.toList()
 
   return {
     exerciseId,
     audience,
     users: state.application.getIn(['entities', 'users']),
-    audience_users: audienceUsers
+    audience_users: audienceUsers,
+    audience_users_ids: audienceUsersIds
   }
 }
 
