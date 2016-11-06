@@ -5,11 +5,11 @@ import {mergeStore} from '../utils/Store'
 const identity = (state = Map(), action) => {
 
   switch (action.type) {
-    case Constants.APPLICATION_LOGIN_SUBMITTED: {
+    case Constants.IDENTITY_LOGIN_SUBMITTED: {
       return state;
     }
 
-    case Constants.APPLICATION_LOGIN_SUCCESS: {
+    case Constants.IDENTITY_LOGIN_SUCCESS: {
       var result = action.payload.get('result').toString();
       var token = action.payload.getIn(['entities', 'tokens', result]);
       return state.withMutations(function (state) {
@@ -24,7 +24,7 @@ const identity = (state = Map(), action) => {
       return state.set('token', null);
     }
 
-    case Constants.APPLICATION_LOGOUT_SUCCESS: {
+    case Constants.IDENTITY_LOGOUT_SUCCESS: {
       return state.set('token', null);
     }
 

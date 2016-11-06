@@ -5,12 +5,12 @@ import { SubmissionError } from 'redux-form'
 import { push } from 'react-router-redux'
 
 export const askToken = (username, password) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_LOGIN_SUBMITTED});
+  dispatch({type: Constants.IDENTITY_LOGIN_SUBMITTED});
   var data = {login: username, password: password};
   return api(schema.token).post('/api/tokens', data).then(function (response) {
     localStorage.setItem('token', JSON.stringify(response.data.toJS()))
     dispatch({
-      type: Constants.APPLICATION_LOGIN_SUCCESS,
+      type: Constants.IDENTITY_LOGIN_SUCCESS,
       payload: response.data
     });
   }).catch(function () {
@@ -22,14 +22,14 @@ export const askToken = (username, password) => (dispatch) => {
 
 export const logout = () => (dispatch, getState) => {
   let token_id = getState().identity.get('token');
-  dispatch({type: Constants.APPLICATION_LOGOUT_SUBMITTED});
+  dispatch({type: Constants.IDENTITY_LOGOUT_SUBMITTED});
   return api().delete('/api/tokens/' + token_id).then(function () {
     //Set the localStorage token and dispatch LOGIN SUCCESS
     localStorage.removeItem('token');
-    dispatch({type: Constants.APPLICATION_LOGOUT_SUCCESS});
+    dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS});
   }).catch(function (response) {
     dispatch({
-      type: Constants.APPLICATION_LOGOUT_ERROR,
+      type: Constants.IDENTITY_LOGOUT_ERROR,
       payload: response.data
     });
   })

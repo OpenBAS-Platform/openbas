@@ -99,7 +99,7 @@ export const api = (schema) => {
     let res = err.response;
     if (res.status === 401) {//User is not logged anymore
       localStorage.removeItem('token');
-      store.dispatch({type: Constants.APPLICATION_LOGOUT_SUCCESS});
+      store.dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS});
       return Promise.reject(err);
     } else if (res.status === 503 && err.config && !err.config.__isRetryRequest) {
       err.config.__isRetryRequest = true;
