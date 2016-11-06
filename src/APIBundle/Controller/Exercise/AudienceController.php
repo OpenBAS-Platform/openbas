@@ -104,6 +104,75 @@ class AudienceController extends Controller
         }
     }
 
+    /**
+     * @ApiDoc(
+     *    description="Delete an audience"
+     * )
+     *
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"audience"})
+     * @Rest\Delete("/exercises/{exercise_id}/audiences/{audience_id}")
+     */
+    public function removeExercisesAudienceAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        $this->denyAccessUnlessGranted('update', $exercise);
+
+        $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
+        /* @var $audience Audience */
+
+        if ($audience) {
+            $em->remove($audience);
+            $em->flush();
+        }
+    }
+
+    /**
+     * @ApiDoc(
+     *    description="Update an audience",
+     *   input={"class"=AudienceType::class, "name"=""}
+     * )
+     *
+     * @Rest\View(serializerGroups={"audience"})
+     * @Rest\Put("/exercises/{exercise_id}/audiences/{audience_id}")
+     */
+    public function updateExercisesAudienceAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        $this->denyAccessUnlessGranted('update', $exercise);
+
+        $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
+        /* @var $audience Audience */
+
+        if (empty($audience)) {
+            return $this->audienceNotFound();
+        }
+
+        $form = $this->createForm(AudienceType::class, $audience);
+        $form->submit($request->request->all(), false);
+        if ($form->isValid()) {
+            $em->persist($audience);
+            $em->flush();
+
+            return $audience;
+        } else {
+            return $form;
+        }
+    }
+
     private function exerciseNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);

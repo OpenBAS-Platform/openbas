@@ -188,6 +188,17 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getUserAudiences()
+    {
+        return $this->user_audiences;
+    }
+
+    public function setUserAudiences($audiences)
+    {
+        $this->user_audiences = $audiences;
+        return $this;
+    }
+
     public function getUserAdmin()
     {
         return $this->user_admin;

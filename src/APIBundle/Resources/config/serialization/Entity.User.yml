@@ -18,3 +18,5 @@ APIBundle\Entity\User:
             groups: ['user', 'token']
         user_groups:
             groups: ['user']
+        user_audiences:
+            groups: ['user']
