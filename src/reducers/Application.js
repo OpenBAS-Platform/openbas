@@ -1,61 +1,9 @@
-import * as Constants from '../constants/ActionTypes';
-import {Map, fromJS} from 'immutable';
+import * as Constants from '../constants/ActionTypes'
+import {Map, fromJS} from 'immutable'
+import {mergeStore} from '../utils/Store'
 import R from 'ramda'
 
 const application = (state = Map(), action) => {
-  function mergeFiles() {
-    const files = state.getIn(['entities', 'files']) || Map()
-    const mergedFiles = files.mergeDeep(action.payload.getIn(['entities', 'files']))
-    return mergedFiles;
-  }
-
-  function mergeExerciseStatuses() {
-    const exercise_statuses = state.getIn(['entities', 'exercise_statuses']) || Map()
-    const mergedExerciseStatuses = exercise_statuses.mergeDeep(action.payload.getIn(['entities', 'exercise_statuses']))
-    return mergedExerciseStatuses;
-  }
-
-  function mergeUsers() {
-    const users = state.getIn(['entities', 'users']) || Map()
-    const mergedUsers = users.mergeDeep(action.payload.getIn(['entities', 'users']))
-    return mergedUsers;
-  }
-
-  function mergeTokens() {
-    const tokens = state.getIn(['entities', 'tokens']) || Map()
-    const mergedTokens = tokens.mergeDeep(action.payload.getIn(['entities', 'tokens']))
-    return mergedTokens;
-  }
-
-  function mergeExercises() {
-    const exercises = state.getIn(['entities', 'exercises']) || Map()
-    const mergedExercises = exercises.mergeDeep(action.payload.getIn(['entities', 'exercises']))
-    return mergedExercises;
-  }
-
-  function mergeAudiences() {
-    const audiences = state.getIn(['entities', 'audiences']) || Map()
-    const mergedAudiences = audiences.mergeDeep(action.payload.getIn(['entities', 'audiences']))
-    return mergedAudiences;
-  }
-
-  function mergeEvents() {
-    const events = state.getIn(['entities', 'events']) || Map()
-    const mergedEvents = events.mergeDeep(action.payload.getIn(['entities', 'events']))
-    return mergedEvents;
-  }
-
-  function mergeIncidents() {
-    const incidents = state.getIn(['entities', 'incidents']) || Map()
-    const mergedIncidents = incidents.mergeDeep(action.payload.getIn(['entities', 'incidents']))
-    return mergedIncidents;
-  }
-
-  function mergeInjects() {
-    const injects = state.getIn(['entities', 'injects']) || Map()
-    const mergedInjects = injects.mergeDeep(action.payload.getIn(['entities', 'injects']))
-    return mergedInjects;
-  }
 
   function getExerciseAudiences(exerciseId, audienceId) {
     const audiences = state.getIn(['entities', 'audiences']).toJS()
@@ -68,14 +16,14 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
+        mergeStore(state, action, ['entities', 'exercise_statuses'])
         state.setIn(['ui', 'loading'], false)
       })
     }
 
     case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'files'], mergeFiles())
+        mergeStore(state, action, ['entities', 'files'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -86,7 +34,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_ADD_FILE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'files'], mergeFiles())
+        mergeStore(state, action, ['entities', 'files'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -97,7 +45,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_USERS_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'users'], mergeUsers())
+        mergeStore(state,action, ['entities', 'users'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -116,8 +64,8 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_EXERCISES_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercises'], mergeExercises())
-        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
+        mergeStore(state, action, ['entities', 'exercises'])
+        mergeStore(state, action, ['entities', 'exercise_statuses'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -132,8 +80,8 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercises'], mergeExercises())
-        state.setIn(['entities', 'exercise_statuses'], mergeExerciseStatuses())
+        mergeStore(state, action, ['entities', 'exercises'])
+        mergeStore(state, action, ['entities', 'exercise_statuses'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -148,8 +96,8 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_ADD_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercises'], mergeExercises())
-        state.setIn(['ui', 'loading'], false)
+        mergeStore(state, action, ['entities', 'exercises'])
+        mergeStore(state, action, ['ui', 'loading'])
       })
     }
 
@@ -163,7 +111,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_UPDATE_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'exercises'], mergeExercises())
+        mergeStore(state, action, ['entities', 'exercises'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -182,7 +130,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_AUDIENCES_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'audiences'], mergeAudiences())
+        mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -197,7 +145,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_AUDIENCE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'audiences'], mergeAudiences())
+        mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -212,7 +160,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_ADD_AUDIENCE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'audiences'], mergeAudiences())
+        mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
         state.setIn(['ui', 'states', 'current_audience'], action.payload.get('result'))
       })
@@ -228,7 +176,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS: {
       return state.withMutations(function (state) {
-        state.setIn(['entities', 'audiences'], mergeAudiences())
+        mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
       })
     }

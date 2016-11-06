@@ -1,10 +1,6 @@
-import * as Constants from '../constants/ActionTypes';
-import {Map} from 'immutable';
-
-function mergeStore(state, action, path) {
-  const elements = state.getIn(path) || Map()
-  return state.setIn(path, elements.mergeDeep(action.payload.getIn(path)))
-}
+import * as Constants from '../constants/ActionTypes'
+import {Map} from 'immutable'
+import {mergeStore} from '../utils/Store'
 
 const identity = (state = Map(), action) => {
 
