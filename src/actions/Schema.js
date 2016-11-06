@@ -15,6 +15,9 @@ export const arrayOfInjectStates = arrayOf(injectState)
 export const token = new Schema('tokens', {idAttribute: 'token_id'})
 export const arrayOfTokens = arrayOf(token)
 
+export const organization = new Schema('organizations', {idAttribute: 'organization_id'})
+export const arrayOfOrganizations = arrayOf(organization)
+
 export const user = new Schema('users', {idAttribute: 'user_id'})
 export const arrayOfUsers = arrayOf(user)
 
@@ -26,6 +29,10 @@ export const arrayOfAudiences = arrayOf(audience)
 
 token.define({
   token_user: user
+})
+
+user.define({
+  user_organization: organization
 })
 
 exercise.define({

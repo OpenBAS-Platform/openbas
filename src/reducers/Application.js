@@ -128,6 +128,10 @@ export const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], false)
     }
 
+    case Constants.APPLICATION_SEARCH_USERS_SUBMITTED: {
+      return state.setIn(['ui', 'states', 'current_search_keyword'], action.payload)
+    }
+
     case Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
