@@ -1,8 +1,8 @@
 import * as Constants from '../constants/ActionTypes';
-import { SubmissionError } from 'redux-form'
+import {SubmissionError} from 'redux-form'
 import {api} from '../App';
 import * as schema from './Schema'
-import { push } from 'react-router-redux'
+import {push} from 'react-router-redux'
 
 export const fetchExercises = () => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED});
@@ -40,12 +40,12 @@ export const addExercise = (data) => (dispatch) => {
       payload: response.data
     });
   }).catch(function () {
+    dispatch({type: Constants.APPLICATION_ADD_EXERCISE_ERROR});
     throw new SubmissionError({_error: 'Failed to add exercise!'})
   })
 }
 
 export const updateExercise = (exerciseId, data) => (dispatch) => {
-  console.log("DATA", data)
   dispatch({type: Constants.APPLICATION_UPDATE_EXERCISE_SUBMITTED});
   return api(schema.exercise).put('/api/exercises/' + exerciseId, data).then(function (response) {
     dispatch({
@@ -53,6 +53,7 @@ export const updateExercise = (exerciseId, data) => (dispatch) => {
       payload: response.data
     });
   }).catch(function () {
+    dispatch({type: Constants.APPLICATION_UPDATE_EXERCISE_ERROR});
     throw new SubmissionError({_error: 'Failed to update exercise!'})
   })
 }
@@ -66,6 +67,7 @@ export const deleteExercise = (exerciseId) => (dispatch) => {
     });
     dispatch(push('/private'))
   }).catch(function () {
+    dispatch({type: Constants.APPLICATION_DELETE_EXERCISE_ERROR});
     throw new SubmissionError({_error: 'Failed to delete exercise!'})
   })
 }

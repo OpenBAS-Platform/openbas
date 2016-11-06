@@ -1,5 +1,6 @@
 import * as Constants from '../constants/ActionTypes';
-import {Map} from 'immutable';
+import {Map, fromJS} from 'immutable';
+import R from 'ramda'
 
 const application = (state = Map(), action) => {
   function mergeFiles() {
@@ -56,6 +57,13 @@ const application = (state = Map(), action) => {
     return mergedInjects;
   }
 
+  function getExerciseAudiences(exerciseId, audienceId) {
+    const audiences = state.getIn(['entities', 'audiences']).toJS()
+    var filter = n => n.audience_exercise === exerciseId && n.audience_id !== audienceId
+    var filteredAudiences = R.filter(filter, audiences)
+    return fromJS(filteredAudiences)
+  }
+
   switch (action.type) {
 
     case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
@@ -96,6 +104,10 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_USERS_ERROR: {
       return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_SEARCH_USERS_SUBMITTED: {
+      return state.setIn(['ui', 'states', 'current_search_keyword'], action.payload)
     }
 
     case Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED: {
@@ -202,6 +214,7 @@ const application = (state = Map(), action) => {
       return state.withMutations(function (state) {
         state.setIn(['entities', 'audiences'], mergeAudiences())
         state.setIn(['ui', 'loading'], false)
+        state.setIn(['ui', 'states', 'current_audience'], action.payload.get('result'))
       })
     }
 
@@ -224,8 +237,21 @@ const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], false)
     }
 
+    case Constants.APPLICATION_DELETE_AUDIENCE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
     case Constants.APPLICATION_DELETE_AUDIENCE_SUCCESS: {
-      return state.deleteIn(['entities', 'audiences', action.payload])
+      let audienceId = undefined
+      let audiences = getExerciseAudiences(action.payload.get('exerciseId'), action.payload.get('audienceId'))
+      if( audiences.first() !== undefined ) {
+        audienceId = audiences.first().get('audience_id')
+      }
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'audiences', action.payload.get('audienceId')])
+        state.setIn(['ui', 'states', 'current_audience'], audienceId)
+        state.setIn(['ui', 'loading'], false)
+      })
     }
 
     case Constants.APPLICATION_SELECT_AUDIENCE: {

@@ -7,6 +7,11 @@ const avatarStyle = {
     marginRight: '10px',
     marginTop: '5px',
     cursor: 'pointer'
+  },
+  [ Constants.AVATAR_TYPE_LIST ]: {
+    position: 'absolute',
+    top: '8px',
+    left: '16px'
   }
 }
 

@@ -56,7 +56,8 @@ const initialState = {
       navbar_right_open: true,
       loading: false,
       states: Map({
-        current_audience: undefined
+        current_audience: undefined,
+        current_search_keyword: ''
       })
     })
   }),

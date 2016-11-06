@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import * as Constants from '../../../constants/ComponentTypes'
 import {addExercise} from '../../../actions/Exercise'
 import {Dialog} from '../../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../components/Button';
@@ -44,7 +45,7 @@ class CreateExercise extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate onClick={this.handleOpen.bind(this)}/>
+        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpen.bind(this)}/>
         <Dialog
           title="Create a new exercise"
           modal={false}
@@ -52,7 +53,7 @@ class CreateExercise extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
-          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)} />
+          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)}/>
         </Dialog>
       </div>
     );

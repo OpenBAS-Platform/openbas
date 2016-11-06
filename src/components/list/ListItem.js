@@ -68,3 +68,23 @@ IconListItemLink.propTypes = {
   active: PropTypes.bool
 }
 
+const AvatarListItemLinkIntl = (props) => (
+  <MUIListItem
+    primaryText={props.intl.formatMessage({id: props.label})}
+    leftAvatar={props.leftAvatar}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    innerDivStyle={{padding: '20px 20px 20px 70px'}}/>
+);
+export const AvatarListItemLink = injectIntl(AvatarListItemLinkIntl)
+
+AvatarListItemLinkIntl.propTypes = {
+  label: PropTypes.string,
+  intl: PropTypes.object,
+  leftAvatar: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+}
+

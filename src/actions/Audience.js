@@ -2,6 +2,7 @@ import * as Constants from '../constants/ActionTypes';
 import {SubmissionError} from 'redux-form'
 import {api} from '../App';
 import * as schema from './Schema'
+import {Map} from 'immutable'
 
 export const fetchAudiences = (exerciseId) => (dispatch, getState) => {
   dispatch({type: Constants.APPLICATION_FETCH_AUDIENCES_SUBMITTED});
@@ -34,6 +35,7 @@ export const addAudience = (exerciseId, data) => (dispatch) => {
       payload: response.data
     })
   }).catch(function () {
+    dispatch({type: Constants.APPLICATION_ADD_AUDIENCE_ERROR});
     throw new SubmissionError({_error: 'Failed to add audience!'})
   })
 }
@@ -42,5 +44,35 @@ export const selectAudience = (audienceId) => (dispatch) => {
   dispatch({
     type: Constants.APPLICATION_SELECT_AUDIENCE,
     payload: audienceId
+  })
+}
+
+export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_UPDATE_AUDIENCE_SUBMITTED});
+  return api(schema.audience).put('/api/exercises/' + exerciseId + '/audiences/' + audienceId, data).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS,
+      payload: response.data
+    });
+  }).catch(function () {
+    dispatch({type: Constants.APPLICATION_UPDATE_AUDIENCE_ERROR});
+    throw new SubmissionError({_error: 'Failed to update audience!'})
+  })
+}
+
+export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_DELETE_AUDIENCE_SUBMITTED});
+  return api().delete('/api/exercises/' + exerciseId + '/audiences/' + audienceId).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_DELETE_AUDIENCE_SUCCESS,
+      payload: Map({
+          audienceId: audienceId,
+          exerciseId: exerciseId
+        }
+      )
+    })
+  }).catch(function () {
+    dispatch({type: Constants.APPLICATION_UPDATE_AUDIENCE_ERROR});
+    throw new SubmissionError({_error: 'Failed to delete audience!'})
   })
 }

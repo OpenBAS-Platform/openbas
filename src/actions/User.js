@@ -30,3 +30,10 @@ export const fetchUser = () => (dispatch, getState) => {
     dispatch({type: Constants.APPLICATION_FETCH_USER_ERROR});
   })
 }
+
+export const searchUsers = (keyword) => (dispatch) => {
+  dispatch({
+    type: Constants.APPLICATION_SEARCH_USERS_SUBMITTED,
+    payload: keyword
+  })
+}

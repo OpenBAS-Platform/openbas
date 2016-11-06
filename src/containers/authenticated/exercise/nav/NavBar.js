@@ -27,8 +27,8 @@ class NavBar extends Component {
       <Drawer width={65} docked={true} open={true} zindex={50}>
         <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/world'}
-                            to={'/private/exercise/' + this.props.id + '/world'}
+          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id}
+                            to={'/private/exercise/' + this.props.id}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
           <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/objectives'}

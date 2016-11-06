@@ -6,6 +6,7 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColu
 import {Avatar} from '../../../../components/Avatar';
 import AudienceNav from './AudienceNav';
 import AudiencePopover from './AudiencePopover';
+import AddUsers from './AddUsers';
 
 const styles = {
   'container': {
@@ -15,6 +16,12 @@ const styles = {
     float: 'left',
     fontSize: '18px',
     fontWeight: 600
+  },
+  'empty': {
+    marginTop: 40,
+    fontSize: '18px',
+    fontWeight: 500,
+    textAlign: 'center'
   },
   'number': {
     float: 'right',
@@ -29,10 +36,20 @@ class Index extends Component {
   }
 
   render() {
+    if (this.props.audience.get('audience_id') === undefined) {
+      return (
+        <div style={styles.container}>
+          <AudienceNav exerciseId={this.props.exerciseId}/>
+          <div style={styles.empty}>No audience selected.</div>
+        </div>
+      )
+    }
+
     return (
       <div style={styles.container}>
-        <AudienceNav id={this.props.id}/>
-        <div style={styles.title}>{this.props.audience.get('audience_name')}</div><AudiencePopover />
+        <AudienceNav exerciseId={this.props.exerciseId}/>
+        <div style={styles.title}>{this.props.audience.get('audience_name')}</div>
+        <AudiencePopover exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}/>
         <div style={styles.number}>{this.props.audience_users.count()} users</div>
         <div className="clearfix"></div>
         <Table selectable={true} multiSelectable={true}>
@@ -60,17 +77,18 @@ class Index extends Component {
             })}
           </TableBody>
         </Table>
+        <AddUsers exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')} />
       </div>
     );
   }
 }
 
 Index.propTypes = {
-  id: PropTypes.string,
+  exerciseId: PropTypes.string,
   users: PropTypes.object,
   audience: PropTypes.object,
   audience_users: PropTypes.object,
-  fetchUsers: PropTypes.func.isRequired,
+  fetchUsers: PropTypes.func,
 }
 
 const select = (state, ownProps) => {
@@ -81,9 +99,9 @@ const select = (state, ownProps) => {
   let audienceUsers = currentAudience ? audiences.get(currentAudience).get('audience_users') : Map()
 
   return {
-    id: exerciseId,
-    users: state.identity.getIn(['entities', 'users']),
+    exerciseId,
     audience,
+    users: state.application.getIn(['entities', 'users']),
     audience_users: audienceUsers
   }
 }
