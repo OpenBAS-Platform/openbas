@@ -40,11 +40,7 @@ var user = tokens ? tokens.get(token).get('token_user') : null
 const initialState = {
   application: Map({
     locale: navigator.language,
-    user: user,
-    token: token,
     entities: Map({
-      users: users,
-      tokens: tokens,
       files: Map(),
       exercise_statuses: Map(),
       inject_statuses: Map(),
@@ -62,6 +58,14 @@ const initialState = {
       states: Map({
         current_audience: undefined
       })
+    })
+  }),
+  identity: Map({
+    user: user,
+    token: token,
+    entities: Map({
+      users: users,
+      tokens: tokens
     })
   })
 };
@@ -82,7 +86,7 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 
 //Axios API
 export const api = (schema) => {
-  const app = store.getState().application;
+  const app = store.getState().identity;
   const authToken = app.getIn(['entities', 'tokens', app.get('token'), 'token_value'])
   const instance = axios.create({headers: {'X-Auth-Token': authToken}})
   //Intercept to apply schema and test unauthorized users
@@ -117,7 +121,7 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 const history = syncHistoryWithStore(baseHistory, store)
 
 //region authentication
-const authenticationToken = (state) => state.application.getIn(['entities', 'tokens', state.application.get('token')])
+const authenticationToken = (state) => state.identity.getIn(['entities', 'tokens', state.identity.get('token')])
 const UserIsAuthenticated = UserAuthWrapper({
   authSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,

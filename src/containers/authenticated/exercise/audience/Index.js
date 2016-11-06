@@ -82,7 +82,7 @@ const select = (state, ownProps) => {
 
   return {
     id: exerciseId,
-    users: state.application.getIn(['entities', 'users']),
+    users: state.identity.getIn(['entities', 'users']),
     audience,
     audience_users: audienceUsers
   }

@@ -23,7 +23,7 @@ export const askToken = (username, password) => (dispatch) => {
 }
 
 export const logout = () => (dispatch, getState) => {
-  let token_id = getState().application.get('token');
+  let token_id = getState().identity.get('token');
   dispatch({type: Constants.APPLICATION_LOGOUT_SUBMITTED});
   return api().delete('/api/tokens/' + token_id).then(function () {
     //Set the localStorage token and dispatch LOGIN SUCCESS

@@ -66,8 +66,8 @@ UserPopover.propTypes = {
 }
 
 const select = (state) => {
-  var userId = state.application.get('user')
-  const userGravatar = state.application.getIn(['entities', 'users', userId, 'user_gravatar'])
+  var userId = state.identity.get('user')
+  const userGravatar = state.identity.getIn(['entities', 'users', userId, 'user_gravatar'])
   return {
     userGravatar: userGravatar
   }
