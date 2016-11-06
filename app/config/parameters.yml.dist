@@ -20,5 +20,3 @@ parameters:
 
     hostname:          localhost
     protocol:          http
-    upload_directory:  '%kernel.root_dir%/../web/upload'
-    upload_path:       'upload'

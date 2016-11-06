@@ -55,20 +55,14 @@ class User implements UserInterface
     protected $user_organization;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Group", inversedBy="group_users")
-     * @ORM\JoinTable(name="users_groups",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="group_id", onDelete="CASCADE")}
-     *      )
+     * @ORM\ManyToMany(targetEntity="Group", mappedBy="group_users")
+     * @var Group[]
      */
     protected $user_groups;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Audience", inversedBy="audience_users")
-     * @ORM\JoinTable(name="users_audiences",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="audience_id", referencedColumnName="audience_id", onDelete="CASCADE")}
-     *      )
+     * @ORM\ManyToMany(targetEntity="Audience", mappedBy="audience_users")
+     * @var Audience[]
      */
     protected $user_audiences;
 
@@ -87,6 +81,7 @@ class User implements UserInterface
     public function __construct()
     {
         $this->user_groups = new ArrayCollection();
+        $this->user_audiences = new ArrayCollection();
     }
 
     public function getUserId()
@@ -185,6 +180,17 @@ class User implements UserInterface
     public function setUserGroups($groups)
     {
         $this->user_groups = $groups;
+        return $this;
+    }
+
+    public function getUserAudiences()
+    {
+        return $this->user_audiences;
+    }
+
+    public function setUserAudiences($audiences)
+    {
+        $this->user_audiences = $audiences;
         return $this;
     }
 

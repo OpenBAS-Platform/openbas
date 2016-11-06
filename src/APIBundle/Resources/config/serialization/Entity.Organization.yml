@@ -4,7 +4,7 @@ APIBundle\Entity\Organization:
             groups: ['organization', 'user']
         organization_name:
             groups: ['organization', 'user']
-        organization_descrption:
-            groups: ['organization', 'user']
+        organization_description:
+            groups: ['organization']
         organization_users:
             groups: ['organization']
