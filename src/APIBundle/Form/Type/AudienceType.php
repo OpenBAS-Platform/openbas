@@ -12,6 +12,7 @@ class AudienceType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('audience_name');
+        $builder->add('audience_users');
     }
 
     public function configureOptions(OptionsResolver $resolver)

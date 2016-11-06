@@ -32,7 +32,20 @@ class UserController extends Controller
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
 
         $em = $this->get('doctrine.orm.entity_manager');
-        $users = $em->getRepository('APIBundle:User')->findAll();
+
+        $users = array();
+        if( !$request->get('keyword') ) {
+            $users = $em->getRepository('APIBundle:User')->findAll();
+        } else {
+            $users = $em->getRepository('APIBundle:User')->createQueryBuilder('o')
+                ->where('o.user_firstname LIKE :keyword')
+                ->orWhere('o.user_lastname LIKE :keyword')
+                ->orWhere('o.user_email LIKE :keyword')
+                ->orWhere('o.user_phone LIKE :keyword')
+                ->setParameter('keyword', '%' . $request->get('keyword') . '%')
+                ->getQuery()
+                ->getResult();
+        }
         /* @var $users User[] */
 
         foreach( $users as &$user ) {

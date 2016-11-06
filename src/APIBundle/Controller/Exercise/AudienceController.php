@@ -166,7 +166,6 @@ class AudienceController extends Controller
         if ($form->isValid()) {
             $em->persist($audience);
             $em->flush();
-
             return $audience;
         } else {
             return $form;
