@@ -151,10 +151,12 @@ const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_ADD_AUDIENCE_SUCCESS: {
+      let audienceId = action.payload.get('result')
+      let exerciseId = action.payload.getIn(['entities', 'audiences', audienceId, 'audience_exercise'])
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
-        state.setIn(['ui', 'states', 'current_audience'], action.payload.get('result'))
+        state.setIn(['ui', 'states', 'current_audiences', exerciseId], action.payload.get('result'))
       })
     }
 
@@ -184,7 +186,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_DELETE_AUDIENCE_SUCCESS: {
       return state.withMutations(function (state) {
         state.deleteIn(['entities', 'audiences', action.payload.get('audienceId')])
-        state.setIn(['ui', 'states', 'current_audience'], undefined)
+        state.setIn(['ui', 'states', 'current_audiences', action.payload.get('exerciseId')], undefined)
         state.setIn(['ui', 'loading'], false)
       })
     }

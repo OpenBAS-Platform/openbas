@@ -28,8 +28,7 @@ class AudienceNav extends Component {
 
   componentWillReceiveProps(nextProps) {
     let audiences = filterAudiences(nextProps.audiences, nextProps.exerciseId)
-    //If current selected audience is not defined or no longer inside the filtered audiences
-    if(nextProps.currentAudience === undefined || !audiences.has(nextProps.currentAudience)) {
+    if(nextProps.currentAudience === undefined) {
       this.props.selectAudience(nextProps.exerciseId, audiences.count() > 0 ? audiences.keySeq().first() : undefined)
     }
   }
