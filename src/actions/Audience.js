@@ -32,10 +32,10 @@ export const addAudience = (exerciseId, data) => (dispatch) => {
   })
 }
 
-export const selectAudience = (audienceId) => (dispatch) => {
+export const selectAudience = (exerciseId, audienceId) => (dispatch) => {
   dispatch({
     type: Constants.APPLICATION_SELECT_AUDIENCE,
-    payload: audienceId
+    payload: {exerciseId, audienceId}
   })
 }
 

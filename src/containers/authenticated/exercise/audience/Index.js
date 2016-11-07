@@ -1,14 +1,13 @@
 import React, {Component, PropTypes} from 'react'
-import {Map, List} from 'immutable'
+import {Map} from 'immutable'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import {fetchUsers} from '../../../../actions/User'
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
-import {Avatar} from '../../../../components/Avatar';
-import {Toolbar} from '../../../../components/Toolbar';
-import AudienceNav from './AudienceNav';
-import AudiencePopover from './AudiencePopover';
-import AddUsers from './AddUsers';
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table'
+import {Avatar} from '../../../../components/Avatar'
+import AudienceNav from './AudienceNav'
+import AudiencePopover from './AudiencePopover'
+import AddUsers from './AddUsers'
 
 const styles = {
   'container': {
@@ -125,7 +124,7 @@ Index.propTypes = {
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let audiences = state.application.getIn(['entities', 'audiences'])
-  let currentAudience = state.application.getIn(['ui', 'states', 'current_audience'])
+  let currentAudience = state.application.getIn(['ui', 'states', 'current_audiences', exerciseId])
   let audience = currentAudience ? audiences.get(currentAudience) : Map()
   let audienceUsers = currentAudience ? audiences.get(currentAudience).get('audience_users') : Map()
   let audienceUsersIds = audienceUsers.toList()

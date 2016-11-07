@@ -1,7 +1,6 @@
 import * as Constants from '../constants/ActionTypes'
-import {Map, fromJS} from 'immutable'
+import {Map} from 'immutable'
 import {mergeStore} from '../utils/Store'
-import R from 'ramda'
 
 const application = (state = Map(), action) => {
 
@@ -191,7 +190,7 @@ const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_SELECT_AUDIENCE: {
-      return state.setIn(['ui', 'states', 'current_audience'], action.payload)
+      return state.setIn(['ui', 'states', 'current_audiences', action.payload.exerciseId], action.payload.audienceId)
     }
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {

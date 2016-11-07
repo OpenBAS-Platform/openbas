@@ -23,17 +23,19 @@ class AudienceNav extends Component {
   }
 
   handleChangeAudience(audienceId) {
-    this.props.selectAudience(audienceId)
+    this.props.selectAudience(this.props.exerciseId, audienceId)
   }
 
   componentWillReceiveProps(nextProps) {
     let audiences = filterAudiences(nextProps.audiences, nextProps.exerciseId)
-    if(audiences.count() > 0 && nextProps.currentAudience === undefined) {
-      this.props.selectAudience(audiences.keySeq().first())
+    //If current selected audience is not defined or no longer inside the filtered audiences
+    if(nextProps.currentAudience === undefined || !audiences.has(nextProps.currentAudience)) {
+      this.props.selectAudience(nextProps.exerciseId, audiences.count() > 0 ? audiences.keySeq().first() : undefined)
     }
   }
 
   render() {
+    console.log("===== Render AudienceNav =====", this.props.audiences)
     return (
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
         <CreateAudience exerciseId={this.props.exerciseId}/>
@@ -70,7 +72,7 @@ const filteredAudiences = createImmutableSelector(
 const select = (state, props) => {
   return {
     audiences: filteredAudiences(state, props),
-    currentAudience: state.application.getIn(['ui', 'states', 'current_audience'])
+    currentAudience: state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
   }
 }
 
