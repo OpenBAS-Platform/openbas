@@ -27,9 +27,10 @@ class AudienceNav extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    //select default audience if exercise doesn't currently have one.
     let audiences = filterAudiences(nextProps.audiences, nextProps.exerciseId)
-    if(nextProps.currentAudience === undefined) {
-      this.props.selectAudience(nextProps.exerciseId, audiences.count() > 0 ? audiences.keySeq().first() : undefined)
+    if(nextProps.currentAudience === undefined && audiences.count() > 0) {
+      this.props.selectAudience(nextProps.exerciseId, audiences.keySeq().first())
     }
   }
 
