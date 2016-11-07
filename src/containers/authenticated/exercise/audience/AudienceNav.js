@@ -11,6 +11,12 @@ import {ListItemLink} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import CreateAudience from './CreateAudience'
 
+const filterAudiences = (audiences, exerciseId) => {
+  var filterByExercise = n => n.audience_exercise === exerciseId
+  var filteredAudiences = R.filter(filterByExercise, audiences.toJS())
+  return fromJS(filteredAudiences)
+}
+
 class AudienceNav extends Component {
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId);
@@ -21,8 +27,9 @@ class AudienceNav extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.audiences.count() > 0 && nextProps.currentAudience === undefined) {
-      this.props.selectAudience(nextProps.audiences.keySeq().first())
+    let audiences = filterAudiences(nextProps.audiences, nextProps.exerciseId)
+    if(audiences.count() > 0 && nextProps.currentAudience === undefined) {
+      this.props.selectAudience(audiences.keySeq().first())
     }
   }
 
@@ -56,14 +63,9 @@ AudienceNav.propTypes = {
   selectAudience: PropTypes.func
 }
 
-const audiencesSelector = (state, props) => {
-  const audiences = state.application.getIn(['entities', 'audiences']).toJS()
-  var filterByExercise = n => n.audience_exercise === props.exerciseId
-  var filteredAudiences = R.filter(filterByExercise, audiences)
-  return fromJS(filteredAudiences)
-}
-
-const filteredAudiences = createImmutableSelector(audiencesSelector, audiences => audiences)
+const filteredAudiences = createImmutableSelector(
+  (state, props) => filterAudiences(state.application.getIn(['entities', 'audiences']), props.exerciseId),
+  audiences => audiences)
 
 const select = (state, props) => {
   return {
