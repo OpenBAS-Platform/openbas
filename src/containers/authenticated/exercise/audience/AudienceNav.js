@@ -35,7 +35,6 @@ class AudienceNav extends Component {
   }
 
   render() {
-    console.log("===== Render AudienceNav =====", this.props.audiences)
     return (
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
         <CreateAudience exerciseId={this.props.exerciseId}/>
