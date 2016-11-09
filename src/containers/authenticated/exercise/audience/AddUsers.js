@@ -13,6 +13,7 @@ import {List} from '../../../../components/List'
 import {AvatarListItemLink} from '../../../../components/list/ListItem';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
 import {SimpleTextField} from '../../../../components/SimpleTextField'
+import CreateUser from './CreateUser'
 
 const styles = {
   dialog: {
@@ -84,6 +85,7 @@ class AddUsers extends Component {
   }
 
   createUser() {
+    this.handleOpenCreateUser()
   }
 
   submitAddUsers() {
@@ -160,13 +162,7 @@ class AddUsers extends Component {
                   />
                 )
               })}
-              <AvatarListItemLink
-                key="create"
-                onClick={this.createUser.bind(this)}
-                label="Create a new user"
-                leftAvatar={<Avatar type={Constants.AVATAR_TYPE_LIST}
-                                    src="https://www.gravatar.com/avatar/00000000?d=mm&f=y"/>}
-              />
+              <CreateUser exerciseId={this.props.exerciseId} />
             </List>
           </div>
         </Dialog>
