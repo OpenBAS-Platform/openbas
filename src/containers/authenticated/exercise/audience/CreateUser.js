@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {addUser} from '../../../../actions/User'
+import {fetchOrganizations} from '../../../../actions/Organization'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton} from '../../../../components/Button';
 import UserForm from '../../admin/users/UserForm'
@@ -12,6 +13,10 @@ class CreateUser extends Component {
   constructor(props) {
     super(props);
     this.state = {openCreate: false}
+  }
+
+  componentDidMount() {
+    this.props.fetchOrganizations();
   }
 
   handleOpenCreate() {
@@ -32,7 +37,6 @@ class CreateUser extends Component {
   }
 
   render() {
-
     const actionsCreateUser = [
       <FlatButton
         label="Cancel"
@@ -62,7 +66,7 @@ class CreateUser extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={actionsCreateUser}
         >
-          <UserForm ref="userForm" onSubmit={this.onSubmitCreate.bind(this)} />
+          <UserForm ref="userForm" onSubmit={this.onSubmitCreate.bind(this)} organizations={this.props.organizations} />
         </Dialog>
       </div>
     );
@@ -71,7 +75,15 @@ class CreateUser extends Component {
 
 CreateUser.propTypes = {
   exerciseId: PropTypes.string,
+  organizations: PropTypes.object,
+  fetchOrganizations: PropTypes.func,
   addUser: PropTypes.func
 }
 
-export default connect(null, {addUser})(CreateUser);
+const select = (state) => {
+  return {
+    organizations: state.application.getIn(['entities', 'organizations']),
+  }
+}
+
+export default connect(select, {fetchOrganizations, addUser})(CreateUser);

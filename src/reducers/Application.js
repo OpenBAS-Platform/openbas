@@ -50,6 +50,51 @@ const application = (state = Map(), action) => {
       return state.setIn(['ui', 'states', 'current_search_keyword'], action.payload)
     }
 
+    case Constants.APPLICATION_ADD_USER_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_USER_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'users'])
+        mergeStore(state, action, ['ui', 'loading'])
+      })
+    }
+
+    case Constants.APPLICATION_ADD_USER_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_ORGANIZATIONS_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_ORGANIZATIONS_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state,action, ['entities', 'organizations'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_ORGANIZATIONS_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_ADD_ORGANIZATION_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_ORGANIZATION_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'organizations'])
+        mergeStore(state, action, ['ui', 'loading'])
+      })
+    }
+
+    case Constants.APPLICATION_ADD_ORGANIZATION_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
     case Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }

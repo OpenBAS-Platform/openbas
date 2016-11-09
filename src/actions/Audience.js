@@ -64,7 +64,7 @@ export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
       )
     })
   }).catch(function () {
-    dispatch({type: Constants.APPLICATION_UPDATE_AUDIENCE_ERROR});
+    dispatch({type: Constants.APPLICATION_DELETE_AUDIENCE_ERROR});
     throw new SubmissionError({_error: 'Failed to delete audience!'})
   })
 }

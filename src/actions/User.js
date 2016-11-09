@@ -1,5 +1,6 @@
 import * as Constants from '../constants/ActionTypes';
 import {api} from '../App';
+import {SubmissionError} from 'redux-form'
 import * as schema from './Schema'
 
 export const fetchUsers = () => (dispatch) => {
@@ -18,9 +19,9 @@ export const fetchUsers = () => (dispatch) => {
 }
 
 export const fetchUser = () => (dispatch, getState) => {
-  let user_id = getState().application.get('user');
+  let userId = getState().application.get('user');
   dispatch({type: Constants.APPLICATION_FETCH_USER_SUBMITTED});
-  return api().get('/api/users/' + user_id).then(function (response) {
+  return api().get('/api/users/' + userId).then(function (response) {
     dispatch({
       type: Constants.APPLICATION_FETCH_USER_SUCCESS,
       payload: response.data
@@ -35,5 +36,19 @@ export const searchUsers = (keyword) => (dispatch) => {
   dispatch({
     type: Constants.APPLICATION_SEARCH_USERS_SUBMITTED,
     payload: keyword
+  })
+}
+
+export const addUser = (data) => (dispatch) => {
+  console.log('DATA', data)
+  dispatch({type: Constants.APPLICATION_ADD_USER_SUBMITTED});
+  return api(schema.user).post('/api/users', data).then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_ADD_USER_SUCCESS,
+      payload: response.data
+    });
+  }).catch(function () {
+    dispatch({type: Constants.APPLICATION_ADD_USER_ERROR});
+    throw new SubmissionError({_error: 'Failed to add user!'})
   })
 }
