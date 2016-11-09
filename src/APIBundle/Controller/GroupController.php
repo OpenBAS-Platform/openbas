@@ -114,7 +114,7 @@ class GroupController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace a group",
+     *    description="Update a group",
      *   input={"class"=GroupType::class, "name"=""}
      * )
      *
@@ -122,25 +122,6 @@ class GroupController extends Controller
      * @Rest\Put("/groups/{group_id}")
      */
     public function updateGroupAction(Request $request)
-    {
-        return $this->updateGroup($request, true);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Update a group",
-     *   input={"class"=GroupType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"group"})
-     * @Rest\Patch("/groups/{group_id}")
-     */
-    public function patchGroupAction(Request $request)
-    {
-        return $this->updateGroup($request, false);
-    }
-
-    private function updateGroup(Request $request, $clearMissing)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
@@ -153,7 +134,7 @@ class GroupController extends Controller
         $this->denyAccessUnlessGranted('update', $group);
 
         $form = $this->createForm(GroupType::class, $group);
-        $form->submit($request->request->all(), $clearMissing);
+        $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             $em->persist($group);

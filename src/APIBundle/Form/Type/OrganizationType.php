@@ -7,22 +7,18 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 
-class UserType extends AbstractType
+class OrganizationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('user_firstname');
-        $builder->add('user_lastname');
-        $builder->add('user_email', EmailType::class);
-        $builder->add('user_phone');
-        $builder->add('user_plain_password');
-        $builder->add('user_organization');
+        $builder->add('organization_name');
+        $builder->add('organization_description');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'APIBundle\Entity\User',
+            'data_class' => 'APIBundle\Entity\Organization',
             'csrf_protection' => false
         ]);
     }

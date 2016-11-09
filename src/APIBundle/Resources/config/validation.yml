@@ -12,11 +12,13 @@ APIBundle\Entity\User:
             - NotBlank: ~
             - Email: ~
         user_plain_password:
-            - NotBlank: { groups: [New, FullUpdate] }
             - Type: string
-            - Length:
-                min: 4
-                max: 50
+
+APIBundle\Entity\Organization:
+    properties:
+        organization_name:
+            - NotBlank: ~
+            - Type: string
 
 APIBundle\Entity\Group:
     properties:

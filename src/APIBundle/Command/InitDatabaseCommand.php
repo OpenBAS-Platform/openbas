@@ -13,6 +13,7 @@ use APIBundle\Entity\ExerciseStatus;
 use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Token;
 use APIBundle\Entity\User;
+use APIBundle\Entity\Organization;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -67,25 +68,28 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $fileExercise = $this->createFile('Exercise default', 'default_exercise.png');
         $output->writeln('Creating default files');
 
-        $userAdmin = $this->createUser('admin', 'admin', 'John', 'Doe', true);
+        $organizationAgency = $this->createOrganization('The agency', 'The national security agency');
+        $output->writeln('Creating organization \'The agency\'');
+
+        $userAdmin = $this->createUser('admin', 'admin', 'John', 'Doe', true, $organizationAgency);
         $output->writeln('Creating user admin with password admin');
 
         $tokenAdmin = $this->createToken($userAdmin);
         $output->writeln('Creating token for user admin: ' . $tokenAdmin->getTokenValue());
 
-        $userJane = $this->createUser('jane', 'jane', 'Jane', 'Doe', true);
+        $userJane = $this->createUser('jane', 'jane', 'Jane', 'Doe', true, $organizationAgency);
         $output->writeln('Creating user jane with password jane');
 
         $tokenJane = $this->createToken($userJane);
         $output->writeln('Creating token for user jane: ' . $tokenJane->getTokenValue());
 
-        $userJerry = $this->createUser('jerry', 'jerry', 'Jerry', 'Doe', true);
+        $userJerry = $this->createUser('jerry', 'jerry', 'Jerry', 'Doe', true, $organizationAgency);
         $output->writeln('Creating user jerry with password jerry');
 
         $tokenJerry = $this->createToken($userJerry);
         $output->writeln('Creating token for user jerry: ' . $tokenJerry->getTokenValue());
 
-        $userSam = $this->createUser('sam', 'sam', 'Sam', 'Doe', true);
+        $userSam = $this->createUser('sam', 'sam', 'Sam', 'Doe', true, $organizationAgency);
         $output->writeln('Creating user sam with password sam');
 
         $tokenSam = $this->createToken($userSam);
@@ -200,13 +204,14 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $type;
     }
 
-    private function createUser($login, $password, $firstname, $lastname, $admin) {
+    private function createUser($login, $password, $firstname, $lastname, $admin, $organization) {
         $user = new User();
         $user->setUserFirstname($firstname);
         $user->setUserLastname($lastname);
         $user->setUserEmail($login);
         $user->setUserAdmin($admin);
         $user->setUserStatus(1);
+        $user->setUserOrganization($organization);
         $encoder = $this->getContainer()->get('security.password_encoder');
         $encoded = $encoder->encodePassword($user, $password);
         $user->setUserPassword($encoded);
@@ -214,6 +219,17 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
 
         return $user;
+    }
+
+    private function createOrganization($name, $description) {
+        $organization = new Organization();
+        $organization->setOrganizationName($name);
+        $organization->setOrganizationDescription($description);
+
+        $this->em->persist($organization);
+        $this->em->flush();
+
+        return $organization;
     }
 
     private function createToken($user) {

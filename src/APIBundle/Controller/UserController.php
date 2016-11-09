@@ -15,6 +15,7 @@ use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\UserType;
 use APIBundle\Entity\User;
+use APIBundle\Service\OpenexMailerService;
 
 class UserController extends Controller
 {
@@ -51,7 +52,9 @@ class UserController extends Controller
         foreach( $users as &$user ) {
             $user->setUserGravatar();
         }
-        
+
+        //$this->get('openex_mailer')->sendEmailWithMessage("samuel@hassine.fr", 'This is a test', 'test message');
+
         return $users;
     }
 
@@ -91,9 +94,7 @@ class UserController extends Controller
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
-
         $form->submit($request->request->all());
-
         if ($form->isValid()) {
             $encoder = $this->get('security.password_encoder');
             $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
@@ -131,7 +132,7 @@ class UserController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace a user",
+     *    description="Update a user",
      *   input={"class"=UserType::class, "name"=""}
      * )
      *
@@ -139,25 +140,6 @@ class UserController extends Controller
      * @Rest\Put("/users/{user_id}")
      */
     public function updateUserAction(Request $request)
-    {
-        return $this->updateUser($request, true);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Update a user",
-     *   input={"class"=UserType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"user"})
-     * @Rest\Patch("/users/{user_id}")
-     */
-    public function patchUserAction(Request $request)
-    {
-        return $this->updateUser($request, false);
-    }
-
-    private function updateUser(Request $request, $clearMissing)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
@@ -169,14 +151,8 @@ class UserController extends Controller
 
         $this->denyAccessUnlessGranted('update', $user);
 
-        if ($clearMissing) {
-            $options = ['validation_groups' => ['Default', 'FullUpdate']];
-        } else {
-            $options = [];
-        }
-
-        $form = $this->createForm(UserType::class, $user, $options);
-        $form->submit($request->request->all(), $clearMissing);
+        $form = $this->createForm(UserType::class, $user);
+        $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             if (!empty($user->getUserPlainPassword())) {

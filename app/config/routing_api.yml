@@ -18,6 +18,10 @@ tokens:
     type:     rest
     resource: APIBundle\Controller\TokenController
 
+organizations:
+    type:     rest
+    resource: APIBundle\Controller\OrganizationController
+
 files:
     type:     rest
     resource: APIBundle\Controller\FileController

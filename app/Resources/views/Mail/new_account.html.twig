@@ -1,0 +1,16 @@
+{% extends 'layout.html.twig' %}
+
+{% block mailcontent %}
+    <p>{% trans %}Hello{% endtrans %},</p>
+    <p style="margin: 0 0 15px 0;">
+        {% trans %}You requested a password recovery procedure on the Busit plateform. In order to choose a new password, please follow the link below. Be carefull, this link will remain valid only for the next 24 hours!{% endtrans %}
+    </p>
+    <p style="margin: 0 0 15px 0;">
+        <a style="color: #005596; text-decoration: none;" href="https://{{ app.request.server.get("SERVER_NAME") }}/password/reset/{{ id }}/{{ code }}">https://{{ app.request.server.get("SERVER_NAME") }}/password/reset/{{ id }}/{{ code }}</a>
+    </p>
+    <p style="margin: 0 0 15px 0;">
+        {% trans %}Best regards{% endtrans %},
+        <br />
+        {% trans %}The Busit Team{% endtrans %}
+    </p>
+{% endblock %}
