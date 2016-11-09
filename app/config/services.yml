@@ -4,6 +4,10 @@ parameters:
 #    parameter_name: value
 
 services:
+    openex_mailer:
+        class: APIBundle\Service\OpenexMailerService
+        arguments: ["@mailer", "@templating", "@translator.default"]
+
     token_user_provider:
         class: APIBundle\Security\TokenUserProvider
         arguments: ["@token_repository", "@user_repository"]
