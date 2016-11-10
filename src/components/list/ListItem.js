@@ -9,6 +9,9 @@ const styles = {
   },
   'inactive': {
 
+  },
+  'mainitem': {
+    borderBottom: '1px solid #EEEEEE'
   }
 }
 
@@ -88,3 +91,24 @@ AvatarListItemLinkIntl.propTypes = {
   disabled: PropTypes.bool,
 }
 
+export const MainListItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    style={styles.mainitem}
+    rightIconButton={props.rightIconButton}/>
+);
+
+MainListItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node
+}

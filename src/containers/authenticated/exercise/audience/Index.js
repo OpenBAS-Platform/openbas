@@ -1,13 +1,15 @@
 import React, {Component, PropTypes} from 'react'
 import {Map} from 'immutable'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table'
+import {List} from '../../../../components/List'
+import {MainListItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
 import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
+import UserPopover from './UserPopover'
 
 const styles = {
   'container': {
@@ -15,7 +17,7 @@ const styles = {
   },
   'title': {
     float: 'left',
-    fontSize: '18px',
+    fontSize: '20px',
     fontWeight: 600
   },
   'empty': {
@@ -28,6 +30,24 @@ const styles = {
     float: 'right',
     color: '#9E9E9E',
     fontSize: '12px',
+  },
+  'name': {
+    float: 'left',
+    width: '30%',
+    padding: '5px 0 0 0'
+  },
+  'mail': {
+    float: 'left',
+    width: '40%',
+    padding: '5px 0 0 0'
+  },
+  'org': {
+    float: 'left',
+    padding: '5px 0 0 0'
+  },
+  'popover': {
+    float: 'left',
+    padding: '17px 0 0 0'
   }
 }
 
@@ -42,25 +62,6 @@ class Index extends Component {
 
   componentDidMount() {
     this.props.fetchUsers();
-  }
-
-  handleRowSelection(rowList) {
-    console.log(rowList)
-    if (rowList === 'all') {
-      this.selectedUsers = this.props.audience_users_ids.toJS()
-    } else if (rowList === 'none') {
-      this.selectedUsers = []
-    } else {
-      this.selectedUsers = R.map(index => this.props.audience_users_ids.get(index), rowList)
-    }
-
-    if (this.selectedUsers.length > 0) {
-
-    }
-  }
-
-  handleDeletion() {
-
   }
 
   render() {
@@ -80,36 +81,36 @@ class Index extends Component {
         <AudiencePopover exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}/>
         <div style={styles.number}>{this.props.audience_users.count()} users</div>
         <div className="clearfix"></div>
-        <Table selectable={true} multiSelectable={true} onRowSelection={this.handleRowSelection.bind(this)}>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Name</TableHeaderColumn>
-              <TableHeaderColumn>Email</TableHeaderColumn>
-              <TableHeaderColumn>Organization</TableHeaderColumn>
-              <TableHeaderColumn>Avatar</TableHeaderColumn>
-            </TableRow>
-          </TableHeader>
-          <TableBody deselectOnClickaway={false} showRowHover={true} stripedRows={true}>
-            {this.props.audience_users.toList().map(userId => {
-              let user = this.props.users.get(userId)
-              let organizationName = ''
-              if( user.get('user_organization') && this.props.organizations ) {
-                organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
-              }
-
-              return (
-                <TableRow hoverable={true} key={user.get('user_id')}>
-                  <TableRowColumn>{user.get('user_firstname')} {user.get('user_lastname')}</TableRowColumn>
-                  <TableRowColumn>{user.get('user_email')}</TableRowColumn>
-                  <TableRowColumn>{organizationName}</TableRowColumn>
-                  <TableRowColumn>
-                    <Avatar src={user.get('user_gravatar')}/>
-                  </TableRowColumn>
-                </TableRow>
-              )
-            })}
-          </TableBody>
-        </Table>
+        <List>
+          {this.props.audience_users.toList().map(userId => {
+            let user = this.props.users.get(userId)
+            let organizationName = ''
+            if (user.get('user_organization') && this.props.organizations) {
+              organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
+            }
+            return (
+              <MainListItem
+                key={user.get('user_id')}
+                leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user.get('user_gravatar')}/>}
+                rightIconButton={
+                  <div style={styles.popover}>
+                    <UserPopover exerciseId={this.props.exerciseId}
+                                 audienceId={this.props.audience.get('audience_id')}
+                                 userId={user.get('user_id')}/>
+                  </div>
+                }
+                primaryText={
+                  <div>
+                    <div style={styles.name}>{user.get('user_firstname')} {user.get('user_lastname')}</div>
+                    <div style={styles.mail}>{user.get('user_email')}</div>
+                    <div style={styles.org}>{organizationName}</div>
+                    <div className="clearfix"></div>
+                  </div>
+                }
+              />
+            )
+          })}
+        </List>
         <AddUsers exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}
                   audienceUsersIds={this.props.audience_users_ids}/>
       </div>

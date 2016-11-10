@@ -12,6 +12,11 @@ const avatarStyle = {
     position: 'absolute',
     top: '8px',
     left: '16px'
+  },
+  [ Constants.AVATAR_TYPE_MAINLIST ]: {
+    position: 'absolute',
+    top: '14px',
+    left: '16px'
   }
 }
 

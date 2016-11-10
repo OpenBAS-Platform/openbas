@@ -5,7 +5,7 @@ import * as Constants from '../constants/ComponentTypes'
 
 const styles = {
   [ Constants.FIELD_TYPE_INTITLE ]: {
-    padding: '0 20px 0 20px'
+    padding: '0 20px 10px 20px'
   }
 }
 
@@ -18,6 +18,7 @@ const SimpleTextFieldIntl = (props) => (
     type={props.type}
     disabled={props.disabled}
     onChange={props.onChange}
+    style={{paddingBottom: 10}}
     inputStyle={styles[props.styletype]}
     hintStyle={styles[props.styletype]}
   />

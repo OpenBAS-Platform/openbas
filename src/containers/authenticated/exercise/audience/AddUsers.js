@@ -89,9 +89,9 @@ class AddUsers extends Component {
   }
 
   submitAddUsers() {
-    let userList = this.props.audienceUsersIds.concat(this.state.users_ids)
+    let usersList = this.props.audienceUsersIds.concat(this.state.users_ids)
     let data = Map({
-      audience_users: userList
+      audience_users: usersList
     })
     this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
     this.setState({
@@ -170,7 +170,7 @@ class AddUsers extends Component {
   }
 }
 
-const usersSelector = (state, props) => {
+const usersSelector = (state) => {
   const users = state.application.getIn(['entities', 'users']).toJS()
   let keyword = state.application.getIn(['ui', 'states', 'current_search_keyword'])
   var filterByKeyword = n => keyword === '' || n.user_email.toLowerCase().indexOf(keyword) !== -1 || n.user_firstname.toLowerCase().indexOf(keyword) !== -1 || n.user_lastname.toLowerCase().indexOf(keyword) !== -1

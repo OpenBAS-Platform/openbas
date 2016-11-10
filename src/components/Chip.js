@@ -9,6 +9,7 @@ const chipStyle = {
     height: '20px'
   },
   [ Constants.CHIP_TYPE_LIST ]: {
+    width: '170px',
     margin: '4px'
   }
 }

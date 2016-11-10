@@ -8,7 +8,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {updateAudience, deleteAudience} from '../../../../actions/Audience'
+import {updateAudience} from '../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
 
 const style = {
@@ -16,7 +16,7 @@ const style = {
   marginTop: '-14px'
 }
 
-class AudiencePopover extends Component {
+class UserPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -74,7 +74,11 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.exerciseId, this.props.audienceId)
+    let usersList = this.props.audience.get('audience_users').delete(this.props.audience.get('audience_users').keyOf(this.props.userId))
+    let data = Map({
+      audience_users: usersList
+    })
+    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
     this.handleCloseDelete()
   }
 
@@ -110,7 +114,7 @@ class AudiencePopover extends Component {
         audience_name: this.props.audience.get('audience_name'),
       }
     }
-    console.log('INITIAL', initialInformation)
+
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -131,10 +135,10 @@ class AudiencePopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the deletion of this audience?
+          Do you confirm the removing of this user?
         </Dialog>
         <Dialog
-          title="Update the audience"
+          title="Update the user"
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
@@ -157,13 +161,13 @@ const select = (state, props) => {
   }
 }
 
-AudiencePopover.propTypes = {
+UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
-  deleteAudience: PropTypes.func,
+  userId: PropTypes.string,
   updateAudience: PropTypes.func,
   audience: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateAudience, deleteAudience})(AudiencePopover)
+export default connect(select, {updateAudience})(UserPopover)

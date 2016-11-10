@@ -216,6 +216,7 @@ const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS: {
+      console.log('ACTION', action)
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
