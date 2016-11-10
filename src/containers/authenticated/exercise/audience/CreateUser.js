@@ -36,11 +36,11 @@ class CreateUser extends Component {
       data['user_organization'] = this.props.addOrganization(orgData)
       //this.props.addUser(data)
     }
+    this.handleCloseCreate()
   }
 
   submitFormCreate() {
     this.refs.userForm.submit()
-    this.handleCloseCreate()
   }
 
   render() {

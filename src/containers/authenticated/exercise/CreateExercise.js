@@ -22,11 +22,11 @@ class CreateExercise extends Component {
 
   onSubmit(data) {
     this.props.addExercise(data)
+    this.handleClose()
   }
 
   submitForm() {
     this.refs.exerciseForm.submit()
-    this.handleClose()
   }
 
   render() {

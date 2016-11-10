@@ -53,11 +53,11 @@ class UserPopover extends Component {
 
   onSubmitEdit(data) {
     this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
+    this.handleCloseEdit()
   }
 
   submitFormEdit() {
     this.refs.audienceForm.submit()
-    this.handleCloseEdit()
   }
 
   handleOpenDelete() {

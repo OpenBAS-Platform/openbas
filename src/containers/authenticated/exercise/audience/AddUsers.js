@@ -84,10 +84,6 @@ class AddUsers extends Component {
     })
   }
 
-  createUser() {
-    this.handleOpenCreateUser()
-  }
-
   submitAddUsers() {
     let usersList = this.props.audienceUsersIds.concat(this.state.users_ids)
     let data = Map({

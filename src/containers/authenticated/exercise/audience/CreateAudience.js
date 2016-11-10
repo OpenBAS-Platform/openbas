@@ -23,11 +23,11 @@ class CreateAudience extends Component {
 
   onSubmitCreate(data) {
     this.props.addAudience(this.props.exerciseId, data)
+    this.handleCloseCreate()
   }
 
   submitFormCreate() {
     this.refs.audienceForm.submit()
-    this.handleCloseCreate()
   }
 
   render() {
