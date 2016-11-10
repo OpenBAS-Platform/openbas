@@ -24,7 +24,7 @@ class Organization
     protected $organization_name;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $organization_description;
 

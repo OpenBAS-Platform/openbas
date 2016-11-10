@@ -41,7 +41,7 @@ class User implements UserInterface
     protected $user_phone;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $user_password;
 
