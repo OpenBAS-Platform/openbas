@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {addUser} from '../../../../actions/User'
-import {fetchOrganizations} from '../../../../actions/Organization'
+import {fetchOrganizations, addOrganization} from '../../../../actions/Organization'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton} from '../../../../components/Button';
 import UserForm from '../../admin/users/UserForm'
@@ -28,7 +28,14 @@ class CreateUser extends Component {
   }
 
   onSubmitCreate(data) {
-    this.props.addUser(data)
+    if( typeof data['user_organization'] === 'object' ) {
+      data['user_organization'] = data['user_organization']['organization_id']
+      this.props.addUser(data)
+    } else {
+      let orgData = {organization_name: data['user_organization']}
+      data['user_organization'] = this.props.addOrganization(orgData)
+      //this.props.addUser(data)
+    }
   }
 
   submitFormCreate() {
@@ -77,6 +84,7 @@ CreateUser.propTypes = {
   exerciseId: PropTypes.string,
   organizations: PropTypes.object,
   fetchOrganizations: PropTypes.func,
+  addOrganization: PropTypes.func,
   addUser: PropTypes.func
 }
 
@@ -86,4 +94,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchOrganizations, addUser})(CreateUser);
+export default connect(select, {fetchOrganizations, addOrganization, addUser})(CreateUser);

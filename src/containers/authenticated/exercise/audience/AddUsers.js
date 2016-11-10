@@ -6,7 +6,7 @@ import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {updateAudience} from '../../../../actions/Audience'
 import {fetchUsers, searchUsers} from '../../../../actions/User'
-import {Dialog} from '../../../../components/Dialog';
+import {DialogTitleElement} from '../../../../components/Dialog';
 import {Chip} from '../../../../components/Chip';
 import {Avatar} from '../../../../components/Avatar';
 import {List} from '../../../../components/List'
@@ -119,7 +119,9 @@ class AddUsers extends Component {
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
                                      onClick={this.handleOpenAddUsers.bind(this)}/>
-        <Dialog
+        <DialogTitleElement
+          title={<SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a user"
+                                   onChange={this.handleSearchUsers.bind(this)} styletype={Constants.FIELD_TYPE_INTITLE} />}
           modal={false}
           open={this.state.openAddUsers}
           onRequestClose={this.handleCloseAddUsers.bind(this)}
@@ -127,9 +129,6 @@ class AddUsers extends Component {
           actions={actions}
           contentStyle={styles.dialog}
         >
-          <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a user"
-                           onChange={this.handleSearchUsers.bind(this)}/>
-
           <div style={styles.list}>
             {this.state.users.toList().map(user => {
               return (
@@ -165,7 +164,7 @@ class AddUsers extends Component {
               <CreateUser exerciseId={this.props.exerciseId} />
             </List>
           </div>
-        </Dialog>
+        </DialogTitleElement>
       </div>
     );
   }

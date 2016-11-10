@@ -27,7 +27,7 @@ const renderAutoCompleteField = ({input, label, fullWidth, hint, onFocus, onClic
                    {...input}
                    onFocus={onFocus}
                    onClick={onClick}
-                   onChange={(event, index, value) => input.onChange(value)}
+                   onNewRequest={(value) => input.onChange(value)}
   />)
 
 renderAutoCompleteField.propTypes = {

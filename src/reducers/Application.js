@@ -37,7 +37,8 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_USERS_SUCCESS: {
       return state.withMutations(function (state) {
-        mergeStore(state,action, ['entities', 'users'])
+        mergeStore(state, action, ['entities', 'users'])
+        mergeStore(state, action, ['entities', 'organizations'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -57,7 +58,8 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_USER_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'users'])
-        mergeStore(state, action, ['ui', 'loading'])
+        mergeStore(state, action, ['entities', 'organizations'])
+        state.setIn(['ui', 'loading'], false)
       })
     }
 
@@ -71,7 +73,7 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_FETCH_ORGANIZATIONS_SUCCESS: {
       return state.withMutations(function (state) {
-        mergeStore(state,action, ['entities', 'organizations'])
+        mergeStore(state, action, ['entities', 'organizations'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -87,7 +89,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_ORGANIZATION_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'organizations'])
-        mergeStore(state, action, ['ui', 'loading'])
+        state.setIn(['ui', 'loading'], false)
       })
     }
 
@@ -134,7 +136,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'exercises'])
-        mergeStore(state, action, ['ui', 'loading'])
+        state.setIn(['ui', 'loading'], false)
       })
     }
 

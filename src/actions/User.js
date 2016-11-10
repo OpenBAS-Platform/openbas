@@ -40,7 +40,7 @@ export const searchUsers = (keyword) => (dispatch) => {
 }
 
 export const addUser = (data) => (dispatch) => {
-  console.log('DATA', data)
+  console.log('USER', data)
   dispatch({type: Constants.APPLICATION_ADD_USER_SUBMITTED});
   return api(schema.user).post('/api/users', data).then(function (response) {
     dispatch({

@@ -59,3 +59,7 @@ export const GRIDLIST_TYPE_GALLERY = 'GRIDLIST_TYPE_GALLERY';
 //region SNACKBAR
 export const SNACKBAR_TYPE_LOADING = 'SNACKBAR_TYPE_LOADING';
 //endregion
+
+//region FIELD
+export const FIELD_TYPE_INTITLE = 'FIELD_TYPE_INTITLE'
+//endregion

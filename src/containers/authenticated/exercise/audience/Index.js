@@ -46,15 +46,15 @@ class Index extends Component {
 
   handleRowSelection(rowList) {
     console.log(rowList)
-    if( rowList === 'all' ) {
+    if (rowList === 'all') {
       this.selectedUsers = this.props.audience_users_ids.toJS()
-    } else if( rowList === 'none') {
+    } else if (rowList === 'none') {
       this.selectedUsers = []
     } else {
       this.selectedUsers = R.map(index => this.props.audience_users_ids.get(index), rowList)
     }
 
-    if( this.selectedUsers.length > 0 ) {
+    if (this.selectedUsers.length > 0) {
 
     }
   }
@@ -92,11 +92,16 @@ class Index extends Component {
           <TableBody deselectOnClickaway={false} showRowHover={true} stripedRows={true}>
             {this.props.audience_users.toList().map(userId => {
               let user = this.props.users.get(userId)
+              let organizationName = ''
+              if( user.get('user_organization') && this.props.organizations ) {
+                organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
+              }
+
               return (
                 <TableRow hoverable={true} key={user.get('user_id')}>
                   <TableRowColumn>{user.get('user_firstname')} {user.get('user_lastname')}</TableRowColumn>
                   <TableRowColumn>{user.get('user_email')}</TableRowColumn>
-                  <TableRowColumn>ANSSI</TableRowColumn>
+                  <TableRowColumn>{organizationName}</TableRowColumn>
                   <TableRowColumn>
                     <Avatar src={user.get('user_gravatar')}/>
                   </TableRowColumn>
@@ -115,10 +120,12 @@ class Index extends Component {
 Index.propTypes = {
   exerciseId: PropTypes.string,
   users: PropTypes.object,
+  organizations: PropTypes.object,
   audience: PropTypes.object,
   audience_users: PropTypes.object,
   audience_users_ids: PropTypes.object,
   fetchUsers: PropTypes.func,
+  fetchOrganizations: PropTypes.func,
 }
 
 const select = (state, ownProps) => {
@@ -133,6 +140,7 @@ const select = (state, ownProps) => {
     exerciseId,
     audience,
     users: state.application.getIn(['entities', 'users']),
+    organizations: state.application.getIn(['entities', 'organizations']),
     audience_users: audienceUsers,
     audience_users_ids: audienceUsersIds
   }

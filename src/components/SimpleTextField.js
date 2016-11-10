@@ -1,6 +1,13 @@
 import React, {PropTypes} from 'react'
 import MUITextField from 'material-ui/TextField';
 import {injectIntl} from 'react-intl'
+import * as Constants from '../constants/ComponentTypes'
+
+const styles = {
+  [ Constants.FIELD_TYPE_INTITLE ]: {
+    padding: '0 20px 0 20px'
+  }
+}
 
 const SimpleTextFieldIntl = (props) => (
   <MUITextField
@@ -11,6 +18,8 @@ const SimpleTextFieldIntl = (props) => (
     type={props.type}
     disabled={props.disabled}
     onChange={props.onChange}
+    inputStyle={styles[props.styletype]}
+    hintStyle={styles[props.styletype]}
   />
 )
 
@@ -25,4 +34,5 @@ SimpleTextFieldIntl.propTypes = {
   disabled: PropTypes.bool,
   onChange: PropTypes.func,
   intl: PropTypes.object,
+  styletype: PropTypes.string
 }
