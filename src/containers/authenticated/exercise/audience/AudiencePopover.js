@@ -110,7 +110,7 @@ class AudiencePopover extends Component {
         audience_name: this.props.audience.get('audience_name'),
       }
     }
-    console.log('INITIAL', initialInformation)
+
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>

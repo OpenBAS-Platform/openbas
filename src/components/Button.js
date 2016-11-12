@@ -24,7 +24,11 @@ const buttonStyle = {
     position: 'fixed',
     bottom: 30,
     right: 330
-  }
+  },
+  [ Constants.BUTTON_TYPE_DIALOG_LEFT ]: {
+    float: 'left',
+    marginTop: '-35px'
+  },
 }
 
 const ButtonIntl = (props) => (
@@ -48,9 +52,10 @@ ButtonIntl.propTypes = {
 }
 
 const FlatButtonIntl = (props) => (
-  <MUIFlatButton secondary={true}
+  <MUIFlatButton secondary={props.secondary}
+                 primary={props.primary}
                  label={props.intl.formatMessage({id: props.label})}
-                 type={props.type}
+                 style={buttonStyle[props.type]}
                  disabled={props.disabled}
                  onClick={props.onClick}
                  onTouchTap={props.onTouchTap}
@@ -63,6 +68,8 @@ FlatButtonIntl.propTypes = {
   type: PropTypes.string,
   intl: PropTypes.object,
   disabled: PropTypes.bool,
+  primary: PropTypes.bool,
+  secondary: PropTypes.bool,
   onClick: PropTypes.func,
   onTouchTap: PropTypes.func
 }

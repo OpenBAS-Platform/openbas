@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
+import R from 'ramda'
 import {FormField} from '../../../../components/Field'
 import {AutoCompleteField} from '../../../../components/AutoComplete'
 import AutoComplete from 'material-ui/AutoComplete';
@@ -22,17 +23,7 @@ const dataSourceConfig = {
 
 class UserForm extends Component {
   render() {
-    //console.log('DATASOURCE', this.props.organizations.toList().toArray())
-    let dataSource = []
-
-    this.props.organizations.toList().map(organization => {
-      let org = {
-        organization_id: organization.get('organization_id'),
-        organization_name: organization.get('organization_name')
-      }
-      dataSource.push(org)
-    })
-
+    let dataSource  = R.map(val => {return {organization_id: val.organization_id, organization_name: val.organization_name}}, this.props.organizations.toList().toJS())
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}

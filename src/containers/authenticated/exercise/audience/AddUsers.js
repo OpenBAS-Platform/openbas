@@ -10,29 +10,35 @@ import {DialogTitleElement} from '../../../../components/Dialog';
 import {Chip} from '../../../../components/Chip';
 import {Avatar} from '../../../../components/Avatar';
 import {List} from '../../../../components/List'
-import {AvatarListItemLink} from '../../../../components/list/ListItem';
+import {MainSmallListItem} from '../../../../components/list/ListItem';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
 import {SimpleTextField} from '../../../../components/SimpleTextField'
 import CreateUser from './CreateUser'
 
 const styles = {
   dialog: {
-    width: '780px',
-    minHeight: '500px',
-    maxWidth: 'none'
+
   },
   list: {
-    float: 'right',
-    width: '200px',
-    height: '100%',
-    padding: '0 0 0 10px',
-    borderLeft: '1px solid #f0f0f0'
+
   },
   search: {
+
+  },
+  'name': {
     float: 'left',
-    width: '460px',
-    padding: '0 10px 0 0',
-  }
+    width: '30%',
+    padding: '5px 0 0 0'
+  },
+  'mail': {
+    float: 'left',
+    width: '40%',
+    padding: '5px 0 0 0'
+  },
+  'org': {
+    float: 'left',
+    padding: '5px 0 0 0'
+  },
 }
 
 class AddUsers extends Component {
@@ -40,7 +46,6 @@ class AddUsers extends Component {
     super(props);
     this.state = {
       openAddUsers: false,
-      openCreateUser: false,
       users: Map(),
       users_ids: iList(),
     }
@@ -56,14 +61,6 @@ class AddUsers extends Component {
 
   handleCloseAddUsers() {
     this.setState({openAddUsers: false})
-  }
-
-  handleOpenCreateUser() {
-    this.setState({openCreateUser: true})
-  }
-
-  handleCloseCreateUser() {
-    this.setState({openCreateUser: false})
   }
 
   handleSearchUsers(event, value) {
@@ -109,6 +106,7 @@ class AddUsers extends Component {
         primary={true}
         onTouchTap={this.submitAddUsers.bind(this)}
       />,
+      <CreateUser exerciseId={this.props.exerciseId} />
     ];
 
     return (
@@ -133,11 +131,12 @@ class AddUsers extends Component {
                   onRequestDelete={this.removeUser.bind(this, user)}
                   type={Constants.CHIP_TYPE_LIST}
                 >
-                  <Avatar src={user.get('user_gravatar')}/>
+                  <Avatar src={user.get('user_gravatar')} size={32} type={Constants.AVATAR_TYPE_CHIP}/>
                   {user.get('user_firstname')} {user.get('user_lastname')}
                 </Chip>
               )
             })}
+            <div className="clearfix"></div>
           </div>
           <div style={styles.search}>
             <List>
@@ -147,17 +146,28 @@ class AddUsers extends Component {
                   || this.props.audienceUsersIds.keyOf(user.get('user_id')) !== undefined) {
                   disabled = true
                 }
+                let organizationName = ''
+                if (user.get('user_organization') && this.props.organizations) {
+                  organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
+                }
                 return (
-                  <AvatarListItemLink
+                  <MainSmallListItem
                     key={user.get('user_id')}
+                    ref={user.get('user_id')}
                     disabled={disabled}
                     onClick={this.addUser.bind(this, user)}
-                    label={user.get('user_firstname') + " " + user.get('user_lastname')}
+                    primaryText={
+                      <div>
+                        <div style={styles.name}>{user.get('user_firstname')} {user.get('user_lastname')}</div>
+                        <div style={styles.mail}>{user.get('user_email')}</div>
+                        <div style={styles.org}>{organizationName}</div>
+                        <div className="clearfix"></div>
+                      </div>
+                    }
                     leftAvatar={<Avatar type={Constants.AVATAR_TYPE_LIST} src={user.get('user_gravatar')}/>}
                   />
                 )
               })}
-              <CreateUser exerciseId={this.props.exerciseId} />
             </List>
           </div>
         </DialogTitleElement>
@@ -182,12 +192,14 @@ AddUsers.propTypes = {
   searchUsers: PropTypes.func,
   updateAudience: PropTypes.func,
   users: PropTypes.object,
+  organizations: PropTypes.object,
   audienceUsersIds: PropTypes.object
 }
 
 const select = (state, props) => {
   return {
     users: filteredUsers(state, props),
+    organizations: state.application.getIn(['entities', 'organizations']),
   }
 }
 

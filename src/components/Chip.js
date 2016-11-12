@@ -9,7 +9,7 @@ const chipStyle = {
     height: '20px'
   },
   [ Constants.CHIP_TYPE_LIST ]: {
-    width: '170px',
+    float: 'left',
     margin: '4px'
   }
 }

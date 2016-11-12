@@ -8,8 +8,10 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
+import {addOrganizationAndUpdateUser} from '../../../../actions/Organization'
+import {updateUser} from '../../../../actions/User'
 import {updateAudience} from '../../../../actions/Audience'
-import AudienceForm from './AudienceForm'
+import UserForm from '../../admin/users/UserForm'
 
 const style = {
   float: 'left',
@@ -52,12 +54,17 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
-    this.handleCloseEdit()
+    if (typeof data['user_organization'] === 'object') {
+      data['user_organization'] = data['user_organization']['organization_id']
+      return this.props.updateUser(this.props.userId, data)
+    } else {
+      let orgData = {organization_name: data['user_organization']}
+      this.props.addOrganizationAndUpdateUser(orgData, this.props.userId, data)
+    }
   }
 
   submitFormEdit() {
-    this.refs.audienceForm.submit()
+    this.refs.userForm.submit()
   }
 
   handleOpenDelete() {
@@ -109,11 +116,16 @@ class UserPopover extends Component {
     ];
 
     let initialInformation = undefined
-    if (this.props.audience) {
+    if (this.props.user && this.props.organizations) {
       initialInformation = {
-        audience_name: this.props.audience.get('audience_name'),
+        user_firstname: this.props.user.get('user_firstname'),
+        user_lastname: this.props.user.get('user_lastname'),
+        user_email: this.props.user.get('user_email'),
+        user_organization: this.props.organizations.get(this.props.user.get('user_organization')).get('organization_name')
       }
     }
+
+    console.log('initialInformation', initialInformation)
 
     return (
       <div style={style}>
@@ -144,7 +156,7 @@ class UserPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <AudienceForm ref="audienceForm" initialValues={initialInformation} onSubmit={this.onSubmitEdit.bind(this)}/>
+          <UserForm ref="userForm" initialValues={initialInformation}  organizations={this.props.organizations} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
       </div>
     )
@@ -157,7 +169,9 @@ const select = (state, props) => {
   let audience = currentAudience ? audiences.get(currentAudience) : Map()
 
   return {
-    audience
+    audience,
+    user: state.application.getIn(['entities', 'users', props.userId]),
+    organizations: state.application.getIn(['entities', 'organizations'])
   }
 }
 
@@ -165,9 +179,13 @@ UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
   userId: PropTypes.string,
+  updateUser: PropTypes.func,
+  addOrganizationAndUpdateUser: PropTypes.func,
   updateAudience: PropTypes.func,
   audience: PropTypes.object,
+  organizations: PropTypes.object,
+  user: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateAudience})(UserPopover)
+export default connect(select, {updateUser, addOrganizationAndUpdateUser, updateAudience})(UserPopover)

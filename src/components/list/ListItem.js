@@ -11,8 +11,19 @@ const styles = {
 
   },
   'mainitem': {
-    borderBottom: '1px solid #EEEEEE'
-  }
+    borderBottom: '1px solid #E0E0E0'
+  },
+  'mainitemdisabled': {
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0'
+  },
+  'mainsmallitem': {
+    borderBottom: '1px solid #E0E0E0'
+  },
+  'mainsmallitemdisabled': {
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0'
+  },
 }
 
 const ListItemLinkIntl = (props) => (
@@ -99,11 +110,33 @@ export const MainListItem = (props) => (
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
     disabled={props.disabled}
-    style={styles.mainitem}
+    style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
     rightIconButton={props.rightIconButton}/>
 );
 
 MainListItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node
+}
+
+export const MainSmallListItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    style={props.disabled ? styles.mainsmallitemdisabled : styles.mainsmallitem}
+    rightIconButton={props.rightIconButton}/>
+);
+
+MainSmallListItem.propTypes = {
   primaryText: PropTypes.node,
   secondaryText: PropTypes.node,
   leftAvatar: PropTypes.element,

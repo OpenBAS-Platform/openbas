@@ -21,8 +21,7 @@ class CreateExercise extends Component {
   }
 
   onSubmit(data) {
-    this.props.addExercise(data)
-    this.handleClose()
+    return this.props.addExercise(data)
   }
 
   submitForm() {
@@ -53,7 +52,7 @@ class CreateExercise extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
-          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)}/>
+          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)} onSubmitSuccess={this.handleClose.bind(this)}/>
         </Dialog>
       </div>
     );

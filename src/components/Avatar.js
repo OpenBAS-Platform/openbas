@@ -17,12 +17,17 @@ const avatarStyle = {
     position: 'absolute',
     top: '14px',
     left: '16px'
+  },
+  [ Constants.AVATAR_TYPE_CHIP ]: {
+    float: 'left',
+    margin: '0 5px 0 -12px'
   }
 }
 
 export const Avatar = (props) => (
   <MUIAvatar
     src={props.src}
+    size={props.size}
     onTouchTap={props.onTouchTap}
     style={avatarStyle[props.type]}
   />
@@ -31,5 +36,6 @@ export const Avatar = (props) => (
 Avatar.propTypes = {
   src: PropTypes.string,
   onTouchTap: PropTypes.func,
+  size: PropTypes.number,
   type: PropTypes.string
 }
