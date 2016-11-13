@@ -27,8 +27,10 @@ import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
+import roundMoment from './utils/moment-round'
 
 injectTapEventPlugin()
+roundMoment()
 
 const data = fromJS(JSON.parse(localStorage.getItem('token')))
 var tokens = data ? data.getIn(['entities', 'tokens']) : null
