@@ -15,6 +15,12 @@ const styles = {
     padding: '90px 20px 0 85px',
     textAlign: 'center'
   },
+  empty: {
+    marginTop: 40,
+    fontSize: '18px',
+    fontWeight: 500,
+    textAlign: 'center'
+  },
   logo: {
     width: '40px',
     marginTop: '4px',
@@ -47,6 +53,7 @@ class IndexAuthenticated extends Component {
           iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo}/>}
         />
         <div style={styles.container}>
+          {this.props.exercises.count() === 0 ? <div style={styles.empty}>You do not have any available exercise on this platform.</div>:""}
           {this.props.exercises.toList().map(exercise => {
             return (
               <Link to={'/private/exercise/' + exercise.get('exercise_id')} key={exercise.get('exercise_id')}>

@@ -83,6 +83,7 @@ class Index extends Component {
         <AudiencePopover exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}/>
         <div style={styles.number}>{this.props.audience_users.count()} users</div>
         <div className="clearfix"></div>
+        {this.props.audience_users.count() === 0 ? <div style={styles.empty}>This audience is empty.</div>:""}
         <List>
           {this.props.audience_users.toList().map(userId => {
             let user = this.props.users.get(userId)

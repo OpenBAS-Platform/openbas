@@ -144,7 +144,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'exercises'])
-        mergeStore(state, action, ['ui', 'loading'])
+        state.setIn(['ui', 'loading'], false)
       })
     }
 
@@ -167,8 +167,19 @@ const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], false)
     }
 
+    case Constants.APPLICATION_DELETE_EXERCISE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
     case Constants.APPLICATION_DELETE_EXERCISE_SUCCESS: {
-      return state.deleteIn(['entities', 'exercises', action.payload])
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'exercises', action.payload])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_DELETE_EXERCISE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
     }
     //endregion
 
@@ -253,17 +264,45 @@ const application = (state = Map(), action) => {
     }
     //endregion
 
+    // region EVENTS
+    case Constants.APPLICATION_FETCH_EVENTS_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_EVENTS_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'events'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_EVENTS_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_EVENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_EVENT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'events'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_EVENT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
     case Constants.APPLICATION_ADD_EVENT_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
 
     case Constants.APPLICATION_ADD_EVENT_SUCCESS: {
-      let eventId = action.payload.get('result')
-      let exerciseId = action.payload.getIn(['entities', 'events', eventId, 'event_exercise'])
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'events'])
         state.setIn(['ui', 'loading'], false)
-        state.setIn(['ui', 'states', 'current_events', exerciseId], action.payload.get('result'))
       })
     }
 
@@ -292,11 +331,11 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_DELETE_EVENT_SUCCESS: {
       return state.withMutations(function (state) {
-        state.deleteIn(['entities', 'audiences', action.payload.get('audienceId')])
-        state.setIn(['ui', 'states', 'current_audiences', action.payload.get('exerciseId')], undefined)
+        state.deleteIn(['entities', 'events', action.payload.get('eventId')])
         state.setIn(['ui', 'loading'], false)
       })
     }
+    //endregion
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
       return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))

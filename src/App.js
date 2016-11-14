@@ -28,6 +28,7 @@ import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
+
 import roundMoment from './utils/moment-round'
 
 injectTapEventPlugin()
@@ -164,6 +165,9 @@ class App extends Component {
                   <Route path='world' component={IndexExercise}/>
                   <Route path='objectives' component={IndexExercise}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
+                  <Route path='scenario/:scenarioId'>
+                    <IndexRoute component={IndexExerciseScenario}/>
+                  </Route>
                   <Route path='audience' component={IndexExerciseAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>

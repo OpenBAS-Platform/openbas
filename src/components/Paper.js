@@ -11,6 +11,14 @@ const paperStyle = {
     height: '256px',
     cursor: 'pointer'
   },
+  [ Constants.PAPER_TYPE_EVENT ]: {
+    display: 'inline-block',
+    margin: '20px 20px 20px 20px',
+    verticalAlign: 'top',
+    width: '400px',
+    height: '200px',
+    cursor: 'pointer'
+  },
   [ Constants.PAPER_TYPE_SETTINGS ]: {
     margin: '0 auto',
     marginBottom: '30px',

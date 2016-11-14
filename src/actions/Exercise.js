@@ -39,9 +39,6 @@ export const addExercise = (data) => (dispatch) => {
       type: Constants.APPLICATION_ADD_EXERCISE_SUCCESS,
       payload: response.data
     });
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_ADD_EXERCISE_ERROR});
-    throw new SubmissionError({_error: 'Failed to add exercise!'})
   })
 }
 
