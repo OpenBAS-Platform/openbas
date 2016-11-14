@@ -28,8 +28,10 @@ import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
+import roundMoment from './utils/moment-round'
 
 injectTapEventPlugin()
+roundMoment()
 
 const data = fromJS(JSON.parse(localStorage.getItem('token')))
 var tokens = data ? data.getIn(['entities', 'tokens']) : null
@@ -161,7 +163,7 @@ class App extends Component {
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
                   <Route path='objectives' component={IndexExercise}/>
-                  <Route path='scenario' component={IndexExerciseAudience}/>
+                  <Route path='scenario' component={IndexExerciseScenario}/>
                   <Route path='audience' component={IndexExerciseAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>
