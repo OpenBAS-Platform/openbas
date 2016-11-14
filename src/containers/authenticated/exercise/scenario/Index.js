@@ -3,14 +3,10 @@ import {Map} from 'immutable'
 import {connect} from 'react-redux'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
-import {fetchOrganizations} from '../../../../actions/Organization'
 import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
-import AudienceNav from './AudienceNav'
-import AudiencePopover from './AudiencePopover'
-import AddUsers from './AddUsers'
-import UserPopover from './UserPopover'
+import ScenarioNav from './ScenarioNav'
 
 const styles = {
   'container': {
@@ -62,15 +58,14 @@ class Index extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchUsers()
-    this.props.fetchOrganizations()
+    this.props.fetchUsers();
   }
 
   render() {
     if (this.props.audience.get('audience_id') === undefined) {
       return (
         <div style={styles.container}>
-          <AudienceNav exerciseId={this.props.exerciseId}/>
+          <ScenarioNav exerciseId={this.props.exerciseId}/>
           <div style={styles.empty}>No audience selected.</div>
         </div>
       )
@@ -149,4 +144,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {fetchUsers, fetchOrganizations})(Index);
+export default connect(select, {fetchUsers})(Index);

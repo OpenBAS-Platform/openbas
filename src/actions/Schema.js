@@ -27,6 +27,15 @@ export const arrayOfExercises = arrayOf(exercise)
 export const audience = new Schema('audiences', {idAttribute: 'audience_id'})
 export const arrayOfAudiences = arrayOf(audience)
 
+export const event = new Schema('events', {idAttribute: 'event_id'})
+export const arrayOfEvents = arrayOf(event)
+
+export const incident = new Schema('incidents', {idAttribute: 'incident_id'})
+export const arrayOfIncidents = arrayOf(incident)
+
+export const inject = new Schema('injects', {idAttribute: 'inject_id'})
+export const arrayOfInjects = arrayOf(inject)
+
 token.define({
   token_user: user
 })
@@ -42,4 +51,18 @@ exercise.define({
 audience.define({
   audience_users: arrayOfUsers,
   audience_exercise: exercise
+})
+
+event.define({
+  event_exercise: exercise,
+  event_incidents: arrayOfIncidents
+})
+
+incident.define({
+  incident_event: event,
+  incident_injects: arrayOfInjects
+})
+
+inject.define({
+  inject_incident: incident,
 })

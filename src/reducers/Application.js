@@ -6,13 +6,16 @@ const application = (state = Map(), action) => {
 
   switch (action.type) {
 
+    // region EXERCISESTATUSES
     case Constants.APPLICATION_FETCH_EXERCISE_STATUSES_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'exercise_statuses'])
         state.setIn(['ui', 'loading'], false)
       })
     }
+    //endregion
 
+    // region FILES
     case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'files'])
@@ -30,15 +33,17 @@ const application = (state = Map(), action) => {
         state.setIn(['ui', 'loading'], false)
       })
     }
+    //endregion
 
+    // region USERS
     case Constants.APPLICATION_FETCH_USERS_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
 
     case Constants.APPLICATION_FETCH_USERS_SUCCESS: {
       return state.withMutations(function (state) {
-        mergeStore(state, action, ['entities', 'users'])
-        mergeStore(state, action, ['entities', 'organizations'])
+        mergeStore(state,action, ['entities', 'users'])
+        mergeStore(state, action, ['entities', 'exercise_statuses'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -58,22 +63,23 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_USER_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'users'])
-        mergeStore(state, action, ['entities', 'organizations'])
-        state.setIn(['ui', 'loading'], false)
+        mergeStore(state, action, ['ui', 'loading'])
       })
     }
 
     case Constants.APPLICATION_ADD_USER_ERROR: {
       return state.setIn(['ui', 'loading'], false)
     }
+    //endregion
 
+    //region ORGANIZATIONS
     case Constants.APPLICATION_FETCH_ORGANIZATIONS_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
 
     case Constants.APPLICATION_FETCH_ORGANIZATIONS_SUCCESS: {
       return state.withMutations(function (state) {
-        mergeStore(state, action, ['entities', 'organizations'])
+        mergeStore(state,action, ['entities', 'organizations'])
         state.setIn(['ui', 'loading'], false)
       })
     }
@@ -89,14 +95,16 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_ORGANIZATION_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'organizations'])
-        state.setIn(['ui', 'loading'], false)
+        mergeStore(state, action, ['ui', 'loading'])
       })
     }
 
     case Constants.APPLICATION_ADD_ORGANIZATION_ERROR: {
       return state.setIn(['ui', 'loading'], false)
     }
+    //endregion
 
+    //region EXERCISES
     case Constants.APPLICATION_FETCH_EXERCISES_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
@@ -136,7 +144,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_EXERCISE_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'exercises'])
-        state.setIn(['ui', 'loading'], false)
+        mergeStore(state, action, ['ui', 'loading'])
       })
     }
 
@@ -162,7 +170,9 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_DELETE_EXERCISE_SUCCESS: {
       return state.deleteIn(['entities', 'exercises', action.payload])
     }
+    //endregion
 
+    // region AUDIENCES
     case Constants.APPLICATION_FETCH_AUDIENCES_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }
@@ -216,7 +226,6 @@ const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS: {
-      console.log('ACTION', action)
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'audiences'])
         state.setIn(['ui', 'loading'], false)
@@ -241,6 +250,52 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_SELECT_AUDIENCE: {
       return state.setIn(['ui', 'states', 'current_audiences', action.payload.exerciseId], action.payload.audienceId)
+    }
+    //endregion
+
+    case Constants.APPLICATION_ADD_EVENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_EVENT_SUCCESS: {
+      let eventId = action.payload.get('result')
+      let exerciseId = action.payload.getIn(['entities', 'events', eventId, 'event_exercise'])
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'events'])
+        state.setIn(['ui', 'loading'], false)
+        state.setIn(['ui', 'states', 'current_events', exerciseId], action.payload.get('result'))
+      })
+    }
+
+    case Constants.APPLICATION_ADD_EVENT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_UPDATE_EVENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_UPDATE_EVENT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'events'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_UPDATE_EVENT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_DELETE_EVENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_DELETE_EVENT_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'audiences', action.payload.get('audienceId')])
+        state.setIn(['ui', 'states', 'current_audiences', action.payload.get('exerciseId')], undefined)
+        state.setIn(['ui', 'loading'], false)
+      })
     }
 
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
