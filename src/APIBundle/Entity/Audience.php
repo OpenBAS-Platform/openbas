@@ -40,9 +40,16 @@ class Audience
      */
     protected $audience_exercise;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="Inject", mappedBy="audience_injects")
+     * @var Inject[]
+     */
+    protected $audience_injects;
+
     public function __construct()
     {
         $this->audience_users = new ArrayCollection();
+        $this->audience_injects = new ArrayCollection();
     }
 
     public function getAudienceId()

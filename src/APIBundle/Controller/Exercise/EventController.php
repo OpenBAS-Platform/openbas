@@ -35,6 +35,11 @@ class EventController extends Controller
         $this->denyAccessUnlessGranted('select', $exercise);
 
         $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+        /* @var $events Event[] */
+
+        foreach( $events as &$event) {
+            $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+        }
 
         return $events;
     }
@@ -66,6 +71,7 @@ class EventController extends Controller
             return $this->eventNotFound();
         }
 
+        $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
         return $event;
     }
 
@@ -91,13 +97,17 @@ class EventController extends Controller
         $this->denyAccessUnlessGranted('update', $exercise);
 
         $event = new Event();
-        $event->setEventExercise($exercise);
         $form = $this->createForm(EventType::class, $event);
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
+            $file = $em->getRepository('APIBundle:File')->findOneBy(['file_name' => 'Event default']);
+            $event->setEventExercise($exercise);
+            $event->setEventImage($file);
             $em->persist($event);
             $em->flush();
+
+            $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
             return $event;
         } else {
             return $form;
@@ -137,33 +147,14 @@ class EventController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace an event",
-     *   input={"class"=EventType::class, "name"=""}
+     *    description="Update an event",
+     *    input={"class"=EventType::class, "name"=""}
      * )
      *
      * @Rest\View(serializerGroups={"event"})
      * @Rest\Put("/exercises/{exercise_id}/events/{event_id}")
      */
     public function updateExercisesEventAction(Request $request)
-    {
-        return $this->updateEvent($request, true);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Update an event",
-     *    input={"class"=EventType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"event"})
-     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}")
-     */
-    public function patchExercisesEventAction(Request $request)
-    {
-        return $this->updateEvent($request, false);
-    }
-
-    private function updateEvent(Request $request, $clearMissing)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -183,7 +174,7 @@ class EventController extends Controller
         }
 
         $form = $this->createForm(EventType::class, $event);
-        $form->submit($request->request->all(), $clearMissing);
+        $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             $em->persist($event);

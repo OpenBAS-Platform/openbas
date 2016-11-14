@@ -41,6 +41,12 @@ class Event
      */
     protected $event_incidents;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="File")
+     * @ORM\JoinColumn(name="event_image", referencedColumnName="file_id")
+     */
+    protected $event_image;
+
     public function __construct()
     {
         $this->event_incidents = new ArrayCollection();
@@ -87,6 +93,28 @@ class Event
     public function setEventExercise($exercise)
     {
         $this->event_exercise = $exercise;
+        return $this;
+    }
+
+    public function getEventIncidents()
+    {
+        return $this->event_incidents;
+    }
+
+    public function setEventIncidents($incidents)
+    {
+        $this->event_incidents = $incidents;
+        return $this;
+    }
+
+    public function getEventImage()
+    {
+        return $this->event_image;
+    }
+
+    public function setEventImage($image)
+    {
+        $this->event_image = $image;
         return $this;
     }
 }

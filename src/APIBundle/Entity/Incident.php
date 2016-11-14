@@ -53,7 +53,7 @@ class Incident
     protected $incident_event;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Objective", mappedBy="objective_events")
+     * @ORM\ManyToMany(targetEntity="Objective", mappedBy="objective_objectives")
      * @var Objective[]
      */
     protected $incident_objectives;
@@ -64,10 +64,17 @@ class Incident
      */
     protected $incident_outcomes;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_incident")
+     * @var Inject[]
+     */
+    protected $incident_injects;
+
     public function __construct()
     {
         $this->incident_objectives = new ArrayCollection();
         $this->incident_outcomes = new ArrayCollection();
+        $this->incident_injects = new ArrayCollection();
     }
 
     public function getIncidentId()

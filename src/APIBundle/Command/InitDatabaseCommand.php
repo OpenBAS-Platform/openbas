@@ -66,6 +66,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Creating default inject types');
 
         $fileExercise = $this->createFile('Exercise default', 'default_exercise.png');
+        $fileEvent = $this->createFile('Event default', 'default_event.png');
         $output->writeln('Creating default files');
 
         $organizationAgency = $this->createOrganization('The agency', 'The national security agency');

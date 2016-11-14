@@ -39,7 +39,7 @@ class ExerciseController extends Controller
         }
 
         foreach( $exercises as &$exercise) {
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
         }
 
         return $exercises;
@@ -64,8 +64,8 @@ class ExerciseController extends Controller
         }
 
         $this->denyAccessUnlessGranted('select', $exercise);
-        $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
 
+        $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
         return $exercise;
     }
 
@@ -98,8 +98,8 @@ class ExerciseController extends Controller
             $exercise->setExerciseImage($file);
             $em->persist($exercise);
             $em->flush();
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
 
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
             return $exercise;
         } else {
             return $form;
@@ -153,7 +153,7 @@ class ExerciseController extends Controller
         if ($form->isValid()) {
             $em->persist($exercise);
             $em->flush();
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
 
             return $exercise;
         } else {
