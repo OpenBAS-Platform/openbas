@@ -44,7 +44,11 @@ class Inject
     protected $inject_sender;
 
     /**
-     * @ORM\OneToMany(targetEntity="Audience", mappedBy="audience_exercise")
+     * @ORM\ManyToMany(targetEntity="Audience", inversedBy="inject_audiences")
+     * @ORM\JoinTable(name="injects_audiences",
+     *     joinColumns={@ORM\JoinColumn(name="inject_id", referencedColumnName="inject_id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="audience_id", referencedColumnName="audience_id", onDelete="CASCADE")}
+     *     )
      * @var Audience[]
      */
     protected $inject_audiences;

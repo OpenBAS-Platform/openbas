@@ -1,3 +1,7 @@
+parameters:
+    type:     rest
+    resource: APIBundle\Controller\ParameterController
+
 users:
     type:     rest
     resource: APIBundle\Controller\UserController
@@ -50,14 +54,18 @@ exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController
 
+exercises_incidents:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\IncidentController
+
 exercises_events_incidents:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\IncidentController
 
-exercises_events_incidents_injects:
+exercises_event_incidents_injects:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\Incident\InjectController
 
-exercises_events_incidents_outcomes:
+exercises_event_incidents_outcomes:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\Incident\OutcomeController
