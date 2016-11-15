@@ -6,6 +6,7 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Entity\File;
 use APIBundle\Entity\Grant;
 use APIBundle\Entity\Group;
+use APIBundle\Entity\IncidentType;
 use APIBundle\Entity\InjectType;
 use APIBundle\Entity\Result;
 use APIBundle\Entity\InjectState;
@@ -57,6 +58,11 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $resultSemiAchieved = $this->createResult('SEMI_ACHIEVED');
         $resultNotAchieved = $this->createResult('NOT_ACHIEVED');
         $output->writeln('Creating default results');
+
+        $typeTechnical = $this->createIncidentType('TECHNICAL');
+        $typeOperational = $this->createIncidentType('OPERATIONAL');
+        $typeStrategic = $this->createIncidentType('STRATEGIC');
+        $output->writeln('Creating default incident types');
 
         $typeWeb = $this->createInjectType('WEB');
         $typeMail = $this->createInjectType('MAIL');
@@ -167,6 +173,15 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
 
         return $status;
+    }
+
+    private function createIncidentType($name) {
+        $type = new IncidentType();
+        $type->setTypeName($name);
+        $this->em->persist($type);
+        $this->em->flush();
+
+        return $type;
     }
 
     private function createInjectStatus($name) {

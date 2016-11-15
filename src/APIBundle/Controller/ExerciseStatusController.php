@@ -18,7 +18,7 @@ class ExerciseStatusController extends Controller
      * @ApiDoc(
      *    description="List exercise statuses"
      * )
-     * @Rest\View(serializerGroups={"exerciseStatus"})
+     * @Rest\View(serializerGroups={"ExerciseStatus"})
      * @Rest\Get("/exercise_statuses")
      */
     public function getExerciseStatusesAction(Request $request)

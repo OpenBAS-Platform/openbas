@@ -1,7 +1,7 @@
 APIBundle\Entity\Inject:
     attributes:
         inject_id:
-            groups: ['inject']
+            groups: ['inject', 'audience']
         inject_title:
             groups: ['inject']
         inject_description:

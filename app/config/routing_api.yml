@@ -34,6 +34,10 @@ exercise_statuses:
     type:     rest
     resource: APIBundle\Controller\ExerciseStatusController
 
+incident_types:
+    type:     rest
+    resource: APIBundle\Controller\IncidentTypeController
+
 inject_statuses:
     type:     rest
     resource: APIBundle\Controller\InjectStatusController

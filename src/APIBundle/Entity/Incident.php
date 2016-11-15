@@ -53,7 +53,11 @@ class Incident
     protected $incident_event;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Objective", mappedBy="objective_objectives")
+     * @ORM\ManyToMany(targetEntity="Objective", inversedBy="incident_objectives")
+     * @ORM\JoinTable(name="incidents_objectives",
+     *      joinColumns={@ORM\JoinColumn(name="incident_id", referencedColumnName="incident_id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="objective_id", referencedColumnName="objective_id", onDelete="RESTRICT")}
+     *      )
      * @var Objective[]
      */
     protected $incident_objectives;

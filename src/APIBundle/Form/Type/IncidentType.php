@@ -13,8 +13,14 @@ class IncidentType extends AbstractType
     {
         $builder->add('incident_title');
         $builder->add('incident_story');
-        $builder->add('incident_start_date');
-        $builder->add('incident_end_date');
+        $builder->add('incident_start_date', DateTimeType::class, array(
+            'widget' => 'single_text',
+            'input' => 'datetime'
+        ));
+        $builder->add('incident_end_date', DateTimeType::class, array(
+            'widget' => 'single_text',
+            'input' => 'datetime'
+        ));
         $builder->add('incident_type');
     }
 
