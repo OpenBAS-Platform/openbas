@@ -28,6 +28,7 @@ import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
+import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
 
 import roundMoment from './utils/moment-round'
 
@@ -48,6 +49,7 @@ const initialState = {
       organizations: Map(),
       files: Map(),
       exercise_statuses: Map(),
+      incident_types: Map(),
       inject_statuses: Map(),
       inject_states: Map(),
       exercises: Map(),
@@ -61,7 +63,6 @@ const initialState = {
       navbar_right_open: true,
       loading: false,
       states: Map({
-        current_audience: undefined,
         current_search_keyword: ''
       })
     })
@@ -165,9 +166,7 @@ class App extends Component {
                   <Route path='world' component={IndexExercise}/>
                   <Route path='objectives' component={IndexExercise}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
-                  <Route path='scenario/:scenarioId'>
-                    <IndexRoute component={IndexExerciseScenario}/>
-                  </Route>
+                  <Route path='scenario/:eventId' component={IndexExerciseScenarioEvent}/>
                   <Route path='audience' component={IndexExerciseAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>

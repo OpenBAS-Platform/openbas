@@ -53,14 +53,6 @@ const styles = {
 }
 
 class Index extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedUsers: [],
-    }
-    this.selectedUsers = []
-  }
-
   componentDidMount() {
     this.props.fetchUsers()
     this.props.fetchOrganizations()

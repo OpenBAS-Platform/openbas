@@ -6,6 +6,9 @@ export const arrayOfFiles = arrayOf(file)
 export const exerciseStatus = new Schema('exercise_statuses', {idAttribute: 'status_id'})
 export const arrayOfExercisesStatuses = arrayOf(exerciseStatus)
 
+export const incidentType = new Schema('incident_types', {idAttribute: 'type_id'})
+export const arrayOfIncidentTypes = arrayOf(incidentType)
+
 export const injectStatus = new Schema('inject_statuses', {idAttribute: 'status_id'})
 export const arrayOfInjectStatuses = arrayOf(injectStatus)
 
@@ -60,7 +63,8 @@ event.define({
 
 incident.define({
   incident_event: event,
-  incident_injects: arrayOfInjects
+  incident_injects: arrayOfInjects,
+  incident_type: incidentType
 })
 
 inject.define({

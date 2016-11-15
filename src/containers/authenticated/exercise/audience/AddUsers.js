@@ -153,7 +153,6 @@ class AddUsers extends Component {
                 return (
                   <MainSmallListItem
                     key={user.get('user_id')}
-                    ref={user.get('user_id')}
                     disabled={disabled}
                     onClick={this.addUser.bind(this, user)}
                     primaryText={

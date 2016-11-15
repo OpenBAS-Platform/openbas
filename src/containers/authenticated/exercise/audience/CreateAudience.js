@@ -23,7 +23,6 @@ class CreateAudience extends Component {
 
   onSubmitCreate(data) {
     this.props.addAudience(this.props.exerciseId, data)
-    this.handleCloseCreate()
   }
 
   submitFormCreate() {
@@ -57,7 +56,7 @@ class CreateAudience extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={actions}
         >
-          <AudienceForm ref="audienceForm" onSubmit={this.onSubmitCreate.bind(this)} />
+          <AudienceForm ref="audienceForm" onSubmit={this.onSubmitCreate.bind(this)} onSubmitSuccess={this.handleCloseCreate.bind(this)} />
         </Dialog>
       </div>
     );

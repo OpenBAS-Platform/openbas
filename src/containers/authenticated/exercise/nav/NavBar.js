@@ -35,7 +35,7 @@ class NavBar extends Component {
                             to={'/private/exercise/' + this.props.id + '/objectives'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
-          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/scenario'}
+          <IconListItemLink active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/scenario')}
                             to={'/private/exercise/' + this.props.id + '/scenario'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>

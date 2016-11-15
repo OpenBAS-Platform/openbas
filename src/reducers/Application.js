@@ -15,6 +15,15 @@ const application = (state = Map(), action) => {
     }
     //endregion
 
+    // region INCIDENTTYPES
+    case Constants.APPLICATION_FETCH_INCIDENT_TYPES_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'incident_types'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+    //endregion
+
     // region FILES
     case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
       return state.withMutations(function (state) {
@@ -63,7 +72,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_USER_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'users'])
-        mergeStore(state, action, ['ui', 'loading'])
+        state.setIn(['ui', 'loading'], false)
       })
     }
 
@@ -95,7 +104,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_ORGANIZATION_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'organizations'])
-        mergeStore(state, action, ['ui', 'loading'])
+        state.setIn(['ui', 'loading'], false)
       })
     }
 
@@ -334,6 +343,88 @@ const application = (state = Map(), action) => {
         state.deleteIn(['entities', 'events', action.payload.get('eventId')])
         state.setIn(['ui', 'loading'], false)
       })
+    }
+    //endregion
+
+    // region INCIDENTS
+    case Constants.APPLICATION_FETCH_INCIDENTS_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_INCIDENTS_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'incidents'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_INCIDENTS_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_INCIDENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_INCIDENT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'incidents'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_INCIDENT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_ADD_INCIDENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_INCIDENT_SUCCESS: {
+      let incidentId = action.payload.get('result')
+      let eventId = action.payload.getIn(['entities', 'incidents', incidentId, 'incident_event'])
+      let exerciseId = action.payload.getIn(['entities', 'events', eventId, 'event_exercise'])
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'incidents'])
+        state.setIn(['ui', 'loading'], false)
+        state.setIn(['ui', 'states', 'current_incidents', exerciseId, eventId], action.payload.get('result'))
+      })
+    }
+
+    case Constants.APPLICATION_ADD_INCIDENT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_UPDATE_INCIDENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_UPDATE_INCIDENT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'incidents'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_UPDATE_INCIDENT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_DELETE_INCIDENT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_DELETE_INCIDENT_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'incidents', action.payload.get('incidentId')])
+        state.setIn(['ui', 'states', 'current_incidents', action.payload.get('exerciseId'), action.payload.get('eventId')], undefined)
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_SELECT_INCIDENT: {
+      return state.setIn(['ui', 'states', 'current_audiences', action.payload.exerciseId, action.payload.eventId], action.payload.audienceId)
     }
     //endregion
 
