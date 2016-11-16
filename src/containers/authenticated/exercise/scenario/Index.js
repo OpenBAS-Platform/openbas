@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
 import {fetchEvents} from '../../../../actions/Event'
-import * as Constants from '../../../../constants/ComponentTypes'
 import {Event} from '../../../../components/Event'
 import CreateEvent from './event/CreateEvent'
 

@@ -5,6 +5,10 @@ export const AVATAR_TYPE_MAINLIST = 'AVATAR_TYPE_MAINLIST'
 export const AVATAR_TYPE_CHIP = 'AVATAR_TYPE_CHIP'
 //endregion
 
+// region LISTITEM
+export const LIST_ITEM_NOSPACE = 'LIST_ITEM_NOSPACE'
+//endregion
+
 //region ICON
 export const ICON_TYPE_NAVBAR = 'ICON_TYPE_NAVBAR'
 export const ICON_TYPE_LIST = 'ICON_TYPE_LIST'

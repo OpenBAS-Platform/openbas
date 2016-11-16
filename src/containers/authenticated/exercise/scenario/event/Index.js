@@ -5,6 +5,7 @@ import * as Constants from '../../../../../constants/ComponentTypes'
 import {List} from '../../../../../components/List'
 import {MainListItem} from '../../../../../components/list/ListItem';
 import IncidentNav from './IncidentNav'
+import IncidentPopover from './IncidentPopover'
 
 const styles = {
   'container': {
@@ -63,14 +64,10 @@ class Index extends Component {
 
     return (
       <div style={styles.container}>
-        <IncidentNav exerciseId={this.props.exerciseId}/>
-        <div style={styles.title}>{this.props.audience.get('audience_name')}</div>
-        <AudiencePopover exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}/>
-        <div style={styles.number}>{this.props.audience_users.count()} users</div>
+        <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
+        <div style={styles.title}>{this.props.incident.get('incident_title')}</div>
+        <IncidentPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId} incidentId={this.props.incident.get('incident_id')}/>
         <div className="clearfix"></div>
-        {this.props.audience_users.count() === 0 ? <div style={styles.empty}>This audience is empty.</div>:""}
-        <AddUsers exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}
-                  audienceUsersIds={this.props.audience_users_ids}/>
       </div>
     );
   }
@@ -87,14 +84,14 @@ const select = (state, ownProps) => {
   let eventId = ownProps.params.eventId
   let incidents = state.application.getIn(['entities', 'incidents'])
   let currentIncident = state.application.getIn(['ui', 'states', 'current_incidents', exerciseId, eventId])
+
+  console.log('currentIncident', currentIncident)
   let incident = currentIncident ? incidents.get(currentIncident) : Map()
 
   return {
     exerciseId,
     eventId,
-    incident,
-    users: state.application.getIn(['entities', 'users']),
-    organizations: state.application.getIn(['entities', 'organizations']),
+    incident
   }
 }
 

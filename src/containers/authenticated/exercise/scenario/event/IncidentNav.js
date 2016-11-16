@@ -43,6 +43,7 @@ class IncidentNav extends Component {
           {this.props.incidents.toList().map(incident => {
             return (
               <ListItemLink
+                type={Constants.LIST_ITEM_NOSPACE}
                 key={incident.get('incident_id')}
                 active={this.props.currentIncident === incident.get('incident_id')}
                 onClick={this.handleChangeIncident.bind(this, incident.get('incident_id'))}

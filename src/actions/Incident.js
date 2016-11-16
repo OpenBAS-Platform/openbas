@@ -20,7 +20,6 @@ export const fetchIncidents = (exerciseId, eventId) => (dispatch) => {
 }
 
 export const addIncident = (exerciseId, eventId, data) => (dispatch) => {
-  console.log('DATA', data)
   dispatch({type: Constants.APPLICATION_ADD_INCIDENT_SUBMITTED});
   return api(schema.incident).post('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents', data).then(function (response) {
     dispatch({

@@ -29,7 +29,7 @@ class CreateIncident extends Component {
   }
 
   onSubmitCreate(data) {
-    this.props.addIncident(this.props.exerciseId, this.props.eventId, data)
+    return this.props.addIncident(this.props.exerciseId, this.props.eventId, data)
   }
 
   submitFormCreate() {

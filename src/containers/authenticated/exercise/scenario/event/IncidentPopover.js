@@ -1,22 +1,28 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {Map} from 'immutable'
-import * as Constants from '../../../../constants/ComponentTypes'
-import {Popover} from '../../../../components/Popover';
-import {Menu} from '../../../../components/Menu'
-import {Dialog} from '../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../components/Button'
-import {Icon} from '../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {updateAudience, deleteAudience} from '../../../../actions/Audience'
-import AudienceForm from './AudienceForm'
+import * as Constants from '../../../../../constants/ComponentTypes'
+import {Popover} from '../../../../../components/Popover';
+import {Menu} from '../../../../../components/Menu'
+import {Dialog} from '../../../../../components/Dialog'
+import {IconButton, FlatButton} from '../../../../../components/Button'
+import {Icon} from '../../../../../components/Icon'
+import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
+import {updateIncident, deleteIncident} from '../../../../../actions/Incident'
+import IncidentForm from './IncidentForm'
+
+const typesNames = {
+  TECHNICAL: 'Technical',
+  OPERATIONAL: 'Operational',
+  STRATEGIC: 'Strategic'
+}
 
 const style = {
   float: 'left',
   marginTop: '-14px'
 }
 
-class AudiencePopover extends Component {
+class IncidentPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -52,11 +58,11 @@ class AudiencePopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
+    return this.props.updateIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId, data)
   }
 
   submitFormEdit() {
-    this.refs.audienceForm.submit()
+    this.refs.incidentForm.submit()
   }
 
   handleOpenDelete() {
@@ -73,7 +79,7 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.exerciseId, this.props.audienceId)
+    this.props.deleteIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
     this.handleCloseDelete()
   }
 
@@ -104,9 +110,11 @@ class AudiencePopover extends Component {
     ];
 
     let initialInformation = undefined
-    if (this.props.audience) {
+    if (this.props.incident) {
       initialInformation = {
-        audience_name: this.props.audience.get('audience_name'),
+        incident_title: this.props.incident.get('incident_title'),
+        incident_story: this.props.incident.get('incident_story'),
+        incident_type: this.props.incident.get('incident_type')
       }
     }
 
@@ -130,16 +138,25 @@ class AudiencePopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the deletion of this audience?
+          Do you confirm the deletion of this incident?
         </Dialog>
         <Dialog
-          title="Update the audience"
+          title="Update the incident"
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <AudienceForm ref="audienceForm" initialValues={initialInformation} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          <IncidentForm ref="incidentForm"
+                        initialValues={initialInformation}
+                        onSubmit={this.onSubmitEdit.bind(this)}
+                        onSubmitSuccess={this.handleCloseEdit.bind(this)}
+                        types={this.props.incident_types.toList().map(type => {
+                          return (
+                            <MenuItemLink key={type.get('type_id')} value={type.get('type_id')}
+                                          label={typesNames[type.get('type_name')]}/>
+                          )
+                        })}/>
         </Dialog>
       </div>
     )
@@ -147,22 +164,25 @@ class AudiencePopover extends Component {
 }
 
 const select = (state, props) => {
-  let audiences = state.application.getIn(['entities', 'audiences'])
-  let currentAudience = state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
-  let audience = currentAudience ? audiences.get(currentAudience) : Map()
+  let incidents = state.application.getIn(['entities', 'incidents'])
+  let currentIncident = state.application.getIn(['ui', 'states', 'current_incidents', props.exerciseId, props.eventId])
+  let incident = currentIncident ? incidents.get(currentIncident) : Map()
 
   return {
-    audience
+    incident,
+    incident_types: state.application.getIn(['entities', 'incident_types']),
   }
 }
 
-AudiencePopover.propTypes = {
+IncidentPopover.propTypes = {
   exerciseId: PropTypes.string,
-  audienceId: PropTypes.string,
-  deleteAudience: PropTypes.func,
-  updateAudience: PropTypes.func,
-  audience: PropTypes.object,
+  eventId: PropTypes.string,
+  incidentId: PropTypes.string,
+  deleteIncident: PropTypes.func,
+  updateIncident: PropTypes.func,
+  incident: PropTypes.object,
+  incident_types: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateAudience, deleteAudience})(AudiencePopover)
+export default connect(select, {updateIncident, deleteIncident})(IncidentPopover)

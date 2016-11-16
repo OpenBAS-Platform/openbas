@@ -424,7 +424,7 @@ const application = (state = Map(), action) => {
     }
 
     case Constants.APPLICATION_SELECT_INCIDENT: {
-      return state.setIn(['ui', 'states', 'current_audiences', action.payload.exerciseId, action.payload.eventId], action.payload.audienceId)
+      return state.setIn(['ui', 'states', 'current_incidents', action.payload.exerciseId, action.payload.eventId], action.payload.incidentId)
     }
     //endregion
 

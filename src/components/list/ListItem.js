@@ -2,13 +2,13 @@ import React, {PropTypes} from 'react'
 import MUIListItem from 'material-ui/List/ListItem'
 import {injectIntl} from 'react-intl'
 import {Link} from 'react-router'
+import * as Constants from '../../constants/ComponentTypes'
 
 const styles = {
   'active': {
-    backgroundColor: "#BDBDBD"
+    backgroundColor: '#BDBDBD',
   },
   'inactive': {
-
   },
   'mainitem': {
     borderBottom: '1px solid #E0E0E0'
@@ -26,11 +26,18 @@ const styles = {
   },
 }
 
+const innerDivStyle = {
+  [ Constants.LIST_ITEM_NOSPACE ]: {
+    padding: '16px 16px 16px 55px'
+  }
+}
+
 const ListItemLinkIntl = (props) => (
   <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
     containerElement={<Link to={props.to}/>}
     style={props.active === true ? styles.active : styles.inactive}
+    innerDivStyle={innerDivStyle[props.type]}
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
@@ -46,7 +53,8 @@ ListItemLinkIntl.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  active: PropTypes.bool
+  active: PropTypes.bool,
+  type: PropTypes.string
 }
 
 const ListItemButtonIntl = (props) => (

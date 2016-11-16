@@ -33,27 +33,33 @@ class LeftBar extends Component {
         <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_LEFTBAR} onTitleTouchTap={this.redirectToHome.bind(this)}
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
-          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id}
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id}
                         label="World"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
-          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/objectives'}
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/objectives'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/objectives'}
                         label="Objectives"
                         leftIcon={<Icon name={Constants.ICON_NAME_CONTENT_FLAG}/>}/>
-          <ListItemLink active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/scenario')}
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/scenario')}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/scenario'}
                         label="Scenario"
                         leftIcon={<Icon name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
-          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/audience'}
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/audience'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/audience'}
                         label="Audience"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
-          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/calendar'}
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/calendar'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/calendar'}
                         label="Calendar"
                         leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
-          <ListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/settings'}
                         label="Settings"
                         leftIcon={<Icon name={Constants.ICON_NAME_ACTION_SETTINGS}/>}/>
