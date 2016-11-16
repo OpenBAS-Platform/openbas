@@ -1,7 +1,7 @@
 APIBundle\Entity\Event:
     attributes:
         event_id:
-            groups: ['event']
+            groups: ['event', 'incident']
         event_title:
             groups: ['event']
         event_description:

@@ -2,13 +2,11 @@ APIBundle\Entity\Incident:
     attributes:
         incident_id:
             groups: ['incident']
+        incident_type:
+            groups: ['incident']
+        incident_event:
+            groups: ['incident']
         incident_title:
             groups: ['incident']
         incident_story:
-            groups: ['incident']
-        incident_start_date:
-            groups: ['incident']
-        incident_end_date:
-            groups: ['incident']
-        incident_type:
             groups: ['incident']

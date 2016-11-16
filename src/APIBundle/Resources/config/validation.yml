@@ -82,10 +82,6 @@ APIBundle\Entity\Incident:
         incident_story:
             - NotBlank: ~
             - Type: string
-        incident_start_date:
-            - DateTime: ~
-        incident_end_date:
-            - DateTime: ~
 
 APIBundle\Entity\Inject:
     properties:

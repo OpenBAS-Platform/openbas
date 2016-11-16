@@ -29,16 +29,6 @@ class Incident
     protected $incident_story;
 
     /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $incident_start_date;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $incident_end_date;
-
-    /**
      * @ORM\ManyToOne(targetEntity="IncidentType", inversedBy="type_incidents")
      * @ORM\JoinColumn(name="incident_type", referencedColumnName="type_id", onDelete="CASCADE")
      * @var IncidentType
