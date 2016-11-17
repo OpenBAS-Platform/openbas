@@ -16,3 +16,5 @@ APIBundle\Entity\Inject:
             groups: ['inject']
         inject_status:
             groups: ['inject']
+        inject_incident:
+            groups: ['inject']
