@@ -17,7 +17,7 @@ class IncidentController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List incidents"
+     *    description="List incidents of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"incident"})

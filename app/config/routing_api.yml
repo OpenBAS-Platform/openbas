@@ -34,6 +34,10 @@ exercise_statuses:
     type:     rest
     resource: APIBundle\Controller\ExerciseStatusController
 
+incident_types:
+    type:     rest
+    resource: APIBundle\Controller\IncidentTypeController
+
 inject_statuses:
     type:     rest
     resource: APIBundle\Controller\InjectStatusController
@@ -58,9 +62,17 @@ exercises_incidents:
     type:     rest
     resource: APIBundle\Controller\Exercise\IncidentController
 
+exercises_injects:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\InjectController
+
 exercises_events_incidents:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\IncidentController
+
+exercises_events_injects:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Event\InjectController
 
 exercises_event_incidents_injects:
     type:     rest
@@ -69,3 +81,7 @@ exercises_event_incidents_injects:
 exercises_event_incidents_outcomes:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\Incident\OutcomeController
+
+injects:
+    type:     rest
+    resource: APIBundle\Controller\InjectController

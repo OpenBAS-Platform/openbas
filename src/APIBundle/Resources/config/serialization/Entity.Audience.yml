@@ -8,3 +8,5 @@ APIBundle\Entity\Audience:
             groups: ['audience']
         audience_users:
             groups: ['audience']
+        audience_injects:
+            groups: ['audience']

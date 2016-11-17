@@ -41,7 +41,7 @@ class Audience
     protected $audience_exercise;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Inject", mappedBy="audience_injects")
+     * @ORM\ManyToMany(targetEntity="Inject", mappedBy="inject_audiences")
      * @var Inject[]
      */
     protected $audience_injects;
@@ -93,6 +93,17 @@ class Audience
     public function setAudienceExercise($exercise)
     {
         $this->audience_exercise = $exercise;
+        return $this;
+    }
+
+    public function getAudienceInjects()
+    {
+        return $this->audience_injects;
+    }
+
+    public function setAudienceInjects($injects)
+    {
+        $this->audience_injects = $injects;
         return $this;
     }
 }

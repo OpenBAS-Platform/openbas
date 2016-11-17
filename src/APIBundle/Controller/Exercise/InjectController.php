@@ -9,21 +9,22 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Exercise;
-use APIBundle\Form\Type\IncidentType;
+use APIBundle\Form\Type\InjectType;
 use APIBundle\Entity\Event;
 use APIBundle\Entity\Incident;
+use APIBundle\Entity\Inject;
 
-class IncidentController extends Controller
+class InjectController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List incidents of an exercise"
+     *    description="List injects of an exercise"
      * )
      *
-     * @Rest\View(serializerGroups={"incident"})
-     * @Rest\Get("/exercises/{exercise_id}/incidents")
+     * @Rest\View(serializerGroups={"inject"})
+     * @Rest\Get("/exercises/{exercise_id}/injects")
      */
-    public function getExercisesIncidentsAction(Request $request)
+    public function getExercisesInjectsAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -38,12 +39,17 @@ class IncidentController extends Controller
         $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
         /* @var $events Event[] */
 
-        $incidents = array();
-        foreach( $events as $event ) {
-            $incidents = array_merge($incidents, $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]));
+        $injects = array();
+        foreach ($events as $event) {
+            $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
+            /* @var $incidents Incident[] */
+
+            foreach ($incidents as $incident) {
+                $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+            }
         }
 
-        return $incidents;
+        return $injects;
     }
 
     private function exerciseNotFound()

@@ -18,7 +18,7 @@ class InjectController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List injects"
+     *    description="List injects of an incident"
      * )
      *
      * @Rest\View(serializerGroups={"inject"})

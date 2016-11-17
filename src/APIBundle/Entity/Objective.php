@@ -41,11 +41,8 @@ class Objective
     protected $objective_exercise;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Incident", inversedBy="incident_objectives")
-     * @ORM\JoinTable(name="objectives_incidents",
-     *      joinColumns={@ORM\JoinColumn(name="objective_id", referencedColumnName="objective_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="incident_id", referencedColumnName="incident_id", onDelete="CASCADE")}
-     *      )
+     * @ORM\ManyToMany(targetEntity="Incident", mappedBy="incident_objectives")
+     * @var Incident[]
      */
     protected $objective_incidents;
 

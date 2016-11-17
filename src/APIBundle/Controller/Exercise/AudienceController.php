@@ -16,7 +16,7 @@ class AudienceController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List audiences"
+     *    description="List audiences of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"audience"})

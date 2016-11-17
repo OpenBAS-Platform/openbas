@@ -29,16 +29,6 @@ class Incident
     protected $incident_story;
 
     /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $incident_start_date;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $incident_end_date;
-
-    /**
      * @ORM\ManyToOne(targetEntity="IncidentType", inversedBy="type_incidents")
      * @ORM\JoinColumn(name="incident_type", referencedColumnName="type_id", onDelete="CASCADE")
      * @var IncidentType
@@ -53,7 +43,11 @@ class Incident
     protected $incident_event;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Objective", mappedBy="objective_objectives")
+     * @ORM\ManyToMany(targetEntity="Objective", inversedBy="incident_objectives")
+     * @ORM\JoinTable(name="incidents_objectives",
+     *      joinColumns={@ORM\JoinColumn(name="incident_id", referencedColumnName="incident_id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="objective_id", referencedColumnName="objective_id", onDelete="RESTRICT")}
+     *      )
      * @var Objective[]
      */
     protected $incident_objectives;
@@ -110,28 +104,6 @@ class Incident
         return $this;
     }
 
-    public function getIncidentStartDate()
-    {
-        return $this->incident_start_date;
-    }
-
-    public function setIncidentStartDate($startDate)
-    {
-        $this->incident_start_date = $startDate;
-        return $this;
-    }
-
-    public function getIncidentEndDate()
-    {
-        return $this->incident_end_date;
-    }
-
-    public function setIncidentEndDate($endDate)
-    {
-        $this->incident_end_date = $endDate;
-        return $this;
-    }
-
     public function getIncidentType()
     {
         return $this->incident_type;
@@ -173,6 +145,17 @@ class Incident
     public function setIncidentOutcomes($outcomes)
     {
         $this->incident_outcomes = $outcomes;
+        return $this;
+    }
+
+    public function getIncidentInjects()
+    {
+        return $this->incident_injects;
+    }
+
+    public function setIncidentInjects($injects)
+    {
+        $this->incident_injects = $injects;
         return $this;
     }
 }
