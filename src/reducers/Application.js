@@ -385,6 +385,7 @@ const application = (state = Map(), action) => {
       let incidentId = action.payload.get('result')
       let eventId = action.payload.getIn(['entities', 'incidents', incidentId, 'incident_event'])
       let exerciseId = action.payload.getIn(['entities', 'events', eventId, 'event_exercise'])
+      console.log('ADD', incidentId, eventId, exerciseId)
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'incidents'])
         state.setIn(['ui', 'loading'], false)
@@ -425,6 +426,85 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_SELECT_INCIDENT: {
       return state.setIn(['ui', 'states', 'current_incidents', action.payload.exerciseId, action.payload.eventId], action.payload.incidentId)
+    }
+    //endregion
+
+    //region INJECTS
+    case Constants.APPLICATION_FETCH_INJECTS_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_INJECTS_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'injects'])
+        mergeStore(state, action, ['entities', 'inject_statuses'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_INJECTS_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_INJECT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_INJECT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'injects'])
+        mergeStore(state, action, ['entities', 'inject_statuses'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_INJECT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_ADD_INJECT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_INJECT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'injects'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_ADD_INJECT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_UPDATE_INJECT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_UPDATE_INJECT_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'injects'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_UPDATE_INJECT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_DELETE_INJECT_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_DELETE_INJECT_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'injects', action.payload])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_DELETE_INJECT_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
     }
     //endregion
 

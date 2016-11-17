@@ -4,6 +4,7 @@ import createImmutableSelector from '../../../../../utils/ImmutableSelect'
 import {fromJS} from 'immutable'
 import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
+import {fetchEvents} from '../../../../../actions/Event'
 import {fetchIncidents, selectIncident} from '../../../../../actions/Incident'
 import {fetchIncidentTypes} from '../../../../../actions/IncidentType'
 import {Drawer} from '../../../../../components/Drawer'
@@ -20,6 +21,7 @@ const filterIncidents = (incidents, eventId) => {
 
 class IncidentNav extends Component {
   componentDidMount() {
+    this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidentTypes()
     this.props.fetchIncidents(this.props.exerciseId, this.props.eventId)
   }
@@ -63,6 +65,7 @@ IncidentNav.propTypes = {
   eventId: PropTypes.string,
   currentIncident: PropTypes.string,
   incidents: PropTypes.object,
+  fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
   selectIncident: PropTypes.func
@@ -79,4 +82,4 @@ const select = (state, props) => {
   }
 }
 
-export default connect(select, {fetchIncidentTypes, fetchIncidents, selectIncident})(IncidentNav);
+export default connect(select, {fetchEvents, fetchIncidentTypes, fetchIncidents, selectIncident})(IncidentNav);

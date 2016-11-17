@@ -19,9 +19,24 @@ export const fetchInjects = (exerciseId, eventId, incidentId) => (dispatch) => {
   })
 }
 
+export const fetchInjectsOfEvent = (exerciseId, eventId) => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_FETCH_INJECTS_SUBMITTED});
+  return api(schema.arrayOfInjects).get('/api/exercises/' + exerciseId + '/events/' + eventId + '/injects').then(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_FETCH_INJECTS_SUCCESS,
+      payload: response.data
+    })
+  }).catch(function (response) {
+    dispatch({
+      type: Constants.APPLICATION_FETCH_INJECTS_ERROR,
+      payload: response.data
+    })
+  })
+}
+
 export const addInject = (exerciseId, eventId, incidentId, data) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_ADD_INJECT_SUBMITTED});
-  return api(schema.audience).post('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects', data).then(function (response) {
+  return api(schema.inject).post('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects', data).then(function (response) {
     dispatch({
       type: Constants.APPLICATION_ADD_INJECT_SUCCESS,
       payload: response.data
@@ -34,7 +49,7 @@ export const addInject = (exerciseId, eventId, incidentId, data) => (dispatch) =
 
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_UPDATE_INJECT_SUBMITTED});
-  return api(schema.audience).put('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId, data).then(function (response) {
+  return api(schema.inject).put('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId, data).then(function (response) {
     dispatch({
       type: Constants.APPLICATION_UPDATE_INJECT_SUCCESS,
       payload: response.data

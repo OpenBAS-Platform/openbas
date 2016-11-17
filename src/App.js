@@ -51,7 +51,6 @@ const initialState = {
       exercise_statuses: Map(),
       incident_types: Map(),
       inject_statuses: Map(),
-      inject_states: Map(),
       exercises: Map(),
       audiences: Map(),
       events: Map(),
