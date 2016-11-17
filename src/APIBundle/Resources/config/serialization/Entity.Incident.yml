@@ -10,3 +10,5 @@ APIBundle\Entity\Incident:
             groups: ['incident']
         incident_story:
             groups: ['incident']
+        incident_injects:
+            groups: ['incident']

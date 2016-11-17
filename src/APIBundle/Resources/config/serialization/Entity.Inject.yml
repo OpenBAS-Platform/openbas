@@ -1,18 +1,16 @@
 APIBundle\Entity\Inject:
     attributes:
         inject_id:
-            groups: ['inject', 'audience']
+            groups: ['inject', 'audience', 'incident']
         inject_title:
-            groups: ['inject']
+            groups: ['inject', 'incident']
         inject_description:
-            groups: ['inject']
+            groups: ['inject', 'incident']
         inject_content:
             groups: ['inject']
         inject_date:
-            groups: ['inject']
+            groups: ['inject', 'incident']
         inject_sender:
-            groups: ['inject']
+            groups: ['inject', 'incident']
         inject_status:
-            groups: ['inject']
-        inject_state:
             groups: ['inject']

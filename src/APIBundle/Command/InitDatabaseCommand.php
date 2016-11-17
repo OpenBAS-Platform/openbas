@@ -7,9 +7,7 @@ use APIBundle\Entity\File;
 use APIBundle\Entity\Grant;
 use APIBundle\Entity\Group;
 use APIBundle\Entity\IncidentType;
-use APIBundle\Entity\InjectType;
 use APIBundle\Entity\Result;
-use APIBundle\Entity\InjectState;
 use APIBundle\Entity\ExerciseStatus;
 use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Token;
@@ -45,14 +43,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $statusRunning = $this->createExerciseStatus('RUNNING');
         $statusFinished = $this->createExerciseStatus('FINISHED');
 
-        $statusDraft = $this->createInjectStatus('DRAFT');
-        $statusReady = $this->createInjectStatus('READY');
         $statusDisabled = $this->createInjectStatus('DISABLED');
+        $statusPending = $this->createInjectStatus('DRAFT');
+        $statusSent = $this->createInjectStatus('READY');
         $output->writeln('Creating default statuses');
-
-        $statePending = $this->createInjectState('PENDING');
-        $stateSent = $this->createInjectState('SENT');
-        $output->writeln('Creating default states');
 
         $resultAchieved = $this->createResult('ACHIEVED');
         $resultSemiAchieved = $this->createResult('SEMI_ACHIEVED');
@@ -63,13 +57,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $typeOperational = $this->createIncidentType('OPERATIONAL');
         $typeStrategic = $this->createIncidentType('STRATEGIC');
         $output->writeln('Creating default incident types');
-
-        $typeWeb = $this->createInjectType('WEB');
-        $typeMail = $this->createInjectType('MAIL');
-        $typePhone = $this->createInjectType('PHONE');
-        $typeSMS = $this->createInjectType('SMS');
-        $typeHangout = $this->createInjectType('HANGOUT');
-        $output->writeln('Creating default inject types');
 
         $fileExercise = $this->createFile('Exercise default', 'default_exercise.png');
         $fileEvent = $this->createFile('Event default', 'default_event.png');
@@ -193,15 +180,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $status;
     }
 
-    private function createInjectState($name) {
-        $state = new InjectState();
-        $state->setStateName($name);
-        $this->em->persist($state);
-        $this->em->flush();
-
-        return $state;
-    }
-
     private function createResult($name) {
         $result = new Result();
         $result->setResultName($name);
@@ -209,15 +187,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
 
         return $result;
-    }
-
-    private function createInjectType($name) {
-        $type = new InjectType();
-        $type->setTypeName($name);
-        $this->em->persist($type);
-        $this->em->flush();
-
-        return $type;
     }
 
     private function createUser($login, $password, $firstname, $lastname, $admin, $organization) {

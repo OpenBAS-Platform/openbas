@@ -104,28 +104,6 @@ class Incident
         return $this;
     }
 
-    public function getIncidentStartDate()
-    {
-        return $this->incident_start_date;
-    }
-
-    public function setIncidentStartDate($startDate)
-    {
-        $this->incident_start_date = $startDate;
-        return $this;
-    }
-
-    public function getIncidentEndDate()
-    {
-        return $this->incident_end_date;
-    }
-
-    public function setIncidentEndDate($endDate)
-    {
-        $this->incident_end_date = $endDate;
-        return $this;
-    }
-
     public function getIncidentType()
     {
         return $this->incident_type;
@@ -167,6 +145,17 @@ class Incident
     public function setIncidentOutcomes($outcomes)
     {
         $this->incident_outcomes = $outcomes;
+        return $this;
+    }
+
+    public function getIncidentInjects()
+    {
+        return $this->incident_injects;
+    }
+
+    public function setIncidentInjects($injects)
+    {
+        $this->incident_injects = $injects;
         return $this;
     }
 }

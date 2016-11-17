@@ -16,7 +16,7 @@ class EventController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List events"
+     *    description="List events of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"event"})

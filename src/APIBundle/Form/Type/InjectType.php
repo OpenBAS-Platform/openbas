@@ -20,7 +20,6 @@ class InjectType extends AbstractType
         $builder->add('inject_type');
         $builder->add('inject_automatic');
         $builder->add('inject_status');
-        $builder->add('inject_state');
     }
 
     public function configureOptions(OptionsResolver $resolver)

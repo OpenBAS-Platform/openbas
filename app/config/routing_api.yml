@@ -66,6 +66,10 @@ exercises_events_incidents:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\IncidentController
 
+exercises_events_injects:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Event\InjectController
+
 exercises_event_incidents_injects:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\Incident\InjectController

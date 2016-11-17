@@ -8,3 +8,5 @@ APIBundle\Entity\Event:
             groups: ['event']
         event_image:
             groups: ['event']
+        event_exercise:
+            groups: ['event', 'incident']

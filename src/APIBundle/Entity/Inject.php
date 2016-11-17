@@ -44,6 +44,11 @@ class Inject
     protected $inject_sender;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    protected $inject_type;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Audience", inversedBy="inject_audiences")
      * @ORM\JoinTable(name="injects_audiences",
      *     joinColumns={@ORM\JoinColumn(name="inject_id", referencedColumnName="inject_id", onDelete="CASCADE")},
@@ -52,13 +57,6 @@ class Inject
      * @var Audience[]
      */
     protected $inject_audiences;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="InjectType", inversedBy="type_injects")
-     * @ORM\JoinColumn(name="inject_type", referencedColumnName="type_id", onDelete="CASCADE")
-     * @var InjectType
-     */
-    protected $inject_type;
 
     /**
      * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_injects")
@@ -77,12 +75,6 @@ class Inject
      * @ORM\JoinColumn(name="inject_status", referencedColumnName="status_id")
      */
     protected $inject_status;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="InjectState")
-     * @ORM\JoinColumn(name="inject_state", referencedColumnName="state_id")
-     */
-    protected $inject_state;
 
     public function __construct()
     {
@@ -207,17 +199,6 @@ class Inject
     public function setInjectStatus($status)
     {
         $this->inject_status = $status;
-        return $this;
-    }
-
-    public function getInjectState()
-    {
-        return $this->inject_state;
-    }
-
-    public function setInjectState($state)
-    {
-        $this->inject_state = $state;
         return $this;
     }
 }
