@@ -41,9 +41,6 @@ export const addInject = (exerciseId, eventId, incidentId, data) => (dispatch) =
       type: Constants.APPLICATION_ADD_INJECT_SUCCESS,
       payload: response.data
     })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_ADD_INJECT_ERROR});
-    throw new SubmissionError({_error: 'Failed to add inject!'})
   })
 }
 

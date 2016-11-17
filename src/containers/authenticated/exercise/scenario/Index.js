@@ -1,6 +1,9 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
+import {fromJS} from 'immutable'
+import createImmutableSelector from '../../../../utils/ImmutableSelect'
+import R from 'ramda'
 import {fetchEvents} from '../../../../actions/Event'
 import {Event} from '../../../../components/Event'
 import CreateEvent from './event/CreateEvent'
@@ -15,6 +18,12 @@ const styles = {
     fontWeight: 500,
     textAlign: 'center'
   },
+}
+
+const filterEvents = (events, exerciseId) => {
+  var filterByExercise = n => n.event_exercise === exerciseId
+  var filteredEvents = R.filter(filterByExercise, events.toJS())
+  return fromJS(filteredEvents)
 }
 
 class IndexScenario extends Component {
@@ -49,12 +58,15 @@ IndexScenario.propTypes = {
   fetchEvents: PropTypes.func.isRequired,
 }
 
+const filteredEvents = createImmutableSelector(
+  (state, exerciseId) => filterEvents(state.application.getIn(['entities', 'events']), exerciseId),
+  events => events)
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
-
   return {
     exerciseId,
-    events: state.application.getIn(['entities', 'events']),
+    events: filteredEvents(state, exerciseId)
   }
 }
 
