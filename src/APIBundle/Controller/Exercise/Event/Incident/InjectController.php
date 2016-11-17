@@ -91,11 +91,13 @@ class InjectController extends Controller
         }
 
         $inject = new Inject();
-        $inject->setInjectIncident($incident);
         $form = $this->createForm(InjectType::class, $inject);
         $form->submit($request->request->all());
-
         if ($form->isValid()) {
+            $status = $em->getRepository('APIBundle:InjectStatus')->findOneBy(['status_name' => 'PENDING']);
+            $inject->setInjectIncident($incident);
+            $inject->setInjectStatus($status);
+            $inject->setInjectAutomatic(true);
             $em->persist($inject);
             $em->flush();
             return $inject;

@@ -14,7 +14,10 @@ class InjectType extends AbstractType
         $builder->add('inject_title');
         $builder->add('inject_description');
         $builder->add('inject_content');
-        $builder->add('inject_date');
+        $builder->add('inject_date', DateTimeType::class, array(
+            'widget' => 'single_text',
+            'input' => 'datetime'
+        ));
         $builder->add('inject_sender');
         $builder->add('inject_audiences');
         $builder->add('inject_type');
