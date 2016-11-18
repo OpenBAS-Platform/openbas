@@ -36,7 +36,7 @@ class Login extends Component {
       <div style={styles.login}>
         <Toolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
           <ToolbarGroup>
-            <ToolbarTitle text="Login"/>
+            <ToolbarTitle text="Login" type={Constants.TOOLBAR_TYPE_LOGIN}/>
           </ToolbarGroup>
         </Toolbar>
         <LoginForm onSubmit={this.onSubmit.bind(this)}/>

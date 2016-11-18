@@ -27,6 +27,9 @@ export const arrayOfUsers = arrayOf(user)
 export const exercise = new Schema('exercises', {idAttribute: 'exercise_id'})
 export const arrayOfExercises = arrayOf(exercise)
 
+export const objective = new Schema('objectives', {idAttribute: 'objective_id'})
+export const arrayOfObjectives = arrayOf(objective)
+
 export const audience = new Schema('audiences', {idAttribute: 'audience_id'})
 export const arrayOfAudiences = arrayOf(audience)
 
@@ -49,6 +52,10 @@ user.define({
 
 exercise.define({
   exercise_status: exerciseStatus
+})
+
+objective.define({
+  objective_exercise: exercise
 })
 
 audience.define({

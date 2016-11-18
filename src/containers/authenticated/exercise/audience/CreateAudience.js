@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import * as Constants from '../../../../constants/ComponentTypes'
 import {addAudience} from '../../../../actions/Audience'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton} from '../../../../components/Button';
@@ -48,7 +49,7 @@ class CreateAudience extends Component {
         <AppBar
           title="Audiences"
           showMenuIconButton={false}
-          iconElementRight={<ActionButtonCreate onClick={this.handleOpenCreate.bind(this)} />}/>
+          iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT} onClick={this.handleOpenCreate.bind(this)} />}/>
         <Dialog
           title="Create a new audience"
           modal={false}

@@ -3,6 +3,7 @@ import {SubmissionError} from 'redux-form'
 import {api} from '../App';
 import * as schema from './Schema'
 import {Map} from 'immutable'
+import {push} from 'react-router-redux'
 
 export const fetchEvents = (exerciseId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_EVENTS_SUBMITTED});
@@ -49,13 +50,14 @@ export const deleteEvent = (exerciseId, eventId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_DELETE_EVENT_SUBMITTED});
   return api().delete('/api/exercises/' + exerciseId + '/events/' + eventId).then(function (response) {
     dispatch({
-      type: Constants.APPLICATION_DELETE_AUDIENCE_SUCCESS,
+      type: Constants.APPLICATION_DELETE_EVENT_SUCCESS,
       payload: Map({
           eventId: eventId,
           exerciseId: exerciseId
         }
       )
     })
+    dispatch(push('/private/exercise/' + exerciseId + '/scenario'))
   }).catch(function () {
     dispatch({type: Constants.APPLICATION_DELETE_EVENT_ERROR});
     throw new SubmissionError({_error: 'Failed to delete event!'})

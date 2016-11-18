@@ -61,7 +61,7 @@ export const deleteExercise = (exerciseId) => (dispatch) => {
     dispatch({
       type: Constants.APPLICATION_DELETE_EXERCISE_SUCCESS,
       payload: exerciseId
-    });
+    })
     dispatch(push('/private'))
   }).catch(function () {
     dispatch({type: Constants.APPLICATION_DELETE_EXERCISE_ERROR});

@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import * as Constants from '../../../../../constants/ComponentTypes'
 import {addIncident} from '../../../../../actions/Incident'
 import {Dialog} from '../../../../../components/Dialog';
 import {FlatButton} from '../../../../../components/Button';
@@ -55,7 +56,7 @@ class CreateIncident extends Component {
         <AppBar
           title="Incidents"
           showMenuIconButton={false}
-          iconElementRight={<ActionButtonCreate onClick={this.handleOpenCreate.bind(this)} />}/>
+          iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT} onClick={this.handleOpenCreate.bind(this)} />}/>
         <Dialog
           title="Create a new incident"
           modal={false}

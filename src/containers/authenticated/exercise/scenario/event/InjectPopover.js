@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {Map} from 'immutable'
+import moment from 'moment';
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
 import {Menu} from '../../../../../components/Menu'
@@ -8,17 +9,26 @@ import {Dialog} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {addOrganizationAndUpdateUser} from '../../../../../actions/Organization'
-import {updateUser} from '../../../../../actions/User'
-import {updateAudience} from '../../../../../actions/Audience'
-import UserForm from '../../../admin/users/UserForm'
+import {updateInject, deleteInject} from '../../../../../actions/Inject'
+import InjectForm from './InjectForm'
 
 const style = {
   float: 'left',
   marginTop: '-14px'
 }
 
-class UserPopover extends Component {
+const types = Map({
+  0: Map({
+    type_id: "0",
+    type_name: "EMAIL"
+  }),
+  1: Map({
+    type_id: "1",
+    type_name: "SMS"
+  })
+})
+
+class InjectPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -54,13 +64,7 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    if (typeof data['user_organization'] === 'object') {
-      data['user_organization'] = data['user_organization']['organization_id']
-      return this.props.updateUser(this.props.userId, data)
-    } else {
-      let orgData = {organization_name: data['user_organization']}
-      this.props.addOrganizationAndUpdateUser(orgData, this.props.userId, data)
-    }
+    return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, data)
   }
 
   submitFormEdit() {
@@ -81,11 +85,7 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    let usersList = this.props.audience.get('audience_users').delete(this.props.audience.get('audience_users').keyOf(this.props.userId))
-    let data = Map({
-      audience_users: usersList
-    })
-    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
+    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId)
     this.handleCloseDelete()
   }
 
@@ -116,12 +116,14 @@ class UserPopover extends Component {
     ];
 
     let initialInformation = undefined
-    if (this.props.user && this.props.organizations) {
+    if (this.props.inject) {
       initialInformation = {
-        user_firstname: this.props.user.get('user_firstname'),
-        user_lastname: this.props.user.get('user_lastname'),
-        user_email: this.props.user.get('user_email'),
-        user_organization: this.props.organizations.get(this.props.user.get('user_organization')).get('organization_name')
+        inject_title: this.props.inject.get('inject_title'),
+        inject_description: this.props.inject.get('inject_description'),
+        inject_content: this.props.inject.get('inject_content'),
+        inject_date: moment(this.props.inject.get('inject_date')).format('YYYY-MM-DD HH:mm:ss'),
+        inject_sender: this.props.inject.get('inject_sender'),
+        inject_type: this.props.inject.get('inject_type')
       }
     }
 
@@ -147,16 +149,27 @@ class UserPopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the removing of this user?
+          Do you confirm the removing of this inject?
         </Dialog>
         <Dialog
-          title="Update the user"
+          title="Update the inject"
           modal={false}
+          autoScrollBodyContent={true}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <UserForm ref="userForm" initialValues={initialInformation}  organizations={this.props.organizations} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          <InjectForm
+            ref="injectForm"
+            initialValues={initialInformation}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            onSubmitSuccess={this.handleCloseEdit.bind(this)}
+            types={types.toList().map(type => {
+              return (
+                <MenuItemLink key={type.get('type_id')} value={type.get('type_name')}
+                              label={type.get('type_name')}/>
+              )
+            })}/>
         </Dialog>
       </div>
     )
@@ -164,28 +177,20 @@ class UserPopover extends Component {
 }
 
 const select = (state, props) => {
-  let audiences = state.application.getIn(['entities', 'audiences'])
-  let currentAudience = state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
-  let audience = currentAudience ? audiences.get(currentAudience) : Map()
-
   return {
-    audience,
-    user: state.application.getIn(['entities', 'users', props.userId]),
-    organizations: state.application.getIn(['entities', 'organizations'])
+    inject: state.application.getIn(['entities', 'injects', props.injectId]),
   }
 }
 
-UserPopover.propTypes = {
+InjectPopover.propTypes = {
   exerciseId: PropTypes.string,
-  audienceId: PropTypes.string,
-  userId: PropTypes.string,
-  updateUser: PropTypes.func,
-  addOrganizationAndUpdateUser: PropTypes.func,
-  updateAudience: PropTypes.func,
-  audience: PropTypes.object,
-  organizations: PropTypes.object,
-  user: PropTypes.object,
+  eventId: PropTypes.string,
+  incidentId: PropTypes.string,
+  injectId: PropTypes.string,
+  updateInject: PropTypes.func,
+  deleteInject: PropTypes.func,
+  inject: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateUser, addOrganizationAndUpdateUser, updateAudience})(UserPopover)
+export default connect(select, {updateInject, deleteInject})(InjectPopover)

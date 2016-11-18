@@ -2,7 +2,6 @@ import * as Constants from '../constants/ActionTypes';
 import {SubmissionError} from 'redux-form'
 import {api} from '../App';
 import * as schema from './Schema'
-import {Map} from 'immutable'
 
 export const fetchInjects = (exerciseId, eventId, incidentId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_INJECTS_SUBMITTED});
@@ -62,13 +61,7 @@ export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (disp
   return api().delete('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId).then(function (response) {
     dispatch({
       type: Constants.APPLICATION_DELETE_INJECT_SUCCESS,
-      payload: Map({
-          injectId: injectId,
-          incidentId: incidentId,
-          eventId: eventId,
-          exerciseId: exerciseId
-        }
-      )
+      payload: injectId
     })
   }).catch(function () {
     dispatch({type: Constants.APPLICATION_DELETE_INJECT_ERROR});

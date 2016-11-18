@@ -1,6 +1,5 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import {Map} from 'immutable'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
 import {Menu} from '../../../../../components/Menu'
@@ -8,21 +7,14 @@ import {Dialog} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {updateIncident, deleteIncident} from '../../../../../actions/Incident'
-import IncidentForm from './IncidentForm'
-
-const typesNames = {
-  TECHNICAL: 'Technical',
-  OPERATIONAL: 'Operational',
-  STRATEGIC: 'Strategic'
-}
+import {updateEvent, deleteEvent} from '../../../../../actions/Event'
+import EventForm from './EventForm'
 
 const style = {
-  float: 'left',
-  marginTop: '-13px'
+  margin: '8px -30px 0 0'
 }
 
-class IncidentPopover extends Component {
+class EventPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -58,11 +50,11 @@ class IncidentPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId, data)
+    return this.props.updateEvent(this.props.exerciseId, this.props.eventId, data)
   }
 
   submitFormEdit() {
-    this.refs.incidentForm.submit()
+    this.refs.eventForm.submit()
   }
 
   handleOpenDelete() {
@@ -79,7 +71,7 @@ class IncidentPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
+    this.props.deleteEvent(this.props.exerciseId, this.props.eventId)
     this.handleCloseDelete()
   }
 
@@ -110,18 +102,17 @@ class IncidentPopover extends Component {
     ];
 
     let initialInformation = undefined
-    if (this.props.incident) {
+    if (this.props.event) {
       initialInformation = {
-        incident_title: this.props.incident.get('incident_title'),
-        incident_story: this.props.incident.get('incident_story'),
-        incident_type: this.props.incident.get('incident_type')
+        event_title: this.props.event.get('event_title'),
+        event_description: this.props.event.get('event_description'),
       }
     }
 
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+          <Icon color="#ffffff" name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
         <Popover open={this.state.openPopover}
                  anchorEl={this.state.anchorEl}
@@ -138,25 +129,21 @@ class IncidentPopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the deletion of this incident?
+          Do you confirm the deletion of this event?
         </Dialog>
         <Dialog
-          title="Update the incident"
+          title="Update the event"
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <IncidentForm ref="incidentForm"
-                        initialValues={initialInformation}
-                        onSubmit={this.onSubmitEdit.bind(this)}
-                        onSubmitSuccess={this.handleCloseEdit.bind(this)}
-                        types={this.props.incident_types.toList().map(type => {
-                          return (
-                            <MenuItemLink key={type.get('type_id')} value={type.get('type_id')}
-                                          label={typesNames[type.get('type_name')]}/>
-                          )
-                        })}/>
+          <EventForm
+            ref="eventForm"
+            initialValues={initialInformation}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            onSubmitSuccess={this.handleCloseEdit.bind(this)}
+          />
         </Dialog>
       </div>
     )
@@ -164,25 +151,21 @@ class IncidentPopover extends Component {
 }
 
 const select = (state, props) => {
-  let incidents = state.application.getIn(['entities', 'incidents'])
-  let currentIncident = state.application.getIn(['ui', 'states', 'current_incidents', props.exerciseId, props.eventId])
-  let incident = currentIncident ? incidents.get(currentIncident) : Map()
+  let events = state.application.getIn(['entities', 'events'])
+  let event = events.get(props.eventId)
 
   return {
-    incident,
-    incident_types: state.application.getIn(['entities', 'incident_types']),
+    event
   }
 }
 
-IncidentPopover.propTypes = {
+EventPopover.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
-  incidentId: PropTypes.string,
-  deleteIncident: PropTypes.func,
-  updateIncident: PropTypes.func,
-  incident: PropTypes.object,
-  incident_types: PropTypes.object,
+  deleteEvent: PropTypes.func,
+  updateEvent: PropTypes.func,
+  event: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateIncident, deleteIncident})(IncidentPopover)
+export default connect(select, {updateEvent, deleteEvent})(EventPopover)

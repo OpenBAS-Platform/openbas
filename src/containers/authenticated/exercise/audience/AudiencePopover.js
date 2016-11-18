@@ -13,7 +13,7 @@ import AudienceForm from './AudienceForm'
 
 const style = {
   float: 'left',
-  marginTop: '-14px'
+  marginTop: '-13px'
 }
 
 class AudiencePopover extends Component {

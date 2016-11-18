@@ -125,8 +125,6 @@ class UserPopover extends Component {
       }
     }
 
-    console.log('initialInformation', initialInformation)
-
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
