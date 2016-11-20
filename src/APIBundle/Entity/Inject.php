@@ -29,7 +29,7 @@ class Inject
     protected $inject_description;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $inject_content;
 
