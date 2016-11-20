@@ -1,12 +1,12 @@
 APIBundle\Entity\Audience:
     attributes:
         audience_id:
-            groups: ['audience', 'user']
+            groups: ['audience', 'user', 'inject']
         audience_name:
-            groups: ['audience']
+            groups: ['audience', 'inject']
         audience_exercise:
             groups: ['audience']
         audience_users:
-            groups: ['audience']
+            groups: ['audience', 'inject']
         audience_injects:
             groups: ['audience']
