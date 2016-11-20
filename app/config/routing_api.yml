@@ -38,6 +38,10 @@ incident_types:
     type:     rest
     resource: APIBundle\Controller\IncidentTypeController
 
+inject_types:
+    type:     rest
+    resource: APIBundle\Controller\InjectTypeController
+
 inject_statuses:
     type:     rest
     resource: APIBundle\Controller\InjectStatusController

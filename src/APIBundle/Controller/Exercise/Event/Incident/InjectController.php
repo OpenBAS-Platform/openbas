@@ -153,33 +153,14 @@ class InjectController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace an inject",
-     *   input={"class"=InjectType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
-     */
-    public function updateExercisesEventsInjectAction(Request $request)
-    {
-        return $this->updateInject($request, true);
-    }
-
-    /**
-     * @ApiDoc(
      *    description="Update an inject",
      *    input={"class"=InjectType::class, "name"=""}
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
+     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
-    public function patchExercisesEventsIncidentsInjectAction(Request $request)
-    {
-        return $this->updateInject($request, false);
-    }
-
-    private function updateInject(Request $request, $clearMissing)
+    public function updateExercisesEventsIncidentsInjectAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -213,7 +194,7 @@ class InjectController extends Controller
         }
 
         $form = $this->createForm(InjectType::class, $inject);
-        $form->submit($request->request->all(), $clearMissing);
+        $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             $em->persist($inject);

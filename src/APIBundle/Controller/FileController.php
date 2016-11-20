@@ -28,7 +28,7 @@ class FileController extends Controller
         /* @var $files File[] */
 
         foreach( $files as &$file) {
-            $file->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
+            $file->buildUrl($this->getParameter('protocol'), $request->getHost());
         }
 
         return $files;
@@ -60,7 +60,7 @@ class FileController extends Controller
                 break;
             }
 
-            $file->buildUrl($this->getParameter('protocol'), $this->getParameter('hostname'));
+            $file->buildUrl($this->getParameter('protocol'), $request->getHost());
             return $file;
         }
     }

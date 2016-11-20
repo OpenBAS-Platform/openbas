@@ -18,7 +18,6 @@ class InjectType extends AbstractType
             'widget' => 'single_text',
             'input' => 'datetime'
         ));
-        $builder->add('inject_sender');
         $builder->add('inject_audiences');
         $builder->add('inject_type');
         $builder->add('inject_automatic');

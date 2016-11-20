@@ -129,33 +129,14 @@ class IncidentController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace an incident",
-     *   input={"class"=IncidentType::class, "name"=""}
+     *    description="Update an incident",
+     *    input={"class"=IncidentType::class, "name"=""}
      * )
      *
      * @Rest\View(serializerGroups={"incident"})
      * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}")
      */
     public function updateExercisesEventsIncidentAction(Request $request)
-    {
-        return $this->updateIncident($request, true);
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Update an incident",
-     *    input={"class"=IncidentType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"incident"})
-     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}")
-     */
-    public function patchExercisesEventsIncidentAction(Request $request)
-    {
-        return $this->updateIncident($request, false);
-    }
-
-    private function updateIncident(Request $request, $clearMissing)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -182,7 +163,7 @@ class IncidentController extends Controller
         }
 
         $form = $this->createForm(IncidentType::class, $incident);
-        $form->submit($request->request->all(), $clearMissing);
+        $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             $em->persist($incident);

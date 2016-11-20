@@ -10,8 +10,6 @@ APIBundle\Entity\Inject:
             groups: ['inject']
         inject_date:
             groups: ['inject', 'incident']
-        inject_sender:
-            groups: ['inject', 'incident']
         inject_type:
             groups: ['inject']
         inject_status:

@@ -41,11 +41,6 @@ class Inject
     /**
      * @ORM\Column(type="string")
      */
-    protected $inject_sender;
-
-    /**
-     * @ORM\Column(type="string")
-     */
     protected $inject_type;
 
     /**
@@ -135,18 +130,7 @@ class Inject
         $this->inject_date = $date;
         return $this;
     }
-
-    public function getInjectSender()
-    {
-        return $this->inject_sender;
-    }
-
-    public function setInjectSender($sender)
-    {
-        $this->inject_sender = $sender;
-        return $this;
-    }
-
+    
     public function getInjectAudiences()
     {
         return $this->inject_audiences;

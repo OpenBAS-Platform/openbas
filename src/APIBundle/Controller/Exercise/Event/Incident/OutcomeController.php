@@ -151,33 +151,14 @@ class OutcomeController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Replace an outcome",
-     *   input={"class"=OutcomeType::class, "name"=""}
-     * )
-     *
-     * @Rest\View(serializerGroups={"outcome"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/outcomes/{outcome_id}")
-     */
-    public function updateExercisesEventsOutcomeAction(Request $request)
-    {
-        return $this->updateOutcome($request, true);
-    }
-
-    /**
-     * @ApiDoc(
      *    description="Update an outcome",
      *    input={"class"=OutcomeType::class, "name"=""}
      * )
      *
      * @Rest\View(serializerGroups={"outcome"})
-     * @Rest\Patch("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/outcomes/{outcome_id}")
+     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/outcomes/{outcome_id}")
      */
-    public function patchExercisesEventsIncidentsOutcomeAction(Request $request)
-    {
-        return $this->updateOutcome($request, false);
-    }
-
-    private function updateOutcome(Request $request, $clearMissing)
+    public function updateExercisesEventsIncidentsOutcomeAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -211,7 +192,7 @@ class OutcomeController extends Controller
         }
 
         $form = $this->createForm(OutcomeType::class, $outcome);
-        $form->submit($request->request->all(), $clearMissing);
+        $form->submit($request->request->all(), false);
 
         if ($form->isValid()) {
             $em->persist($outcome);
