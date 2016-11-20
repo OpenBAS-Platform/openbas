@@ -9,11 +9,11 @@ export const arrayOfExercisesStatuses = arrayOf(exerciseStatus)
 export const incidentType = new Schema('incident_types', {idAttribute: 'type_id'})
 export const arrayOfIncidentTypes = arrayOf(incidentType)
 
+export const injectType = new Schema('inject_types', {idAttribute: 'type'})
+export const arrayOfInjectTypes = arrayOf(injectType)
+
 export const injectStatus = new Schema('inject_statuses', {idAttribute: 'status_id'})
 export const arrayOfInjectStatuses = arrayOf(injectStatus)
-
-export const injectState = new Schema('inject_states', {idAttribute: 'state_id'})
-export const arrayOfInjectStates = arrayOf(injectState)
 
 export const token = new Schema('tokens', {idAttribute: 'token_id'})
 export const arrayOfTokens = arrayOf(token)
@@ -76,4 +76,5 @@ incident.define({
 
 inject.define({
   inject_incident: incident,
+  inject_status: injectStatus
 })

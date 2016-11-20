@@ -9,8 +9,14 @@ import {Dialog} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
+import {
+  Step,
+  Stepper,
+  StepLabel,
+} from '../../../../../components/Stepper';
 import {updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
+import InjectContentForm from './InjectContentForm'
 
 const style = {
   float: 'left',
@@ -34,7 +40,11 @@ class InjectPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openPopover: false
+      openPopover: false,
+      type: this.props.type,
+      stepIndex: 0,
+      finished: false,
+      stepDisabled: false
     }
   }
 
@@ -59,16 +69,33 @@ class InjectPopover extends Component {
 
   handleCloseEdit() {
     this.setState({
-      openEdit: false
+      openEdit: false,
+      stepIndex: 0,
+      finished: false
     })
   }
 
-  onSubmitEdit(data) {
+  onGlobalSubmitEdit(data) {
     return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, data)
   }
 
+  onContentSubmitEdit(data) {
+    let injectData = Map({
+      inject_content: JSON.stringify(data)
+    })
+    return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, injectData)
+  }
+
   submitFormEdit() {
-    this.refs.userForm.submit()
+    if (this.state.stepIndex === 0) {
+      this.refs.injectForm.submit()
+    } else if (this.state.stepIndex === 1) {
+      this.refs.contentForm.submit()
+    }
+  }
+
+  changeType(event, index, value) {
+    this.setState({type: value})
   }
 
   handleOpenDelete() {
@@ -89,6 +116,48 @@ class InjectPopover extends Component {
     this.handleCloseDelete()
   }
 
+  selectContent() {
+    this.setState({
+      stepIndex: 1,
+      finished: true,
+      stepDisabled: true
+    })
+  }
+
+  getStepContent(stepIndex, initialInformation) {
+    let initialContent = null
+    switch (stepIndex) {
+      case 0:
+        return (
+          <InjectForm
+            ref="injectForm"
+            onSubmit={this.onGlobalSubmitEdit.bind(this)}
+            onSubmitSuccess={this.selectContent.bind(this)}
+            initialValues={initialInformation}
+            changeType={this.changeType.bind(this)}
+            types={this.props.inject_types.toList().map(type => {
+              return (
+                <MenuItemLink key={type.get('type')} value={type.get('type')}
+                              label={type.get('type')}/>
+              )
+            })}/>
+        )
+      case 1:
+        initialContent = JSON.parse(initialInformation.inject_content)
+        return (
+          <InjectContentForm
+            ref="contentForm"
+            initialValues={initialContent}
+            types={this.props.inject_types}
+            type={this.state.type}
+            onSubmit={this.onContentSubmitEdit.bind(this)}
+            onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+        )
+      default:
+        return 'Go away!';
+    }
+  }
+
   render() {
     const editActions = [
       <FlatButton
@@ -97,7 +166,7 @@ class InjectPopover extends Component {
         onTouchTap={this.handleCloseEdit.bind(this)}
       />,
       <FlatButton
-        label="Update"
+        label={this.state.stepIndex === 0 ? "Next" : "Update"}
         primary={true}
         onTouchTap={this.submitFormEdit.bind(this)}
       />,
@@ -122,12 +191,9 @@ class InjectPopover extends Component {
         inject_description: this.props.inject.get('inject_description'),
         inject_content: this.props.inject.get('inject_content'),
         inject_date: moment(this.props.inject.get('inject_date')).format('YYYY-MM-DD HH:mm:ss'),
-        inject_sender: this.props.inject.get('inject_sender'),
         inject_type: this.props.inject.get('inject_type')
       }
     }
-
-    console.log('initialInformation', initialInformation)
 
     return (
       <div style={style}>
@@ -152,24 +218,26 @@ class InjectPopover extends Component {
           Do you confirm the removing of this inject?
         </Dialog>
         <Dialog
-          title="Update the inject"
+          title={
+            <Stepper linear={true} activeStep={this.state.stepIndex}>
+              <Step disabled={this.state.stepDisabled}>
+                <StepLabel>
+                  1. Global parameters
+                </StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>
+                  2. Content settings
+                </StepLabel>
+              </Step>
+            </Stepper>
+          }
           modal={false}
-          autoScrollBodyContent={true}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <InjectForm
-            ref="injectForm"
-            initialValues={initialInformation}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-            types={types.toList().map(type => {
-              return (
-                <MenuItemLink key={type.get('type_id')} value={type.get('type_name')}
-                              label={type.get('type_name')}/>
-              )
-            })}/>
+          <div>{this.getStepContent(this.state.stepIndex, initialInformation)}</div>
         </Dialog>
       </div>
     )
@@ -177,8 +245,11 @@ class InjectPopover extends Component {
 }
 
 const select = (state, props) => {
+  let inject = state.application.getIn(['entities', 'injects', props.injectId])
   return {
-    inject: state.application.getIn(['entities', 'injects', props.injectId]),
+    inject,
+    type: inject.get('inject_type'),
+    inject_types: state.application.getIn(['entities', 'inject_types']),
   }
 }
 
@@ -187,9 +258,11 @@ InjectPopover.propTypes = {
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
   injectId: PropTypes.string,
+  type: PropTypes.string,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   inject: PropTypes.object,
+  inject_types: PropTypes.object,
   children: PropTypes.node
 }
 

@@ -42,27 +42,21 @@ class InjectForm extends Component {
                    type="text"
                    label="Date and time"
                    onClick={this.raiseDatePicker.bind(this)}/>
+        <DateTimePicker ref="datePicker" handleResult={this.replaceDateValue.bind(this)}/>
         <FormField name="inject_description"
                    fullWidth={true}
                    multiLine={true}
                    rows={3}
                    type="text"
                    label="Description"/>
-        <FormField name="inject_content"
-                   fullWidth={true}
-                   multiLine={true}
-                   rows={6}
-                   type="text"
-                   label="Content"/>
-        <FormField name="inject_sender" fullWidth={true} type="text" label="Sender"/>
         <SelectField
           label="Type"
           name="inject_type"
           fullWidth={true}
+          onChange={this.props.changeType}
         >
           {this.props.types}
         </SelectField>
-        <DateTimePicker ref="datePicker" handleResult={this.replaceDateValue.bind(this)}/>
       </form>
     )
   }
@@ -75,6 +69,7 @@ InjectForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
+  changeType: PropTypes.func,
   types: PropTypes.node
 }
 
