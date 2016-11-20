@@ -24,6 +24,24 @@ const application = (state = Map(), action) => {
     }
     //endregion
 
+    // region INJECTTYPES
+    case Constants.APPLICATION_FETCH_INJECT_TYPES_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'inject_types'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+    //endregion
+
+    // region INJECTSTATUSES
+    case Constants.APPLICATION_FETCH_INJECT_STATUSES_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'inject_statuses'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+    //endregion
+
     // region FILES
     case Constants.APPLICATION_FETCH_FILES_SUCCESS: {
       return state.withMutations(function (state) {
@@ -469,6 +487,7 @@ const application = (state = Map(), action) => {
     case Constants.APPLICATION_ADD_INJECT_SUCCESS: {
       return state.withMutations(function (state) {
         mergeStore(state, action, ['entities', 'injects'])
+        state.setIn(['ui', 'states', 'lastId'], action.payload.get('result'))
         state.setIn(['ui', 'loading'], false)
       })
     }

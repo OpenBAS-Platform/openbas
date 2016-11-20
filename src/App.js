@@ -50,6 +50,7 @@ const initialState = {
       files: Map(),
       exercise_statuses: Map(),
       incident_types: Map(),
+      inject_types: Map(),
       inject_statuses: Map(),
       exercises: Map(),
       audiences: Map(),
@@ -62,7 +63,8 @@ const initialState = {
       navbar_right_open: true,
       loading: false,
       states: Map({
-        current_search_keyword: ''
+        current_search_keyword: '',
+        lastId: null
       })
     })
   }),

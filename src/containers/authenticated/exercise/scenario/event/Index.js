@@ -8,6 +8,8 @@ import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
 import {MainListItem} from '../../../../../components/list/ListItem';
 import {fetchInjectsOfEvent} from '../../../../../actions/Inject'
+import {fetchInjectTypes} from '../../../../../actions/InjectType'
+import {fetchInjectStatuses} from '../../../../../actions/InjectStatuses'
 import * as Constants from '../../../../../constants/ComponentTypes';
 import IncidentNav from './IncidentNav'
 import EventPopover from './EventPopover'
@@ -64,6 +66,8 @@ const styles = {
 
 class Index extends Component {
   componentDidMount() {
+    this.props.fetchInjectTypes()
+    this.props.fetchInjectStatuses()
     this.props.fetchInjectsOfEvent(this.props.exerciseId, this.props.eventId)
   }
 
@@ -137,7 +141,9 @@ Index.propTypes = {
   incident: PropTypes.object,
   incident_injects: PropTypes.object,
   injects: PropTypes.object,
-  fetchInjectsOfEvent: PropTypes.func
+  fetchInjectTypes: PropTypes.func,
+  fetchInjectStatuses: PropTypes.func,
+  fetchInjectsOfEvent: PropTypes.func,
 }
 
 const filteredInjects = createImmutableSelector(
@@ -158,9 +164,10 @@ const select = (state, ownProps) => {
     eventId,
     event,
     incident,
+    inject_types: state.application.getIn(['entities', 'inject_types']),
     injects: state.application.getIn(['entities', 'injects']),
     incident_injects: incidentInjects
   }
 }
 
-export default connect(select, {fetchInjectsOfEvent})(Index);
+export default connect(select, {fetchInjectTypes, fetchInjectStatuses, fetchInjectsOfEvent})(Index);
