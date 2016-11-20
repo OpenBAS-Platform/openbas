@@ -1,17 +1,17 @@
 APIBundle\Entity\User:
     attributes:
         user_id:
-            groups: ['user', 'token', 'audience', 'organization']
+            groups: ['user', 'token', 'audience', 'organization', 'inject']
         user_firstname:
-            groups: ['user', 'token']
+            groups: ['user', 'token', 'inject']
         user_lastname:
-            groups: ['user', 'token']
+            groups: ['user', 'token', 'inject']
         user_email:
-            groups: ['user', 'token']
+            groups: ['user', 'token', 'inject']
         user_phone:
-            groups: ['user', 'token']
+            groups: ['user', 'token', 'inject']
         user_organization:
-            groups: ['user', 'token']
+            groups: ['user', 'token', 'inject']
         user_gravatar:
             groups: ['user', 'token']
         user_admin:

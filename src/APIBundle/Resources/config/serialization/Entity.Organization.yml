@@ -1,9 +1,9 @@
 APIBundle\Entity\Organization:
     attributes:
         organization_id:
-            groups: ['organization', 'user']
+            groups: ['organization', 'user', 'inject']
         organization_name:
-            groups: ['organization', 'user']
+            groups: ['organization', 'user', 'inject']
         organization_description:
             groups: ['organization']
         organization_users:
