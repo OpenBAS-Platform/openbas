@@ -57,10 +57,6 @@ const styles = {
     float: 'left',
     width: '20%',
     padding: '5px 0 0 0'
-  },
-  'popover': {
-    float: 'left',
-    padding: '17px 0 0 0'
   }
 }
 
@@ -72,14 +68,14 @@ class Index extends Component {
   }
 
   render() {
-    if (this.props.incident.get('incident_id') === undefined && this.props.event ) {
+    if (this.props.incident.get('incident_id') === undefined && this.props.event) {
       return (
         <div style={styles.container}>
           <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
           <div style={styles.empty}>This event is empty.</div>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={this.props.event.get('event_title')}/>
-            <EventPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId} />
+            <EventPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
           </Toolbar>
         </div>
       )
@@ -100,14 +96,12 @@ class Index extends Component {
               <MainListItem
                 key={inject.get('inject_id')}
                 rightIconButton={
-                  <div style={styles.popover}>
-                    <InjectPopover
-                      exerciseId={this.props.exerciseId}
-                      eventId={this.props.eventId}
-                      incidentId={this.props.incident.get('incident_id')}
-                      injectId={inject.get('inject_id')}
-                    />
-                  </div>
+                  <InjectPopover
+                    exerciseId={this.props.exerciseId}
+                    eventId={this.props.eventId}
+                    incidentId={this.props.incident.get('incident_id')}
+                    injectId={inject.get('inject_id')}
+                  />
                 }
                 primaryText={
                   <div>
@@ -125,8 +119,9 @@ class Index extends Component {
         <CreateInject exerciseId={this.props.exerciseId} eventId={this.props.eventId}
                       incidentId={this.props.incident.get('incident_id')}/>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={this.props.event ? this.props.event.get('event_title') : ""}/>
-          <EventPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId} />
+          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT}
+                        text={this.props.event ? this.props.event.get('event_title') : ""}/>
+          <EventPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
         </Toolbar>
       </div>
     );

@@ -178,7 +178,7 @@ class AddUsers extends Component {
 const usersSelector = (state) => {
   const users = state.application.getIn(['entities', 'users']).toJS()
   let keyword = state.application.getIn(['ui', 'states', 'current_search_keyword'])
-  var filterByKeyword = n => keyword === '' || n.user_email.toLowerCase().indexOf(keyword) !== -1 || n.user_firstname.toLowerCase().indexOf(keyword) !== -1 || n.user_lastname.toLowerCase().indexOf(keyword) !== -1
+  var filterByKeyword = n => keyword === '' || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
   var filteredUsers = R.filter(filterByKeyword, users)
   return fromJS(filteredUsers)
 }

@@ -45,10 +45,6 @@ const styles = {
   'org': {
     float: 'left',
     padding: '5px 0 0 0'
-  },
-  'popover': {
-    float: 'left',
-    padding: '17px 0 0 0'
   }
 }
 
@@ -88,11 +84,9 @@ class Index extends Component {
                 key={user.get('user_id')}
                 leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user.get('user_gravatar')}/>}
                 rightIconButton={
-                  <div style={styles.popover}>
                     <UserPopover exerciseId={this.props.exerciseId}
                                  audienceId={this.props.audience.get('audience_id')}
                                  userId={user.get('user_id')}/>
-                  </div>
                 }
                 primaryText={
                   <div>

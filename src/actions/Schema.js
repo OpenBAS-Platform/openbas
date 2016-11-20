@@ -76,5 +76,6 @@ incident.define({
 
 inject.define({
   inject_incident: incident,
-  inject_status: injectStatus
+  inject_status: injectStatus,
+  inject_audiences: arrayOfAudiences
 })

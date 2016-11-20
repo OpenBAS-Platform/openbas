@@ -27,6 +27,7 @@ const avatarStyle = {
 export const Avatar = (props) => (
   <MUIAvatar
     src={props.src}
+    icon={props.icon}
     size={props.size}
     onTouchTap={props.onTouchTap}
     style={avatarStyle[props.type]}
@@ -35,6 +36,7 @@ export const Avatar = (props) => (
 
 Avatar.propTypes = {
   src: PropTypes.string,
+  icon: PropTypes.node,
   onTouchTap: PropTypes.func,
   size: PropTypes.number,
   type: PropTypes.string

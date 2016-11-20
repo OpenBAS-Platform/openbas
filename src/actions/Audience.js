@@ -11,11 +11,13 @@ export const fetchAudiences = (exerciseId) => (dispatch) => {
       type: Constants.APPLICATION_FETCH_AUDIENCES_SUCCESS,
       payload: response.data
     })
-  }).catch(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_AUDIENCES_ERROR,
-      payload: response.data
-    })
+  })
+}
+
+export const searchAudiences = (keyword) => (dispatch) => {
+  dispatch({
+    type: Constants.APPLICATION_SEARCH_AUDIENCES_SUBMITTED,
+    payload: keyword
   })
 }
 

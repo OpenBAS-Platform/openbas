@@ -241,6 +241,10 @@ const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], false)
     }
 
+    case Constants.APPLICATION_SEARCH_AUDIENCES_SUBMITTED: {
+      return state.setIn(['ui', 'states', 'current_search_keyword'], action.payload)
+    }
+
     case Constants.APPLICATION_ADD_AUDIENCE_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }

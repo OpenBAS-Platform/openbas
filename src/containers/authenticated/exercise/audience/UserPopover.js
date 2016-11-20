@@ -14,8 +14,8 @@ import {updateAudience} from '../../../../actions/Audience'
 import UserForm from '../../admin/users/UserForm'
 
 const style = {
-  float: 'left',
-  marginTop: '-14px'
+  float: 'right',
+  marginTop: '-12px'
 }
 
 class UserPopover extends Component {

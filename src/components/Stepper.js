@@ -5,7 +5,6 @@ import {
   StepButton as MUIStepButton,
   StepLabel as MUIStepLabel,
 } from 'material-ui/Stepper';
-import * as Constants from '../constants/ComponentTypes'
 
 export const Step = (props) => (
   <MUIStep active={props.active} completed={props.completed} disabled={props.disabled}>{props.children}</MUIStep>

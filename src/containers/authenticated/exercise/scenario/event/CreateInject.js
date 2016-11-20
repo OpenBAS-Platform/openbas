@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import {Map} from 'immutable'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
-import {Dialog} from '../../../../../components/Dialog';
+import {DialogTitleElement} from '../../../../../components/Dialog';
 import {
   Step,
   Stepper,
@@ -13,6 +13,7 @@ import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button';
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
+import InjectAudiences from './InjectAudiences'
 
 class CreateInject extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ class CreateInject extends Component {
       type: null,
       stepIndex: 0,
       finished: false,
-      stepDisabled: false
+      created: false
     }
   }
 
@@ -35,14 +36,18 @@ class CreateInject extends Component {
   }
 
   handleCancel() {
-    if( this.state.stepIndex === 1 ) {
+    if( this.state.created ) {
       this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.lastId)
     }
     this.handleClose()
   }
 
   onGlobalSubmit(data) {
-    return this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, data)
+    if( this.state.created ) {
+      return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.lastId, data)
+    } else {
+      return this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, data)
+    }
   }
 
   onContentSubmit(data) {
@@ -57,6 +62,8 @@ class CreateInject extends Component {
       this.refs.injectForm.submit()
     } else if (this.state.stepIndex === 1) {
       this.refs.contentForm.submit()
+    } else if (this.state.stepIndex === 2) {
+      this.handleClose()
     }
   }
 
@@ -67,8 +74,14 @@ class CreateInject extends Component {
   selectContent() {
     this.setState({
       stepIndex: 1,
-      finished: true,
-      stepDisabled: true
+      created: true
+    })
+  }
+
+  selectAudiences() {
+    this.setState({
+      stepIndex: 2,
+      finished: true
     })
   }
 
@@ -95,7 +108,18 @@ class CreateInject extends Component {
             types={this.props.inject_types}
             type={this.state.type}
             onSubmit={this.onContentSubmit.bind(this)}
-            onSubmitSuccess={this.handleClose.bind(this)}/>
+            onSubmitSuccess={this.selectAudiences.bind(this)}/>
+        )
+      case 2:
+        return (
+          <InjectAudiences
+            ref="injectAudiences"
+            exerciseId={this.props.exerciseId}
+            eventId={this.props.eventId}
+            incidentId={this.props.incidentId}
+            injectId={this.props.lastId}
+            injectAudiencesIds={this.props.inject_audiences_ids}
+          />
         )
       default:
         return 'Go away!';
@@ -110,7 +134,7 @@ class CreateInject extends Component {
         onTouchTap={this.handleCancel.bind(this)}
       />,
       <FlatButton
-        label={this.state.stepIndex === 0 ? "Next" : "Create"}
+        label={this.state.stepIndex === 2 ? "Close" : "Next"}
         primary={true}
         onTouchTap={this.submitForm.bind(this)}
       />,
@@ -120,10 +144,10 @@ class CreateInject extends Component {
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
                                      onClick={this.handleOpen.bind(this)}/>
-        <Dialog
+        <DialogTitleElement
           title={
-            <Stepper linear={true} activeStep={this.state.stepIndex}>
-              <Step disabled={this.state.stepDisabled}>
+            <Stepper linear={false} activeStep={this.state.stepIndex}>
+              <Step>
                 <StepLabel>
                   1. Global parameters
                 </StepLabel>
@@ -131,6 +155,11 @@ class CreateInject extends Component {
               <Step>
                 <StepLabel>
                   2. Content settings
+                </StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>
+                  3. Audiences
                 </StepLabel>
               </Step>
             </Stepper>
@@ -141,9 +170,9 @@ class CreateInject extends Component {
           actions={actions}
         >
           <div>{this.getStepContent(this.state.stepIndex)}</div>
-        </Dialog>
+        </DialogTitleElement>
       </div>
-    );
+    )
   }
 }
 
@@ -153,15 +182,22 @@ CreateInject.propTypes = {
   incidentId: PropTypes.string,
   lastId: PropTypes.string,
   inject_types: PropTypes.object,
+  inject_audiences_ids: PropTypes.object,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func
 }
 
 const select = (state) => {
+  let lastId = state.application.getIn(['ui', 'states', 'lastId'])
+  let injects = state.application.getIn(['entities', 'injects'])
+  let injectAudiences = lastId ? injects.get(lastId).get('inject_audiences') : Map()
+  let injectAudiencesIds = injectAudiences.toList()
+
   return {
-    lastId: state.application.getIn(['ui', 'states', 'lastId']),
+    lastId,
     inject_types: state.application.getIn(['entities', 'inject_types']),
+    inject_audiences_ids: injectAudiencesIds
   }
 }
 

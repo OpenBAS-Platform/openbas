@@ -5,34 +5,24 @@ import moment from 'moment';
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
 import {Menu} from '../../../../../components/Menu'
-import {Dialog} from '../../../../../components/Dialog'
+import {DialogTitleElement} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
 import {
   Step,
   Stepper,
-  StepLabel,
+  StepButton,
 } from '../../../../../components/Stepper';
 import {updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
+import InjectAudiences from './InjectAudiences'
 
 const style = {
-  float: 'left',
-  marginTop: '-14px'
+  float: 'right',
+  marginTop: '-12px'
 }
-
-const types = Map({
-  0: Map({
-    type_id: "0",
-    type_name: "EMAIL"
-  }),
-  1: Map({
-    type_id: "1",
-    type_name: "SMS"
-  })
-})
 
 class InjectPopover extends Component {
   constructor(props) {
@@ -44,7 +34,6 @@ class InjectPopover extends Component {
       type: this.props.type,
       stepIndex: 0,
       finished: false,
-      stepDisabled: false
     }
   }
 
@@ -91,6 +80,8 @@ class InjectPopover extends Component {
       this.refs.injectForm.submit()
     } else if (this.state.stepIndex === 1) {
       this.refs.contentForm.submit()
+    } else if (this.state.stepIndex === 2) {
+      this.handleCloseEdit()
     }
   }
 
@@ -116,11 +107,22 @@ class InjectPopover extends Component {
     this.handleCloseDelete()
   }
 
+  selectGlobal() {
+    this.setState({
+      stepIndex: 0
+    })
+  }
+
   selectContent() {
     this.setState({
-      stepIndex: 1,
-      finished: true,
-      stepDisabled: true
+      stepIndex: 1
+    })
+  }
+
+  selectAudiences() {
+    this.setState({
+      stepIndex: 2,
+      finished: true
     })
   }
 
@@ -151,7 +153,18 @@ class InjectPopover extends Component {
             types={this.props.inject_types}
             type={this.state.type}
             onSubmit={this.onContentSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+            onSubmitSuccess={this.selectAudiences.bind(this)}/>
+        )
+      case 2:
+        return (
+          <InjectAudiences
+            ref="injectAudiences"
+            exerciseId={this.props.exerciseId}
+            eventId={this.props.eventId}
+            incidentId={this.props.incidentId}
+            injectId={this.props.injectId}
+            injectAudiencesIds={this.props.inject_audiences_ids}
+          />
         )
       default:
         return 'Go away!';
@@ -166,7 +179,7 @@ class InjectPopover extends Component {
         onTouchTap={this.handleCloseEdit.bind(this)}
       />,
       <FlatButton
-        label={this.state.stepIndex === 0 ? "Next" : "Update"}
+        label={this.state.stepIndex === 2 ? "Close" : "Next"}
         primary={true}
         onTouchTap={this.submitFormEdit.bind(this)}
       />,
@@ -208,7 +221,7 @@ class InjectPopover extends Component {
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
-        <Dialog
+        <DialogTitleElement
           title="Confirmation"
           modal={false}
           open={this.state.openDelete}
@@ -216,19 +229,24 @@ class InjectPopover extends Component {
           actions={deleteActions}
         >
           Do you confirm the removing of this inject?
-        </Dialog>
-        <Dialog
+        </DialogTitleElement>
+        <DialogTitleElement
           title={
-            <Stepper linear={true} activeStep={this.state.stepIndex}>
-              <Step disabled={this.state.stepDisabled}>
-                <StepLabel>
+            <Stepper linear={false} activeStep={this.state.stepIndex}>
+              <Step>
+                <StepButton onClick={this.selectGlobal.bind(this)}>
                   1. Global parameters
-                </StepLabel>
+                </StepButton>
               </Step>
               <Step>
-                <StepLabel>
+                <StepButton onClick={this.selectContent.bind(this)}>
                   2. Content settings
-                </StepLabel>
+                </StepButton>
+              </Step>
+              <Step>
+                <StepButton onClick={this.selectAudiences.bind(this)}>
+                  3. Audiences
+                </StepButton>
               </Step>
             </Stepper>
           }
@@ -238,7 +256,7 @@ class InjectPopover extends Component {
           actions={editActions}
         >
           <div>{this.getStepContent(this.state.stepIndex, initialInformation)}</div>
-        </Dialog>
+        </DialogTitleElement>
       </div>
     )
   }
@@ -246,10 +264,14 @@ class InjectPopover extends Component {
 
 const select = (state, props) => {
   let inject = state.application.getIn(['entities', 'injects', props.injectId])
+  let injectAudiencesList = inject ? inject.get('inject_audiences') : Map()
+  let injectAudiencesIds = injectAudiencesList.toList()
+
   return {
     inject,
     type: inject.get('inject_type'),
     inject_types: state.application.getIn(['entities', 'inject_types']),
+    inject_audiences_ids: injectAudiencesIds,
   }
 }
 
@@ -263,6 +285,7 @@ InjectPopover.propTypes = {
   deleteInject: PropTypes.func,
   inject: PropTypes.object,
   inject_types: PropTypes.object,
+  inject_audiences_ids: PropTypes.object,
   children: PropTypes.node
 }
 

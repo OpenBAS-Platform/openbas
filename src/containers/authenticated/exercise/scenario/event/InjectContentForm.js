@@ -1,8 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../../../components/Field'
-import {SelectField} from '../../../../../components/SelectField'
-import DateTimePicker from '../../../../../components/DateTimePicker'
 import {i18nRegister} from '../../../../../utils/Messages'
 
 i18nRegister({
