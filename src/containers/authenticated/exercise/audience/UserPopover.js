@@ -121,7 +121,7 @@ class UserPopover extends Component {
         user_firstname: this.props.user.get('user_firstname'),
         user_lastname: this.props.user.get('user_lastname'),
         user_email: this.props.user.get('user_email'),
-        user_organization: this.props.organizations.get(this.props.user.get('user_organization')).get('organization_name')
+        user_organization: this.props.organizations.get(this.props.user.get('user_organization')).toJS()
       }
     }
 
@@ -152,9 +152,12 @@ class UserPopover extends Component {
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
-        >
-          <UserForm ref="userForm" initialValues={initialInformation}  organizations={this.props.organizations} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          actions={editActions}>
+          <UserForm ref="userForm"
+                    initialValues={initialInformation}
+                    organizations={this.props.organizations}
+                    onSubmit={this.onSubmitEdit.bind(this)}
+                    onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
       </div>
     )

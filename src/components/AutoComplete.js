@@ -24,10 +24,11 @@ const renderAutoCompleteField = ({input, label, fullWidth, hint, onFocus, onClic
                    dataSourceConfig={dataSourceConfig}
                    openOnFocus={openOnFocus}
                    filter={filter}
-                   {...input}
                    onFocus={onFocus}
                    onClick={onClick}
+                   searchText={input.value[dataSourceConfig.text]}
                    onNewRequest={(value) => input.onChange(value)}
+                   {...input}
   />)
 
 renderAutoCompleteField.propTypes = {
