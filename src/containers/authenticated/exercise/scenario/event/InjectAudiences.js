@@ -85,6 +85,8 @@ class InjectAudiences extends Component {
                   {audience.get('audience_name')}
                 </Chip>
               )
+            } else {
+              return (<div></div>)
             }
           })}
           <div className="clearfix"></div>

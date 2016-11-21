@@ -46,6 +46,7 @@ const initialState = {
   application: Map({
     locale: navigator.language,
     entities: Map({
+      users: Map(),
       organizations: Map(),
       files: Map(),
       exercise_statuses: Map(),

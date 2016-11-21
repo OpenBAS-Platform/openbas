@@ -12,9 +12,13 @@ import {Icon} from '../../../../components/Icon'
 import CreateAudience from './CreateAudience'
 
 const filterAudiences = (audiences, exerciseId) => {
-  var filterByExercise = n => n.audience_exercise === exerciseId
-  var filteredAudiences = R.filter(filterByExercise, audiences.toJS())
-  return fromJS(filteredAudiences)
+  let filterByExercise = n => n.audience_exercise === exerciseId
+  let filteredAudiences = R.filter(filterByExercise, audiences.toJS())
+  filteredAudiences = fromJS(filteredAudiences)
+  filteredAudiences = filteredAudiences.sort(
+    (a, b) => a.get('audience_name').localeCompare(b.get('audience_name'))
+  )
+  return filteredAudiences
 }
 
 class AudienceNav extends Component {
