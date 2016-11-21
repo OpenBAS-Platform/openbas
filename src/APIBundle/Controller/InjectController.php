@@ -78,11 +78,11 @@ class InjectController extends Controller
                 $data['context']['type'] = $inject->getInjectType();
                 $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
                 $data['data'] = json_decode($inject->getInjectContent(), true);
-                $data['context']['users'] = array();
+                $data['data']['users'] = array();
                 foreach ($inject->getInjectAudiences() as $audience) {
                     /* @var $audience Audience */
                     foreach(  $audience->getAudienceUsers() as $user ) {
-                        $data['context']['users'][] = $user;
+                        $data['data']['users'][] = $user;
                     }
                 }
                 $output[] = $data;
