@@ -1,7 +1,8 @@
 <?php
 
-namespace APIBundle\Controller\Exercise;
+namespace APIBundle\Controller\Exercise\Objective;
 
+use APIBundle\Entity\Subobjective;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,43 +13,17 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Form\Type\ObjectiveType;
 use APIBundle\Entity\Objective;
 
-class ObjectiveController extends Controller
+class SubobjectiveController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List objectives"
+     *    description="List subobjectives of objective"
      * )
      *
-     * @Rest\View(serializerGroups={"objective"})
-     * @Rest\Get("/exercises/{exercise_id}/objectives")
+     * @Rest\View(serializerGroups={"subobjective"})
+     * @Rest\Get("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
      */
-    public function getExercisesObjectivesAction(Request $request)
-    {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
-        /* @var $exercise Exercise */
-
-        if (empty($exercise)) {
-            return $this->exerciseNotFound();
-        }
-
-        $this->denyAccessUnlessGranted('select', $exercise);
-
-        $objectives = $em->getRepository('APIBundle:Objective')->findBy(['objective_exercise' => $exercise]);
-        /* @var $objectives Objective[] */
-
-        return $objectives;
-    }
-
-    /**
-     * @ApiDoc(
-     *    description="Read an objective"
-     * )
-     *
-     * @Rest\View(serializerGroups={"objective"})
-     * @Rest\Get("/exercises/{exercise_id}/objectives/{objective_id}")
-     */
-    public function getExerciseObjectivesAction(Request $request)
+    public function getExercisesObjectiveSubobjectivesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -67,19 +42,21 @@ class ObjectiveController extends Controller
             return $this->objectiveNotFound();
         }
 
-        return $objective;
+        $subobjectives = $em->getRepository('APIBundle:Subobjective')->findBy(['subobjective_objective' => $objective]);
+
+        return $subobjectives;
     }
 
     /**
      * @ApiDoc(
-     *    description="Create an objective",
-     *    input={"class"=ObjectiveType::class, "name"=""}
+     *    description="Create a subobjective",
+     *    input={"class"=SubobjectiveType::class, "name"=""}
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"objective"})
-     * @Rest\Post("/exercises/{exercise_id}/objectives")
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"subobjective"})
+     * @Rest\Post("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
      */
-    public function postExercisesObjectivesAction(Request $request)
+    public function postExercisesObjectiveSubobjectivesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -91,15 +68,21 @@ class ObjectiveController extends Controller
 
         $this->denyAccessUnlessGranted('update', $exercise);
 
-        $objective = new Objective();
-        $objective->setObjectiveExercise($exercise);
-        $form = $this->createForm(ObjectiveType::class, $objective);
-        $form->submit($request->request->all());
+        $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
+        /* @var $objective Objective */
 
+        if (empty($objective)) {
+            return $this->objectiveNotFound();
+        }
+
+        $subobjective = new Subobjective();
+        $form = $this->createForm(ObjectiveType::class, $subobjective);
+        $form->submit($request->request->all());
         if ($form->isValid()) {
-            $em->persist($objective);
+            $subobjective->setSubobjectiveObjective($objective);
+            $em->persist($subobjective);
             $em->flush();
-            return $objective;
+            return $subobjective;
         } else {
             return $form;
         }
@@ -107,13 +90,13 @@ class ObjectiveController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Delete an objective"
+     *    description="Delete a subobjective"
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"objective"})
-     * @Rest\Delete("/exercises/{exercise_id}/objectives/{objective_id}")
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"subobjective"})
+     * @Rest\Delete("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")
      */
-    public function removeExercisesObjectiveAction(Request $request)
+    public function removeExercisesObjectiveSubobjectiveAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -132,20 +115,27 @@ class ObjectiveController extends Controller
             return $this->objectiveNotFound();
         }
 
-        $em->remove($objective);
+        $subobjective = $em->getRepository('APIBundle:Subobjective')->find($request->get('subobjective_id'));
+        /* @var $objective Subobjective */
+
+        if (empty($subobjective)) {
+            return $this->subobjectiveNotFound();
+        }
+
+        $em->remove($subobjective);
         $em->flush();
     }
 
     /**
      * @ApiDoc(
-     *    description="Update an objective",
-     *   input={"class"=ObjectiveType::class, "name"=""}
+     *    description="Update a subobjective",
+     *   input={"class"=SubobjectiveType::class, "name"=""}
      * )
      *
-     * @Rest\View(serializerGroups={"objective"})
-     * @Rest\Put("/exercises/{exercise_id}/objectives/{objective_id}")
+     * @Rest\View(serializerGroups={"subobjective"})
+     * @Rest\Put("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")
      */
-    public function updateExercisesObjectiveAction(Request $request)
+    public function updateExercisesObjectiveSubobjectiveAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -184,5 +174,10 @@ class ObjectiveController extends Controller
     private function objectiveNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Objective not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function subobjectiveNotFound()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'Subobjective not found'], Response::HTTP_NOT_FOUND);
     }
 }

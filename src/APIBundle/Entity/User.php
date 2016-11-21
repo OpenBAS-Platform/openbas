@@ -67,6 +67,12 @@ class User implements UserInterface
     protected $user_audiences;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Comcheck", mappedBy="comcheck_users")
+     * @var Comcheck[]
+     */
+    protected $user_comchecks;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     protected $user_admin = 0;
@@ -82,6 +88,7 @@ class User implements UserInterface
     {
         $this->user_groups = new ArrayCollection();
         $this->user_audiences = new ArrayCollection();
+        $this->user_comchecks = new ArrayCollection();
     }
 
     public function getUserId()

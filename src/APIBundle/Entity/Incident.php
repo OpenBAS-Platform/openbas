@@ -43,14 +43,14 @@ class Incident
     protected $incident_event;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Objective", inversedBy="incident_objectives")
-     * @ORM\JoinTable(name="incidents_objectives",
+     * @ORM\ManyToMany(targetEntity="Subobjective", inversedBy="incident_subobjectives")
+     * @ORM\JoinTable(name="incidents_subobjectives",
      *      joinColumns={@ORM\JoinColumn(name="incident_id", referencedColumnName="incident_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="objective_id", referencedColumnName="objective_id", onDelete="RESTRICT")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="subobjective_id", referencedColumnName="subobjective_id", onDelete="RESTRICT")}
      *      )
-     * @var Objective[]
+     * @var Subobjective[]
      */
-    protected $incident_objectives;
+    protected $incident_subobjectives;
 
     /**
      * @ORM\OneToMany(targetEntity="Outcome", mappedBy="outcome_incident")
@@ -126,14 +126,14 @@ class Incident
         return $this;
     }
 
-    public function getIncidentObjectives()
+    public function getIncidentSubobjectives()
     {
-        return $this->incident_objectives;
+        return $this->incident_subobjectives;
     }
 
-    public function setIncidentObjectives($objectives)
+    public function setIncidentSubobjectives($subobjectives)
     {
-        $this->incident_objectives = $objectives;
+        $this->incident_subobjectives = $subobjectives;
         return $this;
     }
 
