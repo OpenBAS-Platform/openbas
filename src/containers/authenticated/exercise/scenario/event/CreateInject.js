@@ -3,17 +3,20 @@ import {connect} from 'react-redux'
 import {Map} from 'immutable'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
+import {searchAudiences} from '../../../../../actions/Audience'
 import {DialogTitleElement} from '../../../../../components/Dialog';
 import {
   Step,
   Stepper,
-  StepLabel,
+  StepButton,
 } from '../../../../../components/Stepper';
 import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button';
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
+
+let injectData = null
 
 class CreateInject extends Component {
   constructor(props) {
@@ -23,7 +26,6 @@ class CreateInject extends Component {
       type: null,
       stepIndex: 0,
       finished: false,
-      created: false
     }
   }
 
@@ -33,48 +35,49 @@ class CreateInject extends Component {
 
   handleClose() {
     this.setState({stepIndex: 0, finished: false, open: false})
-  }
-
-  handleCancel() {
-    if( this.state.created ) {
-      this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.lastId)
-    }
-    this.handleClose()
+    this.props.searchAudiences('')
   }
 
   onGlobalSubmit(data) {
-    if( this.state.created ) {
-      return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.lastId, data)
-    } else {
-      return this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, data)
-    }
+    injectData = data
   }
 
   onContentSubmit(data) {
-    let injectData = Map({
-      inject_content: JSON.stringify(data)
-    })
-    return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.lastId, injectData)
+    injectData.inject_content = JSON.stringify(data)
   }
 
-  submitForm() {
+  onAudiencesChange(data) {
+    injectData.inject_audiences = data
+  }
+
+  handleNext() {
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
     } else if (this.state.stepIndex === 1) {
       this.refs.contentForm.submit()
     } else if (this.state.stepIndex === 2) {
-      this.handleClose()
+      this.createInject()
     }
+  }
+
+  createInject() {
+    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, injectData)
+    this.handleClose()
   }
 
   changeType(event, index, value) {
     this.setState({type: value})
   }
 
+  selectGlobal() {
+    this.setState({
+      stepIndex: 0
+    })
+  }
+
   selectContent() {
     this.setState({
-      stepIndex: 1,
-      created: true
+      stepIndex: 1
     })
   }
 
@@ -117,6 +120,7 @@ class CreateInject extends Component {
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
+            onChange={this.onAudiencesChange.bind(this)}
             injectId={this.props.lastId}
             injectAudiencesIds={this.props.inject_audiences_ids}
           />
@@ -131,12 +135,12 @@ class CreateInject extends Component {
       <FlatButton
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCancel.bind(this)}
+        onTouchTap={this.handleClose.bind(this)}
       />,
       <FlatButton
-        label={this.state.stepIndex === 2 ? "Close" : "Next"}
+        label={this.state.stepIndex === 2 ? "Create" : "Next"}
         primary={true}
-        onTouchTap={this.submitForm.bind(this)}
+        onTouchTap={this.handleNext.bind(this)}
       />,
     ]
 
@@ -148,25 +152,25 @@ class CreateInject extends Component {
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
-                <StepLabel>
+                <StepButton onClick={this.selectGlobal.bind(this)}>
                   1. Global parameters
-                </StepLabel>
+                </StepButton>
               </Step>
               <Step>
-                <StepLabel>
+                <StepButton onClick={this.selectContent.bind(this)}>
                   2. Content settings
-                </StepLabel>
+                </StepButton>
               </Step>
               <Step>
-                <StepLabel>
+                <StepButton onClick={this.selectAudiences.bind(this)}>
                   3. Audiences
-                </StepLabel>
+                </StepButton>
               </Step>
             </Stepper>
           }
           modal={false}
           open={this.state.open}
-          onRequestClose={this.handleCancel.bind(this)}
+          onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
           <div>{this.getStepContent(this.state.stepIndex)}</div>
@@ -185,7 +189,8 @@ CreateInject.propTypes = {
   inject_audiences_ids: PropTypes.object,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
-  deleteInject: PropTypes.func
+  deleteInject: PropTypes.func,
+  searchAudiences: PropTypes.func
 }
 
 const select = (state) => {
@@ -201,4 +206,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {addInject, updateInject, deleteInject})(CreateInject);
+export default connect(select, {addInject, updateInject, deleteInject, searchAudiences})(CreateInject);

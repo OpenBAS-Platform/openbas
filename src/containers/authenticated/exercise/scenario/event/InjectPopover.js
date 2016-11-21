@@ -14,6 +14,7 @@ import {
   Stepper,
   StepButton,
 } from '../../../../../components/Stepper';
+import {searchAudiences} from '../../../../../actions/Audience'
 import {updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
@@ -24,6 +25,8 @@ const style = {
   top: '7px',
   right: 0,
 }
+
+let injectData = null
 
 class InjectPopover extends Component {
   constructor(props) {
@@ -63,17 +66,20 @@ class InjectPopover extends Component {
       stepIndex: 0,
       finished: false
     })
+    injectData = null
+    this.props.searchAudiences('')
   }
 
-  onGlobalSubmitEdit(data) {
-    return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, data)
+  onGlobalSubmit(data) {
+    injectData = data
   }
 
-  onContentSubmitEdit(data) {
-    let injectData = Map({
-      inject_content: JSON.stringify(data)
-    })
-    return this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, injectData)
+  onContentSubmit(data) {
+    injectData.inject_content = JSON.stringify(data)
+  }
+
+  onAudiencesChange(data) {
+    injectData.inject_audiences = data
   }
 
   submitFormEdit() {
@@ -82,8 +88,13 @@ class InjectPopover extends Component {
     } else if (this.state.stepIndex === 1) {
       this.refs.contentForm.submit()
     } else if (this.state.stepIndex === 2) {
-      this.handleCloseEdit()
+      this.updateInject()
     }
+  }
+
+  updateInject() {
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, injectData)
+    this.handleCloseEdit()
   }
 
   changeType(event, index, value) {
@@ -134,7 +145,7 @@ class InjectPopover extends Component {
         return (
           <InjectForm
             ref="injectForm"
-            onSubmit={this.onGlobalSubmitEdit.bind(this)}
+            onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
             initialValues={initialInformation}
             changeType={this.changeType.bind(this)}
@@ -153,7 +164,7 @@ class InjectPopover extends Component {
             initialValues={initialContent}
             types={this.props.inject_types}
             type={this.state.type}
-            onSubmit={this.onContentSubmitEdit.bind(this)}
+            onSubmit={this.onContentSubmit.bind(this)}
             onSubmitSuccess={this.selectAudiences.bind(this)}/>
         )
       case 2:
@@ -163,6 +174,7 @@ class InjectPopover extends Component {
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
+            onChange={this.onAudiencesChange.bind(this)}
             injectId={this.props.injectId}
             injectAudiencesIds={this.props.inject_audiences_ids}
           />
@@ -180,11 +192,11 @@ class InjectPopover extends Component {
         onTouchTap={this.handleCloseEdit.bind(this)}
       />,
       <FlatButton
-        label={this.state.stepIndex === 2 ? "Close" : "Next"}
+        label={this.state.stepIndex === 2 ? "Update" : "Next"}
         primary={true}
         onTouchTap={this.submitFormEdit.bind(this)}
       />,
-    ];
+    ]
     const deleteActions = [
       <FlatButton
         label="Cancel"
@@ -196,7 +208,7 @@ class InjectPopover extends Component {
         primary={true}
         onTouchTap={this.submitDelete.bind(this)}
       />,
-    ];
+    ]
 
     let initialInformation = undefined
     if (this.props.inject) {
@@ -284,10 +296,11 @@ InjectPopover.propTypes = {
   type: PropTypes.string,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
+  searchAudiences: PropTypes.func,
   inject: PropTypes.object,
   inject_types: PropTypes.object,
   inject_audiences_ids: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateInject, deleteInject})(InjectPopover)
+export default connect(select, {updateInject, deleteInject, searchAudiences})(InjectPopover)

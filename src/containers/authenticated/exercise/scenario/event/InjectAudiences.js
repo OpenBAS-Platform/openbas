@@ -1,10 +1,9 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Map, fromJS, List as iList} from 'immutable'
+import {fromJS, List as iList} from 'immutable'
 import createImmutableSelector from '../../../../../utils/ImmutableSelect'
 import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
-import {updateInject} from '../../../../../actions/Inject'
 import {fetchAudiences, searchAudiences} from '../../../../../actions/Audience'
 import {Chip} from '../../../../../components/Chip';
 import {Avatar} from '../../../../../components/Avatar';
@@ -43,9 +42,9 @@ class InjectAudiences extends Component {
     this.props.searchAudiences(value)
   }
 
-  addAudience(audience) {
-    let audiencesIds = this.state.audiences_ids.push(audience.get('audience_id'))
-    if (this.state.audiences_ids.keyOf(audience.get('audience_id')) === undefined) {
+  addAudience(audienceId) {
+    let audiencesIds = this.state.audiences_ids.push(audienceId)
+    if (this.state.audiences_ids.keyOf(audienceId) === undefined) {
       this.setState({
         audiences_ids: audiencesIds
       })
@@ -53,19 +52,17 @@ class InjectAudiences extends Component {
     this.submitAudiences(audiencesIds)
   }
 
-  removeAudience(audience) {
-    let audiencesIds = this.state.audiences_ids.delete(this.state.audiences_ids.keyOf(audience.get('audience_id')))
+  removeAudience(audienceId) {
+    let audiencesIds = this.state.audiences_ids.delete(this.state.audiences_ids.keyOf(audienceId))
     this.setState({
       audiences_ids: audiencesIds
     })
     this.submitAudiences(audiencesIds)
+    console.log('audiencesIds', audiencesIds)
   }
 
   submitAudiences(audiences_ids) {
-    let data = Map({
-      inject_audiences: audiences_ids
-    })
-    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, data)
+    this.props.onChange(audiences_ids)
   }
 
   render() {
@@ -75,27 +72,29 @@ class InjectAudiences extends Component {
                          onChange={this.handleSearchAudiences.bind(this)}/>
         <div style={styles.list}>
           {this.state.audiences_ids.toList().map(audienceId => {
-            let audience = this.props.audiences.get(audienceId)
-            return (
-              <Chip
-                key={audience.get('audience_id')}
-                onRequestDelete={this.removeAudience.bind(this, audience)}
-                type={Constants.CHIP_TYPE_LIST}
-              >
-                <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
-                        type={Constants.AVATAR_TYPE_CHIP}/>
-                {audience.get('audience_name')}
-              </Chip>
-            )
+            let audience = this.props.allAudiences.get(audienceId)
+            if( audience ) {
+              return (
+                <Chip
+                  key={audience.get('audience_id')}
+                  onRequestDelete={this.removeAudience.bind(this, audience.get('audience_id'))}
+                  type={Constants.CHIP_TYPE_LIST}
+                >
+                  <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
+                          type={Constants.AVATAR_TYPE_CHIP}/>
+                  {audience.get('audience_name')}
+                </Chip>
+              )
+            }
           })}
           <div className="clearfix"></div>
         </div>
         <div style={styles.search}>
+          {this.props.audiences.count() === 0 ? <div style={styles.empty}>No audience found.</div> : ""}
           <List>
             {this.props.audiences.toList().map(audience => {
               let disabled = false
-              if (this.state.audiences_ids.keyOf(audience.get('audience_id')) !== undefined
-                || this.props.injectAudiencesIds.keyOf(audience.get('audience_id')) !== undefined) {
+              if (this.state.audiences_ids.keyOf(audience.get('audience_id')) !== undefined ) {
                 disabled = true
               }
 
@@ -103,7 +102,7 @@ class InjectAudiences extends Component {
                 <MainSmallListItem
                   key={audience.get('audience_id')}
                   disabled={disabled}
-                  onClick={this.addAudience.bind(this, audience)}
+                  onClick={this.addAudience.bind(this, audience.get('audience_id'))}
                   primaryText={
                     <div>
                       <div style={styles.name}>{audience.get('audience_name')}</div>
@@ -137,15 +136,17 @@ InjectAudiences.propTypes = {
   injectId: PropTypes.string,
   fetchAudiences: PropTypes.func,
   searchAudiences: PropTypes.func,
-  updateInject: PropTypes.func,
+  onChange: PropTypes.func,
   injectAudiencesIds: PropTypes.object,
   audiences: PropTypes.object,
+  allAudiences: PropTypes.object
 }
 
 const select = (state, props) => {
   return {
-    audiences: filteredAudiences(state, props)
+    audiences: filteredAudiences(state, props),
+    allAudiences: state.application.getIn(['entities', 'audiences'])
   }
 }
 
-export default connect(select, {fetchAudiences, searchAudiences, updateInject})(InjectAudiences);
+export default connect(select, {fetchAudiences, searchAudiences})(InjectAudiences);
