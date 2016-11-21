@@ -3,10 +3,10 @@ package io.openex.management.rest;
 import com.google.gson.Gson;
 import io.openex.management.Executor;
 import io.openex.management.camel.IOpenexContext;
+import io.openex.management.contract.Contract;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.builder.ProxyBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
-import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -16,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,16 +37,24 @@ public class WorkerRest {
 	UriInfo uri;
 	
 	@GET
+	@Path("/heartbeat")
+	@Produces(MediaType.APPLICATION_JSON)
+	public RestHeartbeat heartbeat() {
+		return new RestHeartbeat(workerRegistry.workers().size());
+	}
+	
+	@GET
 	@Path("/contracts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<RestContract> getContracts() throws IOException {
 		List<RestContract> contracts = new ArrayList<>();
 		Map<String, Executor> workers = workerRegistry.workers();
 		for (Map.Entry<String, Executor> entry : workers.entrySet()) {
-			if (entry.getValue().contract() != null) {
+			Contract contract = entry.getValue().contract();
+			if (contract != null) { //No external contract for the worker
 				RestContract restContract = new RestContract();
 				restContract.setType(entry.getKey());
-				restContract.setDefinition(IOUtils.toString(entry.getValue().contract(), "UTF-8"));
+				restContract.setFields(contract.getFields());
 				contracts.add(restContract);
 			}
 		}

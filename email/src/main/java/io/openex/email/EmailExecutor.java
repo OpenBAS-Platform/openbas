@@ -1,22 +1,28 @@
 package io.openex.email;
 
+import com.google.common.collect.ImmutableMap;
 import io.openex.management.Executor;
+import io.openex.management.contract.Contract;
 import org.apache.camel.Component;
 import org.apache.camel.component.stream.StreamComponent;
 
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import static io.openex.management.contract.ContractCardinality.Multiple;
+import static io.openex.management.contract.ContractType.Attachment;
 
 @SuppressWarnings("PackageAccessibility")
 class EmailExecutor implements Executor {
-
+	
 	public String name() {
 		return "email";
 	}
 	
-	public Map<String, Component> components() {
-		return Collections.singletonMap("stream", new StreamComponent());
+	@Override
+	public Contract contract() {
+		return Contract.build().add("subject").add("body").add("attachments", Attachment, Multiple);
+	}
+	
+	@Override
+	public ImmutableMap<String, Component> components() {
+		return ImmutableMap.of("stream", new StreamComponent());
 	}
 }

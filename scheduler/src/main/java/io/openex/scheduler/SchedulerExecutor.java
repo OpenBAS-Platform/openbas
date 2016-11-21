@@ -1,14 +1,11 @@
 package io.openex.scheduler;
 
+import com.google.common.collect.ImmutableMap;
 import io.openex.management.Executor;
+import io.openex.management.contract.Contract;
 import org.apache.camel.Component;
 import org.apache.camel.component.gson.GsonDataFormat;
 import org.apache.camel.component.http4.HttpComponent;
-
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @SuppressWarnings("PackageAccessibility")
 class SchedulerExecutor implements Executor {
@@ -17,18 +14,21 @@ class SchedulerExecutor implements Executor {
 		return "scheduler";
 	}
 	
-	public InputStream contract() {
+	@Override
+	public Contract contract() {
 		return null;
 	}
 	
-	public Map<String, Component> components() {
-		return Collections.singletonMap("http", new HttpComponent());
+	@Override
+	public ImmutableMap<String, Component> components() {
+		return ImmutableMap.of("http", new HttpComponent());
 	}
 	
-	public Map<String, Object> beans() {
-		Map<String, Object> beans = new HashMap<>();
-		beans.put("schedulerRouter", new SchedulerRouter());
-		beans.put("json-gson", new GsonDataFormat());
-		return beans;
+	@Override
+	public ImmutableMap<String, Object> beans() {
+		return ImmutableMap.of(
+				"schedulerRouter", new SchedulerRouter(),
+				"json-gson", new GsonDataFormat()
+		);
 	}
 }

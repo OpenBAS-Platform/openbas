@@ -12,6 +12,7 @@
     <repository>mvn:io.openex/worker-sms/${pom.version}/xml/features</repository>
 
     <feature name="worker-features" version="${pom.version}">
+        <bundle>mvn:com.google.guava/guava/20.0</bundle>
         <feature>scr</feature>
         <feature>cxf-dosgi-provider-rs</feature>
         <feature>worker-management</feature>
