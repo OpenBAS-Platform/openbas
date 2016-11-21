@@ -63,7 +63,6 @@ class InjectController extends Controller
                             ->setParameter('end', $dateEnd)
                             ->getQuery()
                             ->getResult());
-
                     } else {
                         $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
                     }
@@ -74,21 +73,60 @@ class InjectController extends Controller
         if ($request->get('worker')) {
             $output = array();
             foreach ($injects as $inject) {
-                $content = json_decode($inject->getInjectContent(), true);
-                $content['inject_id'] = $inject->getInjectId();
-                $content['users'] = array();
+                $data = array();
+                $data['context']['id'] = $inject->getInjectId();
+                $data['data'] = json_decode($inject->getInjectContent(), true);
+                $data['context']['users'] = array();
                 foreach ($inject->getInjectAudiences() as $audience) {
                     /* @var $audience Audience */
                     foreach(  $audience->getAudienceUsers() as $user ) {
-                        $content['users'][] = $user;
+                        $data['context']['users'][] = $user;
                     }
                 }
-                $output[] = $content;
+                $output[] = $data;
             }
 
             return $output;
         } else {
             return $injects;
         }
+    }
+
+    /**
+     * @ApiDoc(
+     *    description="Update an inject",
+     *    input={"class"=InjectType::class, "name"=""}
+     * )
+     *
+     * @Rest\View(serializerGroups={"inject"})
+     * @Rest\Put("/injects/{inject_id}")
+     */
+    public function updateInjectAction(Request $request)
+    {
+        if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin())
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
+        /* @var $inject Inject */
+
+        if (empty($inject)) {
+            return $this->injectNotFound();
+        }
+
+        $form = $this->createForm(InjectType::class, $inject);
+        $form->submit($request->request->all(), false);
+        if ($form->isValid()) {
+            $em->persist($inject);
+            $em->flush();
+            return $inject;
+        } else {
+            return $form;
+        }
+    }
+
+    private function injectNotFound()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'Inject not found'], Response::HTTP_NOT_FOUND);
     }
 }
