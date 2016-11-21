@@ -7,7 +7,7 @@ import org.apache.camel.Component;
 import org.apache.camel.component.stream.StreamComponent;
 
 import static io.openex.management.contract.ContractCardinality.Multiple;
-import static io.openex.management.contract.ContractType.Attachment;
+import static io.openex.management.contract.ContractType.*;
 
 @SuppressWarnings("PackageAccessibility")
 class EmailExecutor implements Executor {
@@ -18,7 +18,11 @@ class EmailExecutor implements Executor {
 	
 	@Override
 	public Contract contract() {
-		return Contract.build().add("subject").add("body").add("attachments", Attachment, Multiple);
+		return Contract.build()
+				.add("sender")
+				.add("subject")
+				.add("body", Textarea)
+				.add("attachments", Attachment, Multiple);
 	}
 	
 	@Override

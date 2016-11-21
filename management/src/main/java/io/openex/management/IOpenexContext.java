@@ -1,4 +1,4 @@
-package io.openex.management.camel;
+package io.openex.management;
 
 import org.apache.camel.impl.DefaultCamelContext;
 

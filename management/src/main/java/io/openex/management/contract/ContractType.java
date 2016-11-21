@@ -8,5 +8,6 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum(String.class)
 public enum ContractType {
 	@XmlEnumValue("text") Text,
+	@XmlEnumValue("textarea") Textarea,
 	@XmlEnumValue("attachment") Attachment
 }

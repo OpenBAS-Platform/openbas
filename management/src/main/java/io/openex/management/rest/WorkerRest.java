@@ -2,7 +2,7 @@ package io.openex.management.rest;
 
 import com.google.gson.Gson;
 import io.openex.management.Executor;
-import io.openex.management.camel.IOpenexContext;
+import io.openex.management.IOpenexContext;
 import io.openex.management.contract.Contract;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.builder.ProxyBuilder;
@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

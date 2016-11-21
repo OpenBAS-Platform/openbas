@@ -2,7 +2,7 @@
     <route id="openex-sms">
         <from uri="direct:sms"/>
         <setBody>
-            <simple>Hello SMS: ${body[exercise_id]}/${threadName}</simple>
+            <simple>Hello SMS: ${body[context][id]}/${threadName}</simple>
         </setBody>
         <to uri="stream:out"/>
     </route>

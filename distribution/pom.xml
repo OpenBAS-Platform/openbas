@@ -91,6 +91,28 @@
                     </bootFeatures>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <configuration>
+                            <target>
+                                <copy todir="src/main/filtered-resources/openex"
+                                      overwrite="true" flatten="true">
+                                    <fileset dir="../">
+                                        <include name="**/openex_*.properties"/>
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

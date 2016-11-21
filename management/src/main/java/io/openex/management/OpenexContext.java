@@ -1,6 +1,5 @@
-package io.openex.management.camel;
+package io.openex.management;
 
-import io.openex.management.Executor;
 import io.openex.management.registry.IWorkerListener;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.ThreadPoolRejectedPolicy;
@@ -18,8 +17,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @SuppressWarnings("PackageAccessibility")
@@ -69,7 +72,7 @@ public class OpenexContext implements IOpenexContext {
 			SimpleRegistry openexRegistry = (SimpleRegistry) registry;
 			Set<Map.Entry<String, Object>> beansEntries = executor.beans().entrySet();
 			for (Map.Entry<String, Object> beansEntry : beansEntries) {
-				if(openexRegistry.containsKey(beansEntry.getKey())) {
+				if (openexRegistry.containsKey(beansEntry.getKey())) {
 					openexRegistry.remove(beansEntry.getKey());
 				}
 			}
@@ -94,7 +97,7 @@ public class OpenexContext implements IOpenexContext {
 			SimpleRegistry openexRegistry = (SimpleRegistry) registry;
 			Set<Map.Entry<String, Object>> beansEntries = executor.beans().entrySet();
 			for (Map.Entry<String, Object> beansEntry : beansEntries) {
-				if(!openexRegistry.containsKey(beansEntry.getKey())) {
+				if (!openexRegistry.containsKey(beansEntry.getKey())) {
 					openexRegistry.put(beansEntry.getKey(), beansEntry.getValue());
 				}
 			}
@@ -134,7 +137,13 @@ public class OpenexContext implements IOpenexContext {
 	private void createContext() throws Exception {
 		SimpleRegistry registry = new SimpleRegistry();
 		context.setRegistry(registry);
-		context.addComponent("properties", new PropertiesComponent("file:${karaf.home}/etc/openex.properties"));
+		File[] propertiesFiles = new File(System.getProperty("karaf.home") + "/openex/").listFiles();
+		assert propertiesFiles != null;
+		List<String> paths = Arrays.stream(propertiesFiles)
+				.filter(file -> file.getName().endsWith(".properties"))
+				.map(file -> "file:" + file.getAbsolutePath()).collect(Collectors.toList());
+		String[] locations = paths.toArray(new String[paths.size()]);
+		context.addComponent("properties", new PropertiesComponent(locations));
 		context.getExecutorServiceManager().registerThreadPoolProfile(threadPoolProfileRemote());
 		context.getExecutorServiceManager().registerThreadPoolProfile(threadPoolProfileExecutor());
 		context.setTracing(true);

@@ -2,26 +2,35 @@
     <route id="openex-scheduler">
         <from uri="timer:simple?period=5000"/>
         <setHeader headerName="X-Auth-Token">
-            <constant>{{openex_token}}</constant>
+            <constant>{{openex.token}}</constant>
         </setHeader>
-        <to uri="{{openex_inject_fetch}}"/>
+        <to uri="{{openex.inject_fetch}}"/>
         <unmarshal>
             <json library="Gson" unmarshalTypeName="java.lang.Object"/>
         </unmarshal>
         <split executorServiceRef="openex-worker-thread-profile" streaming="true">
             <simple>${body}</simple>
             <setHeader headerName="router-header">
-                <simple>${body[exercise_name]}</simple>
+                <simple>${body[context][type]}</simple>
+            </setHeader>
+            <setHeader headerName="router-callback">
+                <simple>${body[context][callback_url]}</simple>
             </setHeader>
             <doTry>
                 <dynamicRouter ignoreInvalidEndpoints="true">
                     <method ref="schedulerRouter" method="forward"/>
                 </dynamicRouter>
+                <setBody>
+                    <simple>{"status":"success", "message":"${header.return-message}"}</simple>
+                </setBody>
                 <to uri="direct:callback"/>
                 <doCatch>
-                    <exception>org.apache.camel.component.direct.DirectConsumerNotAvailableException</exception>
-                    <log message="Error calling schedulerRouter for component ${header.router-header}"/>
-                    <to uri="mock:routing_error"/>
+                    <exception>java.lang.Exception</exception>
+                    <setBody>
+                        <simple>{"status":"error", "message":"${property.CamelExceptionCaught}"}</simple>
+                    </setBody>
+                    <log loggingLevel="ERROR" message="Error calling ${header.router-header} ${body}"/>
+                    <to uri="direct:callback"/>
                 </doCatch>
             </doTry>
         </split>
@@ -32,15 +41,17 @@
             <constant>application/json</constant>
         </setHeader>
         <setHeader headerName="CamelHttpMethod">
-            <constant>{{callback_mode}}</constant>
+            <constant>POST</constant>
         </setHeader>
         <doTry>
-            <to uri="{{callback_uri}}"/>
+            <setHeader headerName="CamelHttpUri">
+                <simple>${header.router-callback}</simple>
+            </setHeader>
+            <log message="Calling callback ${header.CamelHttpUri} ${body}"/>
+            <to uri="http://fake"/>
             <doCatch>
                 <exception>java.lang.Exception</exception>
-                <!-- TODO add logger here -->
-                <log message="Error calling callback uri for component ${header.router-header}"/>
-                <to uri="mock:callback_error"/>
+                <log loggingLevel="ERROR" message="Error calling callback ${property.CamelExceptionCaught}"/>
             </doCatch>
         </doTry>
     </route>
