@@ -45,7 +45,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
         $statusDisabled = $this->createInjectStatus('DISABLED');
         $statusPending = $this->createInjectStatus('PENDING');
-        $statusSent = $this->createInjectStatus('SENT');
+        $statusProcessed = $this->createInjectStatus('PROCESSED');
         $output->writeln('Creating default inject statuses');
 
         $resultAchieved = $this->createResult('ACHIEVED');
