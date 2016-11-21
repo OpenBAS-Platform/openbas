@@ -39,11 +39,11 @@ class InjectContentForm extends Component {
 
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.types.get(this.state.currentType).get('definition').map((value, key) => {
-          if (value === "Text") {
-            return ( <FormField name={key} fullWidth={true} type="text" label={key}/> )
+        {this.props.types.get(this.state.currentType).get('fields').toList().map(field => {
+          if (field.get('type') === "text") {
+            return ( <FormField name={field.get('name')} fullWidth={true} type="text" label={field.get('name')}/> )
           } else {
-            return ( <FormField name={key} fullWidth={true} type="text" label={key}/> )
+            return ( <FormField name={field.get('name')} fullWidth={true} type="text" label={field.get('name')}/> )
           }
         })}
       </form>

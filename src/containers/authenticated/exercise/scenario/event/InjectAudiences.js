@@ -58,7 +58,6 @@ class InjectAudiences extends Component {
       audiences_ids: audiencesIds
     })
     this.submitAudiences(audiencesIds)
-    console.log('audiencesIds', audiencesIds)
   }
 
   submitAudiences(audiences_ids) {
