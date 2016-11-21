@@ -15,7 +15,7 @@ const avatarStyle = {
   },
   [ Constants.AVATAR_TYPE_MAINLIST ]: {
     position: 'absolute',
-    top: '14px',
+    top: '12px',
     left: '16px'
   },
   [ Constants.AVATAR_TYPE_CHIP ]: {

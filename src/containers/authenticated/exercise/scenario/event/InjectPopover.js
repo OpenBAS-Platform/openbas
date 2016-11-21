@@ -20,8 +20,9 @@ import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
 
 const style = {
-  float: 'right',
-  marginTop: '-12px'
+  position: 'absolute',
+  top: '7px',
+  right: 0,
 }
 
 class InjectPopover extends Component {

@@ -43,10 +43,6 @@ class NavBar extends Component {
                             to={'/private/exercise/' + this.props.id + '/audience'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
-          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/calendar'}
-                            to={'/private/exercise/' + this.props.id + '/calendar'}
-                            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
-                                            name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
           <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}
                             to={'/private/exercise/' + this.props.id + '/settings'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}

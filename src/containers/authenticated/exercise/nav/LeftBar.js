@@ -54,11 +54,6 @@ class LeftBar extends Component {
                         label="Audience"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
-                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/calendar'}
-                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/calendar'}
-                        label="Calendar"
-                        leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}/>
-          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
                         active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/settings'}
                         label="Settings"
