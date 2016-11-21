@@ -40,17 +40,6 @@ class Objective
      */
     protected $objective_exercise;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Incident", mappedBy="incident_objectives")
-     * @var Incident[]
-     */
-    protected $objective_incidents;
-
-    public function __construct()
-    {
-        $this->objective_incidents = new ArrayCollection();
-    }
-
     public function getObjectiveId()
     {
         return $this->objective_id;
@@ -103,17 +92,6 @@ class Objective
     public function setObjectiveExercise($exercise)
     {
         $this->objective_exercise = $exercise;
-        return $this;
-    }
-
-    public function getObjectiveIncidents()
-    {
-        return $this->objective_incidents;
-    }
-
-    public function setObjectiveIncidents($incidents)
-    {
-        $this->objective_incidents = $incidents;
         return $this;
     }
 }

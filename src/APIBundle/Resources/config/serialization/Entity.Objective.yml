@@ -1,0 +1,10 @@
+APIBundle\Entity\Objective:
+    attributes:
+        objective_id:
+            groups: ['objective']
+        objective_title:
+            groups: ['objective']
+        objective_description:
+            groups: ['objective']
+        objective_priority:
+            groups: ['objective']
