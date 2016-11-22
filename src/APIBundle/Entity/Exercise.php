@@ -34,7 +34,7 @@ class Exercise
     protected $exercise_description;
 
     /**
-     * @ORM\Column(type="datetime")*
+     * @ORM\Column(type="datetime")
      */
     protected $exercise_start_date;
 
