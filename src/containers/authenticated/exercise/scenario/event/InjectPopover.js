@@ -22,7 +22,7 @@ import InjectAudiences from './InjectAudiences'
 
 const style = {
   position: 'absolute',
-  top: '7px',
+  top: '5px',
   right: 0,
 }
 
