@@ -40,7 +40,6 @@ class InjectContentForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.types.get(this.state.currentType).get('fields').toList().map(field => {
-          console.log('FIELD', field)
           if (field.get('type') === "text") {
             return ( <FormField key={field.get('name')} name={field.get('name')} fullWidth={true} type="text" label={field.get('name')}/> )
           } else {

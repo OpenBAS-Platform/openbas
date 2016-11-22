@@ -24,6 +24,15 @@ const styles = {
     borderBottom: '1px solid #E0E0E0',
     backgroundColor: '#F0F0F0'
   },
+  'secondaryitem': {
+    marginLeft: '30px',
+    borderBottom: '1px solid #E0E0E0'
+  },
+  'secondaryitemdisabled': {
+    marginLeft: '30px',
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0'
+  },
 }
 
 const innerDivStyle = {
@@ -118,6 +127,8 @@ export const MainListItem = (props) => (
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
     disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={true}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
     rightIconButton={props.rightIconButton}/>
 );
@@ -129,7 +140,33 @@ MainListItem.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  rightIconButton: PropTypes.node
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
+}
+
+export const SecondaryListItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={true}
+    style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
+    rightIconButton={props.rightIconButton}/>
+);
+
+SecondaryListItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
 
 export const MainSmallListItem = (props) => (

@@ -6,7 +6,7 @@ import {Map} from 'immutable'
 
 export const fetchObjectives = (exerciseId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_FETCH_OBJECTIVES_SUBMITTED});
-  return api(schema.arrayOfObjectives).get('/api/exercises/' + exerciseId + '/events').then(function (response) {
+  return api(schema.arrayOfObjectives).get('/api/exercises/' + exerciseId + '/objectives').then(function (response) {
     dispatch({
       type: Constants.APPLICATION_FETCH_OBJECTIVES_SUCCESS,
       payload: response.data

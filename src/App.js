@@ -26,6 +26,7 @@ import IndexAuthenticated from './containers/authenticated/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
+import IndexExerciseObjective from './containers/authenticated/exercise/objective/Index'
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
@@ -54,6 +55,8 @@ const initialState = {
       inject_types: Map(),
       inject_statuses: Map(),
       exercises: Map(),
+      objectives: Map(),
+      subobjectives: Map(),
       audiences: Map(),
       events: Map(),
       incidents: Map(),
@@ -166,7 +169,7 @@ class App extends Component {
                 <Route path='exercise/:exerciseId' component={RootExercise}>
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
-                  <Route path='objectives' component={IndexExercise}/>
+                  <Route path='objectives' component={IndexExerciseObjective}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
                   <Route path='scenario/:eventId' component={IndexExerciseScenarioEvent}/>
                   <Route path='audience' component={IndexExerciseAudience}/>

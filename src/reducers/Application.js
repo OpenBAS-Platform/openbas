@@ -1,6 +1,6 @@
 import * as Constants from '../constants/ActionTypes'
-import {Map} from 'immutable'
-import {mergeStore} from '../utils/Store'
+import {Map, List} from 'immutable'
+import {mergeStore, mergeStoreDeep} from '../utils/Store'
 
 const application = (state = Map(), action) => {
 
@@ -207,6 +207,158 @@ const application = (state = Map(), action) => {
 
     case Constants.APPLICATION_DELETE_EXERCISE_ERROR: {
       return state.setIn(['ui', 'loading'], false)
+    }
+    //endregion
+
+    // region OBJECTIVES
+    case Constants.APPLICATION_FETCH_OBJECTIVES_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_OBJECTIVES_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'objectives'])
+        mergeStoreDeep(state, action, ['entities', 'subobjectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_OBJECTIVES_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_OBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_OBJECTIVE_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'objectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_OBJECTIVE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_ADD_OBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_OBJECTIVE_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'objectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_ADD_OBJECTIVE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_UPDATE_OBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_UPDATE_OBJECTIVE_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'objectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_UPDATE_OBJECTIVE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_DELETE_OBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_DELETE_OBJECTIVE_SUCCESS: {
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'objectives', action.payload.get('objectiveId')])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+    //endregion
+
+    // region SUBOBJECTIVES
+    case Constants.APPLICATION_FETCH_SUBOBJECTIVES_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_SUBOBJECTIVES_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'subobjectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_SUBOBJECTIVES_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_FETCH_SUBOBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_FETCH_SUBOBJECTIVE_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'subobjectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_FETCH_SUBOBJECTIVE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_ADD_SUBOBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_ADD_SUBOBJECTIVE_SUCCESS: {
+      let objectiveId = action.payload.getIn(['entities', 'subobjectives', action.payload.get('result'), 'subobjective_objective'])
+      action.payload = action.payload.setIn(['entities', 'objectives', objectiveId, 'objective_subobjectives'], new List([action.payload.get('result')]))
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'subobjectives'])
+        mergeStoreDeep(state, action, ['entities', 'objectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_ADD_SUBOBJECTIVE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_UPDATE_SUBOBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_UPDATE_SUBOBJECTIVE_SUCCESS: {
+      return state.withMutations(function (state) {
+        mergeStore(state, action, ['entities', 'subobjectives'])
+        state.setIn(['ui', 'loading'], false)
+      })
+    }
+
+    case Constants.APPLICATION_UPDATE_SUBOBJECTIVE_ERROR: {
+      return state.setIn(['ui', 'loading'], false)
+    }
+
+    case Constants.APPLICATION_DELETE_SUBOBJECTIVE_SUBMITTED: {
+      return state.setIn(['ui', 'loading'], true)
+    }
+
+    case Constants.APPLICATION_DELETE_SUBOBJECTIVE_SUCCESS: {
+      let subObjectiveKey = state.getIn(['entities', 'objectives', action.payload.get('objectiveId'), 'objective_subobjectives']).keyOf(action.payload.get('subobjectiveId'))
+      return state.withMutations(function (state) {
+        state.deleteIn(['entities', 'objectives', action.payload.get('objectiveId'), 'objective_subobjectives', subObjectiveKey])
+        state.deleteIn(['entities', 'subobjectives', action.payload.get('subobjectiveId')])
+        state.setIn(['ui', 'loading'], false)
+      })
     }
     //endregion
 
