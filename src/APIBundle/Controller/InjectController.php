@@ -45,20 +45,18 @@ class InjectController extends Controller
 
                 foreach ($incidents as $incident) {
                     if ($request->get('worker')) {
-                        // get pending id
-                        $status = $em->getRepository('APIBundle:InjectStatus')->findOneBy(['status_name' => 'PENDING']);
-                        /* @var $status InjectStatus */
                         $dateStart = new \DateTime();
                         $dateStart->modify('-60 minutes');
                         $dateEnd = new \DateTime();
 
                         $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->createQueryBuilder('i')
-                            ->orderBy('i.inject_date', 'ASC')
-                            ->where('i.inject_incident = :incident')
-                            ->andWhere('i.inject_status = :status')
+                            ->leftJoin('i.inject_status', 's')
+                            ->where('s.status_inject = i.inject_id')
+                            ->andWhere('s.status_name = \'PENDING\'')
+                            ->andWhere('i.inject_incident = :incident')
                             ->andWhere('i.inject_date BETWEEN :start AND :end')
+                            ->orderBy('i.inject_date', 'ASC')
                             ->setParameter('incident', $incident->getIncidentId())
-                            ->setParameter('status', $status->getStatusId())
                             ->setParameter('start', $dateStart)
                             ->setParameter('end', $dateEnd)
                             ->getQuery()
@@ -96,14 +94,13 @@ class InjectController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Update an inject",
-     *    input={"class"=InjectType::class, "name"=""}
+     *    description="Update the status of an inject",
      * )
-     *
-     * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Put("/injects/{inject_id}")
+
+     * @Rest\View(serializerGroups={"injectStatus"})
+     * @Rest\Post("/injects/{inject_id}/status")
      */
-    public function updateInjectAction(Request $request)
+    public function updateInjectStatusAction(Request $request)
     {
         if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin())
             throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
@@ -116,15 +113,15 @@ class InjectController extends Controller
             return $this->injectNotFound();
         }
 
-        $form = $this->createForm(InjectType::class, $inject);
-        $form->submit($request->request->all(), false);
-        if ($form->isValid()) {
-            $em->persist($inject);
-            $em->flush();
-            return $inject;
-        } else {
-            return $form;
-        }
+        $status = $inject->getInjectStatus();
+        $status->setStatusName($request->request->get('status'));
+        $status->setStatusMessage($request->request->get('message'));
+        $status->setStatusDate(new \DateTime());
+
+        $em->persist($status);
+        $em->flush();
+
+        return $status;
     }
 
     private function injectNotFound()

@@ -66,8 +66,7 @@ class Inject
     protected $inject_automatic;
 
     /**
-     * @ORM\ManyToOne(targetEntity="InjectStatus")
-     * @ORM\JoinColumn(name="inject_status", referencedColumnName="status_id")
+     * @ORM\OneToOne(targetEntity="InjectStatus", mappedBy="status_inject")
      */
     protected $inject_status;
 

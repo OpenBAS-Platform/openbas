@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Exercise;
 use APIBundle\Form\Type\InjectType;
+use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Event;
 use APIBundle\Entity\Incident;
 use APIBundle\Entity\Inject;
@@ -94,12 +95,18 @@ class InjectController extends Controller
         $form = $this->createForm(InjectType::class, $inject);
         $form->submit($request->request->all());
         if ($form->isValid()) {
-            $status = $em->getRepository('APIBundle:InjectStatus')->findOneBy(['status_name' => 'PENDING']);
             $inject->setInjectIncident($incident);
-            $inject->setInjectStatus($status);
             $inject->setInjectAutomatic(true);
             $em->persist($inject);
             $em->flush();
+
+            $status = new InjectStatus();
+            $status->setStatusName('PENDING');
+            $status->setStatusDate(new \DateTime());
+            $status->setStatusInject($inject);
+            $em->persist($status);
+            $em->flush();
+
             return $inject;
         } else {
             return $form;
