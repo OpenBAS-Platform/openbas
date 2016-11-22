@@ -1,9 +1,25 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="openex-email">
         <from uri="direct:email"/>
-        <setBody>
-            <simple>Hello email test: ${body[context][id]}/${threadName}</simple>
-        </setBody>
-        <to uri="stream:out"/>
+        <setHeader headerName="contentType">
+            <constant>text/html;charset=UTF-8</constant>
+        </setHeader>
+        <setHeader headerName="From">
+            <simple>${body[sender]}</simple>
+        </setHeader>
+        <setHeader headerName="subject">
+            <simple>${body[subject]}</simple>
+        </setHeader>
+        <setHeader headerName="CamelFreemarkerTemplate">
+            <simple>${body[body]}</simple>
+        </setHeader>
+        <split>
+            <simple>${body[users]}</simple>
+            <setHeader headerName="To">
+                <simple>${body[user_email]}</simple>
+            </setHeader>
+            <to uri="freemarker:from_header"/>
+            <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
+        </split>
     </route>
 </routes>

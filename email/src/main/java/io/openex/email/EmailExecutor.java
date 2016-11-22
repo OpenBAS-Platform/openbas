@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableMap;
 import io.openex.management.Executor;
 import io.openex.management.contract.Contract;
 import org.apache.camel.Component;
-import org.apache.camel.component.stream.StreamComponent;
+import org.apache.camel.component.freemarker.FreemarkerComponent;
+import org.apache.camel.component.mail.MailComponent;
 
 import static io.openex.management.contract.ContractCardinality.Multiple;
-import static io.openex.management.contract.ContractType.*;
+import static io.openex.management.contract.ContractType.Attachment;
+import static io.openex.management.contract.ContractType.Textarea;
 
 @SuppressWarnings("PackageAccessibility")
 class EmailExecutor implements Executor {
@@ -27,6 +29,6 @@ class EmailExecutor implements Executor {
 	
 	@Override
 	public ImmutableMap<String, Component> components() {
-		return ImmutableMap.of("stream", new StreamComponent());
+		return ImmutableMap.of("smtp", new MailComponent(), "freemarker", new FreemarkerComponent());
 	}
 }

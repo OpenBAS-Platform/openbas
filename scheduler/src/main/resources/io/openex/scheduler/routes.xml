@@ -16,6 +16,10 @@
             <setHeader headerName="router-callback">
                 <simple>${body[context][callback_url]}</simple>
             </setHeader>
+            <!-- Send only data to workers -->
+            <setBody>
+                <simple>${body[data]}</simple>
+            </setBody>
             <doTry>
                 <dynamicRouter ignoreInvalidEndpoints="true">
                     <method ref="schedulerRouter" method="forward"/>
