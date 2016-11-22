@@ -23,8 +23,7 @@ class InjectTypeController extends Controller
     public function getInjectTypesAction(Request $request)
     {
         $url = $this->getParameter('worker_url') . '/cxf/contracts';
-        $content = json_decode(file_get_contents($url), true);
-        $contracts = $content['contracts'];
+        $contracts = json_decode(file_get_contents($url), true);
         $output = json_encode($contracts);
         return new Response($output);
     }
