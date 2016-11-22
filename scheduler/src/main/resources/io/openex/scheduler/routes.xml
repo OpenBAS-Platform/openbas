@@ -25,15 +25,15 @@
                     <method ref="openexRouter" method="forward"/>
                 </dynamicRouter>
                 <setBody>
-                    <simple>{"status":"success", "message":"${header.return-message}"}</simple>
+                    <simple>{"status":"SUCCESS", "message":"${header.return-message}"}</simple>
                 </setBody>
                 <to uri="direct:callback"/>
                 <doCatch>
                     <exception>java.lang.Exception</exception>
-                    <setBody>
-                        <simple>{"status":"error", "message":"${property.CamelExceptionCaught}"}</simple>
-                    </setBody>
                     <log loggingLevel="ERROR" message="Error calling ${header.router-header} ${body}"/>
+                    <setBody>
+                        <simple>{"status":"ERROR", "message":"${property.CamelExceptionCaught}"}</simple>
+                    </setBody>
                     <to uri="direct:callback"/>
                 </doCatch>
             </doTry>

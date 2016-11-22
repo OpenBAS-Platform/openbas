@@ -13,6 +13,7 @@
         <setHeader headerName="CamelFreemarkerTemplate">
             <simple>${body[body]}</simple>
         </setHeader>
+        <!-- Send a mail for each user -->
         <split streaming="true" parallelProcessing="true">
             <simple>${body[users]}</simple>
             <setHeader headerName="To">
@@ -21,6 +22,7 @@
             <choice>
                 <when>
                     <simple>${header.To}</simple>
+                    <!-- Put the current user as the marker model -->
                     <setHeader headerName="CamelFreemarkerDataModel">
                         <simple>${body}</simple>
                     </setHeader>
@@ -32,5 +34,9 @@
                 </otherwise>
             </choice>
         </split>
+        <!-- Set header for callback inject message -->
+        <setHeader headerName="return-message">
+            <simple>Successfully send mails to ${body[users].size()} users</simple>
+        </setHeader>
     </route>
 </routes>
