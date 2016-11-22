@@ -22,7 +22,7 @@
             </setBody>
             <doTry>
                 <dynamicRouter ignoreInvalidEndpoints="true">
-                    <method ref="schedulerRouter" method="forward"/>
+                    <method ref="openexRouter" method="forward"/>
                 </dynamicRouter>
                 <setBody>
                     <simple>{"status":"success", "message":"${header.return-message}"}</simple>

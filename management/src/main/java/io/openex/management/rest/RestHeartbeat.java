@@ -1,51 +1,30 @@
 package io.openex.management.rest;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Set;
 
-@SuppressWarnings("ALL")
-@XmlRootElement(name = "heartbeat")
+@SuppressWarnings("WeakerAccess")
 public class RestHeartbeat {
+
+	protected String status;
 	
-	private String executor_status = "running";
+	protected String memory_total;
 	
-	private long executor_memory_total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+	protected String memory_free;
 	
-	private long executor_memory_free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+	protected String memory_usage;
 	
-	private long executor_memory_usage = executor_memory_total - executor_memory_free;
+	protected int workers_number;
 	
-	private int executor_workers_number;
+	protected Set<String> workers_registered;
 	
-	public RestHeartbeat() {
-	}
-	
-	public RestHeartbeat(int executor_workers_number) {
-		this.executor_workers_number = executor_workers_number;
-	}
-	
-	@XmlElement(name = "executor_status")
-	public String getExecutor_status() {
-		return executor_status;
-	}
-	
-	@XmlElement(name = "executor_memory_total")
-	public String getExecutorMemoryTotal() {
-		return executor_memory_total + "MO";
-	}
-	
-	@XmlElement(name = "executor_memory_free")
-	public String getExecutor_memory_free() {
-		return executor_memory_free + "MO";
-	}
-	
-	@XmlElement(name = "executor_memory_usage")
-	public String getExecutor_memory_usage() {
-		return executor_memory_usage + "MO";
-	}
-	
-	@XmlElement(name = "executor_workers_number")
-	public int getExecutor_workers_number() {
-		return executor_workers_number;
+	public RestHeartbeat(Set<String> workers) {
+		this.status = workers.size() > 0 ? "RUNNING" : "PENDING";
+		this.workers_number = workers.size();
+		this.workers_registered = workers;
+		long totalMemoryInMb = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+		this.memory_total = totalMemoryInMb + "MO";
+		long freeMemoryInMb = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+		this.memory_free = freeMemoryInMb + "MO";
+		this.memory_usage = totalMemoryInMb - freeMemoryInMb + "MO";
 	}
 }

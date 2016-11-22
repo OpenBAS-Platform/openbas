@@ -1,9 +1,9 @@
 package io.openex.management.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.openex.management.Executor;
 import io.openex.management.IOpenexContext;
-import io.openex.management.contract.Contract;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.builder.ProxyBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -15,9 +15,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("")
 @Component(service = WorkerRest.class,
@@ -28,36 +29,38 @@ import java.util.Map;
 		})
 @SuppressWarnings({"PackageAccessibility", "unused"})
 public class WorkerRest {
-	
+	private Gson gson;
 	private IWorkerRegistry workerRegistry;
 	private IOpenexContext openexContext;
 	
 	@Context
 	UriInfo uri;
 	
+	public WorkerRest() {
+		GsonBuilder builder = new GsonBuilder();
+		builder.setPrettyPrinting();
+		gson = builder.create();
+	}
+	
 	@GET
 	@Path("/heartbeat")
 	@Produces(MediaType.APPLICATION_JSON)
-	public RestHeartbeat heartbeat() {
-		return new RestHeartbeat(workerRegistry.workers().size());
+	public String heartbeat() {
+		Set<String> workers = workerRegistry.workers().values().stream()
+				.filter(executor -> executor.contract() != null)
+				.map(Executor::name).collect(Collectors.toSet());
+		return gson.toJson(new RestHeartbeat(workers));
 	}
 	
 	@GET
 	@Path("/contracts")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<RestContract> getContracts() throws IOException {
-		List<RestContract> contracts = new ArrayList<>();
-		Map<String, Executor> workers = workerRegistry.workers();
-		for (Map.Entry<String, Executor> entry : workers.entrySet()) {
-			Contract contract = entry.getValue().contract();
-			if (contract != null) { //No external contract for the worker
-				RestContract restContract = new RestContract();
-				restContract.setType(entry.getKey());
-				restContract.setFields(contract.getFields());
-				contracts.add(restContract);
-			}
-		}
-		return contracts;
+	public String getContracts() throws IOException {
+		List<RestContract> contracts = workerRegistry.workers().values().stream()
+				.filter(executor -> executor.contract() != null)
+				.map(executor -> new RestContract(executor.name(), executor.contract().getFields()))
+				.collect(Collectors.toList());
+		return gson.toJson(contracts);
 	}
 	
 	@POST
@@ -66,12 +69,13 @@ public class WorkerRest {
 	@Produces(MediaType.APPLICATION_JSON)
 	@SuppressWarnings("unchecked")
 	public String executeWorker(@PathParam("id") String id, String jsonRequest) throws Exception {
-		Gson gson = new Gson();
 		DefaultCamelContext context = openexContext.getContext();
-		AuditWorker auditWorker = new ProxyBuilder(context).endpoint("direct:remote").build(AuditWorker.class);
+		AuditWorker auditWorker = new ProxyBuilder(context).endpoint("direct:remote")
+				.build(AuditWorker.class);
 		Map jsonToCamelMap = gson.fromJson(jsonRequest, Map.class);
 		jsonToCamelMap.put("route-id", id);
-		return gson.toJson(auditWorker.auditMessage(jsonToCamelMap));
+		auditWorker.auditMessage(jsonToCamelMap);
+		return gson.toJson("Execution success");
 	}
 	
 	@Reference

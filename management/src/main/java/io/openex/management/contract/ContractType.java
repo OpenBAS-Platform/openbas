@@ -1,13 +1,10 @@
 package io.openex.management.contract;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlType;
+import com.google.gson.annotations.SerializedName;
 
-@XmlType
-@XmlEnum(String.class)
+@SuppressWarnings("PackageAccessibility")
 public enum ContractType {
-	@XmlEnumValue("text") Text,
-	@XmlEnumValue("textarea") Textarea,
-	@XmlEnumValue("attachment") Attachment
+	@SerializedName("text") Text,
+	@SerializedName("textarea") Textarea,
+	@SerializedName("attachment") Attachment
 }

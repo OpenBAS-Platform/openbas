@@ -13,10 +13,13 @@
         <setHeader headerName="CamelFreemarkerTemplate">
             <simple>${body[body]}</simple>
         </setHeader>
-        <split>
+        <split streaming="true" parallelProcessing="true">
             <simple>${body[users]}</simple>
             <setHeader headerName="To">
                 <simple>${body[user_email]}</simple>
+            </setHeader>
+            <setHeader headerName="CamelFreemarkerDataModel">
+                <simple>${body}</simple>
             </setHeader>
             <to uri="freemarker:from_header"/>
             <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>

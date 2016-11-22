@@ -2,22 +2,19 @@ package io.openex.management.rest;
 
 import io.openex.management.contract.ContractField;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("ALL")
-@XmlRootElement(name = "contracts")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class RestContract {
 	
 	private String type;
 	
-	@XmlElement(required = true)
 	private List<ContractField> fields = new ArrayList<>();
+	
+	public RestContract(String type, List<ContractField> fields) {
+		this.type = type;
+		this.fields = fields;
+	}
 	
 	public String getType() {
 		return type;

@@ -7,8 +7,11 @@
             <setHeader headerName="router-header">
                 <simple>${body[route-id]}</simple>
             </setHeader>
+            <setBody>
+                <simple>${body[data]}</simple>
+            </setBody>
             <dynamicRouter ignoreInvalidEndpoints="true">
-                <method ref="schedulerRouter" method="forward"/>
+                <method ref="openexRouter" method="forward"/>
             </dynamicRouter>
         </threads>
     </route>

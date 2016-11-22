@@ -136,6 +136,7 @@ public class OpenexContext implements IOpenexContext {
 	
 	private void createContext() throws Exception {
 		SimpleRegistry registry = new SimpleRegistry();
+		registry.put("openexRouter", new OpenexRouter());
 		context.setRegistry(registry);
 		File[] propertiesFiles = new File(System.getProperty("karaf.home") + "/openex/").listFiles();
 		assert propertiesFiles != null;

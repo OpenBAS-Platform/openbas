@@ -26,9 +26,6 @@ class SchedulerExecutor implements Executor {
 	
 	@Override
 	public ImmutableMap<String, Object> beans() {
-		return ImmutableMap.of(
-				"schedulerRouter", new SchedulerRouter(),
-				"json-gson", new GsonDataFormat()
-		);
+		return ImmutableMap.of("json-gson", new GsonDataFormat());
 	}
 }

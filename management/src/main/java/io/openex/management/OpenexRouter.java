@@ -1,4 +1,4 @@
-package io.openex.scheduler;
+package io.openex.management;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Header;
@@ -8,7 +8,7 @@ import org.apache.camel.Properties;
 import java.util.Map;
 
 @SuppressWarnings("PackageAccessibility")
-public class SchedulerRouter {
+public class OpenexRouter {
 	
 	@SuppressWarnings("unused")
 	public String forward(String body,

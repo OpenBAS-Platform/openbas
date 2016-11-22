@@ -1,8 +1,5 @@
 package io.openex.management.contract;
 
-/**
- * Created by Julien on 21/11/2016.
- */
 public class ContractField {
 	
 	private String name;
