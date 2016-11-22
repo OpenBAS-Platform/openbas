@@ -2,6 +2,7 @@
 
 namespace APIBundle\Command;
 
+use APIBundle\Entity\Audience;
 use APIBundle\Entity\Exercise;
 use APIBundle\Entity\File;
 use APIBundle\Entity\Grant;
@@ -146,6 +147,9 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
         $this->joinGroup($userSam, $groupCockroachPlayers);
         $output->writeln('Sam is joining group \'Cockroach players\'');
+
+        $this->createAudience('Internet Service Providers', $exercisePotatoes, [$userSam, $userJane]);
+        $output->writeln('Creating audience \'Internet Service Providers\'');
     }
 
     private function createExerciseStatus($name) {
@@ -265,5 +269,17 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
 
         return $file;
+    }
+
+    private function createAudience($name, $exercise, $users) {
+        $audience = new Audience();
+        $audience->setAudienceName($name);
+        $audience->setAudienceExercise($exercise);
+        $audience->setAudienceUsers($users);
+
+        $this->em->persist($audience);
+        $this->em->flush();
+
+        return $audience;
     }
 }

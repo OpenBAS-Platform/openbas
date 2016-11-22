@@ -1,12 +1,12 @@
-APIBundle\Entity\Suybobjective:
+APIBundle\Entity\Subobjective:
     attributes:
         subobjective_id:
-            groups: ['subobjective']
+            groups: ['subobjective', 'objective']
         subobjective_title:
-            groups: ['subobjective']
+            groups: ['subobjective', 'objective']
         subobjective_description:
-            groups: ['subobjective']
+            groups: ['subobjective', 'objective']
         subobjective_priority:
-            groups: ['subobjective']
+            groups: ['subobjective', 'objective']
         subobjective_objective:
             groups: ['subobjective']

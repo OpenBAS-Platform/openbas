@@ -3,6 +3,7 @@
 namespace APIBundle\Controller\Exercise\Objective;
 
 use APIBundle\Entity\Subobjective;
+use APIBundle\Form\Type\SubobjectiveType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -76,7 +77,7 @@ class SubobjectiveController extends Controller
         }
 
         $subobjective = new Subobjective();
-        $form = $this->createForm(ObjectiveType::class, $subobjective);
+        $form = $this->createForm(SubobjectiveType::class, $subobjective);
         $form->submit($request->request->all());
         if ($form->isValid()) {
             $subobjective->setSubobjectiveObjective($objective);
@@ -154,13 +155,19 @@ class SubobjectiveController extends Controller
             return $this->objectiveNotFound();
         }
 
-        $form = $this->createForm(ObjectiveType::class, $objective);
-        $form->submit($request->request->all(), false);
+        $subobjective = $em->getRepository('APIBundle:Subobjective')->find($request->get('subobjective_id'));
+        /* @var $objective Subobjective */
 
+        if (empty($subobjective)) {
+            return $this->subobjectiveNotFound();
+        }
+
+        $form = $this->createForm(SubobjectiveType::class, $subobjective);
+        $form->submit($request->request->all(), false);
         if ($form->isValid()) {
-            $em->persist($objective);
+            $em->persist($subobjective);
             $em->flush();
-            return $objective;
+            return $subobjective;
         } else {
             return $form;
         }
