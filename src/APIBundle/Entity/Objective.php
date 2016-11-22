@@ -40,6 +40,17 @@ class Objective
      */
     protected $objective_exercise;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Subobjective", mappedBy="subobjective_objective")
+     * @var Subobjective[]
+     */
+    protected $objective_subobjectives;
+
+    public function __construct()
+    {
+        $this->objective_subobjectives = new ArrayCollection();
+    }
+
     public function getObjectiveId()
     {
         return $this->objective_id;
@@ -92,6 +103,17 @@ class Objective
     public function setObjectiveExercise($exercise)
     {
         $this->objective_exercise = $exercise;
+        return $this;
+    }
+
+    public function getObjectiveSubobjectives()
+    {
+        return $this->objective_subobjectives;
+    }
+
+    public function setObjectiveSubobjectives($subobjectives)
+    {
+        $this->objective_subobjectives = $subobjectives;
         return $this;
     }
 }
