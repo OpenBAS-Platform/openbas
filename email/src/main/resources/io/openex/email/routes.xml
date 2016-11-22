@@ -18,11 +18,19 @@
             <setHeader headerName="To">
                 <simple>${body[user_email]}</simple>
             </setHeader>
-            <setHeader headerName="CamelFreemarkerDataModel">
-                <simple>${body}</simple>
-            </setHeader>
-            <to uri="freemarker:from_header"/>
-            <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
+            <choice>
+                <when>
+                    <simple>${header.To}</simple>
+                    <setHeader headerName="CamelFreemarkerDataModel">
+                        <simple>${body}</simple>
+                    </setHeader>
+                    <to uri="freemarker:from_header"/>
+                    <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
+                </when>
+                <otherwise>
+                    <log loggingLevel="WARN" message="${body} has no email"/>
+                </otherwise>
+            </choice>
         </split>
     </route>
 </routes>
