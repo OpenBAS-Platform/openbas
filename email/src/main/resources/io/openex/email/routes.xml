@@ -27,7 +27,7 @@
                         <simple>${body}</simple>
                     </setHeader>
                     <to uri="freemarker:from_header"/>
-                    <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
+                    <to uri="smtp://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
                 </when>
                 <otherwise>
                     <log loggingLevel="WARN" message="${body} has no email"/>
