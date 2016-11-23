@@ -1,6 +1,5 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
-import createImmutableSelector from '../../../../utils/ImmutableSelect'
 import {fromJS} from 'immutable'
 import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -10,16 +9,6 @@ import {List} from '../../../../components/List'
 import {ListItemLink} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import CreateAudience from './CreateAudience'
-
-const filterAudiences = (audiences, exerciseId) => {
-  let filterByExercise = n => n.audience_exercise === exerciseId
-  let filteredAudiences = R.filter(filterByExercise, audiences.toJS())
-  filteredAudiences = fromJS(filteredAudiences)
-  filteredAudiences = filteredAudiences.sort(
-    (a, b) => a.get('audience_name').localeCompare(b.get('audience_name'))
-  )
-  return filteredAudiences
-}
 
 class AudienceNav extends Component {
   componentDidMount() {
@@ -67,13 +56,19 @@ AudienceNav.propTypes = {
   selectAudience: PropTypes.func
 }
 
-const filteredAudiences = createImmutableSelector(
-  (state, props) => filterAudiences(state.application.getIn(['entities', 'audiences']), props.exerciseId),
-  audiences => audiences)
+const filterAudiences = (audiences, exerciseId) => {
+  let filterByExercise = n => n.audience_exercise === exerciseId
+  let filteredAudiences = R.filter(filterByExercise, audiences.toJS())
+  filteredAudiences = fromJS(filteredAudiences)
+  filteredAudiences = filteredAudiences.sort(
+    (a, b) => a.get('audience_name').localeCompare(b.get('audience_name'))
+  )
+  return filteredAudiences
+}
 
 const select = (state, props) => {
   return {
-    audiences: filteredAudiences(state, props),
+    audiences: filterAudiences(state.application.getIn(['entities', 'audiences']), props.exerciseId),
     currentAudience: state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
   }
 }
