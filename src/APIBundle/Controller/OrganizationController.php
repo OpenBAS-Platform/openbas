@@ -130,6 +130,8 @@ class OrganizationController extends Controller
         if ($form->isValid()) {
             $em->persist($organization);
             $em->flush();
+            $em->clear();
+            $organization = $em->getRepository('APIBundle:Organization')->find($request->get('organization_id'));
             return $organization;
         } else {
             return $form;

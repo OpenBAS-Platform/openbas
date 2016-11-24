@@ -163,6 +163,8 @@ class UserController extends Controller
             }
             $em->persist($user);
             $em->flush();
+            $em->clear();
+            $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
             return $user;
         } else {
             return $form;

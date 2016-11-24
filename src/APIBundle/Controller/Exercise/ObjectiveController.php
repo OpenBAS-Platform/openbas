@@ -170,6 +170,8 @@ class ObjectiveController extends Controller
         if ($form->isValid()) {
             $em->persist($objective);
             $em->flush();
+            $em->clear();
+            $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
             return $objective;
         } else {
             return $form;

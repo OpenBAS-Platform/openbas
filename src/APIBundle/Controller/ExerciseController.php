@@ -98,7 +98,6 @@ class ExerciseController extends Controller
             $exercise->setExerciseImage($file);
             $em->persist($exercise);
             $em->flush();
-
             $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
             return $exercise;
         } else {
@@ -153,8 +152,9 @@ class ExerciseController extends Controller
         if ($form->isValid()) {
             $em->persist($exercise);
             $em->flush();
+            $em->clear();
+            $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
             $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-
             return $exercise;
         } else {
             return $form;

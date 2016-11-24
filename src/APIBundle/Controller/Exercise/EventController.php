@@ -179,6 +179,8 @@ class EventController extends Controller
         if ($form->isValid()) {
             $em->persist($event);
             $em->flush();
+            $em->clear();
+            $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
             return $event;
         } else {
             return $form;
