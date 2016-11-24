@@ -44,7 +44,7 @@ class AudienceController extends Controller
      *    description="Read an audience"
      * )
      *
-     * @Rest\View(serializerGroups={"event"})
+     * @Rest\View(serializerGroups={"audience"})
      * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function getExerciseAudienceAction(Request $request)
@@ -145,6 +145,7 @@ class AudienceController extends Controller
     public function updateExercisesAudienceAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
+        $em2 = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -166,6 +167,8 @@ class AudienceController extends Controller
         if ($form->isValid()) {
             $em->persist($audience);
             $em->flush();
+            $em->clear();
+            $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
             return $audience;
         } else {
             return $form;

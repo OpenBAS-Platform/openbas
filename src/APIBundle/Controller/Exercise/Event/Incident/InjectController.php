@@ -206,6 +206,8 @@ class InjectController extends Controller
         if ($form->isValid()) {
             $em->persist($inject);
             $em->flush();
+            $em->clear();
+            $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
             return $inject;
         } else {
             return $form;

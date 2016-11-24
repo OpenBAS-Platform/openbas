@@ -168,6 +168,8 @@ class IncidentController extends Controller
         if ($form->isValid()) {
             $em->persist($incident);
             $em->flush();
+            $em->clear();
+            $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
             return $incident;
         } else {
             return $form;

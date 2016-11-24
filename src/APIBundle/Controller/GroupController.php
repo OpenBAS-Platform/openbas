@@ -139,6 +139,8 @@ class GroupController extends Controller
         if ($form->isValid()) {
             $em->persist($group);
             $em->flush();
+            $em->clear();
+            $group = $em->getRepository('APIBundle:Group')->find($request->get('group_id'));
             return $group;
         } else {
             return $form;
