@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {Map} from 'immutable'
+import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -82,11 +83,9 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    let usersList = this.props.audience.get('audience_users').delete(this.props.audience.get('audience_users').keyOf(this.props.userId))
-    let data = Map({
-      audience_users: usersList
-    })
-    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
+    let usersList = R.filter(a => a.user_id !== this.props.userId, this.props.audience.audience_users)
+    let data = Map({audience_users: usersList.map(u => u.user_id)})
+    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, data)
     this.handleCloseDelete()
   }
 
@@ -122,7 +121,7 @@ class UserPopover extends Component {
         user_firstname: this.props.user.get('user_firstname'),
         user_lastname: this.props.user.get('user_lastname'),
         user_email: this.props.user.get('user_email'),
-        user_organization: this.props.organizations.get(this.props.user.get('user_organization')).toJS()
+        user_organization: this.props.organizations.get(this.props.user.get('user_organization'), Map()).toJS()
       }
     }
 
@@ -166,12 +165,7 @@ class UserPopover extends Component {
 }
 
 const select = (state, props) => {
-  let audiences = state.application.getIn(['entities', 'audiences'])
-  let currentAudience = state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
-  let audience = currentAudience ? audiences.get(currentAudience) : Map()
-
   return {
-    audience,
     user: state.application.getIn(['entities', 'users', props.userId]),
     organizations: state.application.getIn(['entities', 'organizations'])
   }
@@ -179,7 +173,6 @@ const select = (state, props) => {
 
 UserPopover.propTypes = {
   exerciseId: PropTypes.string,
-  audienceId: PropTypes.string,
   userId: PropTypes.string,
   updateUser: PropTypes.func,
   addOrganizationAndUpdateUser: PropTypes.func,

@@ -52,7 +52,7 @@ class AddUsers extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchUsers();
+    //this.props.fetchUsers();
   }
 
   handleOpenAddUsers() {
@@ -82,7 +82,7 @@ class AddUsers extends Component {
   }
 
   submitAddUsers() {
-    let usersList = this.props.audienceUsersIds.concat(this.state.users_ids)
+    let usersList = this.props.audienceUsersIds.concat(this.state.users_ids.toJS())
     let data = Map({
       audience_users: usersList
     })
@@ -95,6 +95,7 @@ class AddUsers extends Component {
   }
 
   render() {
+
     const actions = [
       <FlatButton
         label="Cancel"
@@ -143,11 +144,11 @@ class AddUsers extends Component {
               {this.props.users.toList().map(user => {
                 let disabled = false
                 if (this.state.users_ids.keyOf(user.get('user_id')) !== undefined
-                  || this.props.audienceUsersIds.keyOf(user.get('user_id')) !== undefined) {
+                  || this.props.audienceUsersIds.includes(user.get('user_id'))) {
                   disabled = true
                 }
                 let organizationName = ''
-                if (user.get('user_organization') && this.props.organizations) {
+                if (user.get('user_organization') && this.props.organizations.get(user.get('user_organization'))) {
                   organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
                 }
                 return (
@@ -192,7 +193,7 @@ AddUsers.propTypes = {
   updateAudience: PropTypes.func,
   users: PropTypes.object,
   organizations: PropTypes.object,
-  audienceUsersIds: PropTypes.object
+  audienceUsersIds: PropTypes.array
 }
 
 const select = (state, props) => {

@@ -27,7 +27,8 @@
     "redux-auth-wrapper": "^0.8.0",
     "redux-form": "^6.2.0",
     "redux-thunk": "^2.1.0",
-    "reselect": "^2.5.4"
+    "reselect": "^2.5.4",
+    "seamless-immutable": "^6.3.0"
   },
   "scripts": {
     "start": "react-scripts start",

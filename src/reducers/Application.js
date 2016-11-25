@@ -363,21 +363,6 @@ const application = (state = Map(), action) => {
     //endregion
 
     // region AUDIENCES
-    case Constants.APPLICATION_FETCH_AUDIENCES_SUBMITTED: {
-      return state.setIn(['ui', 'loading'], true)
-    }
-
-    case Constants.APPLICATION_FETCH_AUDIENCES_SUCCESS: {
-      return state.withMutations(function (state) {
-        mergeStore(state, action, ['entities', 'audiences'])
-        state.setIn(['ui', 'loading'], false)
-      })
-    }
-
-    case Constants.APPLICATION_FETCH_AUDIENCES_ERROR: {
-      return state.setIn(['ui', 'loading'], false)
-    }
-
     case Constants.APPLICATION_FETCH_AUDIENCE_SUBMITTED: {
       return state.setIn(['ui', 'loading'], true)
     }

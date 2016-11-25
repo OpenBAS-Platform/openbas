@@ -1,9 +1,8 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
-import {fromJS} from 'immutable'
-import R from 'ramda'
+
 import * as Constants from '../../../../constants/ComponentTypes'
-import {fetchAudiences, selectAudience} from '../../../../actions/Audience'
+import {selectAudience} from '../../../../actions/Audience'
 import {Drawer} from '../../../../components/Drawer'
 import {List} from '../../../../components/List'
 import {ListItemLink} from '../../../../components/list/ListItem';
@@ -12,18 +11,10 @@ import CreateAudience from './CreateAudience'
 
 class AudienceNav extends Component {
   componentDidMount() {
-    this.props.fetchAudiences(this.props.exerciseId);
   }
 
   handleChangeAudience(audienceId) {
     this.props.selectAudience(this.props.exerciseId, audienceId)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    let audiences = filterAudiences(nextProps.audiences, nextProps.exerciseId)
-    if(nextProps.currentAudience === undefined && audiences.count() > 0) {
-      this.props.selectAudience(nextProps.exerciseId, audiences.keySeq().first())
-    }
   }
 
   render() {
@@ -31,13 +22,13 @@ class AudienceNav extends Component {
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
         <CreateAudience exerciseId={this.props.exerciseId}/>
         <List>
-          {this.props.audiences.toList().map(audience => {
+          {this.props.audiences.map(audience => {
             return (
               <ListItemLink
-                key={audience.get('audience_id')}
-                active={this.props.currentAudience === audience.get('audience_id')}
-                onClick={this.handleChangeAudience.bind(this, audience.get('audience_id'))}
-                label={audience.get('audience_name')}
+                key={audience.audience_id}
+                active={this.props.selectedAudience === audience.audience_id}
+                onClick={this.handleChangeAudience.bind(this, audience.audience_id)}
+                label={audience.audience_name}
                 leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
               />
             )
@@ -50,27 +41,9 @@ class AudienceNav extends Component {
 
 AudienceNav.propTypes = {
   exerciseId: PropTypes.string,
-  currentAudience: PropTypes.string,
-  audiences: PropTypes.object,
-  fetchAudiences: PropTypes.func,
+  selectedAudience: PropTypes.string,
+  audiences: PropTypes.array,
   selectAudience: PropTypes.func
 }
 
-const filterAudiences = (audiences, exerciseId) => {
-  let filterByExercise = n => n.audience_exercise === exerciseId
-  let filteredAudiences = R.filter(filterByExercise, audiences.toJS())
-  filteredAudiences = fromJS(filteredAudiences)
-  filteredAudiences = filteredAudiences.sort(
-    (a, b) => a.get('audience_name').localeCompare(b.get('audience_name'))
-  )
-  return filteredAudiences
-}
-
-const select = (state, props) => {
-  return {
-    audiences: filterAudiences(state.application.getIn(['entities', 'audiences']), props.exerciseId),
-    currentAudience: state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
-  }
-}
-
-export default connect(select, {fetchAudiences, selectAudience})(AudienceNav);
+export default connect(null, {selectAudience})(AudienceNav);

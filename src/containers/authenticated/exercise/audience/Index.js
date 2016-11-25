@@ -1,9 +1,9 @@
 import React, {Component, PropTypes} from 'react'
-import {Map} from 'immutable'
 import {connect} from 'react-redux'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
+import {fetchAudiences} from '../../../../actions/Audience'
 import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
@@ -11,6 +11,7 @@ import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
 import UserPopover from './UserPopover'
+import R from 'ramda'
 
 const styles = {
   'container': {
@@ -50,60 +51,68 @@ const styles = {
 
 class Index extends Component {
   componentDidMount() {
+    this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchUsers()
     this.props.fetchOrganizations()
   }
 
   render() {
-    if (this.props.audience.get('audience_id') === undefined) {
-      return (
-        <div style={styles.container}>
-          <AudienceNav exerciseId={this.props.exerciseId}/>
-          <div style={styles.empty}>No audience selected.</div>
-        </div>
-      )
-    }
+    console.log(this.props)
+    let {exerciseId, audience, audiences} = this.props
+    if (audience) {
+      return <div style={styles.container}>
+        <AudienceNav selectedAudience={audience.audience_id} exerciseId={exerciseId} audiences={audiences}/>
+        <div>
+          <div style={styles.title}>{audience.audience_name}</div>
+          <AudiencePopover exerciseId={exerciseId} audienceId={audience.audience_id}/>
+          <div style={styles.number}>{audience.audience_users.length} users</div>
+          <div className="clearfix"></div>
 
-    return (
-      <div style={styles.container}>
-        <AudienceNav exerciseId={this.props.exerciseId}/>
-        <div style={styles.title}>{this.props.audience.get('audience_name')}</div>
-        <AudiencePopover exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}/>
-        <div style={styles.number}>{this.props.audience_users.count()} users</div>
-        <div className="clearfix"></div>
-        {this.props.audience_users.count() === 0 ? <div style={styles.empty}>This audience is empty.</div> : ""}
-        <List>
-          {this.props.audience_users.toList().map(userId => {
-            let user = this.props.users.get(userId)
-            let organizationName = ''
-            if (user.get('user_organization') && this.props.organizations) {
-              organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
-            }
-            return (
-              <MainListItem
-                key={user.get('user_id')}
-                leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user.get('user_gravatar')}/>}
-                rightIconButton={
-                  <UserPopover exerciseId={this.props.exerciseId}
-                               audienceId={this.props.audience.get('audience_id')}
-                               userId={user.get('user_id')}/>
-                }
-                primaryText={
-                  <div>
-                    <div style={styles.name}>{user.get('user_firstname')} {user.get('user_lastname')}</div>
-                    <div style={styles.mail}>{user.get('user_email')}</div>
-                    <div style={styles.org}>{organizationName}</div>
-                    <div className="clearfix"></div>
-                  </div>
-                }
-              />
-            )
-          })}
-        </List>
-        <AddUsers exerciseId={this.props.exerciseId} audienceId={this.props.audience.get('audience_id')}
-                  audienceUsersIds={this.props.audience_users_ids}/>
+          {audience.audience_users.length === 0 ?
+            <div style={styles.empty}>This audience is empty.</div> : ""
+          }
+
+          <List>
+            {audience.audience_users.map(data => {
+              //Setup variables
+              let user = R.propOr({}, data.user_id, this.props.users)
+              let userId = R.propOr(data.user_id, 'user_id', user)
+              let user_firstname = R.propOr('-', 'user_firstname', user)
+              let user_lastname = R.propOr('-', 'user_lastname', user)
+              let user_email = R.propOr('-', 'user_email', user)
+              let user_gravatar = R.propOr('', 'user_gravatar', user)
+              let organizationName = R.pathOr('-', [user.user_organization, 'organization_name'], this.props.organizations)
+              //Return the dom
+              return (
+                <MainListItem
+                  key={userId}
+                  leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
+                  rightIconButton={
+                      <UserPopover exerciseId={exerciseId} audience={audience} userId={userId}/>
+                  }
+                  primaryText={
+                    <div>
+                      <div style={styles.name}>{user_firstname} {user_lastname}</div>
+                      <div style={styles.mail}>{user_email}</div>
+                      <div style={styles.org}>{organizationName}</div>
+                      <div className="clearfix"></div>
+                    </div>
+                  }
+                />
+              )
+            })}
+          </List>
+          <AddUsers exerciseId={exerciseId} audienceId={audience.audience_id}
+                    audienceUsersIds={audience.audience_users.map(u => u.user_id)}/>
+        </div>
       </div>
-    );
+
+    } else {
+      return <div style={styles.container}>
+        <AudienceNav exerciseId={exerciseId} audiences={audiences}/>
+        <div style={styles.empty}>No audience selected.</div>
+      </div>
+    }
   }
 }
 
@@ -112,28 +121,36 @@ Index.propTypes = {
   users: PropTypes.object,
   organizations: PropTypes.object,
   audience: PropTypes.object,
-  audience_users: PropTypes.object,
-  audience_users_ids: PropTypes.object,
+  audiences: PropTypes.array,
   fetchUsers: PropTypes.func,
+  fetchAudiences: PropTypes.func,
   fetchOrganizations: PropTypes.func,
+}
+
+const filterAudiences = (audiences, exerciseId) => {
+  let audiencesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.audience_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
+  )
+  return audiencesFilterAndSorting(audiences)
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
-  let audiences = state.application.getIn(['entities', 'audiences'])
-  let currentAudience = state.application.getIn(['ui', 'states', 'current_audiences', exerciseId])
-  let audience = currentAudience ? audiences.get(currentAudience) : Map()
-  let audienceUsers = currentAudience ? audiences.get(currentAudience).get('audience_users') : Map()
-  let audienceUsersIds = audienceUsers.toList()
+  let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
+  let stateCurrentAudience = state.application.getIn(['ui', 'states', 'current_audiences', exerciseId])
+  let audienceId = stateCurrentAudience === undefined && audiences.length > 0
+    ? R.head(audiences).audience_id : stateCurrentAudience //Force a default audience if needed
+  let audience = audienceId ? R.find(a => a.audience_id === audienceId)(audiences) : undefined
 
   return {
     exerciseId,
     audience,
-    users: state.application.getIn(['entities', 'users']),
-    organizations: state.application.getIn(['entities', 'organizations']),
-    audience_users: audienceUsers,
-    audience_users_ids: audienceUsersIds
+    audiences,
+    users: state.referential.entities.users,
+    organizations: state.referential.entities.organizations,
   }
 }
 
-export default connect(select, {fetchUsers, fetchOrganizations})(Index);
+export default connect(select, {fetchUsers, fetchAudiences, fetchOrganizations})(Index);

@@ -30,6 +30,7 @@ import IndexExerciseObjective from './containers/authenticated/exercise/objectiv
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
+import Immutable from 'seamless-immutable'
 
 import roundMoment from './utils/moment-round'
 
@@ -72,6 +73,13 @@ const initialState = {
       })
     })
   }),
+  referential: Immutable({
+    entities: Immutable({
+      users: Immutable({}),
+      audiences: Immutable({}),
+      organizations: Immutable({})
+    })
+  }),
   identity: Map({
     user: user,
     token: token,
@@ -103,6 +111,7 @@ export const api = (schema) => {
   const instance = axios.create({headers: {'X-Auth-Token': authToken}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
+    console.log('Api response', response.data)
     response.data = fromJS(schema ? normalize(response.data, schema) : response.data)
     return response
   }, function (err) {

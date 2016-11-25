@@ -66,10 +66,10 @@ subobjective.define({
   subobjective_objective: objective
 })
 
-audience.define({
+/*audience.define({
   audience_users: arrayOfUsers,
   audience_exercise: exercise
-})
+})*/
 
 event.define({
   event_exercise: exercise,
