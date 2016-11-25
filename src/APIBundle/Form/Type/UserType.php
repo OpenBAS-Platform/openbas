@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class UserType extends AbstractType
 {
@@ -16,7 +17,7 @@ class UserType extends AbstractType
         $builder->add('user_email', EmailType::class);
         $builder->add('user_phone');
         $builder->add('user_plain_password');
-        $builder->add('user_organization');
+        $builder->add('user_organization', TextType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)

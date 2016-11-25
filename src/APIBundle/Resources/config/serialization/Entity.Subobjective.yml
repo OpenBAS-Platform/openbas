@@ -3,10 +3,10 @@ APIBundle\Entity\Subobjective:
         subobjective_id:
             groups: ['subobjective', 'objective']
         subobjective_title:
-            groups: ['subobjective', 'objective']
+            groups: ['subobjective']
         subobjective_description:
-            groups: ['subobjective', 'objective']
+            groups: ['subobjective']
         subobjective_priority:
-            groups: ['subobjective', 'objective']
+            groups: ['subobjective']
         subobjective_objective:
             groups: ['subobjective']

@@ -15,6 +15,7 @@ use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Form\Type\UserType;
 use APIBundle\Entity\User;
+use APIBundle\Entity\Organization;
 use APIBundle\Service\OpenexMailerService;
 
 class UserController extends Controller
@@ -92,15 +93,27 @@ class UserController extends Controller
      */
     public function postUsersAction(Request $request)
     {
+        $em = $this->get('doctrine.orm.entity_manager');
+
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->submit($request->request->all());
         if ($form->isValid()) {
+            $organization = $em->getRepository('APIBundle:Organization')->findOneBy(['organization_name' => $request->request->get('user_organization')]);
+            if( empty($organization) ) {
+                $organization = new Organization();
+                $organization->setOrganizationName($request->request->get('user_organization'));
+                $em->persist($organization);
+                $em->flush();
+            }
+            $user->setUserOrganization($organization);
+
             if (!empty($user->getUserPlainPassword())) {
                 $encoder = $this->get('security.password_encoder');
                 $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
                 $user->setUserPassword($encoded);
             }
+
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($user);
             $em->flush();
@@ -152,9 +165,20 @@ class UserController extends Controller
 
         $this->denyAccessUnlessGranted('update', $user);
 
+        if (!empty($request->request->get('user_organization')) ) {
+            $organization = $em->getRepository('APIBundle:Organization')->findOneBy(['organization_name' => $request->request->get('user_organization')]);
+            if (empty($organization)) {
+                $organization = new Organization();
+                $organization->setOrganizationName($request->request->get('user_organization'));
+                $em->persist($organization);
+                $em->flush();
+            }
+            $user->setUserOrganization($organization);
+            $request->request->remove('user_organization');
+        }
+
         $form = $this->createForm(UserType::class, $user);
         $form->submit($request->request->all(), false);
-
         if ($form->isValid()) {
             if (!empty($user->getUserPlainPassword())) {
                 $encoder = $this->get('security.password_encoder');

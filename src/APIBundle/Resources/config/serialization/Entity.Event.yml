@@ -9,4 +9,4 @@ APIBundle\Entity\Event:
         event_image:
             groups: ['event']
         event_exercise:
-            groups: ['event', 'incident']
+            groups: ['event']
