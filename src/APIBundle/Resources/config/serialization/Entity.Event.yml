@@ -10,3 +10,5 @@ APIBundle\Entity\Event:
             groups: ['event']
         event_exercise:
             groups: ['event']
+        event_incidents:
+            groups: ['event']
