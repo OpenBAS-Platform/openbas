@@ -117,6 +117,8 @@ class UserController extends Controller
             $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($user);
             $em->flush();
+
+            $user->setUserGravatar();
             return $user;
         } else {
             return $form;
@@ -189,6 +191,7 @@ class UserController extends Controller
             $em->flush();
             $em->clear();
             $user = $em->getRepository('APIBundle:User')->find($request->get('user_id'));
+            $user->setUserGravatar();
             return $user;
         } else {
             return $form;
