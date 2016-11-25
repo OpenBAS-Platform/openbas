@@ -1,6 +1,6 @@
 APIBundle\Entity\FileTag:
     attributes:
         tag_id:
-            groups: ['file', 'exercise', 'inject']
+            groups: ['file', 'exercise', 'event', 'inject']
         tag_name:
-            groups: ['file', 'exercise', 'inject']
+            groups: ['file', 'exercise', 'event', 'inject']

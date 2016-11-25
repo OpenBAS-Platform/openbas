@@ -3,15 +3,15 @@ APIBundle\Entity\User:
         user_id:
             groups: ['user', 'token', 'audience', 'organization', 'inject']
         user_firstname:
-            groups: ['user', 'token', 'inject']
+            groups: ['user', 'token']
         user_lastname:
-            groups: ['user', 'token', 'inject']
+            groups: ['user', 'token']
         user_email:
-            groups: ['user', 'token', 'inject']
+            groups: ['user', 'token']
         user_phone:
-            groups: ['user', 'token', 'inject']
+            groups: ['user', 'token']
         user_organization:
-            groups: ['user', 'token', 'inject']
+            groups: ['user', 'token']
         user_gravatar:
             groups: ['user', 'token']
         user_admin:

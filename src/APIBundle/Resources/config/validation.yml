@@ -8,6 +8,8 @@ APIBundle\Entity\User:
         user_lastname:
             - NotBlank: ~
             - Type: string
+        user_organization:
+            - NotBlank: ~
         user_email:
             - NotBlank: ~
             - Email: ~

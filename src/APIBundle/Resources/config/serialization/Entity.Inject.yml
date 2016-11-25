@@ -3,13 +3,13 @@ APIBundle\Entity\Inject:
         inject_id:
             groups: ['inject', 'audience', 'incident']
         inject_title:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_description:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_content:
             groups: ['inject']
         inject_date:
-            groups: ['inject', 'incident']
+            groups: ['inject']
         inject_type:
             groups: ['inject']
         inject_status:

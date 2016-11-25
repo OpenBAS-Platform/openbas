@@ -3,10 +3,10 @@ APIBundle\Entity\Audience:
         audience_id:
             groups: ['audience', 'user', 'inject']
         audience_name:
-            groups: ['audience', 'inject']
+            groups: ['audience']
         audience_exercise:
             groups: ['audience']
         audience_users:
-            groups: ['audience', 'inject']
+            groups: ['audience']
         audience_injects:
             groups: ['audience']
