@@ -9,12 +9,6 @@ import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {AppBar} from '../../../../../components/AppBar'
 import IncidentForm from './IncidentForm'
 
-const typesNames = {
-  TECHNICAL: 'Technical',
-  OPERATIONAL: 'Operational',
-  STRATEGIC: 'Strategic'
-}
-
 class CreateIncident extends Component {
   constructor(props) {
     super(props);
@@ -39,41 +33,25 @@ class CreateIncident extends Component {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseCreate.bind(this)}
-      />,
-      <FlatButton
-        label="Create"
-        primary={true}
-        onTouchTap={this.submitFormCreate.bind(this)}
-      />,
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton label="Create" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
     ];
 
     return (
       <div>
-        <AppBar
-          title="Incidents"
+        <AppBar title="Incidents"
           showMenuIconButton={false}
           iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT} onClick={this.handleOpenCreate.bind(this)} />}/>
-        <Dialog
-          title="Create a new incident"
+        <Dialog title="Create a new incident"
           modal={false}
           open={this.state.openCreate}
           onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actions}
-        >
+          actions={actions}>
           <IncidentForm
             ref="incidentForm"
             onSubmit={this.onSubmitCreate.bind(this)}
             onSubmitSuccess={this.handleCloseCreate.bind(this)}
-            types={this.props.incident_types.toList().map(type => {
-              return (
-                <MenuItemLink key={type.get('type_id')} value={type.get('type_id')}
-                              label={typesNames[type.get('type_name')]}/>
-              )
-            })}/>
+            types={this.props.incident_types}/>
         </Dialog>
       </div>
     );
@@ -89,7 +67,7 @@ CreateIncident.propTypes = {
 
 const select = (state) => {
   return {
-    incident_types: state.application.getIn(['entities', 'incident_types']),
+    incident_types: state.referential.entities.incident_types
   }
 }
 

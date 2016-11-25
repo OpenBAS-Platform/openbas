@@ -53,8 +53,7 @@ class InjectForm extends Component {
           label="Type"
           name="inject_type"
           fullWidth={true}
-          onChange={this.props.changeType}
-        >
+          onChange={this.props.changeType}>
           {this.props.types}
         </SelectField>
       </form>

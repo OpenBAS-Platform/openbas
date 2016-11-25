@@ -68,10 +68,10 @@ class Index extends Component {
   }
 
   render() {
-    if (this.props.incident.get('incident_id') === undefined && this.props.event) {
+    if (this.props.incident.incident_id === undefined && this.props.event) {
       return (
         <div style={styles.container}>
-          <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
+          <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident={this.props.incident}/>
           <div style={styles.empty}>This event is empty.</div>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={this.props.event.get('event_title')}/>
@@ -83,10 +83,9 @@ class Index extends Component {
 
     return (
       <div style={styles.container}>
-        <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
-        <div style={styles.title}>{this.props.incident.get('incident_title')}</div>
-        <IncidentPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId}
-                         incidentId={this.props.incident.get('incident_id')}/>
+        <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident={this.props.incident}/>
+        <div style={styles.title}>{this.props.incident.incident_title}</div>
+        <IncidentPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident={this.props.incident}/>
         <div style={styles.number}>{this.props.incident_injects.count()} injects</div>
         <div className="clearfix"></div>
         {this.props.incident_injects.count() === 0 ? <div style={styles.empty}>This incident is empty.</div> : ""}
@@ -99,15 +98,14 @@ class Index extends Component {
                   <InjectPopover
                     exerciseId={this.props.exerciseId}
                     eventId={this.props.eventId}
-                    incidentId={this.props.incident.get('incident_id')}
+                    incidentId={this.props.incident.incident_id}
                     injectId={inject.get('inject_id')}
                   />
                 }
                 primaryText={
                   <div>
                     <div style={styles.inject_title}>{inject.get('inject_title')}</div>
-                    <div
-                      style={styles.inject_date}>{moment(inject.get('inject_date')).format('MMM D, YYYY HH:mm:ss')}</div>
+                    <div style={styles.inject_date}>{moment(inject.get('inject_date')).format('MMM D, YYYY HH:mm:ss')}</div>
                     <div style={styles.inject_type}>{inject.get('inject_type')}</div>
                     <div className="clearfix"></div>
                   </div>
@@ -117,7 +115,7 @@ class Index extends Component {
           })}
         </List>
         <CreateInject exerciseId={this.props.exerciseId} eventId={this.props.eventId}
-                      incidentId={this.props.incident.get('incident_id')}/>
+                      incidentId={this.props.incident.incident_id}/>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT}
                         text={this.props.event ? this.props.event.get('event_title') : ""}/>
@@ -141,18 +139,17 @@ Index.propTypes = {
   fetchInjectsOfEvent: PropTypes.func,
 }
 
-const filteredInjects = createImmutableSelector(
-  (state, incidentId) => filterInjects(state.application.getIn(['entities', 'injects']), incidentId),
-  injects => injects)
-
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let eventId = ownProps.params.eventId
+  let incidents = state.referential.entities.incidents
+
+  let stateCurrentIncident = state.application.getIn(['ui', 'states', 'current_incidents', exerciseId, eventId])
+  let incidentId = stateCurrentIncident === undefined && incidents.length > 0 ? R.head(incidents).incident_id : stateCurrentIncident //Force a default incident if needed
+  let incident = incidentId ? R.find(a => a.incident_id === incidentId)(incidents) : {}
+
   let event = state.application.getIn(['entities', 'events', eventId])
-  let incidents = state.application.getIn(['entities', 'incidents'])
-  let currentIncident = state.application.getIn(['ui', 'states', 'current_incidents', exerciseId, eventId])
-  let incident = currentIncident ? incidents.get(currentIncident) : Map()
-  let incidentInjects = currentIncident ? filteredInjects(state, currentIncident) : Map()
+  let incidentInjects = incident ? filterInjects(state.application.getIn(['entities', 'injects']), incident.incident_id) : Map()
 
   return {
     exerciseId,

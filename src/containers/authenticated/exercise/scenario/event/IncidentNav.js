@@ -1,7 +1,5 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
-import createImmutableSelector from '../../../../../utils/ImmutableSelect'
-import {fromJS} from 'immutable'
 import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchEvents} from '../../../../../actions/Event'
@@ -13,13 +11,8 @@ import {ListItemLink} from '../../../../../components/list/ListItem';
 import {Icon} from '../../../../../components/Icon'
 import CreateIncident from './CreateIncident'
 
-const filterIncidents = (incidents, eventId) => {
-  var filterByEvent = n => n.incident_event === eventId
-  var filteredIncidents = R.filter(filterByEvent, incidents.toJS())
-  return fromJS(filteredIncidents)
-}
-
 class IncidentNav extends Component {
+    
   componentDidMount() {
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidentTypes()
@@ -30,26 +23,19 @@ class IncidentNav extends Component {
     this.props.selectIncident(this.props.exerciseId, this.props.eventId, incidentId)
   }
 
-  componentWillReceiveProps(nextProps) {
-    let incidents = filterIncidents(nextProps.incidents, nextProps.eventId)
-    if(nextProps.currentIncident === undefined && incidents.count() > 0) {
-      this.props.selectIncident(nextProps.exerciseId, nextProps.eventId, incidents.keySeq().first())
-    }
-  }
-
   render() {
     return (
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
         <CreateIncident exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
         <List>
-          {this.props.incidents.toList().map(incident => {
+          {this.props.incidents.map(incident => {
             return (
               <ListItemLink
                 type={Constants.LIST_ITEM_NOSPACE}
-                key={incident.get('incident_id')}
-                active={this.props.currentIncident === incident.get('incident_id')}
-                onClick={this.handleChangeIncident.bind(this, incident.get('incident_id'))}
-                label={incident.get('incident_title')}
+                key={incident.incident_id}
+                active={this.props.incident.incident_id === incident.incident_id}
+                onClick={this.handleChangeIncident.bind(this, incident.incident_id)}
+                label={incident.incident_title}
                 leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
               />
             )
@@ -63,22 +49,27 @@ class IncidentNav extends Component {
 IncidentNav.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
-  currentIncident: PropTypes.string,
-  incidents: PropTypes.object,
+  incident: PropTypes.object,
+  incidents: PropTypes.array,
   fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
   selectIncident: PropTypes.func
 }
 
-const filteredIncidents = createImmutableSelector(
-  (state, props) => filterIncidents(state.application.getIn(['entities', 'incidents']), props.eventId),
-  incidents => incidents)
+const filterIncidents = (incidents, eventId) => {
+    console.log(incidents)
+    let incidentsFilterAndSorting = R.pipe(
+        R.values,
+        R.filter(n => n.incident_event === eventId),
+        R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
+    )
+    return incidentsFilterAndSorting(incidents)
+}
 
 const select = (state, props) => {
   return {
-    incidents: filteredIncidents(state, props),
-    currentIncident: state.application.getIn(['ui', 'states', 'current_incidents', props.exerciseId,  props.eventId])
+    incidents: filterIncidents(state.referential.entities.incidents, props.eventId),
   }
 }
 

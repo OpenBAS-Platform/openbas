@@ -10,8 +10,6 @@ import {Icon} from '../../../../components/Icon'
 import CreateAudience from './CreateAudience'
 
 class AudienceNav extends Component {
-  componentDidMount() {
-  }
 
   handleChangeAudience(audienceId) {
     this.props.selectAudience(this.props.exerciseId, audienceId)

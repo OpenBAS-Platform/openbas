@@ -77,6 +77,7 @@ const initialState = {
     entities: Immutable({
       users: Immutable({}),
       audiences: Immutable({}),
+      incidents: Immutable({}),
       organizations: Immutable({})
     })
   }),
@@ -89,6 +90,18 @@ const initialState = {
     })
   })
 };
+
+//Console patch in dev temporary disable react intl failure
+if (process.env.NODE_ENV === 'development') {
+  const originalConsoleError = console.error
+  if (console.error === originalConsoleError) {
+    console.error = (...args) => {
+      if (args[0].indexOf('[React Intl] Cannot format message:') === 0) {return}
+      if (args[0].indexOf('[React Intl] Missing message:') === 0) {return}
+      originalConsoleError.call(console, ...args)
+    }
+  }
+}
 
 let store
 const baseHistory = browserHistory
@@ -111,7 +124,6 @@ export const api = (schema) => {
   const instance = axios.create({headers: {'X-Auth-Token': authToken}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
-    console.log('Api response', response.data)
     response.data = fromJS(schema ? normalize(response.data, schema) : response.data)
     return response
   }, function (err) {

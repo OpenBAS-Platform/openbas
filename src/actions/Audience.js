@@ -88,12 +88,14 @@ export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
 
 export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
   dispatch({type: Constants.APPLICATION_DELETE_AUDIENCE_SUBMITTED});
-  return api().delete('/api/exercises/' + exerciseId + '/audiences/' + audienceId).then(function (response) {
+  return api().delete('/api/exercises/' + exerciseId + '/audiences/' + audienceId).then(function () {
     dispatch({
       type: Constants.APPLICATION_DELETE_AUDIENCE_SUCCESS,
       payload: Map({
           type: 'audiences',
           id: audienceId,
+          impacts: [],
+
           audienceId: audienceId,
           exerciseId: exerciseId
         }

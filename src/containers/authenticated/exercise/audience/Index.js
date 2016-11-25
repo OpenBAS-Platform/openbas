@@ -57,7 +57,6 @@ class Index extends Component {
   }
 
   render() {
-    console.log(this.props)
     let {exerciseId, audience, audiences} = this.props
     if (audience) {
       return <div style={styles.container}>
@@ -81,15 +80,14 @@ class Index extends Component {
               let user_lastname = R.propOr('-', 'user_lastname', user)
               let user_email = R.propOr('-', 'user_email', user)
               let user_gravatar = R.propOr('', 'user_gravatar', user)
-              let organizationName = R.pathOr('-', [user.user_organization, 'organization_name'], this.props.organizations)
+              let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
+              let organizationName = R.propOr('-', 'organization_name', user_organization)
               //Return the dom
               return (
                 <MainListItem
                   key={userId}
                   leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
-                  rightIconButton={
-                      <UserPopover exerciseId={exerciseId} audience={audience} userId={userId}/>
-                  }
+                  rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
                   primaryText={
                     <div>
                       <div style={styles.name}>{user_firstname} {user_lastname}</div>
