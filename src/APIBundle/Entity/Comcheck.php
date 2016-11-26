@@ -41,7 +41,7 @@ class Comcheck
     protected $comcheck_audience;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="comcheck_users")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="user_comchecks")
      * @ORM\JoinTable(name="comchecks_users",
      *      joinColumns={@ORM\JoinColumn(name="comcheck_id", referencedColumnName="comcheck_id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="RESTRICT")}

@@ -3,7 +3,7 @@
 # mod_rewrite). Additionally, this reduces the matching process for the
 # start page (path "/") because otherwise Apache will apply the rewriting rules
 # to each configured DirectoryIndex file (e.g. index.php, index.html, index.pl).
-DirectoryIndex app_dev.php
+DirectoryIndex app.php
 #DirectoryIndex index.html
 
 # By default, Apache does not evaluate symbolic links if you did not enable this
@@ -55,7 +55,7 @@ DirectoryIndex app_dev.php
     RewriteRule ^ - [L]
 
     # Rewrite all other queries to the front controller.
-    RewriteRule ^ %{ENV:BASE}/app_dev.php [L]
+    RewriteRule ^ %{ENV:BASE}/app.php [L]
 </IfModule>
 
 <IfModule !mod_rewrite.c>
@@ -63,7 +63,7 @@ DirectoryIndex app_dev.php
         # When mod_rewrite is not available, we instruct a temporary redirect of
         # the start page to the front controller explicitly so that the website
         # and the generated links can still be used.
-        RedirectMatch 302 ^/$ /app_dev.php/
+        RedirectMatch 302 ^/$ /app.php/
         # RedirectTemp cannot be used instead
     </IfModule>
 </IfModule>

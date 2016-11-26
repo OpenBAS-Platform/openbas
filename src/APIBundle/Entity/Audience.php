@@ -24,7 +24,7 @@ class Audience
     protected $audience_name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="audience_users")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="user_audiences")
      * @ORM\JoinTable(name="users_audiences",
      *      joinColumns={@ORM\JoinColumn(name="audience_id", referencedColumnName="audience_id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")}

@@ -24,7 +24,7 @@ class Group
     protected $group_name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="group_users")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="user_groups")
      * @ORM\JoinTable(name="users_groups",
      *      joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="group_id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")}
