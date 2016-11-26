@@ -19,4 +19,4 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     protocol:          http
-    worker_url:        http://127.0.0.1:8181
+    worker_url:        http://127.0.0.1:8080
