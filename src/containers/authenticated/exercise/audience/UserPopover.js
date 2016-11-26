@@ -86,7 +86,8 @@ class UserPopover extends Component {
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ];
 
-    let organization_name = R.pathOr('-', [this.props.user.user_organization, 'organization_name'], this.props.organizations)
+    var organizationPath = [this.props.user, 'user_organization', 'organization_name']
+    let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
       R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization']) //Pickup only needed fields
