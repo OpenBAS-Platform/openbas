@@ -386,6 +386,7 @@ const application = (state = Map(), action) => {
       return state.setIn(['ui', 'loading'], true)
     }
 
+    /*
     case Constants.APPLICATION_ADD_AUDIENCE_SUCCESS: {
       let audienceId = action.payload.get('result')
       let exerciseId = action.payload.getIn(['entities', 'audiences', audienceId, 'audience_exercise'])
@@ -394,7 +395,7 @@ const application = (state = Map(), action) => {
         state.setIn(['ui', 'loading'], false)
         state.setIn(['ui', 'states', 'current_audiences', exerciseId], action.payload.get('result'))
       })
-    }
+    }*/
 
     case Constants.APPLICATION_ADD_AUDIENCE_ERROR: {
       return state.setIn(['ui', 'loading'], false)
@@ -427,9 +428,7 @@ const application = (state = Map(), action) => {
       })
     }
 
-    case Constants.APPLICATION_SELECT_AUDIENCE: {
-      return state.setIn(['ui', 'states', 'current_audiences', action.payload.exerciseId], action.payload.audienceId)
-    }
+
     //endregion
 
     // region EVENTS

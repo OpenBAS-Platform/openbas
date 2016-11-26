@@ -52,7 +52,7 @@ class AddUsers extends Component {
   }
 
   componentDidMount() {
-    //this.props.fetchUsers();
+    this.props.fetchUsers();
   }
 
   handleOpenAddUsers() {
@@ -97,18 +97,10 @@ class AddUsers extends Component {
   render() {
 
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseAddUsers.bind(this)}
-      />,
-      <FlatButton
-        label="Add users"
-        primary={true}
-        onTouchTap={this.submitAddUsers.bind(this)}
-      />,
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseAddUsers.bind(this)}/>,
+      <FlatButton label="Add users" primary={true} onTouchTap={this.submitAddUsers.bind(this)}/>,
       <CreateUser exerciseId={this.props.exerciseId} />
-    ];
+    ]
 
     return (
       <div>
@@ -122,16 +114,14 @@ class AddUsers extends Component {
           onRequestClose={this.handleCloseAddUsers.bind(this)}
           autoScrollBodyContent={true}
           actions={actions}
-          contentStyle={styles.dialog}
-        >
+          contentStyle={styles.dialog}>
           <div style={styles.list}>
             {this.state.users.toList().map(user => {
               return (
                 <Chip
                   key={user.get('user_id')}
                   onRequestDelete={this.removeUser.bind(this, user)}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
+                  type={Constants.CHIP_TYPE_LIST}>
                   <Avatar src={user.get('user_gravatar')} size={32} type={Constants.AVATAR_TYPE_CHIP}/>
                   {user.get('user_firstname')} {user.get('user_lastname')}
                 </Chip>

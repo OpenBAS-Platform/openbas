@@ -2,7 +2,6 @@ import React, {Component, PropTypes} from 'react'
 import R from 'ramda'
 import moment from 'moment';
 import {Map, fromJS} from 'immutable'
-import createImmutableSelector from '../../../../../utils/ImmutableSelect'
 import {connect} from 'react-redux'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
@@ -16,12 +15,6 @@ import EventPopover from './EventPopover'
 import IncidentPopover from './IncidentPopover'
 import CreateInject from './CreateInject'
 import InjectPopover from './InjectPopover'
-
-const filterInjects = (injects, incidentId) => {
-  var filterByIncident = n => n.inject_incident === incidentId
-  var filteredInjects = R.filter(filterByIncident, injects.toJS())
-  return fromJS(filteredInjects)
-}
 
 const styles = {
   'container': {
@@ -95,12 +88,10 @@ class Index extends Component {
               <MainListItem
                 key={inject.get('inject_id')}
                 rightIconButton={
-                  <InjectPopover
-                    exerciseId={this.props.exerciseId}
+                  <InjectPopover exerciseId={this.props.exerciseId}
                     eventId={this.props.eventId}
                     incidentId={this.props.incident.incident_id}
-                    injectId={inject.get('inject_id')}
-                  />
+                    injectId={inject.get('inject_id')}/>
                 }
                 primaryText={
                   <div>
@@ -139,15 +130,21 @@ Index.propTypes = {
   fetchInjectsOfEvent: PropTypes.func,
 }
 
+const filterInjects = (injects, incidentId) => {
+  var filterByIncident = n => n.inject_incident === incidentId
+  var filteredInjects = R.filter(filterByIncident, injects.toJS())
+  return fromJS(filteredInjects)
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let eventId = ownProps.params.eventId
-  let incidents = state.referential.entities.incidents
-
-  let stateCurrentIncident = state.application.getIn(['ui', 'states', 'current_incidents', exerciseId, eventId])
+  //region get default incident
+  let incidents = R.values(state.referential.entities.incidents)
+  let stateCurrentIncident = R.path(['exercise', exerciseId, 'event', eventId,  'current_incident'], state.screen)
   let incidentId = stateCurrentIncident === undefined && incidents.length > 0 ? R.head(incidents).incident_id : stateCurrentIncident //Force a default incident if needed
   let incident = incidentId ? R.find(a => a.incident_id === incidentId)(incidents) : {}
-
+  //endregion
   let event = state.application.getIn(['entities', 'events', eventId])
   let incidentInjects = incident ? filterInjects(state.application.getIn(['entities', 'injects']), incident.incident_id) : Map()
 

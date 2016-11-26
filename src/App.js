@@ -96,8 +96,7 @@ if (process.env.NODE_ENV === 'development') {
   const originalConsoleError = console.error
   if (console.error === originalConsoleError) {
     console.error = (...args) => {
-      if (args[0].indexOf('[React Intl] Cannot format message:') === 0) {return}
-      if (args[0].indexOf('[React Intl] Missing message:') === 0) {return}
+      if (args && args[0].indexOf('[React Intl]') === 0) {return}
       originalConsoleError.call(console, ...args)
     }
   }

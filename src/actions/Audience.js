@@ -18,10 +18,24 @@ export const getReferential = (schema, uri) => (dispatch) => {
 export const putReferential = (schema, uri, data) => (dispatch) => {
   dispatch({type: Constants.DATA_FETCH_SUBMITTED});
   return api(schema).put(uri, data).then(function (response) {
-    dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
+    var payload = response.data
+    dispatch({type: Constants.DATA_FETCH_SUCCESS, payload})
+    return payload
   }).catch(function () {
     dispatch({type: Constants.DATA_FETCH_ERROR});
     throw new SubmissionError({_error: 'Failed to update from ' + uri})
+  })
+}
+
+export const postReferential = (schema, uri, data) => (dispatch) => {
+  dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+  return api(schema).post(uri, data).then(function (response) {
+    var payload = response.data
+    dispatch({type: Constants.DATA_FETCH_SUCCESS, payload})
+    return payload
+  }).catch(function () {
+    dispatch({type: Constants.DATA_FETCH_ERROR});
+    throw new SubmissionError({_error: 'Failed to add from ' + uri})
   })
 }
 
@@ -54,23 +68,11 @@ export const searchAudiences = (keyword) => (dispatch) => {
 }
 
 export const addAudience = (exerciseId, data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_ADD_AUDIENCE_SUBMITTED});
-  return api(schema.audience).post('/api/exercises/' + exerciseId + '/audiences', data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_ADD_AUDIENCE_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_ADD_AUDIENCE_ERROR});
-    throw new SubmissionError({_error: 'Failed to add audience!'})
-  })
+  return postReferential(schema.audience, '/api/exercises/' + exerciseId + '/audiences', data)(dispatch)
 }
 
-export const selectAudience = (exerciseId, audienceId) => (dispatch) => {
-  dispatch({
-    type: Constants.APPLICATION_SELECT_AUDIENCE,
-    payload: {exerciseId, audienceId}
-  })
+export const selectAudience = (exercise_id, audience_id) => (dispatch) => {
+  dispatch({type: Constants.APPLICATION_SELECT_AUDIENCE, payload: {exercise_id, audience_id}})
 }
 
 export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
@@ -79,7 +81,7 @@ export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
     dispatch({
       type: Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS,
       payload: response.data
-    });
+    })
   }).catch(function () {
     dispatch({type: Constants.APPLICATION_UPDATE_AUDIENCE_ERROR});
     throw new SubmissionError({_error: 'Failed to update audience!'})
@@ -94,8 +96,7 @@ export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
       payload: Map({
           type: 'audiences',
           id: audienceId,
-          impacts: [],
-
+          //Old compatibility
           audienceId: audienceId,
           exerciseId: exerciseId
         }

@@ -5,17 +5,11 @@ const referential = (state = Immutable({}), action) => {
 
   switch (action.type) {
 
-    case Constants.DATA_FETCH_SUBMITTED: {
-      return state.set('loading', true)
-    }
-
-    case Constants.DATA_FETCH_ERROR: {
-      return state.set('loading', false)
-    }
-
     case Constants.APPLICATION_FETCH_AUDIENCES_SUCCESS:
     case Constants.APPLICATION_FETCH_USERS_SUCCESS:
     case Constants.APPLICATION_FETCH_ORGANIZATIONS_SUCCESS:
+    case Constants.APPLICATION_FETCH_EVENTS_SUCCESS:
+    case Constants.APPLICATION_FETCH_INJECTS_SUCCESS:
     case Constants.APPLICATION_FETCH_INCIDENTS_SUCCESS:
     case Constants.APPLICATION_FETCH_INCIDENT_TYPES_SUCCESS:
     case Constants.APPLICATION_ADD_AUDIENCE_SUCCESS:
@@ -23,8 +17,8 @@ const referential = (state = Immutable({}), action) => {
     case Constants.APPLICATION_ADD_INCIDENT_SUCCESS:
     case Constants.APPLICATION_UPDATE_AUDIENCE_SUCCESS:
     case Constants.APPLICATION_UPDATE_INCIDENT_SUCCESS:
+    case Constants.APPLICATION_UPDATE_USER_SUCCESS:
     case Constants.DATA_FETCH_SUCCESS: {
-      console.log("DATA_FETCH_SUCCESS", action.payload)
       let payload = Immutable(action.payload.toJS())
       return state.set('loading', false).merge(payload.without('result'), {deep: true})
     }

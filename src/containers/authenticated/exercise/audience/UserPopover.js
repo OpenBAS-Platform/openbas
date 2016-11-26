@@ -8,7 +8,6 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {addOrganizationAndUpdateUser} from '../../../../actions/Organization'
 import {updateUser} from '../../../../actions/User'
 import {updateAudience} from '../../../../actions/Audience'
 import UserForm from '../../admin/users/UserForm'
@@ -51,13 +50,7 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    if (typeof data['user_organization'] === 'object') {
-      data['user_organization'] = data['user_organization']['organization_id']
-      return this.props.updateUser(this.props.userId, data)
-    } else {
-      let orgData = {organization_name: data['user_organization']}
-      this.props.addOrganizationAndUpdateUser(orgData, this.props.userId, data)
-    }
+    return this.props.updateUser(this.props.user.user_id, data)
   }
 
   submitFormEdit() {
@@ -90,26 +83,33 @@ class UserPopover extends Component {
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ];
 
+    let organization_name = R.pathOr('-', [this.props.user.user_organization, 'organization_name'], this.props.organizations)
+    let initialValues = R.pipe(
+      R.assoc('user_organization', organization_name), //Reformat organization
+      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization']) //Pickup only needed fields
+    )(this.props.user)
+
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
-        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl} onRequestClose={this.handlePopoverClose.bind(this)}>
+        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
+                 onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}>
+                onRequestClose={this.handleCloseDelete.bind(this)}
+                actions={deleteActions}>
           Do you confirm the removing of this user?
         </Dialog>
         <Dialog title="Update the user" modal={false} open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}>
-          <UserForm ref="userForm" initialValues={this.props.user}
+                onRequestClose={this.handleCloseEdit.bind(this)}
+                actions={editActions}>
+          <UserForm ref="userForm" initialValues={initialValues}
                     organizations={this.props.organizations}
                     onSubmit={this.onSubmitEdit.bind(this)}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
@@ -119,9 +119,9 @@ class UserPopover extends Component {
   }
 }
 
-const select = (state, props) => {
+const select = (state) => {
   return {
-    organizations: state.application.getIn(['entities', 'organizations'])
+    organizations: state.referential.entities.organizations
   }
 }
 
@@ -129,11 +129,10 @@ UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   user: PropTypes.object,
   updateUser: PropTypes.func,
-  addOrganizationAndUpdateUser: PropTypes.func,
   updateAudience: PropTypes.func,
   audience: PropTypes.object,
   organizations: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateUser, addOrganizationAndUpdateUser, updateAudience})(UserPopover)
+export default connect(select, {updateUser, updateAudience})(UserPopover)

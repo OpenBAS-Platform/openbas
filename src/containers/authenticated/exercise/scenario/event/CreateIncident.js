@@ -5,7 +5,6 @@ import {addIncident} from '../../../../../actions/Incident'
 import {Dialog} from '../../../../../components/Dialog';
 import {FlatButton} from '../../../../../components/Button';
 import {ActionButtonCreate} from '../../../../../components/Button'
-import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {AppBar} from '../../../../../components/AppBar'
 import IncidentForm from './IncidentForm'
 

@@ -73,12 +73,12 @@ subobjective.define({
 
 event.define({
   event_exercise: exercise,
-  event_incidents: arrayOfIncidents
+  //event_incidents: arrayOfIncidents
 })
 
 incident.define({
   incident_event: event,
-  incident_injects: arrayOfInjects,
+  //incident_injects: arrayOfInjects,
   incident_type: incidentType
 })
 

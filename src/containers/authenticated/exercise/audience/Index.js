@@ -63,7 +63,7 @@ class Index extends Component {
         <AudienceNav selectedAudience={audience.audience_id} exerciseId={exerciseId} audiences={audiences}/>
         <div>
           <div style={styles.title}>{audience.audience_name}</div>
-          <AudiencePopover exerciseId={exerciseId} audienceId={audience.audience_id}/>
+          <AudiencePopover exerciseId={exerciseId} audience={audience}/>
           <div style={styles.number}>{audience.audience_users.length} users</div>
           <div className="clearfix"></div>
 
@@ -137,11 +137,12 @@ const filterAudiences = (audiences, exerciseId) => {
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
-  let stateCurrentAudience = state.application.getIn(['ui', 'states', 'current_audiences', exerciseId])
+  //region get default audience
+  let stateCurrentAudience = R.path(['exercise', exerciseId, 'current_audience'], state.screen)
   let audienceId = stateCurrentAudience === undefined && audiences.length > 0
     ? R.head(audiences).audience_id : stateCurrentAudience //Force a default audience if needed
   let audience = audienceId ? R.find(a => a.audience_id === audienceId)(audiences) : undefined
-
+  //endregion
   return {
     exerciseId,
     audience,

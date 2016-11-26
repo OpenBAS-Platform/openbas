@@ -1,7 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import {Map} from 'immutable'
 import * as Constants from '../../../../constants/ComponentTypes'
+import R from 'ramda'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
@@ -52,7 +52,7 @@ class AudiencePopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
+    return this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, data)
   }
 
   submitFormEdit() {
@@ -73,96 +73,56 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.exerciseId, this.props.audienceId)
+    this.props.deleteAudience(this.props.exerciseId, this.props.audience.audience_id)
     this.handleCloseDelete()
   }
 
   render() {
     const editActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseEdit.bind(this)}
-      />,
-      <FlatButton
-        label="Update"
-        primary={true}
-        onTouchTap={this.submitFormEdit.bind(this)}
-      />,
-    ];
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+    ]
     const deleteActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseDelete.bind(this)}
-      />,
-      <FlatButton
-        label="Delete"
-        primary={true}
-        onTouchTap={this.submitDelete.bind(this)}
-      />,
-    ];
-
-    let initialInformation = undefined
-    if (this.props.audience) {
-      initialInformation = {
-        audience_name: this.props.audience.get('audience_name'),
-      }
-    }
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+    ]
 
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
-        <Popover open={this.state.openPopover}
-                 anchorEl={this.state.anchorEl}
+        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
-        <Dialog
-          title="Confirmation"
-          modal={false}
+        <Dialog title="Confirmation" modal={false}
           open={this.state.openDelete}
           onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
-        >
+          actions={deleteActions}>
           Do you confirm the deletion of this audience?
         </Dialog>
-        <Dialog
-          title="Update the audience"
-          modal={false}
+        <Dialog title="Update the audience" modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
-        >
-          <AudienceForm ref="audienceForm" initialValues={initialInformation} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          actions={editActions}>
+          <AudienceForm ref="audienceForm" initialValues={R.pick(['audience_name'], this.props.audience)}
+                        onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
       </div>
     )
   }
 }
 
-const select = (state, props) => {
-  let audiences = state.application.getIn(['entities', 'audiences'])
-  let currentAudience = state.application.getIn(['ui', 'states', 'current_audiences', props.exerciseId])
-  let audience = currentAudience ? audiences.get(currentAudience) : Map()
-
-  return {
-    audience
-  }
-}
-
 AudiencePopover.propTypes = {
   exerciseId: PropTypes.string,
-  audienceId: PropTypes.string,
   deleteAudience: PropTypes.func,
   updateAudience: PropTypes.func,
   audience: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateAudience, deleteAudience})(AudiencePopover)
+export default connect(null, {updateAudience, deleteAudience})(AudiencePopover)

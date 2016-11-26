@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import * as Constants from '../../../../constants/ComponentTypes'
-import {addAudience} from '../../../../actions/Audience'
+import {addAudience, selectAudience} from '../../../../actions/Audience'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton} from '../../../../components/Button';
 import AudienceForm from './AudienceForm'
@@ -24,6 +24,11 @@ class CreateAudience extends Component {
 
   onSubmitCreate(data) {
     return this.props.addAudience(this.props.exerciseId, data)
+      .then((payload) => { //If add audience success, select it directly
+        let audienceId = payload.get('result')
+        let exerciseId = payload.getIn(['entities', 'audiences', audienceId, 'audience_exercise', 'exercise_id'])
+        this.props.selectAudience(exerciseId, audienceId)
+      })
   }
 
   submitFormCreate() {
@@ -32,32 +37,21 @@ class CreateAudience extends Component {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseCreate.bind(this)}
-      />,
-      <FlatButton
-        label="Create"
-        primary={true}
-        onTouchTap={this.submitFormCreate.bind(this)}
-      />,
-    ];
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton label="Create" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
+    ]
 
     return (
       <div>
-        <AppBar
-          title="Audiences"
-          showMenuIconButton={false}
-          iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT} onClick={this.handleOpenCreate.bind(this)} />}/>
-        <Dialog
-          title="Create a new audience"
-          modal={false}
+        <AppBar title="Audiences" showMenuIconButton={false}
+          iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
+                                                onClick={this.handleOpenCreate.bind(this)} />}/>
+        <Dialog title="Create a new audience" modal={false}
           open={this.state.openCreate}
           onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actions}
-        >
-          <AudienceForm ref="audienceForm" onSubmit={this.onSubmitCreate.bind(this)} onSubmitSuccess={this.handleCloseCreate.bind(this)} />
+          actions={actions}>
+          <AudienceForm ref="audienceForm" onSubmit={this.onSubmitCreate.bind(this)}
+                        onSubmitSuccess={this.handleCloseCreate.bind(this)} />
         </Dialog>
       </div>
     );
@@ -66,7 +60,8 @@ class CreateAudience extends Component {
 
 CreateAudience.propTypes = {
   exerciseId: PropTypes.string,
-  addAudience: PropTypes.func
+  addAudience: PropTypes.func,
+  selectAudience: PropTypes.func
 }
 
-export default connect(null, {addAudience})(CreateAudience);
+export default connect(null, {addAudience, selectAudience})(CreateAudience);

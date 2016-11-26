@@ -16,14 +16,9 @@ const validate = values => {
   return errors
 }
 
-const dataSourceConfig = {
-  text: 'organization_name',
-  value: 'organization_id',
-};
-
 class UserForm extends Component {
   render() {
-    let dataSource  = R.map(val => {return {organization_id: val.organization_id, organization_name: val.organization_name}}, this.props.organizations.toList().toJS())
+    let dataSource  = R.map(val => val.organization_name, R.values(this.props.organizations))
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
@@ -31,7 +26,7 @@ class UserForm extends Component {
         <FormField name="user_firstname" fullWidth={true} type="text" label="Firstname"/>
         <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
-                           type="text" label="Organization" dataSource={dataSource} dataSourceConfig={dataSourceConfig}
+                           type="text" label="Organization" dataSource={dataSource}
         />
       </form>
     )
