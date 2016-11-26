@@ -18,7 +18,7 @@ class Grant
     protected $grant_id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Group")
+     * @ORM\ManyToOne(targetEntity="Group", inversedBy="group_grants")
      * @ORM\JoinColumn(name="grant_group", referencedColumnName="group_id", onDelete="CASCADE")
      * @var Group
      */

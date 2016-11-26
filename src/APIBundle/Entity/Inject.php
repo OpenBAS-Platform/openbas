@@ -44,7 +44,7 @@ class Inject
     protected $inject_type;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Audience", inversedBy="inject_audiences")
+     * @ORM\ManyToMany(targetEntity="Audience", inversedBy="audience_injects")
      * @ORM\JoinTable(name="injects_audiences",
      *     joinColumns={@ORM\JoinColumn(name="inject_id", referencedColumnName="inject_id", onDelete="CASCADE")},
      *     inverseJoinColumns={@ORM\JoinColumn(name="audience_id", referencedColumnName="audience_id", onDelete="CASCADE")}
