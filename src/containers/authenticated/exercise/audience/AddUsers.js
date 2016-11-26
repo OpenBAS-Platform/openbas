@@ -1,7 +1,5 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Map, fromJS, List as iList} from 'immutable'
-import createImmutableSelector from '../../../../utils/ImmutableSelect'
 import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {updateAudience} from '../../../../actions/Audience'
@@ -44,11 +42,7 @@ const styles = {
 class AddUsers extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      openAddUsers: false,
-      users: Map(),
-      users_ids: iList(),
-    }
+    this.state = {openAddUsers: false, searchTerm: '', users: []}
   }
 
   componentDidMount() {
@@ -60,37 +54,27 @@ class AddUsers extends Component {
   }
 
   handleCloseAddUsers() {
-    this.setState({openAddUsers: false})
+    this.setState({openAddUsers: false, searchTerm: '', users: []})
   }
 
   handleSearchUsers(event, value) {
-    this.props.searchUsers(value)
+    this.setState({searchTerm: value})
   }
 
   addUser(user) {
-    this.setState({users: this.state.users.set(user.get('user_id'), user)})
-    if (this.state.users_ids.keyOf(user.get('user_id')) === undefined) {
-      this.setState({users_ids: this.state.users_ids.push(user.get('user_id'))})
-    }
+    this.setState({users: R.append(user, this.state.users)})
   }
 
   removeUser(user) {
-    this.setState({
-      users: this.state.users.delete(user.get('user_id')),
-      users_ids: this.state.users_ids.delete(this.state.users_ids.keyOf(user.get('user_id')))
-    })
+    this.setState({users: R.filter(u => u.user_id !== user.user_id, this.state.users)})
   }
 
   submitAddUsers() {
-    let usersList = this.props.audienceUsersIds.concat(this.state.users_ids.toJS())
-    let data = Map({
-      audience_users: usersList
-    })
-    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, data)
-    this.setState({
-      users: Map(),
-      users_ids: iList(),
-    })
+    let usersList = R.pipe(
+      R.map(u => u.user_id),
+      R.concat(this.props.audienceUsersIds)
+    )(this.state.users)
+    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, {audience_users: usersList})
     this.handleCloseAddUsers()
   }
 
@@ -102,13 +86,23 @@ class AddUsers extends Component {
       <CreateUser exerciseId={this.props.exerciseId} />
     ]
 
+    //region filter users by active keyword
+    const keyword = this.state.searchTerm
+    let filterByKeyword = n => keyword === '' ||
+                          n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+                          n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+                          n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    let filteredUsers = R.filter(filterByKeyword, R.values(this.props.users))
+    //endregion
+
     return (
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
                                      onClick={this.handleOpenAddUsers.bind(this)}/>
         <DialogTitleElement
           title={<SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a user"
-                                   onChange={this.handleSearchUsers.bind(this)} styletype={Constants.FIELD_TYPE_INTITLE} />}
+                                   onChange={this.handleSearchUsers.bind(this)}
+                                  styletype={Constants.FIELD_TYPE_INTITLE} />}
           modal={false}
           open={this.state.openAddUsers}
           onRequestClose={this.handleCloseAddUsers.bind(this)}
@@ -116,14 +110,14 @@ class AddUsers extends Component {
           actions={actions}
           contentStyle={styles.dialog}>
           <div style={styles.list}>
-            {this.state.users.toList().map(user => {
+            {this.state.users.map(user => {
               return (
                 <Chip
-                  key={user.get('user_id')}
+                  key={user.user_id}
                   onRequestDelete={this.removeUser.bind(this, user)}
                   type={Constants.CHIP_TYPE_LIST}>
-                  <Avatar src={user.get('user_gravatar')} size={32} type={Constants.AVATAR_TYPE_CHIP}/>
-                  {user.get('user_firstname')} {user.get('user_lastname')}
+                  <Avatar src={user.user_gravatar} size={32} type={Constants.AVATAR_TYPE_CHIP}/>
+                  {user.user_firstname} {user.user_lastname}
                 </Chip>
               )
             })}
@@ -131,30 +125,25 @@ class AddUsers extends Component {
           </div>
           <div style={styles.search}>
             <List>
-              {this.props.users.toList().map(user => {
-                let disabled = false
-                if (this.state.users_ids.keyOf(user.get('user_id')) !== undefined
-                  || this.props.audienceUsersIds.includes(user.get('user_id'))) {
-                  disabled = true
-                }
-                let organizationName = ''
-                if (user.get('user_organization') && this.props.organizations.get(user.get('user_organization'))) {
-                  organizationName = this.props.organizations.get(user.get('user_organization')).get('organization_name')
-                }
+              {filteredUsers.map(user => {
+                let disabled = R.find(u => u.user_id === user.user_id, this.state.users) !== undefined
+                  || this.props.audienceUsersIds.includes(user.user_id)
+                let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
+                let organizationName = R.propOr('-', 'organization_name', user_organization)
                 return (
                   <MainSmallListItem
-                    key={user.get('user_id')}
+                    key={user.user_id}
                     disabled={disabled}
                     onClick={this.addUser.bind(this, user)}
                     primaryText={
                       <div>
-                        <div style={styles.name}>{user.get('user_firstname')} {user.get('user_lastname')}</div>
-                        <div style={styles.mail}>{user.get('user_email')}</div>
+                        <div style={styles.name}>{user.user_firstname} {user.user_lastname}</div>
+                        <div style={styles.mail}>{user.user_email}</div>
                         <div style={styles.org}>{organizationName}</div>
                         <div className="clearfix"></div>
                       </div>
                     }
-                    leftAvatar={<Avatar type={Constants.AVATAR_TYPE_LIST} src={user.get('user_gravatar')}/>}
+                    leftAvatar={<Avatar type={Constants.AVATAR_TYPE_LIST} src={user.user_gravatar}/>}
                   />
                 )
               })}
@@ -165,15 +154,6 @@ class AddUsers extends Component {
     );
   }
 }
-
-const usersSelector = (state) => {
-  const users = state.application.getIn(['entities', 'users']).toJS()
-  let keyword = state.application.getIn(['ui', 'states', 'current_search_keyword'])
-  let filterByKeyword = n => keyword === '' || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-  let filteredUsers = R.filter(filterByKeyword, users)
-  return fromJS(filteredUsers)
-}
-const filteredUsers = createImmutableSelector(usersSelector, users => users)
 
 AddUsers.propTypes = {
   exerciseId: PropTypes.string,
@@ -186,10 +166,10 @@ AddUsers.propTypes = {
   audienceUsersIds: PropTypes.array
 }
 
-const select = (state, props) => {
+const select = (state) => {
   return {
-    users: filteredUsers(state, props),
-    organizations: state.application.getIn(['entities', 'organizations']),
+    users: state.referential.entities.users,
+    organizations: state.referential.entities.organizations
   }
 }
 

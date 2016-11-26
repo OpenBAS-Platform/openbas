@@ -67,9 +67,12 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    let usersList = R.filter(a => a.user_id !== this.props.user.user_id, this.props.audience.audience_users)
-    let data = {audience_users: usersList.map(u => u.user.user_id)}
-    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, data)
+    const user_ids = R.pipe(
+      R.values,
+      R.filter(a => a.user_id !== this.props.user.user_id),
+      R.map(u => u.user_id)
+    )(this.props.audience.audience_users)
+    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {audience_users: user_ids})
     this.handleCloseDelete()
   }
 
