@@ -8,7 +8,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {updateAudience, deleteAudience} from '../../../../actions/Audience'
+import {updateAudience, selectAudience, deleteAudience} from '../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
 
 const style = {
@@ -73,7 +73,9 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.exerciseId, this.props.audience.audience_id)
+    this.props.deleteAudience(this.props.exerciseId, this.props.audience.audience_id).then(() => {
+      this.props.selectAudience(this.props.exerciseId, undefined)
+    })
     this.handleCloseDelete()
   }
 
@@ -121,8 +123,9 @@ AudiencePopover.propTypes = {
   exerciseId: PropTypes.string,
   deleteAudience: PropTypes.func,
   updateAudience: PropTypes.func,
+  selectAudience: PropTypes.func,
   audience: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(null, {updateAudience, deleteAudience})(AudiencePopover)
+export default connect(null, {updateAudience, selectAudience, deleteAudience})(AudiencePopover)
