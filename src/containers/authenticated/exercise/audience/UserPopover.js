@@ -85,8 +85,7 @@ class UserPopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ];
-
-    console.log(this.props.user)
+    
     var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
