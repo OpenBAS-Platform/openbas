@@ -1,66 +1,18 @@
-import * as Constants from '../constants/ActionTypes';
-import {api} from '../App';
-import {SubmissionError} from 'redux-form'
 import * as schema from './Schema'
+import {getReferential, postReferential, putReferential} from '../utils/Action'
 
 export const fetchUsers = () => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_FETCH_USERS_SUBMITTED});
-  return api(schema.arrayOfUsers).get('/api/users').then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_USERS_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_USERS_ERROR,
-      payload: response.data
-    })
-  })
+  return getReferential(schema.arrayOfUsers, '/api/users')(dispatch)
 }
 
-export const fetchUser = () => (dispatch, getState) => {
-  let userId = getState().application.get('user');
-  dispatch({type: Constants.APPLICATION_FETCH_USER_SUBMITTED});
-  return api(schema.user).get('/api/users/' + userId).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_USER_SUCCESS,
-      payload: response.data
-    });
-  }).catch(function (response) {
-    console.error(response)
-    dispatch({type: Constants.APPLICATION_FETCH_USER_ERROR});
-  })
-}
-
-export const searchUsers = (keyword) => (dispatch) => {
-  dispatch({
-    type: Constants.APPLICATION_SEARCH_USERS_SUBMITTED,
-    payload: keyword
-  })
+export const fetchCurrentUser = () => (dispatch, getState) => {
+  return getReferential(schema.user, '/api/users/' + getState().app.logged.user)(dispatch)
 }
 
 export const addUser = (data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_ADD_USER_SUBMITTED});
-  return api(schema.user).post('/api/users', data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_ADD_USER_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_ADD_USER_ERROR});
-    throw new SubmissionError({_error: 'Failed to add user!'})
-  })
+  return postReferential(schema.user, '/api/users', data)(dispatch)
 }
 
 export const updateUser = (userId, data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_UPDATE_USER_SUBMITTED});
-  return api(schema.user).put('/api/users/' + userId, data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_UPDATE_USER_SUCCESS,
-      payload: response.data
-    });
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_UPDATE_USER_ERROR});
-    throw new SubmissionError({_error: 'Failed to update user!'})
-  })
+  return putReferential(schema.user, '/api/users/' + userId, data)(dispatch)
 }

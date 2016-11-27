@@ -18,6 +18,7 @@ import frLocaleData from 'react-intl/locale-data/fr'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import {i18n} from './utils/Messages'
 import * as Constants from './constants/ActionTypes'
+import R from 'ramda'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 import RootAnonymous from './containers/anonymous/Root'
 import Login from './containers/anonymous/login/Login'
@@ -37,11 +38,6 @@ import roundMoment from './utils/moment-round'
 injectTapEventPlugin()
 roundMoment()
 
-const data = fromJS(JSON.parse(localStorage.getItem('token')))
-var tokens = data ? data.getIn(['entities', 'tokens']) : null
-var token = data ? data.get('result') : null
-var users = data ? data.getIn(['entities', 'users']) : null
-var user = tokens ? tokens.get(token).get('token_user') : null
 
 //Default application state
 const initialState = {
@@ -73,20 +69,17 @@ const initialState = {
       })
     })
   }),
+  app: Immutable({
+    logged: JSON.parse(localStorage.getItem('logged')),
+    locale: navigator.language
+  }),
   referential: Immutable({
     entities: Immutable({
       users: Immutable({}),
+      tokens: Immutable({}),
       audiences: Immutable({}),
       incidents: Immutable({}),
       organizations: Immutable({})
-    })
-  }),
-  identity: Map({
-    user: user,
-    token: token,
-    entities: Map({
-      users: users,
-      tokens: tokens
     })
   })
 };
@@ -118,18 +111,17 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 
 //Axios API
 export const api = (schema) => {
-  const app = store.getState().identity;
-  const authToken = app.getIn(['entities', 'tokens', app.get('token'), 'token_value'])
-  const instance = axios.create({headers: {'X-Auth-Token': authToken}})
+  var token = R.path(['logged', 'auth'], store.getState().app)
+  const instance = axios.create({headers: {'X-Auth-Token': token}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
+    console.log("API response", response.data)
     response.data = fromJS(schema ? normalize(response.data, schema) : response.data)
     return response
   }, function (err) {
     console.error("API error", err)
     let res = err.response;
     if (res.status === 401) {//User is not logged anymore
-      localStorage.removeItem('token');
       store.dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS});
       return Promise.reject(err);
     } else if (res.status === 503 && err.config && !err.config.__isRetryRequest) {
@@ -153,7 +145,7 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
 const history = syncHistoryWithStore(baseHistory, store)
 
 //region authentication
-const authenticationToken = (state) => state.identity.getIn(['entities', 'tokens', state.identity.get('token')])
+const authenticationToken = (state) => state.app.logged
 const UserIsAuthenticated = UserAuthWrapper({
   authSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,
