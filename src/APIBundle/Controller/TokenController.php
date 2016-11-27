@@ -101,6 +101,7 @@ class TokenController extends Controller
         $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
 
         if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId() || $connectedUser->isAdmin() ) {
+            $token->setTokenUser($token->getTokenUser()->setUserGravatar());
             return $token;
         } else {
             throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
