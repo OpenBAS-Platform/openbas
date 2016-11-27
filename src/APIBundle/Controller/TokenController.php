@@ -33,14 +33,14 @@ class TokenController extends Controller
         if (!$form->isValid()) {
             return $form;
         }
-;
+
         $em = $this->get('doctrine.orm.entity_manager');
         $user = $em->getRepository('APIBundle:User')->findOneBy(['user_email' => $credentials->getLogin()]);
-        $user->setUserGravatar();
 
         if (!$user) {
             return $this->invalidCredentials();
         }
+        $user->setUserGravatar();
 
         $encoder = $this->get('security.password_encoder');
         $isPasswordValid = $encoder->isPasswordValid($user, $credentials->getPassword());
