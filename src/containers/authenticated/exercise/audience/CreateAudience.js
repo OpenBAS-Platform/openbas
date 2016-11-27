@@ -25,9 +25,7 @@ class CreateAudience extends Component {
   onSubmitCreate(data) {
     return this.props.addAudience(this.props.exerciseId, data)
       .then((payload) => { //If add audience success, select it directly
-        let audienceId = payload.get('result')
-        let exerciseId = payload.getIn(['entities', 'audiences', audienceId, 'audience_exercise', 'exercise_id'])
-        this.props.selectAudience(exerciseId, audienceId)
+        this.props.selectAudience(this.props.exerciseId, payload.result)
       })
   }
 

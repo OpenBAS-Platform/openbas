@@ -1,6 +1,5 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
-
 import * as Constants from '../../../../constants/ComponentTypes'
 import {selectAudience} from '../../../../actions/Audience'
 import {Drawer} from '../../../../components/Drawer'

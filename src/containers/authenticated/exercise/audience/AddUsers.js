@@ -45,10 +45,6 @@ class AddUsers extends Component {
     this.state = {openAddUsers: false, searchTerm: '', users: []}
   }
 
-  componentDidMount() {
-    this.props.fetchUsers();
-  }
-
   handleOpenAddUsers() {
     this.setState({openAddUsers: true})
   }
