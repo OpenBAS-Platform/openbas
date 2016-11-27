@@ -10,4 +10,4 @@ export JAVA_MIN_MEM=512m
 export JAVA_MAX_MEM=1024m
 
 # Enable/set the std/err redirection when using bin/start
-export KARAF_REDIRECT=/dev/stdout
+export KARAF_REDIRECT=stdout

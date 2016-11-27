@@ -16,18 +16,6 @@
 #    limitations under the License.
 #
 
-# Karaf home folder
-export KARAF_HOME=
-
-# Minimum memory for the JVM
-export JAVA_MIN_MEM=512m
-
-# Maximum memory for the JVM
-export JAVA_MAX_MEM=1024m
-
-# Enable/set the std/err redirection when using bin/start
-export KARAF_REDIRECT=/dev/stdout
-
 realpath() {
   OURPWD=${PWD}
   cd "$(dirname "${1}")"
