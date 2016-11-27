@@ -71,15 +71,37 @@ class TokenController extends Controller
     public function removeTokenAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $token = $em->getRepository('APIBundle:Token')
-            ->find($request->get('token_id'));
+        $token = $em->getRepository('APIBundle:Token')->find($request->get('token_id'));
         /* @var $token Token */
 
         $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
 
-        if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId()) {
+        if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId() || $connectedUser->isAdmin()) {
             $em->remove($token);
             $em->flush();
+        } else {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
+        }
+    }
+
+    /**
+     * @ApiDoc(
+     *    description="Read a token",
+     * )
+     *
+     * @Rest\View(serializerGroups={"token"})
+     * @Rest\Get("/tokens/{token_id}")
+     */
+    public function getTokenAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $token = $em->getRepository('APIBundle:Token')->find($request->get('token_id'));
+        /* @var $token Token */
+
+        $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+
+        if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId() || $connectedUser->isAdmin() ) {
+            return $token;
         } else {
             throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
         }
