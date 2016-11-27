@@ -3,6 +3,7 @@ import {is, Iterable} from 'immutable'
 import diff from 'immutablediff'
 import R from 'ramda'
 
+//TODO Remove after refactoring
 const customComparator = (previousState, state) => {
   if (Iterable.isIterable(previousState) && Iterable.isIterable(state)) {
     var isStateUnchanged = is(previousState, state);

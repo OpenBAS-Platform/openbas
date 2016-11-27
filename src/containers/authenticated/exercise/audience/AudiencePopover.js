@@ -1,8 +1,8 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {PropTypes, Component} from 'react'
+import {connect} from 'react-redux'
 import * as Constants from '../../../../constants/ComponentTypes'
 import R from 'ramda'
-import {Popover} from '../../../../components/Popover';
+import {Popover} from '../../../../components/Popover'
 import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'

@@ -22,7 +22,7 @@ RootAuthenticated.propTypes = {
 
 const select = (state) => {
   return {
-    loading: state.application.getIn(['ui', 'loading'])
+    loading: state.screen.loading || false
   }
 }
 
