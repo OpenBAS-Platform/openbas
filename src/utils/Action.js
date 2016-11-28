@@ -1,7 +1,7 @@
 import * as Constants from '../constants/ActionTypes'
 import {SubmissionError} from 'redux-form'
-import {api} from '../App'
 import Immutable from 'seamless-immutable'
+import {api} from '../App'
 
 export const getReferential = (schema, uri) => (dispatch) => {
   dispatch({type: Constants.DATA_FETCH_SUBMITTED});

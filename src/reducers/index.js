@@ -1,14 +1,14 @@
 import {combineReducers} from 'redux';
 import application from './Application';
-import identity from './Identity';
+import app from './App';
 import referential from './Referential';
 import screen from './Screen';
 import {routerReducer} from 'react-router-redux'
 import {reducer as formReducer} from 'redux-form'
 
 const rootReducer = combineReducers({
+  app,
   application,
-  identity,
   referential,
   screen,
   routing: routerReducer,

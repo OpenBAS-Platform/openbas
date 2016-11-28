@@ -1,11 +1,12 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import * as Constants from '../../constants/ComponentTypes'
+import R from 'ramda'
 import {Popover} from '../../components/Popover';
 import {Avatar} from '../../components/Avatar';
 import {Menu} from '../../components/Menu'
 import {MenuItemLink, MenuItemButton} from "../../components/menu/MenuItem"
-import {logout} from '../../actions/Application'
+import {logout, fetchToken} from '../../actions/Application'
 import {i18nRegister} from '../../utils/Messages'
 
 i18nRegister({
@@ -21,6 +22,10 @@ class UserPopover extends Component {
     this.state = {open: false}
   }
 
+  componentDidMount() {
+    this.props.fetchToken()
+  }
+
   handleOpen(event) {
     event.preventDefault()
     this.setState({
@@ -34,7 +39,6 @@ class UserPopover extends Component {
   }
 
   logoutClick() {
-    console.log("LOGOUT CLICKK!!!!")
     this.props.logout()
   }
 
@@ -62,15 +66,15 @@ class UserPopover extends Component {
 UserPopover.propTypes = {
   userGravatar: PropTypes.string,
   logout: PropTypes.func,
+  fetchToken: PropTypes.func,
   children: PropTypes.node
 }
 
 const select = (state) => {
-  var userId = state.identity.get('user')
-  const userGravatar = state.identity.getIn(['entities', 'users', userId, 'user_gravatar'])
+  var userId = R.path(['logged', 'user'], state.app)
   return {
-    userGravatar: userGravatar
+    userGravatar: R.path([userId, 'user_gravatar'], state.referential.entities.users)
   }
 }
 
-export default connect(select, {logout})(UserPopover)
+export default connect(select, {fetchToken, logout})(UserPopover)

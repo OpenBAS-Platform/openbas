@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {updateAudience} from '../../../../actions/Audience'
-import {fetchUsers, searchUsers} from '../../../../actions/User'
+import {fetchUsers} from '../../../../actions/User'
 import {DialogTitleElement} from '../../../../components/Dialog';
 import {Chip} from '../../../../components/Chip';
 import {Avatar} from '../../../../components/Avatar';
@@ -155,7 +155,6 @@ AddUsers.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
   fetchUsers: PropTypes.func,
-  searchUsers: PropTypes.func,
   updateAudience: PropTypes.func,
   users: PropTypes.object,
   organizations: PropTypes.object,
@@ -169,4 +168,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchUsers, searchUsers, updateAudience})(AddUsers);
+export default connect(select, {fetchUsers, updateAudience})(AddUsers);

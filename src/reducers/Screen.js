@@ -10,6 +10,7 @@ const screen = (state = Immutable({}), action) => {
     }
 
     case Constants.DATA_FETCH_ERROR:
+    case Constants.DATA_DELETE_SUCCESS:
     case Constants.DATA_FETCH_SUCCESS: {
       return state.set('loading', false)
     }
