@@ -18,6 +18,14 @@ const screen = (state = Immutable({}), action) => {
       return state.setIn(['exercise', action.payload.exercise_id, 'current_audience'], action.payload.audience_id)
     }
 
+    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
+      return state.setIn(['navbar_left_open'], !state.navbar_left_open)
+    }
+
+    case Constants.APPLICATION_NAVBAR_RIGHT_TOGGLE_SUBMITTED: {
+      return state.setIn(['navbar_right_open'], !state.navbar_right_open)
+    }
+
     default: {
       return state;
     }

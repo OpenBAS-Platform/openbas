@@ -73,6 +73,10 @@ const initialState = {
       })
     })
   }),
+  screen: Immutable({
+    navbar_left_open: false,
+    navbar_right_open: true
+  }),
   referential: Immutable({
     entities: Immutable({
       users: Immutable({}),

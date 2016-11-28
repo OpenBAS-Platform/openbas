@@ -74,7 +74,7 @@ LeftBar.propTypes = {
 
 const select = (state) => {
   return {
-    open: state.application.getIn(['ui', 'navbar_left_open'])
+    open: state.screen.navbar_left_open
   }
 }
 
