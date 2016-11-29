@@ -8,6 +8,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
+import {fetchObjective} from '../../../../actions/Objective'
 import {updateSubobjective, deleteSubobjective} from '../../../../actions/Subobjective'
 import SubobjectiveForm from './SubobjectiveForm'
 
@@ -74,7 +75,10 @@ class SubobjectivePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteSubobjective(this.props.exerciseId, this.props.objectiveId, this.props.subobjective.subobjective_id)
+    this.props.deleteSubobjective(this.props.exerciseId, this.props.objectiveId, this.props.subobjective.subobjective_id).then(() => {
+        this.props.fetchObjective(this.props.exerciseId, this.props.objectiveId)
+      }
+    )
     this.handleCloseDelete()
   }
 
@@ -103,7 +107,6 @@ class SubobjectivePopover extends Component {
         onTouchTap={this.submitDelete.bind(this)}
       />,
     ];
-
 
     let initialValues = R.pick(['subobjective_title', 'subobjective_description', 'subobjective_priority'], this.props.subobjective)
     return (
@@ -145,10 +148,11 @@ class SubobjectivePopover extends Component {
 SubobjectivePopover.propTypes = {
   exerciseId: PropTypes.string,
   objectiveId: PropTypes.string,
+  fetchObjective: PropTypes.func,
   deleteSubobjective: PropTypes.func,
   updateSubobjective: PropTypes.func,
   subobjective: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(null, {updateSubobjective, deleteSubobjective})(SubobjectivePopover)
+export default connect(null, {fetchObjective, updateSubobjective, deleteSubobjective})(SubobjectivePopover)

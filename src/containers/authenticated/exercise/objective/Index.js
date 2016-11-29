@@ -37,10 +37,7 @@ class IndexObjective extends Component {
         <List>
           {objectives.map(objective => {
             let nestedItems = objective.objective_subobjectives.map(data => {
-                console.log('data', data)
-                console.log('subobjectives', this.props.subobjectives)
                 let subobjective = R.propOr({}, data.subobjective_id, this.props.subobjectives)
-                console.log('subobjective', subobjective)
                 let subobjective_id = R.propOr(data.subobjective_id, 'subobjective_id', subobjective)
                 let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
                 let subobjective_description = R.propOr('-', 'subobjective_description', subobjective)
@@ -89,7 +86,7 @@ class IndexObjective extends Component {
 IndexObjective.propTypes = {
   exerciseId: PropTypes.string,
   objectives: PropTypes.array,
-  subobjectives: PropTypes.array,
+  subobjectives: PropTypes.object,
   fetchObjectives: PropTypes.func.isRequired,
   fetchSubobjectives: PropTypes.func.isRequired,
 }
@@ -104,17 +101,18 @@ const filterObjectives = (objectives, exerciseId) => {
 }
 
 const filterSubobjectives = (subobjectives) => {
-  console.log('JE PASSE LA !!!!!')
-  let sorted = R.sort((a, b) => { return console.log('AAAAAAAA', a, b) }, subobjectives)
-
-  return sorted
+  let subobjectivesSorting = R.pipe(
+    R.values,
+    R.sort((a, b) => { return a.subobjective_priority > b.subobjective_priority }),
+    R.indexBy(R.prop('subobjective_id'))
+  )
+  return subobjectivesSorting(subobjectives)
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let objectives = filterObjectives(state.referential.entities.objectives, exerciseId)
   let subobjectives = filterSubobjectives(state.referential.entities.subobjectives)
-
   return {
     exerciseId,
     objectives,

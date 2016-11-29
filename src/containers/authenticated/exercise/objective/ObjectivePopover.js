@@ -83,8 +83,9 @@ class ObjectivePopover extends Component {
   }
 
   onSubmitCreateSubobjective(data) {
-    return this.props.addSubobjective(this.props.exerciseId, this.props.objective.objective_id, data).then(
-      this.props.fetchObjective(this.props.exerciseId, this.props.objective.objective_id)
+    return this.props.addSubobjective(this.props.exerciseId, this.props.objective.objective_id, data).then(() => {
+        this.props.fetchObjective(this.props.exerciseId, this.props.objective.objective_id)
+      }
     )
   }
 
