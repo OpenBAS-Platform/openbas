@@ -83,8 +83,7 @@ class Index extends Component {
               let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
               let organizationName = R.propOr('-', 'organization_name', user_organization)
               //Return the dom
-              return (
-                <MainListItem
+              return <MainListItem
                   key={userId}
                   leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
                   rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
@@ -97,14 +96,12 @@ class Index extends Component {
                     </div>
                   }
                 />
-              )
             })}
           </List>
           <AddUsers exerciseId={exerciseId} audienceId={audience.audience_id}
                     audienceUsersIds={audience.audience_users.map(u => u.user_id)}/>
         </div>
       </div>
-
     } else {
       return <div style={styles.container}>
         <AudienceNav exerciseId={exerciseId} audiences={audiences}/>

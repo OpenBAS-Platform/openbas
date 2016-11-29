@@ -81,6 +81,8 @@ const initialState = {
     entities: Immutable({
       users: Immutable({}),
       tokens: Immutable({}),
+      objectives: Immutable({}),
+      subobjectives: Immutable({}),
       audiences: Immutable({}),
       incidents: Immutable({}),
       organizations: Immutable({})

@@ -1,63 +1,27 @@
-import * as Constants from '../constants/ActionTypes';
-import {SubmissionError} from 'redux-form'
-import {api} from '../App';
 import * as schema from './Schema'
-import {Map} from 'immutable'
+import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
 
 export const fetchObjectives = (exerciseId) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_FETCH_OBJECTIVES_SUBMITTED});
-  return api(schema.arrayOfObjectives).get('/api/exercises/' + exerciseId + '/objectives').then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_OBJECTIVES_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_OBJECTIVES_ERROR,
-      payload: response.data
-    })
-  })
+  var uri = '/api/exercises/' + exerciseId + '/objectives'
+  return getReferential(schema.arrayOfObjectives, uri)(dispatch)
 }
 
-export const addObjective = (exerciseId, data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_ADD_OBJECTIVE_SUBMITTED});
-  return api(schema.objective).post('/api/exercises/' + exerciseId + '/objectives', data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_ADD_OBJECTIVE_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_ADD_OBJECTIVE_ERROR});
-    throw new SubmissionError({_error: 'Failed to add objective!'})
-  })
+export const fetchObjective = (exerciseId, objectiveId) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/objectives/' + objectiveId
+  return getReferential(schema.objective, uri)(dispatch)
 }
 
 export const updateObjective = (exerciseId, objectiveId, data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_UPDATE_OBJECTIVE_SUBMITTED});
-  return api(schema.objective).put('/api/exercises/' + exerciseId + '/objectives/' + objectiveId, data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_UPDATE_OBJECTIVE_SUCCESS,
-      payload: response.data
-    });
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_UPDATE_OBJECTIVE_ERROR});
-    throw new SubmissionError({_error: 'Failed to update objective!'})
-  })
+  var uri = '/api/exercises/' + exerciseId + '/objectives/' + objectiveId
+  return putReferential(schema.objective, uri, data)(dispatch)
+}
+
+export const addObjective = (exerciseId, data) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/objectives'
+  return postReferential(schema.objective, uri, data)(dispatch)
 }
 
 export const deleteObjective = (exerciseId, objectiveId) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_DELETE_OBJECTIVE_SUBMITTED});
-  return api().delete('/api/exercises/' + exerciseId + '/objectives/' + objectiveId).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_DELETE_OBJECTIVE_SUCCESS,
-      payload: Map({
-          objectiveId: objectiveId,
-          exerciseId: exerciseId
-        }
-      )
-    })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_DELETE_OBJECTIVE_ERROR});
-    throw new SubmissionError({_error: 'Failed to delete objective!'})
-  })
+  var uri = '/api/exercises/' + exerciseId + '/objectives/' + objectiveId
+  return delReferential(uri, 'objectives', objectiveId)(dispatch)
 }

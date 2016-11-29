@@ -57,20 +57,6 @@ exercise.define({
   exercise_status: exerciseStatus
 })
 
-objective.define({
-  objective_exercise: exercise,
-  objective_subobjectives: arrayOfSubobjectives
-})
-
-subobjective.define({
-  subobjective_objective: objective
-})
-
-/*audience.define({
-  audience_users: arrayOfUsers,
-  audience_exercise: exercise
-})*/
-
 event.define({
   event_exercise: exercise,
   //event_incidents: arrayOfIncidents

@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -7,7 +8,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {updateObjective, deleteObjective} from '../../../../actions/Objective'
+import {fetchObjective, updateObjective, deleteObjective} from '../../../../actions/Objective'
 import {addSubobjective} from '../../../../actions/Subobjective'
 import ObjectiveForm from './ObjectiveForm'
 import SubobjectiveForm from './SubobjectiveForm'
@@ -42,20 +43,16 @@ class ObjectivePopover extends Component {
   }
 
   handleOpenEdit() {
-    this.setState({
-      openEdit: true
-    })
+    this.setState({openEdit: true})
     this.handlePopoverClose()
   }
 
   handleCloseEdit() {
-    this.setState({
-      openEdit: false
-    })
+    this.setState({openEdit: false})
   }
 
   onSubmitEdit(data) {
-    return this.props.updateObjective(this.props.exerciseId, this.props.objectiveId, data)
+    return this.props.updateObjective(this.props.exerciseId, this.props.objective.objective_id, data)
   }
 
   submitFormEdit() {
@@ -63,25 +60,22 @@ class ObjectivePopover extends Component {
   }
 
   handleOpenDelete() {
-    this.setState({
-      openDelete: true
-    })
+    this.setState({openDelete: true})
     this.handlePopoverClose()
   }
 
   handleCloseDelete() {
-    this.setState({
-      openDelete: false
-    })
+    this.setState({openDelete: false})
   }
 
   submitDelete() {
-    this.props.deleteObjective(this.props.exerciseId, this.props.objectiveId)
+    this.props.deleteObjective(this.props.exerciseId, this.props.objective.objective_id)
     this.handleCloseDelete()
   }
 
   handleOpenCreateSubobjective() {
     this.setState({openCreateSubobjective: true})
+    this.handlePopoverClose()
   }
 
   handleCloseCreateSubobjective() {
@@ -89,7 +83,9 @@ class ObjectivePopover extends Component {
   }
 
   onSubmitCreateSubobjective(data) {
-    return this.props.addSubobjective(this.props.exerciseId, this.props.objectiveId, data)
+    return this.props.addSubobjective(this.props.exerciseId, this.props.objective.objective_id, data).then(
+      this.props.fetchObjective(this.props.exerciseId, this.props.objective.objective_id)
+    )
   }
 
   submitFormCreateSubobjective() {
@@ -134,15 +130,7 @@ class ObjectivePopover extends Component {
       />,
     ]
 
-    let initialInformation = undefined
-    if (this.props.objective) {
-      initialInformation = {
-        objective_title: this.props.objective.get('objective_title'),
-        objective_description: this.props.objective.get('objective_description'),
-        objective_priority: this.props.objective.get('objective_priority')
-      }
-    }
-
+    let initialValues = R.pick(['objective_title', 'objective_description', 'objective_priority'], this.props.objective)
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -173,7 +161,7 @@ class ObjectivePopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <ObjectiveForm ref="objectiveForm" initialValues={initialInformation} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          <ObjectiveForm ref="objectiveForm" initialValues={initialValues} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
         <Dialog
           title="Create a new subobjective"
@@ -189,23 +177,14 @@ class ObjectivePopover extends Component {
   }
 }
 
-const select = (state, props) => {
-  let objectives = state.application.getIn(['entities', 'objectives'])
-  let objective = objectives.get(props.objectiveId)
-
-  return {
-    objective
-  }
-}
-
 ObjectivePopover.propTypes = {
   exerciseId: PropTypes.string,
-  objectiveId: PropTypes.string,
-  deleteObjective: PropTypes.func,
+  fetchObjective: PropTypes.func,
   updateObjective: PropTypes.func,
+  deleteObjective: PropTypes.func,
   addSubobjective: PropTypes.func,
   objective: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateObjective, deleteObjective, addSubobjective})(ObjectivePopover)
+export default connect(null, {fetchObjective, updateObjective, deleteObjective, addSubobjective})(ObjectivePopover)

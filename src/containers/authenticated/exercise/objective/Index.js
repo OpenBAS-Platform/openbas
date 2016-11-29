@@ -1,7 +1,5 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {fromJS} from 'immutable'
-import createImmutableSelector from '../../../../utils/ImmutableSelect'
 import R from 'ramda'
 import {List} from '../../../../components/List'
 import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem';
@@ -12,9 +10,7 @@ import SubobjectivePopover from './SubobjectivePopover'
 import CreateObjective from './CreateObjective'
 
 const styles = {
-  container: {
-
-  },
+  container: {},
   'empty': {
     marginTop: 40,
     fontSize: '18px',
@@ -28,88 +24,101 @@ const styles = {
   },
 }
 
-const filterObjectives = (objectives, exerciseId) => {
-  var filterByExercise = n => n.objective_exercise === exerciseId
-  var filteredObjectives = R.filter(filterByExercise, objectives.toJS())
-  return fromJS(filteredObjectives)
-}
-
 class IndexObjective extends Component {
   componentDidMount() {
     this.props.fetchObjectives(this.props.exerciseId);
+    this.props.fetchSubobjectives(this.props.exerciseId);
   }
 
   render() {
-    return (
-      <div style={styles.container}>
-        {this.props.objectives.count() === 0 ? <div style={styles.empty}>You do not have any objectives in this exercise.</div>:""}
+    let {exerciseId, objectives} = this.props
+    if (objectives.length > 0) {
+      return <div style={styles.container}>
         <List>
-          {this.props.objectives.toList().map(objective => {
-            let subobjectives = objective.get('objective_subobjectives').map(id => this.props.subobjectives.get(id))
-            let nestedItems = subobjectives.map(subobjective =>
-              <SecondaryListItem
-                key={subobjective.get('subobjective_id')}
-                rightIconButton={
-                  <SubobjectivePopover
-                    exerciseId={this.props.exerciseId}
-                    objectiveId={objective.get('objective_id')}
-                    subobjectiveId={subobjective.get('subobjective_id')}
-                  />
-                }
-                primaryText={
-                  <div>
-                    <span style={styles.priority}>{objective.get('objective_priority')}.{subobjective.get('subobjective_priority')}</span>
-                    {subobjective.get('subobjective_title')}
-                  </div>
-                }
-                secondaryText={subobjective.get('subobjective_description')} />
+          {objectives.map(objective => {
+            let nestedItems = objective.objective_subobjectives.map(data => {
+                console.log('data', data)
+                console.log('subobjectives', this.props.subobjectives)
+                let subobjective = R.propOr({}, data.subobjective_id, this.props.subobjectives)
+                console.log('subobjective', subobjective)
+                let subobjective_id = R.propOr(data.subobjective_id, 'subobjective_id', subobjective)
+                let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
+                let subobjective_description = R.propOr('-', 'subobjective_description', subobjective)
+                let subobjective_priority = R.propOr('-', 'subobjective_priority', subobjective)
+
+                return <SecondaryListItem
+                  key={subobjective_id}
+                  rightIconButton={<SubobjectivePopover exerciseId={exerciseId} objectiveId={objective.objective_id} subobjective={subobjective}/>}
+                  primaryText={
+                    <div>
+                      <span style={styles.priority}>{objective.objective_priority}.{subobjective_priority}</span>
+                      {subobjective_title}
+                    </div>
+                  }
+                  secondaryText={subobjective_description}/>
+              }
             )
 
             return (
               <MainListItem
-                key={objective.get('objective_id')}
-                rightIconButton={
-                  <ObjectivePopover
-                    exerciseId={this.props.exerciseId}
-                    objectiveId={objective.get('objective_id')}
-                  />
-                }
+                key={objective.objective_id}
+                rightIconButton={<ObjectivePopover exerciseId={exerciseId} objective={objective}/>}
                 primaryText={
                   <div>
-                    <span style={styles.priority}>{objective.get('objective_priority')}</span>
-                    {objective.get('objective_title')}
+                    <span style={styles.priority}>{objective.objective_priority}</span>
+                    {objective.objective_title}
                   </div>
                 }
-                secondaryText={objective.get('objective_description')}
-                nestedItems={nestedItems.toJS()}
+                secondaryText={objective.objective_description}
+                nestedItems={nestedItems}
               />
             )
           })}
         </List>
-        <CreateObjective exerciseId={this.props.exerciseId}/>
+        <CreateObjective exerciseId={exerciseId}/>
       </div>
-    );
+    } else {
+      return <div style={styles.container}>
+        <div style={styles.empty}>You do not have any objectives in this exercise.</div>
+        <CreateObjective exerciseId={exerciseId}/>
+      </div>
+    }
   }
 }
 
 IndexObjective.propTypes = {
   exerciseId: PropTypes.string,
-  objectives: PropTypes.object,
-  subobjectives: PropTypes.object,
+  objectives: PropTypes.array,
+  subobjectives: PropTypes.array,
   fetchObjectives: PropTypes.func.isRequired,
   fetchSubobjectives: PropTypes.func.isRequired,
 }
 
-const filteredObjectives = createImmutableSelector(
-  (state, exerciseId) => filterObjectives(state.application.getIn(['entities', 'objectives']), exerciseId),
-  objectives => objectives)
+const filterObjectives = (objectives, exerciseId) => {
+  let objectivesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.objective_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.objective_priority > b.objective_priority)
+  )
+  return objectivesFilterAndSorting(objectives)
+}
+
+const filterSubobjectives = (subobjectives) => {
+  console.log('JE PASSE LA !!!!!')
+  let sorted = R.sort((a, b) => { return console.log('AAAAAAAA', a, b) }, subobjectives)
+
+  return sorted
+}
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
+  let objectives = filterObjectives(state.referential.entities.objectives, exerciseId)
+  let subobjectives = filterSubobjectives(state.referential.entities.subobjectives)
+
   return {
     exerciseId,
-    objectives: filteredObjectives(state, exerciseId),
-    subobjectives: state.application.getIn(['entities', 'subobjectives'])
+    objectives,
+    subobjectives
   }
 }
 
