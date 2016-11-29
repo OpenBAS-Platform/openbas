@@ -30,29 +30,19 @@ class CreateExercise extends Component {
 
   render() {
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleClose.bind(this)}
-      />,
-      <FlatButton
-        label="Create"
-        primary={true}
-        onTouchTap={this.submitForm.bind(this)}
-      />,
-    ];
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleClose.bind(this)}/>,
+      <FlatButton label="Create" primary={true} onTouchTap={this.submitForm.bind(this)}/>,
+    ]
 
     return (
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpen.bind(this)}/>
-        <Dialog
-          title="Create a new exercise"
-          modal={false}
+        <Dialog title="Create a new exercise" modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose.bind(this)}
-          actions={actions}
-        >
-          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)} onSubmitSuccess={this.handleClose.bind(this)}/>
+          actions={actions}>
+          <ExerciseForm ref="exerciseForm" onSubmit={this.onSubmit.bind(this)}
+                        onSubmitSuccess={this.handleClose.bind(this)}/>
         </Dialog>
       </div>
     );

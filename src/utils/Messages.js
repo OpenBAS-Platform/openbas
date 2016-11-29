@@ -2,8 +2,22 @@ import {fromJS} from 'immutable'
 
 export const i18n = {
   messages: {
-    fr: {},
-    en: {}
+    fr: {
+      'TECHNICAL': 'Technique',
+      'OPERATIONAL': 'Opérationnel',
+      'STRATEGIC': 'Stratégique',
+      'SCHEDULED': 'Prévu',
+      'RUNNING': 'En cours',
+      'FINISHED': 'Terminé',
+    },
+    en: {
+      'TECHNICAL': 'Technique',
+      'OPERATIONAL': 'Opérationnel',
+      'STRATEGIC': 'Stratégique',
+      'SCHEDULED': 'Scheduled',
+      'RUNNING': 'Running',
+      'FINISHED': 'Finished',
+    }
   }
 }
 export const i18nRegister = (data) => {

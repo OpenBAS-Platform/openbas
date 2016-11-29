@@ -53,11 +53,9 @@ class FileGallery extends Component {
                 title={file.get('file_name')}
                 actionIcon={
                   <IconButton onClick={this.handleFileSelect.bind(this, file)}>
-                    <Icon color="white"
-                          name={Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN}/>
+                    <Icon color="white" name={Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN}/>
                   </IconButton>
-                }
-              >
+                }>
                 <img src={file.get('file_url')} alt="Gallery"/>
               </GridTile>
             )

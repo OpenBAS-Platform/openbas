@@ -4,6 +4,8 @@ import {redirectToExercise, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
 import {Chip} from '../../../components/Chip'
+import {T} from '../../../components/I18n'
+import R from 'ramda'
 import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
 import UserPopover from './../UserPopover'
@@ -20,12 +22,6 @@ const styles = {
   }
 }
 
-const statusesNames = {
-  SCHEDULED: 'Scheduled',
-  RUNNING: 'Running',
-  FINISHED: 'Finished'
-}
-
 class RootAuthenticated extends Component {
   componentDidMount() {
     this.props.fetchExercise(this.props.id)
@@ -40,24 +36,16 @@ class RootAuthenticated extends Component {
   }
 
   render() {
-    let title = ''
-    let status = ''
-
-    if (this.props.exercise) {
-      title = this.props.exercise.get('exercise_name')
-    }
-
-    if (this.props.exercise_statuses && this.props.exercise) {
-      status = this.props.exercise_statuses.getIn([this.props.exercise.get('exercise_status'), 'status_name'])
-    }
+    var exercise_status = R.path(['exercise', 'exercise_status'], this.props)
+    const status_name = R.pathOr('-', [exercise_status, 'status_name'], this.props.exercise_statuses)
 
     return (
       <div>
         <AppBar
           title={
             <div>
-              <span style={styles.title}>{title}</span>
-              <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}>{statusesNames[status]}</Chip>
+              <span style={styles.title}>{R.path(['exercise', 'exercise_name'], this.props)}</span>
+              <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}><T>{status_name}</T></Chip>
             </div>
           }
           type={Constants.APPBAR_TYPE_TOPBAR}
@@ -95,8 +83,8 @@ const select = (state, ownProps) => {
   return {
     id: exerciseId,
     pathname,
-    exercise: state.application.getIn(['entities', 'exercises', exerciseId]),
-    exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
+    exercise: R.prop(exerciseId, state.referential.entities.exercises),
+    exercise_statuses: state.referential.entities.exercise_statuses
   }
 }
 

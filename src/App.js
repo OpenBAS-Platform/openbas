@@ -38,7 +38,6 @@ import roundMoment from './utils/moment-round'
 injectTapEventPlugin()
 roundMoment()
 
-
 //Default application state
 const initialState = {
   application: Map({
@@ -77,6 +76,8 @@ const initialState = {
     entities: Immutable({
       users: Immutable({}),
       tokens: Immutable({}),
+      exercises: Immutable({}),
+      exercise_statuses: Immutable({}),
       audiences: Immutable({}),
       incidents: Immutable({}),
       organizations: Immutable({})
