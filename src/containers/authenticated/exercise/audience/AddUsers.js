@@ -4,12 +4,12 @@ import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {updateAudience} from '../../../../actions/Audience'
 import {fetchUsers} from '../../../../actions/User'
-import {DialogTitleElement} from '../../../../components/Dialog';
-import {Chip} from '../../../../components/Chip';
-import {Avatar} from '../../../../components/Avatar';
+import {DialogTitleElement} from '../../../../components/Dialog'
+import {Chip} from '../../../../components/Chip'
+import {Avatar} from '../../../../components/Avatar'
 import {List} from '../../../../components/List'
-import {MainSmallListItem} from '../../../../components/list/ListItem';
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
+import {MainSmallListItem} from '../../../../components/list/ListItem'
+import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button'
 import {SimpleTextField} from '../../../../components/SimpleTextField'
 import CreateUser from './CreateUser'
 

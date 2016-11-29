@@ -15,8 +15,9 @@ import theme from './components/Theme'
 import {addLocaleData, IntlProvider} from 'react-intl'
 import enLocaleData from 'react-intl/locale-data/en'
 import frLocaleData from 'react-intl/locale-data/fr'
-import getMuiTheme from 'material-ui/styles/getMuiTheme'
+import {locale} from './utils/detectBrowserLanguage'
 import {i18n} from './utils/Messages'
+import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import * as Constants from './constants/ActionTypes'
 import R from 'ramda'
 import injectTapEventPlugin from 'react-tap-event-plugin'
@@ -41,7 +42,6 @@ roundMoment()
 //Default application state
 const initialState = {
   application: Map({
-    locale: navigator.language,
     entities: Map({
       users: Map(),
       organizations: Map(),
@@ -70,7 +70,7 @@ const initialState = {
   }),
   app: Immutable({
     logged: JSON.parse(localStorage.getItem('logged')),
-    locale: navigator.language
+    locale: locale
   }),
   referential: Immutable({
     entities: Immutable({
@@ -167,7 +167,7 @@ const UserIsNotAuthenticated = UserAuthWrapper({
 addLocaleData([...enLocaleData, ...frLocaleData]);
 class App extends Component {
   render() {
-    var locale = store.getState().application.get('locale')
+    var locale = store.getState().app.locale
     return (
       <IntlProvider locale={locale} key={locale} messages={i18n.messages[locale]}>
         <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
