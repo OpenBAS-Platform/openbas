@@ -72,12 +72,18 @@ const initialState = {
     logged: JSON.parse(localStorage.getItem('logged')),
     locale: locale
   }),
+  screen: Immutable({
+    navbar_left_open: false,
+    navbar_right_open: true
+  }),
   referential: Immutable({
     entities: Immutable({
       users: Immutable({}),
       tokens: Immutable({}),
       exercises: Immutable({}),
       exercise_statuses: Immutable({}),
+      objectives: Immutable({}),
+      subobjectives: Immutable({}),
       audiences: Immutable({}),
       incidents: Immutable({}),
       organizations: Immutable({})

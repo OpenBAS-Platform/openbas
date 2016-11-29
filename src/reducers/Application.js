@@ -667,14 +667,6 @@ const application = (state = Map(), action) => {
     }
     //endregion
 
-    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
-      return state.setIn(['ui', 'navbar_left_open'], !state.getIn(['ui', 'navbar_left_open']))
-    }
-
-    case Constants.APPLICATION_NAVBAR_RIGHT_TOGGLE_SUBMITTED: {
-      return state.setIn(['ui', 'navbar_right_open'], !state.getIn(['ui', 'navbar_right_open']))
-    }
-
     default: {
       return state;
     }
