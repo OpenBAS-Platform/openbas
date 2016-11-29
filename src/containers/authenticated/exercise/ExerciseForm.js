@@ -46,24 +46,12 @@ class ExerciseForm extends Component {
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="exercise_name" fullWidth={true} type="text" label="Name"/>
         <FormField name="exercise_subtitle" fullWidth={true} type="text" label="Subtitle"/>
-        <FormField name="exercise_description"
-                   fullWidth={true}
-                   multiLine={true}
-                   rows={3}
-                   type="text"
-                   label="Description"/>
-        <FormField ref="startDate"
-                   name="exercise_start_date"
-                   fullWidth={true}
-                   type="text"
-                   label="Start date"
-                   onClick={this.raiseStartPicker.bind(this)}/>
-        <FormField ref="endDate"
-                   name="exercise_end_date"
-                   fullWidth={true}
-                   type="text"
-                   label="End date"
-                   onClick={this.raiseEndPicker.bind(this)}/>
+        <FormField name="exercise_description" fullWidth={true} multiLine={true} rows={3}
+                   type="text" label="Description"/>
+        <FormField ref="startDate" name="exercise_start_date" fullWidth={true} type="text"
+                   label="Start date" onClick={this.raiseStartPicker.bind(this)}/>
+        <FormField ref="endDate" name="exercise_end_date" fullWidth={true} type="text"
+                   label="End date" onClick={this.raiseEndPicker.bind(this)}/>
         <DateTimePicker ref="startPicker" handleResult={this.replaceStartValue.bind(this)}/>
         <DateTimePicker ref="endPicker" handleResult={this.replaceEndValue.bind(this)}/>
       </form>

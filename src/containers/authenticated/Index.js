@@ -1,14 +1,15 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
-import moment from 'moment';
+import moment from 'moment'
+import R from 'ramda'
 import {fetchExercises} from '../../actions/Exercise'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
 import CreateExercise from './exercise/CreateExercise'
 import UserPopover from './UserPopover'
-import {redirectToHome, toggleLeftBar} from '../../actions/Application'
+import {redirectToHome} from '../../actions/Application'
 
 const styles = {
   container: {
@@ -29,12 +30,9 @@ const styles = {
 }
 
 class IndexAuthenticated extends Component {
+
   componentDidMount() {
     this.props.fetchExercises();
-  }
-
-  toggleLeftBar() {
-    this.props.toggleLeftBar()
   }
 
   redirectToHome() {
@@ -53,19 +51,22 @@ class IndexAuthenticated extends Component {
           iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo}/>}
         />
         <div style={styles.container}>
-          {this.props.exercises.count() === 0 ? <div style={styles.empty}>You do not have any available exercise on this platform.</div>:""}
-          {this.props.exercises.toList().map(exercise => {
+          {this.props.exercises.length === 0 ? <div style={styles.empty}>You do not have any available exercise on this platform.</div>:""}
+          {this.props.exercises.map(exercise => {
+            const status_name = R.path([exercise.exercise_status, 'status_name'], this.props.exercise_statuses)
+            var start_date = moment(exercise.exercise_start_date).format('MMM D, YYYY')
+            var end_date = moment(exercise.exercise_end_date).format('MMM D, YYYY')
             return (
-              <Link to={'/private/exercise/' + exercise.get('exercise_id')} key={exercise.get('exercise_id')}>
+              <Link to={'/private/exercise/' + exercise.exercise_id} key={exercise.exercise_id}>
                 <Exercise
-                  name={exercise.get('exercise_name')}
-                  subtitle={exercise.get('exercise_subtitle')}
-                  description={exercise.get('exercise_description')}
-                  startDate={moment(exercise.get('exercise_start_date')).format('MMM D, YYYY')}
-                  endDate={moment(exercise.get('exercise_end_date')).format('MMM D, YYYY')}
-                  status={this.props.exercise_statuses.getIn([exercise.get('exercise_status'), 'status_name'])}
-                  organizer={exercise.get('exercise_organizer')}
-                  image={exercise.get('exercise_image').get('file_url')}
+                  name={exercise.exercise_name}
+                  subtitle={exercise.exercise_subtitle}
+                  description={exercise.exercise_description}
+                  startDate={start_date}
+                  endDate={end_date}
+                  status={status_name}
+                  organizer={exercise.exercise_organizer}
+                  image={exercise.exercise_image.file_url}
                 />
               </Link>
             )
@@ -78,9 +79,9 @@ class IndexAuthenticated extends Component {
 }
 
 IndexAuthenticated.propTypes = {
-  exercises: PropTypes.object,
-  exercise_statuses: PropTypes.object,
-  fetchExercises: PropTypes.func.isRequired,
+  exercises: PropTypes.array,
+  exercise_statuses: PropTypes.array,
+  fetchExercises: PropTypes.func,
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
@@ -88,9 +89,9 @@ IndexAuthenticated.propTypes = {
 
 const select = (state) => {
   return {
-    exercises: state.application.getIn(['entities', 'exercises']),
-    exercise_statuses: state.application.getIn(['entities', 'exercise_statuses'])
+    exercises: R.values(state.referential.entities.exercises),
+    exercise_statuses: R.values(state.referential.entities.exercise_statuses)
   }
 }
 
-export default connect(select, {redirectToHome, toggleLeftBar, fetchExercises})(IndexAuthenticated);
+export default connect(select, {redirectToHome, fetchExercises})(IndexAuthenticated);
