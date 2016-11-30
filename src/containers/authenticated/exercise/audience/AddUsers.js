@@ -75,7 +75,6 @@ class AddUsers extends Component {
   }
 
   render() {
-
     const actions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseAddUsers.bind(this)}/>,
       <FlatButton label="Add users" primary={true} onTouchTap={this.submitAddUsers.bind(this)}/>,

@@ -57,19 +57,11 @@ exercise.define({
   exercise_status: exerciseStatus
 })
 
-event.define({
-  event_exercise: exercise,
-  //event_incidents: arrayOfIncidents
-})
-
 incident.define({
-  incident_event: event,
-  //incident_injects: arrayOfInjects,
   incident_type: incidentType
 })
 
 inject.define({
-  inject_incident: incident,
-  inject_status: injectStatus,
-  inject_audiences: arrayOfAudiences
+  inject_type: injectType,
+  inject_status: injectStatus
 })

@@ -6,7 +6,7 @@ export const i18n = {
       'TECHNICAL': 'Technique',
       'OPERATIONAL': 'Opérationnel',
       'STRATEGIC': 'Stratégique',
-      'SCHEDULED': 'Prévu',
+      'SCHEDULED': 'Planifié',
       'RUNNING': 'En cours',
       'FINISHED': 'Terminé',
     },

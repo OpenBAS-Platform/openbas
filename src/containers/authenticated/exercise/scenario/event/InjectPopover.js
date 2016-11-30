@@ -14,8 +14,7 @@ import {
   Stepper,
   StepButton,
 } from '../../../../../components/Stepper';
-import {searchAudiences} from '../../../../../actions/Audience'
-import {updateInject, deleteInject} from '../../../../../actions/Inject'
+import {fetchInjectTypes, updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
@@ -26,8 +25,6 @@ const style = {
   right: 0,
 }
 
-let injectData = null
-
 class InjectPopover extends Component {
   constructor(props) {
     super(props);
@@ -35,18 +32,16 @@ class InjectPopover extends Component {
       openDelete: false,
       openEdit: false,
       openPopover: false,
-      type: this.props.type,
+      type: this.props.inject.inject_type,
       stepIndex: 0,
       finished: false,
+      injectData: null
     }
   }
 
   handlePopoverOpen(event) {
     event.preventDefault()
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    })
+    this.setState({openPopover: true, anchorEl: event.currentTarget})
   }
 
   handlePopoverClose() {
@@ -54,32 +49,28 @@ class InjectPopover extends Component {
   }
 
   handleOpenEdit() {
-    this.setState({
-      openEdit: true
-    })
+    this.setState({openEdit: true})
     this.handlePopoverClose()
   }
 
   handleCloseEdit() {
-    this.setState({
-      openEdit: false,
-      stepIndex: 0,
-      finished: false
-    })
-    injectData = null
-    this.props.searchAudiences('')
+    this.setState({openEdit: false, stepIndex: 0, finished: false, searchTerm: '', injectData: null})
   }
 
   onGlobalSubmit(data) {
-    injectData = data
+    this.setState({injectData: data})
   }
 
   onContentSubmit(data) {
+    let injectData = this.state.injectData
     injectData.inject_content = JSON.stringify(data)
+    this.setState({injectData: injectData})
   }
 
   onAudiencesChange(data) {
+    let injectData = this.state.injectData
     injectData.inject_audiences = data
+    this.setState({injectData: injectData})
   }
 
   submitFormEdit() {
@@ -93,7 +84,7 @@ class InjectPopover extends Component {
   }
 
   updateInject() {
-    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId, injectData)
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, this.props.inject.inject_id, this.state.injectData)
     this.handleCloseEdit()
   }
 
@@ -115,27 +106,20 @@ class InjectPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.injectId)
+    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, this.props.inject.inject_id)
     this.handleCloseDelete()
   }
 
   selectGlobal() {
-    this.setState({
-      stepIndex: 0
-    })
+    this.setState({stepIndex: 0})
   }
 
   selectContent() {
-    this.setState({
-      stepIndex: 1
-    })
+    this.setState({stepIndex: 1})
   }
 
   selectAudiences() {
-    this.setState({
-      stepIndex: 2,
-      finished: true
-    })
+    this.setState({stepIndex: 2, finished: true})
   }
 
   getStepContent(stepIndex, initialInformation) {
@@ -180,7 +164,7 @@ class InjectPopover extends Component {
           />
         )
       default:
-        return 'Go away!';
+        return 'Go away!'
     }
   }
 
@@ -291,16 +275,14 @@ const select = (state, props) => {
 InjectPopover.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
-  incidentId: PropTypes.string,
-  injectId: PropTypes.string,
-  type: PropTypes.string,
+  incident: PropTypes.object,
+  inject: PropTypes.object,
+  injectAudiencesIds: PropTypes.object,
+  fetchInjectTypes: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
-  searchAudiences: PropTypes.func,
-  inject: PropTypes.object,
   inject_types: PropTypes.object,
-  inject_audiences_ids: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateInject, deleteInject, searchAudiences})(InjectPopover)
+export default connect(select, {fetchInjectTypes, updateInject, deleteInject})(InjectPopover)

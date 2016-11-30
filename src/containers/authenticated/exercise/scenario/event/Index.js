@@ -1,14 +1,13 @@
 import React, {Component, PropTypes} from 'react'
 import R from 'ramda'
 import moment from 'moment';
-import {Map, fromJS} from 'immutable'
 import {connect} from 'react-redux'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
 import {MainListItem} from '../../../../../components/list/ListItem';
-import {fetchInjectsOfEvent} from '../../../../../actions/Inject'
-import {fetchInjectTypes} from '../../../../../actions/InjectType'
-import {fetchInjectStatuses} from '../../../../../actions/InjectStatuses'
+import {fetchEvents} from '../../../../../actions/Event'
+import {fetchIncidents} from '../../../../../actions/Incident'
+import {fetchInjects} from '../../../../../actions/Inject'
 import * as Constants from '../../../../../constants/ComponentTypes';
 import IncidentNav from './IncidentNav'
 import EventPopover from './EventPopover'
@@ -55,65 +54,80 @@ const styles = {
 
 class Index extends Component {
   componentDidMount() {
-    this.props.fetchInjectTypes()
-    this.props.fetchInjectStatuses()
-    this.props.fetchInjectsOfEvent(this.props.exerciseId, this.props.eventId)
+    this.props.fetchEvents(this.props.exerciseId)
+    this.props.fetchIncidents(this.props.exerciseId)
+    this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
   }
 
   render() {
-    if (this.props.incident.incident_id === undefined && this.props.event) {
-      return (
-        <div style={styles.container}>
-          <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident={this.props.incident}/>
-          <div style={styles.empty}>This event is empty.</div>
-          <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-            <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={this.props.event.get('event_title')}/>
-            <EventPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
-          </Toolbar>
-        </div>
-      )
-    }
+    let {exerciseId, eventId, event, incident, incidents} = this.props
+    let event_title = R.propOr('-', 'event_title', event)
+    if (event && incident) {
+      return <div style={styles.container}>
+        <IncidentNav selectedIncident={incident.incident_id} exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
+        <div>
+          <div style={styles.title}>{incident.incident_title}</div>
+          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}/>
+          <div style={styles.number}>{incident.incident_injects.length} injects</div>
+          <div className="clearfix"></div>
 
-    return (
-      <div style={styles.container}>
-        <IncidentNav exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident={this.props.incident}/>
-        <div style={styles.title}>{this.props.incident.incident_title}</div>
-        <IncidentPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident={this.props.incident}/>
-        <div style={styles.number}>{this.props.incident_injects.count()} injects</div>
-        <div className="clearfix"></div>
-        {this.props.incident_injects.count() === 0 ? <div style={styles.empty}>This incident is empty.</div> : ""}
-        <List>
-          {this.props.incident_injects.toList().map(inject => {
-            return (
-              <MainListItem
-                key={inject.get('inject_id')}
-                rightIconButton={
-                  <InjectPopover exerciseId={this.props.exerciseId}
-                    eventId={this.props.eventId}
-                    incidentId={this.props.incident.incident_id}
-                    injectId={inject.get('inject_id')}/>
+          {incident.incident_injects.length === 0 ?
+            <div style={styles.empty}>This incident is empty.</div> : ""
+          }
+
+          <List>
+            {incident.incident_injects.map(data => {
+              //Setup variables
+              let inject = R.propOr({}, data.inject_id, this.props.injects)
+              let injectId = R.propOr(data.inject_id, 'inject_id', inject)
+              let inject_title = R.propOr('-', 'inject_title', inject)
+              let inject_date = R.prop('inject_date', inject)
+              let inject_type = R.propOr('-', 'inject_type', inject)
+              //Return the dom
+              return <MainListItem
+                key={injectId}
+                rightIconButton={<InjectPopover exerciseId={exerciseId}
+                                                eventId={eventId}
+                                                incident={incident}
+                                                inject={inject}
+                                                injectAudiencesIds={inject.inject_audiences.map(a => a.audience_id)}/>
                 }
                 primaryText={
                   <div>
-                    <div style={styles.inject_title}>{inject.get('inject_title')}</div>
-                    <div style={styles.inject_date}>{moment(inject.get('inject_date')).format('MMM D, YYYY HH:mm:ss')}</div>
-                    <div style={styles.inject_type}>{inject.get('inject_type')}</div>
+                    <div style={styles.inject_title}>{inject_title}</div>
+                    <div style={styles.inject_date}>{moment(inject_date).format('MMM D, YYYY HH:mm:ss')}</div>
+                    <div style={styles.inject_type}>{inject_type}</div>
                     <div className="clearfix"></div>
                   </div>
                 }
               />
-            )
-          })}
-        </List>
-        <CreateInject exerciseId={this.props.exerciseId} eventId={this.props.eventId}
-                      incidentId={this.props.incident.incident_id}/>
+            })}
+          </List>
+          <CreateInject exerciseId={exerciseId} eventId={eventId} incidentId={incident.incident_id}/>
+          <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
+            <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
+            <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
+          </Toolbar>
+        </div>
+      </div>
+    } else if( event ) {
+      return <div style={styles.container}>
+        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
+        <div style={styles.empty}>This event is empty.</div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT}
-                        text={this.props.event ? this.props.event.get('event_title') : ""}/>
-          <EventPopover exerciseId={this.props.exerciseId} eventId={this.props.eventId}/>
+          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
+          <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
         </Toolbar>
       </div>
-    );
+    } else {
+      return <div style={styles.container}>
+        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
+        <div style={styles.empty}>No event loaded.</div>
+        <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
+          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
+        </Toolbar>
+      </div>
+    }
   }
 }
 
@@ -121,42 +135,42 @@ Index.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
   event: PropTypes.object,
-  incidentId: PropTypes.string,
   incident: PropTypes.object,
-  incident_injects: PropTypes.object,
+  incidents: PropTypes.array,
   injects: PropTypes.object,
-  fetchInjectTypes: PropTypes.func,
-  fetchInjectStatuses: PropTypes.func,
-  fetchInjectsOfEvent: PropTypes.func,
+  fetchEvents: PropTypes.func,
+  fetchIncidents: PropTypes.func,
+  fetchInjects: PropTypes.func,
 }
 
-const filterInjects = (injects, incidentId) => {
-  var filterByIncident = n => n.inject_incident === incidentId
-  var filteredInjects = R.filter(filterByIncident, injects.toJS())
-  return fromJS(filteredInjects)
+const filterIncidents = (incidents, eventId) => {
+  let incidentsFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.incident_event.event_id === eventId),
+    R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
+  )
+  return incidentsFilterAndSorting(incidents)
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let eventId = ownProps.params.eventId
+  let event = R.prop(eventId, state.referential.entities.events)
+  let incidents = filterIncidents(state.referential.entities.incidents, eventId)
   //region get default incident
-  let incidents = R.values(state.referential.entities.incidents)
-  let stateCurrentIncident = R.path(['exercise', exerciseId, 'event', eventId,  'current_incident'], state.screen)
+  let stateCurrentIncident = R.path(['exercise', exerciseId, 'event', eventId, 'current_incident'], state.screen)
   let incidentId = stateCurrentIncident === undefined && incidents.length > 0 ? R.head(incidents).incident_id : stateCurrentIncident //Force a default incident if needed
-  let incident = incidentId ? R.find(a => a.incident_id === incidentId)(incidents) : {}
+  let incident = incidentId ? R.find(a => a.incident_id === incidentId)(incidents) : undefined
   //endregion
-  let event = state.application.getIn(['entities', 'events', eventId])
-  let incidentInjects = incident ? filterInjects(state.application.getIn(['entities', 'injects']), incident.incident_id) : Map()
 
   return {
     exerciseId,
     eventId,
     event,
     incident,
-    inject_types: state.application.getIn(['entities', 'inject_types']),
-    injects: state.application.getIn(['entities', 'injects']),
-    incident_injects: incidentInjects
+    incidents,
+    injects: state.referential.entities.injects,
   }
 }
 
-export default connect(select, {fetchInjectTypes, fetchInjectStatuses, fetchInjectsOfEvent})(Index);
+export default connect(select, {fetchEvents, fetchIncidents, fetchInjects})(Index);

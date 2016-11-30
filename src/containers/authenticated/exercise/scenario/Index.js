@@ -1,8 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
-import {fromJS} from 'immutable'
-import createImmutableSelector from '../../../../utils/ImmutableSelect'
 import R from 'ramda'
 import {fetchEvents} from '../../../../actions/Event'
 import {Event} from '../../../../components/Event'
@@ -20,12 +18,6 @@ const styles = {
   },
 }
 
-const filterEvents = (events, exerciseId) => {
-  var filterByExercise = n => n.event_exercise === exerciseId
-  var filteredEvents = R.filter(filterByExercise, events.toJS())
-  return fromJS(filteredEvents)
-}
-
 class IndexScenario extends Component {
   componentDidMount() {
     this.props.fetchEvents(this.props.exerciseId);
@@ -34,19 +26,15 @@ class IndexScenario extends Component {
   render() {
     return (
       <div style={styles.container}>
-        {this.props.events.count() === 0 ? <div style={styles.empty}>You do not have any available events in this exercise.</div>:""}
-        {this.props.events.toList().map(event => {
+        {this.props.events.length === 0 ?<div style={styles.empty}>You do not have any available events in this exercise.</div> : ""}
+        {this.props.events.map(event => {
           return (
-            <Link to={'/private/exercise/' + this.props.exerciseId + '/scenario/' + event.get('event_id')} key={event.get('event_id')}>
-              <Event
-                title={event.get('event_title')}
-                description={event.get('event_description')}
-                image={event.get('event_image').get('file_url')}
-              />
+            <Link to={'/private/exercise/' + this.props.exerciseId + '/scenario/' + event.event_id} key={event.event_id}>
+              <Event title={event.event_title} description={event.event_description} image={event.event_image.file_url} />
             </Link>
           )
         })}
-        <CreateEvent exerciseId={this.props.exerciseId} />
+        <CreateEvent exerciseId={this.props.exerciseId}/>
       </div>
     );
   }
@@ -54,19 +42,26 @@ class IndexScenario extends Component {
 
 IndexScenario.propTypes = {
   exerciseId: PropTypes.string,
-  events: PropTypes.object,
+  events: PropTypes.array,
   fetchEvents: PropTypes.func.isRequired,
 }
 
-const filteredEvents = createImmutableSelector(
-  (state, exerciseId) => filterEvents(state.application.getIn(['entities', 'events']), exerciseId),
-  events => events)
+const filteredEvents = (events, exerciseId) => {
+  let eventsFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.event_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.event_title.localeCompare(b.event_title))
+  )
+  return eventsFilterAndSorting(events)
+}
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
+  let events = filteredEvents(state.referential.entities.events, exerciseId)
+
   return {
     exerciseId,
-    events: filteredEvents(state, exerciseId)
+    events
   }
 }
 

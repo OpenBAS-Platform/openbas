@@ -16,9 +16,8 @@ export const getReferential = (schema, uri) => (dispatch) => {
 export const putReferential = (schema, uri, data) => (dispatch) => {
   dispatch({type: Constants.DATA_FETCH_SUBMITTED});
   return api(schema).put(uri, data).then(function (response) {
-    var payload = Immutable(response.data.toJS())
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
-    return payload
+    return response.data
   }).catch(function () {
     dispatch({type: Constants.DATA_FETCH_ERROR});
     throw new SubmissionError({_error: 'Failed to update from ' + uri})
@@ -28,9 +27,8 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
 export const postReferential = (schema, uri, data) => (dispatch) => {
   dispatch({type: Constants.DATA_FETCH_SUBMITTED});
   return api(schema).post(uri, data).then(function (response) {
-    var payload = Immutable(response.data.toJS())
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
-    return payload
+    return response.data
   }).catch(function () {
     dispatch({type: Constants.DATA_FETCH_ERROR});
     throw new SubmissionError({_error: 'Failed to add from ' + uri})

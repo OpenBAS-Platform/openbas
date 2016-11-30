@@ -29,7 +29,7 @@ i18nRegister({
     'End date': 'Date de fin',
     'State': 'Etat',
     'Status': 'Choisir un état',
-    'Subtitle': 'Sous titre'
+    'Subtitle': 'Sous-titre'
   }
 })
 

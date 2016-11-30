@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
 import {Menu} from '../../../../../components/Menu'
@@ -87,7 +88,7 @@ class EventPopover extends Component {
         primary={true}
         onTouchTap={this.submitFormEdit.bind(this)}
       />,
-    ];
+    ]
     const deleteActions = [
       <FlatButton
         label="Cancel"
@@ -99,16 +100,9 @@ class EventPopover extends Component {
         primary={true}
         onTouchTap={this.submitDelete.bind(this)}
       />,
-    ];
+    ]
 
-    let initialInformation = undefined
-    if (this.props.event) {
-      initialInformation = {
-        event_title: this.props.event.get('event_title'),
-        event_description: this.props.event.get('event_description'),
-      }
-    }
-
+    let initialValues = R.pick(['event_title', 'event_description'], this.props.event) //Pickup only needed fields
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -140,7 +134,7 @@ class EventPopover extends Component {
         >
           <EventForm
             ref="eventForm"
-            initialValues={initialInformation}
+            initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
@@ -150,22 +144,13 @@ class EventPopover extends Component {
   }
 }
 
-const select = (state, props) => {
-  let events = state.application.getIn(['entities', 'events'])
-  let event = events.get(props.eventId)
-
-  return {
-    event
-  }
-}
-
 EventPopover.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
+  event: PropTypes.object,
   deleteEvent: PropTypes.func,
   updateEvent: PropTypes.func,
-  event: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateEvent, deleteEvent})(EventPopover)
+export default connect(null, {updateEvent, deleteEvent})(EventPopover)

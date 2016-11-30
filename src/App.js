@@ -7,7 +7,6 @@ import {Provider} from 'react-redux'
 import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
-import {Map, fromJS} from 'immutable'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
@@ -41,33 +40,6 @@ roundMoment()
 
 //Default application state
 const initialState = {
-  application: Map({
-    entities: Map({
-      users: Map(),
-      organizations: Map(),
-      files: Map(),
-      exercise_statuses: Map(),
-      incident_types: Map(),
-      inject_types: Map(),
-      inject_statuses: Map(),
-      exercises: Map(),
-      objectives: Map(),
-      subobjectives: Map(),
-      audiences: Map(),
-      events: Map(),
-      incidents: Map(),
-      injects: Map()
-    }),
-    ui: Map({
-      navbar_left_open: false,
-      navbar_right_open: true,
-      loading: false,
-      states: Map({
-        current_search_keyword: '',
-        lastId: null
-      })
-    })
-  }),
   app: Immutable({
     logged: JSON.parse(localStorage.getItem('logged')),
     locale: locale
@@ -78,18 +50,23 @@ const initialState = {
   }),
   referential: Immutable({
     entities: Immutable({
+      files: Immutable({}),
       users: Immutable({}),
+      organizations: Immutable({}),
       tokens: Immutable({}),
       exercises: Immutable({}),
       exercise_statuses: Immutable({}),
       objectives: Immutable({}),
       subobjectives: Immutable({}),
       audiences: Immutable({}),
+      events:Immutable({}),
       incidents: Immutable({}),
-      organizations: Immutable({})
+      injects: Immutable({}),
+      inject_types: Immutable({}),
+      inject_statuses: Immutable({})
     })
   })
-};
+}
 
 //Console patch in dev temporary disable react intl failure
 if (process.env.NODE_ENV === 'development') {
@@ -123,7 +100,7 @@ export const api = (schema) => {
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     console.log("API response", response.data)
-    response.data = fromJS(schema ? normalize(response.data, schema) : response.data)
+    response.data = Immutable(schema ? normalize(response.data, schema) : response.data)
     return response
   }, function (err) {
     console.error("API error", err)
@@ -204,4 +181,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default App

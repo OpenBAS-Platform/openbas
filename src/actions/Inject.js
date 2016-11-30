@@ -1,73 +1,30 @@
-import * as Constants from '../constants/ActionTypes';
-import {SubmissionError} from 'redux-form'
-import {api} from '../App';
 import * as schema from './Schema'
+import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
 
-export const fetchInjects = (exerciseId, eventId, incidentId) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_FETCH_INJECTS_SUBMITTED});
-  return api(schema.arrayOfInjects).get('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects').then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_INJECTS_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_INJECTS_ERROR,
-      payload: response.data
-    })
-  })
-}
-
-export const fetchInjectsOfEvent = (exerciseId, eventId) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_FETCH_INJECTS_SUBMITTED});
-  return api(schema.arrayOfInjects).get('/api/exercises/' + exerciseId + '/events/' + eventId + '/injects').then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_INJECTS_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_FETCH_INJECTS_ERROR,
-      payload: response.data
-    })
-  })
-}
-
-export const addInject = (exerciseId, eventId, incidentId, data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_ADD_INJECT_SUBMITTED});
-  return api(schema.inject).post('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects', data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_ADD_INJECT_SUCCESS,
-      payload: response.data
-    })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_ADD_INJECT_ERROR})
-    throw new SubmissionError({_error: 'Failed to add inject!'})
-  })
+export const fetchInjects = (exerciseId, eventId) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/injects'
+  return getReferential(schema.arrayOfInjects, uri)(dispatch)
 }
 
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_UPDATE_INJECT_SUBMITTED});
-  return api(schema.inject).put('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId, data).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_UPDATE_INJECT_SUCCESS,
-      payload: response.data
-    });
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_UPDATE_INJECT_ERROR});
-    throw new SubmissionError({_error: 'Failed to update inject!'})
-  })
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects' + injectId
+  return putReferential(schema.inject, uri, data)(dispatch)
+}
+
+export const addInject = (exerciseId, eventId, incidentId, data) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects'
+  return postReferential(schema.inject, uri, data)(dispatch)
 }
 
 export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_DELETE_INJECT_SUBMITTED});
-  return api().delete('/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId).then(function (response) {
-    dispatch({
-      type: Constants.APPLICATION_DELETE_INJECT_SUCCESS,
-      payload: injectId
-    })
-  }).catch(function () {
-    dispatch({type: Constants.APPLICATION_DELETE_INJECT_ERROR});
-    throw new SubmissionError({_error: 'Failed to delete inject!'})
-  })
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId
+  return delReferential(uri, 'injects', injectId)(dispatch)
+}
+
+export const fetchInjectTypes = () => (dispatch) => {
+  return getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch)
+}
+
+export const fetchInjectStatuses = () => (dispatch) => {
+  return getReferential(schema.arrayOfInjectStatuses, '/api/inject_statuses')(dispatch)
 }
