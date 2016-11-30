@@ -58,6 +58,10 @@ exercises_objectives:
     type:     rest
     resource: APIBundle\Controller\Exercise\ObjectiveController
 
+exercises_subobjectives:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\SubobjectiveController
+
 exercises_objectives_subobjectives:
     type:     rest
     resource: APIBundle\Controller\Exercise\Objective\SubobjectiveController
