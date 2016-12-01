@@ -24,7 +24,7 @@ class InjectTypeController extends Controller
     {
         $url = $this->getParameter('worker_url') . '/cxf/contracts';
         $contracts = json_decode(file_get_contents($url), true);
-        $output = json_encode($contracts['contracts']);
+        $output = json_encode($contracts);
         return new Response($output);
     }
 }
