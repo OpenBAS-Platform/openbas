@@ -7,7 +7,7 @@ export const fetchInjects = (exerciseId, eventId) => (dispatch) => {
 }
 
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects' + injectId
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId
   return putReferential(schema.inject, uri, data)(dispatch)
 }
 

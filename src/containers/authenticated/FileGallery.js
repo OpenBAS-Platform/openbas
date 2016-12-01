@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import R from 'ramda'
 import * as Constants from '../../constants/ComponentTypes'
 import {fetchFiles, addFile} from '../../actions/File'
 import {IconButton} from '../../components/Button'
@@ -46,17 +47,17 @@ class FileGallery extends Component {
     return (
       <div style={styles.root}>
         <GridList cellHeight={180} padding={20} type={Constants.GRIDLIST_TYPE_GALLERY}>
-          {this.props.files.toList().map(file => {
+          {R.values(this.props.files).map(file => {
             return (
               <GridTile
-                key={file.get('file_id')}
-                title={file.get('file_name')}
+                key={file.file_id}
+                title={file.file_name}
                 actionIcon={
                   <IconButton onClick={this.handleFileSelect.bind(this, file)}>
                     <Icon color="white" name={Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN}/>
                   </IconButton>
                 }>
-                <img src={file.get('file_url')} alt="Gallery"/>
+                <img src={file.file_url} alt="Gallery"/>
               </GridTile>
             )
           })}
@@ -77,7 +78,7 @@ FileGallery.propTypes = {
 
 const select = (state) => {
   return {
-    files: state.application.getIn(['entities', 'files']),
+    files: state.referential.entities.files
   }
 }
 

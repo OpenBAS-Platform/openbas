@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
+import {fetchIncident} from '../../../../../actions/Incident'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
 import {DialogTitleElement} from '../../../../../components/Dialog';
 import {
@@ -32,7 +33,7 @@ class CreateInject extends Component {
   }
 
   handleClose() {
-    this.setState({open: false, stepIndex: 0, finished: false, searchTerm: '', type: null, injectData: null})
+    this.setState({open: false, stepIndex: 0, finished: false, type: null, injectData: null})
   }
 
   onGlobalSubmit(data) {
@@ -62,7 +63,9 @@ class CreateInject extends Component {
   }
 
   createInject() {
-    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.state.injectData)
+    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.state.injectData).then(() => {
+      this.props.fetchIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
+    })
     this.handleClose()
   }
 
@@ -115,6 +118,8 @@ class CreateInject extends Component {
             incidentId={this.props.incidentId}
             onChange={this.onAudiencesChange.bind(this)}
             injectId={this.props.lastId}
+            audiences={this.props.audiences}
+            injectAudiencesIds={[]}
           />
         )
       default:
@@ -138,7 +143,8 @@ class CreateInject extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING} onClick={this.handleOpen.bind(this)}/>
+        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
+                                     onClick={this.handleOpen.bind(this)}/>
         <DialogTitleElement
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
@@ -173,13 +179,15 @@ class CreateInject extends Component {
 
 CreateInject.propTypes = {
   exerciseId: PropTypes.string,
+  audiences: PropTypes.array,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
   lastId: PropTypes.string,
   inject_types: PropTypes.object,
+  fetchIncident: PropTypes.func,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
 }
 
-export default connect(null, {addInject, updateInject, deleteInject})(CreateInject);
+export default connect(null, {fetchIncident, addInject, updateInject, deleteInject})(CreateInject);

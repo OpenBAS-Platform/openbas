@@ -88,7 +88,7 @@ class Index extends Component {
   }
 
   handleImageSelection(file) {
-    let data = {"exercise_image": file.get('file_id')}
+    let data = {"exercise_image": file.file_id}
     this.props.updateExercise(this.props.id, data)
     this.handleCloseGallery()
   }

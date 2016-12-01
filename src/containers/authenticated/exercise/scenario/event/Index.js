@@ -72,7 +72,8 @@ class Index extends Component {
                      incidents={incidents} incident_types={this.props.incident_types}/>
         <div>
           <div style={styles.title}>{incident.incident_title}</div>
-          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident} incident_types={this.props.incident_types}/>
+          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}
+                           incident_types={this.props.incident_types}/>
           <div style={styles.number}>{incident.incident_injects.length} injects</div>
           <div className="clearfix"></div>
 
@@ -114,7 +115,8 @@ class Index extends Component {
               />
             })}
           </List>
-          <CreateInject exerciseId={exerciseId} eventId={eventId} incidentId={incident.incident_id} inject_types={this.props.inject_types}/>
+          <CreateInject exerciseId={exerciseId} eventId={eventId} incidentId={incident.incident_id}
+                        inject_types={this.props.inject_types} audiences={this.props.audiences}/>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
             <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
@@ -203,4 +205,11 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {fetchAudiences, fetchEvents, fetchIncidentTypes, fetchIncidents, fetchInjectTypes, fetchInjects})(Index);
+export default connect(select, {
+  fetchAudiences,
+  fetchEvents,
+  fetchIncidentTypes,
+  fetchIncidents,
+  fetchInjectTypes,
+  fetchInjects
+})(Index);

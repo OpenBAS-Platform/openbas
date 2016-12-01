@@ -14,6 +14,7 @@ import {
   Stepper,
   StepButton,
 } from '../../../../../components/Stepper';
+import {fetchIncident} from '../../../../../actions/Incident'
 import {fetchInjectTypes, updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
@@ -54,7 +55,7 @@ class InjectPopover extends Component {
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false, stepIndex: 0, finished: false, searchTerm: '', injectData: null})
+    this.setState({openEdit: false, stepIndex: 0, finished: false, injectData: null})
   }
 
   onGlobalSubmit(data) {
@@ -104,7 +105,9 @@ class InjectPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id)
+    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id).then(() => {
+      this.props.fetchIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
+    })
     this.handleCloseDelete()
   }
 
@@ -156,6 +159,7 @@ class InjectPopover extends Component {
             onChange={this.onAudiencesChange.bind(this)}
             injectId={this.props.inject.inject_id}
             injectAudiencesIds={this.props.injectAudiencesIds}
+            audiences={this.props.audiences}
           />
         )
       default:
@@ -252,10 +256,11 @@ InjectPopover.propTypes = {
   incidentId: PropTypes.string,
   inject: PropTypes.object,
   injectAudiencesIds: PropTypes.array,
+  fetchIncident: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(null, {fetchInjectTypes, updateInject, deleteInject})(InjectPopover)
+export default connect(null, {fetchIncident, fetchInjectTypes, updateInject, deleteInject})(InjectPopover)

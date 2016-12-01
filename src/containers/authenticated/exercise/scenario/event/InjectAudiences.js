@@ -21,34 +21,26 @@ const styles = {
 class InjectAudiences extends Component {
   constructor(props) {
     super(props);
-    this.state = {searchTerm: '', audiences: []}
+    this.state = {searchTerm: '', audiencesIds: []}
   }
 
   componentDidMount() {
-    this.setState({audiences: this.props.injectAudiencesIds})
+    this.setState({audiencesIds: this.props.injectAudiencesIds, searchTerm: ''})
   }
 
   handleSearchAudiences(event, value) {
     this.setState({searchTerm: value})
   }
 
-  addAudience(audience) {
-    this.setState({audiences: R.append(audience, this.state.audiences)})
-
-    let audiencesIds = this.state.audiences_ids.push(audienceId)
-    if (this.state.audiences_ids.keyOf(audienceId) === undefined) {
-      this.setState({
-        audiences_ids: audiencesIds
-      })
-    }
+  addAudience(audienceId) {
+    let audiencesIds = R.append(audienceId, this.state.audiencesIds)
+    this.setState({audiencesIds: audiencesIds})
     this.submitAudiences(audiencesIds)
   }
 
   removeAudience(audienceId) {
-    let audiencesIds = this.state.audiences_ids.delete(this.state.audiences_ids.keyOf(audienceId))
-    this.setState({
-      audiences_ids: audiencesIds
-    })
+    let audiencesIds = R.filter(a => a !== audienceId, this.state.audiencesIds)
+    this.setState({audiencesIds: audiencesIds})
     this.submitAudiences(audiencesIds)
   }
 
@@ -57,56 +49,44 @@ class InjectAudiences extends Component {
   }
 
   render() {
-
     //region filter audience by active keyword
     const keyword = this.state.searchTerm
     let filterByKeyword = n => keyword === '' ||
     n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
     n.audience_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    let filteredAudiences = R.filter(filterByKeyword, R.values(this.props.audiences))
+    let filteredAudiences = R.filter(filterByKeyword, this.props.audiences)
     //endregion
 
     return (
       <div>
         <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience" onChange={this.handleSearchAudiences.bind(this)}/>
         <div style={styles.list}>
-          {this.state.audiences_ids.toList().map(audienceId => {
-            let audience = this.props.allAudiences.get(audienceId)
-            if( audience ) {
-              return (
-                <Chip
-                  key={audience.get('audience_id')}
-                  onRequestDelete={this.removeAudience.bind(this, audience.get('audience_id'))}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
-                  <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
-                          type={Constants.AVATAR_TYPE_CHIP}/>
-                  {audience.get('audience_name')}
-                </Chip>
-              )
-            } else {
-              return (<div></div>)
-            }
+          {this.state.audiencesIds.map(audienceId => {
+            let audience = R.find(a => a.audience_id === audienceId)(this.props.audiences)
+            let audience_name = R.propOr('-', 'audience_name', audience)
+            return (
+              <Chip key={audienceId} onRequestDelete={this.removeAudience.bind(this, audienceId)} type={Constants.CHIP_TYPE_LIST}>
+                <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
+                        type={Constants.AVATAR_TYPE_CHIP}/>
+                {audience_name}
+              </Chip>
+            )
           })}
           <div className="clearfix"></div>
         </div>
         <div style={styles.search}>
-          {this.props.audiences.count() === 0 ? <div style={styles.empty}>No audience found.</div> : ""}
+          {this.props.audiences.length === 0 ? <div style={styles.empty}>No audience found.</div> : ""}
           <List>
-            {this.props.audiences.toList().map(audience => {
-              let disabled = false
-              if (this.state.audiences_ids.keyOf(audience.get('audience_id')) !== undefined ) {
-                disabled = true
-              }
-
+            {filteredAudiences.map(audience => {
+              let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined
               return (
                 <MainSmallListItem
-                  key={audience.get('audience_id')}
+                  key={audience.audience_id}
                   disabled={disabled}
-                  onClick={this.addAudience.bind(this, audience.get('audience_id'))}
+                  onClick={this.addAudience.bind(this, audience.audience_id)}
                   primaryText={
                     <div>
-                      <div style={styles.name}>{audience.get('audience_name')}</div>
+                      <div style={styles.name}>{audience.audience_name}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
@@ -117,7 +97,7 @@ class InjectAudiences extends Component {
           </List>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -129,8 +109,8 @@ InjectAudiences.propTypes = {
   fetchAudiences: PropTypes.func,
   searchAudiences: PropTypes.func,
   onChange: PropTypes.func,
-  injectAudiencesIds: PropTypes.object,
-  audiences: PropTypes.object,
+  injectAudiencesIds: PropTypes.array,
+  audiences: PropTypes.array,
 }
 
 export default InjectAudiences

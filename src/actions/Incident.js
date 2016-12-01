@@ -7,6 +7,11 @@ export const fetchIncidents = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfIncidents, uri)(dispatch)
 }
 
+export const fetchIncident = (exerciseId, eventId, incidentId) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId
+  return getReferential(schema.incident, uri)(dispatch)
+}
+
 export const updateIncident = (exerciseId, eventId, incidentId, data) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId
   return putReferential(schema.incident, uri, data)(dispatch)

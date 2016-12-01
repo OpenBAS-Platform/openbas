@@ -84,9 +84,8 @@ class ObjectivePopover extends Component {
 
   onSubmitCreateSubobjective(data) {
     return this.props.addSubobjective(this.props.exerciseId, this.props.objective.objective_id, data).then(() => {
-        this.props.fetchObjective(this.props.exerciseId, this.props.objective.objective_id)
-      }
-    )
+      this.props.fetchObjective(this.props.exerciseId, this.props.objective.objective_id)
+    })
   }
 
   submitFormCreateSubobjective() {
@@ -162,7 +161,8 @@ class ObjectivePopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <ObjectiveForm ref="objectiveForm" initialValues={initialValues} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          <ObjectiveForm ref="objectiveForm" initialValues={initialValues} onSubmit={this.onSubmitEdit.bind(this)}
+                         onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
         <Dialog
           title="Create a new subobjective"
@@ -171,7 +171,8 @@ class ObjectivePopover extends Component {
           onRequestClose={this.handleCloseCreateSubobjective.bind(this)}
           actions={createSubobjectiveActions}
         >
-          <SubobjectiveForm ref="subobjectiveForm" onSubmit={this.onSubmitCreateSubobjective.bind(this)} onSubmitSuccess={this.handleCloseCreateSubobjective.bind(this)}/>
+          <SubobjectiveForm ref="subobjectiveForm" onSubmit={this.onSubmitCreateSubobjective.bind(this)}
+                            onSubmitSuccess={this.handleCloseCreateSubobjective.bind(this)}/>
         </Dialog>
       </div>
     )
