@@ -33,17 +33,17 @@ class InjectContentForm extends Component {
   render() {
     if (this.state.currentType === null) {
       return (<div>
-        Please select an inject type
+        No content available on this inject type.
       </div>)
     }
 
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.types.get(this.state.currentType).get('fields').toList().map(field => {
-          if (field.get('type') === "text") {
-            return ( <FormField key={field.get('name')} name={field.get('name')} fullWidth={true} type="text" label={field.get('name')}/> )
+        {this.props.types[this.state.currentType].fields.map(field => {
+          if (field.type === "text") {
+            return ( <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/> )
           } else {
-            return ( <FormField key={field.get('name')} name={field.get('name')} fullWidth={true} type="text" label={field.get('name')}/> )
+            return ( <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/> )
           }
         })}
       </form>

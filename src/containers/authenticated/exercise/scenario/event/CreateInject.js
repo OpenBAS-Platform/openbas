@@ -1,9 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Map} from 'immutable'
+import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
-import {searchAudiences} from '../../../../../actions/Audience'
 import {DialogTitleElement} from '../../../../../components/Dialog';
 import {
   Step,
@@ -16,8 +15,6 @@ import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
 
-let injectData = null
-
 class CreateInject extends Component {
   constructor(props) {
     super(props);
@@ -26,6 +23,7 @@ class CreateInject extends Component {
       type: null,
       stepIndex: 0,
       finished: false,
+      injectData: null
     }
   }
 
@@ -34,20 +32,23 @@ class CreateInject extends Component {
   }
 
   handleClose() {
-    this.setState({stepIndex: 0, finished: false, open: false})
-    this.props.searchAudiences('')
+    this.setState({open: false, stepIndex: 0, finished: false, searchTerm: '', injectData: null})
   }
 
   onGlobalSubmit(data) {
-    injectData = data
+    this.setState({injectData: data})
   }
 
   onContentSubmit(data) {
+    let injectData = this.state.injectData
     injectData.inject_content = JSON.stringify(data)
+    this.setState({injectData: injectData})
   }
 
   onAudiencesChange(data) {
+    let injectData = this.state.injectData
     injectData.inject_audiences = data
+    this.setState({injectData: injectData})
   }
 
   handleNext() {
@@ -61,31 +62,25 @@ class CreateInject extends Component {
   }
 
   createInject() {
-    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, injectData)
+    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.state.injectData)
     this.handleClose()
   }
 
   changeType(event, index, value) {
+    console.log('TYPE', value)
     this.setState({type: value})
   }
 
   selectGlobal() {
-    this.setState({
-      stepIndex: 0
-    })
+    this.setState({stepIndex: 0})
   }
 
   selectContent() {
-    this.setState({
-      stepIndex: 1
-    })
+    this.setState({stepIndex: 1})
   }
 
   selectAudiences() {
-    this.setState({
-      stepIndex: 2,
-      finished: true
-    })
+    this.setState({stepIndex: 2, finished: true})
   }
 
   getStepContent(stepIndex) {
@@ -97,10 +92,9 @@ class CreateInject extends Component {
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
             changeType={this.changeType.bind(this)}
-            types={this.props.inject_types.toList().map(type => {
+            types={R.values(this.props.inject_types).map(type => {
               return (
-                <MenuItemLink key={type.get('type')} value={type.get('type')}
-                              label={type.get('type')}/>
+                <MenuItemLink key={type.type} value={type.type} label={type.type}/>
               )
             })}/>
         )
@@ -122,11 +116,10 @@ class CreateInject extends Component {
             incidentId={this.props.incidentId}
             onChange={this.onAudiencesChange.bind(this)}
             injectId={this.props.lastId}
-            injectAudiencesIds={this.props.inject_audiences_ids}
           />
         )
       default:
-        return 'Go away!';
+        return 'Go away!'
     }
   }
 
@@ -146,8 +139,7 @@ class CreateInject extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
-                                     onClick={this.handleOpen.bind(this)}/>
+        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING} onClick={this.handleOpen.bind(this)}/>
         <DialogTitleElement
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
@@ -186,24 +178,9 @@ CreateInject.propTypes = {
   incidentId: PropTypes.string,
   lastId: PropTypes.string,
   inject_types: PropTypes.object,
-  inject_audiences_ids: PropTypes.object,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
-  searchAudiences: PropTypes.func
 }
 
-const select = (state) => {
-  let lastId = state.application.getIn(['ui', 'states', 'lastId'])
-  let injects = state.application.getIn(['entities', 'injects'])
-  let injectAudiences = lastId ? injects.get(lastId).get('inject_audiences') : Map()
-  let injectAudiencesIds = injectAudiences.toList()
-
-  return {
-    lastId,
-    inject_types: state.application.getIn(['entities', 'inject_types']),
-    inject_audiences_ids: injectAudiencesIds
-  }
-}
-
-export default connect(select, {addInject, updateInject, deleteInject, searchAudiences})(CreateInject);
+export default connect(null, {addInject, updateInject, deleteInject})(CreateInject);

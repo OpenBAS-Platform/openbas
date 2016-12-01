@@ -26,7 +26,6 @@ const validate = values => {
 }
 
 class IncidentForm extends Component {
-
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>

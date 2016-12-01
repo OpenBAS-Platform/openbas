@@ -28,10 +28,7 @@ class IncidentPopover extends Component {
 
   handlePopoverOpen(event) {
     event.preventDefault()
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    })
+    this.setState({openPopover: true, anchorEl: event.currentTarget})
   }
 
   handlePopoverClose() {
@@ -39,16 +36,12 @@ class IncidentPopover extends Component {
   }
 
   handleOpenEdit() {
-    this.setState({
-      openEdit: true
-    })
+    this.setState({openEdit: true})
     this.handlePopoverClose()
   }
 
   handleCloseEdit() {
-    this.setState({
-      openEdit: false
-    })
+    this.setState({openEdit: false})
   }
 
   onSubmitEdit(data) {
@@ -60,16 +53,12 @@ class IncidentPopover extends Component {
   }
 
   handleOpenDelete() {
-    this.setState({
-      openDelete: true
-    })
+    this.setState({openDelete: true})
     this.handlePopoverClose()
   }
 
   handleCloseDelete() {
-    this.setState({
-      openDelete: false
-    })
+    this.setState({openDelete: false})
   }
 
   submitDelete() {
@@ -81,12 +70,13 @@ class IncidentPopover extends Component {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
-    ];
+    ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
-    ];
+    ]
 
+    let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type'], this.props.incident)
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -105,7 +95,7 @@ class IncidentPopover extends Component {
         <Dialog title="Update the incident" modal={false} open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)} actions={editActions}>
           <IncidentForm ref="incidentForm"
-                        initialValues={R.pick(['incident_title', 'incident_story', 'incident_type'], this.props.incident)}
+                        initialValues={initialValues}
                         onSubmit={this.onSubmitEdit.bind(this)}
                         onSubmitSuccess={this.handleCloseEdit.bind(this)}
                         types={this.props.incident_types}/>

@@ -34,7 +34,7 @@ class CreateIncident extends Component {
     const actions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
       <FlatButton label="Create" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
-    ];
+    ]
 
     return (
       <div>
@@ -64,10 +64,4 @@ CreateIncident.propTypes = {
   addIncident: PropTypes.func
 }
 
-const select = (state) => {
-  return {
-    incident_types: state.referential.entities.incident_types
-  }
-}
-
-export default connect(select, {addIncident})(CreateIncident);
+export default connect(null, {addIncident})(CreateIncident);

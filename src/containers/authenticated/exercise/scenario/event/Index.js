@@ -5,9 +5,10 @@ import {connect} from 'react-redux'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
 import {MainListItem} from '../../../../../components/list/ListItem';
+import {fetchAudiences} from '../../../../../actions/Audience'
 import {fetchEvents} from '../../../../../actions/Event'
-import {fetchIncidents} from '../../../../../actions/Incident'
-import {fetchInjects} from '../../../../../actions/Inject'
+import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
+import {fetchInjectTypes, fetchInjects} from '../../../../../actions/Inject'
 import * as Constants from '../../../../../constants/ComponentTypes';
 import IncidentNav from './IncidentNav'
 import EventPopover from './EventPopover'
@@ -54,8 +55,11 @@ const styles = {
 
 class Index extends Component {
   componentDidMount() {
+    this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
+    this.props.fetchIncidentTypes()
     this.props.fetchIncidents(this.props.exerciseId)
+    this.props.fetchInjectTypes()
     this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
   }
 
@@ -64,10 +68,11 @@ class Index extends Component {
     let event_title = R.propOr('-', 'event_title', event)
     if (event && incident) {
       return <div style={styles.container}>
-        <IncidentNav selectedIncident={incident.incident_id} exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
+        <IncidentNav selectedIncident={incident.incident_id} exerciseId={exerciseId} eventId={eventId}
+                     incidents={incidents} incident_types={this.props.incident_types}/>
         <div>
           <div style={styles.title}>{incident.incident_title}</div>
-          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}/>
+          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident} incident_types={this.props.incident_types}/>
           <div style={styles.number}>{incident.incident_injects.length} injects</div>
           <div className="clearfix"></div>
 
@@ -86,11 +91,16 @@ class Index extends Component {
               //Return the dom
               return <MainListItem
                 key={injectId}
-                rightIconButton={<InjectPopover exerciseId={exerciseId}
-                                                eventId={eventId}
-                                                incident={incident}
-                                                inject={inject}
-                                                injectAudiencesIds={inject.inject_audiences.map(a => a.audience_id)}/>
+                rightIconButton={
+                  <InjectPopover
+                    exerciseId={exerciseId}
+                    eventId={eventId}
+                    incidentId={incident.incident_id}
+                    inject={inject}
+                    injectAudiencesIds={inject.inject_audiences.map(a => a.audience_id)}
+                    audiences={this.props.audiences}
+                    inject_types={this.props.inject_types}
+                  />
                 }
                 primaryText={
                   <div>
@@ -103,14 +113,14 @@ class Index extends Component {
               />
             })}
           </List>
-          <CreateInject exerciseId={exerciseId} eventId={eventId} incidentId={incident.incident_id}/>
+          <CreateInject exerciseId={exerciseId} eventId={eventId} incidentId={incident.incident_id} inject_types={this.props.inject_types}/>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
             <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
           </Toolbar>
         </div>
       </div>
-    } else if( event ) {
+    } else if (event) {
       return <div style={styles.container}>
         <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
         <div style={styles.empty}>This event is empty.</div>
@@ -133,13 +143,19 @@ class Index extends Component {
 
 Index.propTypes = {
   exerciseId: PropTypes.string,
+  audiences: PropTypes.object,
   eventId: PropTypes.string,
   event: PropTypes.object,
+  incident_types: PropTypes.object,
   incident: PropTypes.object,
   incidents: PropTypes.array,
+  inject_types: PropTypes.object,
   injects: PropTypes.object,
+  fetchAudiences: PropTypes.func,
   fetchEvents: PropTypes.func,
+  fetchIncidentTypes: PropTypes.func,
   fetchIncidents: PropTypes.func,
+  fetchInjectTypes: PropTypes.func,
   fetchInjects: PropTypes.func,
 }
 
@@ -170,7 +186,10 @@ const select = (state, ownProps) => {
     incident,
     incidents,
     injects: state.referential.entities.injects,
+    audiences: state.referential.entities.audiences,
+    incident_types: state.referential.entities.incident_types,
+    inject_types: state.referential.entities.inject_types
   }
 }
 
-export default connect(select, {fetchEvents, fetchIncidents, fetchInjects})(Index);
+export default connect(select, {fetchAudiences, fetchEvents, fetchIncidentTypes, fetchIncidents, fetchInjectTypes, fetchInjects})(Index);

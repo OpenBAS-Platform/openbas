@@ -62,6 +62,5 @@ incident.define({
 })
 
 inject.define({
-  inject_type: injectType,
   inject_status: injectStatus
 })

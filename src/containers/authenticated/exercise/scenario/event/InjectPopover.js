@@ -1,6 +1,5 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
-import {Map} from 'immutable'
 import moment from 'moment';
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
@@ -84,7 +83,7 @@ class InjectPopover extends Component {
   }
 
   updateInject() {
-    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, this.props.inject.inject_id, this.state.injectData)
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, this.state.injectData)
     this.handleCloseEdit()
   }
 
@@ -93,9 +92,7 @@ class InjectPopover extends Component {
   }
 
   handleOpenDelete() {
-    this.setState({
-      openDelete: true
-    })
+    this.setState({openDelete: true})
     this.handlePopoverClose()
   }
 
@@ -106,7 +103,7 @@ class InjectPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, this.props.inject.inject_id)
+    this.props.deleteInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id)
     this.handleCloseDelete()
   }
 
@@ -122,8 +119,7 @@ class InjectPopover extends Component {
     this.setState({stepIndex: 2, finished: true})
   }
 
-  getStepContent(stepIndex, initialInformation) {
-    let initialContent = null
+  getStepContent(stepIndex, initialValues) {
     switch (stepIndex) {
       case 0:
         return (
@@ -131,7 +127,7 @@ class InjectPopover extends Component {
             ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
-            initialValues={initialInformation}
+            initialValues={initialValues}
             changeType={this.changeType.bind(this)}
             types={this.props.inject_types.toList().map(type => {
               return (
@@ -141,11 +137,10 @@ class InjectPopover extends Component {
             })}/>
         )
       case 1:
-        initialContent = JSON.parse(initialInformation.inject_content)
         return (
           <InjectContentForm
             ref="contentForm"
-            initialValues={initialContent}
+            initialValues={JSON.parse(initialValues.inject_content)}
             types={this.props.inject_types}
             type={this.state.type}
             onSubmit={this.onContentSubmit.bind(this)}
@@ -159,8 +154,8 @@ class InjectPopover extends Component {
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
             onChange={this.onAudiencesChange.bind(this)}
-            injectId={this.props.injectId}
-            injectAudiencesIds={this.props.inject_audiences_ids}
+            injectId={this.props.inject.inject_id}
+            injectAudiencesIds={this.props.injectAudiencesIds}
           />
         )
       default:
@@ -259,30 +254,17 @@ class InjectPopover extends Component {
   }
 }
 
-const select = (state, props) => {
-  let inject = state.application.getIn(['entities', 'injects', props.injectId])
-  let injectAudiencesList = inject ? inject.get('inject_audiences') : Map()
-  let injectAudiencesIds = injectAudiencesList.toList()
-
-  return {
-    inject,
-    type: inject.get('inject_type'),
-    inject_types: state.application.getIn(['entities', 'inject_types']),
-    inject_audiences_ids: injectAudiencesIds,
-  }
-}
-
 InjectPopover.propTypes = {
   exerciseId: PropTypes.string,
+  audiences: PropTypes.object,
   eventId: PropTypes.string,
-  incident: PropTypes.object,
+  incidentId: PropTypes.string,
   inject: PropTypes.object,
   injectAudiencesIds: PropTypes.object,
-  fetchInjectTypes: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {fetchInjectTypes, updateInject, deleteInject})(InjectPopover)
+export default connect(null, {fetchInjectTypes, updateInject, deleteInject})(InjectPopover)
