@@ -48,7 +48,7 @@ class ObjectiveController extends Controller
      * @Rest\View(serializerGroups={"objective"})
      * @Rest\Get("/exercises/{exercise_id}/objectives/{objective_id}")
      */
-    public function getExerciseObjectivesAction(Request $request)
+    public function getExercisesObjectiveAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));

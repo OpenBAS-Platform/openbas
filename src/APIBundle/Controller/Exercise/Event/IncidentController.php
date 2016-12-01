@@ -17,7 +17,7 @@ class IncidentController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List incidents of an exercise"
+     *    description="List incidents of an event"
      * )
      *
      * @Rest\View(serializerGroups={"incident"})
@@ -45,6 +45,43 @@ class IncidentController extends Controller
         $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
 
         return $incidents;
+    }
+
+    /**
+     * @ApiDoc(
+     *    description="Read an incident"
+     * )
+     *
+     * @Rest\View(serializerGroups={"incident"})
+     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}")
+     */
+    public function getExercisesEventsIncidentAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        $this->denyAccessUnlessGranted('select', $exercise);
+
+        $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
+        /* @var $event Event */
+
+        if (empty($event)) {
+            return $this->eventNotFound();
+        }
+
+        $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
+        /* @var $incident Incident */
+
+        if (empty($incident)) {
+            return $this->incidentNotFound();
+        }
+
+        return $incident;
     }
 
     /**
