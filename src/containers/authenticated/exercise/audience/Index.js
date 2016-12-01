@@ -5,8 +5,9 @@ import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {List} from '../../../../components/List'
-import {MainListItem} from '../../../../components/list/ListItem';
+import {MainListItem, HeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
+import {Icon} from '../../../../components/Icon'
 import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
@@ -16,6 +17,34 @@ import R from 'ramda'
 const styles = {
   'container': {
     paddingRight: '300px',
+  },
+  'header': {
+    'avatar': {
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700',
+      padding: '12px 0 0 15px'
+    },
+    'name': {
+      float: 'left',
+      width: '30%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'mail': {
+      float: 'left',
+      width: '40%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'org': {
+      float: 'left',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    }
   },
   'title': {
     float: 'left',
@@ -50,6 +79,18 @@ const styles = {
 }
 
 class Index extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sortBy: 'user_firstname',
+      orderAsc: true
+    }
+  }
+
+  reverseBy(field) {
+    this.setState({sortBy: field, orderAsc: !this.state.orderAsc})
+  }
+
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchUsers()
@@ -72,6 +113,39 @@ class Index extends Component {
           }
 
           <List>
+            <HeaderItem
+              leftAvatar={<div style={styles.header.avatar}>#</div>}
+              rightIconButton={<div></div>}
+              primaryText={
+                <div>
+                  <div style={styles.header.name} onClick={this.reverseBy.bind(this, 'user_firstname')}>
+                    Name
+                    { this.state.sortBy === 'user_firstname' ?
+                      <Icon
+                        type={Constants.ICON_TYPE_SORT}
+                        name={this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP}/>
+                      : ""}
+                  </div>
+                  <div style={styles.header.mail} onClick={this.reverseBy.bind(this, 'user_email')}>
+                    Email address
+                    { this.state.sortBy === 'user_email' ?
+                      <Icon
+                        type={Constants.ICON_TYPE_SORT}
+                        name={this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP}/>
+                      : ""}
+                  </div>
+                  <div style={styles.header.org} onClick={this.reverseBy.bind(this, 'user_organization')}>
+                    Organization
+                    { this.state.sortBy === 'user_organization' ?
+                      <Icon
+                        type={Constants.ICON_TYPE_SORT}
+                        name={this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP}/>
+                      : ""}
+                  </div>
+                  <div className="clearfix"></div>
+                </div>
+              }
+            />
             {audience.audience_users.map(data => {
               //Setup variables
               let user = R.propOr({}, data.user_id, this.props.users)
@@ -84,18 +158,18 @@ class Index extends Component {
               let organizationName = R.propOr('-', 'organization_name', user_organization)
               //Return the dom
               return <MainListItem
-                  key={userId}
-                  leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
-                  rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
-                  primaryText={
-                    <div>
-                      <div style={styles.name}>{user_firstname} {user_lastname}</div>
-                      <div style={styles.mail}>{user_email}</div>
-                      <div style={styles.org}>{organizationName}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                />
+                key={userId}
+                leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
+                rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
+                primaryText={
+                  <div>
+                    <div style={styles.name}>{user_firstname} {user_lastname}</div>
+                    <div style={styles.mail}>{user_email}</div>
+                    <div style={styles.org}>{organizationName}</div>
+                    <div className="clearfix"></div>
+                  </div>
+                }
+              />
             })}
           </List>
           <AddUsers exerciseId={exerciseId} audienceId={audience.audience_id}

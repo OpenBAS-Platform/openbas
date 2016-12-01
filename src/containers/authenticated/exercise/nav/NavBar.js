@@ -4,6 +4,7 @@ import {Link} from 'react-router'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Drawer} from '../../../../components/Drawer'
 import {List} from '../../../../components/List'
+import {CircularSpinner} from '../../../../components/Spinner'
 import {IconListItemLink} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {AppBar} from '../../../../components/AppBar'
@@ -25,7 +26,7 @@ class NavBar extends Component {
   render() {
     return (
       <Drawer width={65} docked={true} open={true} zindex={50}>
-        <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
+        <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)} iconElementLeft={this.props.loading?<CircularSpinner size={30}/>:undefined} />
         <List>
           <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id}
                             to={'/private/exercise/' + this.props.id}
@@ -62,12 +63,14 @@ NavBar.propTypes = {
   id: PropTypes.string.isRequired,
   pathname: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
-  open: PropTypes.bool
+  open: PropTypes.bool,
+  loading: React.PropTypes.bool
 }
 
 const select = (state) => {
   return {
-    open: state.screen.navbar_left_open
+    open: state.screen.navbar_left_open,
+    loading: state.screen.loading || false
   }
 }
 
