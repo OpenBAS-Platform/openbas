@@ -103,16 +103,16 @@ export const api = (schema) => {
     response.data = Immutable(schema ? normalize(response.data, schema) : response.data)
     return response
   }, function (err) {
-    console.error("API error", err)
     let res = err.response;
+    console.error("API error", res)
     if (res.status === 401) {//User is not logged anymore
       store.dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS});
-      return Promise.reject(err);
+      return Promise.reject(res.data);
     } else if (res.status === 503 && err.config && !err.config.__isRetryRequest) {
       err.config.__isRetryRequest = true;
       return axios(err.config);
     } else {
-      return Promise.reject(err);
+      return Promise.reject(res.data);
     }
   })
   return instance

@@ -12,11 +12,11 @@ const styles = {
   }
 }
 
-const renderAutoCompleteField = ({input, label, fullWidth, hint, onFocus, onClick, dataSource, dataSourceConfig, openOnFocus, filter, meta: {touched, error}}) => (
+const renderAutoCompleteField = ({intl, input, label, fullWidth, hint, onFocus, onClick, dataSource, dataSourceConfig, openOnFocus, filter, meta: {touched, error}}) => (
   <MUIAutoComplete hintText={hint}
                    floatingLabelText={label}
                    floatingLabelFixed={false}
-                   errorText={touched && error}
+                   errorText={touched && (error ? intl.formatMessage({id: error}) : undefined)}
                    style={styles.global}
                    inputStyle={styles.input}
                    fullWidth={fullWidth}
@@ -57,7 +57,7 @@ export const AutoCompleteFieldIntl = (props) => (
          dataSourceConfig={props.dataSourceConfig}
          openOnFocus={props.openOnFocus}
          filter={props.filter}
-         component={renderAutoCompleteField}/>
+         component={injectIntl(renderAutoCompleteField)}/>
 )
 
 export const AutoCompleteField = injectIntl(AutoCompleteFieldIntl)

@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {updateExercise, deleteExercise} from '../../../../actions/Exercise'
 import {fetchExerciseStatuses} from '../../../../actions/Exercise'
+import {redirectToHome} from '../../../../actions/Application'
 import {Paper} from '../../../../components/Paper'
 import {Button, FlatButton} from '../../../../components/Button'
 import {T} from '../../../../components/I18n'
@@ -47,7 +48,7 @@ class Index extends Component {
   }
 
   onUpdate(data) {
-    this.props.updateExercise(this.props.id, data)
+    return this.props.updateExercise(this.props.id, data)
   }
 
   submitInformation() {
@@ -83,8 +84,7 @@ class Index extends Component {
   }
 
   submitDelete() {
-    this.props.deleteExercise(this.props.id)
-    this.handleCloseDelete()
+    return this.props.deleteExercise(this.props.id).then(() => this.props.redirectToHome())
   }
 
   handleImageSelection(file) {
@@ -168,6 +168,7 @@ Index.propTypes = {
   exercise_statuses: PropTypes.object,
   params: PropTypes.object,
   updateExercise: PropTypes.func,
+  redirectToHome: PropTypes.func,
   deleteExercise: PropTypes.func,
   fetchExerciseStatuses: PropTypes.func
 }
@@ -181,4 +182,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {updateExercise, deleteExercise, fetchExerciseStatuses})(Index)
+export default connect(select, {updateExercise, redirectToHome, deleteExercise, fetchExerciseStatuses})(Index)
