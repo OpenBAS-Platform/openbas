@@ -61,6 +61,18 @@ APIBundle\Entity\Exercise:
             - DateTime: ~
             - NotBlank: ~
 
+APIBundle\Entity\Objective:
+    properties:
+        objective_title:
+            - NotBlank: ~
+            - Type: string
+        objective_description:
+            - NotBlank: ~
+            - Type: string
+        objective_priority:
+            - NotBlank: ~
+            - Type: number
+
 APIBundle\Entity\Audience:
     properties:
         audience_name:
