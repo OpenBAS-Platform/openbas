@@ -48,7 +48,7 @@ class Index extends Component {
   }
 
   onUpdate(data) {
-    this.props.updateExercise(this.props.id, data)
+    return this.props.updateExercise(this.props.id, data)
   }
 
   submitInformation() {
