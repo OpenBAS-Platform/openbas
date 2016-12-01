@@ -3,12 +3,16 @@ import {fromJS} from 'immutable'
 export const i18n = {
   messages: {
     fr: {
+      //Constants
       'TECHNICAL': 'Technique',
       'OPERATIONAL': 'Opérationnel',
       'STRATEGIC': 'Stratégique',
       'SCHEDULED': 'Prévu',
       'RUNNING': 'En cours',
       'FINISHED': 'Terminé',
+      //Validations
+      'This value should not be blank.': 'Cette valeur est obligatoire',
+      'This value is not valid.': 'Valeur invalide',
     },
     en: {
       'TECHNICAL': 'Technique',

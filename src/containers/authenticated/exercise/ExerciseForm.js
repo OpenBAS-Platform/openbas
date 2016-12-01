@@ -12,17 +12,6 @@ i18nRegister({
   }
 })
 
-const validate = values => {
-  const errors = {}
-  const requiredFields = []
-  requiredFields.forEach(field => {
-    if (!values[field]) {
-      errors[field] = 'Required'
-    }
-  })
-  return errors
-}
-
 class ExerciseForm extends Component {
   raiseStartPicker() {
     this.refs.startPicker.refs.datePicker.openDialog()
@@ -68,4 +57,4 @@ ExerciseForm.propTypes = {
   change: PropTypes.func
 }
 
-export default reduxForm({form: 'ExerciseForm', validate}, null, {change})(ExerciseForm)
+export default reduxForm({form: 'ExerciseForm'}, null, {change})(ExerciseForm)

@@ -12,20 +12,20 @@ const styles = {
   }
 }
 
-const renderTextField = ({input, label, fullWidth, multiLine, rows, type, hint, onFocus, onClick, meta: {touched, error}}) => (
+const renderTextField = ({intl, input, label, fullWidth, multiLine, rows, type, hint, onFocus, onClick, meta: {touched, error}}) => (
   <MUITextField hintText={hint}
                 floatingLabelText={label}
                 floatingLabelFixed={false}
-                errorText={touched && error}
+                errorText={touched && (error ? intl.formatMessage({id: error}) : undefined)}
                 style={styles.global}
                 inputStyle={styles.input}
                 fullWidth={fullWidth}
                 multiLine={multiLine}
                 rows={rows}
                 type={type}
-                {...input}
                 onFocus={onFocus}
                 onClick={onClick}
+                {...input}
   />)
 
 renderTextField.propTypes = {
@@ -54,7 +54,7 @@ export const FormFieldIntl = (props) => (
          onFocus={props.onFocus}
          onClick={props.onClick}
          onChange={props.onChange}
-         component={renderTextField}/>
+         component={injectIntl(renderTextField)}/>
 )
 
 export const FormField = injectIntl(FormFieldIntl)
