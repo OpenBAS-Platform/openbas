@@ -20,9 +20,9 @@ class CreateInject extends Component {
     super(props);
     this.state = {
       open: false,
-      type: null,
       stepIndex: 0,
       finished: false,
+      type: null,
       injectData: null
     }
   }
@@ -32,7 +32,7 @@ class CreateInject extends Component {
   }
 
   handleClose() {
-    this.setState({open: false, stepIndex: 0, finished: false, searchTerm: '', injectData: null})
+    this.setState({open: false, stepIndex: 0, finished: false, searchTerm: '', type: null, injectData: null})
   }
 
   onGlobalSubmit(data) {
@@ -67,7 +67,6 @@ class CreateInject extends Component {
   }
 
   changeType(event, index, value) {
-    console.log('TYPE', value)
     this.setState({type: value})
   }
 

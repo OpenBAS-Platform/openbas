@@ -167,4 +167,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchUsers, updateAudience})(AddUsers);
+export default connect(select, {fetchUsers, updateAudience})(AddUsers)

@@ -26,6 +26,7 @@ const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint
                   {...input}
                   onChange={(event, index, value) => {
                     input.onChange(value)
+                    onChange(event, index, value)
                   }}
                   children={children}
   />)

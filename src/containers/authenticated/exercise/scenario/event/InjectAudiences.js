@@ -1,10 +1,6 @@
 import React, {Component, PropTypes} from 'react'
-import {connect} from 'react-redux'
-import {fromJS, List as iList} from 'immutable'
-import createImmutableSelector from '../../../../../utils/ImmutableSelect'
 import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
-import {fetchAudiences, searchAudiences} from '../../../../../actions/Audience'
 import {Chip} from '../../../../../components/Chip';
 import {Avatar} from '../../../../../components/Avatar';
 import {List} from '../../../../../components/List'
@@ -25,24 +21,20 @@ const styles = {
 class InjectAudiences extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      audiences_ids: iList(),
-    }
+    this.state = {searchTerm: '', audiences: []}
   }
 
   componentDidMount() {
-    this.props.fetchAudiences(this.props.exerciseId);
-
-    this.setState({
-      audiences_ids: this.props.injectAudiencesIds,
-    })
+    this.setState({audiences: this.props.injectAudiencesIds})
   }
 
   handleSearchAudiences(event, value) {
-    this.props.searchAudiences(value)
+    this.setState({searchTerm: value})
   }
 
-  addAudience(audienceId) {
+  addAudience(audience) {
+    this.setState({audiences: R.append(audience, this.state.audiences)})
+
     let audiencesIds = this.state.audiences_ids.push(audienceId)
     if (this.state.audiences_ids.keyOf(audienceId) === undefined) {
       this.setState({
@@ -65,10 +57,18 @@ class InjectAudiences extends Component {
   }
 
   render() {
+
+    //region filter audience by active keyword
+    const keyword = this.state.searchTerm
+    let filterByKeyword = n => keyword === '' ||
+    n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+    n.audience_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    let filteredAudiences = R.filter(filterByKeyword, R.values(this.props.audiences))
+    //endregion
+
     return (
       <div>
-        <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience"
-                         onChange={this.handleSearchAudiences.bind(this)}/>
+        <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience" onChange={this.handleSearchAudiences.bind(this)}/>
         <div style={styles.list}>
           {this.state.audiences_ids.toList().map(audienceId => {
             let audience = this.props.allAudiences.get(audienceId)
@@ -121,15 +121,6 @@ class InjectAudiences extends Component {
   }
 }
 
-const audiencesSelector = (state, props) => {
-  const audiences = state.application.getIn(['entities', 'audiences']).toJS()
-  let keyword = state.application.getIn(['ui', 'states', 'current_search_keyword'])
-  var filterByKeyword = n => n.audience_exercise === props.exerciseId && (keyword === '' || n.audience_name.toLowerCase().indexOf(keyword) !== -1)
-  var filteredAudiences = R.filter(filterByKeyword, audiences)
-  return fromJS(filteredAudiences)
-}
-const filteredAudiences = createImmutableSelector(audiencesSelector, audiences => audiences)
-
 InjectAudiences.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
@@ -140,14 +131,6 @@ InjectAudiences.propTypes = {
   onChange: PropTypes.func,
   injectAudiencesIds: PropTypes.object,
   audiences: PropTypes.object,
-  allAudiences: PropTypes.object
 }
 
-const select = (state, props) => {
-  return {
-    audiences: filteredAudiences(state, props),
-    allAudiences: state.application.getIn(['entities', 'audiences'])
-  }
-}
-
-export default connect(select, {fetchAudiences, searchAudiences})(InjectAudiences);
+export default InjectAudiences

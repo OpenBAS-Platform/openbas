@@ -88,6 +88,7 @@ class Index extends Component {
               let inject_title = R.propOr('-', 'inject_title', inject)
               let inject_date = R.prop('inject_date', inject)
               let inject_type = R.propOr('-', 'inject_type', inject)
+              let inject_audiences = R.propOr([], 'inject_audiences', inject)
               //Return the dom
               return <MainListItem
                 key={injectId}
@@ -97,7 +98,7 @@ class Index extends Component {
                     eventId={eventId}
                     incidentId={incident.incident_id}
                     inject={inject}
-                    injectAudiencesIds={inject.inject_audiences.map(a => a.audience_id)}
+                    injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
                     audiences={this.props.audiences}
                     inject_types={this.props.inject_types}
                   />
@@ -159,6 +160,15 @@ Index.propTypes = {
   fetchInjects: PropTypes.func,
 }
 
+const filterAudiences = (audiences, exerciseId) => {
+  let audiencesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.audience_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
+  )
+  return audiencesFilterAndSorting(audiences)
+}
+
 const filterIncidents = (incidents, eventId) => {
   let incidentsFilterAndSorting = R.pipe(
     R.values,
@@ -171,6 +181,7 @@ const filterIncidents = (incidents, eventId) => {
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let eventId = ownProps.params.eventId
+  let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
   let event = R.prop(eventId, state.referential.entities.events)
   let incidents = filterIncidents(state.referential.entities.incidents, eventId)
   //region get default incident
@@ -185,8 +196,8 @@ const select = (state, ownProps) => {
     event,
     incident,
     incidents,
+    audiences,
     injects: state.referential.entities.injects,
-    audiences: state.referential.entities.audiences,
     incident_types: state.referential.entities.incident_types,
     inject_types: state.referential.entities.inject_types
   }

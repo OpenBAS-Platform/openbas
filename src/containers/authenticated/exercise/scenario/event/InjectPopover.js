@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import R from 'ramda'
 import moment from 'moment';
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
@@ -31,7 +32,7 @@ class InjectPopover extends Component {
       openDelete: false,
       openEdit: false,
       openPopover: false,
-      type: this.props.inject.inject_type,
+      type: undefined,
       stepIndex: 0,
       finished: false,
       injectData: null
@@ -129,10 +130,9 @@ class InjectPopover extends Component {
             onSubmitSuccess={this.selectContent.bind(this)}
             initialValues={initialValues}
             changeType={this.changeType.bind(this)}
-            types={this.props.inject_types.toList().map(type => {
+            types={R.values(this.props.inject_types).map(type => {
               return (
-                <MenuItemLink key={type.get('type')} value={type.get('type')}
-                              label={type.get('type')}/>
+                <MenuItemLink key={type.type} value={type.type} label={type.type}/>
               )
             })}/>
         )
@@ -142,7 +142,7 @@ class InjectPopover extends Component {
             ref="contentForm"
             initialValues={JSON.parse(initialValues.inject_content)}
             types={this.props.inject_types}
-            type={this.state.type}
+            type={this.state.type ? this.state.type : this.props.inject.inject_type}
             onSubmit={this.onContentSubmit.bind(this)}
             onSubmitSuccess={this.selectAudiences.bind(this)}/>
         )
@@ -189,17 +189,8 @@ class InjectPopover extends Component {
       />,
     ]
 
-    let initialInformation = undefined
-    if (this.props.inject) {
-      initialInformation = {
-        inject_title: this.props.inject.get('inject_title'),
-        inject_description: this.props.inject.get('inject_description'),
-        inject_content: this.props.inject.get('inject_content'),
-        inject_date: moment(this.props.inject.get('inject_date')).format('YYYY-MM-DD HH:mm:ss'),
-        inject_type: this.props.inject.get('inject_type')
-      }
-    }
-
+    // inject_date: moment(this.props.inject.get('inject_date')).format('YYYY-MM-DD HH:mm:ss')
+    let initialValues = R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'], this.props.inject)
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -247,7 +238,7 @@ class InjectPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          <div>{this.getStepContent(this.state.stepIndex, initialInformation)}</div>
+          <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
         </DialogTitleElement>
       </div>
     )
@@ -256,11 +247,11 @@ class InjectPopover extends Component {
 
 InjectPopover.propTypes = {
   exerciseId: PropTypes.string,
-  audiences: PropTypes.object,
+  audiences: PropTypes.array,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
   inject: PropTypes.object,
-  injectAudiencesIds: PropTypes.object,
+  injectAudiencesIds: PropTypes.array,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   inject_types: PropTypes.object,

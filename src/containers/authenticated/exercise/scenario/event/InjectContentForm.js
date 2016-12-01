@@ -21,25 +21,17 @@ const validate = values => {
 }
 
 class InjectContentForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {currentType: this.props.type}
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({currentType: nextProps.type})
-  }
-
   render() {
-    if (this.state.currentType === null) {
+    if (this.props.type === null) {
       return (<div>
         No content available on this inject type.
       </div>)
     }
 
+    console.log('CURRENTTRYE', this.props.types)
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.types[this.state.currentType].fields.map(field => {
+        {this.props.types[this.props.type].fields.map(field => {
           if (field.type === "text") {
             return ( <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/> )
           } else {
