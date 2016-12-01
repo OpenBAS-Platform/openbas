@@ -3,18 +3,7 @@ import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
 import {FormField} from '../../../../components/Field'
 import {AutoCompleteField} from '../../../../components/AutoComplete'
-import AutoComplete from 'material-ui/AutoComplete';
-
-const validate = values => {
-  const errors = {}
-  const requiredFields = []
-  requiredFields.forEach(field => {
-    if (!values[field]) {
-      errors[field] = 'Required'
-    }
-  })
-  return errors
-}
+import AutoComplete from 'material-ui/AutoComplete'
 
 class UserForm extends Component {
   render() {
@@ -26,8 +15,7 @@ class UserForm extends Component {
         <FormField name="user_firstname" fullWidth={true} type="text" label="Firstname"/>
         <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
-                           type="text" label="Organization" dataSource={dataSource}
-        />
+                           type="text" label="Organization" dataSource={dataSource}/>
       </form>
     )
   }
@@ -43,4 +31,4 @@ UserForm.propTypes = {
   organizations: PropTypes.object
 }
 
-export default reduxForm({form: 'ExerciseForm', validate}, null, {change})(UserForm)
+export default reduxForm({form: 'ExerciseForm'}, null, {change})(UserForm)

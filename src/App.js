@@ -14,7 +14,7 @@ import theme from './components/Theme'
 import {addLocaleData, IntlProvider} from 'react-intl'
 import enLocaleData from 'react-intl/locale-data/en'
 import frLocaleData from 'react-intl/locale-data/fr'
-import {locale} from './utils/detectBrowserLanguage'
+import {locale} from './utils/BrowserLanguage'
 import {i18n} from './utils/Messages'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import * as Constants from './constants/ActionTypes'
@@ -33,7 +33,7 @@ import IndexExerciseScenario from './containers/authenticated/exercise/scenario/
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
 import Immutable from 'seamless-immutable'
 
-import roundMoment from './utils/moment-round'
+import roundMoment from './utils/Moment-round'
 
 injectTapEventPlugin()
 roundMoment()

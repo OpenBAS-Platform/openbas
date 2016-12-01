@@ -3,14 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "immutablediff": "^0.4.3",
     "jest": "^15.1.1",
     "react-scripts": "0.7.0"
   },
   "dependencies": {
     "axios": "^0.14.0",
     "d3": "^4.3.0",
-    "immutable": "^3.8.1",
     "material-ui": "^0.16.4",
     "moment": "^2.15.1",
     "normalizr": "^2.2.1",

@@ -1,19 +1,14 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {PropTypes, Component} from 'react'
+import {connect} from 'react-redux'
 import R from 'ramda'
-import moment from 'moment';
 import * as Constants from '../../../../../constants/ComponentTypes'
-import {Popover} from '../../../../../components/Popover';
+import {Popover} from '../../../../../components/Popover'
 import {Menu} from '../../../../../components/Menu'
 import {DialogTitleElement} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {
-  Step,
-  Stepper,
-  StepButton,
-} from '../../../../../components/Stepper';
+import {Step, Stepper, StepButton,} from '../../../../../components/Stepper'
 import {fetchIncident} from '../../../../../actions/Incident'
 import {fetchInjectTypes, updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
