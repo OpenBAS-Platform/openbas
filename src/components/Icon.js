@@ -15,6 +15,8 @@ import ActionSchedule from 'material-ui/svg-icons/action/schedule'
 import ActionEvent from 'material-ui/svg-icons/action/event'
 import ActionExitToApp from 'material-ui/svg-icons/action/exit-to-app'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
+import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
+import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
 import ActionAssignmentTurnedIn from 'material-ui/svg-icons/action/assignment-turned-in'
 import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
@@ -25,7 +27,13 @@ const iconStyle = {
     padding: 0,
     left: '19px',
     top: '8px'
-  }
+  },
+  [ Constants.ICON_TYPE_SORT ]: {
+    position: 'absolute',
+    margin: '0 0 0 5px',
+    padding: 0,
+    top: '16px',
+  },
 }
 
 export const Icon = (props) => {
@@ -63,6 +71,10 @@ export const Icon = (props) => {
       return (<ActionAssignmentTurnedIn style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
       return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN:
+      return (<NavigationArrowDropDown style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP:
+      return (<NavigationArrowDropUp style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_FILE_FOLDER:
       return (<FileFolder style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_EDITOR_ATTACH_FILE:
@@ -76,5 +88,5 @@ Icon.propTypes = {
   name: PropTypes.string,
   type: PropTypes.string,
   style: PropTypes.object,
-  color: PropTypes.string
+  color: PropTypes.string,
 }

@@ -5,6 +5,9 @@ import {Link} from 'react-router'
 import * as Constants from '../../constants/ComponentTypes'
 
 const styles = {
+  'headeritem': {
+    height: '50px'
+  },
   'active': {
     backgroundColor: '#BDBDBD',
   },
@@ -32,7 +35,7 @@ const styles = {
     marginLeft: '30px',
     borderBottom: '1px solid #E0E0E0',
     backgroundColor: '#F0F0F0'
-  },
+  }
 }
 
 const innerDivStyle = {
@@ -107,7 +110,7 @@ const AvatarListItemLinkIntl = (props) => (
     onTouchTap={props.onClick}
     disabled={props.disabled}
     innerDivStyle={{padding: '20px 20px 20px 70px'}}/>
-);
+)
 export const AvatarListItemLink = injectIntl(AvatarListItemLinkIntl)
 
 AvatarListItemLinkIntl.propTypes = {
@@ -131,7 +134,7 @@ export const MainListItem = (props) => (
     initiallyOpen={true}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
     rightIconButton={props.rightIconButton}/>
-);
+)
 
 MainListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -156,7 +159,7 @@ export const SecondaryListItem = (props) => (
     initiallyOpen={true}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
     rightIconButton={props.rightIconButton}/>
-);
+)
 
 SecondaryListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -179,7 +182,7 @@ export const MainSmallListItem = (props) => (
     disabled={props.disabled}
     style={props.disabled ? styles.mainsmallitemdisabled : styles.mainsmallitem}
     rightIconButton={props.rightIconButton}/>
-);
+)
 
 MainSmallListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -189,4 +192,31 @@ MainSmallListItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.node
+}
+
+export const HeaderItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={true}
+    style={styles.headeritem}
+    hoverColor="#ffffff"
+    disableKeyboardFocus={true}
+    rightIconButton={props.rightIconButton}/>
+)
+
+HeaderItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
 }

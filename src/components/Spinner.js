@@ -7,8 +7,7 @@ export const RoundSpinner = () => (
 )
 
 const style = {
-  margin: '0 auto',
-  marginTop: 10,
+  margin: '10px 0 0 8px',
   textAlign: 'center'
 }
 
