@@ -1,18 +1,14 @@
-import {fromJS} from 'immutable'
+import Immutable from 'seamless-immutable'
 
 export const i18n = {
-  messages: {
+  messages: Immutable({
     fr: {
-      //Constants
       'TECHNICAL': 'Technique',
       'OPERATIONAL': 'Opérationnel',
       'STRATEGIC': 'Stratégique',
       'SCHEDULED': 'Planifié',
       'RUNNING': 'En cours',
       'FINISHED': 'Terminé',
-      //Validations
-      'This value should not be blank.': 'Cette valeur est obligatoire',
-      'This value is not valid.': 'Valeur invalide',
     },
     en: {
       'TECHNICAL': 'Technique',
@@ -22,9 +18,8 @@ export const i18n = {
       'RUNNING': 'Running',
       'FINISHED': 'Finished',
     }
-  }
+  })
 }
 export const i18nRegister = (data) => {
-  var mergedMessages = fromJS(i18n.messages).mergeDeep(fromJS(data))
-  i18n.messages = mergedMessages.toJS()
+  i18n.messages = i18n.messages.merge(data, {deep: true})
 }

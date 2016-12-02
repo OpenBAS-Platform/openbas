@@ -146,7 +146,7 @@ class Index extends Component {
 
 Index.propTypes = {
   exerciseId: PropTypes.string,
-  audiences: PropTypes.object,
+  audiences: PropTypes.array,
   eventId: PropTypes.string,
   event: PropTypes.object,
   incident_types: PropTypes.object,

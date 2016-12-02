@@ -21,11 +21,7 @@ const styles = {
 class InjectAudiences extends Component {
   constructor(props) {
     super(props);
-    this.state = {searchTerm: '', audiencesIds: []}
-  }
-
-  componentDidMount() {
-    this.setState({audiencesIds: this.props.injectAudiencesIds, searchTerm: ''})
+    this.state = {audiencesIds: this.props.injectAudiencesIds, searchTerm: ''}
   }
 
   handleSearchAudiences(event, value) {
@@ -51,9 +47,7 @@ class InjectAudiences extends Component {
   render() {
     //region filter audience by active keyword
     const keyword = this.state.searchTerm
-    let filterByKeyword = n => keyword === '' ||
-    n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-    n.audience_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    let filterByKeyword = n => keyword === '' || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     let filteredAudiences = R.filter(filterByKeyword, this.props.audiences)
     //endregion
 
