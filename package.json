@@ -11,6 +11,7 @@
     "d3": "^4.3.0",
     "material-ui": "^0.16.4",
     "moment": "^2.15.1",
+    "moment-timezone": "^0.5.10",
     "normalizr": "^2.2.1",
     "ramda": "^0.22.1",
     "react": "15.4.0",

@@ -13,7 +13,7 @@ import R from 'ramda'
 import ExerciseForm from '../ExerciseForm'
 import StatusForm from './StatusForm'
 import FileGallery from '../../FileGallery'
-import moment from 'moment'
+import {dateFormat, dateToISO} from '../../../../utils/Time'
 
 const styles = {
   PaperContent: {
@@ -37,10 +37,7 @@ i18nRegister({
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      openDelete: false,
-      openGallery: false
-    }
+    this.state = {openDelete: false, openGallery: false}
   }
 
   componentDidMount() {
@@ -48,7 +45,11 @@ class Index extends Component {
   }
 
   onUpdate(data) {
-    return this.props.updateExercise(this.props.id, data)
+    var tzData = R.pipe( //Need to convert date to ISO format with timezone
+      R.assoc('exercise_start_date', dateToISO(data.exercise_start_date)),
+      R.assoc('exercise_end_date', dateToISO(data.exercise_end_date))
+    )
+    return this.props.updateExercise(this.props.id, tzData(data))
   }
 
   submitInformation() {
@@ -60,27 +61,19 @@ class Index extends Component {
   }
 
   handleOpenDelete() {
-    this.setState({
-      openDelete: true
-    })
+    this.setState({openDelete: true})
   }
 
   handleCloseDelete() {
-    this.setState({
-      openDelete: false
-    })
+    this.setState({openDelete: false})
   }
 
   handleOpenGallery() {
-    this.setState({
-      openGallery: true
-    })
+    this.setState({openGallery: true})
   }
 
   handleCloseGallery() {
-    this.setState({
-      openGallery: false
-    })
+    this.setState({openGallery: false})
   }
 
   submitDelete() {
@@ -93,10 +86,6 @@ class Index extends Component {
     this.handleCloseGallery()
   }
 
-  dateFormat(data) {
-    return moment(data).format('YYYY-MM-DD HH:mm:ss')
-  }
-
   render() {
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
@@ -105,8 +94,8 @@ class Index extends Component {
 
     const {exercise} = this.props
     var initPipe = R.pipe(
-      R.assoc('exercise_start_date', this.dateFormat(R.path(['exercise', 'exercise_start_date'], this.props))),
-      R.assoc('exercise_end_date', this.dateFormat(R.path(['exercise', 'exercise_end_date'], this.props))),
+      R.assoc('exercise_start_date', dateFormat(R.path(['exercise', 'exercise_start_date'], this.props))),
+      R.assoc('exercise_end_date', dateFormat(R.path(['exercise', 'exercise_end_date'], this.props))),
       R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date'])
     )
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
