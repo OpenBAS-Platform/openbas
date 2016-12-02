@@ -71,7 +71,7 @@ APIBundle\Entity\Objective:
             - Type: string
         objective_priority:
             - NotBlank: ~
-            - Type: number
+            - Type: integer
 
 APIBundle\Entity\Audience:
     properties:

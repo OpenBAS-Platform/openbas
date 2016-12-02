@@ -2,6 +2,9 @@
 
 use Symfony\Component\HttpFoundation\Request;
 
+// Set the default timezone
+date_default_timezone_set('UTC');
+
 /**
  * @var Composer\Autoload\ClassLoader
  */
