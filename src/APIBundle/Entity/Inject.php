@@ -70,6 +70,13 @@ class Inject
      */
     protected $inject_status;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="user_injects")
+     * @ORM\JoinColumn(name="inject_user", referencedColumnName="user_id", onDelete="CASCADE")
+     * @var User
+     */
+    protected $inject_user;
+
     public function __construct()
     {
         $this->incident_audiences = new ArrayCollection();
@@ -183,5 +190,22 @@ class Inject
     {
         $this->inject_status = $status;
         return $this;
+    }
+
+    public function getInjectUser()
+    {
+        return $this->inject_user;
+    }
+
+    public function setInjectUser($user)
+    {
+        $this->inject_user = $user;
+        return $this;
+    }
+
+    public function sanitizeUser() {
+        if( $this->inject_user !== null ) {
+            $this->inject_user = $this->inject_user->getUserFirstname() . ' ' . $this->inject_user->getUserLastname();
+        }
     }
 }

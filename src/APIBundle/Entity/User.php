@@ -82,6 +82,17 @@ class User implements UserInterface
      */
     protected $user_status = 1;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_users")
+     * @var User[]
+     */
+    protected $user_injects;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_lang;
+
     protected $user_gravatar;
 
     public function __construct()
@@ -89,6 +100,7 @@ class User implements UserInterface
         $this->user_groups = new ArrayCollection();
         $this->user_audiences = new ArrayCollection();
         $this->user_comchecks = new ArrayCollection();
+        $this->user_injects = new ArrayCollection();
     }
 
     public function getUserId()
@@ -220,6 +232,28 @@ class User implements UserInterface
     public function setUserStatus($status)
     {
         $this->user_status = $status;
+        return $this;
+    }
+
+    public function getUserInjects()
+    {
+        return $this->user_injects;
+    }
+
+    public function setUserInjects($injects)
+    {
+        $this->user_injects = $injects;
+        return $this;
+    }
+
+    public function getUserLang()
+    {
+        return $this->user_lang;
+    }
+
+    public function setUserLang($lang)
+    {
+        $this->user_lang = $lang;
         return $this;
     }
 

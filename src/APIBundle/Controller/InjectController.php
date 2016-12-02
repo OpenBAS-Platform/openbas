@@ -88,6 +88,9 @@ class InjectController extends Controller
 
             return $output;
         } else {
+            foreach( $injects as &$inject ) {
+                $inject->sanitizeUser();
+            }
             return $injects;
         }
     }
