@@ -20,6 +20,8 @@ import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-u
 import ActionAssignmentTurnedIn from 'material-ui/svg-icons/action/assignment-turned-in'
 import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
+import MapsLayers from 'material-ui/svg-icons/maps/layers'
+import NotificationSms from 'material-ui/svg-icons/notification/sms'
 
 const iconStyle = {
   [ Constants.ICON_TYPE_NAVBAR ]: {
@@ -33,6 +35,16 @@ const iconStyle = {
     margin: '0 0 0 5px',
     padding: 0,
     top: '16px',
+  },
+  [ Constants.ICON_TYPE_LIST ]: {
+    position: 'absolute',
+    top: '18px',
+    left: '10px'
+  },
+  [ Constants.ICON_TYPE_MAINLIST ]: {
+    position: 'absolute',
+    top: '20px',
+    left: '15px'
   },
 }
 
@@ -77,6 +89,10 @@ export const Icon = (props) => {
       return (<NavigationArrowDropUp style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_FILE_FOLDER:
       return (<FileFolder style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_MAPS_LAYERS:
+      return (<MapsLayers style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NOTIFICATION_SMS:
+      return (<NotificationSms style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_EDITOR_ATTACH_FILE:
       return (<EditorAttachFile style={mergeStyle} color={props.color} />)
     default:

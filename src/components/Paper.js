@@ -16,7 +16,7 @@ const paperStyle = {
     margin: '20px 20px 20px 20px',
     verticalAlign: 'top',
     width: '400px',
-    height: '200px',
+    height: '120px',
     cursor: 'pointer'
   },
   [ Constants.PAPER_TYPE_SETTINGS ]: {

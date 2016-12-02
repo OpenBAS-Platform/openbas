@@ -28,14 +28,15 @@ class InjectContentForm extends Component {
       </div>)
     }
 
-    console.log('CURRENTTRYE', this.props.types)
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.types[this.props.type].fields.map(field => {
-          if (field.type === "text") {
-            return ( <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/> )
+          if (field.type === 'text') {
+            return <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/>
+          } else if (field.type === 'textarea') {
+            return <FormField key={field.name} name={field.name} fullWidth={true} multiLine={true} rows={5} type="text" label={field.name}/>
           } else {
-            return ( <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/> )
+            return <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/>
           }
         })}
       </form>
