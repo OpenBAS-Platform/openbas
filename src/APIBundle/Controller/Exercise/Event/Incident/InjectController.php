@@ -53,6 +53,10 @@ class InjectController extends Controller
 
         $injects = $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]);
 
+        foreach( $injects as &$inject ) {
+            $inject->sanitizeUser();
+        }
+
         return $injects;
     }
 
@@ -95,8 +99,10 @@ class InjectController extends Controller
         $form = $this->createForm(InjectType::class, $inject);
         $form->submit($request->request->all());
         if ($form->isValid()) {
+            $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
             $inject->setInjectIncident($incident);
             $inject->setInjectAutomatic(true);
+            $inject->setInjectUser($connectedUser);
             $em->persist($inject);
             $em->flush();
 
@@ -107,6 +113,7 @@ class InjectController extends Controller
             $em->persist($status);
             $em->flush();
 
+            $inject->sanitizeUser();
             return $inject;
         } else {
             return $form;
@@ -208,6 +215,7 @@ class InjectController extends Controller
             $em->flush();
             $em->clear();
             $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
+            $inject->sanitizeUser();
             return $inject;
         } else {
             return $form;

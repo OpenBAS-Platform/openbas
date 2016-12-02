@@ -51,6 +51,9 @@ class InjectController extends Controller
             $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
         }
 
+        foreach( $injects as &$inject ) {
+            $inject->sanitizeUser();
+        }
         return $injects;
     }
 
