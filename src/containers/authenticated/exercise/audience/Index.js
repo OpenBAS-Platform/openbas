@@ -16,7 +16,7 @@ import R from 'ramda'
 
 const styles = {
   'container': {
-    paddingRight: '300px',
+    paddingRight: '350px',
   },
   'header': {
     'avatar': {
@@ -85,14 +85,14 @@ class Index extends Component {
     this.state = {sortBy: 'user_firstname', orderAsc: true}
   }
 
-  reverseBy(field) {
-    this.setState({sortBy: field, orderAsc: !this.state.orderAsc})
-  }
-
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchUsers()
     this.props.fetchOrganizations()
+  }
+
+  reverseBy(field) {
+    this.setState({sortBy: field, orderAsc: !this.state.orderAsc})
   }
 
   SortHeader(field, label) {

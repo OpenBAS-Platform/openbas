@@ -53,13 +53,15 @@ class InjectAudiences extends Component {
 
     return (
       <div>
-        <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience" onChange={this.handleSearchAudiences.bind(this)}/>
+        <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience"
+                         onChange={this.handleSearchAudiences.bind(this)} styletype={Constants.FIELD_TYPE_INLINE}/>
         <div style={styles.list}>
           {this.state.audiencesIds.map(audienceId => {
             let audience = R.find(a => a.audience_id === audienceId)(this.props.audiences)
             let audience_name = R.propOr('-', 'audience_name', audience)
             return (
-              <Chip key={audienceId} onRequestDelete={this.removeAudience.bind(this, audienceId)} type={Constants.CHIP_TYPE_LIST}>
+              <Chip key={audienceId} onRequestDelete={this.removeAudience.bind(this, audienceId)}
+                    type={Constants.CHIP_TYPE_LIST}>
                 <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
                         type={Constants.AVATAR_TYPE_CHIP}/>
                 {audience_name}
@@ -84,7 +86,7 @@ class InjectAudiences extends Component {
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
+                  leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}
                 />
               )
             })}

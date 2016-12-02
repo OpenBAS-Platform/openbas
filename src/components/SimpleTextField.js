@@ -6,6 +6,9 @@ import * as Constants from '../constants/ComponentTypes'
 const styles = {
   [ Constants.FIELD_TYPE_INTITLE ]: {
     padding: '0 20px 10px 20px'
+  },
+  [ Constants.FIELD_TYPE_INLINE ]: {
+    padding: '0 0 6px 0'
   }
 }
 

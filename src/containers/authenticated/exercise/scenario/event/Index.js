@@ -4,7 +4,8 @@ import moment from 'moment';
 import {connect} from 'react-redux'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
-import {MainListItem} from '../../../../../components/list/ListItem';
+import {MainListItem, HeaderItem} from '../../../../../components/list/ListItem';
+import {Icon} from '../../../../../components/Icon'
 import {fetchAudiences} from '../../../../../actions/Audience'
 import {fetchEvents} from '../../../../../actions/Event'
 import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
@@ -18,7 +19,36 @@ import InjectPopover from './InjectPopover'
 
 const styles = {
   'container': {
-    paddingRight: '300px',
+    paddingRight: '350px',
+  },
+  'header': {
+    'icon': {
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700',
+      padding: '12px 0 0 8px'
+    },
+    'inject_title': {
+      float: 'left',
+      width: '50%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'inject_date': {
+      float: 'left',
+      width: '20%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'inject_user': {
+      float: 'left',
+      width: '20%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    }
   },
   'title': {
     float: 'left',
@@ -38,7 +68,7 @@ const styles = {
   },
   'inject_title': {
     float: 'left',
-    width: '40%',
+    width: '50%',
     padding: '5px 0 0 0'
   },
   'inject_date': {
@@ -46,14 +76,18 @@ const styles = {
     width: '20%',
     padding: '5px 0 0 0'
   },
-  'inject_type': {
+  'inject_user': {
     float: 'left',
-    width: '20%',
     padding: '5px 0 0 0'
   }
 }
 
 class Index extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {sortBy: 'inject_title', orderAsc: true}
+  }
+
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
@@ -63,10 +97,53 @@ class Index extends Component {
     this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
   }
 
+  reverseBy(field) {
+    this.setState({sortBy: field, orderAsc: !this.state.orderAsc})
+  }
+
+  SortHeader(field, label) {
+    var icon = this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
+      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
+    const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
+    return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
+      {label} {IconDisplay}
+    </div>
+  }
+
+  //TODO replace with sortWith after Ramdajs new release
+  ascend(a, b) {
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+
+  descend(a, b) {
+    return a > b ? -1 : a < b ? 1 : 0;
+  }
+
+  selectIcon(type) {
+    switch (type) {
+      case 'email':
+        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST}/>
+      case 'sms':
+        return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST}/>
+      default:
+        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST}/>
+    }
+  }
+
   render() {
     let {exerciseId, eventId, event, incident, incidents} = this.props
     let event_title = R.propOr('-', 'event_title', event)
     if (event && incident) {
+      //Build users list with sorting on column
+      const injects = R.pipe(
+        R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
+        R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
+          var fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
+          var fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
+          return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
+        })
+      )(incident.incident_injects)
+      //Display the component
       return <div style={styles.container}>
         <IncidentNav selectedIncident={incident.incident_id} exerciseId={exerciseId} eventId={eventId}
                      incidents={incidents} incident_types={this.props.incident_types}/>
@@ -77,22 +154,32 @@ class Index extends Component {
           <div style={styles.number}>{incident.incident_injects.length} injects</div>
           <div className="clearfix"></div>
 
-          {incident.incident_injects.length === 0 ?
-            <div style={styles.empty}>This incident is empty.</div> : ""
-          }
-
           <List>
-            {incident.incident_injects.map(data => {
+            {incident.incident_injects.length === 0 ? (
+              <div style={styles.empty}>This incident is empty.</div>
+            ) : (
+              <HeaderItem leftAvatar={<span style={styles.header.icon}>#</span>}
+                          rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
+                {this.SortHeader('inject_title', 'Title')}
+                {this.SortHeader('inject_date', 'Date')}
+                {this.SortHeader('inject_user', 'Author')}
+                <div className="clearfix"></div>
+              </div>}
+              />
+            )}
+
+            {injects.map(inject => {
               //Setup variables
-              let inject = R.propOr({}, data.inject_id, this.props.injects)
-              let injectId = R.propOr(data.inject_id, 'inject_id', inject)
+              let injectId = R.propOr(Math.random(), 'inject_id', inject)
               let inject_title = R.propOr('-', 'inject_title', inject)
+              let inject_user = R.propOr('-', 'inject_user', inject)
               let inject_date = R.prop('inject_date', inject)
               let inject_type = R.propOr('-', 'inject_type', inject)
               let inject_audiences = R.propOr([], 'inject_audiences', inject)
               //Return the dom
               return <MainListItem
                 key={injectId}
+                leftAvatar={this.selectIcon(inject_type)}
                 rightIconButton={
                   <InjectPopover
                     exerciseId={exerciseId}
@@ -107,8 +194,8 @@ class Index extends Component {
                 primaryText={
                   <div>
                     <div style={styles.inject_title}>{inject_title}</div>
-                    <div style={styles.inject_date}>{moment(inject_date).format('MMM D, YYYY HH:mm:ss')}</div>
-                    <div style={styles.inject_type}>{inject_type}</div>
+                    <div style={styles.inject_date}>{moment(inject_date).format('YYYY-DD-MM HH:mm')}</div>
+                    <div style={styles.inject_user}>{inject_user}</div>
                     <div className="clearfix"></div>
                   </div>
                 }
@@ -125,7 +212,7 @@ class Index extends Component {
       </div>
     } else if (event) {
       return <div style={styles.container}>
-        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
+        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents} incident_types={this.props.incident_types}/>
         <div style={styles.empty}>This event is empty.</div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
