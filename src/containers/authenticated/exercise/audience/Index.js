@@ -25,22 +25,23 @@ const styles = {
       fontWeight: '700',
       padding: '12px 0 0 15px'
     },
-    'name': {
+    'user_firstname': {
       float: 'left',
       width: '30%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'
     },
-    'mail': {
+    'user_email': {
       float: 'left',
       width: '40%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'
     },
-    'org': {
+    'user_organization': {
       float: 'left',
+      width: '30%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'
@@ -81,10 +82,7 @@ const styles = {
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      sortBy: 'user_firstname',
-      orderAsc: true
-    }
+    this.state = {sortBy: 'user_firstname', orderAsc: true}
   }
 
   reverseBy(field) {
@@ -97,9 +95,37 @@ class Index extends Component {
     this.props.fetchOrganizations()
   }
 
+  SortHeader(field, label) {
+    var icon = this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
+      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
+    const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
+    return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
+      {label} {IconDisplay}
+    </div>
+  }
+
+  //TODO replace with sortWith after Ramdajs new release
+  ascend(a, b) {
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+
+  descend(a, b) {
+    return a > b ? -1 : a < b ? 1 : 0;
+  }
+
   render() {
     let {exerciseId, audience, audiences} = this.props
     if (audience) {
+      //Build users list with sorting on column
+      const users = R.pipe(
+        R.map(data => R.pathOr({}, ['users', data.user_id], this.props)),
+        R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
+          var fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
+          var fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
+          return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
+        })
+      )(audience.audience_users)
+      //Display the component
       return <div style={styles.container}>
         <AudienceNav selectedAudience={audience.audience_id} exerciseId={exerciseId} audiences={audiences}/>
         <div>
@@ -108,48 +134,23 @@ class Index extends Component {
           <div style={styles.number}>{audience.audience_users.length} users</div>
           <div className="clearfix"></div>
 
-          {audience.audience_users.length === 0 ?
-            <div style={styles.empty}>This audience is empty.</div> : ""
-          }
-
           <List>
-            <HeaderItem
-              leftAvatar={<div style={styles.header.avatar}>#</div>}
-              rightIconButton={<div></div>}
-              primaryText={
-                <div>
-                  <div style={styles.header.name} onClick={this.reverseBy.bind(this, 'user_firstname')}>
-                    Name
-                    { this.state.sortBy === 'user_firstname' ?
-                      <Icon
-                        type={Constants.ICON_TYPE_SORT}
-                        name={this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP}/>
-                      : ""}
-                  </div>
-                  <div style={styles.header.mail} onClick={this.reverseBy.bind(this, 'user_email')}>
-                    Email address
-                    { this.state.sortBy === 'user_email' ?
-                      <Icon
-                        type={Constants.ICON_TYPE_SORT}
-                        name={this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP}/>
-                      : ""}
-                  </div>
-                  <div style={styles.header.org} onClick={this.reverseBy.bind(this, 'user_organization')}>
-                    Organization
-                    { this.state.sortBy === 'user_organization' ?
-                      <Icon
-                        type={Constants.ICON_TYPE_SORT}
-                        name={this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP}/>
-                      : ""}
-                  </div>
-                  <div className="clearfix"></div>
-                </div>
-              }
-            />
-            {audience.audience_users.map(data => {
+            {audience.audience_users.length === 0 ? (
+              <div style={styles.empty}>This audience is empty.</div>
+            ) : (
+              <HeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
+                          rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
+                {this.SortHeader('user_firstname', 'name')}
+                {this.SortHeader('user_email', 'Email address')}
+                {this.SortHeader('user_organization', 'Organization')}
+                <div className="clearfix"></div>
+              </div>}
+              />
+            )}
+
+            {users.map(user => {
               //Setup variables
-              let user = R.propOr({}, data.user_id, this.props.users)
-              let userId = R.propOr(data.user_id, 'user_id', user)
+              let userId = R.propOr(Math.random(), 'user_id', user)
               let user_firstname = R.propOr('-', 'user_firstname', user)
               let user_lastname = R.propOr('-', 'user_lastname', user)
               let user_email = R.propOr('-', 'user_email', user)

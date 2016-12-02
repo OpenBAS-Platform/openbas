@@ -217,6 +217,6 @@ HeaderItem.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  rightIconButton: PropTypes.node,
+  rightIconButton: PropTypes.element,
   nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
