@@ -48,18 +48,18 @@ class Index extends Component {
   render() {
     var organizationPath = [R.propOr('-', 'user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
-    let initialValues = R.pipe(
+    var initPipe = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
       R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_lang']) //Pickup only needed fields
-    )(this.props.user)
-    console.log('initialValues', initialValues)
+    )
+    const informationValues = this.props.user !== undefined ? initPipe(this.props.user) : undefined
 
     return (
       <div>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2>Profile</h2>
-            <UserForm ref="userForm" organizations={this.props.organizations} onSubmit={this.onUpdate.bind(this)} initialValues={initialValues}/>
+            <UserForm ref="userForm" organizations={this.props.organizations} onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitUser.bind(this)}/>
           </div>
@@ -88,7 +88,7 @@ const select = (state) => {
   var userId = R.path(['logged', 'user'], state.app)
   console.log('USERID', userId)
   return {
-    user: R.propOr({}, userId, state.referential.entities.users),
+    user: R.prop(userId, state.referential.entities.users),
     organizations: state.referential.entities.organizations
   }
 }
