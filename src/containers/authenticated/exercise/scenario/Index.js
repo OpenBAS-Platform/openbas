@@ -26,17 +26,18 @@ class IndexScenario extends Component {
   render() {
     return (
       <div style={styles.container}>
-        {this.props.events.length === 0 ?<div style={styles.empty}>You do not have any available events in this exercise.</div> : ""}
+        {this.props.events.length === 0 ?<div style={styles.empty}>You do not have any events in this exercise.</div> : ""}
         {this.props.events.map(event => {
+          var file_url = R.pathOr('-', ['event_image', 'file_url'], event)
           return (
             <Link to={'/private/exercise/' + this.props.exerciseId + '/scenario/' + event.event_id} key={event.event_id}>
-              <Event title={event.event_title} description={event.event_description} image={event.event_image.file_url} />
+              <Event title={event.event_title} description={event.event_description} image={file_url} />
             </Link>
           )
         })}
         <CreateEvent exerciseId={this.props.exerciseId}/>
       </div>
-    );
+    )
   }
 }
 

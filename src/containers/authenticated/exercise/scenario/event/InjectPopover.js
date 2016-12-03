@@ -8,7 +8,7 @@ import {DialogTitleElement} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {Step, Stepper, StepButton,} from '../../../../../components/Stepper'
+import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {fetchIncident} from '../../../../../actions/Incident'
 import {fetchInjectTypes, updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
@@ -104,10 +104,6 @@ class InjectPopover extends Component {
       this.props.fetchIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
     })
     this.handleCloseDelete()
-  }
-
-  selectGlobal() {
-    this.setState({stepIndex: 0})
   }
 
   selectContent() {
@@ -211,19 +207,19 @@ class InjectPopover extends Component {
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
-                <StepButton onClick={this.selectGlobal.bind(this)}>
+                <StepLabel>
                   1. Global parameters
-                </StepButton>
+                </StepLabel>
               </Step>
               <Step>
-                <StepButton onClick={this.selectContent.bind(this)}>
+                <StepLabel>
                   2. Content settings
-                </StepButton>
+                </StepLabel>
               </Step>
               <Step>
-                <StepButton onClick={this.selectAudiences.bind(this)}>
+                <StepLabel>
                   3. Audiences
-                </StepButton>
+                </StepLabel>
               </Step>
             </Stepper>
           }

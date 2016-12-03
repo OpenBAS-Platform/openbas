@@ -17,7 +17,7 @@ const toolbarStyle = {
   [ Constants.TOOLBAR_TYPE_EVENT ]: {
     position: 'fixed',
     top: 0,
-    right: 370,
+    right: 320,
     zIndex: '5000',
     backgroundColor: 'none',
   }

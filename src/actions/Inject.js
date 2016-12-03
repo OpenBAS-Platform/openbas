@@ -6,6 +6,11 @@ export const fetchInjects = (exerciseId, eventId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch)
 }
 
+export const fetchAllInjects = (exerciseId) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/injects'
+  return getReferential(schema.arrayOfInjects, uri)(dispatch)
+}
+
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId
   return putReferential(schema.inject, uri, data)(dispatch)
@@ -23,8 +28,4 @@ export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (disp
 
 export const fetchInjectTypes = () => (dispatch) => {
   return getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch)
-}
-
-export const fetchInjectStatuses = () => (dispatch) => {
-  return getReferential(schema.arrayOfInjectStatuses, '/api/inject_statuses')(dispatch)
 }

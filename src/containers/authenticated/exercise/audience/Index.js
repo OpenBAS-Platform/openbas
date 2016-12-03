@@ -5,7 +5,7 @@ import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {List} from '../../../../components/List'
-import {MainListItem, HeaderItem} from '../../../../components/list/ListItem';
+import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
 import AudienceNav from './AudienceNav'
@@ -16,7 +16,7 @@ import R from 'ramda'
 
 const styles = {
   'container': {
-    paddingRight: '350px',
+    paddingRight: '300px',
   },
   'header': {
     'avatar': {
@@ -138,7 +138,7 @@ class Index extends Component {
             {audience.audience_users.length === 0 ? (
               <div style={styles.empty}>This audience is empty.</div>
             ) : (
-              <HeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
+              <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
                           rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
                 {this.SortHeader('user_firstname', 'name')}
                 {this.SortHeader('user_email', 'Email address')}
@@ -158,7 +158,7 @@ class Index extends Component {
               let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
               let organizationName = R.propOr('-', 'organization_name', user_organization)
               //Return the dom
-              return <MainListItem
+              return <AvatarListItem
                 key={userId}
                 leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
                 rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
@@ -180,7 +180,7 @@ class Index extends Component {
     } else {
       return <div style={styles.container}>
         <AudienceNav exerciseId={exerciseId} audiences={audiences}/>
-        <div style={styles.empty}>No audience selected.</div>
+        <div style={styles.empty}>You do not have any audiences in this exercise.</div>
       </div>
     }
   }

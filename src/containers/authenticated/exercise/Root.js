@@ -36,16 +36,13 @@ class RootAuthenticated extends Component {
   }
 
   render() {
-    var exercise_status = R.path(['exercise', 'exercise_status'], this.props)
-    const status_name = R.pathOr('-', [exercise_status, 'status_name'], this.props.exercise_statuses)
-
     return (
       <div>
         <AppBar
           title={
             <div>
-              <span style={styles.title}>{R.path(['exercise', 'exercise_name'], this.props)}</span>
-              <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}><T>{status_name}</T></Chip>
+              <span style={styles.title}>{R.propOr('-', 'exercise_name', this.props.exercise)}</span>
+              <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}><T>{R.propOr('-', 'exercise_status', this.props.exercise)}</T></Chip>
             </div>
           }
           type={Constants.APPBAR_TYPE_TOPBAR}
@@ -68,7 +65,6 @@ RootAuthenticated.propTypes = {
   pathname: PropTypes.string,
   leftBarOpen: PropTypes.bool,
   exercise: PropTypes.object,
-  exercise_statuses: PropTypes.object,
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToExercise: PropTypes.func,
@@ -84,7 +80,6 @@ const select = (state, ownProps) => {
     id: exerciseId,
     pathname,
     exercise: R.prop(exerciseId, state.referential.entities.exercises),
-    exercise_statuses: state.referential.entities.exercise_statuses
   }
 }
 

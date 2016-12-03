@@ -22,6 +22,7 @@ class AudienceNav extends Component {
           {this.props.audiences.map(audience => {
             return (
               <ListItemLink
+                type={Constants.LIST_ITEM_NOSPACE}
                 key={audience.audience_id}
                 active={this.props.selectedAudience === audience.audience_id}
                 onClick={this.handleChangeAudience.bind(this, audience.audience_id)}

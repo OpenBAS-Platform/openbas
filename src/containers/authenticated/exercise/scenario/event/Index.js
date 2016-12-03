@@ -19,7 +19,7 @@ import InjectPopover from './InjectPopover'
 
 const styles = {
   'container': {
-    paddingRight: '350px',
+    paddingRight: '300px',
   },
   'header': {
     'icon': {
@@ -179,7 +179,7 @@ class Index extends Component {
               //Return the dom
               return <MainListItem
                 key={injectId}
-                leftAvatar={this.selectIcon(inject_type)}
+                leftIcon={this.selectIcon(inject_type)}
                 rightIconButton={
                   <InjectPopover
                     exerciseId={exerciseId}

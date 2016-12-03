@@ -22,6 +22,9 @@ import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
 import MapsLayers from 'material-ui/svg-icons/maps/layers'
 import NotificationSms from 'material-ui/svg-icons/notification/sms'
+import ImageCenterFocusStrong from 'material-ui/svg-icons/image/center-focus-strong'
+import ImageCenterFocusWeak from 'material-ui/svg-icons/image/center-focus-weak'
+import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 
 const iconStyle = {
   [ Constants.ICON_TYPE_NAVBAR ]: {
@@ -43,7 +46,12 @@ const iconStyle = {
   },
   [ Constants.ICON_TYPE_MAINLIST ]: {
     position: 'absolute',
-    top: '20px',
+    padding: 0,
+    top: '8px',
+  },
+  [ Constants.ICON_TYPE_MAINLIST2 ]: {
+    position: 'absolute',
+    top: '25px',
     left: '15px'
   },
 }
@@ -95,6 +103,12 @@ export const Icon = (props) => {
       return (<NotificationSms style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_EDITOR_ATTACH_FILE:
       return (<EditorAttachFile style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG:
+      return (<ImageCenterFocusStrong style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK:
+      return (<ImageCenterFocusWeak style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_AV_PLAY_ARROW:
+      return (<AVPlayArrow style={mergeStyle} color={props.color} />)
     default:
       return (<HardwareComputer style={mergeStyle} color={props.color} />)
   }

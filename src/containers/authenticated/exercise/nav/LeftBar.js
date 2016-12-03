@@ -34,7 +34,7 @@ class LeftBar extends Component {
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>
         <List>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
-                        active={this.props.pathname === '/private/exercise/' + this.props.id}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id || this.props.pathname.includes('/private/exercise/' + this.props.id + '/world')}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id}
                         label="World"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>

@@ -15,7 +15,7 @@ class IncidentNav extends Component {
 
   render() {
     return (
-      <Drawer width={350} docked={true} open={true} openSecondary={true} zindex={50}>
+      <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
         <CreateIncident exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident_types={this.props.incident_types}/>
         <List>
           {this.props.incidents.map(incident => {

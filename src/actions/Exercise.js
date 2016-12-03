@@ -20,7 +20,3 @@ export const updateExercise = (exerciseId, data) => (dispatch) => {
 export const deleteExercise = (exerciseId) => (dispatch) => {
   return delReferential('/api/exercises/' + exerciseId, 'exercises', exerciseId)(dispatch)
 }
-
-export const fetchExerciseStatuses = () => (dispatch) => {
-  return getReferential(schema.arrayOfExercisesStatuses, '/api/exercise_statuses')(dispatch)
-}

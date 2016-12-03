@@ -52,7 +52,6 @@ class IndexAuthenticated extends Component {
         <div style={styles.container}>
           {this.props.exercises.length === 0 ? <div style={styles.empty}>You do not have any available exercise on this platform.</div>:""}
           {this.props.exercises.map(exercise => {
-            const status_name = R.path([exercise.exercise_status, 'status_name'], this.props.exercise_statuses)
             var start_date = moment(exercise.exercise_start_date).format('MMM D, YYYY')
             var end_date = moment(exercise.exercise_end_date).format('MMM D, YYYY')
             return (
@@ -63,7 +62,7 @@ class IndexAuthenticated extends Component {
                   description={exercise.exercise_description}
                   startDate={start_date}
                   endDate={end_date}
-                  status={status_name}
+                  status={exercise.exercise_status}
                   organizer={exercise.exercise_organizer}
                   image={exercise.exercise_image.file_url}
                 />
@@ -77,9 +76,16 @@ class IndexAuthenticated extends Component {
   }
 }
 
+const sortExercises = (exercises) => {
+  let exercisesSorting = R.pipe(
+    R.sort((a, b) => a.exercise_start_date > b.exercise_start_date)
+  )
+  return exercisesSorting(exercises)
+}
+
+
 IndexAuthenticated.propTypes = {
   exercises: PropTypes.array,
-  exercise_statuses: PropTypes.array,
   fetchExercises: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
@@ -87,8 +93,7 @@ IndexAuthenticated.propTypes = {
 
 const select = (state) => {
   return {
-    exercises: R.values(state.referential.entities.exercises),
-    exercise_statuses: R.values(state.referential.entities.exercise_statuses)
+    exercises: sortExercises(R.values(state.referential.entities.exercises)),
   }
 }
 

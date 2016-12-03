@@ -6,6 +6,7 @@ import MUIFloatingActionButton from 'material-ui/FloatingActionButton';
 import MUIFlatButton from 'material-ui/FlatButton';
 import MUIIconButton from 'material-ui/IconButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import {injectIntl} from 'react-intl'
 
 const styles = {
@@ -78,6 +79,27 @@ FlatButtonIntl.propTypes = {
   onTouchTap: PropTypes.func
 }
 
+export const LinkFlatButtonIntl = (props) => (
+  <MUIFlatButton secondary={props.secondary}
+                 primary={props.primary}
+                 containerElement={<Link to={props.to}/>}
+                 label={props.intl.formatMessage({id: props.label})}
+                 style={buttonStyle[props.type]}
+                 disabled={props.disabled}
+                 />
+)
+export const LinkFlatButton = injectIntl(LinkFlatButtonIntl)
+
+LinkFlatButtonIntl.propTypes = {
+  to: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  intl: PropTypes.object,
+  disabled: PropTypes.bool,
+  primary: PropTypes.bool,
+  secondary: PropTypes.bool,
+}
+
 export const LinkButtonIntl = (props) => (
   <MUIRaisedButton primary={true}
                    containerElement={<Link to={props.to}/>}
@@ -105,6 +127,23 @@ export const FloatingActionsButtonCreate = (props) => (
 )
 
 FloatingActionsButtonCreate.propTypes = {
+  disabled: PropTypes.bool,
+  onClick: PropTypes.func,
+  children: PropTypes.node,
+  type: PropTypes.string
+}
+
+export const FloatingActionsButtonPlay = (props) => (
+  <MUIFloatingActionButton
+    secondary={true}
+    disabled={props.disabled}
+    onClick={props.onClick}
+    style={buttonStyle[props.type]}>
+    <AVPlayArrow />
+  </MUIFloatingActionButton>
+)
+
+FloatingActionsButtonPlay.propTypes = {
   disabled: PropTypes.bool,
   onClick: PropTypes.func,
   children: PropTypes.node,

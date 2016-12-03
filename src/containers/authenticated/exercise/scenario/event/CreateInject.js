@@ -4,11 +4,7 @@ import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchIncident} from '../../../../../actions/Incident'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
 import {DialogTitleElement} from '../../../../../components/Dialog';
-import {
-  Step,
-  Stepper,
-  StepButton,
-} from '../../../../../components/Stepper';
+import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button';
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
@@ -69,10 +65,6 @@ class CreateInject extends Component {
 
   onInjectTypeChange(event, index, value) {
     this.setState({type: value})
-  }
-
-  selectGlobal() {
-    this.setState({stepIndex: 0})
   }
 
   selectContent() {
@@ -143,19 +135,19 @@ class CreateInject extends Component {
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
-                <StepButton onClick={this.selectGlobal.bind(this)}>
+                <StepLabel>
                   1. Global parameters
-                </StepButton>
+                </StepLabel>
               </Step>
               <Step>
-                <StepButton onClick={this.selectContent.bind(this)}>
+                <StepLabel>
                   2. Content settings
-                </StepButton>
+                </StepLabel>
               </Step>
               <Step>
-                <StepButton onClick={this.selectAudiences.bind(this)}>
+                <StepLabel>
                   3. Audiences
-                </StepButton>
+                </StepLabel>
               </Step>
             </Stepper>
           }

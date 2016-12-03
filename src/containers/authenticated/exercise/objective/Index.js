@@ -1,8 +1,10 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem';
+import {Icon} from '../../../../components/Icon'
 import {fetchObjectives} from '../../../../actions/Objective'
 import {fetchSubobjectives} from '../../../../actions/Subobjective'
 import ObjectivePopover from './ObjectivePopover'
@@ -46,6 +48,7 @@ class IndexObjective extends Component {
                 return <SecondaryListItem
                   key={subobjective_id}
                   rightIconButton={<SubobjectivePopover exerciseId={exerciseId} objectiveId={objective.objective_id} subobjective={subobjective}/>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
                   primaryText={
                     <div>
                       <span style={styles.priority}>{objective.objective_priority}.{subobjective_priority}</span>
@@ -59,6 +62,7 @@ class IndexObjective extends Component {
             return (
               <MainListItem
                 key={objective.objective_id}
+                leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}/>}
                 rightIconButton={<ObjectivePopover exerciseId={exerciseId} objective={objective}/>}
                 primaryText={
                   <div>

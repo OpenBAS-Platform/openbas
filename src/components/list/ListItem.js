@@ -14,7 +14,7 @@ const styles = {
   'inactive': {
   },
   'mainitem': {
-    borderBottom: '1px solid #E0E0E0'
+    borderBottom: '1px solid #E0E0E0',
   },
   'mainitemdisabled': {
     borderBottom: '1px solid #E0E0E0',
@@ -74,7 +74,7 @@ const ListItemButtonIntl = (props) => (
     primaryText={props.intl.formatMessage({id: props.label})}
     onTouchTap={props.onClick}
     disabled={props.disabled}/>
-);
+)
 export const ListItemButton = injectIntl(ListItemButtonIntl)
 
 ListItemButtonIntl.propTypes = {
@@ -92,7 +92,7 @@ export const IconListItemLink = (props) => (
     leftIcon={props.leftIcon}
     style={props.active === true ? styles.active : styles.inactive}
     innerDivStyle={{padding: '20px 10px 20px 10px'}}/>
-);
+)
 
 IconListItemLink.propTypes = {
   intl: PropTypes.object,
@@ -122,11 +122,12 @@ AvatarListItemLinkIntl.propTypes = {
   disabled: PropTypes.bool,
 }
 
-export const MainListItem = (props) => (
+export const AvatarListItem = (props) => (
   <MUIListItem
     primaryText={props.primaryText}
     secondaryText={props.secondaryText}
     leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
     disabled={props.disabled}
@@ -136,10 +137,66 @@ export const MainListItem = (props) => (
     rightIconButton={props.rightIconButton}/>
 )
 
+AvatarListItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
+}
+
+export const AvatarHeaderItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={true}
+    style={styles.headeritem}
+    hoverColor="#ffffff"
+    disableKeyboardFocus={true}
+    rightIconButton={props.rightIconButton}/>
+)
+
+AvatarHeaderItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.element,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
+}
+
+export const MainListItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={true}
+    style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
+    innerDivStyle={{padding: '20px 10px 20px 60px'}}
+    rightIconButton={props.rightIconButton}/>
+)
+
 MainListItem.propTypes = {
   primaryText: PropTypes.node,
   secondaryText: PropTypes.node,
   leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
@@ -152,12 +209,14 @@ export const SecondaryListItem = (props) => (
     primaryText={props.primaryText}
     secondaryText={props.secondaryText}
     leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
     initiallyOpen={true}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
+    innerDivStyle={{padding: '20px 20px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>
 )
 
@@ -165,6 +224,7 @@ SecondaryListItem.propTypes = {
   primaryText: PropTypes.node,
   secondaryText: PropTypes.node,
   leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
@@ -205,6 +265,7 @@ export const HeaderItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={true}
     style={styles.headeritem}
+    innerDivStyle={{padding: '20px 20px 20px 60px'}}
     hoverColor="#ffffff"
     disableKeyboardFocus={true}
     rightIconButton={props.rightIconButton}/>

@@ -33,6 +33,8 @@ import IndexExerciseObjective from './containers/authenticated/exercise/objectiv
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
+import IndexExcerciseDryrun from './containers/authenticated/exercise/world/Dryrun'
+
 import Immutable from 'seamless-immutable'
 
 import roundMoment from './utils/Moment-round'
@@ -57,9 +59,10 @@ const initialState = {
       organizations: Immutable({}),
       tokens: Immutable({}),
       exercises: Immutable({}),
-      exercise_statuses: Immutable({}),
       objectives: Immutable({}),
       subobjectives: Immutable({}),
+      dryruns: Immutable({}),
+      dryinjects: Immutable({}),
       audiences: Immutable({}),
       events:Immutable({}),
       incidents: Immutable({}),
@@ -170,6 +173,7 @@ class App extends Component {
                 <Route path='exercise/:exerciseId' component={RootExercise}>
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
+                  <Route path='world/dryrun/:dryrunId' component={IndexExcerciseDryrun}/>
                   <Route path='objectives' component={IndexExerciseObjective}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
                   <Route path='scenario/:eventId' component={IndexExerciseScenarioEvent}/>

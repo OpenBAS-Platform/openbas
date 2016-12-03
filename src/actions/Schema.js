@@ -3,9 +3,6 @@ import {Schema, arrayOf} from 'normalizr'
 export const file = new Schema('files', {idAttribute: 'file_id'})
 export const arrayOfFiles = arrayOf(file)
 
-export const exerciseStatus = new Schema('exercise_statuses', {idAttribute: 'status_id'})
-export const arrayOfExercisesStatuses = arrayOf(exerciseStatus)
-
 export const incidentType = new Schema('incident_types', {idAttribute: 'type_id'})
 export const arrayOfIncidentTypes = arrayOf(incidentType)
 
@@ -33,6 +30,12 @@ export const arrayOfObjectives = arrayOf(objective)
 export const subobjective = new Schema('subobjectives', {idAttribute: 'subobjective_id'})
 export const arrayOfSubobjectives = arrayOf(subobjective)
 
+export const dryrun = new Schema('dryruns', {idAttribute: 'dryrun_id'})
+export const arrayOfDryruns = arrayOf(dryrun)
+
+export const dryinject = new Schema('dryinjects', {idAttribute: 'dryinject_id'})
+export const arrayOfDryinjects = arrayOf(dryinject)
+
 export const audience = new Schema('audiences', {idAttribute: 'audience_id'})
 export const arrayOfAudiences = arrayOf(audience)
 
@@ -53,14 +56,6 @@ user.define({
   user_organization: organization
 })
 
-exercise.define({
-  exercise_status: exerciseStatus
-})
-
 incident.define({
   incident_type: incidentType
-})
-
-inject.define({
-  inject_status: injectStatus
 })

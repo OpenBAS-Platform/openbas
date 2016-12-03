@@ -1,6 +1,6 @@
 import * as Constants from '../constants/ActionTypes'
 import * as schema from './Schema'
-import { push } from 'react-router-redux'
+import {push} from 'react-router-redux'
 import {postReferential, getReferential, delReferential} from '../utils/Action'
 
 export const askToken = (username, password) => (dispatch) => {
