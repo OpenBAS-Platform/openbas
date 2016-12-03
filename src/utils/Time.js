@@ -1,9 +1,12 @@
 import moment from 'moment-timezone'
 
+const openexDateFormat = 'YYYY-MM-DD HH:mm'
+
 export const dateFormat = (data) => {
-  return moment(data).format('YYYY-MM-DD HH:mm')
+  return moment(data).format(openexDateFormat)
 }
 
 export const dateToISO = (date) => {
-  return moment(date).format()
+  var momentDate = moment(date, openexDateFormat, true)
+  return momentDate.isValid() ? momentDate.format() : 'invalid-date'
 }

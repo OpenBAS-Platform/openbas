@@ -4,10 +4,19 @@ import {FormField} from '../../../../../components/Field'
 import {SelectField} from '../../../../../components/SelectField'
 import DateTimePicker from '../../../../../components/DateTimePicker'
 import {i18nRegister} from '../../../../../utils/Messages'
+import {MenuItemLink} from '../../../../../components/menu/MenuItem'
+import {T} from '../../../../../components/I18n'
+import R from 'ramda'
 
 i18nRegister({
   fr: {
     'Name': 'Nom',
+    'sms': 'Sms',
+    'email': 'Email'
+  },
+  en: {
+    'sms': 'Sms',
+    'email': 'Email'
   }
 })
 
@@ -34,27 +43,15 @@ class InjectForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="inject_title" fullWidth={true} type="text" label="Title"/>
-        <FormField ref="date"
-                   name="inject_date"
-                   fullWidth={true}
-                   type="text"
-                   label="Date and time"
+        <FormField ref="date" name="inject_date" fullWidth={true} type="text" label="Date and time"
                    onClick={this.raiseDatePicker.bind(this)}/>
         <DateTimePicker ref="datePicker" handleResult={this.replaceDateValue.bind(this)}/>
-        <FormField name="inject_description"
-                   fullWidth={true}
-                   multiLine={true}
-                   rows={3}
-                   type="text"
-                   label="Description"/>
-        <SelectField
-          label="Type"
-          name="inject_type"
-          fullWidth={true}
-          onChange={this.props.changeType}>
-          {this.props.types}
+        <FormField name="inject_description" fullWidth={true} multiLine={true} rows={3} type="text" label="Description"/>
+        <SelectField label="Type" name="inject_type" fullWidth={true} onSelectChange={this.props.onInjectTypeChange}>
+          {R.values(this.props.types).map(data => {
+            return (<MenuItemLink key={data.type} value={data.type} label={<T>{data.type}</T>}/>)
+          })}
         </SelectField>
       </form>
     )
@@ -68,8 +65,8 @@ InjectForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  changeType: PropTypes.func,
-  types: PropTypes.node
+  onInjectTypeChange: PropTypes.func,
+  types: PropTypes.object
 }
 
 export default reduxForm({form: 'InjectForm', validate}, null, {change})(InjectForm)

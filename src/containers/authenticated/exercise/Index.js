@@ -6,7 +6,7 @@ class Index extends Component {
     return (
       <div>
         <Chronology />
-        
+
       </div>
     )
   }

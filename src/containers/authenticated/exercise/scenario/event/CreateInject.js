@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchIncident} from '../../../../../actions/Incident'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
@@ -10,7 +9,6 @@ import {
   Stepper,
   StepButton,
 } from '../../../../../components/Stepper';
-import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button';
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
@@ -69,7 +67,7 @@ class CreateInject extends Component {
     this.handleClose()
   }
 
-  changeType(event, index, value) {
+  onInjectTypeChange(event, index, value) {
     this.setState({type: value})
   }
 
@@ -93,12 +91,8 @@ class CreateInject extends Component {
             ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
-            changeType={this.changeType.bind(this)}
-            types={R.values(this.props.inject_types).map(type => {
-              return (
-                <MenuItemLink key={type.type} value={type.type} label={type.type}/>
-              )
-            })}/>
+            onInjectTypeChange={this.onInjectTypeChange.bind(this)}
+            types={this.props.inject_types}/>
         )
       case 1:
         return (
@@ -168,8 +162,7 @@ class CreateInject extends Component {
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose.bind(this)}
-          actions={actions}
-        >
+          actions={actions}>
           <div>{this.getStepContent(this.state.stepIndex)}</div>
         </DialogTitleElement>
       </div>
