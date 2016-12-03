@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {SubmissionError} from 'redux-form'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {updateUser} from '../../../../actions/User'
 import {Paper} from '../../../../components/Paper'
@@ -37,6 +38,10 @@ class Index extends Component {
     return this.props.updateUser(this.props.user.user_id, data)
   }
 
+  onUpdatePassword(data) {
+    return this.props.updateUser(this.props.user.user_id, {'user_plain_password': data.user_plain_password})
+  }
+
   submitUser() {
     this.refs.userForm.submit()
   }
@@ -47,7 +52,7 @@ class Index extends Component {
 
   render() {
     var organizationPath = [R.propOr('-', 'user_organization', this.props.user), 'organization_name']
-    let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
+    var organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     var initPipe = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
       R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_lang']) //Pickup only needed fields
@@ -67,7 +72,7 @@ class Index extends Component {
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2>Password</h2>
-            <PasswordForm ref="passwordForm" onSubmit={this.onUpdate.bind(this)}/>
+            <PasswordForm ref="passwordForm" onSubmit={this.onUpdatePassword.bind(this)}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitPassword.bind(this)}/>
           </div>
@@ -86,7 +91,6 @@ Index.propTypes = {
 
 const select = (state) => {
   var userId = R.path(['logged', 'user'], state.app)
-  console.log('USERID', userId)
   return {
     user: R.prop(userId, state.referential.entities.users),
     organizations: state.referential.entities.organizations

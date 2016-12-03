@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {updateExercise, deleteExercise} from '../../../../actions/Exercise'
-import {fetchExerciseStatuses} from '../../../../actions/Exercise'
 import {redirectToHome} from '../../../../actions/Application'
 import {Paper} from '../../../../components/Paper'
 import {Button, FlatButton} from '../../../../components/Button'
@@ -11,7 +10,6 @@ import {Dialog} from '../../../../components/Dialog'
 import * as Constants from '../../../../constants/ComponentTypes'
 import R from 'ramda'
 import ExerciseForm from '../ExerciseForm'
-import StatusForm from './StatusForm'
 import FileGallery from '../../FileGallery'
 import {dateFormat, dateToISO} from '../../../../utils/Time'
 
@@ -28,8 +26,6 @@ i18nRegister({
   fr: {
     'Start date': 'Date de début',
     'End date': 'Date de fin',
-    'State': 'Etat',
-    'Status': 'Choisir un état',
     'Subtitle': 'Sous-titre'
   }
 })
@@ -38,10 +34,6 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {openDelete: false, openGallery: false}
-  }
-
-  componentDidMount() {
-    this.props.fetchExerciseStatuses();
   }
 
   onUpdate(data) {
@@ -54,10 +46,6 @@ class Index extends Component {
 
   submitInformation() {
     this.refs.informationForm.submit()
-  }
-
-  submitStatus() {
-    this.refs.statusForm.submit()
   }
 
   handleOpenDelete() {
@@ -99,7 +87,6 @@ class Index extends Component {
       R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date'])
     )
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
-    const initialStatus = exercise !== undefined ? {exercise_status: exercise.exercise_status} : undefined
     const image = exercise !== undefined ? exercise.exercise_image.file_url : undefined
 
     return (
@@ -110,14 +97,6 @@ class Index extends Component {
             <ExerciseForm ref="informationForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitInformation.bind(this)}/>
-          </div>
-        </Paper>
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2><T>State</T></h2>
-            <StatusForm ref="statusForm" onSubmit={this.onUpdate.bind(this)}
-                        status={this.props.exercise_statuses} initialValues={initialStatus}/>
-            <Button type="submit" label="Update" onClick={this.submitStatus.bind(this)}/>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
@@ -159,7 +138,6 @@ Index.propTypes = {
   updateExercise: PropTypes.func,
   redirectToHome: PropTypes.func,
   deleteExercise: PropTypes.func,
-  fetchExerciseStatuses: PropTypes.func
 }
 
 const select = (state, ownProps) => {
@@ -167,8 +145,7 @@ const select = (state, ownProps) => {
   return {
     id: exerciseId,
     exercise: R.prop(exerciseId, state.referential.entities.exercises),
-    exercise_statuses: state.referential.entities.exercise_statuses
   }
 }
 
-export default connect(select, {updateExercise, redirectToHome, deleteExercise, fetchExerciseStatuses})(Index)
+export default connect(select, {updateExercise, redirectToHome, deleteExercise})(Index)

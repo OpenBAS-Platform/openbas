@@ -1,11 +1,14 @@
 import React, {Component, PropTypes} from 'react'
-import Chronology from './Chronos'
+import Chronology from './world/Chronos'
 
 class Index extends Component {
   render() {
     return (
+      <div>
         <Chronology />
-    );
+        
+      </div>
+    )
   }
 }
 

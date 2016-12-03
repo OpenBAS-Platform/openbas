@@ -2,6 +2,15 @@ import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../../components/Field'
 
+const validate = values => {
+  const errors = {}
+  if( !values.user_plain_password || values.user_plain_password !== values.password_confirmation ) {
+    errors.user_plain_password = 'Passwords do no match'
+  }
+
+  return errors
+}
+
 class PasswordForm extends Component {
   render() {
     return (
@@ -23,4 +32,4 @@ PasswordForm.propTypes = {
   change: PropTypes.func,
 }
 
-export default reduxForm({form: 'ExerciseForm'}, null, {change})(PasswordForm)
+export default reduxForm({form: 'PasswordForm', validate}, null, {change})(PasswordForm)

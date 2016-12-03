@@ -53,7 +53,7 @@ class CreateIncident extends Component {
             types={this.props.incident_types}/>
         </Dialog>
       </div>
-    );
+    )
   }
 }
 

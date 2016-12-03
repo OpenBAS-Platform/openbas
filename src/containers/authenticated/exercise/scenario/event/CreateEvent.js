@@ -40,7 +40,7 @@ class CreateEvent extends Component {
         primary={true}
         onTouchTap={this.submitForm.bind(this)}
       />,
-    ];
+    ]
 
     return (
       <div>
@@ -55,7 +55,7 @@ class CreateEvent extends Component {
           <EventForm ref="eventForm" onSubmit={this.onSubmit.bind(this)} onSubmitSuccess={this.handleClose.bind(this)}/>
         </Dialog>
       </div>
-    );
+    )
   }
 }
 
