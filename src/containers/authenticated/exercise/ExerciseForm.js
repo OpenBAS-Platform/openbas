@@ -32,7 +32,6 @@ class ExerciseForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="exercise_name" fullWidth={true} type="text" label="Name"/>
         <FormField name="exercise_subtitle" fullWidth={true} type="text" label="Subtitle"/>
         <FormField name="exercise_description" fullWidth={true} multiLine={true} rows={3}

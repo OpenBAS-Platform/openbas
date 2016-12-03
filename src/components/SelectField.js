@@ -25,7 +25,7 @@ const renderSelectField = ({input, onSelectChange, label, fullWidth, multiLine, 
                   type={type}
                   {...input}
                   onChange={(event, index, value) => {
-                    onSelectChange(event, index, value)
+                    onSelectChange && onSelectChange(event, index, value)
                     input.onChange(value)
                   }}
                   children={children}
