@@ -51,7 +51,7 @@ class RootAuthenticated extends Component {
           type={Constants.APPBAR_TYPE_TOPBAR}
           onTitleTouchTap={this.redirectToExercise.bind(this)}
           onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
-          iconElementRight={<UserPopover/>}
+          iconElementRight={<UserPopover exerciseId={this.props.id}/>}
           showMenuIconButton={false}/>
         <NavBar id={this.props.id} pathname={this.props.pathname} />
         <LeftBar id={this.props.id} pathname={this.props.pathname}/>

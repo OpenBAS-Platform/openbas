@@ -30,7 +30,6 @@ const styles = {
 }
 
 class IndexAuthenticated extends Component {
-
   componentDidMount() {
     this.props.fetchExercises();
   }
@@ -82,7 +81,6 @@ IndexAuthenticated.propTypes = {
   exercises: PropTypes.array,
   exercise_statuses: PropTypes.array,
   fetchExercises: PropTypes.func,
-  toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
 }

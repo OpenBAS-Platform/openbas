@@ -54,7 +54,7 @@ class UserPopover extends Component {
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Profile" to="/profile"/>
+            <MenuItemLink label="Profile" onTouchTap={this.handleClose.bind(this)} to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
             <MenuItemButton label="Sign out" onTouchTap={this.logoutClick.bind(this)}/>
           </Menu>
         </Popover>
@@ -64,6 +64,7 @@ class UserPopover extends Component {
 }
 
 UserPopover.propTypes = {
+  exerciseId: PropTypes.string,
   userGravatar: PropTypes.string,
   logout: PropTypes.func,
   fetchToken: PropTypes.func,

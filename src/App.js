@@ -23,7 +23,9 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 import RootAnonymous from './containers/anonymous/Root'
 import Login from './containers/anonymous/login/Login'
 import RootAuthenticated from './containers/authenticated/Root'
+import RootUser from './containers/authenticated/user/Root'
 import IndexAuthenticated from './containers/authenticated/Index'
+import IndexProfile from './containers/authenticated/user/profile/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
@@ -162,6 +164,9 @@ class App extends Component {
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
+                <Route path='user' component={RootUser}>
+                  <Route path='profile' component={IndexProfile}/>
+                </Route>
                 <Route path='exercise/:exerciseId' component={RootExercise}>
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
@@ -171,6 +176,7 @@ class App extends Component {
                   <Route path='audience' component={IndexExerciseAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>
+                  <Route path='profile' component={IndexProfile}/>
                 </Route>
               </Route>
             </Router>
