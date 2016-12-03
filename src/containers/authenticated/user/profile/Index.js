@@ -46,13 +46,13 @@ class Index extends Component {
   }
 
   render() {
-    console.log('USER', this.props.user)
     var organizationPath = [R.propOr('-', 'user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
       R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_lang']) //Pickup only needed fields
     )(this.props.user)
+    console.log('initialValues', initialValues)
 
     return (
       <div>
@@ -88,7 +88,7 @@ const select = (state) => {
   var userId = R.path(['logged', 'user'], state.app)
   console.log('USERID', userId)
   return {
-    user: R.pathOr({}, userId, state.referential.entities.users),
+    user: R.propOr({}, userId, state.referential.entities.users),
     organizations: state.referential.entities.organizations
   }
 }
