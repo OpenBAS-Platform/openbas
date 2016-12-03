@@ -11,6 +11,12 @@ import R from 'ramda'
 i18nRegister({
   fr: {
     'Name': 'Nom',
+    'sms': 'Sms',
+    'email': 'Email'
+  },
+  en: {
+    'sms': 'Sms',
+    'email': 'Email'
   }
 })
 
