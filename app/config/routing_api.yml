@@ -50,6 +50,14 @@ exercises:
     type:     rest
     resource: APIBundle\Controller\ExerciseController
 
+exercises_dryruns:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\DryrunController
+
+exercises_dryruns_injects:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Dryrun\DryinjectController
+
 exercises_groups:
     type:     rest
     resource: APIBundle\Controller\Exercise\GroupController

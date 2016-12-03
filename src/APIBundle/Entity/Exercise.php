@@ -50,12 +50,6 @@ class Exercise
     protected $exercise_owner;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ExerciseStatus")
-     * @ORM\JoinColumn(name="exercise_status", referencedColumnName="status_id")
-     */
-    protected $exercise_status;
-
-    /**
      * @ORM\OneToMany(targetEntity="Grant", mappedBy="grant_exercise")
      * @var Grant[]
      */
@@ -78,6 +72,8 @@ class Exercise
      * @ORM\JoinColumn(name="exercise_image", referencedColumnName="file_id")
      */
     protected $exercise_image;
+
+    protected $exercise_status = 'SCHEDULED';
 
     public function __construct()
     {

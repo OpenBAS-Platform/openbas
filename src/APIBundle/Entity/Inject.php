@@ -77,9 +77,11 @@ class Inject
      */
     protected $inject_user;
 
+    protected $inject_exercise;
+
     public function __construct()
     {
-        $this->incident_audiences = new ArrayCollection();
+        $this->inject_audiences = new ArrayCollection();
     }
 
     public function getInjectId()
@@ -207,5 +209,16 @@ class Inject
         if( $this->inject_user !== null ) {
             $this->inject_user = $this->inject_user->getUserFirstname() . ' ' . $this->inject_user->getUserLastname();
         }
+    }
+
+    public function getInjectExercise()
+    {
+        return $this->inject_exercise;
+    }
+
+    public function setInjectExercise($exercise)
+    {
+        $this->inject_exercise = $exercise;
+        return $this;
     }
 }

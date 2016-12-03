@@ -38,7 +38,9 @@ class EventController extends Controller
         /* @var $events Event[] */
 
         foreach( $events as &$event) {
-            $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            if( $event->getEventImage() !== null ) {
+                $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            }
         }
 
         return $events;
@@ -71,7 +73,9 @@ class EventController extends Controller
             return $this->eventNotFound();
         }
 
-        $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+        if( $event->getEventImage() !== null ) {
+            $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+        }
         return $event;
     }
 
@@ -107,7 +111,9 @@ class EventController extends Controller
             $em->persist($event);
             $em->flush();
 
-            $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            if( $event->getEventImage() !== null ) {
+                $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            }
             return $event;
         } else {
             return $form;
@@ -181,6 +187,9 @@ class EventController extends Controller
             $em->flush();
             $em->clear();
             $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
+            if( $event->getEventImage() !== null ) {
+                $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            }
             return $event;
         } else {
             return $form;

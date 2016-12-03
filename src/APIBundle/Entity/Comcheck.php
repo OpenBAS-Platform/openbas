@@ -19,11 +19,6 @@ class Comcheck
     protected $comcheck_id;
 
     /**
-     * @ORM\Column(type="string")
-     */
-    protected $comcheck_name;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     protected $comcheck_start_date;
@@ -36,7 +31,7 @@ class Comcheck
     /**
      * @ORM\ManyToOne(targetEntity="Audience", inversedBy="audience_comchecks")
      * @ORM\JoinColumn(name="comcheck_audience", referencedColumnName="audience_id", onDelete="CASCADE")
-     * @var Objective
+     * @var Audience
      */
     protected $comcheck_audience;
 
@@ -63,17 +58,6 @@ class Comcheck
     public function setComcheckId($id)
     {
         $this->comcheck_id = $id;
-        return $this;
-    }
-
-    public function getComcheckName()
-    {
-        return $this->comcheck_name;
-    }
-
-    public function setComcheckName($name)
-    {
-        $this->comcheck_name = $name;
         return $this;
     }
 

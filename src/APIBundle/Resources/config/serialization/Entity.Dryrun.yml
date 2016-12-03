@@ -1,0 +1,16 @@
+APIBundle\Entity\Dryrun:
+    attributes:
+        dryrun_id:
+            groups: ['dryrun', 'dryinject']
+        dryrun_date:
+            groups: ['dryrun']
+        dryrun_status:
+            groups: ['dryrun']
+        dryrun_finished:
+            groups: ['dryrun']
+        dryrun_exercise:
+            groups: ['dryrun']
+        dryrun_audience:
+            groups: ['dryrun']
+        dryrun_dryinjects:
+            groups: ['dryrun']

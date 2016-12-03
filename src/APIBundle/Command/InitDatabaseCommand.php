@@ -3,13 +3,16 @@
 namespace APIBundle\Command;
 
 use APIBundle\Entity\Audience;
+use APIBundle\Entity\Event;
 use APIBundle\Entity\Exercise;
 use APIBundle\Entity\File;
 use APIBundle\Entity\Grant;
 use APIBundle\Entity\Group;
+use APIBundle\Entity\Incident;
 use APIBundle\Entity\IncidentType;
+use APIBundle\Entity\Inject;
+use APIBundle\Entity\Objective;
 use APIBundle\Entity\Result;
-use APIBundle\Entity\ExerciseStatus;
 use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Token;
 use APIBundle\Entity\User;
@@ -39,10 +42,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Initializing database');
         $output->writeln('============');
         $output->writeln('');
-
-        $statusScheduled = $this->createExerciseStatus('SCHEDULED');
-        $statusRunning = $this->createExerciseStatus('RUNNING');
-        $statusFinished = $this->createExerciseStatus('FINISHED');
 
         $resultAchieved = $this->createResult('ACHIEVED');
         $resultSemiAchieved = $this->createResult('SEMI_ACHIEVED');
@@ -92,7 +91,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
             new \DateTime('2018-01-01 08:00:00'),
             new \DateTime('2018-01-10 18:00:00'),
             $userAdmin,
-            $statusScheduled,
             $fileExercise
         );
         $output->writeln('Creating exercise \'Potatoes attack\'');
@@ -104,7 +102,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
             new \DateTime('2018-01-01 08:00:00'),
             new \DateTime('2018-01-10 18:00:00'),
             $userAdmin,
-            $statusScheduled,
             $fileExercise
         );
         $output->writeln('Creating exercise \'Cockroach invasion\'');
@@ -148,17 +145,81 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->joinGroup($userSam, $groupCockroachPlayers);
         $output->writeln('Sam is joining group \'Cockroach players\'');
 
-        $this->createAudience('Internet Service Providers', $exercisePotatoes, [$userSam, $userJane]);
-        $output->writeln('Creating audience \'Internet Service Providers\'');
-    }
+        $audienceDefence = $this->createAudience('National defence forces', $exercisePotatoes, [$userSam, $userJane]);
+        $output->writeln('Creating audience \'National defence forces\'');
 
-    private function createExerciseStatus($name) {
-        $status = new ExerciseStatus();
-        $status->setStatusName($name);
-        $this->em->persist($status);
-        $this->em->flush();
+        $audienceMedia = $this->createAudience('Communication team', $exercisePotatoes, [$userSam, $userJane, $userJerry]);
+        $output->writeln('Creating audience \'Communication team\'');
 
-        return $status;
+        $this->createObjective(
+            'Train the government to respond to a potatoes attack',
+            'Train all ministries and agencies to defend against potatoes and manage the crisis.',
+            1,
+            $exercisePotatoes);
+        $output->writeln('Creating objective \'Train the government to respond to a potatoes attack\'');
+
+        $this->createObjective(
+            'Train the government to communicate about a potatoes attack',
+            'Test the government communication strategy when facing a massive potatoes crisis.',
+            2,
+            $exercisePotatoes);
+        $output->writeln('Creating objective \'Train the government to communicate about a potatoes attack\'');
+
+        $eventReco = $this->createEvent('Potatoes go on reconnaissance', 'Potatoes are planning their attack and sending reconnaissance teams.', $exercisePotatoes);
+        $output->writeln('Creating event \'Potatoes go on reconnaissance\'');
+
+        $eventInfiltration = $this->createEvent('Potatoes infiltration', 'Potatoes infiltrate all strategic buildings and federal agencies.', $exercisePotatoes);
+        $output->writeln('Creating event \'Potatoes infiltration\'');
+
+        $incidentCapital = $this->createIncident(
+            'A potato is sent to the capital',
+            'A potato is sent to the capital in order to search targets.',
+            $typeOperational,
+            $eventReco);
+        $output->writeln('Creating incident \'A potato is sent to the capital\'');
+
+        $incidentSpy = $this->createIncident('A potato has been detected',
+            'The national security agency building has been infiltrated by a potato',
+            $typeOperational,
+            $eventInfiltration);
+        $output->writeln('Creating incident \'A potato has been detected in the national security agency\'');
+
+        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Conversation interception', 'body' => 'A conversation between the potatoes chief and an agent');
+        $injectIntercept = $this->createInject(
+            'Potatoes headquarters conversation',
+            'A potatoes headquarters conversation is intercepted',
+            json_encode($content),
+            new \DateTime('2018-01-01 08:01:00'),
+            'email',
+            $incidentCapital,
+            $userAdmin
+        );
+        $this->createInjectStatus($injectIntercept);
+        $output->writeln('Creating inject \'Potatoes headquarters conversation\'');
+
+        $injectArrival = $this->createInject(
+            'Potato arrival at the airport',
+            'A potato is arriving at the airport ',
+            json_encode($content),
+            new \DateTime('2018-01-01 08:15:00'),
+            'email',
+            $incidentCapital,
+            $userAdmin
+        );
+        $this->createInjectStatus($injectArrival);
+        $output->writeln('Creating inject \'Potato arrival at the airport\'');
+
+        $injectCamera = $this->createInject(
+            'A potato has been detected',
+            'A potato has been detected by CCTV',
+            json_encode($content),
+            new \DateTime('2018-01-01 08:45:00'),
+            'email',
+            $incidentCapital,
+            $userAdmin
+        );
+        $this->createInjectStatus($injectCamera);
+        $output->writeln('Creating inject \'A potato has been detected\'');
     }
 
     private function createIncidentType($name) {
@@ -218,7 +279,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $token;
     }
 
-    private function createExercise($name, $subtitle, $description, $startDate, $endDate, $owner, $status, $image) {
+    private function createExercise($name, $subtitle, $description, $startDate, $endDate, $owner, $image) {
         $exercise = new Exercise();
         $exercise->setExerciseName($name);
         $exercise->setExerciseSubtitle($subtitle);
@@ -226,7 +287,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $exercise->setExerciseStartDate($startDate);
         $exercise->setExerciseEndDate($endDate);
         $exercise->setExerciseOwner($owner);
-        $exercise->setExerciseStatus($status);
         $exercise->setExerciseImage($image);
         $this->em->persist($exercise);
         $this->em->flush();
@@ -281,5 +341,72 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
 
         return $audience;
+    }
+
+    private function createObjective($title, $description, $priority, $exercise) {
+        $objective = new Objective();
+        $objective->setObjectiveTitle($title);
+        $objective->setObjectiveDescription($description);
+        $objective->setObjectivePriority($priority);
+        $objective->setObjectiveExercise($exercise);
+
+        $this->em->persist($objective);
+        $this->em->flush();
+
+        return $objective;
+    }
+
+    private function createEvent($title, $description, $exercise) {
+        $event = new Event();
+        $event->setEventTitle($title);
+        $event->setEventDescription($description);
+        $event->setEventExercise($exercise);
+
+        $this->em->persist($event);
+        $this->em->flush();
+
+        return $event;
+    }
+
+    private function createIncident($title, $story, $type, $event) {
+        $incident = new Incident();
+        $incident->setIncidentTitle($title);
+        $incident->setIncidentStory($story);
+        $incident->setIncidentType($type);
+        $incident->setIncidentEvent($event);
+
+        $this->em->persist($incident);
+        $this->em->flush();
+
+        return $incident;
+    }
+
+    private function createInject($title, $description, $content, $date, $type, $incident, $user) {
+        $inject = new Inject();
+        $inject->setInjectAutomatic(1);
+        $inject->setInjectTitle($title);
+        $inject->setInjectDescription($description);
+        $inject->setInjectContent($content);
+        $inject->setInjectDate($date);
+        $inject->setInjectType($type);
+        $inject->setInjectIncident($incident);
+        $inject->setInjectUser($user);
+
+        $this->em->persist($inject);
+        $this->em->flush();
+
+        return $inject;
+    }
+
+    private function createInjectStatus($inject) {
+        $status = new InjectStatus();
+        $status->setStatusName('PENDING');
+        $status->setStatusDate(new \DateTime());
+        $status->setStatusInject($inject);
+
+        $this->em->persist($status);
+        $this->em->flush();
+
+        return $status;
     }
 }

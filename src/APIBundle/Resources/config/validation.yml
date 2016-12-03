@@ -79,6 +79,14 @@ APIBundle\Entity\Audience:
             - NotBlank: ~
             - Type: string
 
+APIBundle\Entity\Dryrun:
+    properties:
+        dryrun_audience:
+             - NotBlank: ~
+        dryrun_speed:
+            - NotBlank: ~
+            - Type: integer
+
 APIBundle\Entity\Event:
     properties:
         event_title:
