@@ -12,7 +12,7 @@ const styles = {
   }
 }
 
-const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint, children, meta: {touched, error}}) => (
+const renderSelectField = ({input, onSelectChange, label, fullWidth, multiLine, rows, type, hint, children, meta: {touched, error}}) => (
   <MUISelectField hintText={hint}
                   floatingLabelText={label}
                   floatingLabelFixed={false}
@@ -24,7 +24,10 @@ const renderSelectField = ({input, label, fullWidth, multiLine, rows, type, hint
                   rows={rows}
                   type={type}
                   {...input}
-                  onChange={(event, index, value) => input.onChange(value)}
+                  onChange={(event, index, value) => {
+                    onSelectChange(event, index, value)
+                    input.onChange(value)
+                  }}
                   children={children}
   />)
 
@@ -38,19 +41,14 @@ renderSelectField.propTypes = {
   label: PropTypes.string,
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
+  onSelectChange: PropTypes.func,
   children: PropTypes.node
 }
 
 export const SelectFieldIntl = (props) => (
-  <Field name={props.name}
-         label={props.label ? props.intl.formatMessage({id: props.label}) : undefined}
+  <Field label={props.label ? props.intl.formatMessage({id: props.label}) : undefined}
          hint={props.hint ? props.intl.formatMessage({id: props.hint}) : undefined}
-         fullWidth={props.fullWidth}
-         multiLine={props.multiLine}
-         rows={props.rows}
-         type={props.type}
-         children={props.children}
-         component={renderSelectField}/>
+         component={renderSelectField} {...props}/>
 )
 
 export const SelectField = injectIntl(SelectFieldIntl)
@@ -64,6 +62,6 @@ SelectFieldIntl.propTypes = {
   fullWidth: PropTypes.bool,
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
-  onChange: PropTypes.func,
+  onSelectChange: PropTypes.func,
   children: PropTypes.node
 }

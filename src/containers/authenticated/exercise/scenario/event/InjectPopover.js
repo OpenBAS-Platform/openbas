@@ -84,7 +84,7 @@ class InjectPopover extends Component {
     this.handleCloseEdit()
   }
 
-  changeType(event, index, value) {
+  onInjectTypeChange(event, index, value) {
     this.setState({type: value})
   }
 
@@ -127,12 +127,8 @@ class InjectPopover extends Component {
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
             initialValues={initialValues}
-            changeType={this.changeType.bind(this)}
-            types={R.values(this.props.inject_types).map(type => {
-              return (
-                <MenuItemLink key={type.type} value={type.type} label={type.type}/>
-              )
-            })}/>
+            onInjectTypeChange={this.onInjectTypeChange.bind(this)}
+            types={this.props.inject_types}/>
         )
       case 1:
         return (
@@ -208,8 +204,7 @@ class InjectPopover extends Component {
           modal={false}
           open={this.state.openDelete}
           onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
-        >
+          actions={deleteActions}>
           Do you confirm the removing of this inject?
         </DialogTitleElement>
         <DialogTitleElement
@@ -235,8 +230,7 @@ class InjectPopover extends Component {
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
-        >
+          actions={editActions}>
           <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
         </DialogTitleElement>
       </div>
