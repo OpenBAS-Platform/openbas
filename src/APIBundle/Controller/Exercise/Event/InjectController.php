@@ -53,6 +53,7 @@ class InjectController extends Controller
 
         foreach( $injects as &$inject ) {
             $inject->sanitizeUser();
+            $inject->setInjectExercise($exercise->getExerciseId());
         }
         return $injects;
     }

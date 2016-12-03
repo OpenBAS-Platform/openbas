@@ -20,3 +20,5 @@ APIBundle\Entity\Inject:
             groups: ['inject']
         inject_user:
             groups: ['inject']
+        inject_exercise:
+            groups: ['inject']
