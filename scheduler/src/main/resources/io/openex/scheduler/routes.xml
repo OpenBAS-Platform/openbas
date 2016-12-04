@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="openex-scheduler">
-        <from uri="timer:simple?period=5000"/>
+        <from uri="timer:simple?period=10s"/>
         <setHeader headerName="X-Auth-Token">
             <constant>{{openex.token}}</constant>
         </setHeader>
