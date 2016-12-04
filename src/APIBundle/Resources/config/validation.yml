@@ -79,6 +79,23 @@ APIBundle\Entity\Audience:
             - NotBlank: ~
             - Type: string
 
+APIBundle\Entity\Comcheck:
+    properties:
+        comcheck_audience:
+            - NotBlank: ~
+        comcheck_end_date:
+            - NotBlank: ~
+            - DateTime: ~
+        comcheck_subject:
+            - NotBlank: ~
+            - Type: string
+        comcheck_message:
+            - NotBlank: ~
+            - Type: string
+        comcheck_footer:
+            - NotBlank: ~
+            - Type: string
+
 APIBundle\Entity\Dryrun:
     properties:
         dryrun_audience:
@@ -114,6 +131,7 @@ APIBundle\Entity\Inject:
             - NotBlank: ~
             - Type: string
         inject_content:
+            - NotBlank: ~
             - Type: string
         inject_date:
             - NotBlank: ~

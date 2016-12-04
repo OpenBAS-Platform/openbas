@@ -2,7 +2,6 @@
 
 namespace APIBundle\Controller\Exercise;
 
-
 use APIBundle\Entity\DryinjectStatus;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -189,7 +188,7 @@ class DryrunController extends Controller
      *    description="Delete a dryrun"
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"audience"})
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"dryrun"})
      * @Rest\Delete("/exercises/{exercise_id}/dryruns/{dryrun_id}")
      */
     public function removeExercisesDryrunAction(Request $request)

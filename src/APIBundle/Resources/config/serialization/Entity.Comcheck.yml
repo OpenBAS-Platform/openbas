@@ -1,0 +1,14 @@
+APIBundle\Entity\Comcheck:
+    attributes:
+        comcheck_id:
+            groups: ['comcheck', 'comcheckStatus']
+        comcheck_start_date:
+            groups: ['comcheck']
+        comcheck_end_date:
+            groups: ['comcheck']
+        comcheck_exercise:
+            groups: ['comcheck']
+        comcheck_audience:
+            groups: ['comcheck']
+        comcheck_finished:
+            groups: ['comcheck']

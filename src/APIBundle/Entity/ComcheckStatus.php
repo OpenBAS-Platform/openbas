@@ -37,6 +37,11 @@ class ComcheckStatus
      */
     protected $status_last_update;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $status_state = 0;
+
     public function getStatusId()
     {
         return $this->status_id;
@@ -78,6 +83,17 @@ class ComcheckStatus
     public function setStatusLastUpdate($lastUpdate)
     {
         $this->status_last_update = $lastUpdate;
+        return $this;
+    }
+
+    public function getStatusState()
+    {
+        return $this->status_state;
+    }
+
+    public function setStatusState($state)
+    {
+        $this->status_state = $state;
         return $this;
     }
 }

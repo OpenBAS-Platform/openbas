@@ -29,26 +29,23 @@ class Comcheck
     protected $comcheck_end_date;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_comechecks")
+     * @ORM\JoinColumn(name="comcheck_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
+     * @var Exercise
+     */
+    protected $comcheck_exercise;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Audience", inversedBy="audience_comchecks")
      * @ORM\JoinColumn(name="comcheck_audience", referencedColumnName="audience_id", onDelete="CASCADE")
      * @var Audience
      */
     protected $comcheck_audience;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="user_comchecks")
-     * @ORM\JoinTable(name="comchecks_users",
-     *      joinColumns={@ORM\JoinColumn(name="comcheck_id", referencedColumnName="comcheck_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="RESTRICT")}
-     *      )
-     * @var User[]
-     */
-    protected $comcheck_users;
-
-    public function __construct()
-    {
-        $this->comcheck_users = new ArrayCollection();
-    }
+    protected $comcheck_subject;
+    protected $comcheck_message;
+    protected $comcheck_footer;
+    protected $comcheck_finished = 0;
 
     public function getComcheckId()
     {
@@ -83,6 +80,17 @@ class Comcheck
         return $this;
     }
 
+    public function getComcheckExercise()
+    {
+        return $this->comcheck_exercise;
+    }
+
+    public function setComcheckExercise($exercise)
+    {
+        $this->comcheck_exercise = $exercise;
+        return $this;
+    }
+
     public function getComcheckAudience()
     {
         return $this->comcheck_audience;
@@ -94,14 +102,56 @@ class Comcheck
         return $this;
     }
 
-    public function getComcheckUsers()
+    public function getComcheckSubject()
     {
-        return $this->comcheck_users;
+        return $this->comcheck_subject;
     }
 
-    public function setComcheckUsers($users)
+    public function setComcheckSubject($subject)
     {
-        $this->comcheck_users = $users;
+        $this->comcheck_subject = $subject;
         return $this;
+    }
+
+    public function getComcheckMessage()
+    {
+        return $this->comcheck_message;
+    }
+
+    public function setComcheckMessage($message)
+    {
+        $this->comcheck_message = $message;
+        return $this;
+    }
+
+    public function getComcheckFooter()
+    {
+        return $this->comcheck_footer;
+    }
+
+    public function setComcheckFooter($footer)
+    {
+        $this->comcheck_footer = $footer;
+        return $this;
+    }
+
+    public function getComcheckFinished()
+    {
+        return $this->comcheck_finished;
+    }
+
+    public function setComcheckFinished($finished)
+    {
+        $this->comcheck_finished = $finished;
+        return $this;
+    }
+
+    public function computeComcheckFinished() {
+        $now = new \DateTime();
+        if( $this->comcheck_end_date < $now ) {
+            $this->comcheck_finished = 1;
+        } else {
+            $this->comcheck_finished = 0;
+        }
     }
 }

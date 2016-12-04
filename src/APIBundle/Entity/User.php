@@ -67,12 +67,6 @@ class User implements UserInterface
     protected $user_audiences;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Comcheck", mappedBy="comcheck_users")
-     * @var Comcheck[]
-     */
-    protected $user_comchecks;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     protected $user_admin = 0;
