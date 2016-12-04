@@ -66,19 +66,19 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $tokenAdmin = $this->createToken($userAdmin);
         $output->writeln('Creating token for user admin: ' . $tokenAdmin->getTokenValue());
 
-        $userJane = $this->createUser('jane', 'jane', 'Jane', 'Doe', true, $organizationAgency);
+        $userJane = $this->createUser('jane', 'jane', 'Jane', 'Doe', false, $organizationAgency);
         $output->writeln('Creating user jane with password jane');
 
         $tokenJane = $this->createToken($userJane);
         $output->writeln('Creating token for user jane: ' . $tokenJane->getTokenValue());
 
-        $userJerry = $this->createUser('jerry', 'jerry', 'Jerry', 'Doe', true, $organizationAgency);
+        $userJerry = $this->createUser('jerry', 'jerry', 'Jerry', 'Doe', false, $organizationAgency);
         $output->writeln('Creating user jerry with password jerry');
 
         $tokenJerry = $this->createToken($userJerry);
         $output->writeln('Creating token for user jerry: ' . $tokenJerry->getTokenValue());
 
-        $userSam = $this->createUser('sam', 'sam', 'Sam', 'Doe', true, $organizationAgency);
+        $userSam = $this->createUser('sam', 'sam', 'Sam', 'Doe', false, $organizationAgency);
         $output->writeln('Creating user sam with password sam');
 
         $tokenSam = $this->createToken($userSam);
@@ -109,41 +109,20 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $groupPotatoesPlanners = $this->createGroup('Potatoes planners', $userAdmin);
         $output->writeln('Creating group \'Potatoes planners\'');
 
-        $groupPotatoesPlayers = $this->createGroup('Potatoes players', $userAdmin);
-        $output->writeln('Creating group \'Potatoes players\'');
-
         $groupCockroachPlanners = $this->createGroup('Cockroach planners', $userAdmin);
         $output->writeln('Creating group \'Cockroach planners\'');
-
-        $groupCockroachPlayers = $this->createGroup('Cockroach players', $userAdmin);
-        $output->writeln('Creating group \'Cockroach players\'');
 
         $this->createGrant('PLANNER', $groupPotatoesPlanners, $exercisePotatoes);
         $output->writeln('Group \'Potatoes planners\' granted PLANNER on exercise \'Potatoes attack\'');
 
-        $this->createGrant('PLAYER', $groupPotatoesPlayers, $exercisePotatoes);
-        $output->writeln('Group \'Potatoes players\' granted PLAYER on exercise \'Potatoes attack\'');
-
         $this->createGrant('PLANNER', $groupCockroachPlanners, $exerciseCockroach);
         $output->writeln('Group \'Cockroach planners\' granted PLANNER on exercise \'Cockroach attack\'');
-
-        $this->createGrant('PLAYER', $groupCockroachPlayers, $exerciseCockroach);
-        $output->writeln('Group \'Cockroach players\' granted PLAYER on exercise \'Cockroach attack\'');
 
         $this->joinGroup($userJane, $groupPotatoesPlanners);
         $output->writeln('Jane is joining group \'Potatoes planners\'');
 
-        $this->joinGroup($userJane, $groupCockroachPlayers);
-        $output->writeln('Jane is joining group \'Cockroach players\'');
-
-        $this->joinGroup($userJerry, $groupPotatoesPlayers);
-        $output->writeln('Jerry is joining group \'Potatoes players\'');
-
         $this->joinGroup($userJerry, $groupCockroachPlanners);
         $output->writeln('Jerry is joining group \'Cockroach planners\'');
-
-        $this->joinGroup($userSam, $groupCockroachPlayers);
-        $output->writeln('Sam is joining group \'Cockroach players\'');
 
         $audienceDefence = $this->createAudience('National defence forces', $exercisePotatoes, [$userSam, $userJane]);
         $output->writeln('Creating audience \'National defence forces\'');
