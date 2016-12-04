@@ -1,0 +1,3 @@
+comcheck_statuses:
+    type:     rest
+    resource: APIBundle\Controller\Anonymous\ComcheckStatusController

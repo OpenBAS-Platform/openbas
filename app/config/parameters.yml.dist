@@ -20,3 +20,4 @@ parameters:
 
     protocol:          http
     worker_url:        http://127.0.0.1:8080
+    mail_sender:       no-reply@openex.io

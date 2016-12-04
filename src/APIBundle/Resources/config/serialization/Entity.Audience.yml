@@ -1,7 +1,7 @@
 APIBundle\Entity\Audience:
     attributes:
         audience_id:
-            groups: ['audience', 'dryrun', 'user', 'inject']
+            groups: ['audience', 'dryrun', 'user', 'inject', 'comcheck']
         audience_name:
             groups: ['audience']
         audience_exercise:

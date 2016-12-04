@@ -50,6 +50,14 @@ exercises:
     type:     rest
     resource: APIBundle\Controller\ExerciseController
 
+exercises_comchecks:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\ComcheckController
+
+exercises_comchecks_statuses:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Comcheck\ComcheckStatusController
+
 exercises_dryruns:
     type:     rest
     resource: APIBundle\Controller\Exercise\DryrunController

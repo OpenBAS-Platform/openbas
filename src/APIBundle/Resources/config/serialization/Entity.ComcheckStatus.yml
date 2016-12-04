@@ -1,0 +1,12 @@
+APIBundle\Entity\ComcheckStatus:
+    attributes:
+        status_id:
+            groups: ['comcheckStatus']
+        status_user:
+            groups: ['comcheckStatus']
+        status_comcheck:
+            groups: ['comcheckStatus']
+        status_last_update:
+            groups: ['comcheckStatus']
+        status_state:
+            groups: ['comcheckStatus']

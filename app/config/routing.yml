@@ -2,6 +2,11 @@ doc:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
     prefix:   /api/doc
 
+anonymous_api:
+    resource: "routing_anonymous_api.yml"
+    prefix:   /api/anonymous
+    type:     rest
+
 api:
     resource: "routing_api.yml"
     prefix:   /api

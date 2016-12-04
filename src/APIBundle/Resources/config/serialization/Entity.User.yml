@@ -1,7 +1,7 @@
 APIBundle\Entity\User:
     attributes:
         user_id:
-            groups: ['user', 'token', 'audience', 'organization']
+            groups: ['user', 'token', 'audience', 'organization', 'comcheckStatus']
         user_firstname:
             groups: ['user', 'token']
         user_lastname:

@@ -49,7 +49,7 @@ class Dryrun
     protected $dryrun_dryinjects;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
     protected $dryrun_status = 1;
 

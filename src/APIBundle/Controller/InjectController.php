@@ -80,6 +80,8 @@ class InjectController extends Controller
                     $userData['user_lastname'] = $user->getUserLastname();
                     $userData['user_email'] = $user->getUserEmail();
                     $userData['user_phone'] = $user->getUserPhone();
+                    $userData['user_organization'] = array();
+                    $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
                     $data['data']['users'][] = $userData;
                 }
             }
@@ -112,6 +114,8 @@ class InjectController extends Controller
                 $userData['user_lastname'] = $user->getUserLastname();
                 $userData['user_email'] = $user->getUserEmail();
                 $userData['user_phone'] = $user->getUserPhone();
+                $userData['user_organization'] = array();
+                $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;
             }
 
