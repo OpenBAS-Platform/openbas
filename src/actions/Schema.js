@@ -18,6 +18,9 @@ export const arrayOfTokens = arrayOf(token)
 export const organization = new Schema('organizations', {idAttribute: 'organization_id'})
 export const arrayOfOrganizations = arrayOf(organization)
 
+export const group = new Schema('groups', {idAttribute: 'group_id'})
+export const arrayOfGroups = arrayOf(group)
+
 export const user = new Schema('users', {idAttribute: 'user_id'})
 export const arrayOfUsers = arrayOf(user)
 

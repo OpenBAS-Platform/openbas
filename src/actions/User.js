@@ -1,5 +1,5 @@
 import * as schema from './Schema'
-import {getReferential, postReferential, putReferential} from '../utils/Action'
+import {getReferential, postReferential, putReferential, delReferential} from '../utils/Action'
 
 export const fetchUsers = () => (dispatch) => {
   return getReferential(schema.arrayOfUsers, '/api/users')(dispatch)
@@ -15,4 +15,8 @@ export const addUser = (data) => (dispatch) => {
 
 export const updateUser = (userId, data) => (dispatch) => {
   return putReferential(schema.user, '/api/users/' + userId, data)(dispatch)
+}
+
+export const deleteUser = (userId) => (dispatch) => {
+  return delReferential('/api/users/' + userId, 'users', userId)(dispatch)
 }

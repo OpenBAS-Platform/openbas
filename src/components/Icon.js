@@ -9,6 +9,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add'
 import ContentCopy from 'material-ui/svg-icons/content/content-copy'
 import ContentMail from 'material-ui/svg-icons/content/mail'
 import ContentFlag from 'material-ui/svg-icons/content/flag'
+import ContentRemoveCircle from 'material-ui/svg-icons/content/remove-circle'
 import ActionDelete from 'material-ui/svg-icons/action/delete'
 import ActionSettings from 'material-ui/svg-icons/action/settings'
 import ActionSchedule from 'material-ui/svg-icons/action/schedule'
@@ -21,6 +22,7 @@ import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-u
 import ActionAssignmentTurnedIn from 'material-ui/svg-icons/action/assignment-turned-in'
 import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
+import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart'
 import MapsLayers from 'material-ui/svg-icons/maps/layers'
 import NotificationSms from 'material-ui/svg-icons/notification/sms'
 import NotificationNetworkCheck from 'material-ui/svg-icons/notification/network-check'
@@ -58,6 +60,10 @@ const iconStyle = {
     top: '25px',
     left: '15px'
   },
+  [ Constants.ICON_TYPE_MAINLIST_RIGHT ]: {
+    position: 'absolute',
+    top: '20px',
+  },
 }
 
 export const Icon = (props) => {
@@ -81,6 +87,8 @@ export const Icon = (props) => {
       return (<ContentMail style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_CONTENT_FLAG:
       return (<ContentFlag style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE:
+      return (<ContentRemoveCircle style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_DELETE:
       return (<ActionDelete style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_SETTINGS:
@@ -113,6 +121,8 @@ export const Icon = (props) => {
       return (<NotificationOndemandVideo style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_EDITOR_ATTACH_FILE:
       return (<EditorAttachFile style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_EDITOR_INSERT_CHART:
+      return (<EditorInsertChart style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG:
       return (<ImageCenterFocusStrong style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK:

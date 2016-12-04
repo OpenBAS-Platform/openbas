@@ -24,9 +24,13 @@ import RootAnonymous from './containers/anonymous/Root'
 import Login from './containers/anonymous/login/Login'
 import IndexComcheck from './containers/anonymous/comcheck/Index'
 import RootAuthenticated from './containers/authenticated/Root'
-import RootUser from './containers/authenticated/user/Root'
 import IndexAuthenticated from './containers/authenticated/Index'
-import IndexProfile from './containers/authenticated/user/profile/Index'
+import RootAdmin from './containers/authenticated/admin/Root'
+import IndexAdmin from './containers/authenticated/admin/Index'
+import IndexAdminUsers from './containers/authenticated/admin/user/Index'
+import IndexAdminGroups from './containers/authenticated/admin/group/Index'
+import RootUser from './containers/authenticated/user/Root'
+import IndexUserProfile from './containers/authenticated/user/profile/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
@@ -59,6 +63,7 @@ const initialState = {
     entities: Immutable({
       files: Immutable({}),
       users: Immutable({}),
+      groups: Immutable({}),
       organizations: Immutable({}),
       tokens: Immutable({}),
       exercises: Immutable({}),
@@ -173,8 +178,13 @@ class App extends Component {
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
+                <Route path='admin' component={RootAdmin}>
+                  <Route path='index' component={IndexAdmin}/>
+                  <Route path='users' component={IndexAdminUsers}/>
+                  <Route path='groups' component={IndexAdminGroups}/>
+                </Route>
                 <Route path='user' component={RootUser}>
-                  <Route path='profile' component={IndexProfile}/>
+                  <Route path='profile' component={IndexUserProfile}/>
                 </Route>
                 <Route path='exercise/:exerciseId' component={RootExercise}>
                   <IndexRoute component={IndexExercise}/>
@@ -188,7 +198,7 @@ class App extends Component {
                   <Route path='audience' component={IndexExerciseAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>
-                  <Route path='profile' component={IndexProfile}/>
+                  <Route path='profile' component={IndexUserProfile}/>
                 </Route>
               </Route>
             </Router>

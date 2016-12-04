@@ -12,7 +12,8 @@ import {i18nRegister} from '../../utils/Messages'
 i18nRegister({
   fr: {
     'Sign out': 'Se déconnecter',
-    'Profile': 'Profil'
+    'Profile': 'Profil',
+    'Admin': 'Admin'
   }
 })
 
@@ -55,6 +56,7 @@ class UserPopover extends Component {
                  onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Profile" onTouchTap={this.handleClose.bind(this)} to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
+            {this.props.userAdmin ? <MenuItemLink label="Admin" onTouchTap={this.handleClose.bind(this)} to='/private/admin/index'/> :""}
             <MenuItemButton label="Sign out" onTouchTap={this.logoutClick.bind(this)}/>
           </Menu>
         </Popover>
@@ -66,6 +68,7 @@ class UserPopover extends Component {
 UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   userGravatar: PropTypes.string,
+  userAdmin: PropTypes.bool,
   logout: PropTypes.func,
   fetchToken: PropTypes.func,
   children: PropTypes.node
@@ -74,7 +77,8 @@ UserPopover.propTypes = {
 const select = (state) => {
   var userId = R.path(['logged', 'user'], state.app)
   return {
-    userGravatar: R.path([userId, 'user_gravatar'], state.referential.entities.users)
+    userGravatar: R.path([userId, 'user_gravatar'], state.referential.entities.users),
+    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users)
   }
 }
 

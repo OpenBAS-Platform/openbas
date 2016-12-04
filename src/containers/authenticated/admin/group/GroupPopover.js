@@ -8,9 +8,8 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {updateUser} from '../../../../actions/User'
-import {updateAudience} from '../../../../actions/Audience'
-import UserForm from './UserForm'
+import {updateGroup, deleteGroup} from '../../../../actions/Group'
+import GroupForm from './GroupForm'
 
 const style = {
   position: 'absolute',
@@ -18,7 +17,7 @@ const style = {
   right: 0,
 }
 
-class UserPopover extends Component {
+class GroupPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,11 +49,11 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateUser(this.props.user.user_id, data)
+    return this.props.updateGroup(this.props.group.group_id, data)
   }
 
   submitFormEdit() {
-    this.refs.userForm.submit()
+    this.refs.groupForm.submit()
   }
 
   handleOpenDelete() {
@@ -67,12 +66,7 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    const user_ids = R.pipe(
-      R.values,
-      R.filter(a => a.user_id !== this.props.user.user_id),
-      R.map(u => u.user_id)
-    )(this.props.audience.audience_users)
-    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {audience_users: user_ids})
+    this.props.deleteGroup(this.props.group.group_id)
     this.handleCloseDelete()
   }
 
@@ -80,18 +74,13 @@ class UserPopover extends Component {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
-    ];
+    ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
-    ];
-    
-    var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
-    let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
-    let initialValues = R.pipe(
-      R.assoc('user_organization', organization_name), //Reformat organization
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization']) //Pickup only needed fields
-    )(this.props.user)
+    ]
+
+    let initialValues = R.pick(['group_name'], this.props.group) //Pickup only needed fields
 
     return (
       <div style={style}>
@@ -108,13 +97,12 @@ class UserPopover extends Component {
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          Do you confirm the removing of this user?
+          Do you confirm the removing of this group?
         </Dialog>
-        <Dialog title="Update the user" modal={false} open={this.state.openEdit}
+        <Dialog title="Update the group" modal={false} open={this.state.openEdit}
                 onRequestClose={this.handleCloseEdit.bind(this)}
                 actions={editActions}>
-          <UserForm ref="userForm" initialValues={initialValues}
-                    organizations={this.props.organizations}
+          <GroupForm ref="groupForm" initialValues={initialValues}
                     onSubmit={this.onSubmitEdit.bind(this)}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
@@ -129,14 +117,12 @@ const select = (state) => {
   }
 }
 
-UserPopover.propTypes = {
-  exerciseId: PropTypes.string,
-  user: PropTypes.object,
-  updateUser: PropTypes.func,
-  updateAudience: PropTypes.func,
-  audience: PropTypes.object,
+GroupPopover.propTypes = {
+  group: PropTypes.object,
+  updateGroup: PropTypes.func,
+  deleteGroup: PropTypes.func,
   organizations: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateUser, updateAudience})(UserPopover)
+export default connect(select, {updateGroup, deleteGroup})(GroupPopover)

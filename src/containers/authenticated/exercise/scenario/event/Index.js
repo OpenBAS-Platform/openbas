@@ -26,7 +26,7 @@ const styles = {
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700',
-      padding: '12px 0 0 8px'
+      padding: '8px 0 0 8px'
     },
     'inject_title': {
       float: 'left',
@@ -158,7 +158,7 @@ class Index extends Component {
             {incident.incident_injects.length === 0 ? (
               <div style={styles.empty}>This incident is empty.</div>
             ) : (
-              <HeaderItem leftAvatar={<span style={styles.header.icon}>#</span>}
+              <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
                           rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
                 {this.SortHeader('inject_title', 'Title')}
                 {this.SortHeader('inject_date', 'Date')}

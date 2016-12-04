@@ -185,7 +185,7 @@ class IndexExercise extends Component {
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(inject.inject_type, '#FF5722')}
+                  leftIcon={this.selectIcon(inject.inject_type)}
                 />
               )
             })}
@@ -201,6 +201,8 @@ class IndexExercise extends Component {
               let color = '#4CAF50'
               if( inject.inject_status.status_name === 'ERROR' ) {
                 color ='#F44336'
+              } else if( inject.inject_status.status_name === 'PARTIAL' ) {
+                color ='#FF5722'
               }
               return (
                 <MainListItem

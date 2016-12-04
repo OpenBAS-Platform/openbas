@@ -125,7 +125,7 @@ class IndexExcerciseDryrun extends Component {
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(dryinject.dryinject_type, '#FF5722')}
+                  leftIcon={this.selectIcon(dryinject.dryinject_type)}
                 />
               )
             })}
@@ -141,6 +141,8 @@ class IndexExcerciseDryrun extends Component {
               let color = '#4CAF50'
               if( dryinject.dryinject_status.status_name === 'ERROR' ) {
                 color ='#F44336'
+              } else if( dryinject.dryinject_status.status_name === 'PARTIAL' ) {
+                color ='#FF5722'
               }
               return (
                 <MainListItem

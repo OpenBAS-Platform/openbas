@@ -52,6 +52,7 @@ const styles = {
     },
     'status_state': {
       float: 'right',
+      width: '8%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'

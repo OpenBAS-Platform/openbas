@@ -29,6 +29,10 @@ export const redirectToHome  = () => (dispatch) => {
   dispatch(push('/'))
 }
 
+export const redirectToAdmin  = () => (dispatch) => {
+  dispatch(push('/private/admin/index'))
+}
+
 export const redirectToExercise  = (exerciseId) => (dispatch) => {
   dispatch(push('/private/exercise/' + exerciseId))
 }

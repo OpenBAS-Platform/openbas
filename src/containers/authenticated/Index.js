@@ -70,7 +70,7 @@ class IndexAuthenticated extends Component {
             )
           })}
         </div>
-        <CreateExercise />
+        {this.props.userAdmin ? <CreateExercise /> :""}
       </div>
     );
   }
@@ -89,11 +89,14 @@ IndexAuthenticated.propTypes = {
   fetchExercises: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
+  userAdmin: PropTypes.bool
 }
 
 const select = (state) => {
+  var userId = R.path(['logged', 'user'], state.app)
   return {
     exercises: sortExercises(R.values(state.referential.entities.exercises)),
+    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users)
   }
 }
 

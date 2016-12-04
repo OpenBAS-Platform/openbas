@@ -253,7 +253,7 @@ export const HeaderItem = (props) => (
   <MUIListItem
     primaryText={props.primaryText}
     secondaryText={props.secondaryText}
-    leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
     disabled={props.disabled}
@@ -269,7 +269,7 @@ export const HeaderItem = (props) => (
 HeaderItem.propTypes = {
   primaryText: PropTypes.node,
   secondaryText: PropTypes.node,
-  leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,

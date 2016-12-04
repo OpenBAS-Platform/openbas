@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {addUser} from '../../../../actions/User'
 import {Dialog} from '../../../../components/Dialog';
-import {FlatButton} from '../../../../components/Button';
+import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
 import UserForm from './UserForm'
 import * as Constants from '../../../../constants/ComponentTypes'
 
@@ -36,15 +36,12 @@ class CreateUser extends Component {
 
     return (
       <div>
-        <FlatButton label="Create a new user"
-          secondary={true}
-          onTouchTap={this.handleOpenCreate.bind(this)}
-          type={Constants.BUTTON_TYPE_DIALOG_LEFT}/>
+        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpenCreate.bind(this)}/>
         <Dialog title="Create a new user"
-          modal={false}
-          open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actionsCreateUser}>
+                modal={false}
+                open={this.state.openCreate}
+                onRequestClose={this.handleCloseCreate.bind(this)}
+                actions={actionsCreateUser}>
           <UserForm ref="userForm" onSubmit={this.onSubmitCreate.bind(this)} organizations={this.props.organizations}
                     onSubmitSuccess={this.handleCloseCreate.bind(this)}/>
         </Dialog>
@@ -54,7 +51,6 @@ class CreateUser extends Component {
 }
 
 CreateUser.propTypes = {
-  exerciseId: PropTypes.string,
   organizations: PropTypes.object,
   addUser: PropTypes.func,
 }

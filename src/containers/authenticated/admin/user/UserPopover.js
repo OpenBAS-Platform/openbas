@@ -8,8 +8,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {updateUser} from '../../../../actions/User'
-import {updateAudience} from '../../../../actions/Audience'
+import {updateUser, deleteUser} from '../../../../actions/User'
 import UserForm from './UserForm'
 
 const style = {
@@ -67,12 +66,7 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    const user_ids = R.pipe(
-      R.values,
-      R.filter(a => a.user_id !== this.props.user.user_id),
-      R.map(u => u.user_id)
-    )(this.props.audience.audience_users)
-    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {audience_users: user_ids})
+    this.props.deleteUser(this.props.user.user_id)
     this.handleCloseDelete()
   }
 
@@ -80,11 +74,11 @@ class UserPopover extends Component {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
-    ];
+    ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
-    ];
+    ]
     
     var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
@@ -116,6 +110,7 @@ class UserPopover extends Component {
           <UserForm ref="userForm" initialValues={initialValues}
                     organizations={this.props.organizations}
                     onSubmit={this.onSubmitEdit.bind(this)}
+                    userAdmin={this.props.user.user_admin}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
       </div>
@@ -130,13 +125,11 @@ const select = (state) => {
 }
 
 UserPopover.propTypes = {
-  exerciseId: PropTypes.string,
   user: PropTypes.object,
   updateUser: PropTypes.func,
-  updateAudience: PropTypes.func,
-  audience: PropTypes.object,
+  deleteUser: PropTypes.func,
   organizations: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateUser, updateAudience})(UserPopover)
+export default connect(select, {updateUser, deleteUser})(UserPopover)
