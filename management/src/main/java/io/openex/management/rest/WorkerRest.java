@@ -68,14 +68,13 @@ public class WorkerRest {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@SuppressWarnings("unchecked")
-	public String executeWorker(@PathParam("id") String id, String jsonRequest) throws Exception {
+	public Object executeWorker(@PathParam("id") String id, String jsonRequest) throws Exception {
 		DefaultCamelContext context = openexContext.getContext();
 		AuditWorker auditWorker = new ProxyBuilder(context).endpoint("direct:remote")
 				.build(AuditWorker.class);
 		Map jsonToCamelMap = gson.fromJson(jsonRequest, Map.class);
 		jsonToCamelMap.put("route-id", id);
-		auditWorker.auditMessage(jsonToCamelMap);
-		return gson.toJson("Execution success");
+		return auditWorker.auditMessage(jsonToCamelMap);
 	}
 	
 	@Reference
