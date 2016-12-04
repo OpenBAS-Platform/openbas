@@ -13,8 +13,8 @@
         <setHeader headerName="CamelFreemarkerTemplate">
             <simple>${body[body]}</simple>
         </setHeader>
-        <!-- Send a mail for each user -->
-        <split streaming="true" parallelProcessing="true">
+        <!-- Send a mail for each user (openexStrategy is mandatory) -->
+        <split streaming="true" parallelProcessing="true" strategyRef="openexStrategy">
             <simple>${body[users]}</simple>
             <setHeader headerName="To">
                 <simple>${body[user_email]}</simple>
@@ -27,16 +27,17 @@
                         <simple>${body}</simple>
                     </setHeader>
                     <to uri="freemarker:from_header"/>
+                    <!-- Send the email -->
                     <to uri="smtp://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
+                    <!-- Output message for callback -->
+                    <setBody>
+                        <simple>${header.To} success</simple>
+                    </setBody>
                 </when>
                 <otherwise>
-                    <log loggingLevel="WARN" message="${body} has no email"/>
+                    <throwException exceptionType="java.lang.IllegalArgumentException" message="${body[user_firstname]} error: no email"/>
                 </otherwise>
             </choice>
         </split>
-        <!-- Set header for callback inject message -->
-        <setHeader headerName="return-message">
-            <simple>Successfully send mails to ${body[users].size()} users</simple>
-        </setHeader>
     </route>
 </routes>

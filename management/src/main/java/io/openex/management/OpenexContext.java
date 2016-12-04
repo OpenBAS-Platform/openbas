@@ -1,5 +1,6 @@
 package io.openex.management;
 
+import io.openex.management.helper.OpenexAggregationStrategy;
 import io.openex.management.registry.IWorkerListener;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.ThreadPoolRejectedPolicy;
@@ -20,9 +21,7 @@ import org.osgi.service.component.annotations.Reference;
 import java.io.File;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @SuppressWarnings("PackageAccessibility")
@@ -137,6 +136,7 @@ public class OpenexContext implements IOpenexContext {
 	private void createContext() throws Exception {
 		SimpleRegistry registry = new SimpleRegistry();
 		registry.put("openexRouter", new OpenexRouter());
+		registry.put("openexStrategy", new OpenexAggregationStrategy());
 		context.setRegistry(registry);
 		File[] propertiesFiles = new File(System.getProperty("karaf.home") + "/openex/").listFiles();
 		assert propertiesFiles != null;

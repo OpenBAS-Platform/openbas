@@ -17,18 +17,33 @@ public class Contract {
 		return new Contract();
 	}
 	
-	public Contract add(String field) {
+	public Contract mandatory(String field) {
 		fields.add(new ContractField(field, Text));
 		return this;
 	}
 	
-	public Contract add(String field, ContractType type) {
+	public Contract optional(String field) {
+		fields.add(new ContractField(field, Text, false));
+		return this;
+	}
+	
+	public Contract mandatory(String field, ContractType type) {
 		fields.add(new ContractField(field, type));
 		return this;
 	}
 	
-	public Contract add(String field, ContractType type, ContractCardinality cardinality) {
+	public Contract optional(String field, ContractType type) {
+		fields.add(new ContractField(field, type, false));
+		return this;
+	}
+	
+	public Contract mandatory(String field, ContractType type, ContractCardinality cardinality) {
 		fields.add(new ContractField(field, type, cardinality));
+		return this;
+	}
+	
+	public Contract optional(String field, ContractType type, ContractCardinality cardinality) {
+		fields.add(new ContractField(field, type, cardinality, false));
 		return this;
 	}
 	

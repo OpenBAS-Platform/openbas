@@ -21,10 +21,10 @@ class EmailExecutor implements Executor {
 	@Override
 	public Contract contract() {
 		return Contract.build()
-				.add("sender")
-				.add("subject")
-				.add("body", Textarea)
-				.add("attachments", Attachment, Multiple);
+				.mandatory("sender")
+				.mandatory("subject")
+				.mandatory("body", Textarea)
+				.optional("attachments", Attachment, Multiple);
 	}
 	
 	@Override
