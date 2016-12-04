@@ -69,21 +69,6 @@ ListItemLinkIntl.propTypes = {
   type: PropTypes.string
 }
 
-const ListItemButtonIntl = (props) => (
-  <MUIListItem
-    primaryText={props.intl.formatMessage({id: props.label})}
-    onTouchTap={props.onClick}
-    disabled={props.disabled}/>
-)
-export const ListItemButton = injectIntl(ListItemButtonIntl)
-
-ListItemButtonIntl.propTypes = {
-  label: PropTypes.string.isRequired,
-  intl: PropTypes.object,
-  disabled: PropTypes.bool,
-  onClick: PropTypes.func
-}
-
 export const IconListItemLink = (props) => (
   <MUIListItem
     containerElement={<Link to={props.to}/>}
@@ -100,26 +85,6 @@ IconListItemLink.propTypes = {
   leftIcon: PropTypes.element,
   disabled: PropTypes.bool,
   active: PropTypes.bool
-}
-
-const AvatarListItemLinkIntl = (props) => (
-  <MUIListItem
-    primaryText={props.intl.formatMessage({id: props.label})}
-    leftAvatar={props.leftAvatar}
-    rightIcon={props.rightIcon}
-    onTouchTap={props.onClick}
-    disabled={props.disabled}
-    innerDivStyle={{padding: '20px 20px 20px 70px'}}/>
-)
-export const AvatarListItemLink = injectIntl(AvatarListItemLinkIntl)
-
-AvatarListItemLinkIntl.propTypes = {
-  label: PropTypes.string,
-  intl: PropTypes.object,
-  leftAvatar: PropTypes.element,
-  rightIcon: PropTypes.element,
-  onClick: PropTypes.func,
-  disabled: PropTypes.bool,
 }
 
 export const AvatarListItem = (props) => (
@@ -204,6 +169,36 @@ MainListItem.propTypes = {
   nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
 
+export const MainListItemLink = (props) => (
+  <MUIListItem
+    containerElement={<Link to={props.to}/>}
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={true}
+    style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
+    innerDivStyle={{padding: '20px 10px 20px 60px'}}
+    rightIconButton={props.rightIconButton}/>
+)
+
+MainListItemLink.propTypes = {
+  to: PropTypes.string,
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
+}
+
 export const SecondaryListItem = (props) => (
   <MUIListItem
     primaryText={props.primaryText}
@@ -265,7 +260,7 @@ export const HeaderItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={true}
     style={styles.headeritem}
-    innerDivStyle={{padding: '20px 20px 20px 60px'}}
+    innerDivStyle={{padding: '20px 10px 20px 60px'}}
     hoverColor="#ffffff"
     disableKeyboardFocus={true}
     rightIconButton={props.rightIconButton}/>

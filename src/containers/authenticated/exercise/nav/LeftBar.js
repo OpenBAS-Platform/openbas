@@ -11,8 +11,12 @@ import {i18nRegister} from '../../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'Exercises': 'Exercices',
-    'Users': 'Utilisateurs'
+    'Home': 'Accueil',
+    'Checks': 'Vérifications',
+    'Objectives': 'Objectifs',
+    'Scenario': 'Scénario',
+    'Audience': 'Audience',
+    'Settings': 'Paramètres',
   }
 })
 
@@ -36,8 +40,13 @@ class LeftBar extends Component {
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
                         active={this.props.pathname === '/private/exercise/' + this.props.id || this.props.pathname.includes('/private/exercise/' + this.props.id + '/world')}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id}
-                        label="World"
+                        label="Home"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/checks')}
+                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/checks'}
+                        label="Checks"
+                        leftIcon={<Icon name={Constants.ICON_NAME_AV_SLOW_MOTION_VIDEO}/>}/>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
                         active={this.props.pathname === '/private/exercise/' + this.props.id + '/objectives'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/objectives'}

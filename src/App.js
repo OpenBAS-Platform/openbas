@@ -22,6 +22,7 @@ import R from 'ramda'
 import injectTapEventPlugin from 'react-tap-event-plugin'
 import RootAnonymous from './containers/anonymous/Root'
 import Login from './containers/anonymous/login/Login'
+import IndexComcheck from './containers/anonymous/comcheck/Index'
 import RootAuthenticated from './containers/authenticated/Root'
 import RootUser from './containers/authenticated/user/Root'
 import IndexAuthenticated from './containers/authenticated/Index'
@@ -29,11 +30,13 @@ import IndexProfile from './containers/authenticated/user/profile/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
-import IndexExerciseObjective from './containers/authenticated/exercise/objective/Index'
+import IndexExerciseObjectives from './containers/authenticated/exercise/objective/Index'
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
-import IndexExcerciseDryrun from './containers/authenticated/exercise/world/Dryrun'
+import IndexExerciseChecks from './containers/authenticated/exercise/check/Index'
+import IndexExcerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
+import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
 
 import Immutable from 'seamless-immutable'
 
@@ -61,6 +64,8 @@ const initialState = {
       exercises: Immutable({}),
       objectives: Immutable({}),
       subobjectives: Immutable({}),
+      comchecks: Immutable({}),
+      comchecks_statuses: Immutable({}),
       dryruns: Immutable({}),
       dryinjects: Immutable({}),
       audiences: Immutable({}),
@@ -164,6 +169,7 @@ class App extends Component {
               <Route path='/' component={UserIsNotAuthenticated(RootAnonymous)}>
                 <IndexRoute component={Login}/>
                 <Route path='/login' component={UserIsNotAuthenticated(Login)}/>
+                <Route path='/comcheck/:statusId' component={IndexComcheck}/>
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
@@ -173,8 +179,10 @@ class App extends Component {
                 <Route path='exercise/:exerciseId' component={RootExercise}>
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
-                  <Route path='world/dryrun/:dryrunId' component={IndexExcerciseDryrun}/>
-                  <Route path='objectives' component={IndexExerciseObjective}/>
+                  <Route path='checks' component={IndexExerciseChecks}/>
+                  <Route path='checks/dryrun/:dryrunId' component={IndexExcerciseDryrun}/>
+                  <Route path='checks/comcheck/:comcheckId' component={IndexExerciseComcheck}/>
+                  <Route path='objectives' component={IndexExerciseObjectives}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
                   <Route path='scenario/:eventId' component={IndexExerciseScenarioEvent}/>
                   <Route path='audience' component={IndexExerciseAudience}/>

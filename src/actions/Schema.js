@@ -30,6 +30,12 @@ export const arrayOfObjectives = arrayOf(objective)
 export const subobjective = new Schema('subobjectives', {idAttribute: 'subobjective_id'})
 export const arrayOfSubobjectives = arrayOf(subobjective)
 
+export const comcheck = new Schema('comchecks', {idAttribute: 'comcheck_id'})
+export const arrayOfComchecks = arrayOf(comcheck)
+
+export const comcheckStatus = new Schema('comchecks_statuses', {idAttribute: 'status_id'})
+export const arrayOfComcheckStatuses = arrayOf(comcheckStatus)
+
 export const dryrun = new Schema('dryruns', {idAttribute: 'dryrun_id'})
 export const arrayOfDryruns = arrayOf(dryrun)
 

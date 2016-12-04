@@ -1,27 +1,25 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
 import {Link} from 'react-router'
 import MenuItem from 'material-ui/MenuItem'
 import {injectIntl} from 'react-intl'
 
-class MenuItemLinkClass extends Component {
-    render() {
-        return (<MenuItem
-            primaryText={this.props.label}
-            containerElement={<Link to={this.props.to}/>}
-            disabled={this.props.disabled}
-            value={this.props.value}
-            onTouchTap={this.props.onTouchTap}/>)
-    }
-}
+const MenuItemLinkIntl = (props) => (
+  <MenuItem
+    primaryText={props.intl.formatMessage({id: props.label})}
+    containerElement={<Link to={props.to}/>}
+    disabled={props.disabled}
+    value={props.value}
+    onTouchTap={props.onTouchTap}/>
+)
+export const MenuItemLink = injectIntl(MenuItemLinkIntl)
 
-export const MenuItemLink = MenuItemLinkClass
-
-MenuItemLink.propTypes = {
+MenuItemLinkIntl.propTypes = {
   label: PropTypes.oneOfType([PropTypes.string.isRequired, PropTypes.object.isRequired]),
   to: PropTypes.string,
   disabled: PropTypes.bool,
   value: PropTypes.string,
-  onTouchTap: PropTypes.func
+  onTouchTap: PropTypes.func,
+  intl: PropTypes.object
 }
 
 const MenuItemButtonIntl = (props) => (
@@ -30,7 +28,7 @@ const MenuItemButtonIntl = (props) => (
     onTouchTap={props.onTouchTap}
     disabled={props.disabled}
   />
-);
+)
 export const MenuItemButton = injectIntl(MenuItemButtonIntl)
 
 MenuItemButtonIntl.propTypes = {

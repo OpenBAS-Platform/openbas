@@ -11,8 +11,8 @@ import {i18nRegister} from '../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'Sign out': 'Déconnexion',
-    'Profile': 'Profile'
+    'Sign out': 'Se déconnecter',
+    'Profile': 'Profil'
   }
 })
 

@@ -14,6 +14,7 @@ import ActionSettings from 'material-ui/svg-icons/action/settings'
 import ActionSchedule from 'material-ui/svg-icons/action/schedule'
 import ActionEvent from 'material-ui/svg-icons/action/event'
 import ActionExitToApp from 'material-ui/svg-icons/action/exit-to-app'
+import ActionCheckCircle from 'material-ui/svg-icons/action/check-circle'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
 import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
 import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
@@ -22,9 +23,12 @@ import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
 import MapsLayers from 'material-ui/svg-icons/maps/layers'
 import NotificationSms from 'material-ui/svg-icons/notification/sms'
+import NotificationNetworkCheck from 'material-ui/svg-icons/notification/network-check'
+import NotificationOndemandVideo from 'material-ui/svg-icons/notification/ondemand-video'
 import ImageCenterFocusStrong from 'material-ui/svg-icons/image/center-focus-strong'
 import ImageCenterFocusWeak from 'material-ui/svg-icons/image/center-focus-weak'
 import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow'
+import AVSlowMotionVideo from 'material-ui/svg-icons/av/slow-motion-video'
 
 const iconStyle = {
   [ Constants.ICON_TYPE_NAVBAR ]: {
@@ -89,6 +93,8 @@ export const Icon = (props) => {
       return (<ActionExitToApp style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN:
       return (<ActionAssignmentTurnedIn style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_ACTION_CHECK_CIRCLE:
+      return (<ActionCheckCircle style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
       return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN:
@@ -101,6 +107,10 @@ export const Icon = (props) => {
       return (<MapsLayers style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NOTIFICATION_SMS:
       return (<NotificationSms style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK:
+      return (<NotificationNetworkCheck style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO:
+      return (<NotificationOndemandVideo style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_EDITOR_ATTACH_FILE:
       return (<EditorAttachFile style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG:
@@ -109,6 +119,8 @@ export const Icon = (props) => {
       return (<ImageCenterFocusWeak style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_AV_PLAY_ARROW:
       return (<AVPlayArrow style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_AV_SLOW_MOTION_VIDEO:
+      return (<AVSlowMotionVideo style={mergeStyle} color={props.color} />)
     default:
       return (<HardwareComputer style={mergeStyle} color={props.color} />)
   }

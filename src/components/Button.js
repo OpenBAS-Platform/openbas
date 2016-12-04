@@ -24,7 +24,7 @@ const buttonStyle = {
   [ Constants.BUTTON_TYPE_FLOATING_PADDING ]: {
     position: 'fixed',
     bottom: 30,
-    right: 380,
+    right: 330,
     zIndex: '5000'
   },
   [ Constants.BUTTON_TYPE_DIALOG_LEFT ]: {

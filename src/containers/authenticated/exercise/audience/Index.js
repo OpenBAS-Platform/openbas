@@ -1,9 +1,12 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
+import {fetchComchecks} from '../../../../actions/Comcheck'
+import {LinkFlatButton} from '../../../../components/Button'
 import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
@@ -12,7 +15,7 @@ import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
 import UserPopover from './UserPopover'
-import R from 'ramda'
+import {dateFormat} from '../../../../utils/Time'
 
 const styles = {
   'container': {
@@ -76,6 +79,17 @@ const styles = {
   'org': {
     float: 'left',
     padding: '5px 0 0 0'
+  },
+  'comchecks': {
+    borderRadius: '5px',
+    border: '3px solid #FF4081',
+    padding: '10px',
+    margin: '0 0 20px 0',
+    textAlign: 'center'
+  },
+  'running': {
+    fontWeight: '600',
+    margin: '0 0 10px 0'
   }
 }
 
@@ -89,6 +103,27 @@ class Index extends Component {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchUsers()
     this.props.fetchOrganizations()
+    this.props.fetchComchecks(this.props.exerciseId)
+    this.repeatTimeout()
+  }
+
+  componentWillUnmount() {
+    //noinspection Eslint
+    clearTimeout(this.repeat)
+  }
+
+  repeatTimeout() {
+    //noinspection Eslint
+    const context = this
+    //noinspection Eslint
+    this.repeat = setTimeout(function () {
+      context.circularFetch()
+      context.repeatTimeout(context);
+    }, 5000)
+  }
+
+  circularFetch() {
+    this.props.fetchComchecks(this.props.exerciseId, true)
   }
 
   reverseBy(field) {
@@ -114,6 +149,22 @@ class Index extends Component {
   }
 
   render() {
+    let comchecks = null
+    if (this.props.comchecks.length > 0) {
+      comchecks = (
+        <div style={styles.comchecks}>
+          <div style={styles.running}>{this.props.comchecks.length} comcheck(s) currently running:</div>
+          {this.props.comchecks.map(comcheck => {
+            return (
+              <LinkFlatButton to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + comcheck.comcheck_id} secondary={true}
+                              key={comcheck.comcheck_id} label={dateFormat(comcheck.comcheck_start_date)}/>
+            )
+          })}
+          <br />
+        </div>
+      )
+    }
+
     let {exerciseId, audience, audiences} = this.props
     if (audience) {
       //Build users list with sorting on column
@@ -133,7 +184,7 @@ class Index extends Component {
           <AudiencePopover exerciseId={exerciseId} audience={audience}/>
           <div style={styles.number}>{audience.audience_users.length} users</div>
           <div className="clearfix"></div>
-
+          {comchecks}
           <List>
             {audience.audience_users.length === 0 ? (
               <div style={styles.empty}>This audience is empty.</div>
@@ -192,9 +243,11 @@ Index.propTypes = {
   organizations: PropTypes.object,
   audience: PropTypes.object,
   audiences: PropTypes.array,
+  comchecks: PropTypes.array,
   fetchUsers: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchOrganizations: PropTypes.func,
+  fetchComchecks: PropTypes.func,
 }
 
 const filterAudiences = (audiences, exerciseId) => {
@@ -206,6 +259,15 @@ const filterAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences)
 }
 
+const filterComchecks = (comchecks, audienceId) => {
+  let comchecksFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.comcheck_audience.audience_id === audienceId && !n.comcheck_finished),
+    R.sort((a, b) => a.comcheck_end_date > b.comcheck_end_date)
+  )
+  return comchecksFilterAndSorting(comchecks)
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
@@ -214,14 +276,16 @@ const select = (state, ownProps) => {
   let audienceId = stateCurrentAudience === undefined && audiences.length > 0
     ? R.head(audiences).audience_id : stateCurrentAudience //Force a default audience if needed
   let audience = audienceId ? R.find(a => a.audience_id === audienceId)(audiences) : undefined
-  //endregion
+  let comchecks = filterComchecks(state.referential.entities.comchecks, audienceId)
+
   return {
     exerciseId,
     audience,
     audiences,
+    comchecks,
     users: state.referential.entities.users,
     organizations: state.referential.entities.organizations,
   }
 }
 
-export default connect(select, {fetchUsers, fetchAudiences, fetchOrganizations})(Index);
+export default connect(select, {fetchUsers, fetchAudiences, fetchOrganizations, fetchComchecks})(Index);

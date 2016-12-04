@@ -85,7 +85,7 @@ const styles = {
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'inject_title', orderAsc: true}
+    this.state = {sortBy: 'inject_date', orderAsc: true}
   }
 
   componentDidMount() {

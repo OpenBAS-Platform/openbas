@@ -23,8 +23,12 @@ const submitErrors = (data) => {
   return new SubmissionError(errorsExtractor(data))
 }
 
-export const getReferential = (schema, uri) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+export const getReferential = (schema, uri, noloading) => (dispatch) => {
+  if( noloading === true ) {
+    dispatch({type: Constants.DATA_FETCH_SUBMITTED_NO_LOADING});
+  } else {
+    dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+  }
   return api(schema).get(uri).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
   }).catch(function (data) {

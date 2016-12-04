@@ -6,9 +6,9 @@ export const fetchInjects = (exerciseId, eventId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch)
 }
 
-export const fetchAllInjects = (exerciseId) => (dispatch) => {
+export const fetchAllInjects = (exerciseId, noloading) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/injects'
-  return getReferential(schema.arrayOfInjects, uri)(dispatch)
+  return getReferential(schema.arrayOfInjects, uri, noloading)(dispatch)
 }
 
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {

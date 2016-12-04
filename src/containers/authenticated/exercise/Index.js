@@ -11,7 +11,7 @@ import {fetchObjectives} from '../../../actions/Objective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchAllInjects} from '../../../actions/Inject'
 import {fetchDryruns} from '../../../actions/Dryrun'
-import CreateDryrun from './world/CreateDryrun'
+import CreateDryrun from './check/CreateDryrun'
 
 const styles = {
   'container': {
@@ -66,8 +66,7 @@ const styles = {
   'running': {
     fontWeight: '600',
     margin: '0 0 10px 0'
-  },
-  'dryrun': {}
+  }
 }
 
 class IndexExercise extends Component {
@@ -76,6 +75,27 @@ class IndexExercise extends Component {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchAllInjects(this.props.exerciseId)
     this.props.fetchDryruns(this.props.exerciseId)
+    this.repeatTimeout()
+  }
+
+  componentWillUnmount() {
+    //noinspection Eslint
+    clearTimeout(this.repeat)
+  }
+
+  repeatTimeout() {
+    //noinspection Eslint
+    const context = this
+    //noinspection Eslint
+    this.repeat = setTimeout(function () {
+      context.circularFetch()
+      context.repeatTimeout(context);
+    }, 5000)
+  }
+
+  circularFetch() {
+    this.props.fetchAllInjects(this.props.exerciseId, true)
+    this.props.fetchDryruns(this.props.exerciseId, true)
   }
 
   selectIcon(type, color) {
@@ -99,7 +119,7 @@ class IndexExercise extends Component {
             let audienceName = R.propOr('-', 'audience_name', dryrun_audience)
 
             return (
-              <LinkFlatButton to={'/private/exercise/' + this.props.exerciseId + '/world/dryrun/' + dryrun.dryrun_id} secondary={true}
+              <LinkFlatButton to={'/private/exercise/' + this.props.exerciseId + '/checks/dryrun/' + dryrun.dryrun_id} secondary={true}
                           key={dryrun.dryrun_id} label={audienceName}/>
             )
           })}
@@ -172,12 +192,16 @@ class IndexExercise extends Component {
           </List>
         </div>
         <div style={styles.columnRight}>
-          <div style={styles.title}>Sent injects</div>
+          <div style={styles.title}>Processed injects</div>
           <div className="clearfix"></div>
-          {this.props.injectsSent.length === 0 ?
-            <div style={styles.empty}>You do not have any sent injects in this exercise.</div> : ""}
+          {this.props.injectsProcessed.length === 0 ?
+            <div style={styles.empty}>You do not have any processed injects in this exercise.</div> : ""}
           <List>
-            {this.props.injectsSent.map(inject => {
+            {this.props.injectsProcessed.map(inject => {
+              let color = '#4CAF50'
+              if( inject.inject_status.status_name === 'ERROR' ) {
+                color ='#F44336'
+              }
               return (
                 <MainListItem
                   key={inject.inject_id}
@@ -188,7 +212,7 @@ class IndexExercise extends Component {
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(inject.inject_type, '#4CAF50')}
+                  leftIcon={this.selectIcon(inject.inject_type, color)}
                 />
               )
             })}
@@ -206,7 +230,7 @@ IndexExercise.propTypes = {
   audiences: PropTypes.array,
   dryruns: PropTypes.array,
   injectsPending: PropTypes.array,
-  injectsSent: PropTypes.array,
+  injectsProcessed: PropTypes.array,
   fetchObjectives: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchAllInjects: PropTypes.func,
@@ -231,11 +255,20 @@ const filterAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences)
 }
 
-const filterInjects = (injects, exerciseId, status) => {
+const filterInjectsPending = (injects, exerciseId) => {
   let injectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === status),
+    R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === 'PENDING'),
     R.sort((a, b) => a.inject_date > b.inject_date)
+  )
+  return injectsFilterAndSorting(injects)
+}
+
+const filterInjectsProcessed = (injects, exerciseId) => {
+  let injectsFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.inject_exercise === exerciseId && (n.inject_status.status_name === 'SUCCESS' || n.inject_status.status_name === 'ERROR')),
+    R.sort((a, b) => a.inject_date < b.inject_date)
   )
   return injectsFilterAndSorting(injects)
 }
@@ -254,8 +287,8 @@ const select = (state, ownProps) => {
   let objectives = filterObjectives(state.referential.entities.objectives, exerciseId)
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
   let dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId)
-  let injectsPending = filterInjects(state.referential.entities.injects, exerciseId, 'PENDING')
-  let injectsSent = filterInjects(state.referential.entities.injects, exerciseId, 'SUCCESS')
+  let injectsPending = filterInjectsPending(state.referential.entities.injects, exerciseId)
+  let injectsProcessed = filterInjectsProcessed(state.referential.entities.injects, exerciseId)
 
   return {
     exerciseId,
@@ -263,7 +296,7 @@ const select = (state, ownProps) => {
     audiences,
     dryruns,
     injectsPending,
-    injectsSent
+    injectsProcessed
   }
 }
 

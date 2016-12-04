@@ -36,7 +36,7 @@ class CreateDryrun extends Component {
         onTouchTap={this.handleClose.bind(this)}
       />,
       <FlatButton
-        label="Create"
+        label="Launch"
         primary={true}
         onTouchTap={this.submitForm.bind(this)}
       />,

@@ -7,7 +7,7 @@ import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import {fetchAudiences} from '../../../../actions/Audience'
-import {fetchDryruns} from '../../../../actions/Dryrun'
+import {fetchDryrun} from '../../../../actions/Dryrun'
 import {fetchDryinjects} from '../../../../actions/Dryinject'
 
 const styles = {
@@ -59,9 +59,29 @@ const styles = {
 
 class IndexExcerciseDryrun extends Component {
   componentDidMount() {
-    this.props.fetchAudiences(this.props.exerciseId)
-    this.props.fetchDryruns(this.props.exerciseId)
     this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
+    this.props.fetchAudiences(this.props.exerciseId)
+    this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
+    this.repeatTimeout()
+  }
+
+  componentWillUnmount() {
+    //noinspection Eslint
+    clearTimeout(this.repeat)
+  }
+
+  repeatTimeout() {
+    //noinspection Eslint
+    const context = this
+    //noinspection Eslint
+    this.repeat = setTimeout(function () {
+      context.circularFetch()
+      context.repeatTimeout(context);
+    }, 5000)
+  }
+
+  circularFetch() {
+    this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true)
   }
 
   selectIcon(type, color) {
@@ -77,12 +97,11 @@ class IndexExcerciseDryrun extends Component {
 
   render() {
     let audienceName = null
-    if( this.props.dryrun ) {
+    if( this.props.dryrun.dryrun_audience && this.props.audiences.length > 0 ) {
       let dryrun_audience = R.find(a => a.audience_id === this.props.dryrun.dryrun_audience.audience_id)(this.props.audiences)
       audienceName = R.propOr('-', 'audience_name', dryrun_audience)
     }
-
-    let dryrun_date = R.propOr('-', 'dryrun_date', this.props.dryrun)
+    let dryrun_date = R.propOr('', 'dryrun_date', this.props.dryrun)
 
     return (
       <div style={styles.container}>
@@ -113,12 +132,16 @@ class IndexExcerciseDryrun extends Component {
           </List>
         </div>
         <div style={styles.columnRight}>
-          <div style={styles.title}>Sent injects</div>
+          <div style={styles.title}>Processed injects</div>
           <div className="clearfix"></div>
-          {this.props.dryinjectsSent.length === 0 ?
-            <div style={styles.empty}>You do not have any sent injects in this dryrun.</div> : ""}
+          {this.props.dryinjectsProcessed.length === 0 ?
+            <div style={styles.empty}>You do not have any processed injects in this dryrun.</div> : ""}
           <List>
-            {this.props.dryinjectsSent.map(dryinject => {
+            {this.props.dryinjectsProcessed.map(dryinject => {
+              let color = '#4CAF50'
+              if( dryinject.dryinject_status.status_name === 'ERROR' ) {
+                color ='#F44336'
+              }
               return (
                 <MainListItem
                   key={dryinject.dryinject_id}
@@ -129,7 +152,7 @@ class IndexExcerciseDryrun extends Component {
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(dryinject.dryinject_type, '#4CAF50')}
+                  leftIcon={this.selectIcon(dryinject.dryinject_type, color)}
                 />
               )
             })}
@@ -146,10 +169,10 @@ IndexExcerciseDryrun.propTypes = {
   audiences: PropTypes.array,
   dryrun: PropTypes.object,
   dryinjectsPending: PropTypes.array,
-  dryinjectsSent: PropTypes.array,
+  dryinjectsProcessed: PropTypes.array,
   fetchAudiences: PropTypes.func,
   fetchDryinjects: PropTypes.func,
-  fetchDryruns: PropTypes.func
+  fetchDryrun: PropTypes.func
 }
 
 const filterAudiences = (audiences, exerciseId) => {
@@ -161,11 +184,20 @@ const filterAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences)
 }
 
-const filterDryinjects = (dryinjects, dryrunId, status) => {
+const filterDryinjectsPending = (dryinjects, dryrunId) => {
   let dryinjectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && n.dryinject_status.status_name === status),
+    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && n.dryinject_status.status_name === 'PENDING'),
     R.sort((a, b) => a.dryinject_date > b.dryinject_date)
+  )
+  return dryinjectsFilterAndSorting(dryinjects)
+}
+
+const filterDryinjectsProcessed = (dryinjects, dryrunId) => {
+  let dryinjectsFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && (n.dryinject_status.status_name === 'SUCCESS' || n.dryinject_status.status_name === 'ERROR')),
+    R.sort((a, b) => a.dryinject_date < b.dryinject_date)
   )
   return dryinjectsFilterAndSorting(dryinjects)
 }
@@ -175,8 +207,8 @@ const select = (state, ownProps) => {
   let dryrunId = ownProps.params.dryrunId
   let dryrun = R.propOr({}, dryrunId, state.referential.entities.dryruns)
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
-  let dryinjectsPending = filterDryinjects(state.referential.entities.dryinjects, dryrunId, 'PENDING')
-  let dryinjectsSent = filterDryinjects(state.referential.entities.dryinjects, dryrunId, 'SUCCESS')
+  let dryinjectsPending = filterDryinjectsPending(state.referential.entities.dryinjects, dryrunId)
+  let dryinjectsProcessed = filterDryinjectsProcessed(state.referential.entities.dryinjects, dryrunId)
 
   return {
     exerciseId,
@@ -184,8 +216,8 @@ const select = (state, ownProps) => {
     dryrun,
     audiences,
     dryinjectsPending,
-    dryinjectsSent
+    dryinjectsProcessed
   }
 }
 
-export default connect(select, {fetchAudiences, fetchDryruns, fetchDryinjects})(IndexExcerciseDryrun)
+export default connect(select, {fetchAudiences, fetchDryrun, fetchDryinjects})(IndexExcerciseDryrun)
