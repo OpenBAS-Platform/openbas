@@ -39,7 +39,7 @@ class InjectController extends Controller
         $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         /* @var $event Event */
 
-        if (empty($event)) {
+        if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
 

@@ -62,7 +62,7 @@ class AudienceController extends Controller
         $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
         /* @var $audience Audience */
 
-        if (empty($audience)) {
+        if (empty($audience) || $audience->getAudienceExercise() !== $exercise) {
             return $this->audienceNotFound();
         }
 
@@ -127,10 +127,12 @@ class AudienceController extends Controller
         $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
         /* @var $audience Audience */
 
-        if ($audience) {
-            $em->remove($audience);
-            $em->flush();
+        if (empty($audience) || $audience->getAudienceExercise() !== $exercise) {
+            return $this->audienceNotFound();
         }
+
+        $em->remove($audience);
+        $em->flush();
     }
 
     /**
@@ -158,7 +160,7 @@ class AudienceController extends Controller
         $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
         /* @var $audience Audience */
 
-        if (empty($audience)) {
+        if (empty($audience) || $audience->getAudienceExercise() !== $exercise) {
             return $this->audienceNotFound();
         }
 

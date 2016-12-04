@@ -63,7 +63,7 @@ class ObjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() !== $exercise) {
             return $this->objectiveNotFound();
         }
 
@@ -128,7 +128,7 @@ class ObjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() !== $exercise) {
             return $this->objectiveNotFound();
         }
 
@@ -160,7 +160,7 @@ class ObjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() !== $exercise) {
             return $this->objectiveNotFound();
         }
 
