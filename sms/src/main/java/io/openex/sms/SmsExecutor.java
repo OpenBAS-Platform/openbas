@@ -15,7 +15,7 @@ class SmsExecutor implements Executor {
 	
 	@Override
 	public Contract contract() {
-		return Contract.build().add("message");
+		return Contract.build().mandatory("message");
 	}
 	
 	@Override

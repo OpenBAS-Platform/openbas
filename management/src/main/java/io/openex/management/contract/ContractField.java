@@ -8,14 +8,25 @@ public class ContractField {
 	
 	private ContractCardinality cardinality;
 	
-	public ContractField(String name, ContractType type) {
-		this(name, type, ContractCardinality.One);
+	private boolean mandatory;
+	
+	ContractField(String name, ContractType type) {
+		this(name, type, ContractCardinality.One, true);
 	}
 	
-	public ContractField(String name, ContractType type, ContractCardinality cardinality) {
+	ContractField(String name, ContractType type, ContractCardinality cardinality) {
+		this(name, type, cardinality, true);
+	}
+	
+	ContractField(String name, ContractType type, Boolean mandatory) {
+		this(name, type, ContractCardinality.One, mandatory);
+	}
+	
+	ContractField(String name, ContractType type, ContractCardinality cardinality, Boolean mandatory) {
 		this.name = name;
 		this.type = type;
 		this.cardinality = cardinality;
+		this.mandatory = mandatory;
 	}
 	
 	public String getName() {
@@ -40,5 +51,13 @@ public class ContractField {
 	
 	public void setCardinality(ContractCardinality cardinality) {
 		this.cardinality = cardinality;
+	}
+	
+	public boolean isMandatory() {
+		return mandatory;
+	}
+	
+	public void setMandatory(boolean mandatory) {
+		this.mandatory = mandatory;
 	}
 }

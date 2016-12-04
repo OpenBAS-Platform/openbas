@@ -1,6 +1,6 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="openex-scheduler">
-        <from uri="timer:simple?period=10s"/>
+        <from uri="timer:simple?period=5s"/>
         <setHeader headerName="X-Auth-Token">
             <constant>{{openex.token}}</constant>
         </setHeader>
@@ -13,9 +13,10 @@
             <setHeader headerName="router-header">
                 <simple>${body[context][type]}</simple>
             </setHeader>
-            <setHeader headerName="router-callback">
+            <!-- Inside property to navigate through all exchanges -->
+            <setProperty propertyName="router-callback">
                 <simple>${body[context][callback_url]}</simple>
-            </setHeader>
+            </setProperty>
             <!-- Send only data to workers -->
             <setBody>
                 <simple>${body[data]}</simple>
@@ -24,18 +25,13 @@
                 <dynamicRouter ignoreInvalidEndpoints="true">
                     <method ref="openexRouter" method="forward"/>
                 </dynamicRouter>
-                <setBody>
-                    <simple>{"status":"SUCCESS", "message":"${header.return-message}"}</simple>
-                </setBody>
-                <to uri="direct:callback"/>
                 <doCatch>
                     <exception>java.lang.Exception</exception>
                     <log loggingLevel="ERROR" message="Error calling ${header.router-header} ${body}"/>
-                    <setBody>
-                        <simple>{"status":"ERROR", "message":"${property.CamelExceptionCaught}"}</simple>
-                    </setBody>
-                    <to uri="direct:callback"/>
                 </doCatch>
+                <doFinally>
+                    <to uri="direct:callback"/>
+                </doFinally>
             </doTry>
         </split>
     </route>
@@ -44,12 +40,15 @@
         <setHeader headerName="Content-Type">
             <constant>application/json</constant>
         </setHeader>
+        <setHeader headerName="X-Auth-Token">
+            <constant>{{openex.token}}</constant>
+        </setHeader>
         <setHeader headerName="CamelHttpMethod">
             <constant>POST</constant>
         </setHeader>
         <doTry>
             <setHeader headerName="CamelHttpUri">
-                <simple>${header.router-callback}</simple>
+                <simple>${property.router-callback}</simple>
             </setHeader>
             <log message="Calling callback ${header.CamelHttpUri} ${body}"/>
             <to uri="http://fake"/>

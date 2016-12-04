@@ -5,13 +5,13 @@ import io.openex.management.contract.ContractField;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestContract {
+class RestContract {
 	
 	private String type;
 	
 	private List<ContractField> fields = new ArrayList<>();
 	
-	public RestContract(String type, List<ContractField> fields) {
+	RestContract(String type, List<ContractField> fields) {
 		this.type = type;
 		this.fields = fields;
 	}
