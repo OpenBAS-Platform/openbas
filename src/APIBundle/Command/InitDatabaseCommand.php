@@ -197,6 +197,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->createInjectStatus($injectIntercept);
         $output->writeln('Creating inject \'Potatoes headquarters conversation\'');
 
+        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Potato confirmed in flight PO345', 'body' => 'A potato is arriving at the airport, according to the flight passengers records.');
         $injectArrival = $this->createInject(
             'Potato arrival at the airport',
             'A potato is arriving at the airport ',
@@ -209,6 +210,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->createInjectStatus($injectArrival);
         $output->writeln('Creating inject \'Potato arrival at the airport\'');
 
+        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Potato filmed by CCTV', 'body' => 'A potato has been detected by the CCTV of the airport');
         $injectCamera = $this->createInject(
             'A potato has been detected',
             'A potato has been detected by CCTV',

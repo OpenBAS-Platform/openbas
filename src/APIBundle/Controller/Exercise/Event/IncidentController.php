@@ -38,7 +38,7 @@ class IncidentController extends Controller
         $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         /* @var $event Event */
 
-        if (empty($event)) {
+        if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
 
@@ -70,14 +70,14 @@ class IncidentController extends Controller
         $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         /* @var $event Event */
 
-        if (empty($event)) {
+        if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
 
         $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
         /* @var $incident Incident */
 
-        if (empty($incident)) {
+        if (empty($incident) || $incident->getIncidentEvent() !== $event) {
             return $this->incidentNotFound();
         }
 
@@ -108,7 +108,7 @@ class IncidentController extends Controller
         $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         /* @var $event Event */
 
-        if (empty($event)) {
+        if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
 
@@ -149,14 +149,14 @@ class IncidentController extends Controller
         $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         /* @var $event Event */
 
-        if (empty($event)) {
+        if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
 
         $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
         /* @var $incident Incident */
 
-        if (empty($incident)) {
+        if (empty($incident) || $incident->getIncidentEvent() !== $event) {
             return $this->incidentNotFound();
         }
 
@@ -188,14 +188,14 @@ class IncidentController extends Controller
         $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         /* @var $event Event */
 
-        if (empty($event)) {
+        if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
 
         $incident = $em->getRepository('APIBundle:Incident')->find($request->get('incident_id'));
         /* @var $incident Incident */
 
-        if (empty($incident)) {
+        if (empty($incident) || $incident->getIncidentEvent() !== $event) {
             return $this->incidentNotFound();
         }
 

@@ -37,7 +37,7 @@ class DryinjectController extends Controller
         $dryrun = $em->getRepository('APIBundle:Dryrun')->find($request->get('dryrun_id'));
         /* @var $dryrun Dryrun */
 
-        if (empty($dryrun)) {
+        if (empty($dryrun) || $dryrun->getDryrunExercise() !== $exercise) {
             return $this->dryrunNotFound();
         }
 

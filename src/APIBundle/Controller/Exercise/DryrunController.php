@@ -207,10 +207,12 @@ class DryrunController extends Controller
         $dryrun = $em->getRepository('APIBundle:Dryrun')->find($request->get('dryrun_id'));
         /* @var $dryrun Dryrun */
 
-        if ($dryrun) {
-            $em->remove($dryrun);
-            $em->flush();
+        if (empty($dryrun) || $dryrun->getDryrunExercise() !== $exercise ) {
+            return $this->dryrunNotFound();
         }
+
+        $em->remove($dryrun);
+        $em->flush();
     }
 
     private function exerciseNotFound()
