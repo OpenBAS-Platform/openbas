@@ -18,6 +18,7 @@ class ComcheckType extends AbstractType
         ));
         $builder->add('comcheck_subject');
         $builder->add('comcheck_message');
+        $builder->add('comcheck_footer');
     }
 
     public function configureOptions(OptionsResolver $resolver)

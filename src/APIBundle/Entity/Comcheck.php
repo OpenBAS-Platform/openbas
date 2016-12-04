@@ -44,6 +44,7 @@ class Comcheck
 
     protected $comcheck_subject;
     protected $comcheck_message;
+    protected $comcheck_footer;
     protected $comcheck_finished = 0;
 
     public function getComcheckId()
@@ -120,6 +121,17 @@ class Comcheck
     public function setComcheckMessage($message)
     {
         $this->comcheck_message = $message;
+        return $this;
+    }
+
+    public function getComcheckFooter()
+    {
+        return $this->comcheck_footer;
+    }
+
+    public function setComcheckFooter($footer)
+    {
+        $this->comcheck_footer = $footer;
         return $this;
     }
 

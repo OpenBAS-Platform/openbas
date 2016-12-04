@@ -92,6 +92,9 @@ APIBundle\Entity\Comcheck:
         comcheck_message:
             - NotBlank: ~
             - Type: string
+        comcheck_footer:
+            - NotBlank: ~
+            - Type: string
 
 APIBundle\Entity\Dryrun:
     properties:

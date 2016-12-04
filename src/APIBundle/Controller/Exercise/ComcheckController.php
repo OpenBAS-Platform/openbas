@@ -112,11 +112,11 @@ class ComcheckController extends Controller
 
             $link = $this->getParameter('protocol') . '://' . $request->getHost() . '/comcheck/' . '${user_comcheck_id}';
             $data = array();
-            $data['sender'] = $this->getParameter('mail_sender');
-            $data['subject'] = $comcheck->getComcheckSubject();
-            $data['body'] = $comcheck->getComcheckMessage();
-            $data['body'] .= '<br /><br />' . $link;
-            $data['users'] = array();
+            $data['data'] = array();
+            $data['data']['sender'] = $this->getParameter('mail_sender');
+            $data['data']['subject'] = '[' . strtoupper($exercise->getExerciseName()) . '] ' . $comcheck->getComcheckSubject();
+            $data['data']['body'] = $comcheck->getComcheckMessage() . '<br /><br /><a href="' . $link . '">' . $link . '</a><br /><br />' . $comcheck->getComcheckFooter();
+            $data['data']['users'] = array();
             foreach( $users as $user ) {
                 $status = new ComcheckStatus();
                 $status->setStatusComcheck($comcheck);
@@ -135,6 +135,9 @@ class ComcheckController extends Controller
                 $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;
             }
+
+            $url = $this->getParameter('worker_url') . '/cxf/worker/email';
+            $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
 
             return $comcheck;
         } else {

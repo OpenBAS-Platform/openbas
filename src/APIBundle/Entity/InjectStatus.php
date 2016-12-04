@@ -25,12 +25,12 @@ class InjectStatus
     protected $status_inject;
 
     /**
-     * @ORM\Column(type="string", columnDefinition="ENUM('SUCCESS', 'ERROR', 'PENDING')")
+     * @ORM\Column(type="string", columnDefinition="ENUM('SUCCESS', 'PARTIAL', 'ERROR', 'PENDING')")
      */
     protected $status_name;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $status_message;
 
