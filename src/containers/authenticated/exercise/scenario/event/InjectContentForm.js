@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
-import {FormField} from '../../../../../components/Field'
+import {FormField, RichTextField} from '../../../../../components/Field'
 import {i18nRegister} from '../../../../../utils/Messages'
 
 i18nRegister({
@@ -34,7 +34,7 @@ class InjectContentForm extends Component {
           if (field.type === 'text') {
             return <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/>
           } else if (field.type === 'textarea') {
-            return <FormField key={field.name} name={field.name} fullWidth={true} multiLine={true} rows={5} type="text" label={field.name}/>
+            return <RichTextField key={field.name} name={field.name}/>
           } else {
             return <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/>
           }

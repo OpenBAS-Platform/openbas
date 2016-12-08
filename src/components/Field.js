@@ -1,7 +1,8 @@
-import React, {PropTypes} from 'react'
+import React, {PropTypes, Component} from 'react'
 import MUITextField from 'material-ui/TextField'
 import {Field} from 'redux-form'
 import {injectIntl} from 'react-intl'
+import RichTextEditor from 'react-rte'
 
 const styles = {
   global: {
@@ -9,6 +10,16 @@ const styles = {
   },
   input: {
     borderRadius: '5px'
+  },
+  richText: {
+    header: {
+      fontSize: 12,
+      opacity: 0.6,
+      marginBottom: 8
+    },
+    content: {
+      color: 'black'
+    }
   }
 }
 
@@ -72,3 +83,41 @@ FormFieldIntl.propTypes = {
   onClick: PropTypes.func,
   onChange: PropTypes.func,
 }
+
+class renderRichEditor extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {value: RichTextEditor.createValueFromString(props.input.value, 'html')}
+  }
+
+  onChange(value) {
+    this.setState({value});
+    this.props.input.onChange(value.toString('html'))
+  }
+
+  render () {
+    return (<div>
+      <div style={styles.richText.header}>{this.props.name}</div>
+      <div style={styles.richText.content}>
+        <RichTextEditor value={this.state.value} onChange={this.onChange.bind(this)}/>
+      </div>
+    </div>);
+  }
+}
+
+renderRichEditor.propTypes = {
+  input: PropTypes.object,
+  name: PropTypes.string.isRequired,
+}
+
+const RichTextFieldIntl = (props) => (
+  <Field name={props.intl.formatMessage({id: props.name})} component={renderRichEditor}/>
+)
+
+RichTextFieldIntl.propTypes = {
+  intl: PropTypes.object,
+  name: PropTypes.string.isRequired,
+}
+
+export const RichTextField = injectIntl(RichTextFieldIntl)
