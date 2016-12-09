@@ -16,6 +16,17 @@ import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
 import UserPopover from './UserPopover'
 import {dateFormat} from '../../../../utils/Time'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
+
+i18nRegister({
+  fr: {
+    'name': 'Nom',
+    'Email address': 'Adresse email',
+    'Organization': 'Organisation',
+    'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience pour cet exercice'
+  }
+})
 
 const styles = {
   'container': {
@@ -135,7 +146,7 @@ class Index extends Component {
       : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
     const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
     return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-      {label} {IconDisplay}
+      <T>{label}</T> {IconDisplay}
     </div>
   }
 
@@ -231,7 +242,7 @@ class Index extends Component {
     } else {
       return <div style={styles.container}>
         <AudienceNav exerciseId={exerciseId} audiences={audiences}/>
-        <div style={styles.empty}>You do not have any audiences in this exercise.</div>
+        <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div>
       </div>
     }
   }

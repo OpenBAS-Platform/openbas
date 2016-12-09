@@ -1,4 +1,5 @@
 import Immutable from 'seamless-immutable'
+import {logDate} from './Time'
 
 export const i18n = {
   messages: Immutable({
@@ -25,5 +26,5 @@ export const i18nRegister = (data) => {
 }
 
 export const debug = (...msg) => {
-  if (process.env.NODE_ENV === `development`) Function.prototype.apply.call(console.log, console, msg);
+  if (process.env.NODE_ENV === `development`) Function.prototype.apply.call(console.log, console, [logDate(), msg]);
 }

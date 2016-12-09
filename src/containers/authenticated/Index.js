@@ -10,6 +10,14 @@ import {Exercise} from '../../components/Exercise'
 import CreateExercise from './exercise/CreateExercise'
 import UserPopover from './UserPopover'
 import {redirectToHome} from '../../actions/Application'
+import {T} from '../../components/I18n'
+import {i18nRegister} from '../../utils/Messages'
+
+i18nRegister({
+  fr: {
+    'You do not have any available exercise on this platform.': 'Vous n\'avez aucun exercice disponible'
+  }
+})
 
 const styles = {
   container: {
@@ -50,7 +58,7 @@ class IndexAuthenticated extends Component {
           iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo}/>}
         />
         <div style={styles.container}>
-          {this.props.exercises.length === 0 ? <div style={styles.empty}>You do not have any available exercise on this platform.</div>:""}
+          {this.props.exercises.length === 0 ? <div style={styles.empty}><T>You do not have any available exercise on this platform.</T></div>:""}
           {this.props.exercises.map(exercise => {
             var start_date = moment(exercise.exercise_start_date).format('MMM D, YYYY')
             var end_date = moment(exercise.exercise_end_date).format('MMM D, YYYY')

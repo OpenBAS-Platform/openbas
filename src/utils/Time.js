@@ -10,3 +10,7 @@ export const dateToISO = (date) => {
   var momentDate = moment(date, openexDateFormat, true)
   return momentDate.isValid() ? momentDate.format() : 'invalid-date'
 }
+
+export const logDate = () => {
+  return moment().format('HH:mm:ss.SSS')
+}

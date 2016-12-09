@@ -1,9 +1,9 @@
-import React, {Component} from 'react'
+import React, {Component, PropTypes} from 'react'
 import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import rootReducer from './reducers'
-import {Provider} from 'react-redux'
+import {Provider, connect} from 'react-redux'
 import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
@@ -51,8 +51,7 @@ roundMoment()
 //Default application state
 const initialState = {
   app: Immutable({
-    logged: JSON.parse(localStorage.getItem('logged')),
-    locale: locale
+    logged: JSON.parse(localStorage.getItem('logged'))
   }),
   screen: Immutable({
     navbar_left_open: false,
@@ -164,12 +163,30 @@ const UserIsNotAuthenticated = UserAuthWrapper({
 })
 //endregion
 
+class IntlWrapper extends Component {
+  render () {
+    const { children, lang } = this.props
+    debug('Rendering i18n app in ' + lang) //If browser lang != profile one, all app will render again
+    return <IntlProvider locale={lang} key={lang} messages={i18n.messages[lang]}>{children}</IntlProvider>
+  }
+}
+
+IntlWrapper.propTypes = {
+  lang: PropTypes.string,
+  children: PropTypes.node
+}
+
+const select = (state) => {
+  return {lang: R.pathOr(locale, ['logged', 'lang'], state.app)}
+}
+
+const ConnectedIntl = connect(select)(IntlWrapper)
+
 addLocaleData([...enLocaleData, ...frLocaleData]);
 class App extends Component {
   render() {
-    var locale = store.getState().app.locale
     return (
-      <IntlProvider locale={locale} key={locale} messages={i18n.messages[locale]}>
+      <ConnectedIntl store={store}>
         <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
           <Provider store={store}>
             <Router history={history}>
@@ -206,7 +223,7 @@ class App extends Component {
             </Router>
           </Provider>
         </MuiThemeProvider>
-      </IntlProvider>
+      </ConnectedIntl>
     )
   }
 }
