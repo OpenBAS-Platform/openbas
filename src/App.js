@@ -8,14 +8,13 @@ import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
 import {UserAuthWrapper} from 'redux-auth-wrapper'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import {logger} from './middlewares/Logger'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
 import {addLocaleData, IntlProvider} from 'react-intl'
 import enLocaleData from 'react-intl/locale-data/en'
 import frLocaleData from 'react-intl/locale-data/fr'
 import {locale} from './utils/BrowserLanguage'
-import {i18n} from './utils/Messages'
+import {i18n, debug} from './utils/Messages'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import * as Constants from './constants/ActionTypes'
 import R from 'ramda'
@@ -99,13 +98,15 @@ const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)
 //Only compose the store if devTools are available
 if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
+  const createLogger = require(`redux-logger`);
   store = createStore(rootReducer, initialState, compose(
-    applyMiddleware(routingMiddleware, thunk, logger),
+    applyMiddleware(routingMiddleware, thunk, createLogger({
+      predicate: (getState, action) => !action.type.startsWith('DATA_FETCH') && !action.type.startsWith('@@redux-form')
+    })),
     window.devToolsExtension && window.devToolsExtension()
   ))
 } else {
-  store = createStore(rootReducer, initialState,
-    applyMiddleware(routingMiddleware, thunk, logger))
+  store = createStore(rootReducer, initialState, applyMiddleware(routingMiddleware, thunk))
 }
 
 //Axios API
@@ -114,12 +115,13 @@ export const api = (schema) => {
   const instance = axios.create({headers: {'X-Auth-Token': token}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
-    console.log("API response", response.data)
-    response.data = Immutable(schema ? normalize(response.data, schema) : response.data)
+    var dataNormalize = Immutable(schema ? normalize(response.data, schema) : response.data)
+    debug("api", {from: response.request.responseURL, data: {raw: response.data, normalize: dataNormalize}})
+    response.data = dataNormalize
     return response
   }, function (err) {
     let res = err.response;
-    console.error("API error", res)
+    console.error("api", res)
     if (res.status === 401) {//User is not logged anymore
       store.dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS});
       return Promise.reject(res.data);

@@ -23,3 +23,7 @@ export const i18n = {
 export const i18nRegister = (data) => {
   i18n.messages = i18n.messages.merge(data, {deep: true})
 }
+
+export const debug = (...msg) => {
+  if (process.env.NODE_ENV === `development`) Function.prototype.apply.call(console.log, console, msg);
+}

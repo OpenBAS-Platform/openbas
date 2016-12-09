@@ -3,6 +3,7 @@ import * as d3 from 'd3'
 import Faux from 'react-faux-dom'
 import {connect} from 'react-redux'
 import moment from 'moment'
+import {debug} from '../../../../utils/Messages'
 
 const data = []
 
@@ -103,7 +104,7 @@ const Chronos = React.createClass({
 
     var start = moment().round(5, 'seconds').subtract(1, 'm')
     var end = moment().round(5, 'seconds').add(1, 'm')
-    console.log('Boudaries', start.format(), end.format())
+    debug('Boudaries', start.format(), end.format())
     this.xScale = d3.scaleTime()
       .domain([start.toDate(), end.toDate()])
       .range([0, width])
