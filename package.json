@@ -8,7 +8,7 @@
   "dependencies": {
     "axios": "^0.15.3",
     "d3": "^4.4.0",
-    "material-ui": "^0.16.4",
+    "material-ui": "^0.16.5",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.10",
     "normalizr": "^2.3.0",
