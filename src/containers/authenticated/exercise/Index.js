@@ -269,7 +269,7 @@ const filterInjectsPending = (injects, exerciseId) => {
 const filterInjectsProcessed = (injects, exerciseId) => {
   let injectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.inject_exercise === exerciseId && (n.inject_status.status_name === 'SUCCESS' || n.inject_status.status_name === 'ERROR')),
+    R.filter(n => n.inject_exercise === exerciseId && (n.inject_status.status_name === 'SUCCESS' || n.inject_status.status_name === 'ERROR' || n.inject_status.status_name === 'PARTIAL')),
     R.sort((a, b) => a.inject_date < b.inject_date)
   )
   return injectsFilterAndSorting(injects)

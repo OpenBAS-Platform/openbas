@@ -194,7 +194,7 @@ class Index extends Component {
                 primaryText={
                   <div>
                     <div style={styles.inject_title}>{inject_title}</div>
-                    <div style={styles.inject_date}>{moment(inject_date).format('YYYY-DD-MM HH:mm')}</div>
+                    <div style={styles.inject_date}>{moment(inject_date).format('YYYY-MM-DD HH:mm')}</div>
                     <div style={styles.inject_user}>{inject_user}</div>
                     <div className="clearfix"></div>
                   </div>
