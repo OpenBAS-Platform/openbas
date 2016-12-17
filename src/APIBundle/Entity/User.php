@@ -67,7 +67,7 @@ class User implements UserInterface
     protected $user_audiences;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="smallint")
      */
     protected $user_admin = 0;
 
@@ -312,15 +312,5 @@ class User implements UserInterface
 
     public function isAdmin() {
         return $this->user_admin;
-    }
-
-    public function joinGroup($group) {
-        $this->user_groups->add($group);
-        return $this;
-    }
-
-    public function leaveGroup($group) {
-        $this->user_groups->removeElement($group);
-        return $this;
     }
 }
