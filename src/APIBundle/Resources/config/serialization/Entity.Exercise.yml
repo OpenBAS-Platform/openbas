@@ -1,7 +1,7 @@
 APIBundle\Entity\Exercise:
     attributes:
         exercise_id:
-            groups: ['exercise', 'dryrun', 'comcheck', 'audience', 'event', 'incident', 'objective']
+            groups: ['exercise', 'dryrun', 'comcheck', 'audience', 'event', 'incident', 'objective', 'group']
         exercise_name:
             groups: ['exercise']
         exercise_subtitle:

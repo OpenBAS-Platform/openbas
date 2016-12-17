@@ -318,8 +318,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
     }
 
     private function joinGroup($user, $group) {
-        $user->joinGroup($group);
-        $this->em->persist($user);
+        $users = $group->getGroupUsers();
+        $users[] = $user;
+        $group->setGroupUsers($users);
+        $this->em->persist($group);
         $this->em->flush();
     }
 

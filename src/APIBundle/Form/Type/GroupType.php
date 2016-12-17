@@ -12,6 +12,7 @@ class GroupType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('group_name');
+        $builder->add('group_users');
     }
 
     public function configureOptions(OptionsResolver $resolver)

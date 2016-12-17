@@ -28,13 +28,6 @@ services:
         arguments: ["@security.http_utils"]
         public:    false
 
-    user_voter:
-        class: APIBundle\Security\UserVoter
-        arguments: ['@security.access.decision_manager']
-        public: false
-        tags:
-            - { name: security.voter }
-
     exercise_voter:
         class: APIBundle\Security\ExerciseVoter
         arguments: ['@security.access.decision_manager']

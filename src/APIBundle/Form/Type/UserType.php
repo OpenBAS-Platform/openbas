@@ -19,6 +19,7 @@ class UserType extends AbstractType
         $builder->add('user_plain_password');
         $builder->add('user_organization', TextType::class);
         $builder->add('user_lang');
+        $builder->add('user_admin');
     }
 
     public function configureOptions(OptionsResolver $resolver)
