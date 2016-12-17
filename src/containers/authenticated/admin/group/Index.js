@@ -86,7 +86,7 @@ class Index extends Component {
       <div className="clearfix"></div>
       <List>
         <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
-                          rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
+                    rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
           {this.SortHeader('group_name', 'Name')}
           <div className="clearfix"></div>
         </div>}/>
@@ -98,7 +98,7 @@ class Index extends Component {
           return <MainListItem
             key={group_id}
             leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC} type={Constants.ICON_TYPE_MAINLIST}/>}
-            rightIconButton={<GroupPopover group={group}/>}
+            rightIconButton={<GroupPopover group={group} groupUsersIds={group.group_users.map(u => u.user_id)}/>}
             primaryText={
               <div>
                 <div style={styles.name}>{group_name}</div>

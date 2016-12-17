@@ -49,6 +49,11 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
+    if( data.user_admin ) {
+      data.user_admin = 1
+    } else {
+      data.user_admin = 0
+    }
     return this.props.updateUser(this.props.user.user_id, data)
   }
 
@@ -79,7 +84,7 @@ class UserPopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ]
-    
+
     var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(

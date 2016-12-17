@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {askToken} from '../../../actions/Application'
+import {T} from '../../../components/I18n'
 import {Toolbar, ToolbarGroup, ToolbarTitle} from '../../../components/Toolbar'
 import LoginForm from './LoginForm'
 import {i18nRegister} from '../../../utils/Messages'
@@ -8,7 +9,8 @@ import * as Constants from '../../../constants/ComponentTypes'
 
 i18nRegister({
   fr: {
-    'Login': 'Identification'
+    'Login': 'Identification',
+    'Use demo / demo to login.': 'Utiliser demo / demo pour s\'identifier.'
   }
 })
 
@@ -40,13 +42,24 @@ class Login extends Component {
           </ToolbarGroup>
         </Toolbar>
         <LoginForm onSubmit={this.onSubmit.bind(this)}/>
+        {this.props.demo === '1' ? <i><T>Use demo / demo to login.</T></i>:""}
       </div>
     )
   }
 }
 
 Login.propTypes = {
+  demo: PropTypes.string,
   askToken: PropTypes.func
 }
 
-export default connect(null, {askToken})(Login);
+const select = (state, ownProps) => {
+  let demo = ownProps.location.query.demo
+
+  return {
+    demo
+  }
+}
+
+
+export default connect(select, {askToken})(Login);

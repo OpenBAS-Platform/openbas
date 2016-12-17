@@ -33,7 +33,7 @@ UserForm.propTypes = {
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
   organizations: PropTypes.object,
-  userAdmin: PropTypes.bool
+  userAdmin: PropTypes.number
 }
 
 export default reduxForm({form: 'UserForm'}, null, {change})(UserForm)

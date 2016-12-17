@@ -14,15 +14,6 @@ import {SimpleTextField} from '../../../../components/SimpleTextField'
 import CreateUser from './CreateUser'
 
 const styles = {
-  dialog: {
-
-  },
-  list: {
-
-  },
-  search: {
-
-  },
   'name': {
     float: 'left',
     width: '30%',
@@ -84,9 +75,9 @@ class AddUsers extends Component {
     //region filter users by active keyword
     const keyword = this.state.searchTerm
     let filterByKeyword = n => keyword === '' ||
-                          n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-                          n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-                          n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+    n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+    n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     let filteredUsers = R.filter(filterByKeyword, R.values(this.props.users))
     //endregion
 
@@ -96,15 +87,14 @@ class AddUsers extends Component {
                                      onClick={this.handleOpenAddUsers.bind(this)}/>
         <DialogTitleElement
           title={<SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a user"
-                                   onChange={this.handleSearchUsers.bind(this)}
+                                  onChange={this.handleSearchUsers.bind(this)}
                                   styletype={Constants.FIELD_TYPE_INTITLE} />}
           modal={false}
           open={this.state.openAddUsers}
           onRequestClose={this.handleCloseAddUsers.bind(this)}
           autoScrollBodyContent={true}
-          actions={actions}
-          contentStyle={styles.dialog}>
-          <div style={styles.list}>
+          actions={actions}>
+          <div>
             {this.state.users.map(user => {
               return (
                 <Chip

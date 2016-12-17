@@ -91,13 +91,12 @@ const sortExercises = (exercises) => {
   return exercisesSorting(exercises)
 }
 
-
 IndexAuthenticated.propTypes = {
   exercises: PropTypes.array,
   fetchExercises: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
-  userAdmin: PropTypes.bool
+  userAdmin: PropTypes.number
 }
 
 const select = (state) => {
