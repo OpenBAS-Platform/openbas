@@ -47,6 +47,7 @@ class GroupPopover extends Component {
       openDelete: false,
       openEdit: false,
       openUsers: false,
+      openGrants: false,
       openPopover: false,
       searchTerm: '',
       usersIds: this.props.groupUsersIds,
@@ -113,6 +114,21 @@ class GroupPopover extends Component {
     this.handleCloseUsers()
   }
 
+  handleOpenGrants() {
+    this.setState({openGrants: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseGrants() {
+    this.setState({openGrants: false})
+  }
+
+  submitGrants() {
+    this.props.updateGroup(this.props.group.group_id, {group_users: this.state.usersIds})
+    this.handleCloseGrants()
+  }
+
+
   handleOpenDelete() {
     this.setState({openDelete: true})
     this.handlePopoverClose()
@@ -129,7 +145,7 @@ class GroupPopover extends Component {
 
   render() {
     const grantsActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseUsers.bind(this)}/>,
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseGrants.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitGrants.bind(this)}/>,
     ]
     const usersActions = [
