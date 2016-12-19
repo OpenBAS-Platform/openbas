@@ -10,7 +10,10 @@ import R from 'ramda'
 
 i18nRegister({
   fr: {
-    'Name': 'Nom',
+    'Title': 'Titre',
+    'Description': 'Description',
+    'Date and time': 'Date et heure',
+    'Type': 'Type',
     'sms': 'Sms',
     'email': 'Email'
   },

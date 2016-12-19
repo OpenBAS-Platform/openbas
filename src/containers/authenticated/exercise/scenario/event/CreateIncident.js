@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../../../utils/Messages'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {addIncident} from '../../../../../actions/Incident'
 import {Dialog} from '../../../../../components/Dialog';
@@ -7,6 +8,13 @@ import {FlatButton} from '../../../../../components/Button';
 import {ActionButtonCreate} from '../../../../../components/Button'
 import {AppBar} from '../../../../../components/AppBar'
 import IncidentForm from './IncidentForm'
+
+i18nRegister({
+  fr: {
+    'Incidents': 'Incidents',
+    'Create a new incident': 'Créer un nouvel incident'
+  }
+})
 
 class CreateIncident extends Component {
   constructor(props) {

@@ -107,7 +107,7 @@ const styles = {
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'user_firstname', orderAsc: true,  searchTerm: ''}
+    this.state = {sortBy: 'user_firstname', orderAsc: true, searchTerm: ''}
   }
 
   componentDidMount() {
@@ -217,7 +217,7 @@ class Index extends Component {
             ) : (
               <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
                           rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
-                {this.SortHeader('user_firstname', 'name')}
+                {this.SortHeader('user_firstname', 'Name')}
                 {this.SortHeader('user_email', 'Email address')}
                 {this.SortHeader('user_organization', 'Organization')}
                 <div className="clearfix"></div>

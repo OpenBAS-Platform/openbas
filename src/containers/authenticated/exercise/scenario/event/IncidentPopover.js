@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {i18nRegister} from '../../../../../utils/Messages'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
 import {Menu} from '../../../../../components/Menu'
@@ -13,8 +14,14 @@ import IncidentForm from './IncidentForm'
 
 const style = {
   float: 'left',
-  marginTop: '-13px'
+  marginTop: '-16px'
 }
+
+i18nRegister({
+  fr: {
+    'Update the incident': 'Modifier l\'incident',
+  }
+})
 
 class IncidentPopover extends Component {
   constructor(props) {

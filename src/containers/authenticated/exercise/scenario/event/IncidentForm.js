@@ -11,6 +11,7 @@ i18nRegister({
   fr: {
     'Name': 'Nom',
     'Title': 'Titre',
+    'Story': 'Description'
   }
 })
 

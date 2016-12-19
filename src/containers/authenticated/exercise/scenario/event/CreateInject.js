@@ -1,5 +1,9 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import R from 'ramda'
+import {i18nRegister} from '../../../../../utils/Messages'
+import {T} from '../../../../../components/I18n'
+import {dateToISO} from '../../../../../utils/Time'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchIncident} from '../../../../../actions/Incident'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
@@ -9,6 +13,14 @@ import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
+
+i18nRegister({
+  fr: {
+    '1. Parameters': '1. Paramètres',
+    '2. Content': '2. Contenu',
+    '3. Audiences': '3. Audiences',
+  }
+})
 
 class CreateInject extends Component {
   constructor(props) {
@@ -57,7 +69,8 @@ class CreateInject extends Component {
   }
 
   createInject() {
-    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.state.injectData).then(() => {
+    let data = R.assoc('inject_date', dateToISO(this.state.injectData.inject_date), this.state.injectData)
+    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, data).then(() => {
       this.props.fetchIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
     })
     this.handleClose()
@@ -136,17 +149,17 @@ class CreateInject extends Component {
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
-                  1. Global parameters
+                  <T>1. Parameters</T>
                 </StepLabel>
               </Step>
               <Step>
                 <StepLabel>
-                  2. Content settings
+                  <T>2. Content</T>
                 </StepLabel>
               </Step>
               <Step>
                 <StepLabel>
-                  3. Audiences
+                  <T>3. Audiences</T>
                 </StepLabel>
               </Step>
             </Stepper>

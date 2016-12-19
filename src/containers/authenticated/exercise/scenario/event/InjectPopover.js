@@ -1,6 +1,9 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {i18nRegister} from '../../../../../utils/Messages'
+import {T} from '../../../../../components/I18n'
+import {dateFormat, dateToISO} from '../../../../../utils/Time'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover'
 import {Menu} from '../../../../../components/Menu'
@@ -20,6 +23,15 @@ const style = {
   top: '5px',
   right: 0,
 }
+
+i18nRegister({
+  fr: {
+    '1. Parameters': '1. Paramètres',
+    '2. Content': '2. Contenu',
+    '3. Audiences': '3. Audiences',
+    'Do you want to delete this inject?': 'Souhaitez-vous supprimer cet inject ?'
+  }
+})
 
 class InjectPopover extends Component {
   constructor(props) {
@@ -80,7 +92,8 @@ class InjectPopover extends Component {
   }
 
   updateInject() {
-    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, this.state.injectData)
+    let data = R.assoc('inject_date', dateToISO(this.state.injectData.inject_date), this.state.injectData)
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, data)
     this.handleCloseEdit()
   }
 
@@ -180,8 +193,12 @@ class InjectPopover extends Component {
       />,
     ]
 
-    // inject_date: moment(this.props.inject.get('inject_date')).format('YYYY-MM-DD HH:mm:ss')
-    let initialValues = R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'], this.props.inject)
+    var initPipe = R.pipe(
+      R.assoc('inject_date', dateFormat(R.path(['inject', 'exercise_start_date'], this.props))),
+      R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'])
+    )
+    const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined
+
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -201,24 +218,24 @@ class InjectPopover extends Component {
           open={this.state.openDelete}
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}>
-          Do you confirm the removing of this inject?
+          <T>Do you want to delete this inject?</T>
         </DialogTitleElement>
         <DialogTitleElement
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
-                  1. Global parameters
+                  <T>1. Parameters</T>
                 </StepLabel>
               </Step>
               <Step>
                 <StepLabel>
-                  2. Content settings
+                  <T>2. Content</T>
                 </StepLabel>
               </Step>
               <Step>
                 <StepLabel>
-                  3. Audiences
+                  <T>3. Audiences</T>
                 </StepLabel>
               </Step>
             </Stepper>

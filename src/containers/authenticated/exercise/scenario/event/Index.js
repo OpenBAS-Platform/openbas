@@ -1,11 +1,14 @@
 import React, {Component, PropTypes} from 'react'
 import R from 'ramda'
-import moment from 'moment';
+import {dateFormat} from '../../../../../utils/Time'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../../../utils/Messages'
+import {T} from '../../../../../components/I18n'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
 import {MainListItem, HeaderItem} from '../../../../../components/list/ListItem';
 import {Icon} from '../../../../../components/Icon'
+import {SearchField} from '../../../../../components/SimpleTextField'
 import {fetchAudiences} from '../../../../../actions/Audience'
 import {fetchEvents} from '../../../../../actions/Event'
 import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
@@ -52,8 +55,8 @@ const styles = {
   },
   'title': {
     float: 'left',
-    fontSize: '20px',
-    fontWeight: 600
+    fontSize: '13px',
+    textTransform: 'uppercase'
   },
   'empty': {
     marginTop: 40,
@@ -61,10 +64,8 @@ const styles = {
     fontWeight: 500,
     textAlign: 'center'
   },
-  'number': {
+  'search': {
     float: 'right',
-    color: '#9E9E9E',
-    fontSize: '12px',
   },
   'inject_title': {
     float: 'left',
@@ -82,10 +83,20 @@ const styles = {
   }
 }
 
+i18nRegister({
+  fr: {
+    'This event is empty.': 'Cet événement est vide.',
+    'This incident is empty.': 'Cet incident est vide.',
+    'Title': 'Titre',
+    'Date': 'Date',
+    'Author': 'Auteur'
+  }
+})
+
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'inject_date', orderAsc: true}
+    this.state = {sortBy: 'inject_date', orderAsc: true, searchTerm: ''}
   }
 
   componentDidMount() {
@@ -97,6 +108,10 @@ class Index extends Component {
     this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
   }
 
+  handleSearchInjects(event, value) {
+    this.setState({searchTerm: value})
+  }
+
   reverseBy(field) {
     this.setState({sortBy: field, orderAsc: !this.state.orderAsc})
   }
@@ -106,7 +121,7 @@ class Index extends Component {
       : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
     const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
     return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-      {label} {IconDisplay}
+      <T>{label}</T> {IconDisplay}
     </div>
   }
 
@@ -134,9 +149,15 @@ class Index extends Component {
     let {exerciseId, eventId, event, incident, incidents} = this.props
     let event_title = R.propOr('-', 'event_title', event)
     if (event && incident) {
-      //Build users list with sorting on column
+      const keyword = this.state.searchTerm
+      let filterByKeyword = n => keyword === '' ||
+      n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+      n.inject_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+      n.inject_content.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+
       const injects = R.pipe(
         R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
+        R.filter(filterByKeyword),
         R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
           var fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
           var fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
@@ -151,12 +172,16 @@ class Index extends Component {
           <div style={styles.title}>{incident.incident_title}</div>
           <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}
                            incident_types={this.props.incident_types}/>
-          <div style={styles.number}>{incident.incident_injects.length} injects</div>
+          <div style={styles.search}>
+            <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
+                         onChange={this.handleSearchInjects.bind(this)}
+                         styletype={Constants.FIELD_TYPE_RIGHT} />
+          </div>
           <div className="clearfix"></div>
 
           <List>
             {incident.incident_injects.length === 0 ? (
-              <div style={styles.empty}>This incident is empty.</div>
+                <div style={styles.empty}><T>This incident is empty.</T></div>
             ) : (
               <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
                           rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
@@ -194,7 +219,7 @@ class Index extends Component {
                 primaryText={
                   <div>
                     <div style={styles.inject_title}>{inject_title}</div>
-                    <div style={styles.inject_date}>{moment(inject_date).format('YYYY-MM-DD HH:mm')}</div>
+                    <div style={styles.inject_date}>{dateFormat(inject_date)}</div>
                     <div style={styles.inject_user}>{inject_user}</div>
                     <div className="clearfix"></div>
                   </div>
@@ -213,20 +238,14 @@ class Index extends Component {
     } else if (event) {
       return <div style={styles.container}>
         <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents} incident_types={this.props.incident_types}/>
-        <div style={styles.empty}>This event is empty.</div>
+        <div style={styles.empty}><T>This event is empty.</T></div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
           <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
         </Toolbar>
       </div>
     } else {
-      return <div style={styles.container}>
-        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents}/>
-        <div style={styles.empty}>No event loaded.</div>
-        <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
-        </Toolbar>
-      </div>
+      return <div style={styles.container}></div>
     }
   }
 }

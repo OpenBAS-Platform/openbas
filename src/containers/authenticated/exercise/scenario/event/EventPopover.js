@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {i18nRegister} from '../../../../../utils/Messages'
+import {T} from '../../../../../components/I18n'
 import {redirectToScenario} from '../../../../../actions/Application'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
@@ -15,6 +17,13 @@ import EventForm from './EventForm'
 const style = {
   margin: '8px -30px 0 0'
 }
+
+i18nRegister({
+  fr: {
+    'Update the event': 'Modifier l\'événement',
+    'Do you want to delete this event?': 'Souhaitez-vous supprimer cet événement ?'
+  }
+})
 
 class EventPopover extends Component {
   constructor(props) {
@@ -120,7 +129,7 @@ class EventPopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the deletion of this event?
+          <T>Do you want to delete this event?</T>
         </Dialog>
         <Dialog
           title="Update the event"

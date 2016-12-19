@@ -11,6 +11,7 @@ export const i18n = {
       'RUNNING': 'En cours',
       'FINISHED': 'Terminé',
       'Cancel': 'Annuler',
+      'Next': 'Suivant',
       'Create': 'Créer',
       'Launch': 'Lancer',
       'Edit': 'Modifier',
