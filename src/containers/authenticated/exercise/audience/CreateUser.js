@@ -1,10 +1,18 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../../utils/Messages'
 import {addUser} from '../../../../actions/User'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton} from '../../../../components/Button';
 import UserForm from './UserForm'
 import * as Constants from '../../../../constants/ComponentTypes'
+
+i18nRegister({
+  fr: {
+    'Create user': 'Créer un utilisateur',
+    'Create a new user': 'Créer un nouvel utilisateur'
+  }
+})
 
 class CreateUser extends Component {
   constructor(props) {

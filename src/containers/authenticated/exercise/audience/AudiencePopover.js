@@ -1,5 +1,7 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import R from 'ramda'
 import {Popover} from '../../../../components/Popover'
@@ -15,8 +17,21 @@ import ComcheckForm from '../check/ComcheckForm'
 
 const style = {
   float: 'left',
-  marginTop: '-13px'
+  marginTop: '-16px'
 }
+
+i18nRegister({
+  fr: {
+    'Update the audience': 'Modifier l\'audience',
+    'Do you want to delete this audience?': 'Souhaitez-vous supprimer cette audience?',
+    'Launch a comcheck': 'Lancher un comcheck',
+    'Communication check': 'Test de communication',
+    'Hello': 'Bonjour',
+    'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:': 'Ceci est un test de communication avant le début de l\'exercice. Merci de cliquer sur le lien ci-dessous afin de confirmer que vous avez bien reçu ce message :',
+    'Best regards': 'Cordialement',
+    'The exercise control Team': 'La direction de l\'animation',
+  }
+})
 
 class AudiencePopover extends Component {
   constructor(props) {
@@ -91,11 +106,10 @@ class AudiencePopover extends Component {
 
   render() {
     const initialComcheckValues = {
-      comcheck_subject: 'Communication check',
-      comcheck_message: 'Hello,<br /><br />This is a communication ' +
-      'check before the beginning of the exercise. Please click on the following ' +
-      'link in order to confirm you successfully received this message:',
-      comcheck_footer: 'Best regards,<br />The exercise control Team'
+      comcheck_subject: <T>Communication check</T>,
+      comcheck_message: <T>Hello</T> + ',<br /><br />' + <T>This is a communication check before the beginning of the exercise. Please
+        click on the following link in order to confirm you successfully received this message:</T>,
+      comcheck_footer: <T>Best regards</T> + ',<br />' + <T>The exercise control Team</T>
     }
 
     const comcheckActions = [
@@ -128,7 +142,7 @@ class AudiencePopover extends Component {
                 open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          Do you confirm the deletion of this audience?
+          <T>Do you want to delete this audience?</T>
         </Dialog>
         <Dialog title="Update the audience" modal={false}
                 open={this.state.openEdit}

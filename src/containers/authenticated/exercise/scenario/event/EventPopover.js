@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {redirectToScenario} from '../../../../../actions/Application'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover';
 import {Menu} from '../../../../../components/Menu'
@@ -59,20 +60,16 @@ class EventPopover extends Component {
   }
 
   handleOpenDelete() {
-    this.setState({
-      openDelete: true
-    })
+    this.setState({openDelete: true})
     this.handlePopoverClose()
   }
 
   handleCloseDelete() {
-    this.setState({
-      openDelete: false
-    })
+    this.setState({openDelete: false})
   }
 
   submitDelete() {
-    this.props.deleteEvent(this.props.exerciseId, this.props.eventId)
+    this.props.deleteEvent(this.props.exerciseId, this.props.eventId).then(() => this.props.redirectToScenario(this.props.exerciseId))
     this.handleCloseDelete()
   }
 
@@ -150,7 +147,8 @@ EventPopover.propTypes = {
   event: PropTypes.object,
   deleteEvent: PropTypes.func,
   updateEvent: PropTypes.func,
+  redirectToScenario: PropTypes.func,
   children: PropTypes.node
 }
 
-export default connect(null, {updateEvent, deleteEvent})(EventPopover)
+export default connect(null, {updateEvent, deleteEvent, redirectToScenario})(EventPopover)

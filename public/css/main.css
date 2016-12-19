@@ -12,6 +12,15 @@ input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
 }
 
+hr {
+  margin: 0;
+  padding: 0;
+  border: none;
+  height: 1px;
+  color: #E0E0E0;
+  background-color: #E0E0E0;
+}
+
 h2 {
   margin: 10px 0 20px 0 !important;
   -webkit-margin-before: 0 !important;

@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
@@ -11,20 +13,20 @@ import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
+import {SearchField} from '../../../../components/SimpleTextField'
 import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
 import UserPopover from './UserPopover'
 import {dateFormat} from '../../../../utils/Time'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'name': 'Nom',
+    'Name': 'Nom',
     'Email address': 'Adresse email',
     'Organization': 'Organisation',
-    'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience pour cet exercice'
+    'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
+    'This audience is empty.': 'Cette audience est vide.'
   }
 })
 
@@ -63,8 +65,8 @@ const styles = {
   },
   'title': {
     float: 'left',
-    fontSize: '20px',
-    fontWeight: 600
+    fontSize: '13px',
+    textTransform: 'uppercase'
   },
   'empty': {
     marginTop: 40,
@@ -72,10 +74,8 @@ const styles = {
     fontWeight: 500,
     textAlign: 'center'
   },
-  'number': {
+  'search': {
     float: 'right',
-    color: '#9E9E9E',
-    fontSize: '12px',
   },
   'name': {
     float: 'left',
@@ -107,7 +107,7 @@ const styles = {
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'user_firstname', orderAsc: true}
+    this.state = {sortBy: 'user_firstname', orderAsc: true,  searchTerm: ''}
   }
 
   componentDidMount() {
@@ -135,6 +135,10 @@ class Index extends Component {
 
   circularFetch() {
     this.props.fetchComchecks(this.props.exerciseId, true)
+  }
+
+  handleSearchUsers(event, value) {
+    this.setState({searchTerm: value})
   }
 
   reverseBy(field) {
@@ -178,9 +182,16 @@ class Index extends Component {
 
     let {exerciseId, audience, audiences} = this.props
     if (audience) {
+      const keyword = this.state.searchTerm
+      let filterByKeyword = n => keyword === '' ||
+      n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+      n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+      n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+
       //Build users list with sorting on column
       const users = R.pipe(
         R.map(data => R.pathOr({}, ['users', data.user_id], this.props)),
+        R.filter(filterByKeyword),
         R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
           var fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
           var fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
@@ -193,12 +204,16 @@ class Index extends Component {
         <div>
           <div style={styles.title}>{audience.audience_name}</div>
           <AudiencePopover exerciseId={exerciseId} audience={audience}/>
-          <div style={styles.number}>{audience.audience_users.length} users</div>
+          <div style={styles.search}>
+            <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
+                             onChange={this.handleSearchUsers.bind(this)}
+                             styletype={Constants.FIELD_TYPE_RIGHT} />
+          </div>
           <div className="clearfix"></div>
           {comchecks}
           <List>
             {audience.audience_users.length === 0 ? (
-              <div style={styles.empty}>This audience is empty.</div>
+                <div style={styles.empty}><T>This audience is empty.</T></div>
             ) : (
               <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
                           rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>

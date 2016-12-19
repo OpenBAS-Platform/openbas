@@ -10,6 +10,14 @@ export const i18n = {
       'SCHEDULED': 'Planifié',
       'RUNNING': 'En cours',
       'FINISHED': 'Terminé',
+      'Cancel': 'Annuler',
+      'Create': 'Créer',
+      'Launch': 'Lancer',
+      'Edit': 'Modifier',
+      'Update': 'Modifier',
+      'Delete': 'Supprimer',
+      'Confirmation': 'Confirmation',
+      'Search': 'Rechercher'
     },
     en: {
       'TECHNICAL': 'Technique',

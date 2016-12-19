@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem';
@@ -24,7 +26,19 @@ const styles = {
     fontWeight: 500,
     marginRight: '10px'
   },
+  'title': {
+    float: 'left',
+    fontSize: '13px',
+    textTransform: 'uppercase'
+  }
 }
+
+i18nRegister({
+  fr: {
+    'Objectives': 'Objectifs',
+    'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.'
+  }
+})
 
 class IndexObjective extends Component {
   componentDidMount() {
@@ -36,6 +50,8 @@ class IndexObjective extends Component {
     let {exerciseId, objectives} = this.props
     if (objectives.length > 0) {
       return <div style={styles.container}>
+        <div style={styles.title}><T>Objectives</T></div>
+        <div className="clearfix"></div>
         <List>
           {objectives.map(objective => {
             let nestedItems = objective.objective_subobjectives.map(data => {
@@ -80,7 +96,9 @@ class IndexObjective extends Component {
       </div>
     } else {
       return <div style={styles.container}>
-        <div style={styles.empty}>You do not have any objectives in this exercise.</div>
+        <div style={styles.title}><T>Objectives</T></div>
+        <div className="clearfix"></div>
+        <div style={styles.empty}><T>You do not have any objectives in this exercise.</T></div>
         <CreateObjective exerciseId={exerciseId}/>
       </div>
     }

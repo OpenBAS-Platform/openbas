@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {addAudience, selectAudience} from '../../../../actions/Audience'
 import {Dialog} from '../../../../components/Dialog';
@@ -7,6 +8,13 @@ import {FlatButton} from '../../../../components/Button';
 import AudienceForm from './AudienceForm'
 import {ActionButtonCreate} from '../../../../components/Button'
 import {AppBar} from '../../../../components/AppBar'
+
+i18nRegister({
+  fr: {
+    'Audiences': 'Audiences',
+    'Create a new audience': 'Créer une nouvelle audience'
+  }
+})
 
 class CreateAudience extends Component {
   constructor(props) {

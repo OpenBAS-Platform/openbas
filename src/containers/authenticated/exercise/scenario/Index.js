@@ -1,14 +1,18 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import {Link} from 'react-router'
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
+import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchEvents} from '../../../../actions/Event'
-import {Event} from '../../../../components/Event'
+import {Icon} from '../../../../components/Icon'
+import {List} from '../../../../components/List'
+import {MainListItemLink} from '../../../../components/list/ListItem';
 import CreateEvent from './event/CreateEvent'
 
 const styles = {
   container: {
-    textAlign: 'center'
+    textAlign: 'left'
   },
   'empty': {
     marginTop: 40,
@@ -16,7 +20,19 @@ const styles = {
     fontWeight: 500,
     textAlign: 'center'
   },
+  'title': {
+    float: 'left',
+    fontSize: '13px',
+    textTransform: 'uppercase'
+  }
 }
+
+i18nRegister({
+  fr: {
+    'Events': 'Evénements',
+    'You do not have any events in this exercise.': 'Vous n\'avez aucun événement dans cet exercice.'
+  }
+})
 
 class IndexScenario extends Component {
   componentDidMount() {
@@ -26,15 +42,26 @@ class IndexScenario extends Component {
   render() {
     return (
       <div style={styles.container}>
-        {this.props.events.length === 0 ?<div style={styles.empty}>You do not have any events in this exercise.</div> : ""}
-        {this.props.events.map(event => {
-          var file_url = R.pathOr('-', ['event_image', 'file_url'], event)
-          return (
-            <Link to={'/private/exercise/' + this.props.exerciseId + '/scenario/' + event.event_id} key={event.event_id}>
-              <Event title={event.event_title} description={event.event_description} image={file_url} />
-            </Link>
-          )
-        })}
+        <div style={styles.title}><T>Events</T></div>
+        <div className="clearfix"></div>
+        {this.props.events.length === 0 ?<div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
+        <List>
+          {this.props.events.map(event => {
+            return (
+              <MainListItemLink
+                to={'/private/exercise/' + this.props.exerciseId + '/scenario/' + event.event_id}
+                key={event.event_id}
+                leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}
+                primaryText={
+                  <div>
+                    {event.event_title}
+                  </div>
+                }
+                secondaryText={event.event_description}
+              />
+            )
+          })}
+        </List>
         <CreateEvent exerciseId={this.props.exerciseId}/>
       </div>
     )

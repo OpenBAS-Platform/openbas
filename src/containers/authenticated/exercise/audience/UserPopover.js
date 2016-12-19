@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -17,6 +19,13 @@ const style = {
   top: '7px',
   right: 0,
 }
+
+i18nRegister({
+  fr: {
+    'Do you want to remove the user from this audience?': 'Souhaitez-vous supprimer l\'utilisateur de cette audience ?',
+    'Update the user': 'Modifier l\'utilisateur',
+  }
+})
 
 class UserPopover extends Component {
   constructor(props) {
@@ -108,7 +117,7 @@ class UserPopover extends Component {
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          Do you confirm the removing of this user?
+          <T>Do you want to remove the user from this audience?</T>
         </Dialog>
         <Dialog title="Update the user" modal={false} open={this.state.openEdit}
                 onRequestClose={this.handleCloseEdit.bind(this)}

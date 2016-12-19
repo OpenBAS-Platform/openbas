@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {updateAudience} from '../../../../actions/Audience'
 import {fetchUsers} from '../../../../actions/User'
@@ -29,6 +30,13 @@ const styles = {
     padding: '5px 0 0 0'
   },
 }
+
+i18nRegister({
+  fr: {
+    'Add these users': 'Ajouter ces utilisateurs',
+    'Search for a user': 'Rechercher un utilisateur'
+  }
+})
 
 class AddUsers extends Component {
   constructor(props) {
@@ -68,7 +76,7 @@ class AddUsers extends Component {
   render() {
     const actions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseAddUsers.bind(this)}/>,
-      <FlatButton label="Add users" primary={true} onTouchTap={this.submitAddUsers.bind(this)}/>,
+      <FlatButton label="Add these users" primary={true} onTouchTap={this.submitAddUsers.bind(this)}/>,
       <CreateUser exerciseId={this.props.exerciseId} />
     ]
 

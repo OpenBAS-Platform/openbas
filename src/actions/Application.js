@@ -33,6 +33,10 @@ export const redirectToAdmin  = () => (dispatch) => {
   dispatch(push('/private/admin/index'))
 }
 
-export const redirectToExercise  = (exerciseId) => (dispatch) => {
+export const redirectToExercise = (exerciseId) => (dispatch) => {
   dispatch(push('/private/exercise/' + exerciseId))
+}
+
+export const redirectToScenario = (exerciseId) => (dispatch) => {
+  dispatch(push('/private/exercise/' + exerciseId + '/scenario'))
 }
