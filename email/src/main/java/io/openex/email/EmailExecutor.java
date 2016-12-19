@@ -31,4 +31,9 @@ class EmailExecutor implements Executor {
 	public ImmutableMap<String, Component> components() {
 		return ImmutableMap.of("smtp", new MailComponent(), "freemarker", new FreemarkerComponent());
 	}
+	
+	@Override
+	public ImmutableMap<String, Object> beans() {
+		return ImmutableMap.of("attachments-handler", new EmailAttacher());
+	}
 }

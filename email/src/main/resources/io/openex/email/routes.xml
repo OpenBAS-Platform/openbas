@@ -10,6 +10,9 @@
         <setHeader headerName="subject">
             <simple>${body[subject]}</simple>
         </setHeader>
+        <setHeader headerName="attachments">
+            <simple>${body[attachments]}</simple>
+        </setHeader>
         <setHeader headerName="CamelFreemarkerTemplate">
             <simple>${body[body]}</simple>
         </setHeader>
@@ -27,6 +30,8 @@
                         <simple>${body}</simple>
                     </setHeader>
                     <to uri="freemarker:from_header"/>
+                    <!-- Add attachments -->
+                    <bean ref="attachments-handler"/>
                     <!-- Send the email -->
                     <to uri="smtp://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
                     <!-- Output message for callback -->
