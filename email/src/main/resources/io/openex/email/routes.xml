@@ -33,7 +33,7 @@
                     <!-- Add attachments -->
                     <bean ref="attachments-handler"/>
                     <!-- Send the email -->
-                    <to uri="smtp://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}"/>
+                    <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
                     <!-- Output message for callback -->
                     <setBody>
                         <simple>${header.To} success</simple>

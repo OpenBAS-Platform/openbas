@@ -29,11 +29,12 @@ class EmailExecutor implements Executor {
 	
 	@Override
 	public ImmutableMap<String, Component> components() {
-		return ImmutableMap.of("smtp", new MailComponent(), "freemarker", new FreemarkerComponent());
+		MailComponent mailComponent = new MailComponent();
+		return ImmutableMap.of("smtp", mailComponent, "smtps", mailComponent, "freemarker", new FreemarkerComponent());
 	}
 	
 	@Override
 	public ImmutableMap<String, Object> beans() {
-		return ImmutableMap.of("attachments-handler", new EmailAttacher());
+		return ImmutableMap.of("attachments-handler", new EmailAttacher(), "ssl-handler", new EmailTrust());
 	}
 }
