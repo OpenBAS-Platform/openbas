@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -9,13 +10,13 @@ import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
 import {SimpleTextField} from '../../../../components/SimpleTextField'
+import {Checkbox} from '../../../../components/Checkbox'
 import {Chip} from '../../../../components/Chip'
 import {Avatar} from '../../../../components/Avatar'
 import {List} from '../../../../components/List'
 import {MainSmallListItem} from '../../../../components/list/ListItem'
-import {updateGroup, deleteGroup} from '../../../../actions/Group'
-import {fetchUsers} from '../../../../actions/User'
-import {fetchOrganizations} from '../../../../actions/Organization'
+import {fetchGroup, updateGroup, deleteGroup} from '../../../../actions/Group'
+import {addGrant, deleteGrant} from '../../../../actions/Grant'
 import GroupForm from './GroupForm'
 
 const styles = {
@@ -51,12 +52,9 @@ class GroupPopover extends Component {
       openPopover: false,
       searchTerm: '',
       usersIds: this.props.groupUsersIds,
+      grantsToAdd: [],
+      grantsToRemove: []
     }
-  }
-
-  componentDidMount() {
-    this.props.fetchUsers()
-    this.props.fetchOrganizations()
   }
 
   handlePopoverOpen(event) {
@@ -123,11 +121,47 @@ class GroupPopover extends Component {
     this.setState({openGrants: false})
   }
 
-  submitGrants() {
-    this.props.updateGroup(this.props.group.group_id, {group_users: this.state.usersIds})
-    this.handleCloseGrants()
+  handleGrantCheck(exerciseId, grantId, grantName, event, isChecked) {
+    // the grant already exists
+    if (grantId !== null && isChecked) {
+      return;
+      // the grant does not exist yet
+    } else if (isChecked) {
+      let grantsToAdd = this.state.grantsToAdd
+      grantsToAdd.push({exercise_id: exerciseId, grant_name: grantName})
+      this.setState({grantsToAdd: grantsToAdd})
+    }
+
+    // the grand does not exist
+    if (grantId === null && !isChecked) {
+      return;
+    } else if (!isChecked) {
+      let grantsToRemove = this.state.grantsToRemove
+      grantsToRemove.push({exercise_id: exerciseId, grant_id: grantId})
+      this.setState({grantsToRemove: grantsToRemove})
+    }
   }
 
+  submitGrants() {
+    let grantsToAdd = this.state.grantsToAdd
+    let addGrant = n => this.props.addGrant(this.props.group.group_id, {
+      grant_name: n.grant_name,
+      grant_exercise: n.exercise_id
+    }).then(() => {
+      this.props.fetchGroup(this.props.group.group_id)
+    })
+    R.forEach(addGrant, grantsToAdd)
+    this.setState({grantsToAdd: []})
+
+    let grantsToRemove = this.state.grantsToRemove
+    let deleteGrant = n => this.props.deleteGrant(this.props.group.group_id, n.grant_id).then(() => {
+      this.props.fetchGroup(this.props.group.group_id)
+    })
+    R.forEach(deleteGrant, grantsToRemove)
+    this.setState({grantsToRemove: []})
+
+    this.handleCloseGrants()
+  }
 
   handleOpenDelete() {
     this.setState({openDelete: true})
@@ -182,6 +216,7 @@ class GroupPopover extends Component {
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
             <MenuItemLink label="Manage users" onTouchTap={this.handleOpenUsers.bind(this)}/>
+            <MenuItemLink label="Manage grants" onTouchTap={this.handleOpenGrants.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -209,7 +244,7 @@ class GroupPopover extends Component {
           contentStyle={styles.dialog}>
           <div style={styles.list}>
             {this.state.usersIds.map(userId => {
-              let user =  R.propOr({}, userId, this.props.users)
+              let user = R.propOr({}, userId, this.props.users)
               let user_firstname = R.propOr('-', 'user_firstname', user)
               let user_lastname = R.propOr('-', 'user_lastname', user)
               let user_gravatar = R.propOr('-', 'user_gravatar', user)
@@ -251,6 +286,37 @@ class GroupPopover extends Component {
             </List>
           </div>
         </DialogTitleElement>
+        <Dialog title="Manage grants" modal={false} open={this.state.openGrants}
+                onRequestClose={this.handleCloseGrants.bind(this)}
+                actions={grantsActions}>
+          <Table selectable={false}>
+            <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+              <TableRow>
+                <TableHeaderColumn>Exercise</TableHeaderColumn>
+                <TableHeaderColumn>Planner</TableHeaderColumn>
+                <TableHeaderColumn>Observer</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody displayRowCheckbox={false}>
+              {R.values(this.props.exercises).map(exercise => {
+                let grantPlanner = R.find(g => g.grant_exercise.exercise_id === exercise.exercise_id && g.grant_name === 'PLANNER')(this.props.group.group_grants)
+                let grantObserver = R.find(g => g.grant_exercise.exercise_id === exercise.exercise_id && g.grant_name === 'OBSERVER')(this.props.group.group_grants)
+                let grantPlannerId = R.propOr(null, 'grant_id', grantPlanner)
+                let grantObserverId = R.propOr(null, 'grant_id', grantObserver)
+
+                return (
+                  <TableRow key={exercise.exercise_id}>
+                    <TableRowColumn>{exercise.exercise_name}</TableRowColumn>
+                    <TableRowColumn><Checkbox defaultChecked={grantPlannerId !== null}
+                                              onCheck={this.handleGrantCheck.bind(this, exercise.exercise_id, grantPlannerId, 'PLANNER')}/></TableRowColumn>
+                    <TableRowColumn><Checkbox defaultChecked={grantObserverId !== null}
+                                              onCheck={this.handleGrantCheck.bind(this, exercise.exercise_id, grantObserverId, 'OBSERVER')}/></TableRowColumn>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </Dialog>
       </div>
     )
   }
@@ -259,20 +325,23 @@ class GroupPopover extends Component {
 const select = (state) => {
   return {
     users: state.referential.entities.users,
-    organizations: state.referential.entities.organizations
+    organizations: state.referential.entities.organizations,
+    exercises: state.referential.entities.exercises,
   }
 }
 
 GroupPopover.propTypes = {
   group: PropTypes.object,
-  fetchUsers: PropTypes.func,
-  fetchOrganizations: PropTypes.func,
+  fetchGroup: PropTypes.func,
   updateGroup: PropTypes.func,
   deleteGroup: PropTypes.func,
+  addGrant: PropTypes.func,
+  deleteGrant: PropTypes.func,
   organizations: PropTypes.object,
-  groupUsersIds: PropTypes.array,
+  exercises: PropTypes.object,
   users: PropTypes.object,
+  groupUsersIds: PropTypes.array,
   children: PropTypes.node
 }
 
-export default connect(select, {fetchUsers, fetchOrganizations, updateGroup, deleteGroup})(GroupPopover)
+export default connect(select, {fetchGroup, updateGroup, deleteGroup, addGrant, deleteGrant})(GroupPopover)

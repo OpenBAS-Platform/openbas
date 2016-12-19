@@ -62,6 +62,7 @@ const initialState = {
       files: Immutable({}),
       users: Immutable({}),
       groups: Immutable({}),
+      grants: Immutable({}),
       organizations: Immutable({}),
       tokens: Immutable({}),
       exercises: Immutable({}),

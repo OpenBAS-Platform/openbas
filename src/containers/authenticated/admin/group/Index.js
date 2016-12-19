@@ -3,6 +3,9 @@ import {connect} from 'react-redux'
 import R from 'ramda'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchGroups} from '../../../../actions/Group'
+import {fetchUsers} from '../../../../actions/User'
+import {fetchOrganizations} from '../../../../actions/Organization'
+import {fetchExercises} from '../../../../actions/Exercise'
 import {List} from '../../../../components/List'
 import {MainListItem, HeaderItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
@@ -55,6 +58,9 @@ class Index extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchExercises()
+    this.props.fetchUsers()
+    this.props.fetchOrganizations()
     this.props.fetchGroups()
   }
 
@@ -98,7 +104,9 @@ class Index extends Component {
           return <MainListItem
             key={group_id}
             leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PUBLIC} type={Constants.ICON_TYPE_MAINLIST}/>}
-            rightIconButton={<GroupPopover group={group} groupUsersIds={group.group_users.map(u => u.user_id)}/>}
+            rightIconButton={<GroupPopover group={group} groupUsersIds={group.group_users.map(u => u.user_id)}
+                                           organizations={this.props.organizations} users={this.props.users}
+                                           exercises={this.props.exercises}/>}
             primaryText={
               <div>
                 <div style={styles.name}>{group_name}</div>
@@ -115,13 +123,22 @@ class Index extends Component {
 
 Index.propTypes = {
   groups: PropTypes.object,
+  organizations: PropTypes.object,
+  exercises: PropTypes.object,
+  users: PropTypes.object,
+  fetchUsers: PropTypes.func,
+  fetchOrganizations: PropTypes.func,
+  fetchExercises: PropTypes.func,
   fetchGroups: PropTypes.func,
 }
 
 const select = (state) => {
   return {
     groups: state.referential.entities.groups,
+    exercises: state.referential.entities.exercises,
+    users: state.referential.entities.users,
+    organizations: state.referential.entities.organizations,
   }
 }
 
-export default connect(select, {fetchGroups})(Index);
+export default connect(select, {fetchGroups, fetchExercises, fetchUsers, fetchOrganizations})(Index);

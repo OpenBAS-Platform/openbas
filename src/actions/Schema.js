@@ -21,6 +21,9 @@ export const arrayOfOrganizations = arrayOf(organization)
 export const group = new Schema('groups', {idAttribute: 'group_id'})
 export const arrayOfGroups = arrayOf(group)
 
+export const grant = new Schema('grants', {idAttribute: 'grant_id'})
+export const arrayOfGrants = arrayOf(grant)
+
 export const user = new Schema('users', {idAttribute: 'user_id'})
 export const arrayOfUsers = arrayOf(user)
 
