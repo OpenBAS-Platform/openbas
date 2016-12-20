@@ -1,4 +1,5 @@
 /composer.lock
+/composer.phar
 /app/config/parameters.yml
 /build/
 /phpunit.xml
