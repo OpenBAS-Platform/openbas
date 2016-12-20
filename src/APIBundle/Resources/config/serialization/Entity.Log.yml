@@ -6,6 +6,8 @@ APIBundle\Entity\Objective:
             groups: ['log']
         log_content:
             groups: ['log']
+        log_date:
+            groups: ['log']
         log_exercise:
             groups: ['log']
         log_user:
