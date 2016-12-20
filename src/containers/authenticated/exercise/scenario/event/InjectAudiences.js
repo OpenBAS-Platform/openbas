@@ -1,5 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import R from 'ramda'
+import {i18nRegister} from '../../../../../utils/Messages'
+import {T} from '../../../../../components/I18n'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Chip} from '../../../../../components/Chip';
 import {Avatar} from '../../../../../components/Avatar';
@@ -9,14 +11,18 @@ import {SimpleTextField} from '../../../../../components/SimpleTextField'
 import {Icon} from '../../../../../components/Icon'
 
 const styles = {
-  list: {},
-  search: {},
   'name': {
     float: 'left',
     width: '80%',
     padding: '5px 0 0 0'
   }
 }
+
+i18nRegister({
+  fr: {
+    'No available audience.': 'Aucune audience disponible.'
+  }
+})
 
 class InjectAudiences extends Component {
   constructor(props) {
@@ -70,8 +76,8 @@ class InjectAudiences extends Component {
           })}
           <div className="clearfix"></div>
         </div>
-        <div style={styles.search}>
-          {this.props.audiences.length === 0 ? <div style={styles.empty}>No audience found.</div> : ""}
+        <div>
+          {this.props.audiences.length === 0 ? <div><T>No available audience.</T></div> : ""}
           <List>
             {filteredAudiences.map(audience => {
               let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined

@@ -26,7 +26,9 @@ i18nRegister({
   fr: {
     'Start date': 'Date de début',
     'End date': 'Date de fin',
-    'Subtitle': 'Sous-titre'
+    'Subtitle': 'Sous-titre',
+    'Do you want to delete this exercise?': 'Souhaitez-vous supprimer cet exercice ?',
+    'Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.': 'Supprimer un exercice conduit à la suppression de son contenu, incluant ses objectifs, événéments, incidents, injects et audiences. Nous vous déconseillons de faire cela.'
   }
 })
 
@@ -114,14 +116,12 @@ class Index extends Component {
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2><T>Delete</T></h2>
-            <p>Deleting an exercise will result in deleting all the content of the exercise, including objectives,
-              events, incidents, injects and audience groups. We do not recommend
-              you do this.</p>
+            <p><T>Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.</T></p>
             <Button label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
             <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                     onRequestClose={this.handleCloseDelete.bind(this)}
                     actions={deleteActions}>
-              Do you confirm the deletion of this exercise?
+              <T>Do you want to delete this exercise?</T>
             </Dialog>
           </div>
         </Paper>

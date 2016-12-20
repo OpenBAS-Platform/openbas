@@ -27,7 +27,7 @@ The frontend is the user interface of the product, built with the [ReactJS frame
 The worker is the executor that send incidents and injects, built with the [Camel framework](http://camel.apache.org).
  
 ## Development
- 
+
 To contribute to the frontend development, please follow the next steps to deploy it.
 
 *Installation*:
@@ -35,7 +35,7 @@ To contribute to the frontend development, please follow the next steps to deplo
 ```bash
 $ git clone https://github.com/LuatixHQ/openex-frontend
 $ cd openex-frontend
-$ npm install
+$ yarn install
 ```
 
 *Configuration*:

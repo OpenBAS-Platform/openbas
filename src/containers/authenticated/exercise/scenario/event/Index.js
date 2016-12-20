@@ -170,7 +170,7 @@ class Index extends Component {
                      incidents={incidents} incident_types={this.props.incident_types}/>
         <div>
           <div style={styles.title}>{incident.incident_title}</div>
-          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}
+          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident} incidentSubobjectivesIds={incident.incident_subobjectives.map(i => i.subobjective_id)}
                            incident_types={this.props.incident_types}/>
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"

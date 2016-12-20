@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -18,6 +20,15 @@ const style = {
   top: '10px',
   right: 0,
 }
+
+i18nRegister({
+  fr: {
+    'Update the objective': 'Modifier l\'objectif',
+    'Create a new subobjective': 'Créer un nouveau sous-objectif',
+    'Add a new subobjective': 'Ajouter un nouveau sous-objectif',
+    'Do you want to delete this objective?': 'Souhaitez-vous supprimer cet objectif ?'
+  }
+})
 
 class ObjectivePopover extends Component {
   constructor(props) {
@@ -152,7 +163,7 @@ class ObjectivePopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the deletion of this objective?
+          <T>Do you want to delete this objective?</T>
         </Dialog>
         <Dialog
           title="Update the objective"

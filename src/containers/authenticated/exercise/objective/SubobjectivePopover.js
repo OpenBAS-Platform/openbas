@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -17,6 +19,13 @@ const style = {
   top: '10px',
   right: 0,
 }
+
+i18nRegister({
+  fr: {
+    'Update the subobjective': 'Modifier le sous-objectif',
+    'Do you want to delete this subobjective?': 'Souhaitez-vous supprimer ce sous-objectif ?',
+  }
+})
 
 class SubobjectivePopover extends Component {
   constructor(props) {
@@ -129,7 +138,7 @@ class SubobjectivePopover extends Component {
           onRequestClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
-          Do you confirm the deletion of this subobjective?
+          <T>Do you want to delete this subobjective?</T>
         </Dialog>
         <Dialog
           title="Update the subobjective"

@@ -116,7 +116,7 @@ class AddUsers extends Component {
             })}
             <div className="clearfix"></div>
           </div>
-          <div style={styles.search}>
+          <div>
             <List>
               {filteredUsers.map(user => {
                 let disabled = R.find(u => u.user_id === user.user_id, this.state.users) !== undefined
@@ -144,7 +144,7 @@ class AddUsers extends Component {
           </div>
         </DialogTitleElement>
       </div>
-    );
+    )
   }
 }
 

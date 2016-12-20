@@ -24,7 +24,7 @@ i18nRegister({
   fr: {
     'Update the audience': 'Modifier l\'audience',
     'Do you want to delete this audience?': 'Souhaitez-vous supprimer cette audience?',
-    'Launch a comcheck': 'Lancher un comcheck',
+    'Launch a comcheck': 'Lancer un comcheck',
     'Communication check': 'Test de communication',
     'Hello': 'Bonjour',
     'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:': 'Ceci est un test de communication avant le début de l\'exercice. Merci de cliquer sur le lien ci-dessous afin de confirmer que vous avez bien reçu ce message :',

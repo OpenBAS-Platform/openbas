@@ -5,9 +5,9 @@ import {i18nRegister} from '../../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'Email address': 'Adresse email',
-    'Password': 'Mot de passe',
-    'Sign in': 'Se connecter'
+    'Title': 'Titre',
+    'Description': 'Description',
+    'Priority': 'Priorité'
   }
 })
 

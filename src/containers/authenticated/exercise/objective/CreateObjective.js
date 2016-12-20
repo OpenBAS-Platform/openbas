@@ -1,10 +1,17 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {addObjective} from '../../../../actions/Objective'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
 import ObjectiveForm from './ObjectiveForm'
+
+i18nRegister({
+  fr: {
+    'Create a new objective': 'Créer un nouvel objectif'
+  }
+})
 
 class CreateObjective extends Component {
   constructor(props) {

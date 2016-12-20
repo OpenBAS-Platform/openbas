@@ -87,7 +87,7 @@ class GroupPopover extends Component {
   }
 
   handleOpenUsers() {
-    this.setState({openUsers: true})
+    this.setState({openUsers: true, usersIds: this.props.groupUsersIds})
     this.handlePopoverClose()
   }
 
@@ -240,9 +240,8 @@ class GroupPopover extends Component {
           open={this.state.openUsers}
           onRequestClose={this.handleCloseUsers.bind(this)}
           autoScrollBodyContent={true}
-          actions={usersActions}
-          contentStyle={styles.dialog}>
-          <div style={styles.list}>
+          actions={usersActions}>
+          <div>
             {this.state.usersIds.map(userId => {
               let user = R.propOr({}, userId, this.props.users)
               let user_firstname = R.propOr('-', 'user_firstname', user)
@@ -260,10 +259,10 @@ class GroupPopover extends Component {
             })}
             <div className="clearfix"></div>
           </div>
-          <div style={styles.search}>
+          <div>
             <List>
               {filteredUsers.map(user => {
-                let disabled = R.find(user_id => user_id === user.audience_id, this.state.usersIds) !== undefined
+                let disabled = R.find(user_id => user_id === user.user_id, this.state.usersIds) !== undefined
                 let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
                 let organizationName = R.propOr('-', 'organization_name', user_organization)
                 return (
