@@ -43,11 +43,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('============');
         $output->writeln('');
 
-        $resultAchieved = $this->createResult('ACHIEVED');
-        $resultSemiAchieved = $this->createResult('SEMI_ACHIEVED');
-        $resultNotAchieved = $this->createResult('NOT_ACHIEVED');
-        $output->writeln('Creating default results');
-
         $typeTechnical = $this->createIncidentType('TECHNICAL');
         $typeOperational = $this->createIncidentType('OPERATIONAL');
         $typeStrategic = $this->createIncidentType('STRATEGIC');
@@ -109,41 +104,20 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $groupPotatoesPlanners = $this->createGroup('Potatoes planners', $userAdmin);
         $output->writeln('Creating group \'Potatoes planners\'');
 
-        $groupPotatoesPlayers = $this->createGroup('Potatoes players', $userAdmin);
-        $output->writeln('Creating group \'Potatoes players\'');
-
         $groupCockroachPlanners = $this->createGroup('Cockroach planners', $userAdmin);
         $output->writeln('Creating group \'Cockroach planners\'');
-
-        $groupCockroachPlayers = $this->createGroup('Cockroach players', $userAdmin);
-        $output->writeln('Creating group \'Cockroach players\'');
 
         $this->createGrant('PLANNER', $groupPotatoesPlanners, $exercisePotatoes);
         $output->writeln('Group \'Potatoes planners\' granted PLANNER on exercise \'Potatoes attack\'');
 
-        $this->createGrant('PLAYER', $groupPotatoesPlayers, $exercisePotatoes);
-        $output->writeln('Group \'Potatoes players\' granted PLAYER on exercise \'Potatoes attack\'');
-
         $this->createGrant('PLANNER', $groupCockroachPlanners, $exerciseCockroach);
         $output->writeln('Group \'Cockroach planners\' granted PLANNER on exercise \'Cockroach attack\'');
-
-        $this->createGrant('PLAYER', $groupCockroachPlayers, $exerciseCockroach);
-        $output->writeln('Group \'Cockroach players\' granted PLAYER on exercise \'Cockroach attack\'');
 
         $this->joinGroup($userJane, $groupPotatoesPlanners);
         $output->writeln('Jane is joining group \'Potatoes planners\'');
 
-        $this->joinGroup($userJane, $groupCockroachPlayers);
-        $output->writeln('Jane is joining group \'Cockroach players\'');
-
-        $this->joinGroup($userJerry, $groupPotatoesPlayers);
-        $output->writeln('Jerry is joining group \'Potatoes players\'');
-
         $this->joinGroup($userJerry, $groupCockroachPlanners);
         $output->writeln('Jerry is joining group \'Cockroach planners\'');
-
-        $this->joinGroup($userSam, $groupCockroachPlayers);
-        $output->writeln('Sam is joining group \'Cockroach players\'');
 
         $audienceDefence = $this->createAudience('National defence forces', $exercisePotatoes, [$userSam, $userJane]);
         $output->writeln('Creating audience \'National defence forces\'');
@@ -178,7 +152,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             $eventReco);
         $output->writeln('Creating incident \'A potato is sent to the capital\'');
 
-        $incidentSpy = $this->createIncident('A potato has been detected',
+        $incidentSpy = $this->createIncident('A potato is infiltrated',
             'The national security agency building has been infiltrated by a potato',
             $typeOperational,
             $eventInfiltration);

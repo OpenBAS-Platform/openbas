@@ -19,25 +19,18 @@ class Outcome
     protected $outcome_id;
 
     /**
-     * @ORM\Column(type="string")
-     */
-    protected $outcome_title;
-
-    /**
      * @ORM\Column(type="text")
      */
-    protected $outcome_description;
+    protected $outcome_comment;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_outcomes")
+     * @ORM\OneToOne(targetEntity="Incident", inversedBy="incident_outcome")
      * @ORM\JoinColumn(name="outcome_incident", referencedColumnName="incident_id", onDelete="CASCADE")
-     * @var Incident
      */
     protected $outcome_incident;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Result")
-     * @ORM\JoinColumn(name="outcome_result", referencedColumnName="result_id")
+     * @ORM\Column(type="integer")
      */
     protected $outcome_result;
 
@@ -52,25 +45,14 @@ class Outcome
         return $this;
     }
 
-    public function getOutcomeTitle()
+    public function getOutcomeComment()
     {
-        return $this->outcome_title;
+        return $this->outcome_comment;
     }
 
-    public function setOutcomeTitle($title)
+    public function setOutcomeComment($comment)
     {
-        $this->outcome_title = $title;
-        return $this;
-    }
-
-    public function getOutcomeDescription()
-    {
-        return $this->outcome_description;
-    }
-
-    public function setOutcomeDescription($description)
-    {
-        $this->outcome_description = $description;
+        $this->outcome_comment = $comment;
         return $this;
     }
 

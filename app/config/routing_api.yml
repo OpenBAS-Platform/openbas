@@ -114,6 +114,10 @@ exercises_event_incidents_outcomes:
     type:     rest
     resource: APIBundle\Controller\Exercise\Event\Incident\OutcomeController
 
+exercises_logs:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\LogController
+
 injects:
     type:     rest
     resource: APIBundle\Controller\InjectController

@@ -1,7 +1,7 @@
 APIBundle\Entity\Incident:
     attributes:
         incident_id:
-            groups: ['incident', 'event', 'inject']
+            groups: ['incident', 'event', 'inject', 'subobjective']
         incident_type:
             groups: ['incident']
         incident_event:
@@ -11,4 +11,8 @@ APIBundle\Entity\Incident:
         incident_story:
             groups: ['incident']
         incident_injects:
+            groups: ['incident']
+        incident_subobjectives:
+            groups: ['incident']
+        incident_outcome:
             groups: ['incident']
