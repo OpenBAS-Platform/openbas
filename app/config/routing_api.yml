@@ -121,3 +121,7 @@ exercises_logs:
 injects:
     type:     rest
     resource: APIBundle\Controller\InjectController
+
+worker_status:
+    type:     rest
+    resource: APIBundle\Controller\WorkerStatusController
