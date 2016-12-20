@@ -2,11 +2,9 @@ APIBundle\Entity\Outcome:
     attributes:
         outcome_id:
             groups: ['outcome', 'incident']
-        outcome_title:
-            groups: ['outcome']
-        outcome_description:
-            groups: ['outcome']
         outcome_incident:
             groups: ['outcome']
+        outcome_comment:
+            groups: ['outcome', 'incident']
         outcome_result:
-            groups: ['outcome']
+            groups: ['outcome', 'incident']

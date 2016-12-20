@@ -1,0 +1,12 @@
+APIBundle\Entity\Objective:
+    attributes:
+        log_id:
+            groups: ['log']
+        log_title:
+            groups: ['log']
+        log_content:
+            groups: ['log']
+        log_exercise:
+            groups: ['log']
+        log_user:
+            groups: ['log']

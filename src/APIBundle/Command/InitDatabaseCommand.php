@@ -43,11 +43,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('============');
         $output->writeln('');
 
-        $resultAchieved = $this->createResult('ACHIEVED');
-        $resultSemiAchieved = $this->createResult('SEMI_ACHIEVED');
-        $resultNotAchieved = $this->createResult('NOT_ACHIEVED');
-        $output->writeln('Creating default results');
-
         $typeTechnical = $this->createIncidentType('TECHNICAL');
         $typeOperational = $this->createIncidentType('OPERATIONAL');
         $typeStrategic = $this->createIncidentType('STRATEGIC');
@@ -157,7 +152,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             $eventReco);
         $output->writeln('Creating incident \'A potato is sent to the capital\'');
 
-        $incidentSpy = $this->createIncident('A potato has been detected',
+        $incidentSpy = $this->createIncident('A potato is infiltrated',
             'The national security agency building has been infiltrated by a potato',
             $typeOperational,
             $eventInfiltration);

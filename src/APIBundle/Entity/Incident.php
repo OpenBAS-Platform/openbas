@@ -53,10 +53,9 @@ class Incident
     protected $incident_subobjectives;
 
     /**
-     * @ORM\OneToMany(targetEntity="Outcome", mappedBy="outcome_incident")
-     * @var Outcome[]
+     * @ORM\OneToOne(targetEntity="Outcome", mappedBy="outcome_incident")
      */
-    protected $incident_outcomes;
+    protected $incident_outcome;
 
     /**
      * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_incident")
@@ -67,7 +66,6 @@ class Incident
     public function __construct()
     {
         $this->incident_objectives = new ArrayCollection();
-        $this->incident_outcomes = new ArrayCollection();
         $this->incident_injects = new ArrayCollection();
     }
 
@@ -137,14 +135,14 @@ class Incident
         return $this;
     }
 
-    public function getIncidentOutcomes()
+    public function getIncidentOutcome()
     {
-        return $this->incident_outcomes;
+        return $this->incident_outcome;
     }
 
-    public function setIncidentOutcomes($outcomes)
+    public function setIncidentOutcome($outcome)
     {
-        $this->incident_outcomes = $outcomes;
+        $this->incident_outcome = $outcome;
         return $this;
     }
 

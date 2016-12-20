@@ -5,22 +5,19 @@ namespace APIBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class IncidentType extends AbstractType
+class LogType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('incident_title');
-        $builder->add('incident_story');
-        $builder->add('incident_type');
-        $builder->add('incident_subobjectives');
+        $builder->add('log_title');
+        $builder->add('log_content');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'APIBundle\Entity\Incident',
+            'data_class' => 'APIBundle\Entity\Log',
             'csrf_protection' => false
         ]);
     }
