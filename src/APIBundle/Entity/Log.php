@@ -29,6 +29,11 @@ class Log
     protected $log_content;
 
     /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $log_date;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_logs")
      * @ORM\JoinColumn(name="log_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
@@ -74,6 +79,18 @@ class Log
         $this->log_content = $content;
         return $this;
     }
+
+    public function getLogDate()
+    {
+        return $this->log_date;
+    }
+
+    public function setLogDate($date)
+    {
+        $this->log_date = $date;
+        return $this;
+    }
+
 
     public function getLogExercise()
     {
