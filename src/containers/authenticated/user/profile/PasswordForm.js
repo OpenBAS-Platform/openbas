@@ -15,7 +15,6 @@ class PasswordForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>
         <FormField name="password_confirmation" fullWidth={true} type="password" label="Confirmation"/>
       </form>

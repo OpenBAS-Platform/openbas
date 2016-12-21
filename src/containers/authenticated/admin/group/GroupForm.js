@@ -6,7 +6,6 @@ class GroupForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="group_name" fullWidth={true} type="text" label="Name"/>
       </form>
     )

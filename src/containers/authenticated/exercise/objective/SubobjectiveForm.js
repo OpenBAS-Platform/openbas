@@ -26,7 +26,6 @@ class SubobjectiveForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="subobjective_title" fullWidth={true} type="text" label="Title"/>
         <FormField name="subobjective_description" fullWidth={true} type="text" label="Description"/>
         <FormField name="subobjective_priority" fullWidth={true} type="text" label="Priority"/>

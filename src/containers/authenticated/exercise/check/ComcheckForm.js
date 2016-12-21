@@ -36,7 +36,6 @@ class ComcheckForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="comcheck_subject" fullWidth={true} type="text" label="Subject"/>
         <FormField name="comcheck_message" fullWidth={true} multiLine={true} rows={3}
                    type="text" label="Message"/>

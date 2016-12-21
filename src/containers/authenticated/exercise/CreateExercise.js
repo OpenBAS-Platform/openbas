@@ -45,7 +45,7 @@ class CreateExercise extends Component {
                         onSubmitSuccess={this.handleClose.bind(this)}/>
         </Dialog>
       </div>
-    );
+    )
   }
 }
 

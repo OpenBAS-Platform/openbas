@@ -12,7 +12,6 @@ class UserForm extends Component {
 
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="user_email" fullWidth={true} type="text" label="Email address"/>
         <FormField name="user_firstname" fullWidth={true} type="text" label="Firstname"/>
         <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>

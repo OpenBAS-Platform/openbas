@@ -193,7 +193,7 @@ class InjectPopover extends Component {
       />,
     ]
 
-    var initPipe = R.pipe(
+    let initPipe = R.pipe(
       R.assoc('inject_date', dateFormat(R.path(['inject', 'exercise_start_date'], this.props))),
       R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'])
     )

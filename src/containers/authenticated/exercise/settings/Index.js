@@ -27,6 +27,7 @@ i18nRegister({
     'Start date': 'Date de début',
     'End date': 'Date de fin',
     'Subtitle': 'Sous-titre',
+    'Change the image': 'Change l\'image',
     'Do you want to delete this exercise?': 'Souhaitez-vous supprimer cet exercice ?',
     'Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.': 'Supprimer un exercice conduit à la suppression de son contenu, incluant ses objectifs, événéments, incidents, injects et audiences. Nous vous déconseillons de faire cela.'
   }
@@ -39,7 +40,7 @@ class Index extends Component {
   }
 
   onUpdate(data) {
-    var tzData = R.pipe( //Need to convert date to ISO format with timezone
+    let tzData = R.pipe( //Need to convert date to ISO format with timezone
       R.assoc('exercise_start_date', dateToISO(data.exercise_start_date)),
       R.assoc('exercise_end_date', dateToISO(data.exercise_end_date))
     )
@@ -83,7 +84,7 @@ class Index extends Component {
     ]
 
     const {exercise} = this.props
-    var initPipe = R.pipe(
+    let initPipe = R.pipe(
       R.assoc('exercise_start_date', dateFormat(R.path(['exercise', 'exercise_start_date'], this.props))),
       R.assoc('exercise_end_date', dateFormat(R.path(['exercise', 'exercise_end_date'], this.props))),
       R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date'])
@@ -126,7 +127,7 @@ class Index extends Component {
           </div>
         </Paper>
       </div>
-    );
+    )
   }
 }
 

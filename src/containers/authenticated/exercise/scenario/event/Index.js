@@ -159,8 +159,8 @@ class Index extends Component {
         R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
         R.filter(filterByKeyword),
         R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
-          var fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
-          var fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
+          let fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
+          let fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
           return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
         })
       )(incident.incident_injects)

@@ -10,7 +10,7 @@ import * as Constants from '../../../constants/ComponentTypes'
 i18nRegister({
   fr: {
     'Login': 'Identification',
-    'Use demo / demo to login.': 'Utiliser demo / demo pour s\'identifier.'
+    'Login: demo@openex.io / Password: demo': 'Nom d\'utilisateur : demo@openex.io / Mot de passe : demo'
   }
 })
 
@@ -50,7 +50,7 @@ class Login extends Component {
             </ToolbarGroup>
           </Toolbar>
           <LoginForm onSubmit={this.onSubmit.bind(this)}/>
-          {this.props.demo === '1' ? <i><T>Use demo / demo to login.</T></i> : ""}
+          {this.props.demo === '1' ? <i><T>Login: demo@openex.io / Password: demo</T></i> : ""}
         </div>
       </div>
     )

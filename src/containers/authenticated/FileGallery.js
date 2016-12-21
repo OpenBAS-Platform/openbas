@@ -33,7 +33,7 @@ class FileGallery extends Component {
   }
 
   handleFileChange() {
-    var data = new FormData();
+    let data = new FormData();
     data.append('file', this.refs.fileUpload.files[0])
     this.props.addFile(data)
     this.handleCloseUpload()
@@ -65,7 +65,7 @@ class FileGallery extends Component {
         <FloatingActionsButtonCreate onClick={this.openFileDialog.bind(this)} type={Constants.BUTTON_TYPE_FLOATING} />
         <input type="file" ref="fileUpload" style={{"display" : "none"}}  onChange={this.handleFileChange.bind(this)} />
       </div>
-    );
+    )
   }
 }
 

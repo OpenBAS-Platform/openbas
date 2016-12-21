@@ -30,7 +30,6 @@ class IncidentForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="incident_title" fullWidth={true} type="text" label="Title"/>
         <SelectField label="Type" name="incident_type" fullWidth={true}>
           {R.values(this.props.types).map(type => {

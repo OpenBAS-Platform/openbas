@@ -60,8 +60,8 @@ class IndexAuthenticated extends Component {
         <div style={styles.container}>
           {this.props.exercises.length === 0 ? <div style={styles.empty}><T>You do not have any available exercise on this platform.</T></div>:""}
           {this.props.exercises.map(exercise => {
-            var start_date = moment(exercise.exercise_start_date).format('MMM D, YYYY')
-            var end_date = moment(exercise.exercise_end_date).format('MMM D, YYYY')
+            let start_date = moment(exercise.exercise_start_date).format('MMM D, YYYY')
+            let end_date = moment(exercise.exercise_end_date).format('MMM D, YYYY')
             return (
               <Link to={'/private/exercise/' + exercise.exercise_id} key={exercise.exercise_id}>
                 <Exercise
@@ -80,7 +80,7 @@ class IndexAuthenticated extends Component {
         </div>
         {this.props.userAdmin ? <CreateExercise /> :""}
       </div>
-    );
+    )
   }
 }
 
@@ -100,7 +100,7 @@ IndexAuthenticated.propTypes = {
 }
 
 const select = (state) => {
-  var userId = R.path(['logged', 'user'], state.app)
+  let userId = R.path(['logged', 'user'], state.app)
   return {
     exercises: sortExercises(R.values(state.referential.entities.exercises)),
     userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users)
