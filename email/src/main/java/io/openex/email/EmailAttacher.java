@@ -25,6 +25,7 @@ public class EmailAttacher {
 				String file_name = attachmentMap.get("file_name").toString();
 				String file_url = attachmentMap.get("file_url").toString();
 				try {
+					//TODO Add token for fetching URI
 					in.addAttachment(file_name, new DataHandler(new URL(file_url)));
 				} catch (IOException e) {
 					throw new RuntimeException(e);

@@ -22,6 +22,9 @@
             <setHeader headerName="To">
                 <simple>${body[user_email]}</simple>
             </setHeader>
+            <setHeader headerName="PgpKey">
+                <simple>${body[user_pgp_key]}</simple>
+            </setHeader>
             <choice>
                 <when>
                     <simple>${header.To}</simple>
@@ -32,6 +35,8 @@
                     <to uri="freemarker:from_header"/>
                     <!-- Add attachments -->
                     <bean ref="attachments-handler"/>
+                    <!-- Encrypt the body with PGP -->
+                    <bean ref="pgp-encryption"/>
                     <!-- Send the email -->
                     <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
                     <!-- Output message for callback -->

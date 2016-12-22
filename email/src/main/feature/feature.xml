@@ -9,5 +9,6 @@
     <feature name="worker-email" version="${pom.version}">
         <feature>camel-freemarker</feature>
         <feature>camel-mail</feature>
+        <feature>camel-crypto</feature>
     </feature>
 </features>
