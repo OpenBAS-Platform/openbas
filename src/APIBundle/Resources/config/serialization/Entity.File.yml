@@ -4,6 +4,8 @@ APIBundle\Entity\File:
             groups: ['file', 'exercise', 'event', 'inject']
         file_name:
             groups: ['file', 'exercise', 'event', 'inject']
+        file_type:
+            groups: ['file', 'exercise', 'event', 'inject']
         file_url:
             groups: ['file', 'exercise', 'event', 'inject']
         file_tags:

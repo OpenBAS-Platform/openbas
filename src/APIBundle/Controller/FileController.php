@@ -51,6 +51,7 @@ class FileController extends Controller
             $file = new File();
             foreach ($_FILES as $f) {
                 $uploadedFile = new UploadedFile($f['tmp_name'], $f['name']);
+                $file->setFileType($uploadedFile->guessExtension());
                 $filePath = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
                 $uploadedFile->move($this->get('kernel')->getRootDir() . '/../web/upload', $filePath);
                 $file->setFileName($f['name']);
