@@ -1,16 +1,13 @@
 language: node_js
 sudo: required
 
-node_js:
-- 6
-
 cache:
   directories:
   - docs/vendor/bundle
   - node_modules
   - $HOME/.yarn-cache
 
-before-install:
+before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq yarn
 
