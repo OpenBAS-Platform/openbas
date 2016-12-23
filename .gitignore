@@ -1,8 +1,8 @@
 /composer.lock
 /composer.phar
+/phpunit.phar
 /app/config/parameters.yml
 /build/
-/phpunit.xml
 /var/*
 !/var/cache
 /var/cache/*

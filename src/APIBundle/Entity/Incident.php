@@ -29,6 +29,11 @@ class Incident
     protected $incident_story;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    protected $incident_weight;
+
+    /**
      * @ORM\ManyToOne(targetEntity="IncidentType", inversedBy="type_incidents")
      * @ORM\JoinColumn(name="incident_type", referencedColumnName="type_id", onDelete="CASCADE")
      * @var IncidentType
@@ -99,6 +104,17 @@ class Incident
     public function setIncidentStory($story)
     {
         $this->incident_story = $story;
+        return $this;
+    }
+
+    public function getIncidentWeight()
+    {
+        return $this->incident_weight;
+    }
+
+    public function setIncidentWeight($weight)
+    {
+        $this->incident_weight = $weight;
         return $this;
     }
 

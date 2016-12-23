@@ -14,6 +14,7 @@ class IncidentType extends AbstractType
         $builder->add('incident_title');
         $builder->add('incident_story');
         $builder->add('incident_type');
+        $builder->add('incident_weight');
         $builder->add('incident_subobjectives');
     }
 

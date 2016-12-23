@@ -12,6 +12,7 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Form\Type\IncidentType;
 use APIBundle\Entity\Event;
 use APIBundle\Entity\Incident;
+use APIBundle\Entity\Outcome;
 
 class IncidentController extends Controller
 {
@@ -120,6 +121,13 @@ class IncidentController extends Controller
         if ($form->isValid()) {
             $em->persist($incident);
             $em->flush();
+
+            $outcome = new Outcome();
+            $outcome->setOutcomeIncident($incident);
+            $outcome->setOutComeResult(0);
+            $em->persist($outcome);
+            $em->flush();
+
             return $incident;
         } else {
             return $form;
