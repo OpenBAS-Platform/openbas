@@ -19,7 +19,7 @@ class Outcome
     protected $outcome_id;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     protected $outcome_comment;
 
@@ -32,7 +32,7 @@ class Outcome
     /**
      * @ORM\Column(type="integer")
      */
-    protected $outcome_result;
+    protected $outcome_result = 0;
 
     public function getOutcomeId()
     {

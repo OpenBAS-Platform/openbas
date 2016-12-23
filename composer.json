@@ -1,6 +1,6 @@
 {
   "name": "openex",
-  "license": "proprietary",
+  "license": "creative common",
   "type": "project",
   "autoload": {
     "psr-4": {
@@ -37,7 +37,13 @@
     "symfony/phpunit-bridge": "^3.0"
   },
   "scripts": {
-    "symfony-scripts": [
+    "symfony-scripts-install": [
+      "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+      "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
+    ],
+    "symfony-scripts-all": [
       "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
@@ -46,10 +52,10 @@
       "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::prepareDeploymentTarget"
     ],
     "post-install-cmd": [
-      "@symfony-scripts"
+      "@symfony-scripts-install"
     ],
     "post-update-cmd": [
-      "@symfony-scripts"
+      "@symfony-scripts-install"
     ]
   },
   "extra": {

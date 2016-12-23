@@ -12,6 +12,7 @@ use APIBundle\Entity\Incident;
 use APIBundle\Entity\IncidentType;
 use APIBundle\Entity\Inject;
 use APIBundle\Entity\Objective;
+use APIBundle\Entity\Outcome;
 use APIBundle\Entity\Result;
 use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Token;
@@ -55,26 +56,32 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $organizationAgency = $this->createOrganization('The agency', 'The national security agency');
         $output->writeln('Creating organization \'The agency\'');
 
-        $userAdmin = $this->createUser('admin', 'admin', 'John', 'Doe', true, $organizationAgency);
-        $output->writeln('Creating user admin with password admin');
+        $userAdmin = $this->createUser('admin@openex.io', 'admin', 'John', 'Doe', true, $organizationAgency);
+        $output->writeln('Creating user admin@openex.io with password admin');
 
         $tokenAdmin = $this->createToken($userAdmin);
         $output->writeln('Creating token for user admin: ' . $tokenAdmin->getTokenValue());
 
-        $userJane = $this->createUser('jane', 'jane', 'Jane', 'Doe', true, $organizationAgency);
-        $output->writeln('Creating user jane with password jane');
+        $userDemo = $this->createUser('demo@openex.io', 'demo', 'Demo', 'Openex', true, $organizationAgency);
+        $output->writeln('Creating user demo@openex.io with password demo');
+
+        $tokenDemo = $this->createToken($userDemo);
+        $output->writeln('Creating token for user demo: ' . $tokenDemo->getTokenValue());
+
+        $userJane = $this->createUser('jane@openex.io', 'jane', 'Jane', 'Doe', true, $organizationAgency);
+        $output->writeln('Creating user jane@openex.io with password jane');
 
         $tokenJane = $this->createToken($userJane);
         $output->writeln('Creating token for user jane: ' . $tokenJane->getTokenValue());
 
-        $userJerry = $this->createUser('jerry', 'jerry', 'Jerry', 'Doe', true, $organizationAgency);
-        $output->writeln('Creating user jerry with password jerry');
+        $userJerry = $this->createUser('jerry@openex.io', 'jerry', 'Jerry', 'Doe', true, $organizationAgency);
+        $output->writeln('Creating user jerry@openex.io with password jerry');
 
         $tokenJerry = $this->createToken($userJerry);
         $output->writeln('Creating token for user jerry: ' . $tokenJerry->getTokenValue());
 
-        $userSam = $this->createUser('sam', 'sam', 'Sam', 'Doe', true, $organizationAgency);
-        $output->writeln('Creating user sam with password sam');
+        $userSam = $this->createUser('sam@openex.io', 'sam', 'Sam', 'Doe', true, $organizationAgency);
+        $output->writeln('Creating user sam@openex.io with password sam');
 
         $tokenSam = $this->createToken($userSam);
         $output->writeln('Creating token for user sam: ' . $tokenSam->getTokenValue());
@@ -152,11 +159,17 @@ class InitDatabaseCommand extends ContainerAwareCommand
             $eventReco);
         $output->writeln('Creating incident \'A potato is sent to the capital\'');
 
+        $outcomeCapital = $this->createOutcome($incidentCapital);
+        $output->writeln('Creating outcome for incident \'A potato is sent to the capital\'');
+
         $incidentSpy = $this->createIncident('A potato is infiltrated',
             'The national security agency building has been infiltrated by a potato',
             $typeOperational,
             $eventInfiltration);
         $output->writeln('Creating incident \'A potato has been detected in the national security agency\'');
+
+        $outcomeSpy = $this->createOutcome($incidentSpy);
+        $output->writeln('Creating outcome for incident \'A potato has been detected in the national security agency\'');
 
         $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Conversation interception', 'body' => 'A conversation between the potatoes chief and an agent');
         $injectIntercept = $this->createInject(
@@ -352,11 +365,22 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $incident->setIncidentStory($story);
         $incident->setIncidentType($type);
         $incident->setIncidentEvent($event);
-
+        $incident->setIncidentWeight(0);
         $this->em->persist($incident);
         $this->em->flush();
 
         return $incident;
+    }
+
+    private function createOutcome($incident) {
+        $outcome = new Outcome();
+        $outcome->setOutcomeIncident($incident);
+        $outcome->setOutComeResult(0);
+
+        $this->em->persist($outcome);
+        $this->em->flush();
+
+        return $outcome;
     }
 
     private function createInject($title, $description, $content, $date, $type, $incident, $user) {

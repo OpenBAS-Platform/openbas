@@ -133,6 +133,8 @@ APIBundle\Entity\Incident:
         incident_story:
             - NotBlank: ~
             - Type: string
+        incident_weight:
+            - NotBlank: ~
 
 APIBundle\Entity\Inject:
     properties:

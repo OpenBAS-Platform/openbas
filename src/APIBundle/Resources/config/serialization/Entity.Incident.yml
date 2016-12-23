@@ -10,6 +10,8 @@ APIBundle\Entity\Incident:
             groups: ['incident']
         incident_story:
             groups: ['incident']
+        incident_weight:
+            groups: ['incident']
         incident_injects:
             groups: ['incident']
         incident_subobjectives:
