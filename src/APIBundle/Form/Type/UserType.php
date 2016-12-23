@@ -16,6 +16,7 @@ class UserType extends AbstractType
         $builder->add('user_lastname');
         $builder->add('user_email', EmailType::class);
         $builder->add('user_phone');
+        $builder->add('user_pgp_key');
         $builder->add('user_plain_password');
         $builder->add('user_organization', TextType::class);
         $builder->add('user_lang');

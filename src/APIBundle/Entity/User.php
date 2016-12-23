@@ -41,6 +41,11 @@ class User implements UserInterface
     protected $user_phone;
 
     /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $user_pgp_key;
+
+    /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $user_password;
@@ -149,6 +154,17 @@ class User implements UserInterface
     public function setUserPhone($phone)
     {
         $this->user_phone = $phone;
+        return $this;
+    }
+
+    public function getUserPgpKey()
+    {
+        return $this->user_pgp_key;
+    }
+
+    public function setUserPgpKey($key)
+    {
+        $this->user_pgp_key = $key;
         return $this;
     }
 
