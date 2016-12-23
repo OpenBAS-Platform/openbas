@@ -9,8 +9,9 @@ import * as Constants from '../../../../../constants/ComponentTypes'
 import {Button} from '../../../../../components/Button'
 import {Dialog} from '../../../../../components/Dialog'
 import {Icon} from '../../../../../components/Icon'
-import {Chip} from '../../../../../components/Chip';
-import {Avatar} from '../../../../../components/Avatar';
+import {Chip} from '../../../../../components/Chip'
+import {Avatar} from '../../../../../components/Avatar'
+import {injectIntl} from 'react-intl'
 
 const styles = {
   'attachment': {
@@ -33,12 +34,12 @@ i18nRegister({
   }
 })
 
-const validate = values => {
+const validate = (values, props) => {
   const errors = {}
-  const requiredFields = []
-  requiredFields.forEach(field => {
-    if (!values[field]) {
-      errors[field] = 'Required'
+  R.filter(f => f.mandatory, props.types[props.type].fields).forEach(field => {
+    const value = values[field.name]
+    if (!value) {
+      errors[field.name] = props.intl.formatMessage({id: 'Required'})
     }
   })
   return errors
@@ -122,4 +123,5 @@ InjectContentForm.propTypes = {
   attachments: PropTypes.array
 }
 
-export default reduxForm({form: 'InjectContentForm', validate}, null, {change})(InjectContentForm)
+var formComponent = reduxForm({form: 'InjectContentForm', validate}, null, {change})(InjectContentForm)
+export default injectIntl(formComponent, {withRef: true})

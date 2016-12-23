@@ -98,7 +98,7 @@ class InjectPopover extends Component {
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
     } else if (this.state.stepIndex === 1) {
-      this.refs.contentForm.submit()
+      this.refs.contentForm.getWrappedInstance().submit()
     } else if (this.state.stepIndex === 2) {
       this.updateInject()
     }

@@ -18,7 +18,8 @@ export const i18n = {
       'Update': 'Modifier',
       'Delete': 'Supprimer',
       'Confirmation': 'Confirmation',
-      'Search': 'Rechercher'
+      'Search': 'Rechercher',
+      'Required': 'Obligatoire'
     },
     en: {
       'TECHNICAL': 'Technique',
