@@ -4,6 +4,9 @@
         <setHeader headerName="contentType">
             <constant>text/html;charset=UTF-8</constant>
         </setHeader>
+        <setHeader headerName="X-Auth-Token">
+            <constant>{{openex.token}}</constant>
+        </setHeader>
         <setHeader headerName="From">
             <simple>${body[sender]}</simple>
         </setHeader>
@@ -13,6 +16,9 @@
         <setHeader headerName="attachments">
             <simple>${body[attachments]}</simple>
         </setHeader>
+        <!-- Download attachments -->
+        <bean ref="attachments-downloader"/>
+        <!-- Prepare template -->
         <setHeader headerName="CamelFreemarkerTemplate">
             <simple>${body[body]}</simple>
         </setHeader>
@@ -25,29 +31,21 @@
             <setHeader headerName="PgpKey">
                 <simple>${body[user_pgp_key]}</simple>
             </setHeader>
-            <choice>
-                <when>
-                    <simple>${header.To}</simple>
-                    <!-- Put the current user as the marker model -->
-                    <setHeader headerName="CamelFreemarkerDataModel">
-                        <simple>${body}</simple>
-                    </setHeader>
-                    <to uri="freemarker:from_header"/>
-                    <!-- Add attachments -->
-                    <bean ref="attachments-handler"/>
-                    <!-- Encrypt the body with PGP -->
-                    <bean ref="pgp-encryption"/>
-                    <!-- Send the email -->
-                    <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
-                    <!-- Output message for callback -->
-                    <setBody>
-                        <simple>${header.To} success</simple>
-                    </setBody>
-                </when>
-                <otherwise>
-                    <throwException exceptionType="java.lang.IllegalArgumentException" message="${body[user_firstname]} error: no email"/>
-                </otherwise>
-            </choice>
+            <!-- Put the current user as the marker model -->
+            <setHeader headerName="CamelFreemarkerDataModel">
+                <simple>${body}</simple>
+            </setHeader>
+            <to uri="freemarker:from_header"/>
+            <!-- Encrypt the body and attachments with PGP -->
+            <bean ref="pgp-encryption"/>
+            <!-- Add attachments -->
+            <bean ref="attachments-handler"/>
+            <!-- Send the email -->
+            <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
+            <!-- Output message for callback -->
+            <setBody>
+                <simple>${header.To} success</simple>
+            </setBody>
         </split>
     </route>
 </routes>

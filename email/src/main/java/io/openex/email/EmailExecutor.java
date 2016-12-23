@@ -1,6 +1,8 @@
 package io.openex.email;
 
 import com.google.common.collect.ImmutableMap;
+import io.openex.email.attachment.EmailAttacher;
+import io.openex.email.attachment.EmailDownloader;
 import io.openex.management.Executor;
 import io.openex.management.contract.Contract;
 import org.apache.camel.Component;
@@ -40,6 +42,7 @@ class EmailExecutor implements Executor {
 	@Override
 	public ImmutableMap<String, Object> beans() {
 		return ImmutableMap.of(
+				"attachments-downloader", new EmailDownloader(),
 				"attachments-handler", new EmailAttacher(),
 				"pgp-encryption", new EmailPgp(),
 				"ssl-handler", new EmailTrust()
