@@ -4,8 +4,9 @@ import * as Constants from '../constants/ComponentTypes'
 
 const GridListStyle = {
   [ Constants.GRIDLIST_TYPE_GALLERY ]: {
-    width: 700,
-    height: 450,
+    marginTop: '20px',
+    width: '700px',
+    height: '450px',
     overflowY: 'auto',
   }
 }
