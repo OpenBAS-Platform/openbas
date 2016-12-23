@@ -23,7 +23,7 @@
             <simple>${body[body]}</simple>
         </setHeader>
         <!-- Send a mail for each user (openexStrategy is mandatory) -->
-        <split streaming="true" parallelProcessing="false" strategyRef="openexStrategy">
+        <split streaming="true" parallelProcessing="true" strategyRef="openexStrategy">
             <simple>${body[users]}</simple>
             <setHeader headerName="To">
                 <simple>${body[user_email]}</simple>
