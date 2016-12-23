@@ -43,7 +43,8 @@ class InjectPopover extends Component {
       type: undefined,
       stepIndex: 0,
       finished: false,
-      injectData: null
+      injectData: null,
+      injectAttachments: R.propOr([], 'attachments', JSON.parse(R.propOr(null, 'inject_content', this.props.inject)))
     }
   }
 
@@ -71,8 +72,20 @@ class InjectPopover extends Component {
 
   onContentSubmit(data) {
     let injectData = this.state.injectData
+    if( this.state.injectAttachments.length > 0 ) {
+      data.attachments = this.state.injectAttachments
+    }
     injectData.inject_content = JSON.stringify(data)
     this.setState({injectData: injectData})
+  }
+
+  onContentAttachmentAdd(name, url) {
+    let attachment = {'file_name': name, 'file_url': url}
+    this.setState({injectAttachments: R.append(attachment, this.state.injectAttachments)})
+  }
+
+  onContentAttachmentDelete(name) {
+    this.setState({injectAttachments: R.filter(a => a.file_name !== name, this.state.injectAttachments)})
   }
 
   onAudiencesChange(data) {
@@ -147,7 +160,11 @@ class InjectPopover extends Component {
             types={this.props.inject_types}
             type={this.state.type ? this.state.type : this.props.inject.inject_type}
             onSubmit={this.onContentSubmit.bind(this)}
-            onSubmitSuccess={this.selectAudiences.bind(this)}/>
+            onSubmitSuccess={this.selectAudiences.bind(this)}
+            onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
+            onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
+            attachments={this.state.injectAttachments}
+          />
         )
       case 2:
         return (
@@ -262,7 +279,8 @@ InjectPopover.propTypes = {
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   inject_types: PropTypes.object,
-  children: PropTypes.node
+  children: PropTypes.node,
+  initialAttachments: PropTypes.array
 }
 
 export default connect(null, {fetchIncident, fetchInjectTypes, updateInject, deleteInject})(InjectPopover)

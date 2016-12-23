@@ -27,7 +27,7 @@ i18nRegister({
     'Start date': 'Date de début',
     'End date': 'Date de fin',
     'Subtitle': 'Sous-titre',
-    'Change the image': 'Change l\'image',
+    'Change the image': 'Changer l\'image',
     'Do you want to delete this exercise?': 'Souhaitez-vous supprimer cet exercice ?',
     'Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.': 'Supprimer un exercice conduit à la suppression de son contenu, incluant ses objectifs, événéments, incidents, injects et audiences. Nous vous déconseillons de faire cela.'
   }
@@ -110,7 +110,7 @@ class Index extends Component {
             <br /><br />
             <Button label='Change the image' onClick={this.handleOpenGallery.bind(this)}/>
             <Dialog modal={false} open={this.state.openGallery} onRequestClose={this.handleCloseGallery.bind(this)}>
-              <FileGallery imageSelector={this.handleImageSelection.bind(this)}/>
+              <FileGallery fileSelector={this.handleImageSelection.bind(this)}/>
             </Dialog>
           </div>
         </Paper>

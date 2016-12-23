@@ -15,12 +15,18 @@ const styles = {
     float: 'left',
     width: '80%',
     padding: '5px 0 0 0'
+  },
+  'empty': {
+    margin: '0 auto',
+    marginTop: '10px',
+    textAlign: 'center'
   }
 }
 
 i18nRegister({
   fr: {
-    'No available audience.': 'Aucune audience disponible.'
+    'No audience found.': 'Aucune audience trouvée.',
+    'Search for an audience': 'Rechercher une audience'
   }
 })
 
@@ -61,7 +67,7 @@ class InjectAudiences extends Component {
       <div>
         <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience"
                          onChange={this.handleSearchAudiences.bind(this)} styletype={Constants.FIELD_TYPE_INLINE}/>
-        <div style={styles.list}>
+        <div>
           {this.state.audiencesIds.map(audienceId => {
             let audience = R.find(a => a.audience_id === audienceId)(this.props.audiences)
             let audience_name = R.propOr('-', 'audience_name', audience)
@@ -77,7 +83,7 @@ class InjectAudiences extends Component {
           <div className="clearfix"></div>
         </div>
         <div>
-          {this.props.audiences.length === 0 ? <div><T>No available audience.</T></div> : ""}
+          {filteredAudiences.length === 0 ? <div style={styles.empty}><T>No audience found.</T></div> : ""}
           <List>
             {filteredAudiences.map(audience => {
               let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined

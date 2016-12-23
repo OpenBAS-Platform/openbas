@@ -30,7 +30,8 @@ class CreateInject extends Component {
       stepIndex: 0,
       finished: false,
       type: null,
-      injectData: null
+      injectData: null,
+      injectAttachments: []
     }
   }
 
@@ -39,15 +40,27 @@ class CreateInject extends Component {
   }
 
   handleClose() {
-    this.setState({open: false, stepIndex: 0, finished: false, type: null, injectData: null})
+    this.setState({open: false, stepIndex: 0, finished: false, type: null, injectData: null, injectAttachments: []})
   }
 
   onGlobalSubmit(data) {
     this.setState({injectData: data})
   }
 
+  onContentAttachmentAdd(name, url) {
+    let attachment = {'file_name': name, 'file_url': url}
+    this.setState({injectAttachments: R.append(attachment, this.state.injectAttachments)})
+  }
+
+  onContentAttachmentDelete(name) {
+    this.setState({injectAttachments: R.filter(a => a.file_name !== name, this.state.injectAttachments)})
+  }
+
   onContentSubmit(data) {
     let injectData = this.state.injectData
+    if( this.state.injectAttachments.length > 0 ) {
+      data.attachments = this.state.injectAttachments
+    }
     injectData.inject_content = JSON.stringify(data)
     this.setState({injectData: injectData})
   }
@@ -106,7 +119,10 @@ class CreateInject extends Component {
             types={this.props.inject_types}
             type={this.state.type}
             onSubmit={this.onContentSubmit.bind(this)}
-            onSubmitSuccess={this.selectAudiences.bind(this)}/>
+            onSubmitSuccess={this.selectAudiences.bind(this)}
+            onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
+            onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
+            attachments={this.state.injectAttachments}/>
         )
       case 2:
         return (

@@ -5,6 +5,7 @@ import {updateUser} from '../../../../actions/User'
 import {Paper} from '../../../../components/Paper'
 import {Button} from '../../../../components/Button'
 import {i18nRegister} from '../../../../utils/Messages'
+import {T} from '../../../../components/I18n'
 import * as Constants from '../../../../constants/ComponentTypes'
 import R from 'ramda'
 import UserForm from './UserForm'
@@ -24,6 +25,8 @@ i18nRegister({
     'Firstname': 'Prénom',
     'Lastname': 'Nom',
     'Organization': 'Organisation',
+    'Profile': 'Profil',
+    'Password': 'Mot de passe'
   }
 })
 
@@ -61,7 +64,7 @@ class Index extends Component {
       <div>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
-            <h2>Profile</h2>
+            <h2><T>Profile</T></h2>
             <UserForm ref="userForm" organizations={this.props.organizations} onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitUser.bind(this)}/>
@@ -69,7 +72,7 @@ class Index extends Component {
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
-            <h2>Password</h2>
+            <h2><T>Password</T></h2>
             <PasswordForm ref="passwordForm" onSubmit={this.onUpdatePassword.bind(this)}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitPassword.bind(this)}/>

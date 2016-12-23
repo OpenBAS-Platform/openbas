@@ -40,7 +40,7 @@ class FileGallery extends Component {
   }
 
   handleFileSelect(file) {
-    this.props.imageSelector(file)
+    this.props.fileSelector(file)
   }
 
   render() {
@@ -72,7 +72,7 @@ class FileGallery extends Component {
 FileGallery.propTypes = {
   files: PropTypes.object,
   fetchFiles: PropTypes.func,
-  imageSelector: PropTypes.func,
+  fileSelector: PropTypes.func,
   addFile: PropTypes.func
 }
 

@@ -25,7 +25,7 @@ i18nRegister({
   fr: {
     'Update the objective': 'Modifier l\'objectif',
     'Create a new subobjective': 'Créer un nouveau sous-objectif',
-    'Add a new subobjective': 'Ajouter un nouveau sous-objectif',
+    'Add a subobjective': 'Ajouter un sous-objectif',
     'Do you want to delete this objective?': 'Souhaitez-vous supprimer cet objectif ?'
   }
 })
@@ -151,7 +151,7 @@ class ObjectivePopover extends Component {
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Add a new subobjective" onTouchTap={this.handleOpenCreateSubobjective.bind(this)}/>
+            <MenuItemLink label="Add a subobjective" onTouchTap={this.handleOpenCreateSubobjective.bind(this)}/>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>

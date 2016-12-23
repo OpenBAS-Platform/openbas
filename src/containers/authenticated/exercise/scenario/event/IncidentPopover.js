@@ -29,6 +29,11 @@ const styles = {
     width: '80%',
     padding: '5px 0 0 0'
   },
+  'empty': {
+    margin: '0 auto',
+    marginTop: '10px',
+    textAlign: 'center'
+  }
 }
 
 i18nRegister({
@@ -36,7 +41,7 @@ i18nRegister({
     'Update the incident': 'Modifier l\'incident',
     'Do you want to delete this incident?': 'Souhaitez-vous supprimer cet incident ?',
     'Linked subobjectives': 'Sous-objectifs liés',
-    'No available subobjective.': 'Aucun sous-objectif disponible.',
+    'No subobjective found.': 'Aucun sous-objectif trouvé.',
     'Search for a subobjective': 'Rechercher un sous-objectif'
   }
 })
@@ -138,7 +143,7 @@ class IncidentPopover extends Component {
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ]
 
-    let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type'], this.props.incident)
+    let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type', 'incident_weight'], this.props.incident)
 
     //region filter subobjectives by active keyword
     const keyword = this.state.searchTerm
@@ -200,7 +205,7 @@ class IncidentPopover extends Component {
             <div className="clearfix"></div>
           </div>
           <div>
-            {this.props.subobjectives.length === 0 ? <div><T>No subobjective found.</T></div> : ""}
+            {filteredSubobjectives.length === 0 ? <div style={styles.empty}><T>No subobjective found.</T></div> : ""}
             <List>
               {filteredSubobjectives.map(subobjective => {
                 let disabled = R.find(subobjective_id => subobjective_id === subobjective.subobjective_id, this.state.subobjectivesIds) !== undefined

@@ -98,7 +98,7 @@ class renderRichEditor extends Component {
 
   render () {
     return (<div>
-      <div style={styles.richText.header}>{this.props.name}</div>
+      <div style={styles.richText.header}>{this.props.label}</div>
       <div style={styles.richText.content}>
         <RichTextEditor value={this.state.value} onChange={this.onChange.bind(this)}/>
       </div>
@@ -108,16 +108,17 @@ class renderRichEditor extends Component {
 
 renderRichEditor.propTypes = {
   input: PropTypes.object,
-  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
 }
 
 const RichTextFieldIntl = (props) => (
-  <Field name={props.intl.formatMessage({id: props.name})} component={renderRichEditor}/>
+  <Field name={props.name} label={props.intl.formatMessage({id: props.label})} component={renderRichEditor}/>
 )
 
 RichTextFieldIntl.propTypes = {
   intl: PropTypes.object,
   name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired
 }
 
 export const RichTextField = injectIntl(RichTextFieldIntl)
