@@ -29,12 +29,22 @@ class File
     protected $file_path;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    protected $file_type;
+
+    /**
      * @ORM\OneToMany(targetEntity="FileTag", mappedBy="tag_file")
      * @var FileTag[]
      */
     protected $file_tags;
 
     protected $file_url;
+
+    public function __construct()
+    {
+        $this->file_tags = new ArrayCollection();
+    }
 
     public function getFileId()
     {
@@ -66,6 +76,17 @@ class File
     public function setFilePath($path)
     {
         $this->file_path = $path;
+        return $this;
+    }
+
+    public function getFileType()
+    {
+        return $this->file_type;
+    }
+
+    public function setFileType($type)
+    {
+        $this->file_type = $type;
         return $this;
     }
 
