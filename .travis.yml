@@ -4,4 +4,4 @@ jdk:
   - oraclejdk8
 
 script:
-  - maven test
+  - mvn test
