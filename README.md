@@ -1,4 +1,4 @@
-# OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex-frontend.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex-frontend)
+# OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex-worker.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex-worker)
 
 Website: http://openex.io
 
