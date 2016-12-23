@@ -26,7 +26,8 @@ i18nRegister({
     'Email address': 'Adresse email',
     'Organization': 'Organisation',
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
-    'This audience is empty.': 'Cette audience est vide.'
+    'This audience is empty.': 'Cette audience est vide.',
+    'comcheck(s) currently running:': 'comcheck(s) en cours :'
   }
 })
 
@@ -168,7 +169,7 @@ class Index extends Component {
     if (this.props.comchecks.length > 0) {
       comchecks = (
         <div style={styles.comchecks}>
-          <div style={styles.running}>{this.props.comchecks.length} comcheck(s) currently running:</div>
+          <div style={styles.running}>{this.props.comchecks.length} <T>comcheck(s) currently running:</T></div>
           {this.props.comchecks.map(comcheck => {
             return (
               <LinkFlatButton to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + comcheck.comcheck_id} secondary={true}

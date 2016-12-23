@@ -57,13 +57,14 @@ class FileGallery extends Component {
                     <Icon color="white" name={Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN}/>
                   </IconButton>
                 }>
-                <img src={file.file_url} alt="Gallery"/>
+                {file.file_type === 'png' || file.file_type === 'jpg' || file.file_type === 'gif' ?
+                  <img src={file.file_url} alt="Gallery"/> : <img src="../../public" alt="Gallery"/>}
               </GridTile>
             )
           })}
         </GridList>
-        <FloatingActionsButtonCreate onClick={this.openFileDialog.bind(this)} type={Constants.BUTTON_TYPE_FLOATING} />
-        <input type="file" ref="fileUpload" style={{"display" : "none"}}  onChange={this.handleFileChange.bind(this)} />
+        <FloatingActionsButtonCreate onClick={this.openFileDialog.bind(this)} type={Constants.BUTTON_TYPE_FLOATING}/>
+        <input type="file" ref="fileUpload" style={{"display": "none"}} onChange={this.handleFileChange.bind(this)}/>
       </div>
     )
   }

@@ -13,6 +13,7 @@ import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem
 import {updateUser} from '../../../../actions/User'
 import {updateAudience} from '../../../../actions/Audience'
 import UserForm from './UserForm'
+import UserinfoForm from './UserinfoForm'
 
 const style = {
   position: 'absolute',
@@ -24,6 +25,8 @@ i18nRegister({
   fr: {
     'Do you want to remove the user from this audience?': 'Souhaitez-vous supprimer l\'utilisateur de cette audience ?',
     'Update the user': 'Modifier l\'utilisateur',
+    'Update the profile': 'Modifier le profil de l\'utilisateur',
+    'Profile': 'Profil'
   }
 })
 
@@ -33,6 +36,7 @@ class UserPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
+      openInfo: false,
       openPopover: false
     }
   }
@@ -66,6 +70,23 @@ class UserPopover extends Component {
     this.refs.userForm.submit()
   }
 
+  handleOpenInfo() {
+    this.setState({openInfo: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseInfo() {
+    this.setState({openInfo: false})
+  }
+
+  onSubmitInfo(data) {
+    return this.props.updateUser(this.props.user.user_id, data)
+  }
+
+  submitFormInfo() {
+    this.refs.userinfoForm.submit()
+  }
+
   handleOpenDelete() {
     this.setState({openDelete: true})
     this.handlePopoverClose()
@@ -89,18 +110,23 @@ class UserPopover extends Component {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
-    ];
+    ]
+    const infoActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseInfo.bind(this)}/>,
+      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormInfo.bind(this)}/>,
+    ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
-    ];
+    ]
     
     var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
-      R.assoc('user_organization', organization_name), //Reformat organization
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization']) //Pickup only needed fields
+      R.assoc('user_organization', organization_name),
+      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization'])
     )(this.props.user)
+    let initialValuesInfo = R.pick(['user_phone', 'user_pgp_key'], this.props.user)
 
     return (
       <div style={style}>
@@ -111,6 +137,7 @@ class UserPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            <MenuItemLink label="Profile" onTouchTap={this.handleOpenInfo.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -126,6 +153,13 @@ class UserPopover extends Component {
                     organizations={this.props.organizations}
                     onSubmit={this.onSubmitEdit.bind(this)}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+        </Dialog>
+        <Dialog title="Update the profile" modal={false} open={this.state.openInfo}
+                onRequestClose={this.handleCloseInfo.bind(this)}
+                actions={infoActions}>
+          <UserinfoForm ref="userinfoForm" initialValues={initialValuesInfo}
+                    onSubmit={this.onSubmitInfo.bind(this)}
+                    onSubmitSuccess={this.handleCloseInfo.bind(this)}/>
         </Dialog>
       </div>
     )

@@ -2,6 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
 import {FormField, RichTextField} from '../../../../../components/Field'
+import {T} from '../../../../../components/I18n'
 import {i18nRegister} from '../../../../../utils/Messages'
 import FileGallery from '../../../FileGallery'
 import * as Constants from '../../../../../constants/ComponentTypes'
@@ -22,7 +23,8 @@ i18nRegister({
     'sender': 'Expéditeur',
     'subject': 'Sujet',
     'body': 'Message',
-    'Add an attachment': 'Ajouter une pièce jointe'
+    'Add an attachment': 'Ajouter une pièce jointe',
+    'No content available for this inject type.': 'Aucun contenu disponible pour ce type d\'inject'
   },
   en: {
     'sender': 'Sender',
@@ -64,7 +66,7 @@ class InjectContentForm extends Component {
   render() {
     if (this.props.type === null) {
       return (<div>
-        No content available on this inject type
+        <T>No content available for this inject type.</T>
       </div>)
     }
 
@@ -83,6 +85,7 @@ class InjectContentForm extends Component {
                   {this.props.attachments.map(attachment => {
                     let file_name = R.propOr('-', 'file_name', attachment)
                     //let file_url = R.propOr('-', 'file_url', attachment)
+                    // TODO: chip is clickable to download the file
                     return (
                       <Chip key={file_name} onRequestDelete={this.props.onContentAttachmentDelete.bind(this, file_name)}
                             type={Constants.CHIP_TYPE_LIST}>
