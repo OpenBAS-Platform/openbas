@@ -1,11 +1,15 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../../components/Field'
+import {SelectField} from '../../../../components/SelectField'
+import {MenuItemLink} from "../../../../components/menu/MenuItem"
 import DateTimePicker from '../../../../components/DateTimePicker'
 import {i18nRegister} from '../../../../utils/Messages'
+import {T} from '../../../../components/I18n'
 
 i18nRegister({
   fr: {
+    'Target audience': 'Audience cible',
     'Subject': 'Sujet',
     'Message': 'Message',
     'Signature': 'Signature',
@@ -36,14 +40,19 @@ class ComcheckForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
+        <SelectField label="Target audience" name="comcheck_audience" fullWidth={true}>
+          {this.props.audiences.map(audience => {
+            return (<MenuItemLink key={audience.audience_id} value={audience.audience_id} label={<T>{audience.audience_name}</T>}/>)
+          })}
+        </SelectField>
+        <DateTimePicker ref="endPicker" handleResult={this.replaceEndValue.bind(this)}/>
+        <FormField ref="endDate" name="comcheck_end_date" fullWidth={true} type="text"
+                   label="End date" onClick={this.raiseEndPicker.bind(this)}/>
         <FormField name="comcheck_subject" fullWidth={true} type="text" label="Subject"/>
         <FormField name="comcheck_message" fullWidth={true} multiLine={true} rows={3}
                    type="text" label="Message"/>
         <FormField name="comcheck_footer" fullWidth={true} multiLine={true} rows={2}
                    type="text" label="Signature"/>
-        <FormField ref="endDate" name="comcheck_end_date" fullWidth={true} type="text"
-                   label="End date" onClick={this.raiseEndPicker.bind(this)}/>
-        <DateTimePicker ref="endPicker" handleResult={this.replaceEndValue.bind(this)}/>
       </form>
     )
   }
@@ -56,6 +65,7 @@ ComcheckForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
+  audiences: PropTypes.array
 }
 
 export default reduxForm({form: 'ComcheckForm', validate}, null, {change})(ComcheckForm)

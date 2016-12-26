@@ -7,8 +7,11 @@ import {MenuItemLink} from "../../../../components/menu/MenuItem"
 
 i18nRegister({
   fr: {
-    'Name': 'Nom',
-    'Title': 'Titre',
+    'Target audience': 'Audience cible',
+    'Speed': 'Vitesse',
+    '24x (1 day = 1 hour)': '24x (1 jour = 1 heure)',
+    '48x (1 day = 30 minutes)': '48x (1 jour = 30 minutes)',
+    '72x (1 day = 15 minutes)': '72x (1 jour = 15 minutes)'
   }
 })
 

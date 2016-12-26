@@ -97,7 +97,7 @@ class IndexExcerciseDryrun extends Component {
 
   render() {
     let audienceName = null
-    if( this.props.dryrun.dryrun_audience && this.props.audiences.length > 0 ) {
+    if (this.props.dryrun.dryrun_audience && this.props.audiences.length > 0) {
       let dryrun_audience = R.find(a => a.audience_id === this.props.dryrun.dryrun_audience.audience_id)(this.props.audiences)
       audienceName = R.propOr('-', 'audience_name', dryrun_audience)
     }
@@ -121,7 +121,8 @@ class IndexExcerciseDryrun extends Component {
                   primaryText={
                     <div>
                       <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
-                      <div style={styles.dryinject_date}>{moment(dryinject.dryinject_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div
+                        style={styles.dryinject_date}>{moment(dryinject.dryinject_date).format('YYYY-DD-MM HH:mm')}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
@@ -139,10 +140,10 @@ class IndexExcerciseDryrun extends Component {
           <List>
             {this.props.dryinjectsProcessed.map(dryinject => {
               let color = '#4CAF50'
-              if( dryinject.dryinject_status.status_name === 'ERROR' ) {
-                color ='#F44336'
-              } else if( dryinject.dryinject_status.status_name === 'PARTIAL' ) {
-                color ='#FF5722'
+              if (dryinject.dryinject_status.status_name === 'ERROR') {
+                color = '#F44336'
+              } else if (dryinject.dryinject_status.status_name === 'PARTIAL') {
+                color = '#FF5722'
               }
               return (
                 <MainListItem
@@ -150,7 +151,8 @@ class IndexExcerciseDryrun extends Component {
                   primaryText={
                     <div>
                       <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
-                      <div style={styles.dryinject_date}>{moment(dryinject.dryinject_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div
+                        style={styles.dryinject_date}>{moment(dryinject.dryinject_date).format('YYYY-DD-MM HH:mm')}</div>
                       <div className="clearfix"></div>
                     </div>
                   }

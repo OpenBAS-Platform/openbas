@@ -11,7 +11,6 @@ import {fetchObjectives} from '../../../actions/Objective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchAllInjects} from '../../../actions/Inject'
 import {fetchDryruns} from '../../../actions/Dryrun'
-import CreateDryrun from './check/CreateDryrun'
 
 const styles = {
   'container': {
@@ -220,7 +219,6 @@ class IndexExercise extends Component {
             })}
           </List>
         </div>
-        <CreateDryrun exerciseId={this.props.exerciseId} audiences={this.props.audiences}/>
       </div>
     )
   }

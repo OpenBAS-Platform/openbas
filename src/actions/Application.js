@@ -40,3 +40,7 @@ export const redirectToExercise = (exerciseId) => (dispatch) => {
 export const redirectToScenario = (exerciseId) => (dispatch) => {
   dispatch(push('/private/exercise/' + exerciseId + '/scenario'))
 }
+
+export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
+  dispatch(push('/private/exercise/' + exerciseId + '/checks/comcheck/' + comcheckId))
+}

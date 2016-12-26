@@ -205,7 +205,7 @@ LinkIconButtonIntl.propTypes = {
   tooltip: PropTypes.string,
   tooltipPosition: PropTypes.string,
   children: PropTypes.node,
-  to: PropTypes.func,
+  to: PropTypes.string,
   type: PropTypes.string,
   intl: PropTypes.object,
 }

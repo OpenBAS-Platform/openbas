@@ -63,7 +63,6 @@ class AudiencePopover extends Component {
   }
 
   onSubmitComcheck(data) {
-    data.comcheck_audience = this.props.audience.audience_id
     return this.props.addComcheck(this.props.exerciseId, data)
   }
 
@@ -106,6 +105,7 @@ class AudiencePopover extends Component {
 
   render() {
     const initialComcheckValues = {
+      comcheck_audience: R.propOr(0, 'audience_id', this.props.audience),
       comcheck_subject: <T>Communication check</T>,
       comcheck_message: <T>Hello</T> + ',<br /><br />' + <T>This is a communication check before the beginning of the exercise. Please
         click on the following link in order to confirm you successfully received this message:</T>,
@@ -156,6 +156,7 @@ class AudiencePopover extends Component {
                 onRequestClose={this.handleCloseComcheck.bind(this)}
                 actions={comcheckActions}>
           <ComcheckForm ref="comcheckForm"
+                        audiences={this.props.audiences}
                         initialValues={initialComcheckValues}
                         onSubmit={this.onSubmitComcheck.bind(this)}
                         onSubmitSuccess={this.handleCloseComcheck.bind(this)}/>
@@ -172,6 +173,7 @@ AudiencePopover.propTypes = {
   selectAudience: PropTypes.func,
   addComcheck: PropTypes.func,
   audience: PropTypes.object,
+  audiences: PropTypes.array,
   children: PropTypes.node
 }
 

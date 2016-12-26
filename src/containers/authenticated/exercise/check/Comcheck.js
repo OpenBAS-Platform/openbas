@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
@@ -12,9 +14,17 @@ import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
 import {dateFormat} from '../../../../utils/Time'
 
+i18nRegister({
+  fr: {
+    'Name': 'Nom',
+    'Email address': 'Adresse email',
+    'Organization': 'Organisation',
+    'Last update': 'Mise à jour',
+    'State': 'Statut'
+  }
+})
+
 const styles = {
-  'container': {}
-  ,
   'header': {
     'avatar': {
       fontSize: '12px',
@@ -55,7 +65,7 @@ const styles = {
       width: '6%',
       fontSize: '12px',
       textTransform: 'uppercase',
-      textAlign: 'right',
+      textAlign: 'center',
       fontWeight: '700'
     }
   },
@@ -64,9 +74,16 @@ const styles = {
     fontSize: '13px',
     textTransform: 'uppercase'
   },
+  'audience': {
+    float: 'right',
+    fontSize: '15px',
+    fontWeight: '600'
+  },
   'subtitle': {
     float: 'left',
-    fontSize: '14px',
+    fontSize: '12px',
+    marginTop: '5px',
+    color: "#848484"
   },
   'empty': {
     marginTop: 40,
@@ -101,6 +118,7 @@ const styles = {
   },
   'state': {
     float: 'right',
+    width: '6%',
     textAlign: 'center',
     padding: 0
   }
@@ -149,7 +167,7 @@ class Comcheck extends Component {
       : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
     const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
     return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-      {label} {IconDisplay}
+      <T>{label}</T> {IconDisplay}
     </div>
   }
 
@@ -163,46 +181,47 @@ class Comcheck extends Component {
   }
 
   modelSorting(criteria, ascending, a, b) {
-      //TODO Add real type support for instant, boolean, ...
-      var fieldA = R.compose(R.toLower, R.toString, R.propOr('', criteria))(a)
-      var fieldB = R.compose(R.toLower, R.toString, R.propOr('', criteria))(b)
-      return ascending ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
+    //TODO Add real type support for instant, boolean, ...
+    var fieldA = R.compose(R.toLower, R.toString, R.propOr('', criteria))(a)
+    var fieldB = R.compose(R.toLower, R.toString, R.propOr('', criteria))(b)
+    return ascending ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
   }
+
   //TODO MOVE THAT TO UTILS
 
   buildUserModel(status) {
-      let user_id = R.pathOr(Math.random(), ['status_user', 'user_id'], status)
-      let user = R.propOr({}, user_id, this.props.users)
-      let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
-      return {
-          user_firstname:     R.propOr('-', 'user_firstname', user),
-          user_lastname:      R.propOr('-', 'user_lastname', user),
-          user_email:         R.propOr('-', 'user_email', user),
-          user_gravatar:      R.propOr('', 'user_gravatar', user),
-          user_organization:  R.propOr('-', 'organization_name', user_organization),
-          status_id:          R.propOr(Math.random(), 'status_id', status),
-          status_state:       R.propOr(false, 'status_state', status),
-          status_last_update: R.propOr('', 'status_last_update', status)
-      }
+    let user_id = R.pathOr(Math.random(), ['status_user', 'user_id'], status)
+    let user = R.propOr({}, user_id, this.props.users)
+    let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
+    return {
+      user_firstname: R.propOr('-', 'user_firstname', user),
+      user_lastname: R.propOr('-', 'user_lastname', user),
+      user_email: R.propOr('-', 'user_email', user),
+      user_gravatar: R.propOr('', 'user_gravatar', user),
+      user_organization: R.propOr('-', 'organization_name', user_organization),
+      status_id: R.propOr(Math.random(), 'status_id', status),
+      status_state: R.propOr(false, 'status_state', status),
+      status_last_update: R.propOr('', 'status_last_update', status)
+    }
   }
 
   render() {
-
     const data = R.pipe(
-        R.map(status => this.buildUserModel(status)),
-        R.sort((a, b) => this.modelSorting(this.state.sortBy, this.state.orderAsc, a, b))
+      R.map(status => this.buildUserModel(status)),
+      R.sort((a, b) => this.modelSorting(this.state.sortBy, this.state.orderAsc, a, b))
     )(this.props.comcheck_statuses);
 
-    return <div style={styles.container}>
+    return <div>
       <div>
-        <div style={styles.title}>Comcheck to audience {this.props.audience.audience_name}</div>
+        <div style={styles.title}>Comcheck</div>
+        <div style={styles.audience}>{this.props.audience.audience_name}</div>
         <div className="clearfix"></div>
-        <div style={styles.subtitle}>From {dateFormat(this.props.comcheck.comcheck_start_date)} to {dateFormat(this.props.comcheck.comcheck_end_date)}</div>
+        <div style={styles.subtitle}>{dateFormat(this.props.comcheck.comcheck_start_date)} &rarr; {dateFormat(this.props.comcheck.comcheck_end_date)}</div>
         <div className="clearfix"></div>
         <List>
           <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>} primaryText={
             <div>
-              {this.SortHeader('user_firstname', 'name')}
+              {this.SortHeader('user_firstname', 'Name')}
               {this.SortHeader('user_email', 'Email address')}
               {this.SortHeader('user_organization', 'Organization')}
               {this.SortHeader('status_last_update', 'Last update')}
@@ -222,7 +241,8 @@ class Comcheck extends Component {
                   <div style={styles.mail}>{item.user_email}</div>
                   <div style={styles.org}>{item.user_organization}</div>
                   <div style={styles.update}>{dateFormat(item.status_last_update)}</div>
-                  <div style={styles.state}><Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE} color={item.status_state ? "#4CAF50": "#F44336"}/></div>
+                  <div style={styles.state}><Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}
+                                                  color={item.status_state ? "#4CAF50" : "#F44336"}/></div>
                   <div className="clearfix"></div>
                 </div>
               }

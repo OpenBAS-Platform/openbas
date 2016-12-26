@@ -192,7 +192,7 @@ class Index extends Component {
         <AudienceNav selectedAudience={audience.audience_id} exerciseId={exerciseId} audiences={audiences}/>
         <div>
           <div style={styles.title}>{audience.audience_name}</div>
-          <AudiencePopover exerciseId={exerciseId} audience={audience}/>
+          <AudiencePopover exerciseId={exerciseId} audience={audience} audiences={audiences}/>
           {comchecks}
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"

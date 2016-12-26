@@ -1,7 +1,9 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
-import moment from 'moment';
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
+import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItemLink} from '../../../../components/list/ListItem';
@@ -9,6 +11,15 @@ import {Icon} from '../../../../components/Icon'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryruns} from '../../../../actions/Dryrun'
 import {fetchComchecks} from '../../../../actions/Comcheck'
+import DryrunsPopover from './DryrunsPopover'
+import ComchecksPopover from './ComchecksPopover'
+
+i18nRegister({
+  fr: {
+    'You do not have any dryruns in this exercise.': 'Vous n\'avez aucun dryrun dans cet exercice.',
+    'You do not have any comchecks in this exercise.': 'Vous n\'avez aucun comcheck dans cet exercice.'
+  }
+})
 
 const styles = {
   'container': {
@@ -73,9 +84,10 @@ class IndexExcerciseDryrun extends Component {
       <div style={styles.container}>
         <div style={styles.columnLeft}>
           <div style={styles.title}>Dryruns</div>
+          <DryrunsPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
           <div className="clearfix"></div>
           {this.props.dryruns.length === 0 ?
-            <div style={styles.empty}>You do not have any dryruns in this exercise.</div> : ""}
+            <div style={styles.empty}><T>You do not have any dryruns in this exercise.</T></div> : ""}
           <List>
             {this.props.dryruns.map(dryrun => {
               let dryrun_audience = R.propOr({}, dryrun.dryrun_audience.audience_id, this.props.audiences)
@@ -87,11 +99,13 @@ class IndexExcerciseDryrun extends Component {
                   primaryText={
                     <div>
                       <div style={styles.dryrun_audience}>{audienceName}</div>
-                      <div style={styles.dryrun_date}>{moment(dryrun.dryrun_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div style={styles.dryrun_date}>{dateFormat(dryrun.dryrun_date)}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO} type={Constants.ICON_TYPE_MAINLIST}/>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO}
+                                  type={Constants.ICON_TYPE_MAINLIST}
+                                  color={dryrun.dryrun_finished ? "#666666" : "#E91E63"}/>}
                 />
               )
             })}
@@ -99,9 +113,10 @@ class IndexExcerciseDryrun extends Component {
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}>Comchecks</div>
+          <ComchecksPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
           <div className="clearfix"></div>
           {this.props.comchecks.length === 0 ?
-            <div style={styles.empty}>You do not have any comchecks in this exercise.</div> : ""}
+            <div style={styles.empty}><T>You do not have any comchecks in this exercise.</T></div> : ""}
           <List>
             {this.props.comchecks.map(comcheck => {
               let comcheck_audience = R.propOr({}, comcheck.comcheck_audience.audience_id, this.props.audiences)
@@ -113,11 +128,13 @@ class IndexExcerciseDryrun extends Component {
                   primaryText={
                     <div>
                       <div style={styles.dryrun_audience}>{audienceName}</div>
-                      <div style={styles.dryrun_date}>{moment(comcheck.comcheck_start_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div style={styles.dryrun_date}>{dateFormat(comcheck.comcheck_start_date)}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK} type={Constants.ICON_TYPE_MAINLIST}/>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}
+                                  type={Constants.ICON_TYPE_MAINLIST}
+                                  color={comcheck.comcheck_finished ? "#666666" : "#E91E63"}/>}
                 />
               )
             })}
