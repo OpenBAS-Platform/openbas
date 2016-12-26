@@ -42,12 +42,12 @@ class IncidentForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="incident_title" fullWidth={true} type="text" label="Title"/>
-        <SelectField label="Type" name="incident_type" fullWidth={true}>
+        <SelectField label={<T>Type</T>} name="incident_type" fullWidth={true}>
           {R.values(this.props.types).map(type => {
             return (<MenuItemLink key={type.type_id} value={type.type_id} label={<T>{type.type_name}</T>}/>)
           })}
         </SelectField>
-        <SelectField label="Significance" name="incident_weight" fullWidth={true}>
+        <SelectField label={<T>Significance</T>} name="incident_weight" fullWidth={true}>
           {weights.map(weight => {
             return (<MenuItemLink key={weight.weight_id} value={weight.weight_id} label={<T>{weight.weight_name}</T>}/>)
           })}

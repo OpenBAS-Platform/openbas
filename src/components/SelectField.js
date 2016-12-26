@@ -1,7 +1,6 @@
 import React, {PropTypes} from 'react'
 import MUISelectField from 'material-ui/SelectField'
 import {Field} from 'redux-form'
-import {injectIntl} from 'react-intl'
 
 const styles = {
   global: {
@@ -38,30 +37,13 @@ renderSelectField.propTypes = {
   rows: PropTypes.number,
   type: PropTypes.string,
   hint: PropTypes.string,
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   name: PropTypes.string.isRequired,
   meta: PropTypes.object,
   onSelectChange: PropTypes.func,
   children: PropTypes.node
 }
 
-export const SelectFieldIntl = (props) => (
-  <Field label={props.label ? props.intl.formatMessage({id: props.label}) : undefined}
-         hint={props.hint ? props.intl.formatMessage({id: props.hint}) : undefined}
-         component={renderSelectField} {...props}/>
+export const SelectField = (props) => (
+  <Field component={renderSelectField} {...props}/>
 )
-
-export const SelectField = injectIntl(SelectFieldIntl)
-
-SelectFieldIntl.propTypes = {
-  hint: PropTypes.string,
-  label: PropTypes.string,
-  intl: PropTypes.object,
-  name: PropTypes.string.isRequired,
-  type: PropTypes.string,
-  fullWidth: PropTypes.bool,
-  multiLine: PropTypes.bool,
-  rows: PropTypes.number,
-  onSelectChange: PropTypes.func,
-  children: PropTypes.node
-}

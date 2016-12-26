@@ -17,7 +17,7 @@ MenuItemLinkIntl.propTypes = {
   label: PropTypes.oneOfType([PropTypes.string.isRequired, PropTypes.object.isRequired]),
   to: PropTypes.string,
   disabled: PropTypes.bool,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onTouchTap: PropTypes.func,
   intl: PropTypes.object
 }
