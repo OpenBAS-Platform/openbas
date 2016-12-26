@@ -16,7 +16,7 @@ import CreateObjective from './CreateObjective'
 const styles = {
   container: {},
   'empty': {
-    marginTop: 40,
+    marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
     textAlign: 'center'

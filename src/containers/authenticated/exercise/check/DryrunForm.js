@@ -30,7 +30,7 @@ class DryrunForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <SelectField label="Target audience" name="dryrun_audience" fullWidth={true}>
+        <SelectField label={<T>Target audience</T>} name="dryrun_audience" fullWidth={true}>
           {this.props.audiences.map(audience => {
             return (<MenuItemLink key={audience.audience_id} value={audience.audience_id} label={<T>{audience.audience_name}</T>}/>)
           })}

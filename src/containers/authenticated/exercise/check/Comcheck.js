@@ -86,7 +86,7 @@ const styles = {
     color: "#848484"
   },
   'empty': {
-    marginTop: 40,
+    marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
     textAlign: 'center'

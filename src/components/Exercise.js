@@ -40,7 +40,6 @@ const styles = {
     bottom: 0,
     padding: '10px',
     backgroundColor: 'rgba(0, 0, 0, .7)',
-    height: '30px',
     width: '380px'
   },
   description: {

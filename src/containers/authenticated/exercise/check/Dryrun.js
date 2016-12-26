@@ -1,14 +1,26 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
-import moment from 'moment';
+import {i18nRegister} from '../../../../utils/Messages'
+import {T} from '../../../../components/I18n'
+import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
+import {LinearProgress} from '../../../../components/LinearProgress'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryrun} from '../../../../actions/Dryrun'
 import {fetchDryinjects} from '../../../../actions/Dryinject'
+
+i18nRegister({
+  fr: {
+    'You do not have any pending injects in this dryrun.': 'Vous n\'avez aucun inject en attente dans ce dryrun.',
+    'You do not have any processed injects in this dryrun.': 'Vous n\'avez aucun inject traité dans ce dryrun.',
+    'Pending injects': 'Injects en attente',
+    'Processed injects': 'Injects traités'
+  }
+})
 
 const styles = {
   'container': {
@@ -28,20 +40,24 @@ const styles = {
     padding: 0,
     textAlign: 'left'
   },
-  'headtitle': {
-    fontWeight: '600',
-    fontSize: '18px'
-  },
-  'headsubtitle': {
-    fontSize: '15px'
-  },
   'title': {
     float: 'left',
     fontSize: '13px',
     textTransform: 'uppercase'
   },
+  'audience': {
+    float: 'right',
+    fontSize: '15px',
+    fontWeight: '600'
+  },
+  'subtitle': {
+    float: 'left',
+    fontSize: '12px',
+    marginTop: '5px',
+    color: "#848484"
+  },
   'empty': {
-    marginTop: 40,
+    marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
     textAlign: 'left'
@@ -105,14 +121,21 @@ class IndexExcerciseDryrun extends Component {
 
     return (
       <div style={styles.container}>
-        <div style={styles.headtitle}>Dryrun to the audience <i>{audienceName}</i></div>
-        <div style={styles.headsubtitle}>{moment(dryrun_date).format('YYYY-DD-MM HH:mm')}</div>
+        <div style={styles.title}>Dryrun</div>
+        <div style={styles.audience}>{audienceName}</div>
+        <div className="clearfix"></div>
+        <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
+        <div className="clearfix"></div>
+        <br />
+        <LinearProgress mode={this.props.dryinjectsProcessed.length === 0 ? 'indeterminate' : 'determinate'} min={0}
+                        max={this.props.dryinjectsPending.length + this.props.dryinjectsProcessed.length}
+                        value={this.props.dryinjectsProcessed.length}/>
         <br /><br />
         <div style={styles.columnLeft}>
-          <div style={styles.title}>Pending injects</div>
+          <div style={styles.title}><T>Pending injects</T></div>
           <div className="clearfix"></div>
           {this.props.dryinjectsPending.length === 0 ?
-            <div style={styles.empty}>You do not have any pending injects in this dryrun.</div> : ""}
+            <div style={styles.empty}><T>You do not have any pending injects in this dryrun.</T></div> : ""}
           <List>
             {this.props.dryinjectsPending.map(dryinject => {
               return (
@@ -121,8 +144,7 @@ class IndexExcerciseDryrun extends Component {
                   primaryText={
                     <div>
                       <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
-                      <div
-                        style={styles.dryinject_date}>{moment(dryinject.dryinject_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div style={styles.dryinject_date}>{dateFormat(dryinject.dryinject_date)}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
@@ -133,10 +155,10 @@ class IndexExcerciseDryrun extends Component {
           </List>
         </div>
         <div style={styles.columnRight}>
-          <div style={styles.title}>Processed injects</div>
+          <div style={styles.title}><T>Processed injects</T></div>
           <div className="clearfix"></div>
           {this.props.dryinjectsProcessed.length === 0 ?
-            <div style={styles.empty}>You do not have any processed injects in this dryrun.</div> : ""}
+            <div style={styles.empty}><T>You do not have any processed injects in this dryrun.</T></div> : ""}
           <List>
             {this.props.dryinjectsProcessed.map(dryinject => {
               let color = '#4CAF50'
@@ -151,8 +173,7 @@ class IndexExcerciseDryrun extends Component {
                   primaryText={
                     <div>
                       <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
-                      <div
-                        style={styles.dryinject_date}>{moment(dryinject.dryinject_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div style={styles.dryinject_date}>{dateFormat(dryinject.dryinject_date)}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
@@ -200,7 +221,7 @@ const filterDryinjectsPending = (dryinjects, dryrunId) => {
 const filterDryinjectsProcessed = (dryinjects, dryrunId) => {
   let dryinjectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && (n.dryinject_status.status_name === 'SUCCESS' || n.dryinject_status.status_name === 'ERROR')),
+    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && (n.dryinject_status.status_name === 'SUCCESS' || n.dryinject_status.status_name === 'PARTIAL' || n.dryinject_status.status_name === 'ERROR' )),
     R.sort((a, b) => a.dryinject_date < b.dryinject_date)
   )
   return dryinjectsFilterAndSorting(dryinjects)
