@@ -31,7 +31,7 @@ class ComcheckStatusController extends Controller
         }
 
         $status->setStatusLastUpdate(new \DateTime());
-        $status->setStatusState(true);
+        $status->setStatusState(1);
 
         $em->persist($status);
         $em->flush();

@@ -61,9 +61,9 @@ class Inject
     protected $inject_incident;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="smallint")
      */
-    protected $inject_automatic;
+    protected $inject_enabled;
 
     /**
      * @ORM\OneToOne(targetEntity="InjectStatus", mappedBy="status_inject")
@@ -172,14 +172,14 @@ class Inject
         return $this;
     }
 
-    public function getInjectAutomatic()
+    public function getInjectEnabled()
     {
-        return $this->inject_automatic;
+        return $this->inject_enabled;
     }
 
-    public function setInjectAutomatic($automatic)
+    public function setInjectEnabled($enabled)
     {
-        $this->inject_automatic = $automatic;
+        $this->inject_enabled = $enabled;
         return $this;
     }
 

@@ -38,9 +38,9 @@ class ComcheckStatus
     protected $status_last_update;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="smallint")
      */
-    protected $status_state = 0;
+    protected $status_state;
 
     public function getStatusId()
     {
