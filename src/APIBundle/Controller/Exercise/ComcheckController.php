@@ -122,6 +122,7 @@ class ComcheckController extends Controller
                 $status->setStatusComcheck($comcheck);
                 $status->setStatusUser($user);
                 $status->setStatusLastUpdate(new \DateTime());
+                $status->setStatusState(0);
                 $em->persist($status);
                 $em->flush();
 

@@ -136,42 +136,44 @@ class DryrunController extends Controller
             $previousInject = null;
             $previousDryinject = null;
             foreach( $injects as $inject ) {
-                $dryinject = new Dryinject();
-                $dryinject->setDryinjectTitle($inject->getInjectTitle());
-                $dryinject->setDryinjectContent($inject->getInjectContent());
-                $dryinject->setDryinjectType($inject->getInjectType());
-                $dryinject->setDryinjectDryrun($dryrun);
+                if( $inject->getInjectEnabled() === 1 ) {
+                    $dryinject = new Dryinject();
+                    $dryinject->setDryinjectTitle($inject->getInjectTitle());
+                    $dryinject->setDryinjectContent($inject->getInjectContent());
+                    $dryinject->setDryinjectType($inject->getInjectType());
+                    $dryinject->setDryinjectDryrun($dryrun);
 
-                // set the first inject to now
-                if( $previousInject === null ) {
-                    $dryinject->setDryinjectDate(new \DateTime());
-                } else {
-                    // compute the interval in seconds from the previous inject
-                    $previousDate = $previousInject->getInjectDate()->getTimestamp();
-                    $currentDate = $inject->getInjectDate()->getTimestamp();
-                    $intervalInSeconds = $currentDate-$previousDate;
+                    // set the first inject to now
+                    if ($previousInject === null) {
+                        $dryinject->setDryinjectDate(new \DateTime());
+                    } else {
+                        // compute the interval in seconds from the previous inject
+                        $previousDate = $previousInject->getInjectDate()->getTimestamp();
+                        $currentDate = $inject->getInjectDate()->getTimestamp();
+                        $intervalInSeconds = $currentDate - $previousDate;
 
-                    // accelerate the interval and create the interval object
-                    $newInterval = new \DateInterval('PT'.round($intervalInSeconds/$dryrun->getDryrunSpeed()).'S');
+                        // accelerate the interval and create the interval object
+                        $newInterval = new \DateInterval('PT' . round($intervalInSeconds / $dryrun->getDryrunSpeed()) . 'S');
 
-                    // set the new datetime
-                    $dryinject->setDryinjectDate($previousDryinject->getDryinjectDate()->add($newInterval));
+                        // set the new datetime
+                        $dryinject->setDryinjectDate($previousDryinject->getDryinjectDate()->add($newInterval));
+                    }
+
+                    // create the dryinject
+                    $em->persist($dryinject);
+                    $em->flush();
+
+                    // create the dryinject status
+                    $status = new DryinjectStatus();
+                    $status->setStatusName('PENDING');
+                    $status->setStatusDate(new \DateTime());
+                    $status->setStatusDryinject($dryinject);
+                    $em->persist($status);
+                    $em->flush();
+
+                    $previousInject = $inject;
+                    $previousDryinject = $dryinject;
                 }
-
-                // create the dryinject
-                $em->persist($dryinject);
-                $em->flush();
-
-                // create the dryinject status
-                $status = new DryinjectStatus();
-                $status->setStatusName('PENDING');
-                $status->setStatusDate(new \DateTime());
-                $status->setStatusDryinject($dryinject);
-                $em->persist($status);
-                $em->flush();
-
-                $previousInject = $inject;
-                $previousDryinject = $dryinject;
             }
 
             $id = $dryrun->getDryrunId();

@@ -102,7 +102,7 @@ class InjectController extends Controller
         if ($form->isValid()) {
             $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
             $inject->setInjectIncident($incident);
-            $inject->setInjectAutomatic(true);
+            $inject->setInjectEnabled(true);
             $inject->setInjectUser($connectedUser);
             $em->persist($inject);
             $em->flush();

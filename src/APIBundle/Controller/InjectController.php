@@ -52,6 +52,7 @@ class InjectController extends Controller
                         ->leftJoin('i.inject_status', 's')
                         ->where('s.status_inject = i.inject_id')
                         ->andWhere('s.status_name = \'PENDING\'')
+                        ->andWhere('i.inject_enabled = 1')
                         ->andWhere('i.inject_incident = :incident')
                         ->andWhere('i.inject_date BETWEEN :start AND :end')
                         ->orderBy('i.inject_date', 'ASC')
