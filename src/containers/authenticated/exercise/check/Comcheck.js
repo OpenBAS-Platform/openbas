@@ -61,8 +61,8 @@ const styles = {
   },
   'title': {
     float: 'left',
-    fontSize: '20px',
-    fontWeight: 600
+    fontSize: '13px',
+    textTransform: 'uppercase'
   },
   'subtitle': {
     float: 'left',

@@ -8,7 +8,7 @@ import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchComchecks} from '../../../../actions/Comcheck'
-import {LinkFlatButton} from '../../../../components/Button'
+import {LinkIconButton} from '../../../../components/Button'
 import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
@@ -18,7 +18,6 @@ import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
 import UserPopover from './UserPopover'
-import {dateFormat} from '../../../../utils/Time'
 
 i18nRegister({
   fr: {
@@ -27,7 +26,7 @@ i18nRegister({
     'Organization': 'Organisation',
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
     'This audience is empty.': 'Cette audience est vide.',
-    'comcheck(s) currently running:': 'comcheck(s) en cours :'
+    'Comcheck currently running': 'Comcheck en cours'
   }
 })
 
@@ -92,16 +91,9 @@ const styles = {
     float: 'left',
     padding: '5px 0 0 0'
   },
-  'comchecks': {
-    borderRadius: '5px',
-    border: '3px solid #FF4081',
-    padding: '10px',
-    margin: '0 0 20px 0',
-    textAlign: 'center'
-  },
-  'running': {
-    fontWeight: '600',
-    margin: '0 0 10px 0'
+  'comcheck': {
+    float: 'left',
+    margin: '-16px 0px 0px -15px'
   }
 }
 
@@ -168,15 +160,11 @@ class Index extends Component {
     let comchecks = null
     if (this.props.comchecks.length > 0) {
       comchecks = (
-        <div style={styles.comchecks}>
-          <div style={styles.running}>{this.props.comchecks.length} <T>comcheck(s) currently running:</T></div>
-          {this.props.comchecks.map(comcheck => {
-            return (
-              <LinkFlatButton to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + comcheck.comcheck_id} secondary={true}
-                              key={comcheck.comcheck_id} label={dateFormat(comcheck.comcheck_start_date)}/>
-            )
-          })}
-          <br />
+        <div style={styles.comcheck}>
+          <LinkIconButton
+            to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + this.props.comchecks[0].comcheck_id} tooltip="Comcheck currently running"
+            tooltipPosition="bottom-left"><Icon color="#E91E63"
+            name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}/></LinkIconButton>
         </div>
       )
     }
@@ -205,26 +193,26 @@ class Index extends Component {
         <div>
           <div style={styles.title}>{audience.audience_name}</div>
           <AudiencePopover exerciseId={exerciseId} audience={audience}/>
+          {comchecks}
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
-                             onChange={this.handleSearchUsers.bind(this)}
-                             styletype={Constants.FIELD_TYPE_RIGHT} />
+                         onChange={this.handleSearchUsers.bind(this)}
+                         styletype={Constants.FIELD_TYPE_RIGHT}/>
           </div>
           <div className="clearfix"></div>
-          {comchecks}
           <List>
             {audience.audience_users.length === 0 ? (
                 <div style={styles.empty}><T>This audience is empty.</T></div>
-            ) : (
-              <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
-                          rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
-                {this.SortHeader('user_firstname', 'Name')}
-                {this.SortHeader('user_email', 'Email address')}
-                {this.SortHeader('user_organization', 'Organization')}
-                <div className="clearfix"></div>
-              </div>}
-              />
-            )}
+              ) : (
+                <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
+                                  rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
+                  {this.SortHeader('user_firstname', 'Name')}
+                  {this.SortHeader('user_email', 'Email address')}
+                  {this.SortHeader('user_organization', 'Organization')}
+                  <div className="clearfix"></div>
+                </div>}
+                />
+              )}
 
             {users.map(user => {
               //Setup variables

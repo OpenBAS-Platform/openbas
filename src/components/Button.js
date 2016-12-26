@@ -185,3 +185,27 @@ IconButton.propTypes = {
   onClick: PropTypes.func,
   type: PropTypes.string
 }
+
+const LinkIconButtonIntl = (props) => (
+  <MUIIconButton
+    tooltipPosition={props.tooltipPosition}
+    tooltip={props.intl.formatMessage({id: props.tooltip})}
+    disabled={props.disabled}
+    containerElement={<Link to={props.to}/>}
+    style={buttonStyle[props.type]}
+  >
+    {props.children}
+  </MUIIconButton>
+)
+
+export const LinkIconButton = injectIntl(LinkIconButtonIntl)
+
+LinkIconButtonIntl.propTypes = {
+  disabled: PropTypes.bool,
+  tooltip: PropTypes.string,
+  tooltipPosition: PropTypes.string,
+  children: PropTypes.node,
+  to: PropTypes.func,
+  type: PropTypes.string,
+  intl: PropTypes.object,
+}
