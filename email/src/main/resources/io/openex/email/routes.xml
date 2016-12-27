@@ -13,6 +13,9 @@
         <setHeader headerName="subject">
             <simple>${body[subject]}</simple>
         </setHeader>
+        <setHeader headerName="encrypted">
+            <simple>${body[encrypted]}</simple>
+        </setHeader>
         <setHeader headerName="attachments">
             <simple>${body[attachments]}</simple>
         </setHeader>
@@ -36,8 +39,13 @@
                 <simple>${body}</simple>
             </setHeader>
             <to uri="freemarker:from_header"/>
-            <!-- Encrypt the body and attachments with PGP -->
-            <bean ref="pgp-encryption"/>
+            <!-- Encrypt the body and attachments with PGP if needed -->
+            <choice>
+                <when>
+                    <simple>${header.encrypted} == true</simple>
+                    <bean ref="pgp-encryption"/>
+                </when>
+            </choice>
             <!-- Add attachments -->
             <bean ref="attachments-handler"/>
             <!-- Send the email -->

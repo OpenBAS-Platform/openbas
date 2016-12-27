@@ -11,6 +11,7 @@ import org.apache.camel.component.mail.MailComponent;
 
 import static io.openex.management.contract.ContractCardinality.Multiple;
 import static io.openex.management.contract.ContractType.Attachment;
+import static io.openex.management.contract.ContractType.Checkbox;
 import static io.openex.management.contract.ContractType.Textarea;
 
 @SuppressWarnings("PackageAccessibility")
@@ -25,6 +26,7 @@ class EmailExecutor implements Executor {
 		return Contract.build()
 				.mandatory("sender")
 				.mandatory("subject")
+				.optional("encrypted", Checkbox)
 				.mandatory("body", Textarea)
 				.optional("attachments", Attachment, Multiple);
 	}

@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 @SuppressWarnings("PackageAccessibility")
 public enum ContractType {
 	@SerializedName("text") Text,
+	@SerializedName("checkbox") Checkbox,
 	@SerializedName("textarea") Textarea,
 	@SerializedName("attachment") Attachment
 }
