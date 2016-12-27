@@ -136,7 +136,7 @@ class Comcheck extends Component {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchUsers()
     this.props.fetchOrganizations()
-    //this.repeatTimeout()
+    this.repeatTimeout()
   }
 
   componentWillUnmount() {

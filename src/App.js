@@ -23,6 +23,7 @@ import RootAnonymous from './containers/anonymous/Root'
 import Login from './containers/anonymous/login/Login'
 import IndexComcheck from './containers/anonymous/comcheck/Index'
 import RootAuthenticated from './containers/authenticated/Root'
+import NoWorker from './containers/authenticated/NoWorker'
 import IndexAuthenticated from './containers/authenticated/Index'
 import RootAdmin from './containers/authenticated/admin/Root'
 import IndexAdmin from './containers/authenticated/admin/Index'
@@ -198,6 +199,7 @@ class App extends Component {
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
+                <Route path='noworker' component={NoWorker}/>
                 <Route path='admin' component={RootAdmin}>
                   <Route path='index' component={IndexAdmin}/>
                   <Route path='users' component={IndexAdminUsers}/>

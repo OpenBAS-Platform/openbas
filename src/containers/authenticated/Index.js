@@ -15,7 +15,7 @@ import {i18nRegister} from '../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'You do not have any available exercise on this platform.': 'Vous n\'avez aucun exercice disponible'
+    'You do not have any available exercise on this platform.': 'Vous n\'avez aucun exercice disponible sur cette plateforme.'
   }
 })
 
@@ -55,7 +55,7 @@ class IndexAuthenticated extends Component {
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
           iconElementRight={<UserPopover/>}
-          iconElementLeft={<img src="images/logo_white.png" alt="logo" style={styles.logo}/>}
+          iconElementLeft={<img src="/images/logo_white.png" alt="logo" style={styles.logo}/>}
         />
         <div style={styles.container}>
           {this.props.exercises.length === 0 ? <div style={styles.empty}><T>You do not have any available exercise on this platform.</T></div>:""}
