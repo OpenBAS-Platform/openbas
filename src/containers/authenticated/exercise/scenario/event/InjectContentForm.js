@@ -8,6 +8,7 @@ import FileGallery from '../../../FileGallery'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Button} from '../../../../../components/Button'
 import {Dialog} from '../../../../../components/Dialog'
+import {ToggleField} from '../../../../../components/ToggleField'
 import {Icon} from '../../../../../components/Icon'
 import {Chip} from '../../../../../components/Chip'
 import {Avatar} from '../../../../../components/Avatar'
@@ -24,6 +25,7 @@ i18nRegister({
     'sender': 'Expéditeur',
     'subject': 'Sujet',
     'body': 'Message',
+    'encrypted': 'Chiffrement',
     'Add an attachment': 'Ajouter une pièce jointe',
     'No content available for this inject type.': 'Aucun contenu disponible pour ce type d\'inject'
   },
@@ -66,9 +68,7 @@ class InjectContentForm extends Component {
 
   render() {
     if (this.props.type === null) {
-      return (<div>
-        <T>No content available for this inject type.</T>
-      </div>)
+      return (<div><T>No content available for this inject type.</T></div>)
     }
 
     return (
@@ -76,6 +76,8 @@ class InjectContentForm extends Component {
         {this.props.types[this.props.type].fields.map(field => {
           if (field.type === 'textarea') {
             return <RichTextField key={field.name} name={field.name} label={field.name}/>
+          } else if (field.type === 'checkbox') {
+            return <ToggleField key={field.name} name={field.name} label={<T>{field.name}</T>} />
           } else if (field.type === 'attachment') {
             return <div key={field.name} style={styles.attachment}>
                 <Button label='Add an attachment' onClick={this.handleOpenGallery.bind(this)}/>

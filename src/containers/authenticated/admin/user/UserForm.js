@@ -18,7 +18,7 @@ class UserForm extends Component {
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
                            type="text" label="Organization" dataSource={dataSource}/>
         <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>
-        <ToggleField name="user_admin" label="Administrator" defaultToggled={this.props.userAdmin} />
+        <ToggleField name="user_admin" label="Administrator" />
       </form>
     )
   }
@@ -31,8 +31,7 @@ UserForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  organizations: PropTypes.object,
-  userAdmin: PropTypes.number
+  organizations: PropTypes.object
 }
 
 export default reduxForm({form: 'UserForm'}, null, {change})(UserForm)

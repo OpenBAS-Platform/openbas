@@ -15,7 +15,8 @@ const styles = {
     header: {
       fontSize: 12,
       opacity: 0.6,
-      marginBottom: 8
+      marginBottom: 8,
+      marginTop: 8
     },
     content: {
       color: 'black'
