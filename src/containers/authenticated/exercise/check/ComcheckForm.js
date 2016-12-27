@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
-import {FormField} from '../../../../components/Field'
+import {FormField, RichTextField} from '../../../../components/Field'
 import {SelectField} from '../../../../components/SelectField'
 import {MenuItemLink} from "../../../../components/menu/MenuItem"
 import DateTimePicker from '../../../../components/DateTimePicker'
@@ -49,10 +49,8 @@ class ComcheckForm extends Component {
         <FormField ref="endDate" name="comcheck_end_date" fullWidth={true} type="text"
                    label="End date" onClick={this.raiseEndPicker.bind(this)}/>
         <FormField name="comcheck_subject" fullWidth={true} type="text" label="Subject"/>
-        <FormField name="comcheck_message" fullWidth={true} multiLine={true} rows={3}
-                   type="text" label="Message"/>
-        <FormField name="comcheck_footer" fullWidth={true} multiLine={true} rows={2}
-                   type="text" label="Signature"/>
+        <RichTextField name="comcheck_message" label="Message"/>
+        <RichTextField name="comcheck_footer" label="Signature"/>
       </form>
     )
   }
