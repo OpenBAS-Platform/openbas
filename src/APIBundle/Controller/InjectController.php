@@ -2,7 +2,6 @@
 
 namespace APIBundle\Controller;
 
-use APIBundle\Entity\Dryinject;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +15,7 @@ use APIBundle\Entity\InjectStatus;
 use APIBundle\Entity\Event;
 use APIBundle\Entity\Incident;
 use APIBundle\Entity\Inject;
+use APIBundle\Entity\Dryinject;
 
 class InjectController extends Controller
 {
@@ -102,6 +102,7 @@ class InjectController extends Controller
             ->getResult();
 
         foreach ($dryinjects as $dryinject) {
+            /* @var $dryinject Dryinject */
             $data = array();
             $data['context']['id'] = $dryinject->getDryinjectId();
             $data['context']['type'] = $dryinject->getDryinjectType();
