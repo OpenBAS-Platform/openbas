@@ -171,6 +171,7 @@ class IncidentPopover extends Component {
           <T>Do you want to delete this incident?</T>
         </Dialog>
         <Dialog title="Update the incident" modal={false} open={this.state.openEdit}
+                autoScrollBodyContent={true}
                 onRequestClose={this.handleCloseEdit.bind(this)} actions={editActions}>
           <IncidentForm ref="incidentForm"
                         initialValues={initialValues}
@@ -220,7 +221,8 @@ class IncidentPopover extends Component {
                         <div className="clearfix"></div>
                       </div>
                     }
-                    leftAvatar={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK} type={Constants.ICON_TYPE_LIST}/>}
+                    leftAvatar={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}
+                                      type={Constants.ICON_TYPE_LIST}/>}
                   />
                 )
               })}

@@ -183,6 +183,7 @@ class CreateInject extends Component {
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose.bind(this)}
+          autoScrollBodyContent={true}
           actions={actions}>
           <div>{this.getStepContent(this.state.stepIndex)}</div>
         </DialogTitleElement>

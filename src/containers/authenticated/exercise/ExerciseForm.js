@@ -34,8 +34,7 @@ class ExerciseForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="exercise_name" fullWidth={true} type="text" label="Name"/>
         <FormField name="exercise_subtitle" fullWidth={true} type="text" label="Subtitle"/>
-        <FormField name="exercise_description" fullWidth={true} multiLine={true} rows={3}
-                   type="text" label="Description"/>
+        <FormField name="exercise_description" fullWidth={true} type="text" label="Description"/>
         <FormField ref="startDate" name="exercise_start_date" fullWidth={true} type="text"
                    label="Start date" onClick={this.raiseStartPicker.bind(this)}/>
         <FormField ref="endDate" name="exercise_end_date" fullWidth={true} type="text"
