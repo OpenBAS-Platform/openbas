@@ -257,6 +257,7 @@ class InjectPopover extends Component {
               </Step>
             </Stepper>
           }
+          autoScrollBodyContent={true}
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}

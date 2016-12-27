@@ -154,7 +154,7 @@ class UserPopover extends Component {
                     onSubmit={this.onSubmitEdit.bind(this)}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
-        <Dialog title="Update the profile" modal={false} open={this.state.openInfo}
+        <Dialog autoScrollBodyContent={true} title="Update the profile" modal={false} open={this.state.openInfo}
                 onRequestClose={this.handleCloseInfo.bind(this)}
                 actions={infoActions}>
           <UserinfoForm ref="userinfoForm" initialValues={initialValuesInfo}

@@ -170,6 +170,7 @@ class ObjectivePopover extends Component {
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
+          autoScrollBodyContent={true}
           actions={editActions}
         >
           <ObjectiveForm ref="objectiveForm" initialValues={initialValues} onSubmit={this.onSubmitEdit.bind(this)}
@@ -180,6 +181,7 @@ class ObjectivePopover extends Component {
           modal={false}
           open={this.state.openCreateSubobjective}
           onRequestClose={this.handleCloseCreateSubobjective.bind(this)}
+          autoScrollBodyContent={true}
           actions={createSubobjectiveActions}
         >
           <SubobjectiveForm ref="subobjectiveForm" onSubmit={this.onSubmitCreateSubobjective.bind(this)}

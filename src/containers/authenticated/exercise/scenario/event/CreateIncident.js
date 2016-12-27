@@ -47,13 +47,15 @@ class CreateIncident extends Component {
     return (
       <div>
         <AppBar title="Incidents"
-          showMenuIconButton={false}
-          iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT} onClick={this.handleOpenCreate.bind(this)} />}/>
+                showMenuIconButton={false}
+                iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
+                                                      onClick={this.handleOpenCreate.bind(this)}/>}/>
         <Dialog title="Create a new incident"
-          modal={false}
-          open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actions}>
+                modal={false}
+                open={this.state.openCreate}
+                onRequestClose={this.handleCloseCreate.bind(this)}
+                autoScrollBodyContent={true}
+                actions={actions}>
           <IncidentForm
             ref="incidentForm"
             onSubmit={this.onSubmitCreate.bind(this)}
