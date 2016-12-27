@@ -14,6 +14,7 @@ import {addComcheck} from '../../../../actions/Comcheck'
 import {updateAudience, selectAudience, deleteAudience} from '../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
 import ComcheckForm from '../check/ComcheckForm'
+import {injectIntl} from 'react-intl'
 
 const style = {
   float: 'left',
@@ -103,13 +104,16 @@ class AudiencePopover extends Component {
     this.handleCloseDelete()
   }
 
+  t(id) {
+    return this.props.intl.formatMessage({id})
+  }
+
   render() {
     const initialComcheckValues = {
       comcheck_audience: R.propOr(0, 'audience_id', this.props.audience),
-      comcheck_subject: <T>Communication check</T>,
-      comcheck_message: <T>Hello</T> + ',<br /><br />' + <T>This is a communication check before the beginning of the exercise. Please
-        click on the following link in order to confirm you successfully received this message:</T>,
-      comcheck_footer: <T>Best regards</T> + ',<br />' + <T>The exercise control Team</T>
+      comcheck_subject: this.t("Communication check"),
+      comcheck_message: this.t("Hello") + ',<br /><br />' + this.t("This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:"),
+      comcheck_footer: this.t("Best regards") + ',<br />' + this.t("The exercise control Team")
     }
 
     const comcheckActions = [
@@ -174,7 +178,8 @@ AudiencePopover.propTypes = {
   addComcheck: PropTypes.func,
   audience: PropTypes.object,
   audiences: PropTypes.array,
-  children: PropTypes.node
+  children: PropTypes.node,
+  intl: PropTypes.object
 }
 
-export default connect(null, {updateAudience, selectAudience, deleteAudience, addComcheck})(AudiencePopover)
+export default connect(null, {updateAudience, selectAudience, deleteAudience, addComcheck})(injectIntl(AudiencePopover))

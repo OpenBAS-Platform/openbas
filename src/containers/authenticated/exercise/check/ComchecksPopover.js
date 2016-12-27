@@ -106,7 +106,7 @@ DryrunsPopover.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
   addComcheck: PropTypes.func,
-  intl: PropTypes.object,
+  intl: PropTypes.object
 }
 
 export default connect(null, {addComcheck})(injectIntl(DryrunsPopover))
