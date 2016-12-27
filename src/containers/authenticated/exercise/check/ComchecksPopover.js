@@ -1,9 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {i18nRegister} from '../../../../utils/Messages'
-import {T} from '../../../../components/I18n'
 import * as Constants from '../../../../constants/ComponentTypes'
-import {Popover} from '../../../../components/Popover';
+import {Popover} from '../../../../components/Popover'
 import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
@@ -11,6 +10,7 @@ import {Icon} from '../../../../components/Icon'
 import {MenuItemLink} from "../../../../components/menu/MenuItem"
 import {addComcheck} from '../../../../actions/Comcheck'
 import ComcheckForm from './ComcheckForm'
+import {injectIntl} from 'react-intl'
 
 const style = {
   float: 'left',
@@ -61,13 +61,15 @@ class DryrunsPopover extends Component {
     this.refs.comcheckForm.submit()
   }
 
+  t(id) {
+    return this.props.intl.formatMessage({id})
+  }
+
   render() {
     const initialComcheckValues = {
-      comcheck_subject: <T>Communication check</T>,
-      comcheck_message: <T>Hello</T> + ',<br /><br />' +
-      <T>This is a communication check before the beginning of the exercise. Please
-        click on the following link in order to confirm you successfully received this message:</T>,
-      comcheck_footer: <T>Best regards</T> + ',<br />' + <T>The exercise control Team</T>
+      comcheck_subject: this.t("Communication check"),
+      comcheck_message: this.t("Hello") + ',<br /><br />' + this.t("This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:"),
+      comcheck_footer: this.t("Best regards") + ',<br />' + this.t("The exercise control Team")
     }
 
     const launchActions = [
@@ -91,8 +93,7 @@ class DryrunsPopover extends Component {
           modal={false}
           open={this.state.openLaunch}
           onRequestClose={this.handleCloseLaunch.bind(this)}
-          actions={launchActions}
-        >
+          actions={launchActions}>
           <ComcheckForm initialValues={initialComcheckValues} ref="comcheckForm" audiences={this.props.audiences}
                         onSubmit={this.onSubmitLaunch.bind(this)} onSubmitSuccess={this.handleCloseLaunch.bind(this)}/>
         </Dialog>
@@ -105,6 +106,7 @@ DryrunsPopover.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
   addComcheck: PropTypes.func,
+  intl: PropTypes.object,
 }
 
-export default connect(null, {addComcheck})(DryrunsPopover)
+export default connect(null, {addComcheck})(injectIntl(DryrunsPopover))
