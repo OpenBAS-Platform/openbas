@@ -136,7 +136,7 @@ class DryrunController extends Controller
             $previousInject = null;
             $previousDryinject = null;
             foreach( $injects as $inject ) {
-                if( $inject->getInjectEnabled() === 1 ) {
+                if( $inject->getInjectEnabled() == true ) {
                     $dryinject = new Dryinject();
                     $dryinject->setDryinjectTitle($inject->getInjectTitle());
                     $dryinject->setDryinjectContent($inject->getInjectContent());
