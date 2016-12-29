@@ -211,7 +211,7 @@ class InjectPopover extends Component {
     ]
 
     let initPipe = R.pipe(
-      R.assoc('inject_date', dateFormat(R.path(['inject', 'exercise_start_date'], this.props))),
+      R.assoc('inject_date', dateFormat(R.path(['inject', 'inject_date'], this.props))),
       R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'])
     )
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined
