@@ -68,7 +68,7 @@ class UserPopover extends Component {
 UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   userGravatar: PropTypes.string,
-  userAdmin: PropTypes.number,
+  userAdmin: PropTypes.bool,
   logout: PropTypes.func,
   fetchToken: PropTypes.func,
   children: PropTypes.node

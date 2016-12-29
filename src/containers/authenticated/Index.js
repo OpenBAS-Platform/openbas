@@ -96,7 +96,7 @@ IndexAuthenticated.propTypes = {
   fetchExercises: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
-  userAdmin: PropTypes.number
+  userAdmin: PropTypes.bool
 }
 
 const select = (state) => {

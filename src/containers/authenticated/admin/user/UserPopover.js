@@ -115,7 +115,6 @@ class UserPopover extends Component {
           <UserForm ref="userForm" initialValues={initialValues}
                     organizations={this.props.organizations}
                     onSubmit={this.onSubmitEdit.bind(this)}
-                    userAdmin={this.props.user.user_admin}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
         </Dialog>
       </div>
