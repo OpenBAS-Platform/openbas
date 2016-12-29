@@ -73,6 +73,11 @@ class Exercise
      */
     protected $exercise_image;
 
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $exercise_message_header;
+
     protected $exercise_status = 'SCHEDULED';
 
     public function __construct()
@@ -211,6 +216,17 @@ class Exercise
     public function setExerciseImage($image)
     {
         $this->exercise_image = $image;
+        return $this;
+    }
+
+    public function getExerciceMessageHeader()
+    {
+        return $this->exercise_message_header;
+    }
+
+    public function setExerciseMessageHeader($header)
+    {
+        $this->exercise_message_header = $header;
         return $this;
     }
 }

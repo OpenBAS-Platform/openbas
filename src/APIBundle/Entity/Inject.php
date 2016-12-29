@@ -61,7 +61,7 @@ class Inject
     protected $inject_incident;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
     protected $inject_enabled;
 

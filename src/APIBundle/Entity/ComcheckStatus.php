@@ -38,7 +38,7 @@ class ComcheckStatus
     protected $status_last_update;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
     protected $status_state;
 

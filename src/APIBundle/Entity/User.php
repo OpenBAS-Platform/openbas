@@ -72,9 +72,9 @@ class User implements UserInterface
     protected $user_audiences;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="boolean")
      */
-    protected $user_admin = 0;
+    protected $user_admin = false;
 
     /**
      * @ORM\Column(type="smallint")
