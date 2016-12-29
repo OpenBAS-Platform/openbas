@@ -49,8 +49,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $typeStrategic = $this->createIncidentType('STRATEGIC');
         $output->writeln('Creating default incident types');
 
-        $fileExercise = $this->createFile('Exercise default', 'default_exercise.png');
-        $fileEvent = $this->createFile('Event default', 'default_event.png');
+        $fileExercise = $this->createFile('Exercise default', 'default_exercise.png', 'png');
+        $fileEvent = $this->createFile('Event default', 'default_event.png', 'png');
         $output->writeln('Creating default files');
 
         $organizationAgency = $this->createOrganization('The agency', 'The national security agency');
@@ -312,9 +312,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->flush();
     }
 
-    private function createFile($name, $path) {
+    private function createFile($name, $path, $type) {
         $file = new File();
         $file->setFileName($name);
+        $file->setFileTYpe($type);
         $file->setFilePath($path);
         $this->em->persist($file);
         $this->em->flush();
@@ -385,7 +386,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
     private function createInject($title, $description, $content, $date, $type, $incident, $user) {
         $inject = new Inject();
-        $inject->setInjectAutomatic(1);
         $inject->setInjectTitle($title);
         $inject->setInjectDescription($description);
         $inject->setInjectContent($content);
@@ -393,6 +393,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $inject->setInjectType($type);
         $inject->setInjectIncident($incident);
         $inject->setInjectUser($user);
+        $inject->setInjectEnabled(true);
 
         $this->em->persist($inject);
         $this->em->flush();
