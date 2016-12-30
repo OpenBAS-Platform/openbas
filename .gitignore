@@ -1,3 +1,6 @@
 .idea
 *.iml
 target
+distribution/src/main/filtered-resources/openex/openex_mail.properties
+distribution/src/main/filtered-resources/openex/openex_scheduler.properties
+
