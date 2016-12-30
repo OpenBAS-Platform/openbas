@@ -37,6 +37,7 @@ class ComcheckController extends Controller
         $this->denyAccessUnlessGranted('select', $exercise);
 
         $comchecks = $em->getRepository('APIBundle:Comcheck')->findBy(['comcheck_exercise' => $exercise]);
+        /* @var $comchecks Comcheck[] */
 
         foreach( $comchecks as &$comcheck ) {
             $comcheck->computeComcheckFinished();

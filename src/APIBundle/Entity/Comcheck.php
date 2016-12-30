@@ -45,7 +45,7 @@ class Comcheck
     protected $comcheck_subject;
     protected $comcheck_message;
     protected $comcheck_footer;
-    protected $comcheck_finished = 0;
+    protected $comcheck_finished = false;
 
     public function getComcheckId()
     {
@@ -149,9 +149,9 @@ class Comcheck
     public function computeComcheckFinished() {
         $now = new \DateTime();
         if( $this->comcheck_end_date < $now ) {
-            $this->comcheck_finished = 1;
+            $this->comcheck_finished = true;
         } else {
-            $this->comcheck_finished = 0;
+            $this->comcheck_finished = false;
         }
     }
 }
