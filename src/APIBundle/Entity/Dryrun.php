@@ -149,11 +149,11 @@ class Dryrun
     }
 
     public function computeDryRunFinished($dryinjects) {
-        $finished = 1;
+        $finished = true;
         $now = new \DateTime();
         foreach( $dryinjects as $dryinject ) {
             if( $dryinject->getDryinjectDate() > $now ) {
-                $finished = 0;
+                $finished = false;
             }
         }
         $this->dryrun_finished = $finished;

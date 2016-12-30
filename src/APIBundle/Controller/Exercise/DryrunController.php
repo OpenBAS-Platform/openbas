@@ -76,6 +76,8 @@ class DryrunController extends Controller
             return $this->dryrunNotFound();
         }
 
+        $dryinjects = $em->getRepository('APIBundle:Dryinject')->findBy(['dryinject_dryrun' => $dryrun]);
+        $dryrun->computeDryRunFinished($dryinjects);
         return $dryrun;
     }
 
