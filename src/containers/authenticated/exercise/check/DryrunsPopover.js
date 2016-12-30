@@ -9,11 +9,12 @@ import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink} from "../../../../components/menu/MenuItem"
 import {addDryrun} from '../../../../actions/Dryrun'
+import {redirectToDryrun} from '../../../../actions/Application'
 import DryrunForm from './DryrunForm'
 
 const style = {
   float: 'left',
-  marginTop: '-16px'
+  marginTop: '-14px'
 }
 
 i18nRegister({
@@ -53,7 +54,9 @@ class DryrunsPopover extends Component {
   }
 
   onSubmitLaunch(data) {
-    return this.props.addDryrun(this.props.exerciseId, data)
+    return this.props.addDryrun(this.props.exerciseId, data).then((payload) => {
+      this.props.redirectToDryrun(this.props.exerciseId, payload.result)
+    })
   }
 
   submitFormLaunch() {
@@ -95,6 +98,7 @@ DryrunsPopover.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
   addDryrun: PropTypes.func,
+  redirectToDryrun: PropTypes.func
 }
 
-export default connect(null, {addDryrun})(DryrunsPopover)
+export default connect(null, {addDryrun, redirectToDryrun})(DryrunsPopover)

@@ -22,7 +22,7 @@ import IncidentForm from './IncidentForm'
 const styles = {
   container: {
     float: 'left',
-    marginTop: '-16px'
+    marginTop: '-14px'
   },
   'title': {
     float: 'left',

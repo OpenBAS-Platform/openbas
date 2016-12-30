@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {i18nRegister} from '../../../../../utils/Messages'
 import * as Constants from '../../../../../constants/ComponentTypes'
-import {addIncident} from '../../../../../actions/Incident'
+import {addIncident, selectIncident} from '../../../../../actions/Incident'
 import {Dialog} from '../../../../../components/Dialog';
 import {FlatButton} from '../../../../../components/Button';
 import {ActionButtonCreate} from '../../../../../components/Button'
@@ -31,7 +31,9 @@ class CreateIncident extends Component {
   }
 
   onSubmitCreate(data) {
-    return this.props.addIncident(this.props.exerciseId, this.props.eventId, data)
+    return this.props.addIncident(this.props.exerciseId, this.props.eventId, data).then((payload) => {
+      this.props.selectIncident(this.props.exerciseId, this.props.eventId, payload.result)
+    })
   }
 
   submitFormCreate() {
@@ -71,7 +73,8 @@ CreateIncident.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
   incident_types: PropTypes.object,
-  addIncident: PropTypes.func
+  addIncident: PropTypes.func,
+  selectIncident: PropTypes.func
 }
 
-export default connect(null, {addIncident})(CreateIncident);
+export default connect(null, {addIncident, selectIncident})(CreateIncident);

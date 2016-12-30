@@ -18,7 +18,7 @@ import {injectIntl} from 'react-intl'
 
 const style = {
   float: 'left',
-  marginTop: '-16px'
+  marginTop: '-14px'
 }
 
 i18nRegister({

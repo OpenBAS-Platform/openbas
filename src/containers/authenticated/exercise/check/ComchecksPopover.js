@@ -9,12 +9,13 @@ import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink} from "../../../../components/menu/MenuItem"
 import {addComcheck} from '../../../../actions/Comcheck'
+import {redirectToComcheck} from '../../../../actions/Application'
 import ComcheckForm from './ComcheckForm'
 import {injectIntl} from 'react-intl'
 
 const style = {
   float: 'left',
-  marginTop: '-16px'
+  marginTop: '-14px'
 }
 
 i18nRegister({
@@ -54,7 +55,9 @@ class DryrunsPopover extends Component {
   }
 
   onSubmitLaunch(data) {
-    return this.props.addComcheck(this.props.exerciseId, data)
+    return this.props.addComcheck(this.props.exerciseId, data).then((payload) => {
+      this.props.redirectToComcheck(this.props.exerciseId, payload.result)
+    })
   }
 
   submitFormLaunch() {
@@ -107,7 +110,8 @@ DryrunsPopover.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
   addComcheck: PropTypes.func,
+  redirectToComcheck: PropTypes.func,
   intl: PropTypes.object
 }
 
-export default connect(null, {addComcheck})(injectIntl(DryrunsPopover))
+export default connect(null, {addComcheck, redirectToComcheck})(injectIntl(DryrunsPopover))
