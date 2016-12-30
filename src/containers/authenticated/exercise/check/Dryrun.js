@@ -6,12 +6,15 @@ import {T} from '../../../../components/I18n'
 import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
+import Theme from '../../../../components/Theme'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
+import {CircularSpinner} from '../../../../components/Spinner'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryrun} from '../../../../actions/Dryrun'
 import {fetchDryinjects} from '../../../../actions/Dryinject'
+import DryrunPopover from './DryrunPopover'
 
 i18nRegister({
   fr: {
@@ -53,8 +56,10 @@ const styles = {
   'subtitle': {
     float: 'left',
     fontSize: '12px',
-    marginTop: '5px',
     color: "#848484"
+  },
+  'state': {
+    float: 'right',
   },
   'empty': {
     marginTop: 30,
@@ -98,6 +103,7 @@ class IndexExcerciseDryrun extends Component {
 
   circularFetch() {
     this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true)
+    this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId, true)
   }
 
   selectIcon(type, color) {
@@ -118,13 +124,18 @@ class IndexExcerciseDryrun extends Component {
       audienceName = R.propOr('-', 'audience_name', dryrun_audience)
     }
     let dryrun_date = R.propOr('', 'dryrun_date', this.props.dryrun)
+    let dryrun_finished = R.propOr(false, 'dryrun_finished', this.props.dryrun)
 
     return (
       <div style={styles.container}>
         <div style={styles.title}>Dryrun</div>
+        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun}/>
         <div style={styles.audience}>{audienceName}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
+        <div style={styles.state}>{dryrun_finished ?
+          <Icon name={Constants.ICON_NAME_ACTION_DONE_ALL} color={Theme.palette.primary1Color}/> :
+          <CircularSpinner size={20} color={Theme.palette.primary1Color}/>}</div>
         <div className="clearfix"></div>
         <br />
         <LinearProgress mode={this.props.dryinjectsProcessed.length === 0 ? 'indeterminate' : 'determinate'} min={0}

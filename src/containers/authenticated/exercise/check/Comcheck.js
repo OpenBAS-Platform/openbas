@@ -13,6 +13,7 @@ import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/List
 import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
 import {dateFormat} from '../../../../utils/Time'
+import ComcheckPopover from './ComcheckPopover'
 
 i18nRegister({
   fr: {
@@ -82,7 +83,6 @@ const styles = {
   'subtitle': {
     float: 'left',
     fontSize: '12px',
-    marginTop: '5px',
     color: "#848484"
   },
   'empty': {
@@ -156,6 +156,7 @@ class Comcheck extends Component {
 
   circularFetch() {
     this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)
+    this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
   }
 
   reverseBy(field) {
@@ -214,6 +215,7 @@ class Comcheck extends Component {
     return <div>
       <div>
         <div style={styles.title}>Comcheck</div>
+        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck}/>
         <div style={styles.audience}>{this.props.audience.audience_name}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>{dateFormat(this.props.comcheck.comcheck_start_date)} &rarr; {dateFormat(this.props.comcheck.comcheck_end_date)}</div>

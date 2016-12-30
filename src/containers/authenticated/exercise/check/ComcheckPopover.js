@@ -10,7 +10,7 @@ import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemButton} from "../../../../components/menu/MenuItem"
 import {redirectToChecks} from '../../../../actions/Application'
-import {deleteDryrun} from '../../../../actions/Dryrun'
+import {deleteComcheck} from '../../../../actions/Comcheck'
 
 const style = {
   float: 'left',
@@ -19,11 +19,11 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Do you want to delete this dryrun?': 'Souhaitez-vous supprimer ce dryrun ?'
+    'Do you want to delete this comcheck?': 'Souhaitez-vous supprimer ce comcheck ?'
   }
 })
 
-class DryrunPopover extends Component {
+class ComcheckPopover extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -51,7 +51,7 @@ class DryrunPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteDryrun(this.props.exerciseId, this.props.dryrun.dryrun_id).then(() => this.props.redirectToChecks(this.props.exerciseId))
+    this.props.deleteComcheck(this.props.exerciseId, this.props.comcheck.comcheck_id).then(() => this.props.redirectToChecks(this.props.exerciseId))
     this.handleCloseDelete()
   }
 
@@ -76,18 +76,18 @@ class DryrunPopover extends Component {
                 open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          <T>Do you want to delete this dryrun?</T>
+          <T>Do you want to delete this comcheck?</T>
         </Dialog>
       </div>
     )
   }
 }
 
-DryrunPopover.propTypes = {
+ComcheckPopover.propTypes = {
   exerciseId: PropTypes.string,
-  deleteDryrun: PropTypes.func,
+  deleteComcheck: PropTypes.func,
   redirectToChecks: PropTypes.func,
-  dryrun: PropTypes.object
+  comcheck: PropTypes.object
 }
 
-export default connect(null, {deleteDryrun, redirectToChecks})(DryrunPopover)
+export default connect(null, {deleteComcheck, redirectToChecks})(ComcheckPopover)

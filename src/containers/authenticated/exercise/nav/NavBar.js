@@ -26,12 +26,14 @@ class NavBar extends Component {
   render() {
     return (
       <Drawer width={65} docked={true} open={true} zindex={50}>
-        <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)} iconElementLeft={this.props.loading?<CircularSpinner size={30}/>:undefined} />
+        <AppBar onLeftIconButtonTouchTap={this.handleToggle.bind(this)} iconElementLeft={this.props.loading ?
+          <CircularSpinner color="#FFFFFF" type={Constants.SPINNER_TYPE_NAV} size={30}/> : undefined}/>
         <List>
-          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id || this.props.pathname.includes('/private/exercise/' + this.props.id + '/world')}
-                            to={'/private/exercise/' + this.props.id}
-                            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
-                                            name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
+          <IconListItemLink
+            active={this.props.pathname === '/private/exercise/' + this.props.id || this.props.pathname.includes('/private/exercise/' + this.props.id + '/world')}
+            to={'/private/exercise/' + this.props.id}
+            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                            name={Constants.ICON_NAME_SOCIAL_PUBLIC}/>}/>
           <IconListItemLink active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/check')}
                             to={'/private/exercise/' + this.props.id + '/checks'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}

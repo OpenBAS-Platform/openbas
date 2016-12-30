@@ -157,6 +157,7 @@ class AudiencePopover extends Component {
         </Dialog>
         <Dialog title="Launch a comcheck" modal={false}
                 open={this.state.openComcheck}
+                autoScrollBodyContent={true}
                 onRequestClose={this.handleCloseComcheck.bind(this)}
                 actions={comcheckActions}>
           <ComcheckForm ref="comcheckForm"

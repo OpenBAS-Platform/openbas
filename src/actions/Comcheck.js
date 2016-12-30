@@ -1,5 +1,5 @@
 import * as schema from './Schema'
-import {getReferential, postReferential} from '../utils/Action'
+import {getReferential, postReferential, delReferential} from '../utils/Action'
 
 export const fetchComchecks = (exerciseId, noloading) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/comchecks'
@@ -14,6 +14,11 @@ export const fetchComcheck = (exerciseId, comcheckId, noloading) => (dispatch) =
 export const addComcheck = (exerciseId, data) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/comchecks'
   return postReferential(schema.comcheck, uri, data)(dispatch)
+}
+
+export const deleteComcheck = (exerciseId, comcheckId) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId
+  return delReferential(uri, 'comchecks', comcheckId)(dispatch)
 }
 
 export const fetchComcheckStatuses = (exerciseId, comcheckId, noloading) => (dispatch) => {

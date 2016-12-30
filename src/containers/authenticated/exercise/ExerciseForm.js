@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
+import R from 'ramda'
 import {FormField} from '../../../components/Field'
 import DateTimePicker from '../../../components/DateTimePicker'
 import {i18nRegister} from '../../../utils/Messages'
@@ -30,6 +31,16 @@ class ExerciseForm extends Component {
   }
 
   render() {
+    let exercise_start_date = R.pathOr(undefined, ['initialValues', 'exercise_start_date'], this.props)
+    let exercise_end_date = R.pathOr(undefined, ['initialValues', 'exercise_end_date'], this.props)
+
+    if (exercise_start_date !== undefined) {
+      exercise_start_date = new Date(exercise_start_date)
+    }
+    if (exercise_start_date !== undefined) {
+      exercise_end_date = new Date(exercise_end_date)
+    }
+
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="exercise_name" fullWidth={true} type="text" label="Name"/>
@@ -39,8 +50,10 @@ class ExerciseForm extends Component {
                    label="Start date" onClick={this.raiseStartPicker.bind(this)}/>
         <FormField ref="endDate" name="exercise_end_date" fullWidth={true} type="text"
                    label="End date" onClick={this.raiseEndPicker.bind(this)}/>
-        <DateTimePicker ref="startPicker" handleResult={this.replaceStartValue.bind(this)}/>
-        <DateTimePicker ref="endPicker" handleResult={this.replaceEndValue.bind(this)}/>
+        <DateTimePicker ref="startPicker" handleResult={this.replaceStartValue.bind(this)}
+                        defaultDate={exercise_start_date}/>
+        <DateTimePicker ref="endPicker" handleResult={this.replaceEndValue.bind(this)}
+                        defaultDate={exercise_end_date}/>
       </form>
     )
   }

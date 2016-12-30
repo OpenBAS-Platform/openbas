@@ -41,6 +41,14 @@ export const redirectToScenario = (exerciseId) => (dispatch) => {
   dispatch(push('/private/exercise/' + exerciseId + '/scenario'))
 }
 
+export const redirectToChecks = (exerciseId) => (dispatch) => {
+  dispatch(push('/private/exercise/' + exerciseId + '/checks'))
+}
+
 export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
   dispatch(push('/private/exercise/' + exerciseId + '/checks/comcheck/' + comcheckId))
+}
+
+export const redirectToDryrun = (exerciseId, dryrunId) => (dispatch) => {
+  dispatch(push('/private/exercise/' + exerciseId + '/checks/dryrun/' + dryrunId))
 }

@@ -16,6 +16,8 @@ import ActionSchedule from 'material-ui/svg-icons/action/schedule'
 import ActionEvent from 'material-ui/svg-icons/action/event'
 import ActionExitToApp from 'material-ui/svg-icons/action/exit-to-app'
 import ActionCheckCircle from 'material-ui/svg-icons/action/check-circle'
+import ActionDone from 'material-ui/svg-icons/action/done'
+import ActionDoneAll from 'material-ui/svg-icons/action/done-all'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
 import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
 import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
@@ -103,6 +105,10 @@ export const Icon = (props) => {
       return (<ActionAssignmentTurnedIn style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_CHECK_CIRCLE:
       return (<ActionCheckCircle style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_ACTION_DONE:
+      return (<ActionDone style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_ACTION_DONE_ALL:
+      return (<ActionDoneAll style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
       return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN:

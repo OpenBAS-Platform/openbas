@@ -108,26 +108,6 @@ class Index extends Component {
     this.props.fetchUsers()
     this.props.fetchOrganizations()
     this.props.fetchComchecks(this.props.exerciseId)
-    this.repeatTimeout()
-  }
-
-  componentWillUnmount() {
-    //noinspection Eslint
-    clearTimeout(this.repeat)
-  }
-
-  repeatTimeout() {
-    //noinspection Eslint
-    const context = this
-    //noinspection Eslint
-    this.repeat = setTimeout(function () {
-      context.circularFetch()
-      context.repeatTimeout(context);
-    }, 5000)
-  }
-
-  circularFetch() {
-    this.props.fetchComchecks(this.props.exerciseId, true)
   }
 
   handleSearchUsers(event, value) {

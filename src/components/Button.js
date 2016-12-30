@@ -86,7 +86,7 @@ export const LinkFlatButtonIntl = (props) => (
                  label={props.intl.formatMessage({id: props.label})}
                  style={buttonStyle[props.type]}
                  disabled={props.disabled}
-                 />
+  />
 )
 export const LinkFlatButton = injectIntl(LinkFlatButtonIntl)
 

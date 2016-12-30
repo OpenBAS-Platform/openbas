@@ -18,7 +18,7 @@ class DateTimePicker extends Component {
     super(props);
     this.state = {
       datetime: '',
-      finished: false
+      finished: false,
     }
   }
 
@@ -47,13 +47,16 @@ class DateTimePicker extends Component {
           mode="landscape"
           name="Date"
           ref="datePicker"
+          value={this.props.defaultDate}
           onChange={this.handleDateChange.bind(this)}
           floatingLabelText="Date"
           style={styles.global}/>
         <TimePicker
           name="Time"
           autoOk={true}
+          format="24hr"
           ref="timePicker"
+          value={this.props.defaultDate}
           onChange={this.handleTimeChange.bind(this)}
           floatingLabelText="Time"
           okLabel={<div style={{display: 'none'}}></div>}
@@ -65,6 +68,8 @@ class DateTimePicker extends Component {
 
 DateTimePicker.propTypes = {
   handleResult: PropTypes.func,
+  defaultDate: PropTypes.object,
+  defaultTime: PropTypes.object
 }
 
 export default DateTimePicker;

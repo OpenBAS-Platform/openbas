@@ -45,5 +45,5 @@ In the file package.json, replace the "proxy" by the URL of your API deployment.
 *Starting*:
 
 ```bash
-$ npm start
+$ yarn start
 ```

@@ -1,12 +1,12 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
+import R from 'ramda'
 import {FormField} from '../../../../../components/Field'
 import {SelectField} from '../../../../../components/SelectField'
 import DateTimePicker from '../../../../../components/DateTimePicker'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {T} from '../../../../../components/I18n'
-import R from 'ramda'
 
 i18nRegister({
   fr: {
@@ -44,12 +44,18 @@ class InjectForm extends Component {
   }
 
   render() {
+    let inject_date = R.pathOr(undefined, ['initialValues', 'inject_date'], this.props)
+
+    if (inject_date !== undefined) {
+      inject_date = new Date(inject_date)
+    }
+
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="inject_title" fullWidth={true} type="text" label="Title"/>
         <FormField ref="date" name="inject_date" fullWidth={true} type="text" label="Date and time"
                    onClick={this.raiseDatePicker.bind(this)}/>
-        <DateTimePicker ref="datePicker" handleResult={this.replaceDateValue.bind(this)}/>
+        <DateTimePicker ref="datePicker" handleResult={this.replaceDateValue.bind(this)} defaultDate={inject_date}/>
         <FormField name="inject_description" fullWidth={true} multiLine={true} rows={3} type="text" label="Description"/>
         <SelectField label="Type" name="inject_type" fullWidth={true} onSelectChange={this.props.onInjectTypeChange}>
           {R.values(this.props.types).map(data => {

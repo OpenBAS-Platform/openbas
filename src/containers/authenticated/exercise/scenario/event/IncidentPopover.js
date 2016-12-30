@@ -15,7 +15,7 @@ import {Chip} from '../../../../../components/Chip'
 import {List} from '../../../../../components/List'
 import {Avatar} from '../../../../../components/Avatar';
 import {MainSmallListItem} from '../../../../../components/list/ListItem'
-import {updateIncident, deleteIncident} from '../../../../../actions/Incident'
+import {updateIncident, deleteIncident, selectIncident} from '../../../../../actions/Incident'
 import {fetchSubobjectives} from '../../../../../actions/Subobjective'
 import IncidentForm from './IncidentForm'
 
@@ -125,7 +125,9 @@ class IncidentPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id)
+    this.props.deleteIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id).then(() => {
+      this.props.selectIncident(this.props.exerciseId, this.props.eventId, undefined)
+    })
     this.handleCloseDelete()
   }
 
@@ -239,6 +241,7 @@ IncidentPopover.propTypes = {
   eventId: PropTypes.string,
   deleteIncident: PropTypes.func,
   updateIncident: PropTypes.func,
+  selectIncident: PropTypes.func,
   fetchSubobjectives: PropTypes.func,
   incident: PropTypes.object,
   incident_types: PropTypes.object,
@@ -253,4 +256,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchSubobjectives, updateIncident, deleteIncident})(IncidentPopover)
+export default connect(select, {fetchSubobjectives, updateIncident, deleteIncident, selectIncident})(IncidentPopover)
