@@ -78,6 +78,11 @@ class Exercise
      */
     protected $exercise_message_header;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $exercise_canceled = false;
+
     protected $exercise_status = 'SCHEDULED';
 
     public function __construct()
@@ -228,5 +233,42 @@ class Exercise
     {
         $this->exercise_message_header = $header;
         return $this;
+    }
+
+    public function getExerciceCanceled()
+    {
+        return $this->exercise_canceled;
+    }
+
+    public function setExerciseCanceled($canceled)
+    {
+        $this->exercise_canceled = $canceled;
+        return $this;
+    }
+
+    public function computeExerciseStatus($injects) {
+        if( $this->exercise_canceled == true ) {
+            $status = 'CANCELED';
+        } else {
+            $all_injects_in_future = true;
+            $all_injects_in_past = true;
+            $now = new \DateTime();
+            foreach ($injects as $inject) {
+                if ($inject->getInjectDate() < $now) {
+                    $all_injects_in_future = false;
+                } else {
+                    $all_injects_in_past = false;
+                }
+            }
+            if( !$all_injects_in_future && !$all_injects_in_past ) {
+                $status = 'RUNNING';
+            } else if ( $all_injects_in_future ) {
+                $status = 'SCHEDULED';
+            } else {
+                $status = 'FINISHED';
+            }
+        }
+
+        $this->exercise_status = $status;
     }
 }

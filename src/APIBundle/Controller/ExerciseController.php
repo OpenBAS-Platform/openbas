@@ -40,6 +40,19 @@ class ExerciseController extends Controller
 
         foreach( $exercises as &$exercise) {
             $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+            /* @var $events Event[] */
+
+            $injects = array();
+            foreach ($events as $event) {
+                $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
+                /* @var $incidents Incident[] */
+
+                foreach ($incidents as $incident) {
+                    $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+                }
+            }
+            $exercise->computeExerciseStatus($injects);
         }
 
         return $exercises;
@@ -66,6 +79,21 @@ class ExerciseController extends Controller
         $this->denyAccessUnlessGranted('select', $exercise);
 
         $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+
+        $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+        /* @var $events Event[] */
+
+        $injects = array();
+        foreach ($events as $event) {
+            $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
+            /* @var $incidents Incident[] */
+
+            foreach ($incidents as $incident) {
+                $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+            }
+        }
+        $exercise->computeExerciseStatus($injects);
+
         return $exercise;
     }
 
@@ -92,9 +120,8 @@ class ExerciseController extends Controller
 
         if ($form->isValid()) {
             $file = $em->getRepository('APIBundle:File')->findOneBy(['file_name' => 'Exercise default']);
-            $exercise->setExerciseStatus('SCHEDULED');
+            $exercise->setExerciseCanceled(false);
             $exercise->setExerciseOwner($user);
-            $exercise->setExerciseStatus($status);
             $exercise->setExerciseImage($file);
             $em->persist($exercise);
             $em->flush();
@@ -155,6 +182,19 @@ class ExerciseController extends Controller
             $em->clear();
             $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
             $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+            /* @var $events Event[] */
+
+            $injects = array();
+            foreach ($events as $event) {
+                $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
+                /* @var $incidents Incident[] */
+
+                foreach ($incidents as $incident) {
+                    $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+                }
+            }
+            $exercise->computeExerciseStatus($injects);
             return $exercise;
         } else {
             return $form;
