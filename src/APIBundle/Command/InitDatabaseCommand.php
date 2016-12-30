@@ -270,6 +270,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
     private function createExercise($name, $subtitle, $description, $startDate, $endDate, $owner, $image) {
         $exercise = new Exercise();
+        $exercise->setExerciseCanceled(false);
         $exercise->setExerciseName($name);
         $exercise->setExerciseSubtitle($subtitle);
         $exercise->setExerciseDescription($description);

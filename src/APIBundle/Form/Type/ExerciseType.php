@@ -24,6 +24,7 @@ class ExerciseType extends AbstractType
             'input' => 'datetime'
         ));
         $builder->add('exercise_image');
+        $builder->add('exercise_canceled');
     }
 
     public function configureOptions(OptionsResolver $resolver)
