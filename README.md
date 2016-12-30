@@ -24,7 +24,7 @@ The frontend is the user interface of the product, built with the [ReactJS frame
 
 #### Worker [[openex-worker](https://github.com/LuatixHQ/openex-worker)]
 
-The worker is the executor that send incidents and injects, built with the [Camel framework](http://camel.apache.org).
+The worker is the executor that send incidents and injects, built with the [Karaf framework](http://karaf.apache.org).
 
 ## Development
 
