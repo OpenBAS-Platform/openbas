@@ -28,6 +28,10 @@
                 <doCatch>
                     <exception>java.lang.Exception</exception>
                     <log loggingLevel="ERROR" message="Error calling ${header.router-header} ${body}"/>
+                    <setBody>
+                        <simple>Technical error calling ${header.router-header}</simple>
+                    </setBody>
+                    <bean ref="openexCallback" method="error"/>
                 </doCatch>
                 <doFinally>
                     <to uri="direct:callback"/>
