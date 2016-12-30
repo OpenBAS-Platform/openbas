@@ -25,35 +25,47 @@
         <setHeader headerName="CamelFreemarkerTemplate">
             <simple>${body[body]}</simple>
         </setHeader>
-        <!-- Send a mail for each user (openexStrategy is mandatory) -->
-        <split streaming="true" parallelProcessing="true" strategyRef="openexStrategy">
-            <simple>${body[users]}</simple>
-            <setHeader headerName="To">
-                <simple>${body[user_email]}</simple>
-            </setHeader>
-            <setHeader headerName="PgpKey">
-                <simple>${body[user_pgp_key]}</simple>
-            </setHeader>
-            <!-- Put the current user as the marker model -->
-            <setHeader headerName="CamelFreemarkerDataModel">
-                <simple>${body}</simple>
-            </setHeader>
-            <to uri="freemarker:from_header"/>
-            <!-- Encrypt the body and attachments with PGP if needed -->
-            <choice>
-                <when>
-                    <simple>${header.encrypted} == true</simple>
-                    <bean ref="pgp-encryption"/>
-                </when>
-            </choice>
-            <!-- Add attachments -->
-            <bean ref="attachments-handler"/>
-            <!-- Send the email -->
-            <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
-            <!-- Output message for callback -->
-            <setBody>
-                <simple>${header.To} success</simple>
-            </setBody>
-        </split>
+        <choice>
+            <when>
+                <simple>${body[users].size} > 0</simple>
+                <!-- Send a mail for each user (openexStrategy is mandatory) -->
+                <split streaming="true" parallelProcessing="true" strategyRef="openexStrategy">
+                    <simple>${body[users]}</simple>
+                    <setHeader headerName="To">
+                        <simple>${body[user_email]}</simple>
+                    </setHeader>
+                    <setHeader headerName="PgpKey">
+                        <simple>${body[user_pgp_key]}</simple>
+                    </setHeader>
+                    <!-- Put the current user as the marker model -->
+                    <setHeader headerName="CamelFreemarkerDataModel">
+                        <simple>${body}</simple>
+                    </setHeader>
+                    <to uri="freemarker:from_header"/>
+                    <!-- Encrypt the body and attachments with PGP if needed -->
+                    <choice>
+                        <when>
+                            <simple>${header.encrypted} == true</simple>
+                            <bean ref="pgp-encryption"/>
+                        </when>
+                    </choice>
+                    <!-- Add attachments -->
+                    <bean ref="attachments-handler"/>
+                    <!-- Send the email -->
+                    <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
+                    <!-- Output message for callback -->
+                    <setBody>
+                        <simple>${header.To} success</simple>
+                    </setBody>
+                </split>
+            </when>
+            <otherwise>
+                <!-- If no users, forge a success callback message -->
+                <setBody>
+                    <constant>Empty audience</constant>
+                </setBody>
+                <bean ref="openexCallback" method="success"/>
+            </otherwise>
+        </choice>
     </route>
 </routes>

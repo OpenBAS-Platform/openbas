@@ -1,6 +1,7 @@
 package io.openex.management;
 
 import io.openex.management.helper.OpenexAggregationStrategy;
+import io.openex.management.helper.OpenexCallbackBuilder;
 import io.openex.management.registry.IWorkerListener;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.ThreadPoolRejectedPolicy;
@@ -137,6 +138,7 @@ public class OpenexContext implements IOpenexContext {
 		SimpleRegistry registry = new SimpleRegistry();
 		registry.put("openexRouter", new OpenexRouter());
 		registry.put("openexStrategy", new OpenexAggregationStrategy());
+		registry.put("openexCallback", new OpenexCallbackBuilder());
 		context.setRegistry(registry);
 		File[] propertiesFiles = new File(System.getProperty("karaf.home") + "/openex/").listFiles();
 		assert propertiesFiles != null;
