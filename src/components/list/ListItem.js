@@ -35,6 +35,15 @@ const styles = {
     marginLeft: '30px',
     borderBottom: '1px solid #E0E0E0',
     backgroundColor: '#F0F0F0'
+  },
+  'tertiaryitem': {
+    marginLeft: '60px',
+    borderBottom: '1px solid #E0E0E0'
+  },
+  'tertiaryitemdisabled': {
+    marginLeft: '60px',
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0'
   }
 }
 
@@ -209,13 +218,41 @@ export const SecondaryListItem = (props) => (
     onTouchTap={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
-    initiallyOpen={true}
+    initiallyOpen={false}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
     innerDivStyle={{padding: '20px 20px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>
 )
 
 SecondaryListItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
+}
+
+export const TertiaryListItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
+    rightIcon={props.rightIcon}
+    onTouchTap={props.onClick}
+    disabled={props.disabled}
+    nestedItems={props.nestedItems}
+    initiallyOpen={false}
+    style={props.disabled ? styles.tertiaryitemdisabled : styles.tertiaryitem}
+    innerDivStyle={{padding: '20px 20px 20px 60px'}}
+    rightIconButton={props.rightIconButton}/>
+)
+
+TertiaryListItem.propTypes = {
   primaryText: PropTypes.node,
   secondaryText: PropTypes.node,
   leftAvatar: PropTypes.element,

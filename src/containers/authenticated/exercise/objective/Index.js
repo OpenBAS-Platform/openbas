@@ -13,6 +13,13 @@ import ObjectivePopover from './ObjectivePopover'
 import SubobjectivePopover from './SubobjectivePopover'
 import CreateObjective from './CreateObjective'
 
+i18nRegister({
+  fr: {
+    'Objectives': 'Objectifs',
+    'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.'
+  }
+})
+
 const styles = {
   container: {},
   'empty': {
@@ -32,13 +39,6 @@ const styles = {
     textTransform: 'uppercase'
   }
 }
-
-i18nRegister({
-  fr: {
-    'Objectives': 'Objectifs',
-    'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.'
-  }
-})
 
 class IndexObjective extends Component {
   componentDidMount() {

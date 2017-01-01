@@ -216,9 +216,9 @@ class Comcheck extends Component {
       <div>
         <div style={styles.title}>Comcheck</div>
         <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck}/>
-        <div style={styles.audience}>{this.props.audience.audience_name}</div>
+        <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>
         <div className="clearfix"></div>
-        <div style={styles.subtitle}>{dateFormat(this.props.comcheck.comcheck_start_date)} &rarr; {dateFormat(this.props.comcheck.comcheck_end_date)}</div>
+        <div style={styles.subtitle}>{dateFormat(R.propOr('0', 'comcheck_start_date', this.props.comcheck))} &rarr; {dateFormat(R.propOr('0', 'comcheck_end_date', this.props.comcheck))}</div>
         <div className="clearfix"></div>
         <List>
           <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>} primaryText={

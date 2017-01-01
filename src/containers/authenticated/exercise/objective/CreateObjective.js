@@ -57,7 +57,6 @@ class CreateObjective extends Component {
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose.bind(this)}
-          autoScrollBodyContent={true}
           actions={actions}
         >
           <ObjectiveForm ref="objectiveForm" onSubmit={this.onSubmit.bind(this)} onSubmitSuccess={this.handleClose.bind(this)}/>

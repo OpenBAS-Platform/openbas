@@ -2,6 +2,8 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
+import {dateFormat} from '../../../../utils/Time'
+import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import moment from 'moment';
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -17,6 +19,10 @@ import {fetchAllInjects} from '../../../../actions/Inject'
 i18nRegister({
   fr: {
     'Execution': 'Exécution',
+    'Pending injects': 'Injects en attente',
+    'Processed injects': 'Injects traités',
+    'You do not have any pending injects in this exercise.': 'Vous n\'avez aucun inject en attente dans cet exercice.',
+    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucun inject traité dans cet exercice.'
   }
 })
 
@@ -43,10 +49,18 @@ const styles = {
     fontSize: '13px',
     textTransform: 'uppercase'
   },
-  'priority': {
-    fontSize: '18px',
-    fontWeight: 500,
-    marginRight: '10px'
+  'status': {
+    float: 'right',
+    fontSize: '15px',
+    fontWeight: '600'
+  },
+  'subtitle': {
+    float: 'left',
+    fontSize: '12px',
+    color: "#848484"
+  },
+  'state': {
+    float: 'right',
   },
   'empty': {
     marginTop: 40,
@@ -100,27 +114,41 @@ class IndexExecution extends Component {
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
     }
   }
+
+  selectStatus(status) {
+    switch(status) {
+      case 'SCHEDULED':
+        return <Icon name={Constants.ICON_NAME_ACTION_SCHEDULE} color={Theme.palette.primary1Color}/>
+      case 'RUNNING':
+        return <CircularSpinner size={20} color={Theme.palette.primary1Color}/>
+      case 'FINISHED':
+        return <Icon name={Constants.ICON_NAME_ACTION_DONE_ALL} color={Theme.palette.primary1Color}/>
+      case 'CANCELED':
+        return <Icon name={Constants.ICON_NAME_NAVIGATION_CANCEL} color={Theme.palette.primary1Color}/>
+    }
+  }
+
   render() {
+    let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)
+
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
-        <div style={styles.audience}>{audienceName}</div>
+        <div style={styles.status}><T>{exerciseStatus}</T></div>
         <div className="clearfix"></div>
-        <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
-        <div style={styles.state}>{dryrun_finished ?
-          <Icon name={Constants.ICON_NAME_ACTION_DONE_ALL} color={Theme.palette.primary1Color}/> :
-          <CircularSpinner size={20} color={Theme.palette.primary1Color}/>}</div>
+        <div style={styles.subtitle}>{dateFormat(R.propOr('0', 'exercise_start_date', this.props.exercise))} &rarr; {dateFormat(R.propOr('0', 'exercise_end_date', this.props.exercise))}</div>
+        <div style={styles.state}>{this.selectStatus(exerciseStatus)}</div>
         <div className="clearfix"></div>
         <br />
-        <LinearProgress mode={this.props.dryinjectsProcessed.length === 0 ? 'indeterminate' : 'determinate'} min={0}
-                        max={this.props.dryinjectsPending.length + this.props.dryinjectsProcessed.length}
-                        value={this.props.dryinjectsProcessed.length}/>
+        <LinearProgress mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'} min={0}
+                        max={this.props.injectsPending.length + this.props.injectsProcessed.length}
+                        value={this.props.injectsProcessed.length}/>
         <br /><br />
         <div style={styles.columnLeft}>
-          <div style={styles.title}>Pending injects</div>
+          <div style={styles.title}><T>Pending injects</T></div>
           <div className="clearfix"></div>
           {this.props.injectsPending.length === 0 ?
-            <div style={styles.empty}>You do not have any pending injects in this exercise.</div> : ""}
+            <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
           <List>
             {this.props.injectsPending.map(inject => {
               return (
@@ -140,10 +168,10 @@ class IndexExecution extends Component {
           </List>
         </div>
         <div style={styles.columnRight}>
-          <div style={styles.title}>Processed injects</div>
+          <div style={styles.title}><T>Processed injects</T></div>
           <div className="clearfix"></div>
           {this.props.injectsProcessed.length === 0 ?
-            <div style={styles.empty}>You do not have any processed injects in this exercise.</div> : ""}
+            <div style={styles.empty}><T>You do not have any processed injects in this exercise.</T></div> : ""}
           <List>
             {this.props.injectsProcessed.map(inject => {
               let color = '#4CAF50'
@@ -175,6 +203,7 @@ class IndexExecution extends Component {
 
 IndexExecution.propTypes = {
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   injectsPending: PropTypes.array,
   injectsProcessed: PropTypes.array,
   fetchAllInjects: PropTypes.func,
@@ -200,11 +229,13 @@ const filterInjectsProcessed = (injects, exerciseId) => {
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
+  let exercise = R.prop(exerciseId, state.referential.entities.exercises)
   let injectsPending = filterInjectsPending(state.referential.entities.injects, exerciseId)
   let injectsProcessed = filterInjectsProcessed(state.referential.entities.injects, exerciseId)
 
   return {
     exerciseId,
+    exercise,
     injectsPending,
     injectsProcessed
   }

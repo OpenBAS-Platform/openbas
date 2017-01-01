@@ -144,7 +144,6 @@ class SubobjectivePopover extends Component {
           title="Update the subobjective"
           modal={false}
           open={this.state.openEdit}
-          autoScrollBodyContent={true}
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >

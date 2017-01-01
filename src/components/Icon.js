@@ -21,6 +21,7 @@ import ActionDoneAll from 'material-ui/svg-icons/action/done-all'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
 import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
 import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
+import NavigationCancel from 'material-ui/svg-icons/navigation/cancel'
 import ActionAssignmentTurnedIn from 'material-ui/svg-icons/action/assignment-turned-in'
 import FileFolder from 'material-ui/svg-icons/file/folder'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
@@ -117,6 +118,8 @@ export const Icon = (props) => {
       return (<NavigationArrowDropDown style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP:
       return (<NavigationArrowDropUp style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NAVIGATION_CANCEL:
+      return (<NavigationCancel style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_FILE_FOLDER:
       return (<FileFolder style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_MAPS_LAYERS:
