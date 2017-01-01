@@ -33,6 +33,8 @@ import ImageCenterFocusStrong from 'material-ui/svg-icons/image/center-focus-str
 import ImageCenterFocusWeak from 'material-ui/svg-icons/image/center-focus-weak'
 import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import AVSlowMotionVideo from 'material-ui/svg-icons/av/slow-motion-video'
+import AVPlayCircleOutline from 'material-ui/svg-icons/av/play-circle-outline'
+import DeviceGraphicEq from 'material-ui/svg-icons/device/graphic-eq'
 
 const iconStyle = {
   [ Constants.ICON_TYPE_NAVBAR ]: {
@@ -137,6 +139,10 @@ export const Icon = (props) => {
       return (<AVPlayArrow style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_AV_SLOW_MOTION_VIDEO:
       return (<AVSlowMotionVideo style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_AV_PLAY_CIRCLE_OUTLINE:
+      return (<AVPlayCircleOutline style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_DEVICE_GRAPHIC_EQ:
+      return (<DeviceGraphicEq style={mergeStyle} color={props.color} />)
     default:
       return (<HardwareComputer style={mergeStyle} color={props.color} />)
   }

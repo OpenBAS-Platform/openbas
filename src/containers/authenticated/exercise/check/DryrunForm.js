@@ -35,7 +35,7 @@ class DryrunForm extends Component {
             return (<MenuItemLink key={audience.audience_id} value={audience.audience_id} label={<T>{audience.audience_name}</T>}/>)
           })}
         </SelectField>
-        <SelectField label="Speed" name="dryrun_speed" fullWidth={true}>
+        <SelectField label={<T>Speed</T>} name="dryrun_speed" fullWidth={true}>
           <MenuItemLink key="24x" value="24" label="24x (1 day = 1 hour)"/>
           <MenuItemLink key="48x" value="48" label="48x (1 day = 30 minutes)"/>
           <MenuItemLink key="72x" value="72" label="72x (1 day = 15 minutes)"/>

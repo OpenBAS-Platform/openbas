@@ -38,6 +38,7 @@ import IndexExerciseObjectives from './containers/authenticated/exercise/objecti
 import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
+import IndexExerciseExecution from './containers/authenticated/exercise/execution/Index'
 import IndexExerciseChecks from './containers/authenticated/exercise/check/Index'
 import IndexExcerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
@@ -211,6 +212,7 @@ class App extends Component {
                 <Route path='exercise/:exerciseId' component={RootExercise}>
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
+                  <Route path='execution' component={IndexExerciseExecution}/>
                   <Route path='checks' component={IndexExerciseChecks}/>
                   <Route path='checks/dryrun/:dryrunId' component={IndexExcerciseDryrun}/>
                   <Route path='checks/comcheck/:comcheckId' component={IndexExerciseComcheck}/>
