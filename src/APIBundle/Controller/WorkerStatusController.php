@@ -2,12 +2,11 @@
 
 namespace APIBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class WorkerStatusController extends Controller
 {
@@ -20,8 +19,8 @@ class WorkerStatusController extends Controller
     public function getWorkerStatusAction(Request $request)
     {
         $url = $this->getParameter('worker_url') . '/cxf/heartbeat';
-        $status = json_decode(file_get_contents($url), true);
-        $output = json_encode($status);
-        return new Response($output);
+        /** @var \Httpful\Response $response */
+        $response = \Httpful\Request::get($url)->send();
+        return new Response(json_encode($response->body), $response->code, $response->headers->toArray());
     }
 }
