@@ -15,6 +15,7 @@ import enLocaleData from 'react-intl/locale-data/en'
 import frLocaleData from 'react-intl/locale-data/fr'
 import {locale} from './utils/BrowserLanguage'
 import {i18n, debug} from './utils/Messages'
+import {entitiesInitializer} from './reducers/Referential'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import * as Constants from './constants/ActionTypes'
 import R from 'ramda'
@@ -51,36 +52,9 @@ roundMoment()
 
 //Default application state
 const initialState = {
-  app: Immutable({
-    logged: JSON.parse(localStorage.getItem('logged'))
-  }),
-  screen: Immutable({
-    navbar_left_open: false,
-    navbar_right_open: true
-  }),
-  referential: Immutable({
-    entities: Immutable({
-      files: Immutable({}),
-      users: Immutable({}),
-      groups: Immutable({}),
-      grants: Immutable({}),
-      organizations: Immutable({}),
-      tokens: Immutable({}),
-      exercises: Immutable({}),
-      objectives: Immutable({}),
-      subobjectives: Immutable({}),
-      comchecks: Immutable({}),
-      comchecks_statuses: Immutable({}),
-      dryruns: Immutable({}),
-      dryinjects: Immutable({}),
-      audiences: Immutable({}),
-      events:Immutable({}),
-      incidents: Immutable({}),
-      injects: Immutable({}),
-      inject_types: Immutable({}),
-      inject_statuses: Immutable({})
-    })
-  })
+  app: Immutable({logged: JSON.parse(localStorage.getItem('logged'))}),
+  screen: Immutable({navbar_left_open: false, navbar_right_open: true}),
+  referential: entitiesInitializer
 }
 
 //Console patch in dev temporary disable react intl failure
