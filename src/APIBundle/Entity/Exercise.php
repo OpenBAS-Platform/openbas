@@ -235,7 +235,7 @@ class Exercise
         return $this;
     }
 
-    public function getExerciceCanceled()
+    public function getExerciseCanceled()
     {
         return $this->exercise_canceled;
     }
