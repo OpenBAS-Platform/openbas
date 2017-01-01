@@ -78,7 +78,7 @@ const styles = {
   }
 }
 
-class IndexExcerciseDryrun extends Component {
+class IndexExerciseDryrun extends Component {
   componentDidMount() {
     this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
     this.props.fetchAudiences(this.props.exerciseId)
@@ -199,7 +199,7 @@ class IndexExcerciseDryrun extends Component {
   }
 }
 
-IndexExcerciseDryrun.propTypes = {
+IndexExerciseDryrun.propTypes = {
   exerciseId: PropTypes.string,
   dryrunId: PropTypes.string,
   audiences: PropTypes.array,
@@ -256,4 +256,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {fetchAudiences, fetchDryrun, fetchDryinjects})(IndexExcerciseDryrun)
+export default connect(select, {fetchAudiences, fetchDryrun, fetchDryinjects})(IndexExerciseDryrun)

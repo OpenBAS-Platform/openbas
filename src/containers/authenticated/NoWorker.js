@@ -1,10 +1,12 @@
 import React, {Component, PropTypes} from 'react'
+import Rx from 'rx'
 import {connect} from 'react-redux'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
-import {redirectToHome} from '../../actions/Application'
 import {T} from '../../components/I18n'
 import {i18nRegister} from '../../utils/Messages'
+import {fetchWorkerStatus} from '../../actions/Application'
+import {ONE_MINUTE} from '../../utils/Time'
 
 i18nRegister({
   fr: {
@@ -34,20 +36,19 @@ const styles = {
 
 class NoWorker extends Component {
 
-  redirectToHome() {
-    this.props.redirectToHome()
+  componentDidMount() {
+    this.subscription = Rx.Observable.interval(ONE_MINUTE).do(() => this.props.fetchWorkerStatus()).subscribe();
+  }
+
+  componentWillUnmount() {
+    this.subscription.dispose();
   }
 
   render() {
     return (
       <div>
-        <AppBar
-          title="OpenEx"
-          type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
-          onTitleTouchTap={this.redirectToHome.bind(this)}
-          onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
-          iconElementLeft={<img src="/images/logo_white.png" alt="logo" style={styles.logo}/>}
-        />
+        <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
+          iconElementLeft={<img src="/images/logo_white.png" alt="logo" style={styles.logo}/>}/>
         <div style={styles.container}>
           <div style={styles.noworker}>
             <T>No worker available on this platform.</T>
@@ -59,7 +60,7 @@ class NoWorker extends Component {
 }
 
 NoWorker.propTypes = {
-  redirectToHome: PropTypes.func
+  fetchWorkerStatus: PropTypes.func
 }
 
-export default connect(null, {redirectToHome})(NoWorker);
+export default connect(null, {fetchWorkerStatus})(NoWorker);

@@ -18,6 +18,10 @@ const app = (state = Immutable({}), action) => {
       return state.set('logged', null);
     }
 
+    case Constants.DATA_FETCH_WORKER_STATUS: {
+      return state.set('worker', action.payload);
+    }
+
     /* TODO IMPLEMENT
     case Constants.USER_LANG_CHANGE: {
       logged = R.assoc('lang', action.payload.lang, state.logged)

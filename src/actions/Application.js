@@ -1,6 +1,7 @@
 import * as Constants from '../constants/ActionTypes'
 import * as schema from './Schema'
 import {push} from 'react-router-redux'
+import {api} from '../App'
 import {postReferential, getReferential, delReferential} from '../utils/Action'
 
 export const askToken = (username, password) => (dispatch) => {
@@ -12,6 +13,14 @@ export const askToken = (username, password) => (dispatch) => {
 
 export const fetchToken = () => (dispatch, getState) => {
   return getReferential(schema.token, '/api/tokens/' + getState().app.logged.token)(dispatch)
+}
+
+export const fetchWorkerStatus = () => (dispatch) => {
+  return api().get('/api/worker_status').then(function (response) {
+    dispatch({type: Constants.DATA_FETCH_WORKER_STATUS, payload: response.data})
+  }).catch(function () {
+    dispatch({type: Constants.DATA_FETCH_WORKER_STATUS, payload: {status: 'ERROR'}});
+  })
 }
 
 export const logout = () => (dispatch, getState) => {

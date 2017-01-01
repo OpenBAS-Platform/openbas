@@ -28,6 +28,7 @@
     "redux-logger": "^2.7.4",
     "redux-thunk": "^2.1.0",
     "reselect": "^2.5.4",
+    "rx": "^4.1.0",
     "seamless-immutable": "^6.3.0"
   },
   "scripts": {

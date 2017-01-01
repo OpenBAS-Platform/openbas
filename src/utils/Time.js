@@ -2,6 +2,10 @@ import moment from 'moment-timezone'
 
 const openexDateFormat = 'YYYY-MM-DD HH:mm'
 
+export const ONE_MINUTE = 60 * 1000
+
+export const FIVE_SECONDS = 5000
+
 export const dateFormat = (data) => {
   return moment(data).format(openexDateFormat)
 }

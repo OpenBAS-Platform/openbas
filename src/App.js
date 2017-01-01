@@ -41,7 +41,7 @@ import IndexExerciseScenario from './containers/authenticated/exercise/scenario/
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
 import IndexExerciseExecution from './containers/authenticated/exercise/execution/Index'
 import IndexExerciseChecks from './containers/authenticated/exercise/check/Index'
-import IndexExcerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
+import IndexExerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
 
 import Immutable from 'seamless-immutable'
@@ -53,7 +53,7 @@ roundMoment()
 
 //Default application state
 const initialState = {
-  app: Immutable({logged: JSON.parse(localStorage.getItem('logged'))}),
+  app: Immutable({logged: JSON.parse(localStorage.getItem('logged')), worker: {status: 'RUNNING'}}),
   screen: Immutable({navbar_left_open: false, navbar_right_open: true}),
   referential: entitiesInitializer
 }
@@ -128,8 +128,22 @@ const UserIsAuthenticated = UserAuthWrapper({
   redirectAction: routerActions.replace,
   failureRedirectPath: '/login',
   wrapperDisplayName: 'UserIsAuthenticated',
-  //predicate: token => token != null && //TODO test token validity
 })
+
+const PlatformWorkerAccessible = UserAuthWrapper({
+  authSelector: state => state.app.worker,
+  predicate: worker => process.env.NODE_ENV === 'development' || worker.status === "RUNNING",
+  failureRedirectPath: '/unreachable',
+  allowRedirectBack: false
+})
+
+const PlatformWorkerNotAccessible = UserAuthWrapper({
+  authSelector: state => state.app.worker,
+  predicate: worker => worker.status !== "RUNNING",
+  failureRedirectPath: '/private',
+  allowRedirectBack: false
+})
+
 const UserIsNotAuthenticated = UserAuthWrapper({
   authSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,
@@ -167,14 +181,14 @@ class App extends Component {
         <MuiThemeProvider muiTheme={getMuiTheme(theme)}>
           <Provider store={store}>
             <Router history={history}>
-              <Route path='/' component={UserIsNotAuthenticated(RootAnonymous)}>
-                <IndexRoute component={Login}/>
+              <Route path='/' component={RootAnonymous}>
+                <IndexRoute component={UserIsNotAuthenticated(Login)}/>
                 <Route path='/login' component={UserIsNotAuthenticated(Login)}/>
                 <Route path='/comcheck/:statusId' component={IndexComcheck}/>
+                <Route path='/unreachable' component={PlatformWorkerNotAccessible(NoWorker)}/>
               </Route>
-              <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
+              <Route path='/private' component={PlatformWorkerAccessible(UserIsAuthenticated(RootAuthenticated))}>
                 <IndexRoute component={IndexAuthenticated}/>
-                <Route path='noworker' component={NoWorker}/>
                 <Route path='admin' component={RootAdmin}>
                   <Route path='index' component={IndexAdmin}/>
                   <Route path='users' component={IndexAdminUsers}/>
@@ -188,7 +202,7 @@ class App extends Component {
                   <Route path='world' component={IndexExercise}/>
                   <Route path='execution' component={IndexExerciseExecution}/>
                   <Route path='checks' component={IndexExerciseChecks}/>
-                  <Route path='checks/dryrun/:dryrunId' component={IndexExcerciseDryrun}/>
+                  <Route path='checks/dryrun/:dryrunId' component={IndexExerciseDryrun}/>
                   <Route path='checks/comcheck/:comcheckId' component={IndexExerciseComcheck}/>
                   <Route path='objectives' component={IndexExerciseObjectives}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
