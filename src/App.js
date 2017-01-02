@@ -88,7 +88,7 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 //Axios API
 export const api = (schema) => {
   var token = R.path(['logged', 'auth'], store.getState().app)
-  const instance = axios.create({headers: {'X-Auth-Token': token}})
+  const instance = axios.create({headers: {'Authorization': token}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     var dataNormalize = Immutable(schema ? normalize(response.data, schema) : response.data)
