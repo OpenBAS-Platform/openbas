@@ -4,6 +4,7 @@ import {dateFormat} from '../../../../../utils/Time'
 import {connect} from 'react-redux'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
+import Theme from '../../../../../components/Theme'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {List} from '../../../../../components/List'
 import {MainListItem, HeaderItem} from '../../../../../components/list/ListItem';
@@ -134,14 +135,22 @@ class Index extends Component {
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
-  selectIcon(type) {
+  selectIcon(type, color) {
     switch (type) {
       case 'email':
-        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST}/>
+        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       case 'sms':
-        return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST}/>
+        return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       default:
-        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST}/>
+        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+    }
+  }
+
+  switchColor(enabled) {
+    if (enabled) {
+      return Theme.palette.textColor
+    } else {
+      return Theme.palette.disabledColor
     }
   }
 
@@ -170,28 +179,29 @@ class Index extends Component {
                      incidents={incidents} incident_types={this.props.incident_types}/>
         <div>
           <div style={styles.title}>{incident.incident_title}</div>
-          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident} incidentSubobjectivesIds={incident.incident_subobjectives.map(i => i.subobjective_id)}
+          <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}
+                           incidentSubobjectivesIds={incident.incident_subobjectives.map(i => i.subobjective_id)}
                            incident_types={this.props.incident_types}/>
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
                          onChange={this.handleSearchInjects.bind(this)}
-                         styletype={Constants.FIELD_TYPE_RIGHT} />
+                         styletype={Constants.FIELD_TYPE_RIGHT}/>
           </div>
           <div className="clearfix"></div>
 
           <List>
             {incident.incident_injects.length === 0 ? (
                 <div style={styles.empty}><T>This incident is empty.</T></div>
-            ) : (
-              <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
-                          rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
-                {this.SortHeader('inject_title', 'Title')}
-                {this.SortHeader('inject_date', 'Date')}
-                {this.SortHeader('inject_user', 'Author')}
-                <div className="clearfix"></div>
-              </div>}
-              />
-            )}
+              ) : (
+                <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
+                            rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
+                  {this.SortHeader('inject_title', 'Title')}
+                  {this.SortHeader('inject_date', 'Date')}
+                  {this.SortHeader('inject_user', 'Author')}
+                  <div className="clearfix"></div>
+                </div>}
+                />
+              )}
 
             {injects.map(inject => {
               //Setup variables
@@ -201,10 +211,11 @@ class Index extends Component {
               let inject_date = R.prop('inject_date', inject)
               let inject_type = R.propOr('-', 'inject_type', inject)
               let inject_audiences = R.propOr([], 'inject_audiences', inject)
+              let inject_enabled = R.propOr(true, 'inject_enabled', inject)
               //Return the dom
               return <MainListItem
                 key={injectId}
-                leftIcon={this.selectIcon(inject_type)}
+                leftIcon={this.selectIcon(inject_type, this.switchColor(inject_enabled))}
                 rightIconButton={
                   <InjectPopover
                     exerciseId={exerciseId}
@@ -218,9 +229,12 @@ class Index extends Component {
                 }
                 primaryText={
                   <div>
-                    <div style={styles.inject_title}>{inject_title}</div>
-                    <div style={styles.inject_date}>{dateFormat(inject_date)}</div>
-                    <div style={styles.inject_user}>{inject_user}</div>
+                    <div style={styles.inject_title}><span
+                      style={{color: this.switchColor(inject_enabled)}}>{inject_title}</span></div>
+                    <div style={styles.inject_date}><span
+                      style={{color: this.switchColor(inject_enabled)}}>{dateFormat(inject_date)}</span></div>
+                    <div style={styles.inject_user}><span
+                      style={{color: this.switchColor(inject_enabled)}}>{inject_user}</span></div>
                     <div className="clearfix"></div>
                   </div>
                 }
@@ -237,7 +251,8 @@ class Index extends Component {
       </div>
     } else if (event) {
       return <div style={styles.container}>
-        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents} incident_types={this.props.incident_types}/>
+        <IncidentNav exerciseId={exerciseId} eventId={eventId} incidents={incidents}
+                     incident_types={this.props.incident_types}/>
         <div style={styles.empty}><T>This event is empty.</T></div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>

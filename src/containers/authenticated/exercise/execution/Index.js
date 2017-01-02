@@ -15,6 +15,8 @@ import {CircularSpinner} from '../../../../components/Spinner'
 import {fetchObjectives} from '../../../../actions/Objective'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchAllInjects} from '../../../../actions/Inject'
+import ExercisePopover from './ExercisePopover'
+import InjectPopover from './InjectPopover'
 
 i18nRegister({
   fr: {
@@ -70,11 +72,11 @@ const styles = {
   },
   'inject_title': {
     float: 'left',
+    width: '70%',
     padding: '5px 0 0 0'
   },
   'inject_date': {
-    float: 'right',
-    width: '130px',
+    float: 'left',
     padding: '5px 0 0 0'
   }
 }
@@ -116,7 +118,7 @@ class IndexExecution extends Component {
   }
 
   selectStatus(status) {
-    switch(status) {
+    switch (status) {
       case 'SCHEDULED':
         return <Icon name={Constants.ICON_NAME_ACTION_SCHEDULE} color={Theme.palette.primary1Color}/>
       case 'RUNNING':
@@ -130,21 +132,33 @@ class IndexExecution extends Component {
     }
   }
 
+  switchColor(enabled, globalCanceled) {
+    if (enabled && !globalCanceled) {
+      return Theme.palette.textColor
+    } else {
+      return Theme.palette.disabledColor
+    }
+  }
+
   render() {
     let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)
 
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
+        <ExercisePopover exerciseId={this.props.exerciseId} exercise={this.props.exercise}/>
         <div style={styles.status}><T>{exerciseStatus}</T></div>
         <div className="clearfix"></div>
-        <div style={styles.subtitle}>{dateFormat(R.propOr('0', 'exercise_start_date', this.props.exercise))} &rarr; {dateFormat(R.propOr('0', 'exercise_end_date', this.props.exercise))}</div>
+        <div
+          style={styles.subtitle}>{dateFormat(R.propOr('0', 'exercise_start_date', this.props.exercise))} &rarr; {dateFormat(R.propOr('0', 'exercise_end_date', this.props.exercise))}</div>
         <div style={styles.state}>{this.selectStatus(exerciseStatus)}</div>
         <div className="clearfix"></div>
         <br />
-        <LinearProgress mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'} min={0}
-                        max={this.props.injectsPending.length + this.props.injectsProcessed.length}
-                        value={this.props.injectsProcessed.length}/>
+        <LinearProgress
+          mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'}
+          min={0}
+          max={this.props.injectsPending.length + this.props.injectsProcessed.length}
+          value={this.props.injectsProcessed.length}/>
         <br /><br />
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Pending injects</T></div>
@@ -158,12 +172,22 @@ class IndexExecution extends Component {
                   key={inject.inject_id}
                   primaryText={
                     <div>
-                      <div style={styles.inject_title}>{inject.inject_title}</div>
-                      <div style={styles.inject_date}>{moment(inject.inject_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div style={styles.inject_title}><span
+                        style={{color: this.switchColor(inject.inject_enabled, exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span></div>
+                      <div style={styles.inject_date}><span
+                        style={{color: this.switchColor(inject.inject_enabled, exerciseStatus === 'CANCELED')}}>{moment(inject.inject_date).format('YYYY-DD-MM HH:mm')}</span>
+                      </div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(inject.inject_type)}
+                  leftIcon={this.selectIcon(inject.inject_type, this.switchColor(inject.inject_enabled, exerciseStatus === 'CANCELED'))}
+                  rightIconButton={
+                    <InjectPopover
+                      exerciseId={this.props.exerciseId}
+                      eventId={inject.inject_event}
+                      incidentId={inject.inject_incident.incident_id}
+                      inject={inject}
+                    />}
                 />
               )
             })}
@@ -177,10 +201,10 @@ class IndexExecution extends Component {
           <List>
             {this.props.injectsProcessed.map(inject => {
               let color = '#4CAF50'
-              if( inject.inject_status.status_name === 'ERROR' ) {
-                color ='#F44336'
-              } else if( inject.inject_status.status_name === 'PARTIAL' ) {
-                color ='#FF5722'
+              if (inject.inject_status.status_name === 'ERROR') {
+                color = '#F44336'
+              } else if (inject.inject_status.status_name === 'PARTIAL') {
+                color = '#FF5722'
               }
               return (
                 <MainListItem

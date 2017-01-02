@@ -15,6 +15,14 @@ const screen = (state = Immutable({}), action) => {
       return state.set('loading', false)
     }
 
+    case Constants.DATA_UPDATE_SUCCESS: {
+      return state.set('saved', true)
+    }
+
+    case Constants.DATA_SAVED_DISMISS: {
+      return state.set('saved', false)
+    }
+
     case Constants.APPLICATION_SELECT_AUDIENCE: {
       return state.setIn(['exercise', action.payload.exercise_id, 'current_audience'], action.payload.audience_id)
     }

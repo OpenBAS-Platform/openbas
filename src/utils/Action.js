@@ -25,46 +25,47 @@ const submitErrors = (data) => {
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {
   if (noloading === true) {
-    dispatch({type: Constants.DATA_FETCH_SUBMITTED_NO_LOADING});
+    dispatch({type: Constants.DATA_FETCH_SUBMITTED_NO_LOADING})
   } else {
-    dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+    dispatch({type: Constants.DATA_FETCH_SUBMITTED})
   }
   return api(schema).get(uri).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
   }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR});
+    dispatch({type: Constants.DATA_FETCH_ERROR})
     throw submitErrors(data)
   })
 }
 
 export const putReferential = (schema, uri, data) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
   return api(schema).put(uri, data).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
+    dispatch({type: Constants.DATA_UPDATE_SUCCESS, payload: response.data})
     return response.data
   }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR});
+    dispatch({type: Constants.DATA_FETCH_ERROR})
     throw submitErrors(data)
   })
 }
 
 export const postReferential = (schema, uri, data) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
   return api(schema).post(uri, data).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
     return response.data
   }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR});
+    dispatch({type: Constants.DATA_FETCH_ERROR})
     throw submitErrors(data)
   })
 }
 
 export const delReferential = (uri, type, id) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED});
+  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
   return api().delete(uri).then(function () {
     dispatch({type: Constants.DATA_DELETE_SUCCESS, payload: Immutable({type, id})})
   }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR});
+    dispatch({type: Constants.DATA_FETCH_ERROR})
     throw submitErrors(data)
   })
 }

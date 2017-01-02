@@ -7,7 +7,7 @@ import {dateFormat, dateToISO} from '../../../../../utils/Time'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover'
 import {Menu} from '../../../../../components/Menu'
-import {DialogTitleElement} from '../../../../../components/Dialog'
+import {Dialog, DialogTitleElement} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
@@ -29,7 +29,11 @@ i18nRegister({
     '1. Parameters': '1. Paramètres',
     '2. Content': '2. Contenu',
     '3. Audiences': '3. Audiences',
-    'Do you want to delete this inject?': 'Souhaitez-vous supprimer cet inject ?'
+    'Do you want to delete this inject?': 'Souhaitez-vous supprimer cet inject ?',
+    'Enable': 'Activer',
+    'Disable': 'Désactiver',
+    'Do you want to disable this inject?': 'Souhaitez-vous désactiver cet inject ?',
+    'Do you want to enable this inject?': 'Souhaitez-vous activer cet inject ?'
   }
 })
 
@@ -132,6 +136,34 @@ class InjectPopover extends Component {
     this.handleCloseDelete()
   }
 
+  handleOpenDisable() {
+    this.setState({openDisable: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseDisable() {
+    this.setState({openDisable: false})
+  }
+
+  submitDisable() {
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, {'inject_enabled': false})
+    this.handleCloseDisable()
+  }
+
+  handleOpenEnable() {
+    this.setState({openEnable: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseEnable() {
+    this.setState({openEnable: false})
+  }
+
+  submitEnable() {
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, {'inject_enabled': true})
+    this.handleCloseEnable()
+  }
+
   selectContent() {
     this.setState({stepIndex: 1})
   }
@@ -186,28 +218,20 @@ class InjectPopover extends Component {
 
   render() {
     const editActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseEdit.bind(this)}
-      />,
-      <FlatButton
-        label={this.state.stepIndex === 2 ? "Update" : "Next"}
-        primary={true}
-        onTouchTap={this.submitFormEdit.bind(this)}
-      />,
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
     ]
     const deleteActions = [
-      <FlatButton
-        label="Cancel"
-        primary={true}
-        onTouchTap={this.handleCloseDelete.bind(this)}
-      />,
-      <FlatButton
-        label="Delete"
-        primary={true}
-        onTouchTap={this.submitDelete.bind(this)}
-      />,
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+    ]
+    const disableActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
+      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+    ]
+    const enableActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
+      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
     ]
 
     let initPipe = R.pipe(
@@ -215,6 +239,7 @@ class InjectPopover extends Component {
       R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'])
     )
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined
+    let inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject)
 
     return (
       <div style={style}>
@@ -226,6 +251,9 @@ class InjectPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            {inject_enabled ?
+              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
+              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -264,6 +292,18 @@ class InjectPopover extends Component {
           actions={editActions}>
           <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
         </DialogTitleElement>
+        <Dialog title="Confirmation" modal={false}
+                open={this.state.openDisable}
+                onRequestClose={this.handleCloseDisable.bind(this)}
+                actions={disableActions}>
+          <T>Do you want to disable this inject?</T>
+        </Dialog>
+        <Dialog title="Confirmation" modal={false}
+                open={this.state.openEnable}
+                onRequestClose={this.handleCloseEnable.bind(this)}
+                actions={enableActions}>
+          <T>Do you want to enable this inject?</T>
+        </Dialog>
       </div>
     )
   }

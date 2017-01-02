@@ -34,6 +34,10 @@ export const toggleLeftBar = () => (dispatch) => {
   dispatch({type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED});
 }
 
+export const savedDismiss = () => (dispatch) => {
+  dispatch({type: Constants.DATA_SAVED_DISMISS});
+}
+
 export const redirectToHome  = () => (dispatch) => {
   dispatch(push('/'))
 }
