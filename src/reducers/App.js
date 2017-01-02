@@ -1,5 +1,6 @@
 import * as Constants from '../constants/ActionTypes'
 import Immutable from 'seamless-immutable'
+import R from 'ramda'
 
 const app = (state = Immutable({}), action) => {
 
@@ -22,12 +23,12 @@ const app = (state = Immutable({}), action) => {
       return state.set('worker', action.payload);
     }
 
-    /* TODO IMPLEMENT
-    case Constants.USER_LANG_CHANGE: {
-      logged = R.assoc('lang', action.payload.lang, state.logged)
+    case Constants.LANG_UPDATE_ON_USER_CHANGE: {
+      const user_lang = action.payload.entities.users[action.payload.result].user_lang
+      const logged = R.assoc('lang', user_lang, state.logged)
       localStorage.setItem('logged', JSON.stringify(logged))
       return state.set('logged', logged);
-    }*/
+    }
 
     default: {
       return state;

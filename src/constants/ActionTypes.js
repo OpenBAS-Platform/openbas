@@ -26,7 +26,7 @@ export const IDENTITY_LOGOUT_SUBMITTED = 'IDENTITY_LOGOUT_SUBMITTED'
 //endregion
 
 //region lang
-export const USER_LANG_CHANGE = 'USER_LANG_CHANGE'
+export const LANG_UPDATE_ON_USER_CHANGE = 'LANG_UPDATE_ON_USER_CHANGE'
 //endregion
 
 //region AUDIENCE
