@@ -1,7 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="openex-scheduler">
         <from uri="timer:simple?period=5s"/>
-        <setHeader headerName="X-Auth-Token">
+        <setHeader headerName="Authorization">
             <constant>{{openex.token}}</constant>
         </setHeader>
         <to uri="{{openex.inject_fetch}}"/>
@@ -44,7 +44,7 @@
         <setHeader headerName="Content-Type">
             <constant>application/json</constant>
         </setHeader>
-        <setHeader headerName="X-Auth-Token">
+        <setHeader headerName="Authorization">
             <constant>{{openex.token}}</constant>
         </setHeader>
         <setHeader headerName="CamelHttpMethod">
