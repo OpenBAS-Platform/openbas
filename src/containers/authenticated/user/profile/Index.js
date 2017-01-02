@@ -97,4 +97,5 @@ const select = (state) => {
     organizations: state.referential.entities.organizations
   }
 }
+
 export default connect(select, {fetchOrganizations, updateUser})(Index)

@@ -59,7 +59,8 @@ const styles = {
   'subtitle': {
     float: 'left',
     fontSize: '12px',
-    color: "#848484"
+    color: "#848484",
+    height: '29px'
   },
   'state': {
     float: 'right',

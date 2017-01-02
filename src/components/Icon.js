@@ -69,6 +69,10 @@ const iconStyle = {
     position: 'absolute',
     top: '20px',
   },
+  [ Constants.ICON_TYPE_LEFT ]: {
+    float: 'left',
+    margin: '10px 5px 0px 0px'
+  },
 }
 
 export const Icon = (props) => {

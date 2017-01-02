@@ -7,8 +7,7 @@ import {redirectToHome} from '../../../actions/Application'
 
 const styles = {
   container: {
-    padding: '90px 20px 0 85px',
-    textAlign: 'center'
+    padding: '90px 20px 0 85px'
   },
   empty: {
     marginTop: 40,

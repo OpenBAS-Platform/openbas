@@ -19,12 +19,10 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Do you want to pause this exercise?': 'Souhaitez-vous mettre en pause cet exercice ?',
-    'Do you want to resume this exercise?': 'Souhaitez-vous reprendre cet exercice ?',
-    'Pause': 'Pause',
-    'Resume': 'Reprendre',
-    'Pause exercise': 'Mettre en pause l\'exercice',
-    'Resume exercise': 'Reprendre l\'exercice'
+    'Do you want to disable this exercise?': 'Souhaitez-vous désactiver cet exercice ?',
+    'Do you want to enable this exercise?': 'Souhaitez-vous activer cet exercice ?',
+    'Disable': 'Désactiver',
+    'Enable': 'Activer'
   }
 })
 
@@ -80,11 +78,11 @@ class ExercisePopover extends Component {
 
     const disableActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton label="Pause" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
     ]
     const enableActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton label="Resume" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
     ]
 
     return (
@@ -96,21 +94,21 @@ class ExercisePopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             {exercise_disabled ?
-              <MenuItemButton label="Resume exercise" onTouchTap={this.handleOpenEnable.bind(this)}/> :
-              <MenuItemButton label="Pause exercise" onTouchTap={this.handleOpenDisable.bind(this)}/>}
+              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/> :
+              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/>}
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false}
                 open={this.state.openDisable}
                 onRequestClose={this.handleCloseDisable.bind(this)}
                 actions={disableActions}>
-          <T>Do you want to pause this exercise?</T>
+          <T>Do you want to disable this exercise?</T>
         </Dialog>
         <Dialog title="Confirmation" modal={false}
                 open={this.state.openEnable}
                 onRequestClose={this.handleCloseEnable.bind(this)}
                 actions={enableActions}>
-          <T>Do you want to resume this exercise?</T>
+          <T>Do you want to enable this exercise?</T>
         </Dialog>
       </div>
     )

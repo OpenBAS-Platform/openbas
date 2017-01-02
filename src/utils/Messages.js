@@ -10,7 +10,7 @@ export const i18n = {
       'SCHEDULED': 'Planifié',
       'RUNNING': 'En cours',
       'FINISHED': 'Terminé',
-      'CANCELED': 'Annulé',
+      'CANCELED': 'Désactivé',
       'Cancel': 'Annuler',
       'Next': 'Suivant',
       'Create': 'Créer',
@@ -29,7 +29,7 @@ export const i18n = {
       'SCHEDULED': 'Scheduled',
       'RUNNING': 'Running',
       'FINISHED': 'Finished',
-      'CANCELED': 'Canceled',
+      'CANCELED': 'Disabled',
     }
   })
 }
