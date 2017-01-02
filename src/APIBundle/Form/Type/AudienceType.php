@@ -13,6 +13,7 @@ class AudienceType extends AbstractType
     {
         $builder->add('audience_name');
         $builder->add('audience_users');
+        $builder->add('audience_enabled');
     }
 
     public function configureOptions(OptionsResolver $resolver)

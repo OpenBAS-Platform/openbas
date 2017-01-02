@@ -63,7 +63,7 @@ class Inject
     /**
      * @ORM\Column(type="boolean")
      */
-    protected $inject_enabled;
+    protected $inject_enabled = true;
 
     /**
      * @ORM\OneToOne(targetEntity="InjectStatus", mappedBy="status_inject")
@@ -77,6 +77,7 @@ class Inject
      */
     protected $inject_user;
 
+    protected $inject_event;
     protected $inject_exercise;
 
     public function __construct()
@@ -211,6 +212,17 @@ class Inject
         }
     }
 
+    public function getInjectEvent()
+    {
+        return $this->inject_event;
+    }
+
+    public function setInjectEvent($event)
+    {
+        $this->inject_event = $event;
+        return $this;
+    }
+    
     public function getInjectExercise()
     {
         return $this->inject_exercise;
