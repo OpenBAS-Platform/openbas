@@ -13,3 +13,4 @@ build
 .DS_Store
 .idea
 npm-debug.log
+yarn.lock
