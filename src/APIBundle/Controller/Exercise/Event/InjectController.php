@@ -48,7 +48,11 @@ class InjectController extends Controller
 
         $injects = array();
         foreach( $incidents as $incident ) {
-            $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+            $incidentInjects = $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]);
+            foreach( $incidentInjects as &$incidentInject ) {
+                $incidentInject->setInjectEvent($event->getEventId());
+            }
+            $injects = array_merge($injects, $incidentInjects);
         }
 
         foreach( $injects as &$inject ) {

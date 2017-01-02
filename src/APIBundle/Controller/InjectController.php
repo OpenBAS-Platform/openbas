@@ -38,7 +38,7 @@ class InjectController extends Controller
         $dateStart = new \DateTime();
         $dateStart->modify('-60 minutes');
         $dateEnd = new \DateTime();
-        $exercises = $em->getRepository('APIBundle:Exercise')->findAll();
+        $exercises = $em->getRepository('APIBundle:Exercise')->findBy(['exercise_canceled' => 0]);
         /* @var $exercises Exercise[] */
         foreach ($exercises as $exercise) {
             $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
@@ -75,16 +75,18 @@ class InjectController extends Controller
             $data['data']['users'] = array();
             foreach ($inject->getInjectAudiences() as $audience) {
                 /* @var $audience Audience */
-                foreach ($audience->getAudienceUsers() as $user) {
-                    $userData = array();
-                    $userData['user_firstname'] = $user->getUserFirstname();
-                    $userData['user_lastname'] = $user->getUserLastname();
-                    $userData['user_email'] = $user->getUserEmail();
-                    $userData['user_phone'] = $user->getUserPhone();
-                    $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
-                    $userData['user_organization'] = array();
-                    $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
-                    $data['data']['users'][] = $userData;
+                if ($audience->getAudienceEnabled() == true) {
+                    foreach ($audience->getAudienceUsers() as $user) {
+                        $userData = array();
+                        $userData['user_firstname'] = $user->getUserFirstname();
+                        $userData['user_lastname'] = $user->getUserLastname();
+                        $userData['user_email'] = $user->getUserEmail();
+                        $userData['user_phone'] = $user->getUserPhone();
+                        $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                        $userData['user_organization'] = array();
+                        $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                        $data['data']['users'][] = $userData;
+                    }
                 }
             }
             $output[] = $data;

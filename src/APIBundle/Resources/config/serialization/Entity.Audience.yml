@@ -6,6 +6,8 @@ APIBundle\Entity\Audience:
             groups: ['audience']
         audience_exercise:
             groups: ['audience']
+        audience_enabled:
+            groups: ['audience']
         audience_users:
             groups: ['audience']
         audience_injects:

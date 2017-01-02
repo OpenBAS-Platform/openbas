@@ -41,6 +41,11 @@ class Audience
     protected $audience_exercise;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $audience_enabled = true;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Inject", mappedBy="inject_audiences")
      * @var Inject[]
      */
@@ -93,6 +98,17 @@ class Audience
     public function setAudienceExercise($exercise)
     {
         $this->audience_exercise = $exercise;
+        return $this;
+    }
+
+    public function getAudienceEnabled()
+    {
+        return $this->audience_enabled;
+    }
+
+    public function setAudienceEnabled($enabled)
+    {
+        $this->audience_enabled = $enabled;
         return $this;
     }
 
