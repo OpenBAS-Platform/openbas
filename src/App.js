@@ -168,7 +168,8 @@ IntlWrapper.propTypes = {
 }
 
 const select = (state) => {
-  return {lang: R.pathOr(locale, ['logged', 'lang'], state.app)}
+    var lang = R.pathOr("auto", ['logged', 'lang'], state.app);
+    return {lang: lang === "auto" ?  locale : lang}
 }
 
 const ConnectedIntl = connect(select)(IntlWrapper)
