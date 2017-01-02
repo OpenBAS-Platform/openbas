@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {injectIntl} from 'react-intl'
 import * as Constants from '../../../constants/ComponentTypes'
 import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
@@ -17,6 +18,7 @@ i18nRegister({
   fr: {
     'Main objectives': 'Objectifs principaux',
     'Audiences': 'Audiences',
+    'players': 'joueurs',
     'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.',
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
     'Scenario': 'Scénario',
@@ -114,11 +116,12 @@ class IndexExercise extends Component {
             <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
           <List>
             {this.props.audiences.map(audience => {
-              return (
+                var playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
+                return (
                 <MainListItem
                   key={audience.audience_id}
                   primaryText={audience.audience_name}
-                  secondaryText={audience.audience_users.length + ' players'}
+                  secondaryText={playersText}
                   leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
                 />
               )
@@ -242,4 +245,4 @@ export default connect(select, {
   fetchEvents,
   fetchIncidents,
   fetchAllInjects
-})(IndexExercise)
+})(injectIntl(IndexExercise))
