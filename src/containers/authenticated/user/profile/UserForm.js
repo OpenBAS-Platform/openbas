@@ -32,7 +32,7 @@ class UserForm extends Component {
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
                            type="text" label="Organization" dataSource={dataSource}/>
         <SelectField label={<T>Language</T>} name="user_lang" fullWidth={true}>
-          <MenuItemLink key="auto" value={null} label="Automatic"/>
+          <MenuItemLink key="auto" value="auto" label={<T>Automatic</T>}/>
           <MenuItemLink key="en" value="en" label="English"/>
           <MenuItemLink key="fr" value="fr" label="Français"/>
         </SelectField>

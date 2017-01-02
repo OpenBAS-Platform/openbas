@@ -24,6 +24,7 @@ import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-u
 import NavigationCancel from 'material-ui/svg-icons/navigation/cancel'
 import ActionAssignmentTurnedIn from 'material-ui/svg-icons/action/assignment-turned-in'
 import FileFolder from 'material-ui/svg-icons/file/folder'
+import FileFileDownload from 'material-ui/svg-icons/file/file-download'
 import EditorAttachFile from 'material-ui/svg-icons/editor/attach-file'
 import EditorInsertChart from 'material-ui/svg-icons/editor/insert-chart'
 import MapsLayers from 'material-ui/svg-icons/maps/layers'
@@ -126,6 +127,8 @@ export const Icon = (props) => {
       return (<NavigationCancel style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_FILE_FOLDER:
       return (<FileFolder style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_FILE_FILE_DOWNLOAD:
+      return (<FileFileDownload style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_MAPS_LAYERS:
       return (<MapsLayers style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NOTIFICATION_SMS:

@@ -194,6 +194,7 @@ IndexExercise.propTypes = {
   fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
   fetchAllInjects: PropTypes.func,
+  intl: PropTypes.object
 }
 
 const filterObjectives = (objectives, exerciseId) => {

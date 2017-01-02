@@ -189,9 +189,9 @@ IconButton.propTypes = {
 const LinkIconButtonIntl = (props) => (
   <MUIIconButton
     tooltipPosition={props.tooltipPosition}
-    tooltip={props.intl.formatMessage({id: props.tooltip})}
+    tooltip={props.tooltip ? props.intl.formatMessage({id: props.tooltip}) : undefined}
     disabled={props.disabled}
-    containerElement={<Link to={props.to}/>}
+    containerElement={<Link to={props.to} target={props.target}/>}
     style={buttonStyle[props.type]}
   >
     {props.children}
@@ -208,4 +208,5 @@ LinkIconButtonIntl.propTypes = {
   to: PropTypes.string,
   type: PropTypes.string,
   intl: PropTypes.object,
+  target: PropTypes.string
 }

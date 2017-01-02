@@ -4,7 +4,7 @@ import R from 'ramda'
 import {i18nRegister} from '../../utils/Messages'
 import * as Constants from '../../constants/ComponentTypes'
 import {fetchFiles, addFile} from '../../actions/File'
-import {IconButton} from '../../components/Button'
+import {LinkIconButton} from '../../components/Button'
 import {GridList, GridTile} from '../../components/GridList'
 import {Icon} from '../../components/Icon'
 import {FloatingActionsButtonCreate} from '../../components/Button';
@@ -15,6 +15,9 @@ const styles = {
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
+  },
+  image: {
+    cursor: 'pointer'
   }
 }
 
@@ -74,12 +77,12 @@ class FileGallery extends Component {
                 key={file.file_id}
                 title={file.file_name}
                 actionIcon={
-                  <IconButton onClick={this.handleFileSelect.bind(this, file)}>
-                    <Icon color="white" name={Constants.ICON_NAME_ACTION_ASSIGNMENT_TURNED_IN}/>
-                  </IconButton>
+                  <LinkIconButton to={file.file_url} target="_blank">
+                    <Icon color="white" name={Constants.ICON_NAME_FILE_FILE_DOWNLOAD}/>
+                  </LinkIconButton>
                 }>
                 {file.file_type === 'png' || file.file_type === 'jpg' || file.file_type === 'gif' ?
-                  <img src={file.file_url} alt="Gallery"/> : <img src="/images/file_icon.png" alt="Gallery"/>}
+                  <img src={file.file_url} alt="Gallery" style={styles.image} onClick={this.handleFileSelect.bind(this, file)}/> : <img src="/images/file_icon.png" alt="Gallery" style={styles.image}  onClick={this.handleFileSelect.bind(this, file)}/>}
               </GridTile>
             )
           })}
