@@ -218,7 +218,7 @@ export const SecondaryListItem = (props) => (
     onTouchTap={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
-    initiallyOpen={false}
+    initiallyOpen={true}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
     innerDivStyle={{padding: '20px 20px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>

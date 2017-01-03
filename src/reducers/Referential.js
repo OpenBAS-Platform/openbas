@@ -27,7 +27,6 @@ export const entitiesInitializer =
   })
 
 const referential = (state = Immutable({}), action) => {
-
   switch (action.type) {
 
     case Constants.IDENTITY_LOGIN_SUCCESS: {

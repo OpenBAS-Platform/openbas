@@ -50,7 +50,6 @@ class FileGallery extends Component {
     let data = new FormData();
     data.append('file', this.refs.fileUpload.files[0])
     this.props.addFile(data)
-    this.handleCloseUpload()
   }
 
   handleFileSelect(file) {
@@ -58,7 +57,6 @@ class FileGallery extends Component {
   }
 
   render() {
-
     const keyword = this.state.searchTerm
     let filterByKeyword = n => keyword === '' ||
     n.file_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
