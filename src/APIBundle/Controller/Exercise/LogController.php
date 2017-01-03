@@ -37,6 +37,10 @@ class LogController extends Controller
         $logs = $em->getRepository('APIBundle:Log')->findBy(['log_exercise' => $exercise]);
         /* @var $logs Log[] */
 
+        foreach( $logs as &$log) {
+            $log->sanitizeUser();
+        }
+
         return $logs;
     }
 
@@ -67,6 +71,7 @@ class LogController extends Controller
             return $this->logNotFound();
         }
 
+        $log->sanitizeUser();
         return $log;
     }
 
@@ -92,14 +97,16 @@ class LogController extends Controller
         $this->denyAccessUnlessGranted('update', $exercise);
 
         $log = new Log();
-        $log->setLogExercise($exercise);
         $form = $this->createForm(LogType::class, $log);
         $form->submit($request->request->all());
         if ($form->isValid()) {
             $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
             $log->setLogUser($connectedUser);
+            $log->setLogExercise($exercise);
+            $log->setLogDate(new \DateTime());
             $em->persist($log);
             $em->flush();
+            $log->sanitizeUser();
             return $log;
         } else {
             return $form;
@@ -173,6 +180,7 @@ class LogController extends Controller
             $em->flush();
             $em->clear();
             $log = $em->getRepository('APIBundle:Log')->find($request->get('log_id'));
+            $log->sanitizeUser();
             return $log;
         } else {
             return $form;

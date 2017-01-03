@@ -1,4 +1,4 @@
-APIBundle\Entity\Objective:
+APIBundle\Entity\Log:
     attributes:
         log_id:
             groups: ['log']

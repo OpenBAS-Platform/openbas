@@ -68,6 +68,8 @@ class Incident
      */
     protected $incident_injects;
 
+    protected $incident_exercise;
+
     public function __construct()
     {
         $this->incident_objectives = new ArrayCollection();
@@ -170,6 +172,17 @@ class Incident
     public function setIncidentInjects($injects)
     {
         $this->incident_injects = $injects;
+        return $this;
+    }
+
+    public function getIncidentExercise()
+    {
+        return $this->incident_exercise;
+    }
+
+    public function setIncidentExercise($exercise)
+    {
+        $this->incident_exercise = $exercise;
         return $this;
     }
 }
