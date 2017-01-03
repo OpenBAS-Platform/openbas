@@ -157,7 +157,6 @@ const UserIsNotAuthenticated = UserAuthWrapper({
 class IntlWrapper extends Component {
   render () {
     const { children, lang } = this.props
-    debug('Rendering i18n app in ' + lang) //If browser lang != profile one, all app will render again
     return <IntlProvider locale={lang} key={lang} messages={i18n.messages[lang]}>{children}</IntlProvider>
   }
 }
@@ -168,7 +167,7 @@ IntlWrapper.propTypes = {
 }
 
 const select = (state) => {
-    var lang = R.pathOr("auto", ['logged', 'lang'], state.app);
+    var lang = R.pathOr("auto", ['logged', 'lang'], state.app)
     return {lang: lang === "auto" ?  locale : lang}
 }
 
