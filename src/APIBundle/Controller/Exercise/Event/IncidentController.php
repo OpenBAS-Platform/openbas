@@ -82,6 +82,7 @@ class IncidentController extends Controller
             return $this->incidentNotFound();
         }
 
+        $incident->setIncidentExercise($exercise->getExerciseId());
         return $incident;
     }
 

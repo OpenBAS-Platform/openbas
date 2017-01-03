@@ -43,6 +43,10 @@ class IncidentController extends Controller
             $incidents = array_merge($incidents, $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]));
         }
 
+        foreach( $incidents as &$incident ) {
+            $incident->setIncidentExercise($exercise->getExerciseId());
+        }
+
         return $incidents;
     }
 

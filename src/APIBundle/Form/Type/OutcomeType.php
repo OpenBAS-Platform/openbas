@@ -11,10 +11,8 @@ class OutcomeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('outcome_title');
-        $builder->add('outcome_description');
-        $builder->add('outcome_incident');
-        $builder->add('outcome_status');
+        $builder->add('outcome_comment');
+        $builder->add('outcome_result');
     }
 
     public function configureOptions(OptionsResolver $resolver)
