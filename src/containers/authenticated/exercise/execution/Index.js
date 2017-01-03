@@ -7,7 +7,6 @@ import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
 import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
-import moment from 'moment';
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
@@ -165,7 +164,7 @@ class IndexExecution extends Component {
                       <div style={styles.inject_title}><span
                         style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span></div>
                       <div style={styles.inject_date}><span
-                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{moment(inject.inject_date).format('YYYY-DD-MM HH:mm')}</span>
+                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject.inject_date)}</span>
                       </div>
                       <div className="clearfix"></div>
                     </div>
@@ -174,6 +173,7 @@ class IndexExecution extends Component {
                   rightIconButton={
                     <InjectPopover
                       exerciseId={this.props.exerciseId}
+                      exercise={this.props.exercise}
                       eventId={inject.inject_event}
                       incidentId={inject.inject_incident.incident_id}
                       inject={inject}
@@ -202,7 +202,7 @@ class IndexExecution extends Component {
                   primaryText={
                     <div>
                       <div style={styles.inject_title}>{inject.inject_title}</div>
-                      <div style={styles.inject_date}>{moment(inject.inject_date).format('YYYY-DD-MM HH:mm')}</div>
+                      <div style={styles.inject_date}>{dateFormat(inject.inject_date)}</div>
                       <div className="clearfix"></div>
                     </div>
                   }

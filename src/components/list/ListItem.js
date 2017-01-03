@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react'
 import MUIListItem from 'material-ui/List/ListItem'
 import {injectIntl} from 'react-intl'
 import {Link} from 'react-router'
+import Theme from '../Theme'
 import * as Constants from '../../constants/ComponentTypes'
 
 const styles = {
@@ -53,17 +54,24 @@ const innerDivStyle = {
   }
 }
 
+const innerDivStyleGrey = {
+  [ Constants.LIST_ITEM_NOSPACE ]: {
+    padding: '16px 16px 16px 55px',
+    color: Theme.palette.disabledColor
+  }
+}
+
 const ListItemLinkIntl = (props) => (
   <MUIListItem
     primaryText={props.intl.formatMessage({id: props.label})}
     containerElement={<Link to={props.to}/>}
-    style={props.active === true ? styles.active : styles.inactive}
-    innerDivStyle={innerDivStyle[props.type]}
+    style={props.active ? styles.active : styles.inactive}
+    innerDivStyle={props.grey ? innerDivStyleGrey[props.type] : innerDivStyle[props.type]}
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onTouchTap={props.onClick}
     disabled={props.disabled}/>
-);
+)
 export const ListItemLink = injectIntl(ListItemLinkIntl)
 
 ListItemLinkIntl.propTypes = {
@@ -75,7 +83,8 @@ ListItemLinkIntl.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   active: PropTypes.bool,
-  type: PropTypes.string
+  type: PropTypes.string,
+  grey: PropTypes.bool
 }
 
 export const IconListItemLink = (props) => (

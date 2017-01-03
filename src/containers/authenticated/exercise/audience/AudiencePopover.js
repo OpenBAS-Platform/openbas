@@ -10,6 +10,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
+import Theme from '../../../../components/Theme'
 import {addComcheck} from '../../../../actions/Comcheck'
 import {updateAudience, selectAudience, deleteAudience} from '../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
@@ -31,6 +32,10 @@ i18nRegister({
     'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:': 'Ceci est un test de communication avant le début de l\'exercice. Merci de cliquer sur le lien ci-dessous afin de confirmer que vous avez bien reçu ce message :',
     'Best regards': 'Cordialement',
     'The exercise control Team': 'La direction de l\'animation',
+    'Do you want to disable this audience?': 'Souhaitez-vous désactiver cette audience ?',
+    'Do you want to enable this audience?': 'Souhaitez-vous activer cette audience ?',
+    'Disable': 'Désactiver',
+    'Enable': 'Activer'
   }
 })
 
@@ -41,6 +46,8 @@ class AudiencePopover extends Component {
       openDelete: false,
       openEdit: false,
       openComcheck: false,
+      openEnable: false,
+      openDisable: false,
       openPopover: false
     }
   }
@@ -104,11 +111,49 @@ class AudiencePopover extends Component {
     this.handleCloseDelete()
   }
 
+  handleOpenDisable() {
+    this.setState({openDisable: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseDisable() {
+    this.setState({openDisable: false})
+  }
+
+  submitDisable() {
+    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {'audience_enabled': false})
+    this.handleCloseDisable()
+  }
+
+  handleOpenEnable() {
+    this.setState({openEnable: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseEnable() {
+    this.setState({openEnable: false})
+  }
+
+  submitEnable() {
+    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {'audience_enabled': true})
+    this.handleCloseEnable()
+  }
+
   t(id) {
     return this.props.intl.formatMessage({id})
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
+    let audience_enabled = R.propOr(true, 'audience_enabled', this.props.audience)
+
     const initialComcheckValues = {
       comcheck_audience: R.propOr(0, 'audience_id', this.props.audience),
       comcheck_subject: this.t("Communication check"),
@@ -128,17 +173,28 @@ class AudiencePopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ]
+    const disableActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
+      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+    ]
+    const enableActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
+      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+    ]
 
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!audience_enabled)}/>
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Launch a comcheck" onTouchTap={this.handleOpenComcheck.bind(this)}/>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            {audience_enabled ?
+              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
+              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -165,6 +221,18 @@ class AudiencePopover extends Component {
                         initialValues={initialComcheckValues}
                         onSubmit={this.onSubmitComcheck.bind(this)}
                         onSubmitSuccess={this.handleCloseComcheck.bind(this)}/>
+        </Dialog>
+        <Dialog title="Confirmation" modal={false}
+                open={this.state.openDisable}
+                onRequestClose={this.handleCloseDisable.bind(this)}
+                actions={disableActions}>
+          <T>Do you want to disable this audience?</T>
+        </Dialog>
+        <Dialog title="Confirmation" modal={false}
+                open={this.state.openEnable}
+                onRequestClose={this.handleCloseEnable.bind(this)}
+                actions={enableActions}>
+          <T>Do you want to enable this audience?</T>
         </Dialog>
       </div>
     )

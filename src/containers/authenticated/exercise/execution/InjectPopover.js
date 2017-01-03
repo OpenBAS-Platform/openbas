@@ -2,6 +2,7 @@ import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
+import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover'
@@ -73,8 +74,17 @@ class InjectPopover extends Component {
     this.handleCloseEnable()
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     let inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject)
+    let exercise_canceled = R.propOr(false, 'exercise_canceled', this.props.exercise)
 
     const disableActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
@@ -88,7 +98,7 @@ class InjectPopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!inject_enabled || exercise_canceled)}/>
         </IconButton>
         <Popover open={this.state.openPopover}
                  anchorEl={this.state.anchorEl}
@@ -118,6 +128,7 @@ class InjectPopover extends Component {
 
 InjectPopover.propTypes = {
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
   inject: PropTypes.object,
