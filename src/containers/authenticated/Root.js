@@ -22,7 +22,10 @@ class RootAuthenticated extends Component {
     if(process.env.NODE_ENV !== 'development') {
       const initialStream = Rx.Observable.of(1); //Fetch on loading
       var intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
-      this.subscription = initialStream.merge(intervalStream).subscribe(() => this.props.fetchWorkerStatus())
+      this.subscription = initialStream
+        .merge(intervalStream)
+        .exhaustMap(() => this.props.fetchWorkerStatus()) //Fetch only if previous call finished
+        .subscribe()
     }
   }
 
