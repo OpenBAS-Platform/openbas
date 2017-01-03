@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react'
 import R from 'ramda'
 import {i18nRegister} from '../../../../../utils/Messages'
+import {T} from '../../../../../components/I18n'
 
 i18nRegister({
   fr: {
@@ -17,9 +18,14 @@ const styles = {
 class InjectView extends Component {
   render() {
     let inject_title = R.propOr('-', 'inject_title', this.props.inject)
+    let inject_content = R.values(JSON.parse(R.propOr(null, 'inject_content', this.props.inject)))
+
     return (
       <div style={styles.container}>
-        {inject_title}
+        <h3>{inject_title}</h3>
+        {inject_content.map(content => {
+          return <div>{content}<br /><br /></div>
+        })}
       </div>
     )
   }
