@@ -1,7 +1,6 @@
 import React, {PropTypes, Component} from 'react'
 import R from 'ramda'
 import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
 
 i18nRegister({
   fr: {

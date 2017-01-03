@@ -163,6 +163,7 @@ export const MainListItem = (props) => (
   <MUIListItem
     primaryText={props.primaryText}
     secondaryText={props.secondaryText}
+    secondaryTextLines={props.secondaryTextLines}
     leftAvatar={props.leftAvatar}
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
@@ -178,6 +179,7 @@ export const MainListItem = (props) => (
 MainListItem.propTypes = {
   primaryText: PropTypes.node,
   secondaryText: PropTypes.node,
+  secondaryTextLines: PropTypes.number,
   leftAvatar: PropTypes.element,
   leftIcon: PropTypes.element,
   rightIcon: PropTypes.element,

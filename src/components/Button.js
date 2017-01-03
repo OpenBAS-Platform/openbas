@@ -37,6 +37,9 @@ const buttonStyle = {
   [ Constants.BUTTON_TYPE_SINGLE ]: {
     float: 'left',
     margin: '-5px 0px 0px 0px'
+  },
+  [ Constants.BUTTON_TYPE_MAINLIST2 ]: {
+    margin: '20px 0px 0px 15px'
   }
 }
 

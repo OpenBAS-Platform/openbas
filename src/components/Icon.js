@@ -19,6 +19,7 @@ import ActionExitToApp from 'material-ui/svg-icons/action/exit-to-app'
 import ActionCheckCircle from 'material-ui/svg-icons/action/check-circle'
 import ActionDone from 'material-ui/svg-icons/action/done'
 import ActionDoneAll from 'material-ui/svg-icons/action/done-all'
+import ActionDescription from 'material-ui/svg-icons/action/description'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
 import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
 import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
@@ -37,6 +38,7 @@ import ImageCenterFocusWeak from 'material-ui/svg-icons/image/center-focus-weak'
 import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import AVSlowMotionVideo from 'material-ui/svg-icons/av/slow-motion-video'
 import AVPlayCircleOutline from 'material-ui/svg-icons/av/play-circle-outline'
+import AVNote from 'material-ui/svg-icons/av/note'
 import DeviceGraphicEq from 'material-ui/svg-icons/device/graphic-eq'
 
 const iconStyle = {
@@ -64,8 +66,8 @@ const iconStyle = {
   },
   [ Constants.ICON_TYPE_MAINLIST2 ]: {
     position: 'absolute',
+    padding: 0,
     top: '25px',
-    left: '15px'
   },
   [ Constants.ICON_TYPE_MAINLIST_RIGHT ]: {
     position: 'absolute',
@@ -120,6 +122,8 @@ export const Icon = (props) => {
       return (<ActionDone style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_DONE_ALL:
       return (<ActionDoneAll style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_ACTION_DESCRIPTION:
+      return (<ActionDescription style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
       return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN:
@@ -154,6 +158,8 @@ export const Icon = (props) => {
       return (<AVSlowMotionVideo style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_AV_PLAY_CIRCLE_OUTLINE:
       return (<AVPlayCircleOutline style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_AV_NOTE:
+      return (<AVNote style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_DEVICE_GRAPHIC_EQ:
       return (<DeviceGraphicEq style={mergeStyle} color={props.color} />)
     default:

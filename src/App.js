@@ -43,7 +43,7 @@ import IndexExerciseExecution from './containers/authenticated/exercise/executio
 import IndexExerciseChecks from './containers/authenticated/exercise/check/Index'
 import IndexExerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
-import IndexExcerciseLessons from './containers/authenticated/exercise/lessons/Index'
+import IndexExerciseLessons from './containers/authenticated/exercise/lessons/Index'
 import Immutable from 'seamless-immutable'
 import roundMoment from './utils/Moment-round'
 

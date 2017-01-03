@@ -23,5 +23,5 @@ export const addLog = (exerciseId, data) => (dispatch) => {
 
 export const deleteLog = (exerciseId, logId) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/logs/' + logId
-  return delReferential(uri, 'logs', objectiveId)(dispatch)
+  return delReferential(uri, 'logs', logId)(dispatch)
 }

@@ -6,15 +6,20 @@ import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
-import {MainListItemLink} from '../../../../components/list/ListItem';
+import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import {fetchIncidents} from '../../../../actions/Incident'
 import {fetchLogs} from '../../../../actions/Log'
+import LogsPopover from './LogsPopover'
+import LogPopover from './LogPopover'
+import IncidentPopover from './IncidentPopover'
 
 i18nRegister({
   fr: {
-    'You do not have any dryruns in this exercise.': 'Vous n\'avez aucun dryrun dans cet exercice.',
-    'You do not have any comchecks in this exercise.': 'Vous n\'avez aucun comcheck dans cet exercice.'
+    'Incidents outcomes': 'Résultats des incidents',
+    'You do not have any incidents in this exercise.': 'Vous n\'avez aucun incident dans cet exercice.',
+    'Exercise log': 'Journal d\'exercice',
+    'You do not have any entries in the exercise log.': 'Vous n\'avez aucune entrée dans le journal de cet exercice.'
   }
 })
 
@@ -54,22 +59,22 @@ const styles = {
     fontWeight: 500,
     textAlign: 'left'
   },
-  'dryrun_audience': {
+  'log_title': {
     float: 'left',
-    padding: '5px 0 0 0'
+    padding: '5px 0px 0px 0px'
   },
-  'dryrun_status': {
-    float: 'left',
-    padding: '5px 0 0 0'
-  },
-  'dryrun_date': {
+  'log_date': {
     float: 'right',
-    width: '130px',
-    padding: '5px 0 0 0'
+    width: '140px',
+    margin: '5px 20px 0px 0px',
+  },
+  'log_content': {
+    padding: '0px 35px 0px 0px',
+    textAlign: 'justify'
   }
 }
 
-class IndexExcerciseLessons extends Component {
+class IndexExerciseLessons extends Component {
   componentDidMount() {
     this.props.fetchLogs(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
@@ -79,58 +84,55 @@ class IndexExcerciseLessons extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.columnLeft}>
-          <div style={styles.title}>Dryruns</div>
-          <DryrunsPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
+          <div style={styles.title}><T>Incidents outcomes</T></div>
           <div className="clearfix"></div>
-          {this.props.dryruns.length === 0 ?
-            <div style={styles.empty}><T>You do not have any dryruns in this exercise.</T></div> : ""}
+          {this.props.incidents.length === 0 ?
+            <div style={styles.empty}><T>You do not have any incidents in this exercise.</T></div> : ""}
           <List>
-            {this.props.dryruns.map(dryrun => {
-              let dryrun_audience = R.propOr({}, dryrun.dryrun_audience.audience_id, this.props.audiences)
-              let audienceName = R.propOr('-', 'audience_name', dryrun_audience)
+            {this.props.incidents.map(incident => {
               return (
-                <MainListItemLink
-                  to={'/private/exercise/' + this.props.exerciseId + '/checks/dryrun/' + dryrun.dryrun_id}
-                  key={dryrun.dryrun_id}
+                <MainListItem
+                  key={incident.incident_id}
+                  rightIconButton={<IncidentPopover exerciseId={this.props.exerciseId} incident={incident}/>}
                   primaryText={
                     <div>
-                      <div style={styles.dryrun_audience}>{audienceName}</div>
-                      <div style={styles.dryrun_date}>{dateFormat(dryrun.dryrun_date)}</div>
+                      <div style={styles.log_title}>{incident.incident_title}</div>
+                      <div style={styles.log_date}>{incident.incident_outcome.outcome_result}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO}
-                                  type={Constants.ICON_TYPE_MAINLIST}
-                                  color={dryrun.dryrun_finished ? "#666666" : "#E91E63"}/>}
+                  secondaryText={<div style={styles.log_content}>{incident.incident_outcome.outcome_comment}</div>}
+                  secondaryTextLines={2}
+                  leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}
+                                  type={Constants.ICON_TYPE_MAINLIST}/>}
                 />
               )
             })}
           </List>
         </div>
         <div style={styles.columnRight}>
-          <div style={styles.title}>Comchecks</div>
-          <ComchecksPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
+          <div style={styles.title}><T>Exercise log</T></div>
+          <LogsPopover exerciseId={this.props.exerciseId}/>
           <div className="clearfix"></div>
-          {this.props.comchecks.length === 0 ?
-            <div style={styles.empty}><T>You do not have any comchecks in this exercise.</T></div> : ""}
+          {this.props.logs.length === 0 ?
+            <div style={styles.empty}><T>You do not have any entries in the exercise log.</T></div> : ""}
           <List>
-            {this.props.comchecks.map(comcheck => {
-              let comcheck_audience = R.propOr({}, comcheck.comcheck_audience.audience_id, this.props.audiences)
-              let audienceName = R.propOr('-', 'audience_name', comcheck_audience)
+            {this.props.logs.map(log => {
               return (
-                <MainListItemLink
-                  to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + comcheck.comcheck_id}
-                  key={comcheck.comcheck_id}
+                <MainListItem
+                  key={log.log_id}
+                  rightIconButton={<LogPopover exerciseId={this.props.exerciseId} log={log}/>}
                   primaryText={
                     <div>
-                      <div style={styles.dryrun_audience}>{audienceName}</div>
-                      <div style={styles.dryrun_date}>{dateFormat(comcheck.comcheck_start_date)}</div>
+                      <div style={styles.log_title}>{log.log_title}</div>
+                      <div style={styles.log_date}>{dateFormat(log.log_date)}</div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}
-                                  type={Constants.ICON_TYPE_MAINLIST}
-                                  color={comcheck.comcheck_finished ? "#666666" : "#E91E63"}/>}
+                  secondaryText={<div style={styles.log_content}>{log.log_content}</div>}
+                  secondaryTextLines={2}
+                  leftIcon={<Icon name={Constants.ICON_NAME_ACTION_DESCRIPTION}
+                                  type={Constants.ICON_TYPE_MAINLIST2}/>}
                 />
               )
             })}
@@ -141,45 +143,42 @@ class IndexExcerciseLessons extends Component {
   }
 }
 
-IndexExcerciseDryrun.propTypes = {
+IndexExerciseLessons.propTypes = {
   exerciseId: PropTypes.string,
-  audiences: PropTypes.object,
-  dryruns: PropTypes.array,
-  comchecks: PropTypes.array,
-  fetchAudiences: PropTypes.func,
-  fetchDryruns: PropTypes.func,
-  fetchComchecks: PropTypes.func
+  logs: PropTypes.array,
+  incidents: PropTypes.array,
+  fetchLogs: PropTypes.func,
+  fetchIncidents: PropTypes.func
 }
 
-const filterDryruns = (dryruns, exerciseId) => {
-  let dryrunsFilterAndSorting = R.pipe(
+const filterLogs = (logs, exerciseId) => {
+  let logsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.dryrun_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.dryrun_date < b.dryrun_date)
+    R.filter(n => n.log_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.log_date < b.log_date)
   )
-  return dryrunsFilterAndSorting(dryruns)
+  return logsFilterAndSorting(logs)
 }
 
-const filterComchecks = (comchecks, exerciseId) => {
-  let comchecksFilterAndSorting = R.pipe(
+const filterIncidents = (incidents, exerciseId) => {
+  let incidentsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.comcheck_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.comcheck_start_date < b.comcheck_start_date)
+    R.filter(n => n.incident_exercise === exerciseId),
+    R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
   )
-  return comchecksFilterAndSorting(comchecks)
+  return incidentsFilterAndSorting(incidents)
 }
 
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
-  let logs = filterLogs(state.referential.entities.dryruns, exerciseId)
-  let incidents = filterIncidents(state.referential.entities.comchecks, exerciseId)
+  let logs = filterLogs(state.referential.entities.logs, exerciseId)
+  let incidents = filterIncidents(state.referential.entities.incidents, exerciseId)
 
   return {
     exerciseId,
-    audiences: state.referential.entities.audiences,
-    dryruns,
-    comchecks
+    logs,
+    incidents
   }
 }
 
-export default connect(select, {fetchLogs, fetchIncidents})(IndexExcerciseLessons)
+export default connect(select, {fetchLogs, fetchIncidents})(IndexExerciseLessons)
