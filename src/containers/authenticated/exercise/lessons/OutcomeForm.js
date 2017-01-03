@@ -1,12 +1,15 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../../components/Field'
+import {SliderField} from '../../../../components/SliderField'
 import {i18nRegister} from '../../../../utils/Messages'
+import {T} from '../../../../components/I18n'
 
 i18nRegister({
   fr: {
     'Comment': 'Commentaire',
-    'Content': 'Contenu'
+    'Content': 'Contenu',
+    'Players response evaluation': 'Evaluation de la réponse des joueurs'
   }
 })
 
@@ -26,6 +29,9 @@ class OutcomeForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="outcome_comment" fullWidth={true} multiLine={true} rows={4} label="Comment"/>
+        <br /><br />
+        <span style={{fontSize: '13px'}}><T>Players response evaluation</T></span>
+        <SliderField name="outcome_result" min={0} max={100} step={1}/>
       </form>
     )
   }

@@ -8,6 +8,7 @@ import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
+import {LinearProgress} from '../../../../components/LinearProgress'
 import {fetchIncidents} from '../../../../actions/Incident'
 import {fetchLogs} from '../../../../actions/Log'
 import LogsPopover from './LogsPopover'
@@ -51,7 +52,8 @@ const styles = {
   'title': {
     float: 'left',
     fontSize: '13px',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
+    height: '35px'
   },
   'empty': {
     marginTop: 30,
@@ -63,10 +65,19 @@ const styles = {
     float: 'left',
     padding: '5px 0px 0px 0px'
   },
-  'log_date': {
-    float: 'right',
+  'incident_result': {
+    position: 'absolute',
     width: '140px',
-    margin: '5px 20px 0px 0px',
+    right: '45px',
+    top: '38px',
+    fontSize: '14px'
+  },
+  'log_date': {
+    position: 'absolute',
+    width: '140px',
+    right: '45px',
+    top: '34px',
+    fontSize: '14px'
   },
   'log_content': {
     padding: '0px 35px 0px 0px',
@@ -97,14 +108,17 @@ class IndexExerciseLessons extends Component {
                   primaryText={
                     <div>
                       <div style={styles.log_title}>{incident.incident_title}</div>
-                      <div style={styles.log_date}>{incident.incident_outcome.outcome_result}</div>
+                      <div style={styles.incident_result}>
+                        <LinearProgress mode="determinate" min={0} max={100}
+                                        value={incident.incident_outcome.outcome_result}/>
+                      </div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  secondaryText={<div style={styles.log_content}>{incident.incident_outcome.outcome_comment}</div>}
-                  secondaryTextLines={2}
-                  leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}
-                                  type={Constants.ICON_TYPE_MAINLIST}/>}
+                  secondaryText={<div style={styles.log_content}>{incident.incident_outcome.outcome_comment === null ?
+                    <i><T>No comment for this incident.</T></i> :
+                    <i>{incident.incident_outcome.outcome_comment}</i>}</div>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS} type={Constants.ICON_TYPE_MAINLIST2}/>}
                 />
               )
             })}
@@ -130,7 +144,6 @@ class IndexExerciseLessons extends Component {
                     </div>
                   }
                   secondaryText={<div style={styles.log_content}>{log.log_content}</div>}
-                  secondaryTextLines={2}
                   leftIcon={<Icon name={Constants.ICON_NAME_ACTION_DESCRIPTION}
                                   type={Constants.ICON_TYPE_MAINLIST2}/>}
                 />

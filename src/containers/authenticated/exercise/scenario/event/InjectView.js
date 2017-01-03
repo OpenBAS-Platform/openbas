@@ -17,13 +17,21 @@ const styles = {
 class InjectView extends Component {
   render() {
     let inject_title = R.propOr('-', 'inject_title', this.props.inject)
-    let inject_content = R.values(JSON.parse(R.propOr(null, 'inject_content', this.props.inject)))
+    let inject_content = JSON.parse(R.propOr(null, 'inject_content', this.props.inject))
+
+    let inject_fields = R.pipe(
+      R.toPairs(),
+      R.map(d => {return {key: R.head(d), value: R.last(d)}})
+    )(inject_content)
 
     return (
       <div style={styles.container}>
         <h3>{inject_title}</h3>
-        {inject_content.map(content => {
-          return <div>{content}<br /><br /></div>
+        {inject_fields.map(field => {
+          return <div>
+            <strong>{field.key}</strong><br /><br />
+            {field.value}
+          </div>
         })}
       </div>
     )
