@@ -96,6 +96,7 @@ class AudienceController extends Controller
 
         if ($form->isValid()) {
             $audience->setAudienceExercise($exercise);
+            $audience->setAudienceEnabled(true);
             $em->persist($audience);
             $em->flush();
             return $audience;
