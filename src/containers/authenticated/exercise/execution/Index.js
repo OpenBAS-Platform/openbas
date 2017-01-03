@@ -87,8 +87,11 @@ class IndexExecution extends Component {
 
   componentDidMount() {
     const initialStream = Rx.Observable.of(1); //Fetch on loading
-    var intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    this.subscription = initialStream.merge(intervalStream).subscribe(() => this.props.fetchAllInjects(this.props.exerciseId))
+    const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
+    this.subscription = initialStream
+      .merge(intervalStream)
+      .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId)) //Fetch only if previous call finished
+      .subscribe()
   }
 
   componentWillUnmount() {
@@ -138,8 +141,11 @@ class IndexExecution extends Component {
         <ExercisePopover exerciseId={this.props.exerciseId} exercise={this.props.exercise}/>
         <div style={styles.status}><T>{exerciseStatus}</T></div>
         <div className="clearfix"></div>
-        <div
-          style={styles.subtitle}>{dateFormat(R.propOr('0', 'exercise_start_date', this.props.exercise))} &rarr; {dateFormat(R.propOr('0', 'exercise_end_date', this.props.exercise))}</div>
+        <div style={styles.subtitle}>
+          {dateFormat(R.propOr(undefined, 'exercise_start_date', this.props.exercise))}
+          &nbsp;&rarr;&nbsp;
+          {dateFormat(R.propOr(undefined, 'exercise_end_date', this.props.exercise))}
+        </div>
         <div style={styles.state}>{this.selectStatus(exerciseStatus)}</div>
         <div className="clearfix"></div>
         <br />
@@ -162,7 +168,8 @@ class IndexExecution extends Component {
                   primaryText={
                     <div>
                       <div style={styles.inject_title}><span
-                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span></div>
+                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span>
+                      </div>
                       <div style={styles.inject_date}><span
                         style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject.inject_date)}</span>
                       </div>

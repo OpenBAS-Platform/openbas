@@ -87,11 +87,13 @@ class IndexExerciseDryrun extends Component {
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
     const deletionStream = Rx.Observable.create(obs => {this.listenDeletionCall = () => {obs.next(1)}})
-    this.subscription = initialStream.merge(intervalStream).takeUntil(deletionStream).subscribe(() => {
-      this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
-      this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
-      }
-    )
+    this.subscription = initialStream
+      .merge(intervalStream)
+      .takeUntil(deletionStream)
+      .exhaustMap(() => {  //Fetch only if previous call finished
+        this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
+        this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
+      }).subscribe()
   }
 
   componentWillUnmount() {
