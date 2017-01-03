@@ -15,8 +15,8 @@ const app = (state = Immutable({}), action) => {
     }
 
     case Constants.IDENTITY_LOGOUT_SUCCESS: {
-      localStorage.removeItem('logged');
-      return state.set('logged', null);
+      localStorage.removeItem('logged')
+      return state.set('logged', null)
     }
 
     case Constants.DATA_FETCH_WORKER_STATUS: {
@@ -27,7 +27,7 @@ const app = (state = Immutable({}), action) => {
       const user_lang = action.payload.entities.users[action.payload.result].user_lang
       const logged = R.assoc('lang', user_lang, state.logged)
       localStorage.setItem('logged', JSON.stringify(logged))
-      return state.set('logged', logged);
+      return state.set('logged', logged)
     }
 
     default: {

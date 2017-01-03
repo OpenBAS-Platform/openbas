@@ -13,6 +13,7 @@ i18nRegister({
   fr: {
     'Home': 'Accueil',
     'Execution': 'Exécution',
+    'Lessons': 'Expérience',
     'Checks': 'Vérifications',
     'Objectives': 'Objectifs',
     'Scenario': 'Scénario',
@@ -48,6 +49,11 @@ class LeftBar extends Component {
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/execution'}
                         label="Execution"
                         leftIcon={<Icon name={Constants.ICON_NAME_AV_PLAY_CIRCLE_OUTLINE}/>}/>
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/lessons')}
+                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/lessons'}
+                        label="Lessons"
+                        leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_SCHOOL}/>}/>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
                         active={this.props.pathname.includes('/private/exercise/' + this.props.id + '/checks')}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/checks'}

@@ -60,6 +60,12 @@ export const arrayOfIncidents = arrayOf(incident)
 export const inject = new Schema('injects', {idAttribute: 'inject_id'})
 export const arrayOfInjects = arrayOf(inject)
 
+export const log = new Schema('logs', {idAttribute: 'log_id'})
+export const arrayOfLogs = arrayOf(log)
+
+export const outcome = new Schema('outcomes', {idAttribute: 'outcome_id'})
+export const arrayOfOutcomes = arrayOf(outcome)
+
 token.define({
   token_user: user
 })

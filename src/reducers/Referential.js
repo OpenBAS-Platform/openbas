@@ -22,7 +22,9 @@ export const entitiesInitializer =
       incidents: Immutable({}),
       injects: Immutable({}),
       inject_types: Immutable({}),
-      inject_statuses: Immutable({})
+      inject_statuses: Immutable({}),
+      logs: Immutable({}),
+      outcomes: Immutable({})
     })
   })
 
@@ -43,9 +45,9 @@ const referential = (state = Immutable({}), action) => {
     }
 
     default: {
-      return state;
+      return state
     }
   }
 }
 
-export default referential;
+export default referential

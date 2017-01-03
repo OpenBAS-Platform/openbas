@@ -74,12 +74,11 @@ const styles = {
   },
   'inject_title': {
     float: 'left',
-    width: '70%',
     padding: '5px 0 0 0'
   },
   'inject_date': {
-    float: 'left',
-    padding: '5px 0 0 0'
+    float: 'right',
+    padding: '5px 30px 0 0'
   }
 }
 

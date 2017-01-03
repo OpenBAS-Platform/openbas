@@ -43,9 +43,8 @@ import IndexExerciseExecution from './containers/authenticated/exercise/executio
 import IndexExerciseChecks from './containers/authenticated/exercise/check/Index'
 import IndexExerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
-
+import IndexExcerciseLessons from './containers/authenticated/exercise/lessons/Index'
 import Immutable from 'seamless-immutable'
-
 import roundMoment from './utils/Moment-round'
 
 injectTapEventPlugin()
@@ -201,6 +200,7 @@ class App extends Component {
                   <IndexRoute component={IndexExercise}/>
                   <Route path='world' component={IndexExercise}/>
                   <Route path='execution' component={IndexExerciseExecution}/>
+                  <Route path='lessons' component={IndexExerciseLessons}/>
                   <Route path='checks' component={IndexExerciseChecks}/>
                   <Route path='checks/dryrun/:dryrunId' component={IndexExerciseDryrun}/>
                   <Route path='checks/comcheck/:comcheckId' component={IndexExerciseComcheck}/>
