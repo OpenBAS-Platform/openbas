@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import Rx from 'rx'
+import Rx from 'rxjs/Rx'
 import {connect} from 'react-redux'
 import {fetchWorkerStatus} from '../../actions/Application'
 import {savedDismiss} from '../../actions/Application'
@@ -17,14 +17,19 @@ i18nRegister({
 })
 
 class RootAuthenticated extends Component {
+
   componentDidMount() {
-    const initialStream = Rx.Observable.just(1); //Fetch on loading
-    var intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
-    this.subscription = initialStream.merge(intervalStream).do(() => this.props.fetchWorkerStatus()).subscribe();
+    if(process.env.NODE_ENV !== 'development') {
+      const initialStream = Rx.Observable.of(1); //Fetch on loading
+      var intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
+      this.subscription = initialStream.merge(intervalStream).subscribe(() => this.props.fetchWorkerStatus())
+    }
   }
 
   componentWillUnmount() {
-    this.subscription.dispose();
+    if(process.env.NODE_ENV !== 'development') {
+      this.subscription.unsubscribe()
+    }
   }
 
   render() {

@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react'
-import Rx from 'rx'
+import Rx from 'rxjs/Rx'
 import {connect} from 'react-redux'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
@@ -37,11 +37,11 @@ const styles = {
 class NoWorker extends Component {
 
   componentDidMount() {
-    this.subscription = Rx.Observable.interval(ONE_MINUTE).do(() => this.props.fetchWorkerStatus()).subscribe();
+    this.subscription = Rx.Observable.interval(ONE_MINUTE).subscribe(() => this.props.fetchWorkerStatus())
   }
 
   componentWillUnmount() {
-    this.subscription.dispose();
+    this.subscription.unsubscribe()
   }
 
   render() {

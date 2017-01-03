@@ -51,8 +51,9 @@ class DryrunPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteDryrun(this.props.exerciseId, this.props.dryrun.dryrun_id).then(() => this.props.redirectToChecks(this.props.exerciseId))
-    this.handleCloseDelete()
+    if (this.props.listenDeletionCall) this.props.listenDeletionCall()
+    this.props.deleteDryrun(this.props.exerciseId, this.props.dryrun.dryrun_id)
+      .then(() => this.props.redirectToChecks(this.props.exerciseId))
   }
 
   render() {
@@ -87,6 +88,7 @@ DryrunPopover.propTypes = {
   exerciseId: PropTypes.string,
   deleteDryrun: PropTypes.func,
   redirectToChecks: PropTypes.func,
+  listenDeletionCall: PropTypes.func,
   dryrun: PropTypes.object
 }
 
