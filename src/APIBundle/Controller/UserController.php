@@ -111,12 +111,13 @@ class UserController extends Controller
 
             $em = $this->get('doctrine.orm.entity_manager');
             if( $user->getUserAdmin() === null ) {
-                $user->setUserAdmin(0);
+                $user->setUserAdmin(false);
             }
-            if( $user->getUserAdmin() === 1 && !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() ) {
+            if( $user->getUserAdmin() == true && !$this->get('security.token_storage')->getToken()->getUser()->isAdmin() ) {
                 throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
             }
 
+            $user->setUserLang('auto');
             $em->persist($user);
             $em->flush();
 
