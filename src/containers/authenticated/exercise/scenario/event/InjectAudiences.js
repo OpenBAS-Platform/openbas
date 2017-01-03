@@ -3,10 +3,10 @@ import R from 'ramda'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
 import * as Constants from '../../../../../constants/ComponentTypes'
-import {Chip} from '../../../../../components/Chip';
-import {Avatar} from '../../../../../components/Avatar';
+import {Chip} from '../../../../../components/Chip'
+import {Avatar} from '../../../../../components/Avatar'
 import {List} from '../../../../../components/List'
-import {MainSmallListItem} from '../../../../../components/list/ListItem';
+import {MainSmallListItem} from '../../../../../components/list/ListItem'
 import {SimpleTextField} from '../../../../../components/SimpleTextField'
 import {Icon} from '../../../../../components/Icon'
 

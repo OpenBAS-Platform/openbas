@@ -133,11 +133,11 @@ class IndexExecution extends Component {
     }
   }
 
-  switchColor(enabled, globalCanceled) {
-    if (enabled && !globalCanceled) {
-      return Theme.palette.textColor
-    } else {
+  switchColor(disabled) {
+    if (disabled) {
       return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
     }
   }
 
@@ -174,14 +174,14 @@ class IndexExecution extends Component {
                   primaryText={
                     <div>
                       <div style={styles.inject_title}><span
-                        style={{color: this.switchColor(inject.inject_enabled, exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span></div>
+                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span></div>
                       <div style={styles.inject_date}><span
-                        style={{color: this.switchColor(inject.inject_enabled, exerciseStatus === 'CANCELED')}}>{moment(inject.inject_date).format('YYYY-DD-MM HH:mm')}</span>
+                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{moment(inject.inject_date).format('YYYY-DD-MM HH:mm')}</span>
                       </div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(inject.inject_type, this.switchColor(inject.inject_enabled, exerciseStatus === 'CANCELED'))}
+                  leftIcon={this.selectIcon(inject.inject_type, this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED'))}
                   rightIconButton={
                     <InjectPopover
                       exerciseId={this.props.exerciseId}

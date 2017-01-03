@@ -6,9 +6,11 @@ import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
 import Theme from '../../../../../components/Theme'
 import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
+import {Dialog} from '../../../../../components/Dialog'
 import {List} from '../../../../../components/List'
 import {MainListItem, HeaderItem} from '../../../../../components/list/ListItem';
 import {Icon} from '../../../../../components/Icon'
+import {FlatButton} from '../../../../../components/Button'
 import {SearchField} from '../../../../../components/SimpleTextField'
 import {fetchAudiences} from '../../../../../actions/Audience'
 import {fetchEvents} from '../../../../../actions/Event'
@@ -20,6 +22,7 @@ import EventPopover from './EventPopover'
 import IncidentPopover from './IncidentPopover'
 import CreateInject from './CreateInject'
 import InjectPopover from './InjectPopover'
+import InjectView from './InjectView'
 
 const styles = {
   'container': {
@@ -97,7 +100,7 @@ i18nRegister({
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'inject_date', orderAsc: true, searchTerm: ''}
+    this.state = {sortBy: 'inject_date', orderAsc: true, searchTerm: '', openView: false, currentInject: {}}
   }
 
   componentDidMount() {
@@ -146,15 +149,27 @@ class Index extends Component {
     }
   }
 
-  switchColor(enabled) {
-    if (enabled) {
-      return Theme.palette.textColor
-    } else {
+  switchColor(disabled) {
+    if (disabled) {
       return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
     }
   }
 
+  handleOpenView(inject) {
+    this.setState({currentInject: inject, openView: true})
+  }
+
+  handleCloseView() {
+    this.setState({openView: false})
+  }
+
   render() {
+    const viewActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
+    ]
+
     let {exerciseId, eventId, event, incident, incidents} = this.props
     let event_title = R.propOr('-', 'event_title', event)
     if (event && incident) {
@@ -215,7 +230,8 @@ class Index extends Component {
               //Return the dom
               return <MainListItem
                 key={injectId}
-                leftIcon={this.selectIcon(inject_type, this.switchColor(inject_enabled))}
+                leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled))}
+                onClick={this.handleOpenView.bind(this, inject)}
                 rightIconButton={
                   <InjectPopover
                     exerciseId={exerciseId}
@@ -230,11 +246,11 @@ class Index extends Component {
                 primaryText={
                   <div>
                     <div style={styles.inject_title}><span
-                      style={{color: this.switchColor(inject_enabled)}}>{inject_title}</span></div>
+                      style={{color: this.switchColor(!inject_enabled)}}>{inject_title}</span></div>
                     <div style={styles.inject_date}><span
-                      style={{color: this.switchColor(inject_enabled)}}>{dateFormat(inject_date)}</span></div>
+                      style={{color: this.switchColor(!inject_enabled)}}>{dateFormat(inject_date)}</span></div>
                     <div style={styles.inject_user}><span
-                      style={{color: this.switchColor(inject_enabled)}}>{inject_user}</span></div>
+                      style={{color: this.switchColor(!inject_enabled)}}>{inject_user}</span></div>
                     <div className="clearfix"></div>
                   </div>
                 }
@@ -247,6 +263,15 @@ class Index extends Component {
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
             <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
           </Toolbar>
+          <Dialog
+            title="Inject view"
+            modal={false}
+            open={this.state.openView}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseView.bind(this)}
+            actions={viewActions}>
+              <InjectView inject={this.state.currentInject} />
+            </Dialog>
         </div>
       </div>
     } else if (event) {

@@ -5,9 +5,12 @@ import {injectIntl} from 'react-intl'
 import * as Constants from '../../../constants/ComponentTypes'
 import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
+import {dateFormat} from '../../../utils/Time'
 import {List} from '../../../components/List'
 import {MainListItem, SecondaryListItem, TertiaryListItem} from '../../../components/list/ListItem';
 import {Icon} from '../../../components/Icon'
+import {IconButton} from '../../../components/Button'
+import {Avatar} from '../../../components/Avatar'
 import {fetchObjectives} from '../../../actions/Objective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchEvents} from '../../../actions/Event'
@@ -65,6 +68,11 @@ const styles = {
     float: 'right',
     width: '130px',
     padding: '5px 0 0 0'
+  },
+  'audiences': {
+    position: 'absolute',
+    right: '5px',
+    top: '15px'
   }
 }
 
@@ -116,8 +124,8 @@ class IndexExercise extends Component {
             <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
           <List>
             {this.props.audiences.map(audience => {
-                var playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
-                return (
+              var playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
+              return (
                 <MainListItem
                   key={audience.audience_id}
                   primaryText={audience.audience_name}
@@ -136,25 +144,47 @@ class IndexExercise extends Component {
           <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
         <List>
           {this.props.events.map(event => {
-            let nestedItems = event.event_incidents.map(data => {
-                let incident = R.propOr({}, data.incident_id, this.props.incidents)
-                let incident_id = R.propOr(data.incident_id, 'incident_id', incident)
+            const incidents = R.pipe(
+              R.map(data => R.pathOr({}, ['incidents', data.incident_id], this.props)),
+              R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
+            )(event.event_incidents)
+
+            let nestedItems = incidents.map(incident => {
+                let incident_id = R.propOr(Math.random(), 'incident_id', incident)
                 let incident_title = R.propOr('-', 'incident_title', incident)
                 let incident_story = R.propOr('-', 'incident_story', incident)
                 let incident_injects = R.propOr([], 'incident_injects', incident)
 
-                let nestedItems2 = incident_injects.map(data2 => {
-                    let inject = R.propOr({}, data2.inject_id, this.props.injects)
-                    let inject_id = R.propOr(data2.inject_id, 'inject_id', inject)
+                const injects = R.pipe(
+                  R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
+                  R.sort((a, b) => a.inject_date > b.inject_date)
+                )(incident_injects)
+
+                let nestedItems2 = injects.map(inject => {
+                    let inject_id = R.propOr(Math.random(), 'inject_id', inject)
                     let inject_title = R.propOr('-', 'inject_title', inject)
-                    let inject_description = R.propOr('-', 'inject_description', inject)
                     let inject_type = R.propOr('-', 'inject_type', inject)
+                    let inject_date = R.propOr('-', 'inject_date', inject)
+                    let inject_audiences = R.propOr([], 'inject_audiences', inject)
 
                     return <TertiaryListItem
                       key={inject_id}
                       leftIcon={this.selectIcon(inject_type)}
-                      primaryText={inject_title}
-                      secondaryText={inject_description}/>
+                      primaryText={<div>
+                        {inject_title}
+                        {<div style={styles.audiences}>
+                          {inject_audiences.map(data3 => {
+                            let audience = R.find(a => a.audience_id === data3.audience_id)(this.props.audiences)
+                            let audience_id = R.propOr(data3.audience_id, 'audience_id', audience)
+                            let audience_name = R.propOr('-', 'audience_name', audience)
+                            return <IconButton key={audience_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={audience_name}
+                                               tooltipPosition="bottom-left">
+                              <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}/></IconButton>
+                          })}
+                        </div>}
+                      </div>}
+                      secondaryText={dateFormat(inject_date)}
+                    />
                   }
                 )
                 return <SecondaryListItem

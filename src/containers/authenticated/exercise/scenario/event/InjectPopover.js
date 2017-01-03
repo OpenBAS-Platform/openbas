@@ -44,6 +44,8 @@ class InjectPopover extends Component {
       openDelete: false,
       openEdit: false,
       openPopover: false,
+      openDisable: false,
+      openEnable: false,
       type: undefined,
       stepIndex: 0,
       finished: false,

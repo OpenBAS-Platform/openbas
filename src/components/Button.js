@@ -33,6 +33,10 @@ const buttonStyle = {
   },
   [ Constants.BUTTON_TYPE_CREATE_RIGHT ]: {
     marginTop: '4px'
+  },
+  [ Constants.BUTTON_TYPE_SINGLE ]: {
+    float: 'left',
+    margin: '-5px 0px 0px 0px'
   }
 }
 
@@ -172,6 +176,8 @@ ActionButtonCreate.propTypes = {
 export const IconButton = (props) => (
   <MUIIconButton
     disabled={props.disabled}
+    tooltipPosition={props.tooltipPosition}
+    tooltip={props.tooltip}
     onClick={props.onClick}
     style={buttonStyle[props.type]}
   >
@@ -183,7 +189,9 @@ IconButton.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
   onClick: PropTypes.func,
-  type: PropTypes.string
+  type: PropTypes.string,
+  tooltip: PropTypes.string,
+  tooltipPosition: PropTypes.string,
 }
 
 const LinkIconButtonIntl = (props) => (
