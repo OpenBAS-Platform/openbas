@@ -4,6 +4,7 @@ import R from 'ramda'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
 import {dateFormat, dateToISO} from '../../../../../utils/Time'
+import Theme from '../../../../../components/Theme'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover'
 import {Menu} from '../../../../../components/Menu'
@@ -218,6 +219,14 @@ class InjectPopover extends Component {
     }
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
@@ -246,7 +255,7 @@ class InjectPopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!inject_enabled)}/>
         </IconButton>
         <Popover open={this.state.openPopover}
                  anchorEl={this.state.anchorEl}

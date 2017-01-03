@@ -9,6 +9,7 @@ import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchComchecks} from '../../../../actions/Comcheck'
 import {LinkIconButton} from '../../../../components/Button'
+import Theme from '../../../../components/Theme'
 import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
@@ -136,15 +137,24 @@ class Index extends Component {
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     let comchecks = null
     if (this.props.comchecks.length > 0) {
       comchecks = (
         <div style={styles.comcheck}>
           <LinkIconButton
-            to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + this.props.comchecks[0].comcheck_id} tooltip="Comcheck currently running"
+            to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + this.props.comchecks[0].comcheck_id}
+            tooltip="Comcheck currently running"
             tooltipPosition="bottom-left"><Icon color="#E91E63"
-            name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}/></LinkIconButton>
+                                                name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}/></LinkIconButton>
         </div>
       )
     }
@@ -171,7 +181,8 @@ class Index extends Component {
       return <div style={styles.container}>
         <AudienceNav selectedAudience={audience.audience_id} exerciseId={exerciseId} audiences={audiences}/>
         <div>
-          <div style={styles.title}>{audience.audience_name}</div>
+          <div style={styles.title}><span
+            style={{color: this.switchColor(!audience.audience_enabled)}}>{audience.audience_name}</span></div>
           <AudiencePopover exerciseId={exerciseId} audience={audience} audiences={audiences}/>
           {comchecks}
           <div style={styles.search}>
@@ -184,11 +195,15 @@ class Index extends Component {
             {audience.audience_users.length === 0 ? (
                 <div style={styles.empty}><T>This audience is empty.</T></div>
               ) : (
-                <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
+                <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}><span
+                  style={{color: this.switchColor(!audience.audience_enabled)}}>#</span></span>}
                                   rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
-                  {this.SortHeader('user_firstname', 'Name')}
-                  {this.SortHeader('user_email', 'Email address')}
-                  {this.SortHeader('user_organization', 'Organization')}
+                  <span
+                    style={{color: this.switchColor(!audience.audience_enabled)}}>{this.SortHeader('user_firstname', 'Name')}</span>
+                  <span
+                    style={{color: this.switchColor(!audience.audience_enabled)}}>{this.SortHeader('user_email', 'Email address')}</span>
+                  <span
+                    style={{color: this.switchColor(!audience.audience_enabled)}}>{this.SortHeader('user_organization', 'Organization')}</span>
                   <div className="clearfix"></div>
                 </div>}
                 />
@@ -210,9 +225,13 @@ class Index extends Component {
                 rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
                 primaryText={
                   <div>
-                    <div style={styles.name}>{user_firstname} {user_lastname}</div>
-                    <div style={styles.mail}>{user_email}</div>
-                    <div style={styles.org}>{organizationName}</div>
+                    <div style={styles.name}><span
+                      style={{color: this.switchColor(!audience.audience_enabled)}}>{user_firstname} {user_lastname}</span>
+                    </div>
+                    <div style={styles.mail}><span
+                      style={{color: this.switchColor(!audience.audience_enabled)}}>{user_email}</span></div>
+                    <div style={styles.org}><span
+                      style={{color: this.switchColor(!audience.audience_enabled)}}>{organizationName}</span></div>
                     <div className="clearfix"></div>
                   </div>
                 }

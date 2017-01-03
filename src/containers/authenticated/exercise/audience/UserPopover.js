@@ -1,15 +1,16 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {PropTypes, Component} from 'react'
+import {connect} from 'react-redux'
 import R from 'ramda'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
-import {Popover} from '../../../../components/Popover';
+import {Popover} from '../../../../components/Popover'
 import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
+import {MenuItemLink, MenuItemButton} from '../../../../components/menu/MenuItem'
+import Theme from '../../../../components/Theme'
 import {updateUser} from '../../../../actions/User'
 import {updateAudience} from '../../../../actions/Audience'
 import UserForm from './UserForm'
@@ -106,6 +107,14 @@ class UserPopover extends Component {
     this.handleCloseDelete()
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
@@ -131,7 +140,7 @@ class UserPopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!this.props.audience.audience_enabled)}/>
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
