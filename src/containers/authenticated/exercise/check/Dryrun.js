@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import Rx from 'rxjs/Rx'
+import {FIVE_SECONDS} from '../../../../utils/Time'
 import {i18nRegister} from '../../../../utils/Messages'
 import {T} from '../../../../components/I18n'
 import {dateFormat} from '../../../../utils/Time'
@@ -80,30 +82,20 @@ const styles = {
 
 class IndexExerciseDryrun extends Component {
   componentDidMount() {
-    this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
     this.props.fetchAudiences(this.props.exerciseId)
-    this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
-    this.repeatTimeout()
+    //Scheduler listener
+    const initialStream = Rx.Observable.of(1) //Fetch on loading
+    const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
+    const deletionStream = Rx.Observable.create(obs => {this.listenDeletionCall = () => {obs.next(1)}})
+    this.subscription = initialStream.merge(intervalStream).takeUntil(deletionStream).subscribe(() => {
+      this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
+      this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
+      }
+    )
   }
 
   componentWillUnmount() {
-    //noinspection Eslint
-    clearTimeout(this.repeat)
-  }
-
-  repeatTimeout() {
-    //noinspection Eslint
-    const context = this
-    //noinspection Eslint
-    this.repeat = setTimeout(function () {
-      context.circularFetch()
-      context.repeatTimeout(context);
-    }, 5000)
-  }
-
-  circularFetch() {
-    this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true)
-    this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId, true)
+    this.subscription.unsubscribe()
   }
 
   selectIcon(type, color) {
@@ -129,7 +121,7 @@ class IndexExerciseDryrun extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.title}>Dryrun</div>
-        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun}/>
+        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun} listenDeletionCall={this.listenDeletionCall}/>
         <div style={styles.audience}>{audienceName}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>

@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import Rx from 'rxjs/Rx'
+import {FIVE_SECONDS} from '../../../../utils/Time'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -9,7 +11,7 @@ import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchComcheck, fetchComcheckStatuses} from '../../../../actions/Comcheck'
 import {List} from '../../../../components/List'
-import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
+import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem'
 import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
 import {dateFormat} from '../../../../utils/Time'
@@ -125,38 +127,29 @@ const styles = {
 }
 
 class Comcheck extends Component {
+
   constructor(props) {
     super(props);
     this.state = {sortBy: 'user_firstname', orderAsc: true}
   }
 
   componentDidMount() {
-    this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId)
-    this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId)
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchUsers()
     this.props.fetchOrganizations()
-    this.repeatTimeout()
+    //Scheduler listener
+    const initialStream = Rx.Observable.of(1) //Fetch on loading
+    const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
+    const deletionStream = Rx.Observable.create(obs => {this.listenDeletionCall = () => {obs.next(1)}})
+    this.subscription = initialStream.merge(intervalStream).takeUntil(deletionStream).subscribe(() => {
+        this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)
+        this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
+      }
+    )
   }
 
   componentWillUnmount() {
-    //noinspection Eslint
-    clearTimeout(this.repeat)
-  }
-
-  repeatTimeout() {
-    //noinspection Eslint
-    const context = this
-    //noinspection Eslint
-    this.repeat = setTimeout(function () {
-      context.circularFetch()
-      context.repeatTimeout(context);
-    }, 5000)
-  }
-
-  circularFetch() {
-    this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)
-    this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
+    this.subscription.unsubscribe()
   }
 
   reverseBy(field) {
@@ -215,10 +208,11 @@ class Comcheck extends Component {
     return <div>
       <div>
         <div style={styles.title}>Comcheck</div>
-        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck}/>
+        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck} listenDeletionCall={this.listenDeletionCall}/>
         <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>
         <div className="clearfix"></div>
-        <div style={styles.subtitle}>{dateFormat(R.propOr('0', 'comcheck_start_date', this.props.comcheck))} &rarr; {dateFormat(R.propOr('0', 'comcheck_end_date', this.props.comcheck))}</div>
+        <div
+          style={styles.subtitle}>{dateFormat(R.propOr('0', 'comcheck_start_date', this.props.comcheck))} &rarr; {dateFormat(R.propOr('0', 'comcheck_end_date', this.props.comcheck))}</div>
         <div className="clearfix"></div>
         <List>
           <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>} primaryText={

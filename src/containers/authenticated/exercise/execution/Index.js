@@ -1,5 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import Rx from 'rxjs/Rx'
+import {FIVE_SECONDS} from '../../../../utils/Time'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
@@ -83,28 +85,15 @@ const styles = {
 }
 
 class IndexExecution extends Component {
+
   componentDidMount() {
-    this.props.fetchAllInjects(this.props.exerciseId)
-    this.repeatTimeout()
+    const initialStream = Rx.Observable.of(1); //Fetch on loading
+    var intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
+    this.subscription = initialStream.merge(intervalStream).subscribe(() => this.props.fetchAllInjects(this.props.exerciseId))
   }
 
   componentWillUnmount() {
-    //noinspection Eslint
-    clearTimeout(this.repeat)
-  }
-
-  repeatTimeout() {
-    //noinspection Eslint
-    const context = this
-    //noinspection Eslint
-    this.repeat = setTimeout(function () {
-      context.circularFetch()
-      context.repeatTimeout(context);
-    }, 5000)
-  }
-
-  circularFetch() {
-    this.props.fetchAllInjects(this.props.exerciseId, true)
+    this.subscription.unsubscribe()
   }
 
   selectIcon(type, color) {

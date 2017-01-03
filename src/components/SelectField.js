@@ -38,7 +38,7 @@ renderSelectField.propTypes = {
   type: PropTypes.string,
   hint: PropTypes.string,
   label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-  name: PropTypes.string.isRequired,
+  name: PropTypes.string,
   meta: PropTypes.object,
   onSelectChange: PropTypes.func,
   children: PropTypes.node

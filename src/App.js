@@ -132,7 +132,7 @@ const UserIsAuthenticated = UserAuthWrapper({
 
 const PlatformWorkerAccessible = UserAuthWrapper({
   authSelector: state => state.app.worker,
-  predicate: worker => process.env.NODE_ENV === 'development' || worker.status === "RUNNING",
+  predicate: worker => worker.status === "RUNNING",
   failureRedirectPath: '/unreachable',
   allowRedirectBack: false
 })

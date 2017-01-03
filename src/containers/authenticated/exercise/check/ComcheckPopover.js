@@ -51,8 +51,9 @@ class ComcheckPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteComcheck(this.props.exerciseId, this.props.comcheck.comcheck_id).then(() => this.props.redirectToChecks(this.props.exerciseId))
-    this.handleCloseDelete()
+    if (this.props.listenDeletionCall) this.props.listenDeletionCall()
+    this.props.deleteComcheck(this.props.exerciseId, this.props.comcheck.comcheck_id)
+      .then(() => this.props.redirectToChecks(this.props.exerciseId))
   }
 
   render() {
@@ -87,6 +88,7 @@ ComcheckPopover.propTypes = {
   exerciseId: PropTypes.string,
   deleteComcheck: PropTypes.func,
   redirectToChecks: PropTypes.func,
+  listenDeletionCall: PropTypes.func,
   comcheck: PropTypes.object
 }
 

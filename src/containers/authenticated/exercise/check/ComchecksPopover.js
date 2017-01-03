@@ -99,7 +99,7 @@ class DryrunsPopover extends Component {
           autoScrollBodyContent={true}
           actions={launchActions}>
           <ComcheckForm initialValues={initialComcheckValues} ref="comcheckForm" audiences={this.props.audiences}
-                        onSubmit={this.onSubmitLaunch.bind(this)} onSubmitSuccess={this.handleCloseLaunch.bind(this)}/>
+                        onSubmit={this.onSubmitLaunch.bind(this)}/>
         </Dialog>
       </div>
     )
