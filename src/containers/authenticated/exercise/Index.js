@@ -8,15 +8,19 @@ import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
 import {dateFormat} from '../../../utils/Time'
 import {List} from '../../../components/List'
+import {Dialog} from '../../../components/Dialog'
 import {MainListItem, SecondaryListItem, TertiaryListItem} from '../../../components/list/ListItem';
 import {Icon} from '../../../components/Icon'
-import {IconButton} from '../../../components/Button'
+import {IconButton, FlatButton} from '../../../components/Button'
 import {Avatar} from '../../../components/Avatar'
 import {fetchObjectives} from '../../../actions/Objective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchEvents} from '../../../actions/Event'
-import {fetchIncidents} from '../../../actions/Incident'
+import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
 import {fetchAllInjects} from '../../../actions/Inject'
+import IncidentView from './scenario/event/IncidentView'
+import InjectView from './scenario/event/InjectView'
+import AudiencePopover from './AudiencePopover'
 
 i18nRegister({
   fr: {
@@ -26,7 +30,9 @@ i18nRegister({
     'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.',
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
     'Scenario': 'Scénario',
-    'You do not have any events in this exercise.': 'Vous n\'avez aucun événement dans cet exercice.'
+    'You do not have any events in this exercise.': 'Vous n\'avez aucun événement dans cet exercice.',
+    'Inject view': 'Vue de l\'inject',
+    'Incident view': 'Vue de l\'incident'
   }
 })
 
@@ -78,7 +84,13 @@ const styles = {
 }
 
 class IndexExercise extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {openViewIncident: false, openViewInject: false, currentIncident: {}, currentInject: {}}
+  }
+
   componentDidMount() {
+    this.props.fetchIncidentTypes()
     this.props.fetchObjectives(this.props.exerciseId)
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
@@ -105,7 +117,29 @@ class IndexExercise extends Component {
     }
   }
 
+  handleOpenViewIncident(incident) {
+    this.setState({currentIncident: incident, openViewIncident: true})
+  }
+
+  handleCloseViewIncident() {
+    this.setState({openViewIncident: false})
+  }
+
+  handleOpenViewInject(inject) {
+    this.setState({currentInject: inject, openViewInject: true})
+  }
+
+  handleCloseViewInject() {
+    this.setState({openViewInject: false})
+  }
+
   render() {
+    const viewIncidentActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>,
+    ]
+    const viewInjectActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewInject.bind(this)}/>,
+    ]
     return (
       <div>
         <div style={styles.columnLeft}>
@@ -136,6 +170,7 @@ class IndexExercise extends Component {
               var playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
               return (
                 <MainListItem
+                  rightIconButton={<AudiencePopover exerciseId={this.props.exerciseId}  audience={audience}/>}
                   key={audience.audience_id}
                   primaryText={<div
                     style={{color: this.switchColor(!audience.audience_enabled)}}>{audience.audience_name}</div>}
@@ -180,6 +215,7 @@ class IndexExercise extends Component {
 
                     return <TertiaryListItem
                       key={inject_id}
+                      onClick={this.handleOpenViewInject.bind(this, inject)}
                       leftIcon={this.selectIcon(inject_type)}
                       primaryText={<div>
                         {inject_title}
@@ -200,6 +236,7 @@ class IndexExercise extends Component {
                 )
                 return <SecondaryListItem
                   key={incident_id}
+                  onClick={this.handleOpenViewIncident.bind(this, incident)}
                   leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}/>}
                   primaryText={incident_title}
                   secondaryText={incident_story}
@@ -218,6 +255,24 @@ class IndexExercise extends Component {
             )
           })}
         </List>
+        <Dialog
+          title="Incident view"
+          modal={false}
+          open={this.state.openViewIncident}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseViewIncident.bind(this)}
+          actions={viewIncidentActions}>
+          <IncidentView incident={this.state.currentIncident} incident_types={this.props.incident_types} />
+        </Dialog>
+        <Dialog
+          title="Inject view"
+          modal={false}
+          open={this.state.openViewInject}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseViewInject.bind(this)}
+          actions={viewInjectActions}>
+          <InjectView inject={this.state.currentInject} />
+        </Dialog>
       </div>
     )
   }
@@ -229,12 +284,14 @@ IndexExercise.propTypes = {
   audiences: PropTypes.array,
   events: PropTypes.array,
   incidents: PropTypes.object,
+  incident_types: PropTypes.object,
   injects: PropTypes.object,
   fetchObjectives: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
   fetchAllInjects: PropTypes.func,
+  fetchIncidentTypes: PropTypes.func,
   intl: PropTypes.object
 }
 
@@ -277,6 +334,7 @@ const select = (state, ownProps) => {
     audiences,
     events,
     incidents: state.referential.entities.incidents,
+    incident_types: state.referential.entities.incident_types,
     injects: state.referential.entities.injects
   }
 }
@@ -286,5 +344,6 @@ export default connect(select, {
   fetchAudiences,
   fetchEvents,
   fetchIncidents,
+  fetchIncidentTypes,
   fetchAllInjects
 })(injectIntl(IndexExercise))

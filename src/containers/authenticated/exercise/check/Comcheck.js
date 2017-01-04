@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import R from 'ramda'
 import Rx from 'rxjs/Rx'
 import {FIVE_SECONDS} from '../../../../utils/Time'
+import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -13,6 +14,7 @@ import {fetchComcheck, fetchComcheckStatuses} from '../../../../actions/Comcheck
 import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem'
 import {Avatar} from '../../../../components/Avatar'
+import {CircularSpinner} from '../../../../components/Spinner'
 import {Icon} from '../../../../components/Icon'
 import {dateFormat} from '../../../../utils/Time'
 import ComcheckPopover from './ComcheckPopover'
@@ -123,7 +125,10 @@ const styles = {
     width: '6%',
     textAlign: 'center',
     padding: 0
-  }
+  },
+  'comcheck_state': {
+    float: 'right',
+  },
 }
 
 class Comcheck extends Component {
@@ -140,7 +145,11 @@ class Comcheck extends Component {
     //Scheduler listener
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    const cancelStream = Rx.Observable.create(obs => {this.cancelStreamEvent = () => {obs.next(1)}})
+    const cancelStream = Rx.Observable.create(obs => {
+      this.cancelStreamEvent = () => {
+        obs.next(1)
+      }
+    })
     this.subscription = initialStream
       .merge(intervalStream)
       .takeUntil(cancelStream)
@@ -211,17 +220,23 @@ class Comcheck extends Component {
       R.sort((a, b) => this.modelSorting(this.state.sortBy, this.state.orderAsc, a, b))
     )(this.props.comcheck_statuses);
 
+    let comcheck_finished = R.propOr(false, 'comcheck_finished', this.props.comcheck)
+
     return <div>
       <div>
         <div style={styles.title}>Comcheck</div>
-        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck} listenDeletionCall={this.cancelStreamEvent}/>
+        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck}
+                         listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>
-            {dateFormat(R.propOr(undefined, 'comcheck_start_date', this.props.comcheck))}
-            &nbsp;&rarr;&nbsp;
-            {dateFormat(R.propOr(undefined, 'comcheck_end_date', this.props.comcheck))}
+          {dateFormat(R.propOr(undefined, 'comcheck_start_date', this.props.comcheck))}
+          &nbsp;&rarr;&nbsp;
+          {dateFormat(R.propOr(undefined, 'comcheck_end_date', this.props.comcheck))}
         </div>
+        <div style={styles.comcheck_state}>{comcheck_finished ?
+          <Icon name={Constants.ICON_NAME_ACTION_DONE_ALL} color={Theme.palette.primary1Color}/> :
+          <CircularSpinner size={20} color={Theme.palette.primary1Color}/>}</div>
         <div className="clearfix"></div>
         <List>
           <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>} primaryText={

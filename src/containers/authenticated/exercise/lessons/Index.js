@@ -69,14 +69,14 @@ const styles = {
     position: 'absolute',
     width: '140px',
     right: '45px',
-    top: '38px',
+    top: '30px',
     fontSize: '14px'
   },
   'log_date': {
     position: 'absolute',
     width: '140px',
     right: '45px',
-    top: '34px',
+    top: '26px',
     fontSize: '14px'
   },
   'log_content': {
