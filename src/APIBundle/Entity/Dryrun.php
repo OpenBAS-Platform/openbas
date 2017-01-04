@@ -149,10 +149,10 @@ class Dryrun
     }
 
     public function computeDryRunFinished($dryinjects) {
+        /* @var $dryinjects Dryinject[] */
         $finished = true;
-        $now = new \DateTime();
         foreach( $dryinjects as $dryinject ) {
-            if( $dryinject->getDryinjectDate() > $now ) {
+            if( $dryinject->getDryinjectStatus()->getStatusName() == 'PENDING' ) {
                 $finished = false;
             }
         }
