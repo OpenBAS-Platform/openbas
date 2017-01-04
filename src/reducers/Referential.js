@@ -20,6 +20,7 @@ export const entitiesInitializer =
       audiences: Immutable({}),
       events: Immutable({}),
       incidents: Immutable({}),
+      incident_types: Immutable({}),
       injects: Immutable({}),
       inject_types: Immutable({}),
       inject_statuses: Immutable({}),
