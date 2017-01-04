@@ -4,3 +4,7 @@ APIBundle\Entity\InjectStatus:
             groups: ['injectStatus', 'inject']
         status_name:
             groups: ['injectStatus', 'inject']
+        status_message:
+            groups: ['injectStatus', 'inject']
+        status_date:
+            groups: ['injectStatus', 'inject']

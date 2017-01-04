@@ -4,3 +4,7 @@ APIBundle\Entity\DryinjectStatus:
             groups: ['dryinjectStatus', 'dryinject']
         status_name:
             groups: ['dryinjectStatus', 'dryinject']
+        status_message:
+            groups: ['dryinjectStatus', 'dryinject']
+        status_date:
+            groups: ['dryinjectStatus', 'dryinject']
