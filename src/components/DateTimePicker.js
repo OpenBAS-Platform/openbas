@@ -1,7 +1,8 @@
 import React, {Component, PropTypes} from 'react'
-import DatePicker from 'material-ui/DatePicker';
-import TimePicker from 'material-ui/TimePicker';
+import DatePicker from 'material-ui/DatePicker'
+import TimePicker from 'material-ui/TimePicker'
 import moment from 'moment'
+import {injectIntl} from 'react-intl'
 
 const styles = {
   global: {
@@ -48,8 +49,11 @@ class DateTimePicker extends Component {
           name="Date"
           ref="datePicker"
           value={this.props.defaultDate}
+          DateTimeFormat={global.Intl.DateTimeFormat}
           onChange={this.handleDateChange.bind(this)}
           floatingLabelText="Date"
+          locale={this.props.intl.locale}
+          cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
           style={styles.global}/>
         <TimePicker
           name="Time"
@@ -58,6 +62,7 @@ class DateTimePicker extends Component {
           ref="timePicker"
           value={this.props.defaultDate}
           onChange={this.handleTimeChange.bind(this)}
+          cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
           floatingLabelText="Time"
           okLabel={<div style={{display: 'none'}}></div>}
           style={styles.global}/>
@@ -72,4 +77,4 @@ DateTimePicker.propTypes = {
   defaultTime: PropTypes.object
 }
 
-export default DateTimePicker;
+export default injectIntl(DateTimePicker, {withRef: true})

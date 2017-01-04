@@ -15,11 +15,11 @@ i18nRegister({
 
 class ExerciseForm extends Component {
   raiseStartPicker() {
-    this.refs.startPicker.refs.datePicker.openDialog()
+    this.refs.startPicker.getWrappedInstance().refs.datePicker.openDialog()
   }
 
   raiseEndPicker() {
-    this.refs.endPicker.refs.datePicker.openDialog()
+    this.refs.endPicker.getWrappedInstance().refs.datePicker.openDialog()
   }
 
   replaceStartValue(value) {

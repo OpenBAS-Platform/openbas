@@ -30,7 +30,7 @@ const validate = values => {
 
 class ComcheckForm extends Component {
   raiseEndPicker() {
-    this.refs.endPicker.refs.datePicker.openDialog()
+    this.refs.endPicker.getWrappedInstance().refs.datePicker.openDialog()
   }
 
   replaceEndValue(value) {
