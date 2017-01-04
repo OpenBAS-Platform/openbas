@@ -140,14 +140,13 @@ class Comcheck extends Component {
     //Scheduler listener
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    const deletionStream = Rx.Observable.create(obs => {this.listenDeletionCall = () => {obs.next(1)}})
+    const cancelStream = Rx.Observable.create(obs => {this.cancelStreamEvent = () => {obs.next(1)}})
     this.subscription = initialStream
       .merge(intervalStream)
-      .takeUntil(deletionStream)
-      .exhaustMap(() => {  //Fetch only if previous call finished
-        this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)
-        this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
-      }).subscribe()
+      .takeUntil(cancelStream)
+      .exhaustMap(() => this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
+        .then(this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)))
+      .subscribe()
   }
 
   componentWillUnmount() {
@@ -210,7 +209,7 @@ class Comcheck extends Component {
     return <div>
       <div>
         <div style={styles.title}>Comcheck</div>
-        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck} listenDeletionCall={this.listenDeletionCall}/>
+        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck} listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>
         <div className="clearfix"></div>
         <div

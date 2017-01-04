@@ -81,19 +81,24 @@ const styles = {
 }
 
 class IndexExerciseDryrun extends Component {
+
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
     //Scheduler listener
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    const deletionStream = Rx.Observable.create(obs => {this.listenDeletionCall = () => {obs.next(1)}})
+    const cancelStream = Rx.Observable.create(obs => {this.cancelStreamEvent = () => {obs.next(1)}})
     this.subscription = initialStream
       .merge(intervalStream)
-      .takeUntil(deletionStream)
-      .exhaustMap(() => {  //Fetch only if previous call finished
-        this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)
-        this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
-      }).subscribe()
+      .takeUntil(cancelStream)
+      .exhaustMap(() => this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId)
+        .then(this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId)))
+      .subscribe()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    let dryrun_finished = R.propOr(false, 'dryrun_finished', nextProps.dryrun)
+    if(dryrun_finished) this.cancelStreamEvent()
   }
 
   componentWillUnmount() {
@@ -123,7 +128,7 @@ class IndexExerciseDryrun extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.title}>Dryrun</div>
-        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun} listenDeletionCall={this.listenDeletionCall}/>
+        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun} listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{audienceName}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
