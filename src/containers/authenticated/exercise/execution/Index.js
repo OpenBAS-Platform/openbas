@@ -5,14 +5,16 @@ import {FIVE_SECONDS} from '../../../../utils/Time'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
+import {equalsSelector} from '../../../../utils/Selectors'
 import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
-import {MainListItem} from '../../../../components/list/ListItem';
+import {MainListItem} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
 import {CircularSpinner} from '../../../../components/Spinner'
+import Countdown from '../../../../components/Countdown'
 import {fetchObjectives} from '../../../../actions/Objective'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchAllInjects} from '../../../../actions/Inject'
@@ -21,6 +23,7 @@ import InjectPopover from './InjectPopover'
 
 i18nRegister({
   fr: {
+    'Next inject': 'Le prochain inject',
     'Execution': 'Exécution',
     'Pending injects': 'Injects en attente',
     'Processed injects': 'Injects traités',
@@ -133,7 +136,7 @@ class IndexExecution extends Component {
 
   render() {
     let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)
-
+    const nextInject = R.propOr(undefined, 'inject_date', R.head(this.props.injectsPending))
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
@@ -150,10 +153,10 @@ class IndexExecution extends Component {
         <br />
         <LinearProgress
           mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'}
-          min={0}
-          max={this.props.injectsPending.length + this.props.injectsProcessed.length}
-          value={this.props.injectsProcessed.length}/>
-        <br /><br />
+          min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length} value={this.props.injectsProcessed.length}/>
+        <br />
+        <div style={{textAlign: 'Left'}}><T>Next inject</T> <Countdown targetDate={nextInject}/></div>
+        <br />
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Pending injects</T></div>
           <div className="clearfix"></div>
@@ -231,7 +234,9 @@ IndexExecution.propTypes = {
   fetchAllInjects: PropTypes.func,
 }
 
-const filterInjectsPending = (injects, exerciseId) => {
+const filterInjectsPending = (state, ownProps) => {
+  const injects = state.referential.entities.injects
+  const exerciseId = ownProps.params.exerciseId
   let injectsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === 'PENDING'),
@@ -240,7 +245,9 @@ const filterInjectsPending = (injects, exerciseId) => {
   return injectsFilterAndSorting(injects)
 }
 
-const filterInjectsProcessed = (injects, exerciseId) => {
+const filterInjectsProcessed = (state, ownProps) => {
+  const injects = state.referential.entities.injects
+  const exerciseId = ownProps.params.exerciseId
   let injectsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.inject_exercise === exerciseId && (n.inject_status.status_name === 'SUCCESS' || n.inject_status.status_name === 'ERROR' || n.inject_status.status_name === 'PARTIAL')),
@@ -249,18 +256,18 @@ const filterInjectsProcessed = (injects, exerciseId) => {
   return injectsFilterAndSorting(injects)
 }
 
-const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let exercise = R.prop(exerciseId, state.referential.entities.exercises)
-  let injectsPending = filterInjectsPending(state.referential.entities.injects, exerciseId)
-  let injectsProcessed = filterInjectsProcessed(state.referential.entities.injects, exerciseId)
+const exerciseSelector = (state, ownProps) => {
+    const exerciseId = ownProps.params.exerciseId
+    return R.prop(exerciseId, state.referential.entities.exercises)
+}
 
-  return {
-    exerciseId,
-    exercise,
-    injectsPending,
-    injectsProcessed
-  }
+const select = () => {
+    return equalsSelector({ //Prevent view to refresh is nothing as changed (Using reselect)
+        exerciseId: (state, ownProps) => ownProps.params.exerciseId,
+        exercise: exerciseSelector,
+        injectsPending: filterInjectsPending,
+        injectsProcessed: filterInjectsProcessed
+    })
 }
 
 export default connect(select, {fetchObjectives, fetchAudiences, fetchAllInjects})(IndexExecution)
