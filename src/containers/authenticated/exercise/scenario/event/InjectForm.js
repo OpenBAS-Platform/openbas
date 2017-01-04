@@ -36,7 +36,7 @@ const validate = values => {
 
 class InjectForm extends Component {
   raiseDatePicker() {
-    this.refs.datePicker.refs.datePicker.openDialog()
+    this.refs.datePicker.getWrappedInstance().refs.datePicker.openDialog()
   }
 
   replaceDateValue(value) {

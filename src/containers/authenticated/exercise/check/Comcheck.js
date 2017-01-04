@@ -145,13 +145,22 @@ class Comcheck extends Component {
     //Scheduler listener
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    const cancelStream = Rx.Observable.create(obs => {this.cancelStreamEvent = () => {obs.next(1)}})
+    const cancelStream = Rx.Observable.create(obs => {
+      this.cancelStreamEvent = () => {
+        obs.next(1)
+      }
+    })
     this.subscription = initialStream
       .merge(intervalStream)
       .takeUntil(cancelStream)
       .exhaustMap(() => this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
         .then(this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)))
       .subscribe()
+  }
+
+  componentWillReceiveProps(nextProps) {
+    let comcheck_finished = R.propOr(false, 'comcheck_finished', nextProps.comcheck)
+    if (comcheck_finished) this.cancelStreamEvent()
   }
 
   componentWillUnmount() {
@@ -216,11 +225,15 @@ class Comcheck extends Component {
     return <div>
       <div>
         <div style={styles.title}>Comcheck</div>
-        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck} listenDeletionCall={this.cancelStreamEvent}/>
+        <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck}
+                         listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>
         <div className="clearfix"></div>
-        <div
-          style={styles.subtitle}>{dateFormat(R.propOr('0', 'comcheck_start_date', this.props.comcheck))} &rarr; {dateFormat(R.propOr('0', 'comcheck_end_date', this.props.comcheck))}</div>
+        <div style={styles.subtitle}>
+          {dateFormat(R.propOr(undefined, 'comcheck_start_date', this.props.comcheck))}
+          &nbsp;&rarr;&nbsp;
+          {dateFormat(R.propOr(undefined, 'comcheck_end_date', this.props.comcheck))}
+        </div>
         <div style={styles.comcheck_state}>{comcheck_finished ?
           <Icon name={Constants.ICON_NAME_ACTION_DONE_ALL} color={Theme.palette.primary1Color}/> :
           <CircularSpinner size={20} color={Theme.palette.primary1Color}/>}</div>
