@@ -149,6 +149,11 @@ class Comcheck extends Component {
       .subscribe()
   }
 
+  componentWillReceiveProps(nextProps) {
+    let comcheck_finished = R.propOr(false, 'comcheck_finished', nextProps.comcheck)
+    if (comcheck_finished) this.cancelStreamEvent()
+  }
+
   componentWillUnmount() {
     this.subscription.unsubscribe()
   }
@@ -212,8 +217,11 @@ class Comcheck extends Component {
         <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck} listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>
         <div className="clearfix"></div>
-        <div
-          style={styles.subtitle}>{dateFormat(R.propOr('0', 'comcheck_start_date', this.props.comcheck))} &rarr; {dateFormat(R.propOr('0', 'comcheck_end_date', this.props.comcheck))}</div>
+        <div style={styles.subtitle}>
+            {dateFormat(R.propOr(undefined, 'comcheck_start_date', this.props.comcheck))}
+            &nbsp;&rarr;&nbsp;
+            {dateFormat(R.propOr(undefined, 'comcheck_end_date', this.props.comcheck))}
+        </div>
         <div className="clearfix"></div>
         <List>
           <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>} primaryText={
