@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import R from 'ramda'
 import {injectIntl} from 'react-intl'
 import * as Constants from '../../../constants/ComponentTypes'
+import Theme from '../../../components/Theme'
 import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
 import {dateFormat} from '../../../utils/Time'
@@ -96,6 +97,14 @@ class IndexExercise extends Component {
     }
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     return (
       <div>
@@ -128,9 +137,11 @@ class IndexExercise extends Component {
               return (
                 <MainListItem
                   key={audience.audience_id}
-                  primaryText={audience.audience_name}
-                  secondaryText={playersText}
-                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
+                  primaryText={<div
+                    style={{color: this.switchColor(!audience.audience_enabled)}}>{audience.audience_name}</div>}
+                  secondaryText={<div
+                    style={{color: this.switchColor(!audience.audience_enabled)}}>{playersText}</div>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} color={this.switchColor(!audience.audience_enabled)}/>}
                 />
               )
             })}

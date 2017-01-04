@@ -67,7 +67,7 @@ const iconStyle = {
   [ Constants.ICON_TYPE_MAINLIST2 ]: {
     position: 'absolute',
     padding: 0,
-    top: '25px',
+    top: '20px',
   },
   [ Constants.ICON_TYPE_MAINLIST_RIGHT ]: {
     position: 'absolute',
