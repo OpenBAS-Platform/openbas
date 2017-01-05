@@ -36,7 +36,6 @@ renderAutoCompleteField.propTypes = {
   fullWidth: PropTypes.bool,
   hint: PropTypes.string,
   label: PropTypes.string,
-  name: PropTypes.string.isRequired,
   meta: PropTypes.object,
   onFocus: PropTypes.func,
   onClick: PropTypes.func,
