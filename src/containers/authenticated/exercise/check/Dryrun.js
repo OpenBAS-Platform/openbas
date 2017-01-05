@@ -91,9 +91,10 @@ class IndexExerciseDryrun extends Component {
     this.subscription = initialStream
       .merge(intervalStream)
       .takeUntil(cancelStream)
-      .exhaustMap(() => this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId, true)
-        .then(this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true)))
-      .subscribe()
+      .exhaustMap(() => Promise.all([
+        this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId, true),
+        this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true)
+      ])).subscribe()
   }
 
   componentWillReceiveProps(nextProps) {
