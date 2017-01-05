@@ -57,7 +57,8 @@ class Countdown extends Component {
 }
 
 Countdown.propTypes = {
-  targetDate: PropTypes.string
+  targetDate: PropTypes.string,
+  intl: PropTypes.object
 }
 
 export default injectIntl(Countdown)

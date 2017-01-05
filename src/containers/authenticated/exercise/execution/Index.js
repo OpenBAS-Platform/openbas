@@ -15,11 +15,10 @@ import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
 import {CircularSpinner} from '../../../../components/Spinner'
 import Countdown from '../../../../components/Countdown'
-import {fetchObjectives} from '../../../../actions/Objective'
 import {fetchAudiences} from '../../../../actions/Audience'
-import {fetchAllInjects} from '../../../../actions/Inject'
+import {fetchAllInjects, fetchInjectTypes} from '../../../../actions/Inject'
 import ExercisePopover from './ExercisePopover'
-import InjectPopover from './InjectPopover'
+import InjectPopover from '../scenario/event/InjectPopover'
 
 i18nRegister({
   fr: {
@@ -86,13 +85,14 @@ const styles = {
 }
 
 class IndexExecution extends Component {
-
   componentDidMount() {
+    this.props.fetchAudiences(this.props.exerciseId)
+    this.props.fetchInjectTypes()
     const initialStream = Rx.Observable.of(1); //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
     this.subscription = initialStream
       .merge(intervalStream)
-      .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId)) //Fetch only if previous call finished
+      .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId, true)) //Fetch only if previous call finished
       .subscribe()
   }
 
@@ -164,29 +164,38 @@ class IndexExecution extends Component {
             <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
           <List>
             {this.props.injectsPending.map(inject => {
+              let injectId = R.propOr(Math.random(), 'inject_id', inject)
+              let inject_title = R.propOr('-', 'inject_title', inject)
+              let inject_date = R.prop('inject_date', inject)
+              let inject_type = R.propOr('-', 'inject_type', inject)
+              let inject_audiences = R.propOr([], 'inject_audiences', inject)
+              let inject_enabled = R.propOr(true, 'inject_enabled', inject)
               return (
                 <MainListItem
-                  key={inject.inject_id}
+                  key={injectId}
                   primaryText={
                     <div>
                       <div style={styles.inject_title}><span
-                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{inject.inject_title}</span>
+                        style={{color: this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED')}}>{inject_title}</span>
                       </div>
                       <div style={styles.inject_date}><span
-                        style={{color: this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject.inject_date)}</span>
+                        style={{color: this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject_date)}</span>
                       </div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(inject.inject_type, this.switchColor(!inject.inject_enabled || exerciseStatus === 'CANCELED'))}
+                  leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED'))}
                   rightIconButton={
                     <InjectPopover
                       exerciseId={this.props.exerciseId}
-                      exercise={this.props.exercise}
                       eventId={inject.inject_event}
                       incidentId={inject.inject_incident.incident_id}
                       inject={inject}
-                    />}
+                      injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
+                      audiences={this.props.audiences}
+                      inject_types={this.props.inject_types}
+                    />
+                  }
                 />
               )
             })}
@@ -229,9 +238,13 @@ class IndexExecution extends Component {
 IndexExecution.propTypes = {
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
+  audiences: PropTypes.array,
+  inject_types: PropTypes.object,
   injectsPending: PropTypes.array,
   injectsProcessed: PropTypes.array,
   fetchAllInjects: PropTypes.func,
+  fetchAudiences: PropTypes.func,
+  fetchInjectTypes: PropTypes.func
 }
 
 const filterInjectsPending = (state, ownProps) => {
@@ -256,6 +269,18 @@ const filterInjectsProcessed = (state, ownProps) => {
   return injectsFilterAndSorting(injects)
 }
 
+const filterAudiences = (state, ownProps) => {
+  const audiences = state.referential.entities.audiences
+  const exerciseId = ownProps.params.exerciseId
+
+  let audiencesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.audience_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
+  )
+  return audiencesFilterAndSorting(audiences)
+}
+
 const exerciseSelector = (state, ownProps) => {
     const exerciseId = ownProps.params.exerciseId
     return R.prop(exerciseId, state.referential.entities.exercises)
@@ -266,8 +291,10 @@ const select = () => {
         exerciseId: (state, ownProps) => ownProps.params.exerciseId,
         exercise: exerciseSelector,
         injectsPending: filterInjectsPending,
-        injectsProcessed: filterInjectsProcessed
+        injectsProcessed: filterInjectsProcessed,
+        audiences: filterAudiences,
+        inject_types: (state) => state.referential.entities.inject_types
     })
 }
 
-export default connect(select, {fetchObjectives, fetchAudiences, fetchAllInjects})(IndexExecution)
+export default connect(select, {fetchAudiences, fetchAllInjects, fetchInjectTypes})(IndexExecution)
