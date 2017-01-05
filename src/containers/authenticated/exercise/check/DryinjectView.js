@@ -54,6 +54,8 @@ class DryinjectView extends Component {
                 return <div key={v.file_name} dangerouslySetInnerHTML={{__html: v.file_name}}></div>
               })}
             </div>
+          } else {
+            return ''
           }
         })}
       </div>
