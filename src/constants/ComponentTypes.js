@@ -107,3 +107,13 @@ export const FIELD_TYPE_RIGHT = 'FIELD_TYPE_RIGHT'
 
 //region SPINNER
 export const SPINNER_TYPE_NAV = 'SPINNER_TYPE_NAV'
+//endregion
+
+//region COUNTDOWN
+export const COUNTDOWN_TITLE = 'COUNTDOWN_TITLE'
+//endregion
+
+//region INJECT
+export const INJECT_EXEC = 'INJECT_EXEC'
+export const INJECT_SCENARIO = 'INJECT_SCENARIO'
+//endregion

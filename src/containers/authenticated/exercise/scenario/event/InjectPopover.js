@@ -19,10 +19,17 @@ import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
 
-const style = {
-  position: 'absolute',
-  top: '5px',
-  right: 0,
+const styles = {
+  [ Constants.INJECT_EXEC ]: {
+    position: 'absolute',
+    top: '8px',
+    right: 0,
+  },
+  [ Constants.INJECT_SCENARIO ]: {
+    position: 'absolute',
+    top: '5px',
+    right: 0,
+  }
 }
 
 i18nRegister({
@@ -253,7 +260,7 @@ class InjectPopover extends Component {
     let inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject)
 
     return (
-      <div style={style}>
+      <div style={styles[this.props.type]}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!inject_enabled)}/>
         </IconButton>
@@ -332,7 +339,8 @@ InjectPopover.propTypes = {
   deleteInject: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node,
-  initialAttachments: PropTypes.array
+  initialAttachments: PropTypes.array,
+  type: PropTypes.string
 }
 
 export default connect(null, {fetchIncident, fetchInjectTypes, updateInject, deleteInject})(InjectPopover)

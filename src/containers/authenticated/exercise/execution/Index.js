@@ -13,12 +13,16 @@ import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
+import {Dialog} from '../../../../components/Dialog'
+import {FlatButton} from '../../../../components/Button'
 import {CircularSpinner} from '../../../../components/Spinner'
 import Countdown from '../../../../components/Countdown'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchAllInjects, fetchInjectTypes} from '../../../../actions/Inject'
 import ExercisePopover from './ExercisePopover'
 import InjectPopover from '../scenario/event/InjectPopover'
+import InjectView from '../scenario/event/InjectView'
+import InjectStatusView from './InjectStatusView'
 
 i18nRegister({
   fr: {
@@ -27,7 +31,9 @@ i18nRegister({
     'Pending injects': 'Injects en attente',
     'Processed injects': 'Injects traités',
     'You do not have any pending injects in this exercise.': 'Vous n\'avez aucun inject en attente dans cet exercice.',
-    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucun inject traité dans cet exercice.'
+    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucun inject traité dans cet exercice.',
+    'Inject view': 'Vue de l\'inject',
+    'Status': 'Statut'
   }
 })
 
@@ -85,6 +91,11 @@ const styles = {
 }
 
 class IndexExecution extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {openView: false, currentInject: {}, openStatus: false, currentStatus: {}}
+  }
+
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchInjectTypes()
@@ -134,10 +145,33 @@ class IndexExecution extends Component {
     }
   }
 
+  handleOpenView(inject) {
+    this.setState({currentInject: inject, openView: true})
+  }
+
+  handleCloseView() {
+    this.setState({openView: false})
+  }
+
+  handleOpenStatus(inject) {
+    this.setState({currentStatus: inject, openStatus: true})
+  }
+
+  handleCloseStatus() {
+    this.setState({openStatus: false})
+  }
+
   render() {
+    const viewActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
+    ]
+    const statusActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseStatus.bind(this)}/>,
+    ]
+
     let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)
     const nextInject = R.propOr(undefined, 'inject_date', R.head(this.props.injectsPending))
-    const countdown = nextInject ? <div style={{textAlign: 'Left'}}><T>Next inject</T> <Countdown targetDate={nextInject}/></div> : ''
+    const countdown = nextInject ? <Countdown targetDate={nextInject}/> : ''
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
@@ -155,9 +189,9 @@ class IndexExecution extends Component {
         <LinearProgress
           mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'}
           min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length} value={this.props.injectsProcessed.length}/>
-        <br />{countdown}<br />
+        <br />
         <div style={styles.columnLeft}>
-          <div style={styles.title}><T>Pending injects</T></div>
+          <div style={styles.title}><T>Pending injects</T> ({countdown})</div>
           <div className="clearfix"></div>
           {this.props.injectsPending.length === 0 ?
             <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
@@ -172,6 +206,7 @@ class IndexExecution extends Component {
               return (
                 <MainListItem
                   key={injectId}
+                  onClick={this.handleOpenView.bind(this, inject)}
                   primaryText={
                     <div>
                       <div style={styles.inject_title}><span
@@ -186,6 +221,7 @@ class IndexExecution extends Component {
                   leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED'))}
                   rightIconButton={
                     <InjectPopover
+                      type={Constants.INJECT_EXEC}
                       exerciseId={this.props.exerciseId}
                       eventId={inject.inject_event}
                       incidentId={inject.inject_incident.incident_id}
@@ -199,6 +235,15 @@ class IndexExecution extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Inject view"
+            modal={false}
+            open={this.state.openView}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseView.bind(this)}
+            actions={viewActions}>
+            <InjectView inject={this.state.currentInject} />
+          </Dialog>
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Processed injects</T></div>
@@ -216,6 +261,7 @@ class IndexExecution extends Component {
               return (
                 <MainListItem
                   key={inject.inject_id}
+                  onClick={this.handleOpenStatus.bind(this, inject)}
                   primaryText={
                     <div>
                       <div style={styles.inject_title}>{inject.inject_title}</div>
@@ -228,6 +274,15 @@ class IndexExecution extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Status"
+            modal={false}
+            open={this.state.openStatus}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseStatus.bind(this)}
+            actions={statusActions}>
+            <InjectStatusView inject={this.state.currentStatus} />
+          </Dialog>
         </div>
       </div>
     )

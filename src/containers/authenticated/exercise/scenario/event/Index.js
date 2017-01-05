@@ -24,6 +24,16 @@ import CreateInject from './CreateInject'
 import InjectPopover from './InjectPopover'
 import InjectView from './InjectView'
 
+i18nRegister({
+  fr: {
+    'This event is empty.': 'Cet événement est vide.',
+    'This incident is empty.': 'Cet incident est vide.',
+    'Title': 'Titre',
+    'Date': 'Date',
+    'Author': 'Auteur'
+  }
+})
+
 const styles = {
   'container': {
     paddingRight: '300px',
@@ -86,16 +96,6 @@ const styles = {
     padding: '5px 0 0 0'
   }
 }
-
-i18nRegister({
-  fr: {
-    'This event is empty.': 'Cet événement est vide.',
-    'This incident is empty.': 'Cet incident est vide.',
-    'Title': 'Titre',
-    'Date': 'Date',
-    'Author': 'Auteur'
-  }
-})
 
 class Index extends Component {
   constructor(props) {
@@ -234,6 +234,7 @@ class Index extends Component {
                 onClick={this.handleOpenView.bind(this, inject)}
                 rightIconButton={
                   <InjectPopover
+                    type={Constants.INJECT_SCENARIO}
                     exerciseId={exerciseId}
                     eventId={eventId}
                     incidentId={incident.incident_id}

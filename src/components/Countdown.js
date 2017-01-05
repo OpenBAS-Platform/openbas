@@ -3,7 +3,7 @@ import {ONE_SECOND, dateFromNow, now, parse} from '../utils/Time'
 import Rx from 'rxjs/Rx'
 import {injectIntl} from 'react-intl'
 import countdown from 'countdown'
-import {T} from '../components/I18n'
+import * as Constants from '../constants/ComponentTypes'
 import {i18nRegister} from '../utils/Messages'
 
 i18nRegister({
@@ -16,6 +16,13 @@ i18nRegister({
     'now': 'maintenant',
   }
 })
+
+const styles = {
+  [ Constants.COUNTDOWN_TITLE ]: {
+    float: 'left',
+    margin: '0px 0px 0px 0px'
+  }
+}
 
 class Countdown extends Component {
   translate(text) {
@@ -48,17 +55,16 @@ class Countdown extends Component {
   }
 
   render() {
-      if(now().isAfter(parse(this.props.targetDate))) {
-          return <span><T>is currently in progress</T></span>
-      } else {
-          return <span><T>will be executed in</T> {dateFromNow(this.props.targetDate)}</span>
+      if(!now().isAfter(parse(this.props.targetDate))) {
+          return <span style={styles[this.props.type]}>{dateFromNow(this.props.targetDate)}</span>
       }
   }
 }
 
 Countdown.propTypes = {
   targetDate: PropTypes.string,
-  intl: PropTypes.object
+  intl: PropTypes.object,
+  type: PropTypes.string
 }
 
 export default injectIntl(Countdown)
