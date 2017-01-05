@@ -137,6 +137,7 @@ class IndexExecution extends Component {
   render() {
     let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)
     const nextInject = R.propOr(undefined, 'inject_date', R.head(this.props.injectsPending))
+    const countdown = nextInject ? <div style={{textAlign: 'Left'}}><T>Next inject</T> <Countdown targetDate={nextInject}/></div> : ''
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
@@ -154,9 +155,7 @@ class IndexExecution extends Component {
         <LinearProgress
           mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'}
           min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length} value={this.props.injectsProcessed.length}/>
-        <br />
-        <div style={{textAlign: 'Left'}}><T>Next inject</T> <Countdown targetDate={nextInject}/></div>
-        <br />
+        <br />{countdown}<br />
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Pending injects</T></div>
           <div className="clearfix"></div>

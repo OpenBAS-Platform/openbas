@@ -145,17 +145,14 @@ class Comcheck extends Component {
     //Scheduler listener
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    const cancelStream = Rx.Observable.create(obs => {
-      this.cancelStreamEvent = () => {
-        obs.next(1)
-      }
-    })
+    const cancelStream = Rx.Observable.create(obs => {this.cancelStreamEvent = () => {obs.next(1)}})
     this.subscription = initialStream
       .merge(intervalStream)
       .takeUntil(cancelStream)
-      .exhaustMap(() => this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true)
-        .then(this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)))
-      .subscribe()
+      .exhaustMap(() => Promise.all([
+          this.props.fetchComcheck(this.props.exerciseId, this.props.comcheckId, true),
+          this.props.fetchComcheckStatuses(this.props.exerciseId, this.props.comcheckId, true)
+      ])).subscribe()
   }
 
   componentWillReceiveProps(nextProps) {
