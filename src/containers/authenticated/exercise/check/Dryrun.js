@@ -9,21 +9,28 @@ import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import Theme from '../../../../components/Theme'
+import {Dialog} from '../../../../components/Dialog'
+import {FlatButton} from '../../../../components/Button'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
 import {CircularSpinner} from '../../../../components/Spinner'
+import Countdown from '../../../../components/Countdown'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryrun} from '../../../../actions/Dryrun'
 import {fetchDryinjects} from '../../../../actions/Dryinject'
 import DryrunPopover from './DryrunPopover'
+import DryinjectView from './DryinjectView'
+import DryinjectStatusView from './DryinjectStatusView'
 
 i18nRegister({
   fr: {
     'You do not have any pending injects in this dryrun.': 'Vous n\'avez aucun inject en attente dans ce dryrun.',
     'You do not have any processed injects in this dryrun.': 'Vous n\'avez aucun inject traité dans ce dryrun.',
     'Pending injects': 'Injects en attente',
-    'Processed injects': 'Injects traités'
+    'Processed injects': 'Injects traités',
+    'Inject view': 'Vue de l\'inject',
+    'Status': 'Statut'
   }
 })
 
@@ -81,6 +88,10 @@ const styles = {
 }
 
 class IndexExerciseDryrun extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {openView: false, currentDryinject: {}, openStatus: false, currentStatus: {}}
+  }
 
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
@@ -117,7 +128,30 @@ class IndexExerciseDryrun extends Component {
     }
   }
 
+  handleOpenView(dryinject) {
+    this.setState({currentDryinject: dryinject, openView: true})
+  }
+
+  handleCloseView() {
+    this.setState({openView: false})
+  }
+
+  handleOpenStatus(dryinject) {
+    this.setState({currentStatus: dryinject, openStatus: true})
+  }
+
+  handleCloseStatus() {
+    this.setState({openStatus: false})
+  }
+
   render() {
+    const viewActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
+    ]
+    const statusActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseStatus.bind(this)}/>,
+    ]
+
     let audienceName = null
     if (this.props.dryrun.dryrun_audience && this.props.audiences.length > 0) {
       let dryrun_audience = R.find(a => a.audience_id === this.props.dryrun.dryrun_audience.audience_id)(this.props.audiences)
@@ -125,6 +159,9 @@ class IndexExerciseDryrun extends Component {
     }
     let dryrun_date = R.propOr('', 'dryrun_date', this.props.dryrun)
     let dryrun_finished = R.propOr(false, 'dryrun_finished', this.props.dryrun)
+
+    const nextDryinject = R.propOr(undefined, 'dryinject_date', R.head(this.props.dryinjectsPending))
+    const countdown = nextDryinject ? <Countdown targetDate={nextDryinject}/> : ''
 
     return (
       <div style={styles.container}>
@@ -143,7 +180,7 @@ class IndexExerciseDryrun extends Component {
                         value={this.props.dryinjectsProcessed.length}/>
         <br /><br />
         <div style={styles.columnLeft}>
-          <div style={styles.title}><T>Pending injects</T></div>
+          <div style={styles.title}><T>Pending injects</T> {countdown}</div>
           <div className="clearfix"></div>
           {this.props.dryinjectsPending.length === 0 ?
             <div style={styles.empty}><T>You do not have any pending injects in this dryrun.</T></div> : ""}
@@ -152,6 +189,7 @@ class IndexExerciseDryrun extends Component {
               return (
                 <MainListItem
                   key={dryinject.dryinject_id}
+                  onClick={this.handleOpenView.bind(this, dryinject)}
                   primaryText={
                     <div>
                       <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
@@ -164,6 +202,15 @@ class IndexExerciseDryrun extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Inject view"
+            modal={false}
+            open={this.state.openView}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseView.bind(this)}
+            actions={viewActions}>
+            <DryinjectView dryinject={this.state.currentDryinject} />
+          </Dialog>
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Processed injects</T></div>
@@ -181,6 +228,7 @@ class IndexExerciseDryrun extends Component {
               return (
                 <MainListItem
                   key={dryinject.dryinject_id}
+                  onClick={this.handleOpenStatus.bind(this, dryinject)}
                   primaryText={
                     <div>
                       <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
@@ -193,6 +241,15 @@ class IndexExerciseDryrun extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Status"
+            modal={false}
+            open={this.state.openStatus}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseStatus.bind(this)}
+            actions={statusActions}>
+            <DryinjectStatusView dryinject={this.state.currentStatus} />
+          </Dialog>
         </div>
       </div>
     )

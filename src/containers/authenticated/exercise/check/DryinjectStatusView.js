@@ -41,23 +41,23 @@ const styles = {
   }
 }
 
-class InjectStatusView extends Component {
+class DryinjectStatusView extends Component {
 
   render() {
-    let inject_status = R.propOr('-', 'inject_status', this.props.inject)
+    let dryinject_status = R.propOr('-', 'dryinject_status', this.props.dryinject)
     return (
       <div style={styles.container}>
-        <div style={styles.title}><T>{inject_status.status_name}</T></div>
-        <div style={styles.date}>{dateFormat(inject_status.status_date)}</div>
+        <div style={styles.title}><T>{dryinject_status.status_name}</T></div>
+        <div style={styles.date}>{dateFormat(dryinject_status.status_date)}</div>
         <div style={{clear: 'both'}}></div><br />
-        <div style={styles.message}>{inject_status.status_message}</div>
+        <div style={styles.message}>{dryinject_status.status_message}</div>
       </div>
     )
   }
 }
 
-InjectStatusView.propTypes = {
-  inject: PropTypes.object
+DryinjectStatusView.propTypes = {
+  dryinject: PropTypes.object
 }
 
-export default InjectStatusView
+export default DryinjectStatusView

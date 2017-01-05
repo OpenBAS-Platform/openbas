@@ -191,7 +191,7 @@ class IndexExecution extends Component {
           min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length} value={this.props.injectsProcessed.length}/>
         <br />
         <div style={styles.columnLeft}>
-          <div style={styles.title}><T>Pending injects</T> ({countdown})</div>
+          <div style={styles.title}><T>Pending injects</T> {countdown}</div>
           <div className="clearfix"></div>
           {this.props.injectsPending.length === 0 ?
             <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}

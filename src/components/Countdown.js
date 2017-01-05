@@ -8,12 +8,13 @@ import {i18nRegister} from '../utils/Messages'
 
 i18nRegister({
   fr: {
-    'is currently in progress': 'est actuellement en cours',
-    'will be executed in': 'sera exécuté dans',
-    ' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium': ' milliseconde| seconde| minute| heure| jour| semaine| mois| année| décennie| siècle| millénaire',
-    ' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia': ' millisecondes| secondes| minutes| heures| jours| semaines| mois| années| décennies| siècles| millénaires',
-    ' and ': ' et ',
+    ' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium': ' ms| s| m| h| j| s| m| a| d| s| m',
+    ' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia': ' ms| s| m| h| j| s| m| a| d| s| m',
     'now': 'maintenant',
+  },
+  en: {
+    ' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium': ' ms| s| m| h| d| w| m| y| d| c| m',
+    ' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia': ' ms| s| m| h| d| w| m| y| d| c| m',
   }
 })
 
@@ -35,7 +36,7 @@ class Countdown extends Component {
     countdown.setLabels(
       this.translate(' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium'),
       this.translate(' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia'),
-      this.translate(' and '),
+      ', ',
       ', ',
       this.translate('now')
     );
@@ -56,7 +57,7 @@ class Countdown extends Component {
 
   render() {
       if(!now().isAfter(parse(this.props.targetDate))) {
-          return <span style={styles[this.props.type]}>{dateFromNow(this.props.targetDate)}</span>
+          return <span style={styles[this.props.type]}>({dateFromNow(this.props.targetDate)})</span>
       }
   }
 }
