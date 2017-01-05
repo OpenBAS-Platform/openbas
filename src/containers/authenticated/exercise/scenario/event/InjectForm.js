@@ -45,11 +45,6 @@ class InjectForm extends Component {
 
   render() {
     let inject_date = R.pathOr(undefined, ['initialValues', 'inject_date'], this.props)
-
-    if (inject_date !== undefined) {
-      inject_date = new Date(inject_date)
-    }
-
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="inject_title" fullWidth={true} type="text" label="Title"/>

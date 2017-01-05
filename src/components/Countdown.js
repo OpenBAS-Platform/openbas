@@ -29,7 +29,7 @@ class Countdown extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {startDate: new Date()}
+    this.state = {startDate: now()}
     var options = this.translate(' ms| s| m| h| d| w| m| y| d| c| m')
     countdown.setLabels(options, options, ', ', ', ', this.translate('now'));
   }
@@ -37,9 +37,8 @@ class Countdown extends Component {
   componentDidMount() {
     const initialStream = Rx.Observable.of(1);
     const intervalStream = Rx.Observable.interval(ONE_SECOND)
-    this.subscription = initialStream
-      .merge(intervalStream)
-      .do(() => this.setState({startDate: new Date()}))
+    this.subscription = initialStream.merge(intervalStream)
+      .do(() => this.setState({startDate: now()}))
       .subscribe()
   }
 
