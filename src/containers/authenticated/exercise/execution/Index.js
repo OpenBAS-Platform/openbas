@@ -170,8 +170,7 @@ class IndexExecution extends Component {
     ]
 
     let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)
-    const nextInject = R.propOr(undefined, 'inject_date', R.head(this.props.injectsPending))
-    const countdown = nextInject ? <Countdown targetDate={nextInject}/> : ''
+    const countdown = this.props.nextInject ? <Countdown targetDate={this.props.nextInject}/> : ''
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
@@ -296,6 +295,7 @@ IndexExecution.propTypes = {
   inject_types: PropTypes.object,
   injectsPending: PropTypes.array,
   injectsProcessed: PropTypes.array,
+  nextInject: PropTypes.string,
   fetchAllInjects: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchInjectTypes: PropTypes.func
@@ -310,6 +310,14 @@ const filterInjectsPending = (state, ownProps) => {
     R.sort((a, b) => a.inject_date > b.inject_date)
   )
   return injectsFilterAndSorting(injects)
+}
+
+const nextInjectToExecute = (state, ownProps) => {
+  return R.pipe(
+    R.filter(n => n.inject_enabled),
+    R.head(),
+    R.propOr(undefined, 'inject_date')
+  )(filterInjectsPending(state, ownProps))
 }
 
 const filterInjectsProcessed = (state, ownProps) => {
@@ -345,6 +353,7 @@ const select = () => {
         exerciseId: (state, ownProps) => ownProps.params.exerciseId,
         exercise: exerciseSelector,
         injectsPending: filterInjectsPending,
+        nextInject: nextInjectToExecute,
         injectsProcessed: filterInjectsProcessed,
         audiences: filterAudiences,
         inject_types: (state) => state.referential.entities.inject_types

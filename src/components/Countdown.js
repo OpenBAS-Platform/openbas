@@ -9,14 +9,9 @@ import {i18nRegister} from '../utils/Messages'
 
 i18nRegister({
   fr: {
-    ' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium': ' ms| s| m| h| j| s| m| a| d| s| m',
-    ' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia': ' ms| s| m| h| j| s| m| a| d| s| m',
+    ' ms| s| m| h| d| w| m| y| d| c| m': ' ms| s| m| h| j| s| m| a| d| s| m',
     'now': 'maintenant',
     'in progress': 'en cours'
-  },
-  en: {
-    ' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium': ' ms| s| m| h| d| w| m| y| d| c| m',
-    ' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia': ' ms| s| m| h| d| w| m| y| d| c| m',
   }
 })
 
@@ -35,13 +30,8 @@ class Countdown extends Component {
   constructor(props) {
     super(props);
     this.state = {startDate: new Date()}
-    countdown.setLabels(
-      this.translate(' millisecond| second| minute| hour| day| week| month| year| decade| century| millennium'),
-      this.translate(' milliseconds| seconds| minutes| hours| days| weeks| months| years| decades| centuries| millennia'),
-      ', ',
-      ', ',
-      this.translate('now')
-    );
+    var options = this.translate(' ms| s| m| h| d| w| m| y| d| c| m')
+    countdown.setLabels(options, options, ', ', ', ', this.translate('now'));
   }
 
   componentDidMount() {
