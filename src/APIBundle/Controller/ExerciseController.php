@@ -123,6 +123,8 @@ class ExerciseController extends Controller
             $exercise->setExerciseCanceled(false);
             $exercise->setExerciseOwner($user);
             $exercise->setExerciseImage($file);
+            $exercise->setExerciseMessageHeader('EXERCISE - EXERCISE - EXERCISE');
+            $exercise->setExerciseMessageFooter('EXERCISE - EXERCISE - EXERCISE');
             $em->persist($exercise);
             $em->flush();
             $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());

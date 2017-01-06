@@ -18,3 +18,7 @@ APIBundle\Entity\Exercise:
             groups: ['exercise']
         exercise_canceled:
             groups: ['exercise']
+        exercise_message_header:
+            groups: ['exercise']
+        exercise_message_footer:
+            groups: ['exercise']
