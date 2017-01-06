@@ -55,6 +55,7 @@ class InjectController extends Controller
 
         foreach( $injects as &$inject ) {
             $inject->sanitizeUser();
+            $inject->computeUsersNumber();
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
         }
@@ -116,6 +117,7 @@ class InjectController extends Controller
             $em->flush();
 
             $inject->sanitizeUser();
+            $inject->computeUsersNumber();
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
             return $inject;
@@ -220,6 +222,7 @@ class InjectController extends Controller
             $em->clear();
             $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
             $inject->sanitizeUser();
+            $inject->computeUsersNumber();
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
             return $inject;

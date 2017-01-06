@@ -26,3 +26,5 @@ APIBundle\Entity\Inject:
             groups: ['inject']
         inject_event:
             groups: ['inject']
+        inject_users_number:
+            groups: ['inject']
