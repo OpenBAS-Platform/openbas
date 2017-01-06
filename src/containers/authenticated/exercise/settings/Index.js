@@ -9,6 +9,7 @@ import {i18nRegister} from '../../../../utils/Messages'
 import {Dialog} from '../../../../components/Dialog'
 import * as Constants from '../../../../constants/ComponentTypes'
 import R from 'ramda'
+import TemplateForm from './TemplateForm'
 import ExerciseForm from '../ExerciseForm'
 import FileGallery from '../../FileGallery'
 import {dateFormat, dateToISO} from '../../../../utils/Time'
@@ -28,6 +29,7 @@ i18nRegister({
     'End date': 'Date de fin',
     'Subtitle': 'Sous-titre',
     'Change the image': 'Changer l\'image',
+    'Messages template': 'Modèle des messages',
     'Do you want to delete this exercise?': 'Souhaitez-vous supprimer cet exercice ?',
     'Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.': 'Supprimer un exercice conduit à la suppression de son contenu, incluant ses objectifs, événéments, incidents, injects et audiences. Nous vous déconseillons de faire cela.'
   }
@@ -49,6 +51,10 @@ class Index extends Component {
 
   submitInformation() {
     this.refs.informationForm.submit()
+  }
+
+  submitTemplate() {
+    this.refs.templateForm.submit()
   }
 
   handleOpenDelete() {
@@ -87,7 +93,7 @@ class Index extends Component {
     let initPipe = R.pipe(
       R.assoc('exercise_start_date', dateFormat(R.path(['exercise', 'exercise_start_date'], this.props))),
       R.assoc('exercise_end_date', dateFormat(R.path(['exercise', 'exercise_end_date'], this.props))),
-      R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date'])
+      R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date', 'exercise_message_header', 'exercise_message_footer'])
     )
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
     const image = exercise !== undefined ? exercise.exercise_image.file_url : undefined
@@ -100,6 +106,14 @@ class Index extends Component {
             <ExerciseForm ref="informationForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitInformation.bind(this)}/>
+          </div>
+        </Paper>
+        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+          <div style={styles.PaperContent}>
+            <h2><T>Messages template</T></h2>
+            <TemplateForm ref="templateForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
+            <br />
+            <Button type="submit" label="Update" onClick={this.submitTemplate.bind(this)}/>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>

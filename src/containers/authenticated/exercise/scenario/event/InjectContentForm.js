@@ -75,32 +75,34 @@ class InjectContentForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         {this.props.types[this.props.type].fields.map(field => {
           if (field.type === 'textarea') {
+            return <FormField key={field.name} name={field.name} fullWidth={true} multiLine={true} rows={3} type="text" label={field.name}/>
+          } else if (field.type === 'richtextarea') {
             return <RichTextField key={field.name} name={field.name} label={field.name}/>
           } else if (field.type === 'checkbox') {
-            return <ToggleField key={field.name} name={field.name} label={<T>{field.name}</T>} />
+            return <ToggleField key={field.name} name={field.name} label={<T>{field.name}</T>}/>
           } else if (field.type === 'attachment') {
             return <div key={field.name} style={styles.attachment}>
-                <Button label='Add an attachment' onClick={this.handleOpenGallery.bind(this)}/>
-                <Dialog modal={false} open={this.state.openGallery} onRequestClose={this.handleCloseGallery.bind(this)}>
-                  <FileGallery fileSelector={this.handleFileSelection.bind(this)}/>
-                </Dialog>
-                <div>
-                  {this.props.attachments.map(attachment => {
-                    let file_name = R.propOr('-', 'file_name', attachment)
-                    //let file_url = R.propOr('-', 'file_url', attachment)
-                    // TODO: chip is clickable to download the file
-                    return (
-                      <Chip key={file_name} onRequestDelete={this.props.onContentAttachmentDelete.bind(this, file_name)}
-                            type={Constants.CHIP_TYPE_LIST}>
-                        <Avatar icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>} size={32}
-                                type={Constants.AVATAR_TYPE_CHIP} />
-                        {file_name}
-                      </Chip>
-                    )
-                  })}
-                  <div className="clearfix"></div>
-                </div>
+              <Button label='Add an attachment' onClick={this.handleOpenGallery.bind(this)}/>
+              <Dialog modal={false} open={this.state.openGallery} onRequestClose={this.handleCloseGallery.bind(this)}>
+                <FileGallery fileSelector={this.handleFileSelection.bind(this)}/>
+              </Dialog>
+              <div>
+                {this.props.attachments.map(attachment => {
+                  let file_name = R.propOr('-', 'file_name', attachment)
+                  //let file_url = R.propOr('-', 'file_url', attachment)
+                  // TODO: chip is clickable to download the file
+                  return (
+                    <Chip key={file_name} onRequestDelete={this.props.onContentAttachmentDelete.bind(this, file_name)}
+                          type={Constants.CHIP_TYPE_LIST}>
+                      <Avatar icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>} size={32}
+                              type={Constants.AVATAR_TYPE_CHIP}/>
+                      {file_name}
+                    </Chip>
+                  )
+                })}
+                <div className="clearfix"></div>
               </div>
+            </div>
           } else {
             return <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/>
           }

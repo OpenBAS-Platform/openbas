@@ -7,9 +7,11 @@ import {i18nRegister} from '../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'Email address': 'Adresse email',
-    'Password': 'Mot de passe',
-    'Sign in': 'Se connecter'
+    'Name': 'Nom',
+    'Subtitle': 'Sous-titre',
+    'Description': 'Description',
+    'Start date': 'Date de début',
+    'End date': 'Date de fin'
   }
 })
 
