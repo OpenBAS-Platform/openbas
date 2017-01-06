@@ -19,6 +19,8 @@
         <setHeader headerName="attachments">
             <simple>${body[attachments]}</simple>
         </setHeader>
+        <!-- Handler specific header/footer -->
+        <bean ref="headers-handler"/>
         <!-- Download attachments -->
         <bean ref="attachments-downloader"/>
         <!-- Prepare template -->

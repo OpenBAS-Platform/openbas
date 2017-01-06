@@ -7,5 +7,6 @@ public enum ContractType {
 	@SerializedName("text") Text,
 	@SerializedName("checkbox") Checkbox,
 	@SerializedName("textarea") Textarea,
+	@SerializedName("richtextarea") Richtextarea,
 	@SerializedName("attachment") Attachment
 }

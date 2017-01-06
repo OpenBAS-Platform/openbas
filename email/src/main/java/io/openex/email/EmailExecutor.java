@@ -12,7 +12,7 @@ import org.apache.camel.component.mail.MailComponent;
 import static io.openex.management.contract.ContractCardinality.Multiple;
 import static io.openex.management.contract.ContractType.Attachment;
 import static io.openex.management.contract.ContractType.Checkbox;
-import static io.openex.management.contract.ContractType.Textarea;
+import static io.openex.management.contract.ContractType.Richtextarea;
 
 @SuppressWarnings("PackageAccessibility")
 class EmailExecutor implements Executor {
@@ -26,8 +26,8 @@ class EmailExecutor implements Executor {
 		return Contract.build()
 				.mandatory("sender")
 				.mandatory("subject")
+				.mandatory("body", Richtextarea)
 				.optional("encrypted", Checkbox)
-				.mandatory("body", Textarea)
 				.optional("attachments", Attachment, Multiple);
 	}
 	
@@ -46,6 +46,7 @@ class EmailExecutor implements Executor {
 		return ImmutableMap.of(
 				"attachments-downloader", new EmailDownloader(),
 				"attachments-handler", new EmailAttacher(),
+				"headers-handler", new EmailHeaders(),
 				"pgp-encryption", new EmailPgp(),
 				"ssl-handler", new EmailTrust()
 		);
