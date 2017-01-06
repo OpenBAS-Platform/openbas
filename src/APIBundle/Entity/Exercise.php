@@ -79,6 +79,11 @@ class Exercise
     protected $exercise_message_header;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $exercise_message_footer;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     protected $exercise_canceled = false;
@@ -224,7 +229,7 @@ class Exercise
         return $this;
     }
 
-    public function getExerciceMessageHeader()
+    public function getExerciseMessageHeader()
     {
         return $this->exercise_message_header;
     }
@@ -232,6 +237,17 @@ class Exercise
     public function setExerciseMessageHeader($header)
     {
         $this->exercise_message_header = $header;
+        return $this;
+    }
+
+    public function getExerciseMessageFooter()
+    {
+        return $this->exercise_message_footer;
+    }
+
+    public function setExerciseMessageFooter($footer)
+    {
+        $this->exercise_message_footer = $footer;
         return $this;
     }
 

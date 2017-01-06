@@ -236,6 +236,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $user->setUserEmail($login);
         $user->setUserAdmin($admin);
         $user->setUserStatus(1);
+        $user->setUserLang('auto');
         $user->setUserOrganization($organization);
         $encoder = $this->getContainer()->get('security.password_encoder');
         $encoded = $encoder->encodePassword($user, $password);

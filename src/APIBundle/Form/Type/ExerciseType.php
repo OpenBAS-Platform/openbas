@@ -25,6 +25,8 @@ class ExerciseType extends AbstractType
         ));
         $builder->add('exercise_image');
         $builder->add('exercise_canceled');
+        $builder->add('exercise_message_header');
+        $builder->add('exercise_message_footer');
     }
 
     public function configureOptions(OptionsResolver $resolver)
