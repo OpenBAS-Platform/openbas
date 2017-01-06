@@ -79,8 +79,8 @@ class InjectController extends Controller
             $data['context']['type'] = $inject->getInjectType();
             $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
             $data['data'] = json_decode($inject->getInjectContent(), true);
-            $data['content_header'] = $inject->getInjectHeader();
-            $data['content_footer'] = $inject->getInjectFooter();
+            $data['data']['content_header'] = $inject->getInjectHeader();
+            $data['data']['content_footer'] = $inject->getInjectFooter();
             $data['data']['users'] = array();
             foreach ($inject->getInjectAudiences() as $audience) {
                 /* @var $audience Audience */
@@ -120,8 +120,8 @@ class InjectController extends Controller
             $data['context']['type'] = $dryinject->getDryinjectType();
             $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
             $data['data'] = json_decode($dryinject->getDryinjectContent(), true);
-            $data['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
-            $data['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
+            $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
+            $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
             $data['data']['users'] = array();
             $audience = $dryinject->getDryinjectDryrun()->getDryrunAudience();
             /* @var $audience Audience */
