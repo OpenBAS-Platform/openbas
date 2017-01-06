@@ -13,6 +13,7 @@ import {Icon} from '../../../../../components/Icon'
 import {FlatButton} from '../../../../../components/Button'
 import {SearchField} from '../../../../../components/SimpleTextField'
 import {fetchAudiences} from '../../../../../actions/Audience'
+import {fetchSubobjectives} from '../../../../../actions/Subobjective'
 import {fetchEvents} from '../../../../../actions/Event'
 import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
 import {fetchInjectTypes, fetchInjects} from '../../../../../actions/Inject'
@@ -30,7 +31,8 @@ i18nRegister({
     'This incident is empty.': 'Cet incident est vide.',
     'Title': 'Titre',
     'Date': 'Date',
-    'Author': 'Auteur'
+    'Author': 'Auteur',
+    'linked subobjective(s)': 'sous-objectif(s) lié(s)'
   }
 })
 
@@ -72,6 +74,11 @@ const styles = {
     fontSize: '13px',
     textTransform: 'uppercase'
   },
+  'subobjectives': {
+    float: 'left',
+    fontSize: '12px',
+    color: Theme.palette.accent3Color
+  },
   'empty': {
     marginTop: 30,
     fontSize: '18px',
@@ -104,6 +111,7 @@ class Index extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchSubobjectives(this.props.exerciseId)
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidentTypes()
@@ -191,12 +199,13 @@ class Index extends Component {
       //Display the component
       return <div style={styles.container}>
         <IncidentNav selectedIncident={incident.incident_id} exerciseId={exerciseId} eventId={eventId}
-                     incidents={incidents} incident_types={this.props.incident_types}/>
+                     incidents={incidents} incident_types={this.props.incident_types} subobjectives={this.props.subobjectives}/>
         <div>
           <div style={styles.title}>{incident.incident_title}</div>
           <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}
                            incidentSubobjectivesIds={incident.incident_subobjectives.map(i => i.subobjective_id)}
                            incident_types={this.props.incident_types}/>
+          <div style={styles.subobjectives}>{incident.incident_subobjectives.length} <T>linked subobjective(s)</T></div>
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
                          onChange={this.handleSearchInjects.bind(this)}
@@ -301,7 +310,9 @@ Index.propTypes = {
   incidents: PropTypes.array,
   inject_types: PropTypes.object,
   injects: PropTypes.object,
+  subobjectives: PropTypes.array,
   fetchAudiences: PropTypes.func,
+  fetchSubobjectives: PropTypes.func,
   fetchEvents: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
   fetchIncidents: PropTypes.func,
@@ -318,6 +329,15 @@ const filterAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences)
 }
 
+const filterSubobjectives = (subobjectives, exerciseId) => {
+  let subobjectivesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.subobjective_exercise === exerciseId),
+    R.sort((a, b) => a.subobjective_title.localeCompare(b.subobjective_title))
+  )
+  return subobjectivesFilterAndSorting(subobjectives)
+}
+
 const filterIncidents = (incidents, eventId) => {
   let incidentsFilterAndSorting = R.pipe(
     R.values,
@@ -331,6 +351,7 @@ const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let eventId = ownProps.params.eventId
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
+  let subobjectives = filterSubobjectives(state.referential.entities.subobjectives, exerciseId)
   let event = R.prop(eventId, state.referential.entities.events)
   let incidents = filterIncidents(state.referential.entities.incidents, eventId)
   //region get default incident
@@ -346,6 +367,7 @@ const select = (state, ownProps) => {
     incident,
     incidents,
     audiences,
+    subobjectives,
     injects: state.referential.entities.injects,
     incident_types: state.referential.entities.incident_types,
     inject_types: state.referential.entities.inject_types
@@ -354,6 +376,7 @@ const select = (state, ownProps) => {
 
 export default connect(select, {
   fetchAudiences,
+  fetchSubobjectives,
   fetchEvents,
   fetchIncidentTypes,
   fetchIncidents,

@@ -14,6 +14,7 @@ import {Icon} from '../../../components/Icon'
 import {IconButton, FlatButton} from '../../../components/Button'
 import {Avatar} from '../../../components/Avatar'
 import {fetchObjectives} from '../../../actions/Objective'
+import {fetchSubobjectives} from '../../../actions/Subobjective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
@@ -80,6 +81,11 @@ const styles = {
     position: 'absolute',
     right: '5px',
     top: '15px'
+  },
+  'subobjectives': {
+    position: 'absolute',
+    right: '50px',
+    top: '15px'
   }
 }
 
@@ -92,6 +98,7 @@ class IndexExercise extends Component {
   componentDidMount() {
     this.props.fetchIncidentTypes()
     this.props.fetchObjectives(this.props.exerciseId)
+    this.props.fetchSubobjectives(this.props.exerciseId)
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
@@ -200,6 +207,7 @@ class IndexExercise extends Component {
                 let incident_title = R.propOr('-', 'incident_title', incident)
                 let incident_story = R.propOr('-', 'incident_story', incident)
                 let incident_injects = R.propOr([], 'incident_injects', incident)
+                let incident_subobjectives = R.propOr([], 'incident_subobjectives', incident)
 
                 const injects = R.pipe(
                   R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
@@ -238,7 +246,19 @@ class IndexExercise extends Component {
                   key={incident_id}
                   onClick={this.handleOpenViewIncident.bind(this, incident)}
                   leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}/>}
-                  primaryText={incident_title}
+                  primaryText={<div>
+                    {incident_title}
+                    {<div style={styles.subobjectives}>
+                      {incident_subobjectives.map(data4 => {
+                        let subobjective = R.propOr({}, data4.subobjective_id, this.props.subobjectives)
+                        let subobjective_id = R.propOr(data4.subobjective_id, 'subobjective_id', subobjective)
+                        let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
+                        return <IconButton key={subobjective_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={subobjective_title}
+                                           tooltipPosition="bottom-left">
+                          <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>} size={32}/></IconButton>
+                      })}
+                    </div>}
+                  </div>}
                   secondaryText={incident_story}
                   nestedItems={nestedItems2}/>
               }
@@ -281,12 +301,14 @@ class IndexExercise extends Component {
 IndexExercise.propTypes = {
   exerciseId: PropTypes.string,
   objectives: PropTypes.array,
+  subobjectives: PropTypes.object,
   audiences: PropTypes.array,
   events: PropTypes.array,
   incidents: PropTypes.object,
   incident_types: PropTypes.object,
   injects: PropTypes.object,
   fetchObjectives: PropTypes.func,
+  fetchSubobjectives: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
@@ -333,6 +355,7 @@ const select = (state, ownProps) => {
     objectives,
     audiences,
     events,
+    subobjectives: state.referential.entities.subobjectives,
     incidents: state.referential.entities.incidents,
     incident_types: state.referential.entities.incident_types,
     injects: state.referential.entities.injects
@@ -341,6 +364,7 @@ const select = (state, ownProps) => {
 
 export default connect(select, {
   fetchObjectives,
+  fetchSubobjectives,
   fetchAudiences,
   fetchEvents,
   fetchIncidents,

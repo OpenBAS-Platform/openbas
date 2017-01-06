@@ -132,7 +132,6 @@ class CreateInject extends Component {
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
             onChange={this.onAudiencesChange.bind(this)}
-            injectId={this.props.lastId}
             audiences={this.props.audiences}
             injectAudiencesIds={[]}
           />
@@ -197,7 +196,6 @@ CreateInject.propTypes = {
   audiences: PropTypes.array,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
-  lastId: PropTypes.string,
   inject_types: PropTypes.object,
   fetchIncident: PropTypes.func,
   addInject: PropTypes.func,

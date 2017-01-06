@@ -10,14 +10,11 @@ import {Dialog, DialogTitleElement} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {SimpleTextField} from '../../../../../components/SimpleTextField'
-import {Chip} from '../../../../../components/Chip'
-import {List} from '../../../../../components/List'
-import {Avatar} from '../../../../../components/Avatar';
-import {MainSmallListItem} from '../../../../../components/list/ListItem'
+import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {updateIncident, deleteIncident, selectIncident} from '../../../../../actions/Incident'
 import {fetchSubobjectives} from '../../../../../actions/Subobjective'
 import IncidentForm from './IncidentForm'
+import IncidentSubobjectives from './IncidentSubobjectives'
 
 const styles = {
   container: {
@@ -38,9 +35,10 @@ const styles = {
 
 i18nRegister({
   fr: {
+    '1. Parameters': '1. Paramètres',
+    '2. Subobjectives': '2. Sous-objectifs',
     'Update the incident': 'Modifier l\'incident',
     'Do you want to delete this incident?': 'Souhaitez-vous supprimer cet incident ?',
-    'Linked subobjectives': 'Sous-objectifs liés',
     'No subobjective found.': 'Aucun sous-objectif trouvé.',
     'Search for a subobjective': 'Rechercher un sous-objectif'
   }
@@ -52,10 +50,11 @@ class IncidentPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openSubobjectives: false,
       openPopover: false,
       subobjectivesIds: this.props.incidentSubobjectivesIds,
-      searchTerm: ''
+      stepIndex: 0,
+      finished: false,
+      incidentData: null
     }
   }
 
@@ -78,41 +77,34 @@ class IncidentPopover extends Component {
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false})
+    this.setState({openEdit: false, stepIndex: 0, finished: false, injectData: null})
   }
 
-  onSubmitEdit(data) {
-    return this.props.updateIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, data)
+  onGlobalSubmit(data) {
+    this.setState({incidentData: data})
   }
 
-  submitFormEdit() {
-    this.refs.incidentForm.submit()
+  onSubobjectivesChange(data) {
+    let incidentData = this.state.incidentData
+    incidentData.incident_subobjectives = data
+    this.setState({incidentData: incidentData})
   }
 
-  handleOpenSubobjectives() {
-    this.setState({openSubobjectives: true, subobjectivesIds: this.props.incidentSubobjectivesIds})
-    this.handlePopoverClose()
+  handleNext() {
+    if (this.state.stepIndex === 0) {
+      this.refs.incidentForm.submit()
+    } else if (this.state.stepIndex === 1) {
+      this.updateIncident()
+    }
   }
 
-  handleCloseSubobjectives() {
-    this.setState({openSubobjectives: false, searchTerm: ''})
+  selectSubobjectives() {
+    this.setState({stepIndex: 1, finished: true})
   }
 
-  handleSearchSubobjectives(event, value) {
-    this.setState({searchTerm: value})
-  }
-
-  addSubobjective(subobjectiveId) {
-    this.setState({subobjectivesIds: R.append(subobjectiveId, this.state.subobjectivesIds)})
-  }
-
-  removeSubobjective(subobjectiveId) {
-    this.setState({subobjectivesIds: R.filter(s => s !== subobjectiveId, this.state.subobjectivesIds)})
-  }
-
-  submitAddSubobjectives() {
-    this.props.updateIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, {incident_subobjectives: this.state.subobjectivesIds})
-    this.handleCloseSubobjectives()
+  updateIncident() {
+    this.props.updateIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, this.state.incidentData)
+    this.handleCloseEdit()
   }
 
   handleOpenDelete() {
@@ -131,14 +123,38 @@ class IncidentPopover extends Component {
     this.handleCloseDelete()
   }
 
+  getStepContent(stepIndex, initialValues) {
+    switch (stepIndex) {
+      case 0:
+        return (
+          <IncidentForm
+            ref="incidentForm"
+            initialValues={initialValues}
+            onSubmit={this.onGlobalSubmit.bind(this)}
+            onSubmitSuccess={this.selectSubobjectives.bind(this)}
+            types={this.props.incident_types}/>
+        )
+      case 1:
+        return (
+          <IncidentSubobjectives
+            ref="incidentSubobjectives"
+            exerciseId={this.props.exerciseId}
+            eventId={this.props.eventId}
+            onChange={this.onSubobjectivesChange.bind(this)}
+            subobjectives={R.values(this.props.subobjectives)}
+            incidentSubobjectivesIds={this.props.incidentSubobjectivesIds}
+          />
+        )
+      default:
+        return 'Go away!'
+    }
+  }
+
   render() {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
-    ]
-    const subobjectivesActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseSubobjectives.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitAddSubobjectives.bind(this)}/>,
+      <FlatButton label={this.state.stepIndex === 1 ? "Update" : "Next"} primary={true}
+                  onTouchTap={this.handleNext.bind(this)}/>,
     ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
@@ -146,14 +162,6 @@ class IncidentPopover extends Component {
     ]
 
     let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type', 'incident_weight'], this.props.incident)
-
-    //region filter subobjectives by active keyword
-    const keyword = this.state.searchTerm
-    let filterByKeyword = n => keyword === '' ||
-    n.subobjective_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-    n.subobjective_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    let filteredSubobjectives = R.filter(filterByKeyword, R.values(this.props.subobjectives))
-    //endregion
 
     return (
       <div style={styles.container}>
@@ -164,7 +172,6 @@ class IncidentPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemLink label="Linked subobjectives" onTouchTap={this.handleOpenSubobjectives.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -172,64 +179,27 @@ class IncidentPopover extends Component {
                 onRequestClose={this.handleCloseDelete.bind(this)} actions={deleteActions}>
           <T>Do you want to delete this incident?</T>
         </Dialog>
-        <Dialog title="Update the incident" modal={false} open={this.state.openEdit}
-                autoScrollBodyContent={true}
-                onRequestClose={this.handleCloseEdit.bind(this)} actions={editActions}>
-          <IncidentForm ref="incidentForm"
-                        initialValues={initialValues}
-                        onSubmit={this.onSubmitEdit.bind(this)}
-                        onSubmitSuccess={this.handleCloseEdit.bind(this)}
-                        types={this.props.incident_types}/>
-        </Dialog>
         <DialogTitleElement
-          title={<SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a subobjective"
-                                  onChange={this.handleSearchSubobjectives.bind(this)}
-                                  styletype={Constants.FIELD_TYPE_INTITLE}/>}
+          title={
+            <Stepper linear={false} activeStep={this.state.stepIndex}>
+              <Step>
+                <StepLabel>
+                  <T>1. Parameters</T>
+                </StepLabel>
+              </Step>
+              <Step>
+                <StepLabel>
+                  <T>2. Subobjectives</T>
+                </StepLabel>
+              </Step>
+            </Stepper>
+          }
           modal={false}
-          open={this.state.openSubobjectives}
-          onRequestClose={this.handleCloseSubobjectives.bind(this)}
+          open={this.state.openEdit}
+          onRequestClose={this.handleCloseEdit.bind(this)}
           autoScrollBodyContent={true}
-          actions={subobjectivesActions}>
-          <div>
-            {this.state.subobjectivesIds.map(subobjectiveId => {
-              let subobjective = R.propOr({}, subobjectiveId, this.props.subobjectives)
-              let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
-              return (
-                <Chip
-                  key={subobjectiveId}
-                  onRequestDelete={this.removeSubobjective.bind(this, subobjectiveId)}
-                  type={Constants.CHIP_TYPE_LIST}>
-                  <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>} size={32}
-                          type={Constants.AVATAR_TYPE_CHIP}/>
-                  {subobjective_title}
-                </Chip>
-              )
-            })}
-            <div className="clearfix"></div>
-          </div>
-          <div>
-            {filteredSubobjectives.length === 0 ? <div style={styles.empty}><T>No subobjective found.</T></div> : ""}
-            <List>
-              {filteredSubobjectives.map(subobjective => {
-                let disabled = R.find(subobjective_id => subobjective_id === subobjective.subobjective_id, this.state.subobjectivesIds) !== undefined
-                return (
-                  <MainSmallListItem
-                    key={subobjective.subobjective_id}
-                    disabled={disabled}
-                    onClick={this.addSubobjective.bind(this, subobjective.subobjective_id)}
-                    primaryText={
-                      <div>
-                        <div style={styles.title}>{subobjective.subobjective_title}</div>
-                        <div className="clearfix"></div>
-                      </div>
-                    }
-                    leftAvatar={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}
-                                      type={Constants.ICON_TYPE_LIST}/>}
-                  />
-                )
-              })}
-            </List>
-          </div>
+          actions={editActions}>
+          <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
         </DialogTitleElement>
       </div>
     )

@@ -22,7 +22,7 @@ i18nRegister({
 
 const validate = values => {
   const errors = {}
-  const requiredFields = []
+  const requiredFields = ['incident_title', 'incident_type', 'incident_weight', 'incident_story']
   requiredFields.forEach(field => {
     if (!values[field]) {
       errors[field] = 'Required'
