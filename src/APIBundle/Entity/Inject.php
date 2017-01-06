@@ -83,6 +83,8 @@ class Inject
     protected $inject_header;
     protected $inject_footer;
 
+    protected $inject_users_number;
+
     public function __construct()
     {
         $this->inject_audiences = new ArrayCollection();
@@ -257,5 +259,23 @@ class Inject
     {
         $this->inject_footer = $footer;
         return $this;
+    }
+
+    public function getInjectUsersNumber()
+    {
+        return $this->inject_users_number;
+    }
+
+    public function setInjectUsersNumber($number)
+    {
+        $this->inject_users_number = $number;
+        return $this;
+    }
+
+    public function computeUsersNumber() {
+        $this->inject_users_number = 0;
+        foreach( $this->inject_audiences as $audience ) {
+            $this->inject_users_number += count($audience->getAudienceUsers());
+        }
     }
 }
