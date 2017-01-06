@@ -34,9 +34,9 @@ const validate = values => {
 class IncidentForm extends Component {
   render() {
     let weights = [
-      {weight_id: 0, weight_name: 'Minor'},
-      {weight_id: 1, weight_name: 'Medium'},
-      {weight_id: 3, weight_name: 'Major'},
+      {weight_id: 1, weight_name: 'Minor'},
+      {weight_id: 3, weight_name: 'Medium'},
+      {weight_id: 5, weight_name: 'Major'},
     ]
 
     return (

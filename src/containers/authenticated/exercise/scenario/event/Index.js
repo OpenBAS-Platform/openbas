@@ -63,7 +63,15 @@ const styles = {
     },
     'inject_user': {
       float: 'left',
-      width: '20%',
+      width: '18%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'inject_audiences': {
+      float: 'left',
+      textAlign: 'center',
+      width: '2%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'
@@ -99,8 +107,15 @@ const styles = {
     padding: '5px 0 0 0'
   },
   'inject_user': {
+    width: '18%',
     float: 'left',
     padding: '5px 0 0 0'
+  },
+  'inject_audiences': {
+    width: '2%',
+    float: 'left',
+    padding: '5px 0 0 0',
+    textAlign: 'center'
   }
 }
 
@@ -136,6 +151,16 @@ class Index extends Component {
       <T>{label}</T> {IconDisplay}
     </div>
   }
+
+  SortHeader2(field, element) {
+    var icon = this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
+      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
+    const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
+    return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
+      {element} {IconDisplay}
+    </div>
+  }
+
 
   //TODO replace with sortWith after Ramdajs new release
   ascend(a, b) {
@@ -191,8 +216,8 @@ class Index extends Component {
         R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
         R.filter(filterByKeyword),
         R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
-          let fieldA = R.toLower(R.propOr('', this.state.sortBy, a))
-          let fieldB = R.toLower(R.propOr('', this.state.sortBy, b))
+          let fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString())
+          let fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString())
           return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
         })
       )(incident.incident_injects)
@@ -222,6 +247,7 @@ class Index extends Component {
                   {this.SortHeader('inject_title', 'Title')}
                   {this.SortHeader('inject_date', 'Date')}
                   {this.SortHeader('inject_user', 'Author')}
+                  {this.SortHeader2('inject_users_number', <Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>)}
                   <div className="clearfix"></div>
                 </div>}
                 />
@@ -235,6 +261,7 @@ class Index extends Component {
               let inject_date = R.prop('inject_date', inject)
               let inject_type = R.propOr('-', 'inject_type', inject)
               let inject_audiences = R.propOr([], 'inject_audiences', inject)
+              let inject_users_number = R.propOr('-', 'inject_users_number', inject)
               let inject_enabled = R.propOr(true, 'inject_enabled', inject)
               //Return the dom
               return <MainListItem
@@ -261,6 +288,8 @@ class Index extends Component {
                       style={{color: this.switchColor(!inject_enabled)}}>{dateFormat(inject_date)}</span></div>
                     <div style={styles.inject_user}><span
                       style={{color: this.switchColor(!inject_enabled)}}>{inject_user}</span></div>
+                    <div style={styles.inject_audiences}><span
+                      style={{color: this.switchColor(!inject_enabled)}}>{inject_users_number.toString()}</span></div>
                     <div className="clearfix"></div>
                   </div>
                 }

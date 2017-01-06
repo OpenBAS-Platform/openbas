@@ -198,7 +198,7 @@ class IndexExercise extends Component {
         <List>
           {this.props.events.map(event => {
             const incidents = R.pipe(
-              R.map(data => R.pathOr({}, ['incidents', data.incident_id], this.props)),
+              R.map(data => R.pathOr({incident_title: ''}, ['incidents', data.incident_id], this.props)),
               R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
             )(event.event_incidents)
 

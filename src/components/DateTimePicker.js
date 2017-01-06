@@ -33,7 +33,6 @@ class DateTimePicker extends Component {
   }
 
   render() {
-    console.log("this.props.defaultDate", this.state.datetime)
     return (
       <div>
         <DatePicker
