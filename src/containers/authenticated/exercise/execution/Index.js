@@ -187,7 +187,8 @@ class IndexExecution extends Component {
         <br />
         <LinearProgress
           mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'}
-          min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length} value={this.props.injectsProcessed.length}/>
+          min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length}
+          value={this.props.injectsProcessed.length}/>
         <br />
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Pending injects</T> {countdown}</div>
@@ -241,7 +242,7 @@ class IndexExecution extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-            <InjectView inject={this.state.currentInject} />
+            <InjectView inject={this.state.currentInject}/>
           </Dialog>
         </div>
         <div style={styles.columnRight}>
@@ -280,7 +281,7 @@ class IndexExecution extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseStatus.bind(this)}
             actions={statusActions}>
-            <InjectStatusView inject={this.state.currentStatus} />
+            <InjectStatusView inject={this.state.currentStatus}/>
           </Dialog>
         </div>
       </div>
@@ -325,7 +326,11 @@ const filterInjectsProcessed = (state, ownProps) => {
   const exerciseId = ownProps.params.exerciseId
   let injectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.inject_exercise === exerciseId && (n.inject_status.status_name === 'SUCCESS' || n.inject_status.status_name === 'ERROR' || n.inject_status.status_name === 'PARTIAL')),
+    R.filter(n => n.inject_exercise === exerciseId && (
+      n.inject_status.status_name === 'SUCCESS' ||
+      n.inject_status.status_name === 'ERROR' ||
+      n.inject_status.status_name === 'PARTIAL')
+    ),
     R.sort((a, b) => a.inject_date < b.inject_date)
   )
   return injectsFilterAndSorting(injects)
@@ -344,20 +349,20 @@ const filterAudiences = (state, ownProps) => {
 }
 
 const exerciseSelector = (state, ownProps) => {
-    const exerciseId = ownProps.params.exerciseId
-    return R.prop(exerciseId, state.referential.entities.exercises)
+  const exerciseId = ownProps.params.exerciseId
+  return R.prop(exerciseId, state.referential.entities.exercises)
 }
 
 const select = () => {
-    return equalsSelector({ //Prevent view to refresh is nothing as changed (Using reselect)
-        exerciseId: (state, ownProps) => ownProps.params.exerciseId,
-        exercise: exerciseSelector,
-        injectsPending: filterInjectsPending,
-        nextInject: nextInjectToExecute,
-        injectsProcessed: filterInjectsProcessed,
-        audiences: filterAudiences,
-        inject_types: (state) => state.referential.entities.inject_types
-    })
+  return equalsSelector({ //Prevent view to refresh is nothing as changed (Using reselect)
+    exerciseId: (state, ownProps) => ownProps.params.exerciseId,
+    exercise: exerciseSelector,
+    injectsPending: filterInjectsPending,
+    nextInject: nextInjectToExecute,
+    injectsProcessed: filterInjectsProcessed,
+    audiences: filterAudiences,
+    inject_types: (state) => state.referential.entities.inject_types
+  })
 }
 
 export default connect(select, {fetchAudiences, fetchAllInjects, fetchInjectTypes})(IndexExecution)

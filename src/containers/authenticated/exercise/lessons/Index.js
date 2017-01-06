@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import Rx from 'rxjs/Rx'
+import {FIVE_SECONDS} from '../../../../utils/Time'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
@@ -11,6 +13,7 @@ import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
 import {fetchIncidents} from '../../../../actions/Incident'
 import {fetchLogs} from '../../../../actions/Log'
+import {equalsSelector} from '../../../../utils/Selectors'
 import LogsPopover from './LogsPopover'
 import LogPopover from './LogPopover'
 import IncidentPopover from './IncidentPopover'
@@ -86,9 +89,18 @@ const styles = {
 }
 
 class IndexExerciseLessons extends Component {
+
   componentDidMount() {
-    this.props.fetchLogs(this.props.exerciseId)
-    this.props.fetchIncidents(this.props.exerciseId)
+    const initialStream = Rx.Observable.of(1); //Fetch on loading
+    const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
+    this.subscriptionStream = initialStream
+      .merge(intervalStream)
+      .exhaustMap(() => Promise.all([this.props.fetchLogs(this.props.exerciseId), this.props.fetchIncidents(this.props.exerciseId)]))
+      .subscribe()
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe()
   }
 
   render() {
@@ -164,7 +176,9 @@ IndexExerciseLessons.propTypes = {
   fetchIncidents: PropTypes.func
 }
 
-const filterLogs = (logs, exerciseId) => {
+const filterLogs = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let logs = state.referential.entities.logs
   let logsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.log_exercise.exercise_id === exerciseId),
@@ -173,7 +187,9 @@ const filterLogs = (logs, exerciseId) => {
   return logsFilterAndSorting(logs)
 }
 
-const filterIncidents = (incidents, exerciseId) => {
+const filterIncidents = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let incidents = state.referential.entities.incidents
   let incidentsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.incident_exercise === exerciseId),
@@ -182,16 +198,18 @@ const filterIncidents = (incidents, exerciseId) => {
   return incidentsFilterAndSorting(incidents)
 }
 
-const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let logs = filterLogs(state.referential.entities.logs, exerciseId)
-  let incidents = filterIncidents(state.referential.entities.incidents, exerciseId)
+const exerciseStatusSelector = (state, ownProps) => {
+  const exerciseId = ownProps.params.exerciseId
+  return R.path([exerciseId, 'exercise_status'], state.referential.entities.exercises)
+}
 
-  return {
-    exerciseId,
-    logs,
-    incidents
-  }
+const select = () => {
+  return equalsSelector({ //Prevent view to refresh is nothing as changed (Using reselect)
+    exerciseId: (state, ownProps) => ownProps.params.exerciseId,
+    logs: filterLogs,
+    incidents: filterIncidents,
+    exercise_status: exerciseStatusSelector
+  })
 }
 
 export default connect(select, {fetchLogs, fetchIncidents})(IndexExerciseLessons)
