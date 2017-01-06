@@ -33,14 +33,6 @@ class ExerciseForm extends Component {
   render() {
     let exercise_start_date = R.pathOr(undefined, ['initialValues', 'exercise_start_date'], this.props)
     let exercise_end_date = R.pathOr(undefined, ['initialValues', 'exercise_end_date'], this.props)
-
-    if (exercise_start_date !== undefined) {
-      exercise_start_date = new Date(exercise_start_date)
-    }
-    if (exercise_start_date !== undefined) {
-      exercise_end_date = new Date(exercise_end_date)
-    }
-
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="exercise_name" fullWidth={true} type="text" label="Name"/>

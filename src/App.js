@@ -45,10 +45,8 @@ import IndexExerciseDryrun from './containers/authenticated/exercise/check/Dryru
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
 import IndexExerciseLessons from './containers/authenticated/exercise/lessons/Index'
 import Immutable from 'seamless-immutable'
-import roundMoment from './utils/Moment-round'
 
 injectTapEventPlugin()
-roundMoment()
 
 //Default application state
 const initialState = {

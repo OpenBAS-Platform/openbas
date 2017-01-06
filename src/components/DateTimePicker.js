@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import DatePicker from 'material-ui/DatePicker'
 import TimePicker from 'material-ui/TimePicker'
-import moment from 'moment'
+import {dayFormat, timeFormat, parse} from '../utils/Time'
 import {injectIntl} from 'react-intl'
 
 const styles = {
@@ -17,30 +17,23 @@ const styles = {
 class DateTimePicker extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      datetime: '',
-      finished: false,
-    }
+    this.state = {datetime: parse(this.props.defaultDate).toDate()}
   }
 
   handleDateChange(event, date) {
-    this.setState({
-      datetime: moment(date).format('YYYY-MM-DD'),
-    })
+    var buildDateStr = dayFormat(date) + ' ' + timeFormat(this.state.datetime)
+    this.setState({datetime: parse(buildDateStr).toDate()})
     this.refs.timePicker.openDialog()
   }
 
   handleTimeChange(event, time) {
-    if( !this.state.finished ) {
-      this.setState({
-        datetime: this.state.datetime + ' ' + moment(time).format('HH:mm'),
-        finished: true
-      })
-      this.props.handleResult(this.state.datetime)
-    }
+    var buildDateStr = dayFormat(this.state.datetime) + ' ' + timeFormat(time)
+    this.setState({datetime: parse(buildDateStr).toDate()})
+    this.props.handleResult(buildDateStr)
   }
 
   render() {
+    console.log("this.props.defaultDate", this.state.datetime)
     return (
       <div>
         <DatePicker
@@ -48,7 +41,7 @@ class DateTimePicker extends Component {
           mode="landscape"
           name="Date"
           ref="datePicker"
-          value={this.props.defaultDate}
+          value={this.state.datetime}
           DateTimeFormat={global.Intl.DateTimeFormat}
           onChange={this.handleDateChange.bind(this)}
           floatingLabelText="Date"
@@ -60,7 +53,7 @@ class DateTimePicker extends Component {
           autoOk={true}
           format="24hr"
           ref="timePicker"
-          value={this.props.defaultDate}
+          value={this.state.datetime}
           onChange={this.handleTimeChange.bind(this)}
           cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
           floatingLabelText="Time"
@@ -73,8 +66,8 @@ class DateTimePicker extends Component {
 
 DateTimePicker.propTypes = {
   handleResult: PropTypes.func,
-  defaultDate: PropTypes.object,
-  defaultTime: PropTypes.object
+  defaultDate: PropTypes.string,
+  intl: PropTypes.object
 }
 
 export default injectIntl(DateTimePicker, {withRef: true})

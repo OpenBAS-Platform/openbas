@@ -1,8 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
-import moment from 'moment'
 import R from 'ramda'
+import {dateFormat} from '../../utils/Time'
 import {fetchExercises} from '../../actions/Exercise'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
@@ -60,8 +60,8 @@ class IndexAuthenticated extends Component {
         <div style={styles.container}>
           {this.props.exercises.length === 0 ? <div style={styles.empty}><T>You do not have any available exercise on this platform.</T></div>:""}
           {this.props.exercises.map(exercise => {
-            let start_date = moment(exercise.exercise_start_date).format('MMM D, YYYY')
-            let end_date = moment(exercise.exercise_end_date).format('MMM D, YYYY')
+            let start_date = dateFormat(exercise.exercise_start_date, 'MMM D, YYYY')
+            let end_date = dateFormat(exercise.exercise_end_date, 'MMM D, YYYY')
             return (
               <Link to={'/private/exercise/' + exercise.exercise_id} key={exercise.exercise_id}>
                 <Exercise
