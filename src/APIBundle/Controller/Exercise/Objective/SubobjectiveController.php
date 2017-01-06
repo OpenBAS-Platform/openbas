@@ -39,11 +39,15 @@ class SubobjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() != $exercise) {
             return $this->objectiveNotFound();
         }
 
         $subobjectives = $em->getRepository('APIBundle:Subobjective')->findBy(['subobjective_objective' => $objective]);
+
+        foreach( $subobjectives as &$subobjective) {
+            $subobjective->setSubobjectiveExercise($exercise->getExerciseId());
+        }
 
         return $subobjectives;
     }
@@ -72,7 +76,7 @@ class SubobjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() != $exercise) {
             return $this->objectiveNotFound();
         }
 
@@ -83,6 +87,7 @@ class SubobjectiveController extends Controller
             $subobjective->setSubobjectiveObjective($objective);
             $em->persist($subobjective);
             $em->flush();
+            $subobjective->setSubobjectiveExercise($exercise->getExerciseId());
             return $subobjective;
         } else {
             return $form;
@@ -151,7 +156,7 @@ class SubobjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() != $exercise) {
             return $this->objectiveNotFound();
         }
 
@@ -167,6 +172,7 @@ class SubobjectiveController extends Controller
         if ($form->isValid()) {
             $em->persist($subobjective);
             $em->flush();
+            $subobjective->setSubobjectiveExercise($exercise->getExerciseId());
             return $subobjective;
         } else {
             return $form;

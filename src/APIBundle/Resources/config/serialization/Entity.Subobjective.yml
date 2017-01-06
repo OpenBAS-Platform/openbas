@@ -12,3 +12,5 @@ APIBundle\Entity\Subobjective:
             groups: ['subobjective']
         subobjective_incidents:
             groups: ['subobjective']
+        subobjective_exercise:
+            groups: ['subobjective']

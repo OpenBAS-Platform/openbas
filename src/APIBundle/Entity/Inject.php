@@ -80,6 +80,9 @@ class Inject
     protected $inject_event;
     protected $inject_exercise;
 
+    protected $inject_header;
+    protected $inject_footer;
+
     public function __construct()
     {
         $this->inject_audiences = new ArrayCollection();
@@ -231,6 +234,28 @@ class Inject
     public function setInjectExercise($exercise)
     {
         $this->inject_exercise = $exercise;
+        return $this;
+    }
+
+    public function getInjectHeader()
+    {
+        return $this->inject_header;
+    }
+
+    public function setInjectHeader($header)
+    {
+        $this->inject_header = $header;
+        return $this;
+    }
+
+    public function getInjectFooter()
+    {
+        return $this->inject_footer;
+    }
+
+    public function setInjectFooter($footer)
+    {
+        $this->inject_footer = $footer;
         return $this;
     }
 }

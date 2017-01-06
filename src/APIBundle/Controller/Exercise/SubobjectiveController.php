@@ -41,6 +41,9 @@ class SubobjectiveController extends Controller
             $subobjectives = array_merge($subobjectives, $em->getRepository('APIBundle:Subobjective')->findBy(['subobjective_objective' => $objective]));
         }
 
+        foreach( $subobjectives as &$subobjective) {
+            $subobjective->setSubobjectiveExercise($exercise->getExerciseId());
+        }
         return $subobjectives;
     }
 

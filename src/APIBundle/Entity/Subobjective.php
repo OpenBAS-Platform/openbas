@@ -46,6 +46,8 @@ class Subobjective
      */
     protected $subobjective_incidents;
 
+    protected $subobjective_exercise;
+
     public function __construct()
     {
         $this->subobjective_incidents = new ArrayCollection();
@@ -114,6 +116,17 @@ class Subobjective
     public function setSubobjectiveIncidents($incidents)
     {
         $this->subobjective_incidents = $incidents;
+        return $this;
+    }
+
+    public function getSubobjectiveExercise()
+    {
+        return $this->subobjective_exercise;
+    }
+
+    public function setSubobjectiveExercise($exercise)
+    {
+        $this->subobjective_exercise = $exercise;
         return $this;
     }
 }
