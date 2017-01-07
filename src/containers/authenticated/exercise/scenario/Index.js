@@ -58,6 +58,7 @@ class IndexScenario extends Component {
                   </div>
                 }
                 secondaryText={event.event_description}
+                rightIcon={<Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}/>}
               />
             )
           })}

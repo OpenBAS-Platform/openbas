@@ -2,6 +2,7 @@ import React, {PropTypes} from 'react';
 import * as Constants from '../constants/ComponentTypes'
 import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
 import HardwareComputer from 'material-ui/svg-icons/hardware/computer'
+import HardwareKeyboardArrowRight from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
 import SocialPerson from 'material-ui/svg-icons/social/person'
 import SocialGroup from 'material-ui/svg-icons/social/group'
 import SocialPublic from 'material-ui/svg-icons/social/public'
@@ -86,6 +87,8 @@ export const Icon = (props) => {
       return (<LocalMovies style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_HARDWARE_COMPUTER:
       return (<HardwareComputer style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT:
+      return (<HardwareKeyboardArrowRight style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_SOCIAL_PERSON:
       return (<SocialPerson style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_SOCIAL_GROUP:
