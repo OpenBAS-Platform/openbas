@@ -226,7 +226,7 @@ export const SecondaryListItem = (props) => (
     leftAvatar={props.leftAvatar}
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
-    onTouchTap={props.onClick}
+    onClick={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
     initiallyOpen={true}
