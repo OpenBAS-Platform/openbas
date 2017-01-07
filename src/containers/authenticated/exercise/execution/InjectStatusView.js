@@ -45,12 +45,18 @@ class InjectStatusView extends Component {
 
   render() {
     let inject_status = R.propOr('-', 'inject_status', this.props.inject)
+    let inject_message_lines = JSON.parse(R.propOr(null, 'status_message', inject_status))
+
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>{inject_status.status_name}</T></div>
         <div style={styles.date}>{dateFormat(inject_status.status_date)}</div>
         <div style={{clear: 'both'}}></div><br />
-        <div style={styles.message}>{inject_status.status_message}</div>
+        <div style={styles.message}>
+          {inject_message_lines.map(line => {
+            return <div>{line}</div>
+          })}
+          </div>
       </div>
     )
   }

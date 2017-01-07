@@ -29,19 +29,12 @@ i18nRegister({
 class LogPopover extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      openDelete: false,
-      openEdit: false,
-      openPopover: false
-    }
+    this.state = {openDelete: false, openEdit: false, openPopover: false}
   }
 
   handlePopoverOpen(event) {
     event.stopPropagation()
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    })
+    this.setState({openPopover: true, anchorEl: event.currentTarget})
   }
 
   handlePopoverClose() {
