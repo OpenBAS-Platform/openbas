@@ -21,14 +21,15 @@ const styles = {
   },
   'stat': {
     display: 'inline-block',
-    width: "200px",
+    width: "300px",
   },
   'number': {
-    fontSize: '20px',
+    fontSize: '30px',
     fontWeight: '400'
   },
   'name': {
-    fontSize: ''
+    margin: '10px 0px 0px 0px',
+    fontSize: '20px'
   }
 }
 

@@ -32,12 +32,8 @@ i18nRegister({
 
 class UserPopover extends Component {
   constructor(props) {
-    super(props);
-    this.state = {
-      openDelete: false,
-      openEdit: false,
-      openPopover: false
-    }
+    super(props)
+    this.state = {openDelete: false, openEdit: false, openPopover: false}
   }
 
   handlePopoverOpen(event) {

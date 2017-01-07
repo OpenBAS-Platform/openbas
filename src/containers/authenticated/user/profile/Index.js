@@ -9,6 +9,7 @@ import {T} from '../../../../components/I18n'
 import * as Constants from '../../../../constants/ComponentTypes'
 import R from 'ramda'
 import UserForm from './UserForm'
+import ProfileForm from './ProfileForm'
 import PasswordForm from './PasswordForm'
 
 const styles = {
@@ -26,7 +27,8 @@ i18nRegister({
     'Lastname': 'Nom',
     'Organization': 'Organisation',
     'Profile': 'Profil',
-    'Password': 'Mot de passe'
+    'Password': 'Mot de passe',
+    'Information': 'Informations'
   }
 })
 
@@ -47,6 +49,10 @@ class Index extends Component {
     this.refs.userForm.submit()
   }
 
+  submitProfile() {
+    this.refs.profileForm.submit()
+  }
+
   submitPassword() {
     this.refs.passwordForm.submit()
   }
@@ -56,7 +62,7 @@ class Index extends Component {
     var organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     var initPipe = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_lang']) //Pickup only needed fields
+      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_lang', 'user_pgp_key', 'user_phone']) //Pickup only needed fields
     )
     const informationValues = this.props.user !== undefined ? initPipe(this.props.user) : undefined
 
@@ -68,6 +74,14 @@ class Index extends Component {
             <UserForm ref="userForm" organizations={this.props.organizations} onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitUser.bind(this)}/>
+          </div>
+        </Paper>
+        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+          <div style={styles.PaperContent}>
+            <h2><T>Information</T></h2>
+            <ProfileForm ref="profileForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
+            <br />
+            <Button type="submit" label="Update" onClick={this.submitProfile.bind(this)}/>
           </div>
         </Paper>
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>

@@ -26,14 +26,11 @@ i18nRegister({
 class DryrunPopover extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      openDelete: false,
-      openPopover: false
-    }
+    this.state = {openDelete: false, openPopover: false}
   }
 
   handlePopoverOpen(event) {
-    event.preventDefault()
+    event.stopPropagation()
     this.setState({openPopover: true, anchorEl: event.currentTarget})
   }
 
