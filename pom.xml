@@ -35,7 +35,7 @@
         <module>features</module>
         <module>management</module>
         <module>email</module>
-        <module>sms</module>
+        <module>ovh-sms</module>
         <module>scheduler</module>
         <module>distribution</module>
     </modules>

@@ -9,7 +9,7 @@
     <repository>mvn:io.openex/worker-management/${pom.version}/xml/features</repository>
     <repository>mvn:io.openex/worker-scheduler/${pom.version}/xml/features</repository>
     <repository>mvn:io.openex/worker-email/${pom.version}/xml/features</repository>
-    <repository>mvn:io.openex/worker-sms/${pom.version}/xml/features</repository>
+    <repository>mvn:io.openex/worker-ovh-sms/${pom.version}/xml/features</repository>
 
     <feature name="worker-features" version="${pom.version}">
         <bundle>mvn:com.google.guava/guava/20.0</bundle>
@@ -18,6 +18,6 @@
         <feature>worker-management</feature>
         <feature>worker-scheduler</feature>
         <feature>worker-email</feature>
-        <feature>worker-sms</feature>
+        <feature>worker-ovh-sms</feature>
     </feature>
 </features>

@@ -20,7 +20,7 @@
             <simple>${body[attachments]}</simple>
         </setHeader>
         <!-- Handler specific header/footer -->
-        <bean ref="headers-handler"/>
+        <bean ref="email-headers-handler"/>
         <!-- Download attachments -->
         <bean ref="attachments-downloader"/>
         <!-- Prepare template -->

@@ -46,7 +46,7 @@ class EmailExecutor implements Executor {
 		return ImmutableMap.of(
 				"attachments-downloader", new EmailDownloader(),
 				"attachments-handler", new EmailAttacher(),
-				"headers-handler", new EmailHeaders(),
+				"email-headers-handler", new EmailHeaders(),
 				"pgp-encryption", new EmailPgp(),
 				"ssl-handler", new EmailTrust()
 		);

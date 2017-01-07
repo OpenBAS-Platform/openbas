@@ -6,7 +6,7 @@
     name="worker-sms">
 
     <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
-    <feature name="worker-sms" version="${pom.version}">
-        <feature>camel-stream</feature>
+    <feature name="worker-ovh-sms" version="${pom.version}">
+        <feature>camel-freemarker</feature>
     </feature>
 </features>

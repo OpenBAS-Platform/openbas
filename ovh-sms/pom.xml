@@ -10,7 +10,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-	<artifactId>worker-sms</artifactId>
+	<artifactId>worker-ovh-sms</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 
@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-stream</artifactId>
+            <artifactId>camel-freemarker</artifactId>
             <version>${camel.version}</version>
             <scope>provided</scope>
         </dependency>

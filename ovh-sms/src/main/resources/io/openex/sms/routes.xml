@@ -1,0 +1,44 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route id="openex-ovh-sms">
+        <from uri="direct:ovh-sms"/>
+        <!-- Handler specific header/footer -->
+        <bean ref="sms-headers-handler"/>
+        <!-- Prepare template -->
+        <setHeader headerName="CamelFreemarkerTemplate">
+            <simple>${body[body]}</simple>
+        </setHeader>
+        <choice>
+            <when>
+                <simple>${body[users].size} > 0</simple>
+                <!-- Send a mail for each user (openexStrategy is mandatory) -->
+                <split streaming="true" parallelProcessing="true" strategyRef="openexStrategy">
+                    <simple>${body[users]}</simple>
+                    <setHeader headerName="Email">
+                        <simple>${body[user_email]}</simple>
+                    </setHeader>
+                    <setHeader headerName="OvhSmsPhone">
+                        <simple>${body[user_phone]}</simple>
+                    </setHeader>
+                    <!-- Put the current user as the marker model -->
+                    <setHeader headerName="CamelFreemarkerDataModel">
+                        <simple>${body}</simple>
+                    </setHeader>
+                    <!-- Translate the template in the body -->
+                    <to uri="freemarker:from_header"/>
+                    <to uri="ovhSms:send?ak={{openex.ovh_sms_ak}}&amp;as={{openex.ovh_sms_as}}&amp;ck={{openex.ovh_sms_ck}}&amp;service={{openex.ovh_sms_service}}"/>
+                    <!-- Output message for callback -->
+                    <setBody>
+                        <simple>${header.OvhSmsPhone} (${header.Email}) success</simple>
+                    </setBody>
+                </split>
+            </when>
+            <otherwise>
+                <!-- If no users, forge a success callback message -->
+                <setBody>
+                    <constant>Empty audience</constant>
+                </setBody>
+                <bean ref="openexCallback" method="success"/>
+            </otherwise>
+        </choice>
+    </route>
+</routes>
