@@ -45,12 +45,18 @@ class DryinjectStatusView extends Component {
 
   render() {
     let dryinject_status = R.propOr('-', 'dryinject_status', this.props.dryinject)
+    let dryinject_message_lines = JSON.parse(R.propOr(null, 'status_message', dryinject_status))
+
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>{dryinject_status.status_name}</T></div>
         <div style={styles.date}>{dateFormat(dryinject_status.status_date)}</div>
         <div style={{clear: 'both'}}></div><br />
-        <div style={styles.message}>{dryinject_status.status_message}</div>
+        <div style={styles.message}>
+          {dryinject_message_lines.map(line => {
+            return <div>{line}</div>
+          })}
+        </div>
       </div>
     )
   }
