@@ -14,11 +14,11 @@ i18nRegister({
     'Description': 'Description',
     'Date and time': 'Date et heure',
     'Type': 'Type',
-    'sms': 'Sms',
+    'ovh-sms': 'Sms (Ovh)',
     'email': 'Email'
   },
   en: {
-    'sms': 'Sms',
+    'ovh-sms': 'Sms (Ovh)',
     'email': 'Email'
   }
 })
