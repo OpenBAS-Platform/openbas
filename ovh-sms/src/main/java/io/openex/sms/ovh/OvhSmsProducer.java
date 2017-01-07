@@ -1,5 +1,6 @@
 package io.openex.sms.ovh;
 
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.camel.AsyncCallback;
@@ -13,11 +14,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 @SuppressWarnings({"PackageAccessibility", "WeakerAccess"})
@@ -41,6 +39,7 @@ public class OvhSmsProducer extends DefaultAsyncProducer {
 		try {
 			Message in = exchange.getIn();
 			String ovhSmsPhone = in.getHeader("OvhSmsPhone", String.class);
+			if(Strings.isNullOrEmpty(ovhSmsPhone)) throw new Exception("No user_phone provided");
 			String message = in.getBody(String.class);
 			String ovhResponse = sendSms(ovhSmsPhone, message);
 			in.setBody(ovhResponse);

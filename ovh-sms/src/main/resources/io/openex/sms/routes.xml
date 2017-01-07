@@ -16,20 +16,29 @@
                     <setHeader headerName="Email">
                         <simple>${body[user_email]}</simple>
                     </setHeader>
-                    <setHeader headerName="OvhSmsPhone">
-                        <simple>${body[user_phone]}</simple>
-                    </setHeader>
-                    <!-- Put the current user as the marker model -->
-                    <setHeader headerName="CamelFreemarkerDataModel">
-                        <simple>${body}</simple>
-                    </setHeader>
-                    <!-- Translate the template in the body -->
-                    <to uri="freemarker:from_header"/>
-                    <to uri="ovhSms:send?ak={{openex.ovh_sms_ak}}&amp;as={{openex.ovh_sms_as}}&amp;ck={{openex.ovh_sms_ck}}&amp;service={{openex.ovh_sms_service}}"/>
-                    <!-- Output message for callback -->
-                    <setBody>
-                        <simple>${header.OvhSmsPhone} (${header.Email}) success</simple>
-                    </setBody>
+                    <choice>
+                        <when>
+                            <simple>${body[user_phone]} == ""</simple>
+                            <throwException exceptionType="java.lang.Exception" message="${header.Email} error. No phone number"/>
+                        </when>
+                        <otherwise>
+                            <setHeader headerName="OvhSmsPhone">
+                                <simple>${body[user_phone]}</simple>
+                            </setHeader>
+                            <!-- Put the current user as the marker model -->
+                            <setHeader headerName="CamelFreemarkerDataModel">
+                                <simple>${body}</simple>
+                            </setHeader>
+                            <!-- Translate the template in the body -->
+                            <to uri="freemarker:from_header"/>
+                            <!-- Send the SMS -->
+                            <to uri="ovhSms:send?ak={{openex.ovh_sms_ak}}&amp;as={{openex.ovh_sms_as}}&amp;ck={{openex.ovh_sms_ck}}&amp;service={{openex.ovh_sms_service}}"/>
+                            <!-- Output message for callback -->
+                            <setBody>
+                                <simple>${header.OvhSmsPhone} (${header.Email}) success</simple>
+                            </setBody>
+                        </otherwise>
+                    </choice>
                 </split>
             </when>
             <otherwise>
