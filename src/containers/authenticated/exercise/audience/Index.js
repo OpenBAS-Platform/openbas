@@ -145,7 +145,19 @@ class Index extends Component {
     }
   }
 
+  handleOpenView(user) {
+    this.setState({currentUser: user, openView: true})
+  }
+
+  handleCloseView() {
+    this.setState({openView: false})
+  }
+
   render() {
+    const viewAction = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
+    ]
+
     let comchecks = null
     if (this.props.comchecks.length > 0) {
       comchecks = (

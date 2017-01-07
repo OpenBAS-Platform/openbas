@@ -27,9 +27,7 @@ class IncidentView extends Component {
   render() {
     let incident_title = R.propOr('-', 'incident_title', this.props.incident)
     let incident_type = R.propOr('-', 'incident_type', this.props.incident)
-    console.log(incident_type)
     let incident_type_name = R.pathOr('-', [incident_type, 'type_name'], this.props.incident_types)
-    console.log(incident_type_name)
     let incident_story = R.propOr('-', 'incident_story', this.props.incident)
 
     return (

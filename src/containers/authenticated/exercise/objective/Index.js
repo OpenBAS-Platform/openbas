@@ -5,18 +5,24 @@ import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
+import {Dialog} from '../../../../components/Dialog'
 import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
+import {FlatButton} from '../../../../components/Button'
 import {fetchObjectives} from '../../../../actions/Objective'
 import {fetchSubobjectives} from '../../../../actions/Subobjective'
 import ObjectivePopover from './ObjectivePopover'
 import SubobjectivePopover from './SubobjectivePopover'
 import CreateObjective from './CreateObjective'
+import ObjectiveView from './ObjectiveView'
+import SubobjectiveView from './SubobjectiveView'
 
 i18nRegister({
   fr: {
     'Objectives': 'Objectifs',
-    'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.'
+    'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.',
+    'Objective view': 'Vue de l\'objectif',
+    'Subobjective view': 'Vue du sous-objectif'
   }
 })
 
@@ -41,12 +47,40 @@ const styles = {
 }
 
 class IndexObjective extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {openObjective: false, currentObjective: {}, openSubobjective: false, currentSubobjective: {}}
+  }
+
   componentDidMount() {
     this.props.fetchObjectives(this.props.exerciseId);
     this.props.fetchSubobjectives(this.props.exerciseId);
   }
 
+  handleOpenObjective(objective) {
+    this.setState({currentObjective: objective, openObjective: true})
+  }
+
+  handleCloseObjective() {
+    this.setState({openObjective: false})
+  }
+
+  handleOpenSubobjective(subobjective) {
+    this.setState({currentSubobjective: subobjective, openSubobjective: true})
+  }
+
+  handleCloseSubobjective() {
+    this.setState({openSubobjective: false})
+  }
+
   render() {
+    const objectiveActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseObjective.bind(this)}/>,
+    ]
+    const subobjectiveActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseSubobjective.bind(this)}/>,
+    ]
+
     let {exerciseId, objectives} = this.props
     if (objectives.length > 0) {
       return <div style={styles.container}>
@@ -63,6 +97,7 @@ class IndexObjective extends Component {
 
                 return <SecondaryListItem
                   key={subobjective_id}
+                  onClick={this.handleOpenSubobjective.bind(this, subobjective)}
                   rightIconButton={<SubobjectivePopover exerciseId={exerciseId} objectiveId={objective.objective_id} subobjective={subobjective}/>}
                   leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
                   primaryText={
@@ -78,6 +113,7 @@ class IndexObjective extends Component {
             return (
               <MainListItem
                 key={objective.objective_id}
+                onClick={this.handleOpenObjective.bind(this, objective)}
                 leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}/>}
                 rightIconButton={<ObjectivePopover exerciseId={exerciseId} objective={objective}/>}
                 primaryText={
@@ -92,6 +128,24 @@ class IndexObjective extends Component {
             )
           })}
         </List>
+        <Dialog
+          title="Objective view"
+          modal={false}
+          open={this.state.openObjective}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseObjective.bind(this)}
+          actions={objectiveActions}>
+          <ObjectiveView objective={this.state.currentObjective} />
+        </Dialog>
+        <Dialog
+          title="Subobjective view"
+          modal={false}
+          open={this.state.openSubobjective}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseSubobjective.bind(this)}
+          actions={subobjectiveActions}>
+          <SubobjectiveView subobjective={this.state.currentSubobjective} />
+        </Dialog>
         <CreateObjective exerciseId={exerciseId}/>
       </div>
     } else {

@@ -9,18 +9,24 @@ import {List} from '../../../../components/List'
 import {MainListItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
+import {Dialog} from '../../../../components/Dialog'
+import {FlatButton} from '../../../../components/Button'
 import {fetchIncidents} from '../../../../actions/Incident'
 import {fetchLogs} from '../../../../actions/Log'
 import LogsPopover from './LogsPopover'
 import LogPopover from './LogPopover'
 import IncidentPopover from './IncidentPopover'
+import OutcomeView from './OutcomeView'
+import LogView from './LogView'
 
 i18nRegister({
   fr: {
     'Incidents outcomes': 'Résultats des incidents',
     'You do not have any incidents in this exercise.': 'Vous n\'avez aucun incident dans cet exercice.',
     'Exercise log': 'Journal d\'exercice',
-    'You do not have any entries in the exercise log.': 'Vous n\'avez aucune entrée dans le journal de cet exercice.'
+    'You do not have any entries in the exercise log.': 'Vous n\'avez aucune entrée dans le journal de cet exercice.',
+    'Outcome view': 'Vue du résultat',
+    'Log view': 'Vue de l\'entrée'
   }
 })
 
@@ -86,12 +92,40 @@ const styles = {
 }
 
 class IndexExerciseLessons extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {openOutcome: false, currentIncident: {}, openLog: false, currentLog: {}}
+  }
+
   componentDidMount() {
     this.props.fetchLogs(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
   }
 
+  handleOpenOutcome(incident) {
+    this.setState({currentIncident: incident, openOutcome: true})
+  }
+
+  handleCloseOutcome() {
+    this.setState({openOutcome: false})
+  }
+
+  handleOpenLog(log) {
+    this.setState({currentLog: log, openLog: true})
+  }
+
+  handleCloseLog() {
+    this.setState({openLog: false})
+  }
+
   render() {
+    const outcomeActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseOutcome.bind(this)}/>,
+    ]
+    const logActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseLog.bind(this)}/>,
+    ]
+
     return (
       <div style={styles.container}>
         <div style={styles.columnLeft}>
@@ -104,6 +138,7 @@ class IndexExerciseLessons extends Component {
               return (
                 <MainListItem
                   key={incident.incident_id}
+                  onClick={this.handleOpenOutcome.bind(this, incident)}
                   rightIconButton={<IncidentPopover exerciseId={this.props.exerciseId} incident={incident}/>}
                   primaryText={
                     <div>
@@ -123,6 +158,15 @@ class IndexExerciseLessons extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Outcome view"
+            modal={false}
+            open={this.state.openOutcome}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseOutcome.bind(this)}
+            actions={outcomeActions}>
+            <OutcomeView incident={this.state.currentIncident} />
+          </Dialog>
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Exercise log</T></div>
@@ -135,6 +179,7 @@ class IndexExerciseLessons extends Component {
               return (
                 <MainListItem
                   key={log.log_id}
+                  onClick={this.handleOpenLog.bind(this, log)}
                   rightIconButton={<LogPopover exerciseId={this.props.exerciseId} log={log}/>}
                   primaryText={
                     <div>
@@ -150,6 +195,15 @@ class IndexExerciseLessons extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Log view"
+            modal={false}
+            open={this.state.openLog}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseLog.bind(this)}
+            actions={logActions}>
+            <LogView log={this.state.currentLog} />
+          </Dialog>
         </div>
       </div>
     )
