@@ -279,6 +279,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $exercise->setExerciseEndDate($endDate);
         $exercise->setExerciseOwner($owner);
         $exercise->setExerciseImage($image);
+        $exercise->setExerciseMessageHeader('EXERCISE - EXERCISE - EXERCISE');
+        $exercise->setExerciseMessageFooter('EXERCISE - EXERCISE - EXERCISE');
         $this->em->persist($exercise);
         $this->em->flush();
 
