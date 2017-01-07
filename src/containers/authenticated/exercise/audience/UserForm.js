@@ -4,6 +4,18 @@ import R from 'ramda'
 import {FormField} from '../../../../components/Field'
 import {AutoCompleteField} from '../../../../components/AutoComplete'
 import AutoComplete from 'material-ui/AutoComplete'
+import {i18nRegister} from '../../../../utils/Messages'
+
+i18nRegister({
+  fr: {
+    'Email address': 'Adresse email',
+    'Firstname': 'Prénom',
+    'Lastname': 'Nom',
+    'Organization': 'Organisation',
+    'Phone number': 'Numéro de téléphone',
+    'PGP public key': 'Clé publique PGP'
+  }
+})
 
 class UserForm extends Component {
   render() {
