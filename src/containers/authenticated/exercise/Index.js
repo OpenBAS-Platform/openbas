@@ -289,7 +289,7 @@ class IndexExercise extends Component {
                     let inject_id = R.propOr(Math.random(), 'inject_id', inject)
                     let inject_title = R.propOr('-', 'inject_title', inject)
                     let inject_type = R.propOr('-', 'inject_type', inject)
-                    let inject_date = R.propOr('-', 'inject_date', inject)
+                    let inject_date = R.propOr(undefined, 'inject_date', inject)
                     let inject_audiences = R.propOr([], 'inject_audiences', inject)
 
                     return <TertiaryListItem
