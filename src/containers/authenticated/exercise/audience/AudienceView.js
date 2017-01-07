@@ -19,7 +19,7 @@ const styles = {
 class AudienceView extends Component {
 
   render() {
-    let audience_name = R.propOr('-', 'objective_title', this.props.audience)
+    let audience_name = R.propOr('-', 'audience_name', this.props.audience)
 
     return (
       <div style={styles.container}>

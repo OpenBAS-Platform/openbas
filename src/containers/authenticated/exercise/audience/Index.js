@@ -8,7 +8,8 @@ import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchComchecks} from '../../../../actions/Comcheck'
-import {LinkIconButton} from '../../../../components/Button'
+import {FlatButton, LinkIconButton} from '../../../../components/Button'
+import {Dialog} from '../../../../components/Dialog'
 import Theme from '../../../../components/Theme'
 import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
@@ -19,6 +20,7 @@ import AudienceNav from './AudienceNav'
 import AudiencePopover from './AudiencePopover'
 import AddUsers from './AddUsers'
 import UserPopover from './UserPopover'
+import UserView from './UserView'
 
 i18nRegister({
   fr: {
@@ -27,7 +29,8 @@ i18nRegister({
     'Organization': 'Organisation',
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
     'This audience is empty.': 'Cette audience est vide.',
-    'Comcheck currently running': 'Comcheck en cours'
+    'Comcheck currently running': 'Comcheck en cours',
+    'User view': 'Vue de l\'utilisateur'
   }
 })
 
@@ -101,7 +104,7 @@ const styles = {
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'user_firstname', orderAsc: true, searchTerm: ''}
+    this.state = {sortBy: 'user_firstname', orderAsc: true, searchTerm: '', openView: false, currentUser: {}}
   }
 
   componentDidMount() {
@@ -154,7 +157,7 @@ class Index extends Component {
   }
 
   render() {
-    const viewAction = [
+    const viewActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
     ]
 
@@ -233,6 +236,7 @@ class Index extends Component {
               //Return the dom
               return <AvatarListItem
                 key={userId}
+                onClick={this.handleOpenView.bind(this, user)}
                 leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
                 rightIconButton={<UserPopover exerciseId={exerciseId} audience={audience} user={user}/>}
                 primaryText={
@@ -250,6 +254,15 @@ class Index extends Component {
               />
             })}
           </List>
+          <Dialog
+            title="User view"
+            modal={false}
+            open={this.state.openView}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseView.bind(this)}
+            actions={viewActions}>
+            <UserView user={this.state.currentUser} />
+          </Dialog>
           <AddUsers exerciseId={exerciseId} audienceId={audience.audience_id}
                     audienceUsersIds={audience.audience_users.map(u => u.user_id)}/>
         </div>

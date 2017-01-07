@@ -19,8 +19,11 @@ import {fetchAudiences} from '../../../actions/Audience'
 import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
 import {fetchAllInjects} from '../../../actions/Inject'
+import EventView from './scenario/event/EventView'
 import IncidentView from './scenario/event/IncidentView'
 import InjectView from './scenario/event/InjectView'
+import AudienceView from './audience/AudienceView'
+import ObjectiveView from './objective/ObjectiveView'
 import AudiencePopover from './AudiencePopover'
 
 i18nRegister({
@@ -33,7 +36,10 @@ i18nRegister({
     'Scenario': 'Scénario',
     'You do not have any events in this exercise.': 'Vous n\'avez aucun événement dans cet exercice.',
     'Inject view': 'Vue de l\'inject',
-    'Incident view': 'Vue de l\'incident'
+    'Incident view': 'Vue de l\'incident',
+    'Objective view': 'Vue de l\'objectif',
+    'Audience view': 'Vue de l\'audience',
+    'Event view': 'Vue de l\'événement'
   }
 })
 
@@ -92,7 +98,18 @@ const styles = {
 class IndexExercise extends Component {
   constructor(props) {
     super(props);
-    this.state = {openViewIncident: false, openViewInject: false, currentIncident: {}, currentInject: {}}
+    this.state = {
+      openViewEvent: false,
+      currentEvent: {},
+      openViewIncident: false,
+      currentIncident: {},
+      openViewInject: false,
+      currentInject: {},
+      openViewAudience: false,
+      currentAudience: {},
+      openViewObjective: false,
+      currentObjective: {}
+    }
   }
 
   componentDidMount() {
@@ -124,6 +141,14 @@ class IndexExercise extends Component {
     }
   }
 
+  handleOpenViewEvent(event) {
+    this.setState({currentEvent: event, openViewEvent: true})
+  }
+
+  handleCloseViewEvent() {
+    this.setState({openViewEvent: false})
+  }
+
   handleOpenViewIncident(incident) {
     this.setState({currentIncident: incident, openViewIncident: true})
   }
@@ -140,12 +165,37 @@ class IndexExercise extends Component {
     this.setState({openViewInject: false})
   }
 
+  handleOpenViewAudience(audience) {
+    this.setState({currentAudience: audience, openViewAudience: true})
+  }
+
+  handleCloseViewAudience() {
+    this.setState({openViewAudience: false})
+  }
+
+  handleOpenViewObjective(objective) {
+    this.setState({currentObjective: objective, openViewObjective: true})
+  }
+
+  handleCloseViewObjective() {
+    this.setState({openViewObjective: false})
+  }
+
   render() {
+    const viewEventActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewEvent.bind(this)}/>,
+    ]
     const viewIncidentActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>,
     ]
     const viewInjectActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewInject.bind(this)}/>,
+    ]
+    const viewAudienceActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewAudience.bind(this)}/>,
+    ]
+    const viewObjectiveActions = [
+      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewObjective.bind(this)}/>,
     ]
     return (
       <div>
@@ -159,6 +209,7 @@ class IndexExercise extends Component {
               return (
                 <MainListItem
                   key={objective.objective_id}
+                  onClick={this.handleOpenViewObjective.bind(this, objective)}
                   primaryText={objective.objective_title}
                   secondaryText={objective.objective_description}
                   leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}/>}
@@ -166,6 +217,15 @@ class IndexExercise extends Component {
               )
             })}
           </List>
+          <Dialog
+            title="Objective view"
+            modal={false}
+            open={this.state.openViewObjective}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseViewObjective.bind(this)}
+            actions={viewObjectiveActions}>
+            <ObjectiveView objective={this.state.currentObjective}/>
+          </Dialog>
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}>Audiences</div>
@@ -177,17 +237,28 @@ class IndexExercise extends Component {
               var playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
               return (
                 <MainListItem
-                  rightIconButton={<AudiencePopover exerciseId={this.props.exerciseId}  audience={audience}/>}
+                  rightIconButton={<AudiencePopover exerciseId={this.props.exerciseId} audience={audience}/>}
                   key={audience.audience_id}
+                  onClick={this.handleOpenViewAudience.bind(this, audience)}
                   primaryText={<div
                     style={{color: this.switchColor(!audience.audience_enabled)}}>{audience.audience_name}</div>}
                   secondaryText={<div
                     style={{color: this.switchColor(!audience.audience_enabled)}}>{playersText}</div>}
-                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} color={this.switchColor(!audience.audience_enabled)}/>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}
+                                  color={this.switchColor(!audience.audience_enabled)}/>}
                 />
               )
             })}
           </List>
+          <Dialog
+            title="Audience view"
+            modal={false}
+            open={this.state.openViewAudience}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseViewAudience.bind(this)}
+            actions={viewAudienceActions}>
+            <AudienceView audience={this.state.currentAudience}/>
+          </Dialog>
         </div>
         <div className="clearfix"></div>
         <br /><br />
@@ -253,9 +324,11 @@ class IndexExercise extends Component {
                         let subobjective = R.propOr({}, data4.subobjective_id, this.props.subobjectives)
                         let subobjective_id = R.propOr(data4.subobjective_id, 'subobjective_id', subobjective)
                         let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
-                        return <IconButton key={subobjective_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={subobjective_title}
+                        return <IconButton key={subobjective_id} type={Constants.BUTTON_TYPE_SINGLE}
+                                           tooltip={subobjective_title}
                                            tooltipPosition="bottom-left">
-                          <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>} size={32}/></IconButton>
+                          <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
+                                  size={32}/></IconButton>
                       })}
                     </div>}
                   </div>}
@@ -267,6 +340,7 @@ class IndexExercise extends Component {
             return (
               <MainListItem
                 key={event.event_id}
+                onClick={this.handleOpenViewEvent.bind(this, event)}
                 leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}
                 primaryText={event.event_title}
                 secondaryText={event.event_description}
@@ -276,13 +350,22 @@ class IndexExercise extends Component {
           })}
         </List>
         <Dialog
+          title="Event view"
+          modal={false}
+          open={this.state.openViewEvent}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseViewEvent.bind(this)}
+          actions={viewEventActions}>
+          <EventView event={this.state.currentEvent}/>
+        </Dialog>
+        <Dialog
           title="Incident view"
           modal={false}
           open={this.state.openViewIncident}
           autoScrollBodyContent={true}
           onRequestClose={this.handleCloseViewIncident.bind(this)}
           actions={viewIncidentActions}>
-          <IncidentView incident={this.state.currentIncident} incident_types={this.props.incident_types} />
+          <IncidentView incident={this.state.currentIncident} incident_types={this.props.incident_types}/>
         </Dialog>
         <Dialog
           title="Inject view"
@@ -291,7 +374,7 @@ class IndexExercise extends Component {
           autoScrollBodyContent={true}
           onRequestClose={this.handleCloseViewInject.bind(this)}
           actions={viewInjectActions}>
-          <InjectView inject={this.state.currentInject} />
+          <InjectView inject={this.state.currentInject}/>
         </Dialog>
       </div>
     )
