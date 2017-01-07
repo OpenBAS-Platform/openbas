@@ -23,6 +23,50 @@ class InjectController extends Controller
      * @ApiDoc(
      *    description="List injects for the worker"
      * )
+     * @Rest\View(serializerGroups={"inject"})
+     * @Rest\Get("/injects_all")
+     */
+    public function getAllInjectsAction(Request $request)
+    {
+        if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin())
+            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercises = $em->getRepository('APIBundle:Exercise')->findAll();
+        /* @var $exercises Exercise[] */
+
+        $injects = array();
+        foreach( $exercises as $exercise ) {
+            $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+            /* @var $events Event[] */
+
+            foreach ($events as $event) {
+                $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
+                /* @var $incidents Incident[] */
+
+                foreach ($incidents as $incident) {
+                    $incidentInjects = $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]);
+                    foreach ($incidentInjects as &$incidentInject) {
+                        $incidentInject->setInjectEvent($event->getEventId());
+                        $incidentInject->setInjectExercise($exercise->getExerciseId());
+                    }
+                    $injects = array_merge($injects, $incidentInjects);
+                }
+            }
+        }
+
+        foreach ($injects as &$inject) {
+            $inject->sanitizeUser();
+            $inject->computeUsersNumber();
+        }
+
+        return $injects;
+    }
+
+    /**
+     * @ApiDoc(
+     *    description="List injects for the worker"
+     * )
      *
      * @Rest\Get("/injects")
      */
@@ -64,7 +108,7 @@ class InjectController extends Controller
                 }
 
                 // enrich injects
-                foreach( $injects as &$inject ) {
+                foreach ($injects as &$inject) {
                     /* @var $inject Inject */
                     $inject->setInjectHeader($exercise->getExerciseMessageHeader());
                     $inject->setInjectFooter($exercise->getExerciseMessageFooter());

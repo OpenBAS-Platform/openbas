@@ -118,6 +118,7 @@ class InjectController extends Controller
 
             $inject->sanitizeUser();
             $inject->computeUsersNumber();
+            $inject->setInjectStatus($status);
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
             return $inject;
