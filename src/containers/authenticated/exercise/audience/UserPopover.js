@@ -14,7 +14,6 @@ import Theme from '../../../../components/Theme'
 import {updateUser} from '../../../../actions/User'
 import {updateAudience} from '../../../../actions/Audience'
 import UserForm from './UserForm'
-import UserinfoForm from './UserinfoForm'
 
 const style = {
   position: 'absolute',
@@ -37,17 +36,13 @@ class UserPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openInfo: false,
       openPopover: false
     }
   }
 
   handlePopoverOpen(event) {
-    event.preventDefault()
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    })
+    event.stopPropagation()
+    this.setState({openPopover: true, anchorEl: event.currentTarget})
   }
 
   handlePopoverClose() {
@@ -69,23 +64,6 @@ class UserPopover extends Component {
 
   submitFormEdit() {
     this.refs.userForm.submit()
-  }
-
-  handleOpenInfo() {
-    this.setState({openInfo: true})
-    this.handlePopoverClose()
-  }
-
-  handleCloseInfo() {
-    this.setState({openInfo: false})
-  }
-
-  onSubmitInfo(data) {
-    return this.props.updateUser(this.props.user.user_id, data)
-  }
-
-  submitFormInfo() {
-    this.refs.userinfoForm.submit()
   }
 
   handleOpenDelete() {
@@ -120,10 +98,6 @@ class UserPopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
     ]
-    const infoActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseInfo.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormInfo.bind(this)}/>,
-    ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
@@ -133,9 +107,8 @@ class UserPopover extends Component {
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
       R.assoc('user_organization', organization_name),
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization'])
+      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_phone', 'user_php_key'])
     )(this.props.user)
-    let initialValuesInfo = R.pick(['user_phone', 'user_pgp_key'], this.props.user)
 
     return (
       <div style={style}>
@@ -146,7 +119,6 @@ class UserPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemLink label="Profile" onTouchTap={this.handleOpenInfo.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -156,19 +128,13 @@ class UserPopover extends Component {
           <T>Do you want to remove the user from this audience?</T>
         </Dialog>
         <Dialog title="Update the user" modal={false} open={this.state.openEdit}
+                autoScrollBodyContent={true}
                 onRequestClose={this.handleCloseEdit.bind(this)}
                 actions={editActions}>
           <UserForm ref="userForm" initialValues={initialValues}
                     organizations={this.props.organizations}
                     onSubmit={this.onSubmitEdit.bind(this)}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
-        </Dialog>
-        <Dialog autoScrollBodyContent={true} title="Update the profile" modal={false} open={this.state.openInfo}
-                onRequestClose={this.handleCloseInfo.bind(this)}
-                actions={infoActions}>
-          <UserinfoForm ref="userinfoForm" initialValues={initialValuesInfo}
-                    onSubmit={this.onSubmitInfo.bind(this)}
-                    onSubmitSuccess={this.handleCloseInfo.bind(this)}/>
         </Dialog>
       </div>
     )

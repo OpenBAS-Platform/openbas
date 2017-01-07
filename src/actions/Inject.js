@@ -11,6 +11,11 @@ export const fetchAllInjects = (exerciseId, noloading) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri, noloading)(dispatch)
 }
 
+export const fetchAGlobalinjects = () => (dispatch) => {
+  var uri = '/api/injects_all'
+  return getReferential(schema.arrayOfInjects, uri)(dispatch)
+}
+
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId
   return putReferential(schema.inject, uri, data)(dispatch)

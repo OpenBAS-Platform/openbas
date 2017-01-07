@@ -12,11 +12,8 @@ import {i18nRegister} from '../../../../utils/Messages'
 i18nRegister({
   fr: {
     'Home': 'Accueil',
-    'Checks': 'Vérifications',
-    'Objectives': 'Objectifs',
-    'Scenario': 'Scénario',
-    'Audience': 'Audience',
-    'Settings': 'Paramètres',
+    'Users': 'Utilisateurs',
+    'Groups': 'Groupes'
   }
 })
 

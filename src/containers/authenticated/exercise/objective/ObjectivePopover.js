@@ -42,7 +42,7 @@ class ObjectivePopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.preventDefault()
+    event.stopPropagation()
     this.setState({
       openPopover: true,
       anchorEl: event.currentTarget,

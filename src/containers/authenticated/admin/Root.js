@@ -1,11 +1,19 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../utils/Messages'
+import {T} from '../../../components/I18n'
 import {redirectToAdmin, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
 import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
 import UserPopover from './../UserPopover'
+
+i18nRegister({
+  fr: {
+    'Administratinon': 'Administration'
+  }
+})
 
 const styles = {
   root: {
@@ -33,7 +41,7 @@ class RootAuthenticated extends Component {
         <AppBar
           title={
             <div>
-              <span style={styles.title}>Administration</span>
+              <span style={styles.title}><T>Administration</T></span>
             </div>
           }
           type={Constants.APPBAR_TYPE_TOPBAR}
