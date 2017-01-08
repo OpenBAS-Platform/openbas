@@ -82,6 +82,10 @@ exercises_audiences:
     type:     rest
     resource: APIBundle\Controller\Exercise\AudienceController
 
+exercises_audiences_users:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\Audience\UserController
+
 exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController
