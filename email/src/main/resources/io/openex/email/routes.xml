@@ -1,10 +1,7 @@
 <routes xmlns="http://camel.apache.org/schema/spring">
     <route id="openex-email">
         <from uri="direct:email"/>
-        <setHeader headerName="contentType">
-            <constant>text/html;charset=UTF-8</constant>
-        </setHeader>
-        <setHeader headerName="X-Auth-Token">
+        <setHeader headerName="Authorization">
             <constant>{{openex.token}}</constant>
         </setHeader>
         <setHeader headerName="From">

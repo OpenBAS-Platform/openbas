@@ -16,7 +16,7 @@ import java.util.Map;
 @SuppressWarnings({"PackageAccessibility", "WeakerAccess"})
 public class EmailDownloader {
 	
-	public static final String X_AUTH_TOKEN = "X-Auth-Token";
+	public static final String AUTHORIZATION = "Authorization";
 	public static final String FILE_NAME = "file_name";
 	public static final String FILE_URL = "file_url";
 	public static final String ATTACHMENTS = "attachments";
@@ -33,9 +33,9 @@ public class EmailDownloader {
 				String file_name = attachmentMap.get(FILE_NAME).toString();
 				String file_url = attachmentMap.get(FILE_URL).toString();
 				try {
-					String openexToken = in.getHeader(X_AUTH_TOKEN, String.class);
+					String openexToken = in.getHeader(AUTHORIZATION, String.class);
 					HttpURLConnection urlConnection = (HttpURLConnection) new URL(file_url).openConnection();
-					urlConnection.setRequestProperty(X_AUTH_TOKEN, openexToken);
+					urlConnection.setRequestProperty(AUTHORIZATION, openexToken);
 					byte[] content = IOUtils.toByteArray(urlConnection.getInputStream());
 					filesContent.add(new EmailAttachment(file_name, content, urlConnection.getContentType()));
 					
