@@ -29,17 +29,17 @@ const styles = {
   },
   'number': {
     color: Theme.palette.primary1Color,
-    fontSize: '70px',
-    fontWeight: '300'
+    fontSize: '60px',
+    fontWeight: '400'
   },
   'icon': {
     color: Theme.palette.primary1Color,
     margin: '35px 0px 0px 0px',
-    fontWeight: '300'
+    fontWeight: '400'
   },
   'name': {
     color: Theme.palette.disabledColor,
-    fontSize: '15px',
+    fontSize: '12px',
     textTransform: 'uppercase',
   }
 }
@@ -58,7 +58,7 @@ class Index extends Component {
           {this.props.exercises.length}
         </div>
         <div style={styles.icon}>
-          <Icon name={Constants.ICON_NAME_ACTION_ROWING} style={{width: '60px', height: '60px'}} color={Theme.palette.disabledColor} />
+          <Icon name={Constants.ICON_NAME_ACTION_ROWING} style={{width: '40px', height: '40px'}} color={Theme.palette.disabledColor} />
         </div>
         <div style={styles.name}>
           <T>Exercises</T>
@@ -69,7 +69,7 @@ class Index extends Component {
           {this.props.users.length}
         </div>
         <div style={styles.icon}>
-          <Icon name={Constants.ICON_NAME_SOCIAL_GROUP} style={{width: '60px', height: '60px'}} color={Theme.palette.disabledColor} />
+          <Icon name={Constants.ICON_NAME_SOCIAL_GROUP} style={{width: '40px', height: '40px'}} color={Theme.palette.disabledColor} />
         </div>
         <div style={styles.name}>
           <T>Users</T>
@@ -80,7 +80,7 @@ class Index extends Component {
           {this.props.injects.length}
         </div>
         <div style={styles.icon}>
-          <Icon name={Constants.ICON_NAME_AV_CALL_TO_ACTION} style={{width: '60px', height: '60px'}} color={Theme.palette.disabledColor} />
+          <Icon name={Constants.ICON_NAME_AV_CALL_TO_ACTION} style={{width: '40px', height: '40px'}} color={Theme.palette.disabledColor} />
         </div>
         <div style={styles.name}>
           <T>Injects</T>

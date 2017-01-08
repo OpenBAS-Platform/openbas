@@ -10,6 +10,7 @@ import {List} from '../../../../components/List'
 import {AvatarListItem, AvatarHeaderItem} from '../../../../components/list/ListItem';
 import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
+import {SearchField} from '../../../../components/SimpleTextField'
 import CreateUser from './CreateUser'
 import UserPopover from './UserPopover'
 
@@ -19,11 +20,14 @@ i18nRegister({
     'Name': 'Nom',
     'Email address': 'Adresse email',
     'Organization': 'Organisation',
-    'Administrator': 'Administrateur'
+    'Administrator': 'Administrateur',
   }
 })
 
 const styles = {
+  'search': {
+    float: 'right',
+  },
   'header': {
     'avatar': {
       fontSize: '12px',
@@ -103,12 +107,16 @@ const styles = {
 class Index extends Component {
   constructor(props) {
     super(props);
-    this.state = {sortBy: 'user_firstname', orderAsc: true}
+    this.state = {sortBy: 'user_firstname', orderAsc: true, searchTerm: ''}
   }
 
   componentDidMount() {
     this.props.fetchUsers()
     this.props.fetchOrganizations()
+  }
+
+  handleSearchUsers(event, value) {
+    this.setState({searchTerm: value})
   }
 
   reverseBy(field) {
@@ -134,8 +142,29 @@ class Index extends Component {
   }
 
   render() {
+    const keyword = this.state.searchTerm
+    let filterByKeyword = n => keyword === '' ||
+    n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+    n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+    n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+
+    const users = R.pipe(
+      R.values(),
+      R.filter(filterByKeyword),
+      R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
+        var fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString())
+        var fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString())
+        return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
+      })
+    )(this.props.users)
+
     return <div>
       <div style={styles.title}><T>Users management</T></div>
+      <div style={styles.search}>
+        <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
+                     onChange={this.handleSearchUsers.bind(this)}
+                     styletype={Constants.FIELD_TYPE_RIGHT}/>
+      </div>
       <div className="clearfix"></div>
       <List>
         <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
@@ -147,7 +176,7 @@ class Index extends Component {
           <div className="clearfix"></div>
         </div>}/>
 
-        {R.values(this.props.users).map(user => {
+        {users.map(user => {
           let user_id = R.propOr(Math.random(), 'user_id', user)
           let user_firstname = R.propOr('-', 'user_firstname', user)
           let user_lastname = R.propOr('-', 'user_lastname', user)
@@ -167,9 +196,8 @@ class Index extends Component {
                 <div style={styles.mail}>{user_email}</div>
                 <div style={styles.org}>{organizationName}</div>
                 <div style={styles.admin}>{user_admin ?
-                  <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE} type={Constants.ICON_TYPE_MAINLIST_RIGHT}/> :
-                  <Icon name={Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE}
-                        type={Constants.ICON_TYPE_MAINLIST_RIGHT}/>}</div>
+                  <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}/> :
+                  <Icon name={Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE}/>}</div>
                 <div className="clearfix"></div>
               </div>
             }

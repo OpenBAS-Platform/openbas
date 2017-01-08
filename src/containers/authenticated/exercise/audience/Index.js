@@ -182,7 +182,6 @@ class Index extends Component {
       n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
       n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
 
-      //Build users list with sorting on column
       const users = R.pipe(
         R.map(data => R.pathOr({}, ['users', data.user_id], this.props)),
         R.filter(filterByKeyword),
@@ -192,7 +191,7 @@ class Index extends Component {
           return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
         })
       )(audience.audience_users)
-      //Display the component
+
       return <div style={styles.container}>
         <AudienceNav selectedAudience={audience.audience_id} exerciseId={exerciseId} audiences={audiences}/>
         <div>

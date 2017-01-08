@@ -17,7 +17,8 @@ import GroupPopover from './GroupPopover'
 i18nRegister({
   fr: {
     'Groups management': 'Gestion des groupes',
-    'Name': 'Nom'
+    'Name': 'Nom',
+    'Users': 'Utilisateurs'
   }
 })
 
@@ -34,6 +35,14 @@ const styles = {
       width: '25%',
       fontSize: '12px',
       textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'group_users': {
+      float: 'left',
+      width: '25%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      textAlign: 'center',
       fontWeight: '700'
     },
   },
@@ -55,6 +64,12 @@ const styles = {
   },
   'name': {
     float: 'left',
+    width: '25%',
+    padding: '5px 0 0 0'
+  },
+  'users': {
+    float: 'left',
+    textAlign: 'center',
     width: '25%',
     padding: '5px 0 0 0'
   }
@@ -82,7 +97,7 @@ class Index extends Component {
       : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
     const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
     return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-      {label} {IconDisplay}
+      <T>{label}</T> {IconDisplay}
     </div>
   }
 
@@ -96,6 +111,15 @@ class Index extends Component {
   }
 
   render() {
+    const groups = R.pipe(
+      R.values(),
+      R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
+        var fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString())
+        var fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString())
+        return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
+      })
+    )(this.props.groups)
+
     return <div>
       <div style={styles.title}><T>Groups management</T></div>
       <div className="clearfix"></div>
@@ -103,12 +127,14 @@ class Index extends Component {
         <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
                     rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
           {this.SortHeader('group_name', 'Name')}
+          {this.SortHeader('group_users', 'Users')}
           <div className="clearfix"></div>
         </div>}/>
 
-        {R.values(this.props.groups).map(group => {
+        {groups.map(group => {
           let group_id = R.propOr(Math.random(), 'group_id', group)
           let group_name = R.propOr('-', 'group_name', group)
+          let group_users = R.propOr([], 'group_users', group)
 
           return <MainListItem
             key={group_id}
@@ -119,6 +145,7 @@ class Index extends Component {
             primaryText={
               <div>
                 <div style={styles.name}>{group_name}</div>
+                <div style={styles.users}>{group_users.length}</div>
                 <div className="clearfix"></div>
               </div>
             }
