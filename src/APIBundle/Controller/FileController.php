@@ -86,9 +86,9 @@ class FileController extends Controller
         /* @var $file File */
 
         if ($file) {
-            unlink($this->get('kernel')->getRootDir() . '/../web/upload' . $file->getFileName());
             $em->remove($file);
             $em->flush();
+            unlink($this->get('kernel')->getRootDir() . '/../web/upload/' . $file->getFilePath());
         }
     }
 }

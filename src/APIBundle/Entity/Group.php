@@ -39,12 +39,6 @@ class Group
      */
     protected $group_grants;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="group_owner", referencedColumnName="user_id")
-     */
-    protected $group_owner;
-
     protected $group_grant_in_exercise;
 
     public function __construct()
@@ -94,17 +88,6 @@ class Group
     public function setGroupGrants($grants)
     {
         $this->group_grants = $grants;
-        return $this;
-    }
-
-    public function getGroupOwner()
-    {
-        return $this->group_owner;
-    }
-
-    public function setGroupOwner($owner)
-    {
-        $this->group_owner = $owner;
         return $this;
     }
 

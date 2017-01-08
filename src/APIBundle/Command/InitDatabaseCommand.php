@@ -108,10 +108,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         );
         $output->writeln('Creating exercise \'Cockroach invasion\'');
 
-        $groupPotatoesPlanners = $this->createGroup('Potatoes planners', $userAdmin);
+        $groupPotatoesPlanners = $this->createGroup('Potatoes planners');
         $output->writeln('Creating group \'Potatoes planners\'');
 
-        $groupCockroachPlanners = $this->createGroup('Cockroach planners', $userAdmin);
+        $groupCockroachPlanners = $this->createGroup('Cockroach planners');
         $output->writeln('Creating group \'Cockroach planners\'');
 
         $this->createGrant('PLANNER', $groupPotatoesPlanners, $exercisePotatoes);
@@ -287,10 +287,9 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $exercise;
     }
 
-    private function createGroup($name, $owner) {
+    private function createGroup($name) {
         $group = new Group();
         $group->setGroupName($name);
-        $group->setGroupOwner($owner);
         $this->em->persist($group);
         $this->em->flush();
 

@@ -43,7 +43,7 @@ class Event
 
     /**
      * @ORM\ManyToOne(targetEntity="File")
-     * @ORM\JoinColumn(name="event_image", referencedColumnName="file_id")
+     * @ORM\JoinColumn(name="event_image", referencedColumnName="file_id", onDelete="SET NULL", nullable=true)
      */
     protected $event_image;
 
