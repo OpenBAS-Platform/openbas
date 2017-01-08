@@ -96,7 +96,7 @@ class Index extends Component {
       R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date', 'exercise_message_header', 'exercise_message_footer'])
     )
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
-    const image = exercise !== undefined ? exercise.exercise_image.file_url : undefined
+    const image = R.pathOr(null, ['exercise_image', 'file_url'], exercise)
 
     return (
       <div>
@@ -120,7 +120,7 @@ class Index extends Component {
           <div style={styles.PaperContent}>
             <h2>Image</h2>
             <br />
-            <img src={image} alt="Exercise logo" style={styles.image}/>
+            {image ? <img src={image} alt="Exercise logo" style={styles.image}/> : ""}
             <br /><br />
             <Button label='Change the image' onClick={this.handleOpenGallery.bind(this)}/>
             <Dialog modal={false} open={this.state.openGallery} onRequestClose={this.handleCloseGallery.bind(this)}>

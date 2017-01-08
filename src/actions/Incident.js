@@ -2,9 +2,9 @@ import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema'
 import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
 
-export const fetchIncidents = (exerciseId) => (dispatch) => {
+export const fetchIncidents = (exerciseId, noloading) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/incidents'
-  return getReferential(schema.arrayOfIncidents, uri)(dispatch)
+  return getReferential(schema.arrayOfIncidents, uri, noloading)(dispatch)
 }
 
 export const fetchIncident = (exerciseId, eventId, incidentId) => (dispatch) => {

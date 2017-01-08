@@ -62,6 +62,7 @@ class IndexAuthenticated extends Component {
           {this.props.exercises.map(exercise => {
             let start_date = dateFormat(exercise.exercise_start_date, 'MMM D, YYYY')
             let end_date = dateFormat(exercise.exercise_end_date, 'MMM D, YYYY')
+            let file_url = R.pathOr(null, ['exercise_image', 'file_url'], exercise)
             return (
               <Link to={'/private/exercise/' + exercise.exercise_id} key={exercise.exercise_id}>
                 <Exercise
@@ -72,7 +73,7 @@ class IndexAuthenticated extends Component {
                   endDate={end_date}
                   status={exercise.exercise_status}
                   organizer={exercise.exercise_organizer}
-                  image={exercise.exercise_image.file_url}
+                  image={file_url}
                 />
               </Link>
             )

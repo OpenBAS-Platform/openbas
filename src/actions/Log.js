@@ -1,9 +1,9 @@
 import * as schema from './Schema'
 import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
 
-export const fetchLogs = (exerciseId) => (dispatch) => {
+export const fetchLogs = (exerciseId, noloading) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/logs'
-  return getReferential(schema.arrayOfLogs, uri)(dispatch)
+  return getReferential(schema.arrayOfLogs, uri, noloading)(dispatch)
 }
 
 export const fetchLog = (exerciseId, logId) => (dispatch) => {

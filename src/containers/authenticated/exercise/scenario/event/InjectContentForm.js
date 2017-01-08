@@ -79,7 +79,7 @@ class InjectContentForm extends Component {
           } else if (field.type === 'richtextarea') {
             return <RichTextField key={field.name} name={field.name} label={field.name}/>
           } else if (field.type === 'checkbox') {
-            return <ToggleField key={field.name} name={field.name} label={<T>{field.name}</T>}/>
+            return <div><br /><ToggleField key={field.name} name={field.name} label={<T>{field.name}</T>}/></div>
           } else if (field.type === 'attachment') {
             return <div key={field.name} style={styles.attachment}>
               <Button label='Add an attachment' onClick={this.handleOpenGallery.bind(this)}/>

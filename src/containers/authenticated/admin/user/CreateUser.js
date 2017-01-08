@@ -14,7 +14,6 @@ i18nRegister({
   }
 })
 
-
 class CreateUser extends Component {
   constructor(props) {
     super(props);
@@ -47,6 +46,7 @@ class CreateUser extends Component {
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpenCreate.bind(this)}/>
         <Dialog title="Create a user"
+                autoScrollBodyContent={true}
                 modal={false}
                 open={this.state.openCreate}
                 onRequestClose={this.handleCloseCreate.bind(this)}

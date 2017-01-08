@@ -111,6 +111,7 @@ class UserPopover extends Component {
           <T>Do you want to delete this user?</T>
         </Dialog>
         <Dialog title="Update the user" modal={false} open={this.state.openEdit}
+                autoScrollBodyContent={true}
                 onRequestClose={this.handleCloseEdit.bind(this)}
                 actions={editActions}>
           <UserForm ref="userForm" initialValues={initialValues}

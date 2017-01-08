@@ -105,7 +105,7 @@ class IndexExerciseLessons extends Component {
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
     this.subscription = initialStream
       .merge(intervalStream)
-      .exhaustMap(() => Promise.all([this.props.fetchLogs(this.props.exerciseId), this.props.fetchIncidents(this.props.exerciseId)]))
+      .exhaustMap(() => Promise.all([this.props.fetchLogs(this.props.exerciseId, true), this.props.fetchIncidents(this.props.exerciseId, true)]))
       .subscribe()
   }
 
