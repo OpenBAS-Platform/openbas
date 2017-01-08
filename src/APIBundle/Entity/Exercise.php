@@ -69,7 +69,7 @@ class Exercise
 
     /**
      * @ORM\ManyToOne(targetEntity="File")
-     * @ORM\JoinColumn(name="exercise_image", referencedColumnName="file_id")
+     * @ORM\JoinColumn(name="exercise_image", referencedColumnName="file_id", onDelete="SET NULL", nullable=true)
      */
     protected $exercise_image;
 
