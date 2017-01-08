@@ -99,6 +99,7 @@ class InjectController extends Controller
             }
         }
 
+        /* @var $injects Inject[] */
         foreach ($injects as &$inject) {
             $inject->sanitizeUser();
             $inject->computeUsersNumber();
@@ -111,30 +112,30 @@ class InjectController extends Controller
         $xlsInjects->getProperties()
             ->setCreator("OpenEx")
             ->setLastModifiedBy("OpenEx")
-            ->setTitle("Injects list")
-            ->setSubject("Injects list")
-            ->setDescription("The injects of an exercise");
+            ->setTitle("[{$exercise->getExerciseName()}] Injects list");
 
         $xlsInjects->setActiveSheetIndex(0);
         $xlsInjects->getActiveSheet()->setTitle('Injects');
 
         $xlsInjects->getActiveSheet()->setCellValue('A1', 'Title');
-        $xlsInjects->getActiveSheet()->setCellValue('A2', 'Description');
-        $xlsInjects->getActiveSheet()->setCellValue('A3', 'Author');
-        $xlsInjects->getActiveSheet()->setCellValue('A4', 'Content');
+        $xlsInjects->getActiveSheet()->setCellValue('B1', 'Description');
+        $xlsInjects->getActiveSheet()->setCellValue('C1', 'Author');
+        $xlsInjects->getActiveSheet()->setCellValue('D1', 'Date');
+        $xlsInjects->getActiveSheet()->setCellValue('E1', 'Content');
 
         foreach ($injects as $inject) {
-            $xlsInjects->getActiveSheet()->setCellValue('B1', $inject->getInjectTitle());
+            $xlsInjects->getActiveSheet()->setCellValue('A2', $inject->getInjectTitle());
             $xlsInjects->getActiveSheet()->setCellValue('B2', $inject->getInjectDescription());
-            $xlsInjects->getActiveSheet()->setCellValue('B3', $inject->getInjectUser());
-            $xlsInjects->getActiveSheet()->setCellValue('B4', $inject->getInjectContent());
+            $xlsInjects->getActiveSheet()->setCellValue('C2', $inject->getInjectUser());
+            $xlsInjects->getActiveSheet()->setCellValue('D2', $inject->getInjectDate());
+            $xlsInjects->getActiveSheet()->setCellValue('E2', $inject->getInjectContent());
         }
 
         $writer = $this->get('phpexcel')->createWriter($xlsInjects, 'Excel2007');
         $response = $this->get('phpexcel')->createStreamedResponse($writer);
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            'Injects.xlsx'
+            "[{$exercise->getExerciseName()}] Injects list.xlsx"
         );
 
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
