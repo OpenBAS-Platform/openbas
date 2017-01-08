@@ -30,10 +30,10 @@ class UserForm extends Component {
         <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
                            type="text" label="Organization" dataSource={dataSource}/>
-        <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>
-        <ToggleField name="user_admin" label="Administrator" />
         <FormField name="user_phone" fullWidth={true} type="text" label="Phone number"/>
         <FormField name="user_pgp_key" fullWidth={true} multiLine={true} rows={5} type="text" label="PGP public key"/>
+        <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>
+        <ToggleField name="user_admin" label="Administrator" />
       </form>
     )
   }

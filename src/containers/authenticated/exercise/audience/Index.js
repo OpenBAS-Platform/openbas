@@ -30,7 +30,8 @@ i18nRegister({
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
     'This audience is empty.': 'Cette audience est vide.',
     'Comcheck currently running': 'Comcheck en cours',
-    'User view': 'Vue de l\'utilisateur'
+    'User view': 'Vue de l\'utilisateur',
+    'user(s)': 'utilisateur(s)'
   }
 })
 
@@ -98,6 +99,11 @@ const styles = {
   'comcheck': {
     float: 'left',
     margin: '-16px 0px 0px -15px'
+  },
+  'users': {
+    float: 'left',
+    fontSize: '12px',
+    color: Theme.palette.accent3Color
   }
 }
 
@@ -199,6 +205,7 @@ class Index extends Component {
             style={{color: this.switchColor(!audience.audience_enabled)}}>{audience.audience_name}</span></div>
           <AudiencePopover exerciseId={exerciseId} audience={audience} audiences={audiences}/>
           {comchecks}
+          <div style={styles.users}>{audience.audience_users.length} <T>user(s)</T></div>
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
                          onChange={this.handleSearchUsers.bind(this)}
