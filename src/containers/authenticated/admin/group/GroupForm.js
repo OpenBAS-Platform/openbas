@@ -1,6 +1,13 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../../components/Field'
+import {i18nRegister} from '../../../../utils/Messages'
+
+i18nRegister({
+  fr: {
+    'Name': 'Nom'
+  }
+})
 
 class GroupForm extends Component {
   render() {

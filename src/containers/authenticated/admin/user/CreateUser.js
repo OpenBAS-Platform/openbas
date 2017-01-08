@@ -1,10 +1,19 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import {i18nRegister} from '../../../../utils/Messages'
 import {addUser} from '../../../../actions/User'
 import {Dialog} from '../../../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
 import UserForm from './UserForm'
 import * as Constants from '../../../../constants/ComponentTypes'
+
+i18nRegister({
+  fr: {
+    'Create user': 'Créer l\'utilisateur',
+    'Create a user': 'Créer un utilisateur'
+  }
+})
+
 
 class CreateUser extends Component {
   constructor(props) {
@@ -37,7 +46,7 @@ class CreateUser extends Component {
     return (
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpenCreate.bind(this)}/>
-        <Dialog title="Create a new user"
+        <Dialog title="Create a user"
                 modal={false}
                 open={this.state.openCreate}
                 onRequestClose={this.handleCloseCreate.bind(this)}

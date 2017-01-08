@@ -2,6 +2,8 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -18,6 +20,19 @@ import {MainSmallListItem} from '../../../../components/list/ListItem'
 import {fetchGroup, updateGroup, deleteGroup} from '../../../../actions/Group'
 import {addGrant, deleteGrant} from '../../../../actions/Grant'
 import GroupForm from './GroupForm'
+
+i18nRegister({
+  fr: {
+    'Manage users': 'Gérer les utilisateurs',
+    'Manage grants': 'Gérer les permissions',
+    'Do you want to delete this group?': 'Souhaitez-vous supprimer ce groupe ?',
+    'Exercise': 'Exercice',
+    'Planner': 'Planificateur',
+    'Observer': 'Observateur',
+    'Update the group': 'Mettre à jour le groupe',
+    'Search for a user': 'Rechercher un utilisateur'
+  }
+})
 
 const styles = {
   'main': {
@@ -223,7 +238,7 @@ class GroupPopover extends Component {
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          Do you confirm the removing of this group?
+          <T>Do you want to delete this group?</T>
         </Dialog>
         <Dialog title="Update the group" modal={false} open={this.state.openEdit}
                 onRequestClose={this.handleCloseEdit.bind(this)}
@@ -291,9 +306,9 @@ class GroupPopover extends Component {
           <Table selectable={false}>
             <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
               <TableRow>
-                <TableHeaderColumn>Exercise</TableHeaderColumn>
-                <TableHeaderColumn>Planner</TableHeaderColumn>
-                <TableHeaderColumn>Observer</TableHeaderColumn>
+                <TableHeaderColumn><T>Exercise</T></TableHeaderColumn>
+                <TableHeaderColumn><T>Planner</T></TableHeaderColumn>
+                <TableHeaderColumn><T>Observer</T></TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false}>

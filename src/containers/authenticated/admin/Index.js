@@ -1,7 +1,10 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import * as Constants from '../../../constants/ComponentTypes'
+import Theme from '../../../components/Theme'
 import {T} from '../../../components/I18n'
+import {Icon} from '../../../components/Icon'
 import {i18nRegister} from '../../../utils/Messages'
 import {fetchExercises} from '../../../actions/Exercise'
 import {fetchUsers} from '../../../actions/User'
@@ -9,7 +12,7 @@ import {fetchGlobalInjects} from '../../../actions/Inject'
 
 i18nRegister({
   fr: {
-    'Exercices': 'Exercises',
+    'Exercises': 'Exercices',
     'Users': 'Utilisateurs',
     'Injects': 'Injects'
   }
@@ -17,6 +20,7 @@ i18nRegister({
 
 const styles = {
   'container': {
+    padding: '50px 0px 0px 0px',
     textAlign: 'center'
   },
   'stat': {
@@ -24,12 +28,19 @@ const styles = {
     width: "300px",
   },
   'number': {
-    fontSize: '30px',
-    fontWeight: '400'
+    color: Theme.palette.primary1Color,
+    fontSize: '70px',
+    fontWeight: '300'
+  },
+  'icon': {
+    color: Theme.palette.primary1Color,
+    margin: '35px 0px 0px 0px',
+    fontWeight: '300'
   },
   'name': {
-    margin: '10px 0px 0px 0px',
-    fontSize: '20px'
+    color: Theme.palette.disabledColor,
+    fontSize: '15px',
+    textTransform: 'uppercase',
   }
 }
 
@@ -45,9 +56,34 @@ class Index extends Component {
       <div style={styles.stat}>
         <div style={styles.number}>
           {this.props.exercises.length}
-      </div>
+        </div>
+        <div style={styles.icon}>
+          <Icon name={Constants.ICON_NAME_ACTION_ROWING} style={{width: '60px', height: '60px'}} color={Theme.palette.disabledColor} />
+        </div>
         <div style={styles.name}>
           <T>Exercises</T>
+        </div>
+      </div>
+      <div style={styles.stat}>
+        <div style={styles.number}>
+          {this.props.users.length}
+        </div>
+        <div style={styles.icon}>
+          <Icon name={Constants.ICON_NAME_SOCIAL_GROUP} style={{width: '60px', height: '60px'}} color={Theme.palette.disabledColor} />
+        </div>
+        <div style={styles.name}>
+          <T>Users</T>
+        </div>
+      </div>
+      <div style={styles.stat}>
+        <div style={styles.number}>
+          {this.props.injects.length}
+        </div>
+        <div style={styles.icon}>
+          <Icon name={Constants.ICON_NAME_AV_CALL_TO_ACTION} style={{width: '60px', height: '60px'}} color={Theme.palette.disabledColor} />
+        </div>
+        <div style={styles.name}>
+          <T>Injects</T>
         </div>
       </div>
     </div>

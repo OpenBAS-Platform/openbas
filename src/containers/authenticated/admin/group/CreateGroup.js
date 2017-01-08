@@ -5,6 +5,14 @@ import {Dialog} from '../../../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
 import UserForm from './GroupForm'
 import * as Constants from '../../../../constants/ComponentTypes'
+import {i18nRegister} from '../../../../utils/Messages'
+
+i18nRegister({
+  fr: {
+    'Create a group': 'Créer un groupe',
+    'Create group': 'Créer le groupe'
+  }
+})
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -37,7 +45,7 @@ class CreateGroup extends Component {
     return (
       <div>
         <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpenCreate.bind(this)}/>
-        <Dialog title="Create a new group"
+        <Dialog title="Create a group"
                 modal={false}
                 open={this.state.openCreate}
                 onRequestClose={this.handleCloseCreate.bind(this)}

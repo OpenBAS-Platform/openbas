@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
@@ -10,6 +12,16 @@ import {Avatar} from '../../../../components/Avatar'
 import {Icon} from '../../../../components/Icon'
 import CreateUser from './CreateUser'
 import UserPopover from './UserPopover'
+
+i18nRegister({
+  fr: {
+    'Users management': 'Gestion des utilisateurs',
+    'Name': 'Nom',
+    'Email address': 'Adresse email',
+    'Organization': 'Organisation',
+    'Administrator': 'Administrateur'
+  }
+})
 
 const styles = {
   'header': {
@@ -41,6 +53,7 @@ const styles = {
       fontWeight: '700'
     },
     'user_admin': {
+      textAlign: 'center',
       float: 'left',
       width: '10%',
       fontSize: '12px',
@@ -81,6 +94,8 @@ const styles = {
   },
   'admin': {
     float: 'left',
+    textAlign: 'center',
+    width: '10%',
     padding: '5px 0 0 0'
   }
 }
@@ -105,7 +120,7 @@ class Index extends Component {
       : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
     const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
     return <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-      {label} {IconDisplay}
+      <T>{label}</T> {IconDisplay}
     </div>
   }
 
@@ -120,12 +135,12 @@ class Index extends Component {
 
   render() {
     return <div>
-      <div style={styles.title}>Users management</div>
+      <div style={styles.title}><T>Users management</T></div>
       <div className="clearfix"></div>
       <List>
         <AvatarHeaderItem leftAvatar={<span style={styles.header.avatar}>#</span>}
                           rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
-          {this.SortHeader('user_firstname', 'name')}
+          {this.SortHeader('user_firstname', 'Name')}
           {this.SortHeader('user_email', 'Email address')}
           {this.SortHeader('user_organization', 'Organization')}
           {this.SortHeader('user_admin', 'Administrator')}

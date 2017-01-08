@@ -1,6 +1,8 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchGroups} from '../../../../actions/Group'
 import {fetchUsers} from '../../../../actions/User'
@@ -11,6 +13,13 @@ import {MainListItem, HeaderItem} from '../../../../components/list/ListItem';
 import {Icon} from '../../../../components/Icon'
 import CreateGroup from './CreateGroup'
 import GroupPopover from './GroupPopover'
+
+i18nRegister({
+  fr: {
+    'Groups management': 'Gestion des groupes',
+    'Name': 'Nom'
+  }
+})
 
 const styles = {
   'header': {
@@ -88,7 +97,7 @@ class Index extends Component {
 
   render() {
     return <div>
-      <div style={styles.title}>Groups management</div>
+      <div style={styles.title}><T>Groups management</T></div>
       <div className="clearfix"></div>
       <List>
         <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}

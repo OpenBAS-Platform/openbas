@@ -1,6 +1,8 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import R from 'ramda'
+import {T} from '../../../../components/I18n'
+import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover';
 import {Menu} from '../../../../components/Menu'
@@ -10,6 +12,13 @@ import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
 import {updateUser, deleteUser} from '../../../../actions/User'
 import UserForm from './UserForm'
+
+i18nRegister({
+  fr: {
+    'Do you want to delete this user?': 'Souhaitez-vous supprimer cet utilisateur ?',
+    'Update the user': 'Mettre à jour l\'utilisateur'
+  }
+})
 
 const style = {
   position: 'absolute',
@@ -28,11 +37,8 @@ class UserPopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.preventDefault()
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    })
+    event.stopPropagation()
+    this.setState({openPopover: true, anchorEl: event.currentTarget})
   }
 
   handlePopoverClose() {
@@ -49,11 +55,6 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    if( data.user_admin ) {
-      data.user_admin = 1
-    } else {
-      data.user_admin = 0
-    }
     return this.props.updateUser(this.props.user.user_id, data)
   }
 
@@ -89,7 +90,7 @@ class UserPopover extends Component {
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_admin']) //Pickup only needed fields
+      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_organization', 'user_admin', 'user_phone', 'user_pgp_key']) //Pickup only needed fields
     )(this.props.user)
 
     return (
@@ -107,7 +108,7 @@ class UserPopover extends Component {
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          Do you confirm the removing of this user?
+          <T>Do you want to delete this user?</T>
         </Dialog>
         <Dialog title="Update the user" modal={false} open={this.state.openEdit}
                 onRequestClose={this.handleCloseEdit.bind(this)}
