@@ -4,6 +4,7 @@ import {logDate} from './Time'
 export const i18n = {
   messages: Immutable({
     fr: {
+      'OpenEx - Crisis management exercises platform': 'OpenEx - Plateforme d’exercices de crise',
       'TECHNICAL': 'Technique',
       'OPERATIONAL': 'Opérationnel',
       'STRATEGIC': 'Stratégique',

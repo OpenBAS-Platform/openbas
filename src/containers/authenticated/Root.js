@@ -9,6 +9,7 @@ import {T} from '../../components/I18n'
 import {i18nRegister} from '../../utils/Messages'
 import * as Constants from '../../constants/ComponentTypes'
 import {Icon} from '../../components/Icon'
+import DocumentTitle from '../../components/DocumentTitle'
 
 i18nRegister({
   fr: {
@@ -19,7 +20,7 @@ i18nRegister({
 class RootAuthenticated extends Component {
 
   componentDidMount() {
-    if(process.env.NODE_ENV !== 'development') {
+    if (process.env.NODE_ENV !== 'development') {
       const initialStream = Rx.Observable.of(1); //Fetch on loading
       var intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
       this.subscription = initialStream
@@ -30,22 +31,24 @@ class RootAuthenticated extends Component {
   }
 
   componentWillUnmount() {
-    if(process.env.NODE_ENV !== 'development') {
+    if (process.env.NODE_ENV !== 'development') {
       this.subscription.unsubscribe()
     }
   }
 
   render() {
     return (
-      <div>
-        <Snackbar open={this.props.savedPopupOpen} autoHideDuration={1500}
-                  onRequestClose={this.props.savedDismiss.bind(this)} message={
-          <div>
-            <Icon name={Constants.ICON_NAME_ACTION_DONE} color="#ffffff" type={Constants.ICON_TYPE_LEFT}/>
-            <T>Data saved.</T>
-          </div>}/>
-        {this.props.children}
-      </div>
+      <DocumentTitle title='OpenEx - Crisis management exercises platform'>
+        <div>
+          <Snackbar open={this.props.savedPopupOpen} autoHideDuration={1500}
+                    onRequestClose={this.props.savedDismiss.bind(this)} message={
+            <div>
+              <Icon name={Constants.ICON_NAME_ACTION_DONE} color="#ffffff" type={Constants.ICON_TYPE_LEFT}/>
+              <T>Data saved.</T>
+            </div>}/>
+          {this.props.children}
+        </div>
+      </DocumentTitle>
     )
   }
 }

@@ -60,7 +60,7 @@ if (process.env.NODE_ENV === 'development') {
   const originalConsoleError = console.error
   if (console.error === originalConsoleError) {
     console.error = (...args) => {
-      if (args && args[0].indexOf('[React Intl]') === 0) {return}
+      if (args && args[0].indexOf('[React Intl]') === 0) return
       originalConsoleError.call(console, ...args)
     }
   }
@@ -126,21 +126,18 @@ const UserIsAuthenticated = UserAuthWrapper({
   failureRedirectPath: '/login',
   wrapperDisplayName: 'UserIsAuthenticated',
 })
-
 const PlatformWorkerAccessible = UserAuthWrapper({
   authSelector: state => state.app.worker,
   predicate: worker => worker.status === "RUNNING",
   failureRedirectPath: '/unreachable',
   allowRedirectBack: false
 })
-
 const PlatformWorkerNotAccessible = UserAuthWrapper({
   authSelector: state => state.app.worker,
   predicate: worker => worker.status !== "RUNNING",
   failureRedirectPath: '/private',
   allowRedirectBack: false
 })
-
 const UserIsNotAuthenticated = UserAuthWrapper({
   authSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,
@@ -152,8 +149,8 @@ const UserIsNotAuthenticated = UserAuthWrapper({
 //endregion
 
 class IntlWrapper extends Component {
-  render () {
-    const { children, lang } = this.props
+  render() {
+    const {children, lang} = this.props
     return <IntlProvider locale={lang} key={lang} messages={i18n.messages[lang]}>{children}</IntlProvider>
   }
 }
@@ -164,8 +161,8 @@ IntlWrapper.propTypes = {
 }
 
 const select = (state) => {
-    var lang = R.pathOr("auto", ['logged', 'lang'], state.app)
-    return {lang: lang === "auto" ?  locale : lang}
+  var lang = R.pathOr("auto", ['logged', 'lang'], state.app)
+  return {lang: lang === "auto" ? locale : lang}
 }
 
 const ConnectedIntl = connect(select)(IntlWrapper)
