@@ -1,14 +1,14 @@
 APIBundle\Entity\Audience:
     attributes:
         audience_id:
-            groups: ['audience', 'dryrun', 'user', 'inject', 'comcheck']
+            groups: ['Audience', 'dryrun', 'user', 'inject', 'comcheck']
         audience_name:
-            groups: ['audience']
+            groups: ['Audience']
         audience_exercise:
-            groups: ['audience']
+            groups: ['Audience']
         audience_enabled:
-            groups: ['audience']
+            groups: ['Audience']
         audience_users:
-            groups: ['audience']
+            groups: ['Audience']
         audience_injects:
-            groups: ['audience']
+            groups: ['Audience']
