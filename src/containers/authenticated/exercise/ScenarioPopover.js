@@ -37,6 +37,7 @@ class ScenarioPopover extends Component {
 
   handleDownloadInjects() {
     this.props.downloadExportInjects(this.props.exerciseId)
+    this.handlePopoverClose()
   }
 
   render() {

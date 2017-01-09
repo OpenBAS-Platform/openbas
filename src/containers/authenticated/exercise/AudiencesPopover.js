@@ -37,6 +37,7 @@ class AudiencesPopover extends Component {
 
   handleDownloadAudiences() {
     this.props.downloadExportAudiences(this.props.exerciseId)
+    this.handlePopoverClose()
   }
 
   render() {

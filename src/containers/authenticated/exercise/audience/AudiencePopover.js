@@ -153,6 +153,7 @@ class AudiencePopover extends Component {
 
   handleDownloadAudience() {
     this.props.downloadExportAudience(this.props.exerciseId, this.props.audience.audience_id)
+    this.handlePopoverClose()
   }
 
   render() {
