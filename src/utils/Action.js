@@ -3,6 +3,7 @@ import {SubmissionError} from 'redux-form'
 import Immutable from 'seamless-immutable'
 import {api} from '../App'
 import R from 'ramda'
+import FileSaver from 'file-saver'
 
 const submitErrors = (data) => {
   const errorsExtractor = R.pipe(
@@ -21,6 +22,14 @@ const submitErrors = (data) => {
     R.set(R.lensProp('_error'), data.message)
   )
   return new SubmissionError(errorsExtractor(data))
+}
+
+export const fileDownload = (uri) => () => {
+    return api().get(uri, {responseType: 'blob'}).then(function(response) {
+        const contentDisposition = response.headers['content-disposition']
+        var filename = R.last(contentDisposition.match(/filename="(.+)"/))
+        FileSaver.saveAs(response.data, filename);
+    })
 }
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {

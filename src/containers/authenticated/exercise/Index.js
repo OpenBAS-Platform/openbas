@@ -9,7 +9,7 @@ import {i18nRegister} from '../../../utils/Messages'
 import {dateFormat} from '../../../utils/Time'
 import {List} from '../../../components/List'
 import {Dialog} from '../../../components/Dialog'
-import {MainListItem, SecondaryListItem, TertiaryListItem} from '../../../components/list/ListItem';
+import {MainListItem, SecondaryListItem, TertiaryListItem} from '../../../components/list/ListItem'
 import {Icon} from '../../../components/Icon'
 import {IconButton, FlatButton} from '../../../components/Button'
 import {Avatar} from '../../../components/Avatar'
@@ -18,7 +18,7 @@ import {fetchSubobjectives} from '../../../actions/Subobjective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
-import {fetchAllInjects} from '../../../actions/Inject'
+import {fetchAllInjects, downloadExportInjects} from '../../../actions/Inject'
 import EventView from './scenario/event/EventView'
 import IncidentView from './scenario/event/IncidentView'
 import InjectView from './scenario/event/InjectView'
@@ -181,25 +181,20 @@ class IndexExercise extends Component {
     this.setState({openViewObjective: false})
   }
 
+  handleDownloadInjects() {
+    this.props.downloadExportInjects(this.props.exerciseId)
+  }
+
   render() {
-    const viewEventActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewEvent.bind(this)}/>,
-    ]
-    const viewIncidentActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>,
-    ]
-    const viewInjectActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewInject.bind(this)}/>,
-    ]
-    const viewAudienceActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewAudience.bind(this)}/>,
-    ]
-    const viewObjectiveActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewObjective.bind(this)}/>,
-    ]
+    const viewEventActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewEvent.bind(this)}/>]
+    const viewIncidentActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>]
+    const viewInjectActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewInject.bind(this)}/>]
+    const viewAudienceActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewAudience.bind(this)}/>]
+    const viewObjectiveActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewObjective.bind(this)}/>]
     return (
       <div>
         <div style={styles.columnLeft}>
+          <FlatButton label="<<<<<<<< DOWNLOAD INJECTS.XLSX >>>>>>" primary={true} onTouchTap={this.handleDownloadInjects.bind(this)}/>
           <div style={styles.title}><T>Main objectives</T></div>
           <div className="clearfix"></div>
           {this.props.objectives.length === 0 ?
@@ -452,5 +447,6 @@ export default connect(select, {
   fetchEvents,
   fetchIncidents,
   fetchIncidentTypes,
-  fetchAllInjects
+  fetchAllInjects,
+  downloadExportInjects
 })(injectIntl(IndexExercise))

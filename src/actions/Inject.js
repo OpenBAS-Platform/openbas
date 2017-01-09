@@ -1,5 +1,5 @@
 import * as schema from './Schema'
-import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
+import {getReferential, fileDownload, putReferential, postReferential, delReferential} from '../utils/Action'
 
 export const fetchInjects = (exerciseId, eventId) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/injects'
@@ -11,9 +11,12 @@ export const fetchAllInjects = (exerciseId, noloading) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri, noloading)(dispatch)
 }
 
+export const downloadExportInjects = (exerciseId) => (dispatch) => {
+    return fileDownload('/api/exercises/' + exerciseId + '/injects.xlsx')(dispatch)
+}
+
 export const fetchGlobalInjects = () => (dispatch) => {
-  var uri = '/api/injects_all'
-  return getReferential(schema.arrayOfInjects, uri)(dispatch)
+  return getReferential(schema.arrayOfInjects, '/api/injects_all')(dispatch)
 }
 
 export const updateInject = (exerciseId, eventId, incidentId, injectId, data) => (dispatch) => {

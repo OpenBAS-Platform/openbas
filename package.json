@@ -9,6 +9,7 @@
     "axios": "^0.15.3",
     "countdown": "^2.6.0",
     "d3": "^4.4.0",
+    "file-saver": "^1.3.3",
     "material-ui": "^0.16.5",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.10",
