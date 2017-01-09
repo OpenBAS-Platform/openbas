@@ -21,13 +21,13 @@ class UserController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List users of an audience"
+     *    description="List users of an Audience"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users")
      */
-    public function getAudiencesUsersAction(Request $request)
+    public function getExercisesAudiencesUsersAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -62,7 +62,7 @@ class UserController extends Controller
      *
      * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users.xlsx")
      */
-    public function getAudiencesUsersXlsxAction(Request $request)
+    public function getExercisesAudiencesUsersXlsxAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -82,41 +82,39 @@ class UserController extends Controller
         }
 
         $users = $audience->getAudienceUsers();
-
-        foreach ($users as &$user) {
-            $user->setUserGravatar();
-        }
-
-        $xlsInjects = $this->get('phpexcel')->createPHPExcelObject();
+        $xlsUsers = $this->get('phpexcel')->createPHPExcelObject();
         /* @var $xlsInjects PHPExcel */
 
-        $xlsInjects->getProperties()
+        $xlsUsers->getProperties()
             ->setCreator("OpenEx")
             ->setLastModifiedBy("OpenEx")
             ->setTitle("[{$exercise->getExerciseName()}] [{$audience->getAudienceName()}] Users list");
 
-        $xlsInjects->setActiveSheetIndex(0);
-        $xlsInjects->getActiveSheet()->setTitle('Users');
+        $sheet = $xlsUsers->getActiveSheet();
+        $sheet->setTitle('Users');
 
-        $xlsInjects->getActiveSheet()->setCellValue('A1', 'Firstname');
-        $xlsInjects->getActiveSheet()->setCellValue('B1', 'Lastname');
-        $xlsInjects->getActiveSheet()->setCellValue('C1', 'Organization');
-        $xlsInjects->getActiveSheet()->setCellValue('D1', 'Email');
-        $xlsInjects->getActiveSheet()->setCellValue('E1', 'Phone');
+        $sheet->setCellValue('A1', 'Firstname');
+        $sheet->setCellValue('B1', 'Lastname');
+        $sheet->setCellValue('C1', 'Organization');
+        $sheet->setCellValue('D1', 'Email');
+        $sheet->setCellValue('E1', 'Phone');
 
+        $i = 2;
         foreach ($users as $user) {
-            $xlsInjects->getActiveSheet()->setCellValue('A2', $user->getUserFirstname());
-            $xlsInjects->getActiveSheet()->setCellValue('B2', $user->getUserLastname());
-            $xlsInjects->getActiveSheet()->setCellValue('C2', $user->getUserOrganization()->getOrganizationName());
-            $xlsInjects->getActiveSheet()->setCellValue('D2', $user->getUserEmail());
-            $xlsInjects->getActiveSheet()->setCellValue('E2', $user->getUserPhone());
+            $user->setUserGravatar();
+            $sheet->setCellValue('A' . $i, $user->getUserFirstname());
+            $sheet->setCellValue('B' . $i, $user->getUserLastname());
+            $sheet->setCellValue('C' . $i, $user->getUserOrganization()->getOrganizationName());
+            $sheet->setCellValue('D' . $i, $user->getUserEmail());
+            $sheet->setCellValue('E' . $i, $user->getUserPhone());
+            $i++;
         }
 
-        $writer = $this->get('phpexcel')->createWriter($xlsInjects, 'Excel2007');
+        $writer = $this->get('phpexcel')->createWriter($xlsUsers, 'Excel2007');
         $response = $this->get('phpexcel')->createStreamedResponse($writer);
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            "[{$exercise->getExerciseName()}] [{$audience->getAudienceName()}] Users list"
+            "[{$exercise->getExerciseName()}] [{$audience->getAudienceName()}] Users list.xlsx"
         );
 
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');

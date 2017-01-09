@@ -38,8 +38,10 @@ class ExerciseController extends Controller
             }
         }
 
-        foreach( $exercises as &$exercise) {
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+        foreach ($exercises as &$exercise) {
+            if ($exercise->getExerciseImage() !== null) {
+                $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            }
             $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
 
@@ -78,7 +80,9 @@ class ExerciseController extends Controller
 
         $this->denyAccessUnlessGranted('select', $exercise);
 
-        $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+        if ($exercise->getExerciseImage() !== null) {
+            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+        }
 
         $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
         /* @var $events Event[] */
@@ -127,7 +131,9 @@ class ExerciseController extends Controller
             $exercise->setExerciseMessageFooter('EXERCISE - EXERCISE - EXERCISE');
             $em->persist($exercise);
             $em->flush();
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            if ($exercise->getExerciseImage() !== null) {
+                $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            }
             return $exercise;
         } else {
             return $form;
@@ -183,7 +189,9 @@ class ExerciseController extends Controller
             $em->flush();
             $em->clear();
             $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            if ($exercise->getExerciseImage() !== null) {
+                $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
+            }
             $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
 
