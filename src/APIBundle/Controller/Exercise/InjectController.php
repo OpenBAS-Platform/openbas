@@ -99,13 +99,6 @@ class InjectController extends Controller
             }
         }
 
-        /* @var $injects Inject[] */
-        foreach ($injects as &$inject) {
-            $inject->sanitizeUser();
-            $inject->computeUsersNumber();
-            $inject->setInjectExercise($exercise->getExerciseId());
-        }
-
         $xlsInjects = $this->get('phpexcel')->createPHPExcelObject();
         /* @var $xlsInjects PHPExcel */
 
@@ -114,21 +107,29 @@ class InjectController extends Controller
             ->setLastModifiedBy("OpenEx")
             ->setTitle("[{$exercise->getExerciseName()}] Injects list");
 
-        $xlsInjects->setActiveSheetIndex(0);
-        $xlsInjects->getActiveSheet()->setTitle('Injects');
+        $sheet = $xlsInjects->getActiveSheet();
+        $sheet->setTitle('Injects');
 
-        $xlsInjects->getActiveSheet()->setCellValue('A1', 'Title');
-        $xlsInjects->getActiveSheet()->setCellValue('B1', 'Description');
-        $xlsInjects->getActiveSheet()->setCellValue('C1', 'Author');
-        $xlsInjects->getActiveSheet()->setCellValue('D1', 'Date');
-        $xlsInjects->getActiveSheet()->setCellValue('E1', 'Content');
+        $sheet->setCellValue('A1', 'Title');
+        $sheet->setCellValue('B1', 'Description');
+        $sheet->setCellValue('C1', 'Author');
+        $sheet->setCellValue('D1', 'Date');
+        $sheet->setCellValue('E1', 'Type');
+        $sheet->setCellValue('F1', 'Content');
 
+        $i = 2;
         foreach ($injects as $inject) {
-            $xlsInjects->getActiveSheet()->setCellValue('A2', $inject->getInjectTitle());
-            $xlsInjects->getActiveSheet()->setCellValue('B2', $inject->getInjectDescription());
-            $xlsInjects->getActiveSheet()->setCellValue('C2', $inject->getInjectUser());
-            $xlsInjects->getActiveSheet()->setCellValue('D2', $inject->getInjectDate());
-            $xlsInjects->getActiveSheet()->setCellValue('E2', $inject->getInjectContent());
+            $inject->sanitizeUser();
+            $inject->computeUsersNumber();
+            $inject->setInjectExercise($exercise->getExerciseId());
+
+            $sheet->setCellValue('A' . $i, $inject->getInjectTitle());
+            $sheet->setCellValue('B' . $i, $inject->getInjectDescription());
+            $sheet->setCellValue('C' . $i, $inject->getInjectUser());
+            $sheet->setCellValue('D' . $i, $inject->getInjectDate());
+            $sheet->setCellValue('E' . $i, $inject->getInjectType());
+            $sheet->setCellValue('F' . $i, $inject->getInjectContent());
+            $i++;
         }
 
         $writer = $this->get('phpexcel')->createWriter($xlsInjects, 'Excel2007');
