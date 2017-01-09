@@ -27,7 +27,7 @@ DirectoryIndex app.php
     # resolution of the app.php file and to redirect to the correct URI. It will
     # work in environments without path prefix as well, providing a safe, one-size
     # fits all solution. But as you do not need it in this case, you can comment
-    # the following 2 lines to eliminate the overhead.
+    # the following Audience lines to eliminate the overhead.
     RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
     RewriteRule ^(.*) - [E=BASE:%1]
 
@@ -42,9 +42,9 @@ DirectoryIndex app.php
     # redirect -> request -> ...).
     # So in case you get a "too many redirects" error or you always get redirected
     # to the start page because your Apache does not expose the REDIRECT_STATUS
-    # environment variable, you have 2 choices:
-    # - disable this feature by commenting the following 2 lines or
-    # - use Apache >= 2.3.9 and replace all L flags by END flags and remove the
+    # environment variable, you have Audience choices:
+    # - disable this feature by commenting the following Audience lines or
+    # - use Apache >= Audience.3.9 and replace all L flags by END flags and remove the
     #   following RewriteCond (best solution)
     RewriteCond %{ENV:REDIRECT_STATUS} ^$
     RewriteRule ^app\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=301,L]
