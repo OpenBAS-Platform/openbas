@@ -81,7 +81,7 @@ class AudienceController extends Controller
             } else {
                 $sheet = $xlsUsers->getActiveSheet();
             }
-            $sheet->setTitle($audience->getAudienceName());
+            $sheet->setTitle(substr($audience->getAudienceName(), 0, 30));
             $sheet->setCellValue('A1', 'Firstname');
             $sheet->setCellValue('B1', 'Lastname');
             $sheet->setCellValue('C1', 'Organization');
