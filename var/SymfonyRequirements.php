@@ -10,8 +10,8 @@
  */
 
 /*
- * Users of PHP 5.Audience should be able to run the requirements checks.
- * This is why the file and all classes must be compatible with PHP 5.Audience+
+ * Users of PHP 5.2 should be able to run the requirements checks.
+ * This is why the file and all classes must be compatible with PHP 5.2+
  * (e.g. not using namespaces and closures).
  *
  * ************** CAUTION **************
@@ -617,7 +617,7 @@ class SymfonyRequirements extends RequirementCollection
             $this->addRecommendation(
                 $pcreVersion >= 8.0,
                 sprintf('PCRE extension should be at least version 8.0 (%s installed)', $pcreVersion),
-                '<strong>PCRE 8.0+</strong> is preconfigured in PHP since 5.3.Audience but you are using an outdated version of it. Symfony probably works anyway but it is recommended to upgrade your PCRE extension.'
+                '<strong>PCRE 8.0+</strong> is preconfigured in PHP since 5.3.2 but you are using an outdated version of it. Symfony probably works anyway but it is recommended to upgrade your PCRE extension.'
             );
         }
 

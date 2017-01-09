@@ -19,7 +19,7 @@ class AudienceController extends Controller
      *    description="List audiences of an exercise"
      * )
      *
-     * @Rest\View(serializerGroups={"Audience"})
+     * @Rest\View(serializerGroups={"audience"})
      * @Rest\Get("/exercises/{exercise_id}/audiences")
      */
     public function getExercisesAudiencesAction(Request $request)
@@ -41,10 +41,10 @@ class AudienceController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Read an Audience"
+     *    description="Read an audience"
      * )
      *
-     * @Rest\View(serializerGroups={"Audience"})
+     * @Rest\View(serializerGroups={"audience"})
      * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function getExerciseAudienceAction(Request $request)
@@ -71,11 +71,11 @@ class AudienceController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Create an Audience",
+     *    description="Create an audience",
      *    input={"class"=AudienceType::class, "name"=""}
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"Audience"})
+     * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"audience"})
      * @Rest\Post("/exercises/{exercise_id}/audiences")
      */
     public function postExercisesAudiencesAction(Request $request)
@@ -107,10 +107,10 @@ class AudienceController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Delete an Audience"
+     *    description="Delete an audience"
      * )
      *
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"Audience"})
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"audience"})
      * @Rest\Delete("/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function removeExercisesAudienceAction(Request $request)
@@ -138,11 +138,11 @@ class AudienceController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="Update an Audience",
+     *    description="Update an audience",
      *   input={"class"=AudienceType::class, "name"=""}
      * )
      *
-     * @Rest\View(serializerGroups={"Audience"})
+     * @Rest\View(serializerGroups={"audience"})
      * @Rest\Put("/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function updateExercisesAudienceAction(Request $request)
