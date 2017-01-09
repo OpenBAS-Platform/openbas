@@ -108,7 +108,7 @@ class ComcheckController extends Controller
             $em->persist($comcheck);
             $em->flush();
 
-            // create individual statuses for all user of the audience
+            // create individual statuses for all user of the Audience
             $users = $comcheck->getComcheckAudience()->getAudienceUsers();
 
             $link = $this->getParameter('protocol') . '://' . $request->getHost() . '/comcheck/' . '${user_comcheck_id}';

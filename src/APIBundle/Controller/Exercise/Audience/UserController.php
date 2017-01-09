@@ -21,7 +21,7 @@ class UserController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List users of an audience"
+     *    description="List users of an Audience"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
@@ -57,7 +57,7 @@ class UserController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="List users of an audience (xls)"
+     *    description="List users of an Audience (xls)"
      * )
      *
      * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users.xlsx")

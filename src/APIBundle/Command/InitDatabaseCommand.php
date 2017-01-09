@@ -127,10 +127,10 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $output->writeln('Jerry is joining group \'Cockroach planners\'');
 
         $audienceDefence = $this->createAudience('National defence forces', $exercisePotatoes, [$userSam, $userJane]);
-        $output->writeln('Creating audience \'National defence forces\'');
+        $output->writeln('Creating Audience \'National defence forces\'');
 
         $audienceMedia = $this->createAudience('Communication team', $exercisePotatoes, [$userSam, $userJane, $userJerry]);
-        $output->writeln('Creating audience \'Communication team\'');
+        $output->writeln('Creating Audience \'Communication team\'');
 
         $this->createObjective(
             'Train the government to respond to a potatoes attack',
