@@ -95,6 +95,13 @@ const styles = {
     position: 'absolute',
     right: '50px',
     top: '15px'
+  },
+  'expand': {
+    height: '25px',
+    paddingTop: '3px',
+    backgroundColor: '#F0F0F0',
+    cursor: 'pointer',
+    textAlign: 'center'
   }
 }
 
@@ -111,7 +118,9 @@ class IndexExercise extends Component {
       openViewAudience: false,
       currentAudience: {},
       openViewObjective: false,
-      currentObjective: {}
+      currentObjective: {},
+      objectivesLimit: 3,
+      audiencesLimit: 3
     }
   }
 
@@ -184,6 +193,22 @@ class IndexExercise extends Component {
     this.setState({openViewObjective: false})
   }
 
+  handleExpandObjectives() {
+    this.setState({objectivesLimit: 300})
+  }
+
+  handleReduceObjectives() {
+    this.setState({objectivesLimit: 3})
+  }
+
+  handleExpandAudiences() {
+    this.setState({audiencesLimit: 300})
+  }
+
+  handleReduceAudiences() {
+    this.setState({audiencesLimit: 3})
+  }
+
   render() {
     const viewEventActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewEvent.bind(this)}/>]
     const viewIncidentActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>]
@@ -198,7 +223,7 @@ class IndexExercise extends Component {
           {this.props.objectives.length === 0 ?
             <div style={styles.empty}><T>You do not have any objectives in this exercise.</T></div> : ""}
           <List>
-            {this.props.objectives.map(objective => {
+            {R.take(this.state.objectivesLimit, this.props.objectives).map(objective => {
               return (
                 <MainListItem
                   key={objective.objective_id}
@@ -210,6 +235,10 @@ class IndexExercise extends Component {
               )
             })}
           </List>
+          {this.props.objectives.length > 3 && this.state.objectivesLimit === 3 ? <div onClick={this.handleExpandObjectives.bind(this)} style={styles.expand}>
+              <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN}/></div> : ""}
+          {this.props.objectives.length > 3 && this.state.objectivesLimit > 3 ? <div onClick={this.handleReduceObjectives.bind(this)}  style={styles.expand}>
+              <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_UP}/></div> : ""}
           <Dialog
             title="Objective view"
             modal={false}
@@ -227,8 +256,8 @@ class IndexExercise extends Component {
           {this.props.audiences.length === 0 ?
             <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
           <List>
-            {this.props.audiences.map(audience => {
-              var playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
+            {R.take(this.state.audiencesLimit, this.props.audiences).map(audience => {
+              let playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
               return (
                 <MainListItem
                   rightIconButton={<AudiencePopover exerciseId={this.props.exerciseId} audience={audience}/>}
@@ -244,6 +273,10 @@ class IndexExercise extends Component {
               )
             })}
           </List>
+          {this.props.audiences.length > 3 && this.state.audiencesLimit === 3 ? <div onClick={this.handleExpandAudiences.bind(this)} style={styles.expand}>
+              <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN}/></div> : ""}
+          {this.props.audiences.length > 3 && this.state.audiencesLimit > 3 ? <div onClick={this.handleReduceAudiences.bind(this)}  style={styles.expand}>
+              <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_UP}/></div> : ""}
           <Dialog
             title="Audience view"
             modal={false}
@@ -399,7 +432,7 @@ const filterObjectives = (objectives, exerciseId) => {
   let objectivesFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.objective_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.objective_priority > b.objective_priority)
+    R.sort((a, b) => a.objective_priority > b.objective_priority),
   )
   return objectivesFilterAndSorting(objectives)
 }
@@ -408,7 +441,7 @@ const filterAudiences = (audiences, exerciseId) => {
   let audiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.audience_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
   )
   return audiencesFilterAndSorting(audiences)
 }

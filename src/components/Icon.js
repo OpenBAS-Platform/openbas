@@ -3,6 +3,9 @@ import * as Constants from '../constants/ComponentTypes'
 import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
 import HardwareComputer from 'material-ui/svg-icons/hardware/computer'
 import HardwareKeyboardArrowRight from 'material-ui/svg-icons/hardware/keyboard-arrow-right'
+import HardwareKeyboardArrowLeft from 'material-ui/svg-icons/hardware/keyboard-arrow-left'
+import HardwareKeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up'
+import HardwareKeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-down'
 import SocialPerson from 'material-ui/svg-icons/social/person'
 import SocialGroup from 'material-ui/svg-icons/social/group'
 import SocialPublic from 'material-ui/svg-icons/social/public'
@@ -91,6 +94,12 @@ export const Icon = (props) => {
       return (<HardwareComputer style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT:
       return (<HardwareKeyboardArrowRight style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_LEFT:
+      return (<HardwareKeyboardArrowLeft style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_UP:
+      return (<HardwareKeyboardArrowUp style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN:
+      return (<HardwareKeyboardArrowDown style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_SOCIAL_PERSON:
       return (<SocialPerson style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_SOCIAL_GROUP:
