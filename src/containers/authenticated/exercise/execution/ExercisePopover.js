@@ -9,8 +9,11 @@ import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
-import {MenuItemButton} from "../../../../components/menu/MenuItem"
+import {MenuItemButton, MenuItemLink} from "../../../../components/menu/MenuItem"
 import {updateExercise} from '../../../../actions/Exercise'
+import {addDryrun} from '../../../../actions/Dryrun'
+import {redirectToDryrun} from '../../../../actions/Application'
+import DryrunForm from '../check/DryrunForm'
 
 const style = {
   float: 'left',
@@ -22,18 +25,15 @@ i18nRegister({
     'Do you want to disable this exercise?': 'Souhaitez-vous désactiver cet exercice ?',
     'Do you want to enable this exercise?': 'Souhaitez-vous activer cet exercice ?',
     'Disable': 'Désactiver',
-    'Enable': 'Activer'
+    'Enable': 'Activer',
+    'Launch a dryrun': 'Lancer un dryrun'
   }
 })
 
 class ExercisePopover extends Component {
   constructor(props) {
     super(props)
-    this.state = {
-      openDisable: false,
-      openEnable: false,
-      openPopover: false
-    }
+    this.state = {openDisable: false, openEnable: false, openDryrun: false, openPopover: false}
   }
 
   handlePopoverOpen(event) {
@@ -73,6 +73,25 @@ class ExercisePopover extends Component {
     this.handleCloseEnable()
   }
 
+  handleOpenDryrun() {
+    this.setState({openDryrun: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseDryrun() {
+    this.setState({openDryrun: false})
+  }
+
+  onSubmitDryrun(data) {
+    return this.props.addDryrun(this.props.exerciseId, data).then((payload) => {
+      this.props.redirectToDryrun(this.props.exerciseId, payload.result)
+    })
+  }
+
+  submitFormDryrun() {
+    this.refs.dryrunForm.submit()
+  }
+
   render() {
     let exercise_disabled = R.propOr(false, 'exercise_canceled', this.props.exercise)
 
@@ -84,6 +103,10 @@ class ExercisePopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
       <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
     ]
+    const dryrunActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDryrun.bind(this)}/>,
+      <FlatButton label="Launch" primary={true} onTouchTap={this.submitFormDryrun.bind(this)}/>,
+    ]
 
     return (
       <div style={style}>
@@ -93,6 +116,7 @@ class ExercisePopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
+              <MenuItemLink label="Launch a dryrun" onTouchTap={this.handleOpenDryrun.bind(this)}/>
             {exercise_disabled ?
               <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/> :
               <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/>}
@@ -110,6 +134,14 @@ class ExercisePopover extends Component {
                 actions={enableActions}>
           <T>Do you want to enable this exercise?</T>
         </Dialog>
+        <Dialog
+          title="Launch a dryrun"
+          modal={false}
+          open={this.state.openDryrun}
+          onRequestClose={this.handleCloseDryrun.bind(this)}
+          actions={dryrunActions}>
+          <DryrunForm ref="dryrunForm" audiences={this.props.audiences} onSubmit={this.onSubmitDryrun.bind(this)}/>
+        </Dialog>
       </div>
     )
   }
@@ -118,7 +150,10 @@ class ExercisePopover extends Component {
 ExercisePopover.propTypes = {
   exerciseId: PropTypes.string,
   updateExercise: PropTypes.func,
-  exercise: PropTypes.object
+  exercise: PropTypes.object,
+  audiences: PropTypes.array,
+  addDryrun: PropTypes.func,
+  redirectToDryrun: PropTypes.func
 }
 
-export default connect(null, {updateExercise})(ExercisePopover)
+export default connect(null, {updateExercise, addDryrun, redirectToDryrun})(ExercisePopover)

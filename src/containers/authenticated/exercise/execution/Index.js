@@ -174,7 +174,7 @@ class IndexExecution extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
-        <ExercisePopover exerciseId={this.props.exerciseId} exercise={this.props.exercise}/>
+        <ExercisePopover exerciseId={this.props.exerciseId} exercise={this.props.exercise} audiences={this.props.audiences}/>
         <div style={styles.status}><T>{exerciseStatus}</T></div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>

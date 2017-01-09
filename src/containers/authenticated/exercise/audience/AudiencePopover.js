@@ -12,7 +12,7 @@ import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
 import Theme from '../../../../components/Theme'
 import {addComcheck} from '../../../../actions/Comcheck'
-import {updateAudience, selectAudience, deleteAudience} from '../../../../actions/Audience'
+import {updateAudience, selectAudience, downloadExportAudience, deleteAudience} from '../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
 import ComcheckForm from '../check/ComcheckForm'
 import {injectIntl} from 'react-intl'
@@ -151,6 +151,10 @@ class AudiencePopover extends Component {
     }
   }
 
+  handleDownloadAudience() {
+    this.props.downloadExportAudience(this.props.exerciseId, this.props.audience.audience_id)
+  }
+
   render() {
     let audience_enabled = R.propOr(true, 'audience_enabled', this.props.audience)
 
@@ -195,6 +199,7 @@ class AudiencePopover extends Component {
             {audience_enabled ?
               <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
               <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
+            <MenuItemLink label="Export to XLS" onTouchTap={this.handleDownloadAudience.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -244,6 +249,7 @@ AudiencePopover.propTypes = {
   deleteAudience: PropTypes.func,
   updateAudience: PropTypes.func,
   selectAudience: PropTypes.func,
+  downloadExportAudience: PropTypes.func,
   addComcheck: PropTypes.func,
   audience: PropTypes.object,
   audiences: PropTypes.array,
@@ -251,4 +257,4 @@ AudiencePopover.propTypes = {
   intl: PropTypes.object
 }
 
-export default connect(null, {updateAudience, selectAudience, deleteAudience, addComcheck})(injectIntl(AudiencePopover))
+export default connect(null, {updateAudience, selectAudience, downloadExportAudience, deleteAudience, addComcheck})(injectIntl(AudiencePopover))

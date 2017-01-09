@@ -18,13 +18,15 @@ import {fetchSubobjectives} from '../../../actions/Subobjective'
 import {fetchAudiences} from '../../../actions/Audience'
 import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
-import {fetchAllInjects, downloadExportInjects} from '../../../actions/Inject'
+import {fetchAllInjects} from '../../../actions/Inject'
 import EventView from './scenario/event/EventView'
 import IncidentView from './scenario/event/IncidentView'
 import InjectView from './scenario/event/InjectView'
 import AudienceView from './audience/AudienceView'
 import ObjectiveView from './objective/ObjectiveView'
 import AudiencePopover from './AudiencePopover'
+import AudiencesPopover from './AudiencesPopover'
+import ScenarioPopover from './ScenarioPopover'
 
 i18nRegister({
   fr: {
@@ -61,6 +63,7 @@ const styles = {
   'title': {
     float: 'left',
     fontSize: '13px',
+    height: '35px',
     textTransform: 'uppercase'
   },
   'priority': {
@@ -181,10 +184,6 @@ class IndexExercise extends Component {
     this.setState({openViewObjective: false})
   }
 
-  handleDownloadInjects() {
-    this.props.downloadExportInjects(this.props.exerciseId)
-  }
-
   render() {
     const viewEventActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewEvent.bind(this)}/>]
     const viewIncidentActions = [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>]
@@ -194,7 +193,6 @@ class IndexExercise extends Component {
     return (
       <div>
         <div style={styles.columnLeft}>
-          <FlatButton label="<<<<<<<< DOWNLOAD INJECTS.XLSX >>>>>>" primary={true} onTouchTap={this.handleDownloadInjects.bind(this)}/>
           <div style={styles.title}><T>Main objectives</T></div>
           <div className="clearfix"></div>
           {this.props.objectives.length === 0 ?
@@ -224,6 +222,7 @@ class IndexExercise extends Component {
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}>Audiences</div>
+          <AudiencesPopover exerciseId={this.props.exerciseId}/>
           <div className="clearfix"></div>
           {this.props.audiences.length === 0 ?
             <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
@@ -258,6 +257,7 @@ class IndexExercise extends Component {
         <div className="clearfix"></div>
         <br /><br />
         <div style={styles.title}><T>Scenario</T></div>
+        <ScenarioPopover exerciseId={this.props.exerciseId}/>
         <div className="clearfix"></div>
         {this.props.events.length === 0 ?
           <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
@@ -447,6 +447,5 @@ export default connect(select, {
   fetchEvents,
   fetchIncidents,
   fetchIncidentTypes,
-  fetchAllInjects,
-  downloadExportInjects
+  fetchAllInjects
 })(injectIntl(IndexExercise))

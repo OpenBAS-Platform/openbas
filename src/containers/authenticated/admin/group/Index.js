@@ -18,7 +18,8 @@ i18nRegister({
   fr: {
     'Groups management': 'Gestion des groupes',
     'Name': 'Nom',
-    'Users': 'Utilisateurs'
+    'Users': 'Utilisateurs',
+    'You do not have any group on the platform.': 'Vous n\'avez aucun groupe sur cette plateforme.'
   }
 })
 
@@ -52,10 +53,10 @@ const styles = {
     fontWeight: 600
   },
   'empty': {
-    marginTop: 40,
+    marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
-    textAlign: 'center'
+    textAlign: 'left'
   },
   'number': {
     float: 'right',
@@ -124,13 +125,16 @@ class Index extends Component {
       <div style={styles.title}><T>Groups management</T></div>
       <div className="clearfix"></div>
       <List>
-        <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
-                    rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
-          {this.SortHeader('group_name', 'Name')}
-          {this.SortHeader('group_users', 'Users')}
-          <div className="clearfix"></div>
-        </div>}/>
-
+        {groups.length === 0 ? (
+            <div style={styles.empty}><T>You do not have any group on the platform.</T></div>
+          ) : (
+            <HeaderItem leftIcon={<span style={styles.header.icon}>#</span>}
+                        rightIconButton={<Icon style={{display: 'none'}}/>} primaryText={<div>
+              {this.SortHeader('group_name', 'Name')}
+              {this.SortHeader('group_users', 'Users')}
+              <div className="clearfix"></div>
+            </div>}/>
+          )}
         {groups.map(group => {
           let group_id = R.propOr(Math.random(), 'group_id', group)
           let group_name = R.propOr('-', 'group_name', group)
