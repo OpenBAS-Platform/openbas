@@ -130,7 +130,7 @@ class InjectController extends Controller
                 /* @var $audience Audience */
                 if ($audience->getAudienceEnabled() == true) {
                     foreach ($audience->getAudienceUsers() as $user) {
-                        if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) !== false ) {
+                        if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
                             $userData = array();
                             $userData['user_firstname'] = $user->getUserFirstname();
                             $userData['user_lastname'] = $user->getUserLastname();
@@ -172,7 +172,7 @@ class InjectController extends Controller
             $audience = $dryinject->getDryinjectDryrun()->getDryrunAudience();
             /* @var $audience Audience */
             foreach ($audience->getAudienceUsers() as $user) {
-                if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) !== false ) {
+                if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
                     $userData = array();
                     $userData['user_firstname'] = $user->getUserFirstname();
                     $userData['user_lastname'] = $user->getUserLastname();
