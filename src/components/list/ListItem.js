@@ -254,7 +254,7 @@ export const TertiaryListItem = (props) => (
     leftAvatar={props.leftAvatar}
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
-    onTouchTap={props.onClick}
+    onClick={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
     initiallyOpen={false}
@@ -282,7 +282,7 @@ export const MainSmallListItem = (props) => (
     leftAvatar={props.leftAvatar}
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
-    onTouchTap={props.onClick}
+    onClick={props.onClick}
     disabled={props.disabled}
     style={props.disabled ? styles.mainsmallitemdisabled : styles.mainsmallitem}
     rightIconButton={props.rightIconButton}/>

@@ -26,6 +26,7 @@ import ActionDoneAll from 'material-ui/svg-icons/action/done-all'
 import ActionDescription from 'material-ui/svg-icons/action/description'
 import ActionRowing from 'material-ui/svg-icons/action/rowing'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
+import NavigationMoreHoriz from 'material-ui/svg-icons/navigation/more-horiz'
 import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
 import NavigationArrowDropUp from 'material-ui/svg-icons/navigation/arrow-drop-up'
 import NavigationCancel from 'material-ui/svg-icons/navigation/cancel'
@@ -142,6 +143,8 @@ export const Icon = (props) => {
       return (<ActionRowing style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
       return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_NAVIGATION_MORE_HORIZ:
+      return (<NavigationMoreHoriz style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN:
       return (<NavigationArrowDropDown style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP:
