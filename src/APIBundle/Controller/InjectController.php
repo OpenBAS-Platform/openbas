@@ -130,15 +130,17 @@ class InjectController extends Controller
                 /* @var $audience Audience */
                 if ($audience->getAudienceEnabled() == true) {
                     foreach ($audience->getAudienceUsers() as $user) {
-                        $userData = array();
-                        $userData['user_firstname'] = $user->getUserFirstname();
-                        $userData['user_lastname'] = $user->getUserLastname();
-                        $userData['user_email'] = $user->getUserEmail();
-                        $userData['user_phone'] = $user->getUserPhone();
-                        $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
-                        $userData['user_organization'] = array();
-                        $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
-                        $data['data']['users'][] = $userData;
+                        if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) !== false ) {
+                            $userData = array();
+                            $userData['user_firstname'] = $user->getUserFirstname();
+                            $userData['user_lastname'] = $user->getUserLastname();
+                            $userData['user_email'] = $user->getUserEmail();
+                            $userData['user_phone'] = $user->getUserPhone();
+                            $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                            $userData['user_organization'] = array();
+                            $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                            $data['data']['users'][] = $userData;
+                        }
                     }
                 }
             }
@@ -170,15 +172,17 @@ class InjectController extends Controller
             $audience = $dryinject->getDryinjectDryrun()->getDryrunAudience();
             /* @var $audience Audience */
             foreach ($audience->getAudienceUsers() as $user) {
-                $userData = array();
-                $userData['user_firstname'] = $user->getUserFirstname();
-                $userData['user_lastname'] = $user->getUserLastname();
-                $userData['user_email'] = $user->getUserEmail();
-                $userData['user_phone'] = $user->getUserPhone();
-                $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
-                $userData['user_organization'] = array();
-                $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
-                $data['data']['users'][] = $userData;
+                if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) !== false ) {
+                    $userData = array();
+                    $userData['user_firstname'] = $user->getUserFirstname();
+                    $userData['user_lastname'] = $user->getUserLastname();
+                    $userData['user_email'] = $user->getUserEmail();
+                    $userData['user_phone'] = $user->getUserPhone();
+                    $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                    $userData['user_organization'] = array();
+                    $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                    $data['data']['users'][] = $userData;
+                }
             }
 
             $output[] = $data;
