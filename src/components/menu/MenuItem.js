@@ -5,7 +5,7 @@ import {injectIntl} from 'react-intl'
 
 const MenuItemLinkIntl = (props) => (
   <MenuItem
-    primaryText={props.intl.formatMessage({id: props.label})}
+    primaryText={props.label ? props.intl.formatMessage({id: props.label}) : ""}
     containerElement={<Link to={props.to}/>}
     disabled={props.disabled}
     value={props.value}

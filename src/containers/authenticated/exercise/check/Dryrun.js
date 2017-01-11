@@ -290,7 +290,7 @@ const filterDryinjectsProcessed = (dryinjects, dryrunId) => {
   let dryinjectsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && (n.dryinject_status.status_name === 'SUCCESS' || n.dryinject_status.status_name === 'PARTIAL' || n.dryinject_status.status_name === 'ERROR' )),
-    R.sort((a, b) => a.dryinject_date < b.dryinject_date)
+    R.sort((a, b) => timeDiff(a.dryinject_date, b.dryinject_date))
   )
   return dryinjectsFilterAndSorting(dryinjects)
 }

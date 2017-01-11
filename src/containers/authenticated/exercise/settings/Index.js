@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {updateExercise, deleteExercise} from '../../../../actions/Exercise'
+import {fetchGroups} from '../../../../actions/Group'
 import {redirectToHome} from '../../../../actions/Application'
 import {Paper} from '../../../../components/Paper'
 import {Button, FlatButton} from '../../../../components/Button'
@@ -39,6 +40,10 @@ class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {openDelete: false, openGallery: false}
+  }
+
+  componentDidMount() {
+    this.props.fetchGroups()
   }
 
   onUpdate(data) {
@@ -93,9 +98,20 @@ class Index extends Component {
     let initPipe = R.pipe(
       R.assoc('exercise_start_date', dateFormat(R.path(['exercise', 'exercise_start_date'], this.props))),
       R.assoc('exercise_end_date', dateFormat(R.path(['exercise', 'exercise_end_date'], this.props))),
-      R.pick(['exercise_name', 'exercise_description', 'exercise_subtitle', 'exercise_start_date', 'exercise_end_date', 'exercise_message_header', 'exercise_message_footer'])
+      R.assoc('exercise_animation_group', R.path(['exercise', 'exercise_animation_group', 'group_id'], this.props)),
+      R.pick([
+        'exercise_name',
+        'exercise_description',
+        'exercise_subtitle',
+        'exercise_start_date',
+        'exercise_end_date',
+        'exercise_message_header',
+        'exercise_message_footer',
+        'exercise_animation_group'])
     )
+
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
+    console.log(informationValues)
     const image = R.pathOr(null, ['exercise_image', 'file_url'], exercise)
 
     return (
@@ -111,7 +127,7 @@ class Index extends Component {
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2><T>Messages template</T></h2>
-            <TemplateForm ref="templateForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}/>
+            <TemplateForm ref="templateForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues} groups={this.props.groups}/>
             <br />
             <Button type="submit" label="Update" onClick={this.submitTemplate.bind(this)}/>
           </div>
@@ -131,7 +147,8 @@ class Index extends Component {
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2><T>Delete</T></h2>
-            <p><T>Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.</T></p>
+            <p><T>Deleting an exercise will result in deleting all its content, including objectives, events, incidents,
+              injects and audience. We do not recommend you do this.</T></p>
             <Button label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
             <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                     onRequestClose={this.handleCloseDelete.bind(this)}
@@ -153,6 +170,8 @@ Index.propTypes = {
   updateExercise: PropTypes.func,
   redirectToHome: PropTypes.func,
   deleteExercise: PropTypes.func,
+  fetchGroups: PropTypes.func,
+  groups: PropTypes.array
 }
 
 const select = (state, ownProps) => {
@@ -160,7 +179,8 @@ const select = (state, ownProps) => {
   return {
     id: exerciseId,
     exercise: R.prop(exerciseId, state.referential.entities.exercises),
+    groups: R.values(state.referential.entities.groups)
   }
 }
 
-export default connect(select, {updateExercise, redirectToHome, deleteExercise})(Index)
+export default connect(select, {updateExercise, redirectToHome, deleteExercise, fetchGroups})(Index)
