@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import R from 'ramda'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
+import {timeDiff} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
@@ -308,7 +309,7 @@ const filterComchecks = (comchecks, audienceId) => {
   let comchecksFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.comcheck_audience.audience_id === audienceId && !n.comcheck_finished),
-    R.sort((a, b) => a.comcheck_end_date > b.comcheck_end_date)
+    R.sort((a, b) => timeDiff(a.comcheck_end_date, b.comcheck_end_date))
   )
   return comchecksFilterAndSorting(comchecks)
 }

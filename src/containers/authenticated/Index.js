@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
 import R from 'ramda'
-import {dateFormat} from '../../utils/Time'
+import {dateFormat, timeDiff} from '../../utils/Time'
 import {fetchExercises} from '../../actions/Exercise'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
@@ -87,7 +87,7 @@ class IndexAuthenticated extends Component {
 
 const sortExercises = (exercises) => {
   let exercisesSorting = R.pipe(
-    R.sort((a, b) => a.exercise_start_date > b.exercise_start_date)
+    R.sort((a, b) => timeDiff(a.exercise_start_date, b.exercise_start_date))
   )
   return exercisesSorting(exercises)
 }

@@ -2,7 +2,7 @@ import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import Rx from 'rxjs/Rx'
-import {FIVE_SECONDS} from '../../../../utils/Time'
+import {FIVE_SECONDS, timeDiff} from '../../../../utils/Time'
 import {i18nRegister} from '../../../../utils/Messages'
 import {T} from '../../../../components/I18n'
 import {dateFormat} from '../../../../utils/Time'
@@ -281,7 +281,7 @@ const filterDryinjectsPending = (dryinjects, dryrunId) => {
   let dryinjectsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && n.dryinject_status.status_name === 'PENDING'),
-    R.sort((a, b) => a.dryinject_date > b.dryinject_date)
+    R.sort((a, b) => timeDiff(a.dryinject_date, b.dryinject_date))
   )
   return dryinjectsFilterAndSorting(dryinjects)
 }

@@ -6,7 +6,7 @@ import * as Constants from '../../../constants/ComponentTypes'
 import Theme from '../../../components/Theme'
 import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
-import {dateFormat} from '../../../utils/Time'
+import {dateFormat, timeDiff} from '../../../utils/Time'
 import {List} from '../../../components/List'
 import {Dialog} from '../../../components/Dialog'
 import {MainListItem, SecondaryListItem, TertiaryListItem, MainSmallListItem} from '../../../components/list/ListItem'
@@ -385,7 +385,7 @@ class IndexExercise extends Component {
 
                 const injects = R.pipe(
                   R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
-                  R.sort((a, b) => a.inject_date > b.inject_date)
+                  R.sort((a, b) => timeDiff(a.inject_date, b.inject_date))
                 )(incident_injects)
 
                 let nestedItems2 = injects.map(inject => {

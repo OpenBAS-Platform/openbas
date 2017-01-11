@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import Rx from 'rxjs/Rx'
-import {FIVE_SECONDS} from '../../../../utils/Time'
+import {FIVE_SECONDS, timeDiff} from '../../../../utils/Time'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
@@ -307,7 +307,7 @@ const filterInjectsPending = (state, ownProps) => {
   const exerciseId = ownProps.params.exerciseId
   let injectsFilterAndSorting = R.pipe(
     R.values,
-    R.sort((a, b) => a.inject_date > b.inject_date),
+    R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
     R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === 'PENDING')
   )
   return injectsFilterAndSorting(injects)
