@@ -116,6 +116,7 @@ class IncidentController extends Controller
 
         $incident = new Incident();
         $incident->setIncidentEvent($event);
+        $incident->setIncidentOrder(0);
         $form = $this->createForm(IncidentType::class, $incident);
         $form->submit($request->request->all());
 

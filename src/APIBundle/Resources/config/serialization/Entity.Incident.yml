@@ -20,3 +20,5 @@ APIBundle\Entity\Incident:
             groups: ['incident']
         incident_exercise:
             groups: ['incident']
+        incident_order:
+            groups: ['incident']

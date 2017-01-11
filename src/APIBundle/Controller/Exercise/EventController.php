@@ -108,6 +108,7 @@ class EventController extends Controller
             $file = $em->getRepository('APIBundle:File')->findOneBy(['file_name' => 'Event default']);
             $event->setEventExercise($exercise);
             $event->setEventImage($file);
+            $event->setEventOrder(0);
             $em->persist($event);
             $em->flush();
 

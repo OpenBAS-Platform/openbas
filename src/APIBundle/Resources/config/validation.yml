@@ -124,6 +124,8 @@ APIBundle\Entity\Event:
         event_description:
             - NotBlank: ~
             - Type: string
+        event_order:
+            - Type: integer
 
 APIBundle\Entity\Incident:
     properties:
@@ -135,6 +137,8 @@ APIBundle\Entity\Incident:
             - Type: string
         incident_weight:
             - NotBlank: ~
+        incident_order:
+            - Type: integer
 
 APIBundle\Entity\Inject:
     properties:
