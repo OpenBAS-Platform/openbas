@@ -47,6 +47,11 @@ class Event
      */
     protected $event_image;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    protected $event_order = 0;
+
     public function __construct()
     {
         $this->event_incidents = new ArrayCollection();
@@ -115,6 +120,17 @@ class Event
     public function setEventImage($image)
     {
         $this->event_image = $image;
+        return $this;
+    }
+
+    public function getEventOrder()
+    {
+        return $this->event_order;
+    }
+
+    public function setEventOrder($order)
+    {
+        $this->event_order = $order;
         return $this;
     }
 }

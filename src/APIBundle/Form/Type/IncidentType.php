@@ -16,6 +16,7 @@ class IncidentType extends AbstractType
         $builder->add('incident_type');
         $builder->add('incident_weight');
         $builder->add('incident_subobjectives');
+        $builder->add('incident_order');
     }
 
     public function configureOptions(OptionsResolver $resolver)

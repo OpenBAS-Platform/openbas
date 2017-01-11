@@ -68,6 +68,11 @@ class Incident
      */
     protected $incident_injects;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    protected $incident_order = 0;
+
     protected $incident_exercise;
 
     public function __construct()
@@ -172,6 +177,17 @@ class Incident
     public function setIncidentInjects($injects)
     {
         $this->incident_injects = $injects;
+        return $this;
+    }
+
+    public function getIncidentOrder()
+    {
+        return $this->incident_order;
+    }
+
+    public function setIncidentOrder($order)
+    {
+        $this->incident_order = $order;
         return $this;
     }
 
