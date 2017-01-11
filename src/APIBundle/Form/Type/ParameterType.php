@@ -10,6 +10,7 @@ class ParameterType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('parameter_key');
         $builder->add('parameter_value');
     }
 

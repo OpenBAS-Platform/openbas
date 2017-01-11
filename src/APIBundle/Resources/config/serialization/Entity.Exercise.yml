@@ -22,3 +22,5 @@ APIBundle\Entity\Exercise:
             groups: ['exercise']
         exercise_message_footer:
             groups: ['exercise']
+        exercise_animation_group:
+            groups: ['exercise']
