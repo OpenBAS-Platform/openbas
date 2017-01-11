@@ -1,7 +1,7 @@
 APIBundle\Entity\Group:
     attributes:
         group_id:
-            groups: ['group', 'user', 'grant']
+            groups: ['group', 'user', 'grant', 'exercise']
         group_name:
             groups: ['group', 'user', 'grant']
         group_users:

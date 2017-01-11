@@ -88,6 +88,12 @@ class Exercise
      */
     protected $exercise_canceled = false;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Group")
+     * @ORM\JoinColumn(name="exercise_animation_group", referencedColumnName="group_id", onDelete="SET NULL", nullable=true)
+     */
+    protected $exercise_animation_group;
+
     protected $exercise_status = 'SCHEDULED';
 
     public function __construct()
@@ -259,6 +265,17 @@ class Exercise
     public function setExerciseCanceled($canceled)
     {
         $this->exercise_canceled = $canceled;
+        return $this;
+    }
+
+    public function getExerciseAnimationGroup()
+    {
+        return $this->exercise_animation_group;
+    }
+
+    public function setExerciseAnimationGroup($group)
+    {
+        $this->exercise_animation_group = $group;
         return $this;
     }
 

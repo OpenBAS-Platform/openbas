@@ -12,3 +12,5 @@ APIBundle\Entity\Event:
             groups: ['event']
         event_incidents:
             groups: ['event']
+        event_order:
+            groups: ['event']
