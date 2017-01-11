@@ -374,7 +374,7 @@ const filterIncidents = (incidents, eventId) => {
   let incidentsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.incident_event.event_id === eventId),
-    R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
+    R.sort((a, b) => a.incident_order > b.incident_order)
   )
   return incidentsFilterAndSorting(incidents)
 }

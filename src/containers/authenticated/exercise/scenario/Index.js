@@ -79,7 +79,7 @@ const filteredEvents = (events, exerciseId) => {
   let eventsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.event_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.event_title.localeCompare(b.event_title))
+    R.sort((a, b) => a.event_order > b.event_order)
   )
   return eventsFilterAndSorting(events)
 }

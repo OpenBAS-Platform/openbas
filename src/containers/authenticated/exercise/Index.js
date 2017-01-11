@@ -373,7 +373,7 @@ class IndexExercise extends Component {
           {this.props.events.map(event => {
             const incidents = R.pipe(
               R.map(data => R.pathOr({incident_title: ''}, ['incidents', data.incident_id], this.props)),
-              R.sort((a, b) => a.incident_title.localeCompare(b.incident_title))
+              R.sort((a, b) => a.incident_order > b.incident_order)
             )(event.event_incidents)
 
             let nestedItems = incidents.map(incident => {
@@ -557,7 +557,7 @@ const filterEvents = (events, exerciseId) => {
   let eventsFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.event_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.event_title.localeCompare(b.event_title))
+    R.sort((a, b) => a.event_order > b.event_order)
   )
   return eventsFilterAndSorting(events)
 }

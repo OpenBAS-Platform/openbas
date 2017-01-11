@@ -6,7 +6,8 @@ import {i18nRegister} from '../../../../../utils/Messages'
 i18nRegister({
   fr: {
     'Title': 'Titre',
-    'Description': 'Description'
+    'Description': 'Description',
+    'Order': 'Ordre',
   }
 })
 
@@ -27,6 +28,7 @@ class EventForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="event_title" fullWidth={true} type="text" label="Title"/>
         <FormField name="event_description" fullWidth={true} type="text" label="Description"/>
+        <FormField name="event_order" fullWidth={true} type="text" label="Order"/>
       </form>
     )
   }

@@ -156,7 +156,7 @@ class IncidentPopover extends Component {
       <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
     ]
 
-    let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type', 'incident_weight'], this.props.incident)
+    let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type', 'incident_weight', 'incident_order'], this.props.incident)
 
     return (
       <div style={styles.container}>

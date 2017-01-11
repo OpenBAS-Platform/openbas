@@ -17,6 +17,7 @@ i18nRegister({
     'Medium': 'Moyen',
     'Major': 'Majeur',
     'Significance': 'Importance',
+    'Order': 'Ordre'
   }
 })
 
@@ -53,6 +54,7 @@ class IncidentForm extends Component {
           })}
         </SelectField>
         <FormField name="incident_story" fullWidth={true} multiLine={true} rows={3} type="text" label="Story"/>
+        <FormField name="incident_order" fullWidth={true} type="text" label="Order"/>
       </form>
     )
   }

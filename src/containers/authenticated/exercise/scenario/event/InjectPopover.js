@@ -199,7 +199,8 @@ class InjectPopover extends Component {
   }
 
   onCopySubmit(data) {
-    let incident = R.find(a => a.incident_id === data.incident_id)(this.props.incidents)
+    let incident = R.find(i => i.incident_id === data.incident_id)(this.props.incidents)
+    let audiencesList = R.map(a => a.audience_id, this.props.inject.inject_audiences)
     let new_inject = R.pipe(
       R.dissoc('inject_id'),
       R.dissoc('inject_event'),
@@ -208,8 +209,11 @@ class InjectPopover extends Component {
       R.dissoc('inject_status'),
       R.dissoc('inject_user'),
       R.dissoc('inject_users_number'),
-      R.assoc('inject_title', this.props.inject.inject_title + ' (copy)')
+      R.assoc('inject_title', this.props.inject.inject_title + ' (copy)'),
+      R.assoc('inject_audiences', audiencesList)
     )(this.props.inject)
+
+    console.log(new_inject)
 
     this.props.addInject(this.props.exerciseId, incident.incident_event.event_id, data.incident_id, new_inject).then(() => {
       this.props.fetchIncident(this.props.exerciseId, incident.incident_event.event_id, data.incident_id).then(() => {

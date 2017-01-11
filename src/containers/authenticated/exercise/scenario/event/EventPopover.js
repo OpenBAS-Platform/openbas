@@ -108,7 +108,7 @@ class EventPopover extends Component {
       />,
     ]
 
-    let initialValues = R.pick(['event_title', 'event_description'], this.props.event)
+    let initialValues = R.pick(['event_title', 'event_description', 'event_order'], this.props.event)
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
