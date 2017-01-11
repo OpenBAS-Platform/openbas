@@ -5,7 +5,7 @@
         <bean ref="sms-headers-handler"/>
         <!-- Prepare template -->
         <setHeader headerName="CamelFreemarkerTemplate">
-            <simple>${body[body]}</simple>
+            <simple>${body[message]}</simple>
         </setHeader>
         <choice>
             <when>

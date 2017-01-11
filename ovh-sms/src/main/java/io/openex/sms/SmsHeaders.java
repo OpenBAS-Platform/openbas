@@ -21,10 +21,10 @@ public class SmsHeaders {
 		String content_header = exchangeData.get("content_header");
 		StringBuilder data = new StringBuilder();
 		if(content_header != null) data.append(content_header).append(LINE_RETURN);
-		data.append(exchangeData.get("body"));
+		data.append(exchangeData.get("message"));
 		String content_footer = exchangeData.get("content_footer");
 		if(content_footer != null) data.append(LINE_RETURN).append(content_footer);
-		exchangeData.put("body", data.toString());
+		exchangeData.put("message", data.toString());
 		in.setBody(exchangeData);
 	}
 }
