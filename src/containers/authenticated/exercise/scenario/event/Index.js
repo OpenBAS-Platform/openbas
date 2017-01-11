@@ -228,6 +228,7 @@ class Index extends Component {
         <div>
           <div style={styles.title}>{incident.incident_title}</div>
           <IncidentPopover exerciseId={exerciseId} eventId={eventId} incident={incident}
+                           subobjectives={this.props.subobjectives}
                            incidentSubobjectivesIds={incident.incident_subobjectives.map(i => i.subobjective_id)}
                            incident_types={this.props.incident_types}/>
           <div style={styles.subobjectives}>{incident.incident_subobjectives.length} <T>linked subobjective(s)</T></div>
@@ -278,6 +279,7 @@ class Index extends Component {
                     injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
                     audiences={this.props.audiences}
                     inject_types={this.props.inject_types}
+                    incidents={this.props.allIncidents}
                   />
                 }
                 primaryText={
@@ -340,6 +342,7 @@ Index.propTypes = {
   inject_types: PropTypes.object,
   injects: PropTypes.object,
   subobjectives: PropTypes.array,
+  allIncidents: PropTypes.array,
   fetchAudiences: PropTypes.func,
   fetchSubobjectives: PropTypes.func,
   fetchEvents: PropTypes.func,
@@ -399,7 +402,8 @@ const select = (state, ownProps) => {
     subobjectives,
     injects: state.referential.entities.injects,
     incident_types: state.referential.entities.incident_types,
-    inject_types: state.referential.entities.inject_types
+    inject_types: state.referential.entities.inject_types,
+    allIncidents: R.values(state.referential.entities.incidents),
   }
 }
 

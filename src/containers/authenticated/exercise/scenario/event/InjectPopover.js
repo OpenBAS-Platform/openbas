@@ -13,11 +13,13 @@ import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
-import {fetchIncident} from '../../../../../actions/Incident'
-import {fetchInjectTypes, updateInject, deleteInject} from '../../../../../actions/Inject'
+import {fetchIncident, selectIncident} from '../../../../../actions/Incident'
+import {redirectToEvent} from '../../../../../actions/Application'
+import {fetchInjectTypes, addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
+import CopyForm from './CopyForm'
 
 const styles = {
   [ Constants.INJECT_EXEC ]: {
@@ -54,6 +56,7 @@ class InjectPopover extends Component {
       openPopover: false,
       openDisable: false,
       openEnable: false,
+      openCopy: false,
       type: undefined,
       stepIndex: 0,
       finished: false,
@@ -86,7 +89,7 @@ class InjectPopover extends Component {
 
   onContentSubmit(data) {
     let injectData = this.state.injectData
-    if( this.state.injectAttachments.length > 0 ) {
+    if (this.state.injectAttachments.length > 0) {
       data.attachments = this.state.injectAttachments
     }
     injectData.inject_content = JSON.stringify(data)
@@ -182,6 +185,41 @@ class InjectPopover extends Component {
     this.setState({stepIndex: 2, finished: true})
   }
 
+  handleOpenCopy() {
+    this.setState({openCopy: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseCopy() {
+    this.setState({openCopy: false})
+  }
+
+  submitFormCopy() {
+    this.refs.copyForm.submit()
+  }
+
+  onCopySubmit(data) {
+    let incident = R.find(a => a.incident_id === data.incident_id)(this.props.incidents)
+    let new_inject = R.pipe(
+      R.dissoc('inject_id'),
+      R.dissoc('inject_event'),
+      R.dissoc('inject_exercise'),
+      R.dissoc('inject_incident'),
+      R.dissoc('inject_status'),
+      R.dissoc('inject_user'),
+      R.dissoc('inject_users_number'),
+      R.assoc('inject_title', this.props.inject.inject_title + ' (copy)')
+    )(this.props.inject)
+
+    this.props.addInject(this.props.exerciseId, incident.incident_event.event_id, data.incident_id, new_inject).then(() => {
+      this.props.fetchIncident(this.props.exerciseId, incident.incident_event.event_id, data.incident_id).then(() => {
+        this.props.redirectToEvent(this.props.exerciseId, incident.incident_event.event_id)
+      })
+    })
+    this.props.selectIncident(this.props.exerciseId, incident.incident_event.event_id, data.incident_id)
+    this.handleCloseCopy()
+  }
+
   getStepContent(stepIndex, initialValues) {
     switch (stepIndex) {
       case 0:
@@ -237,7 +275,8 @@ class InjectPopover extends Component {
   render() {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+      <FlatButton label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true}
+                  onTouchTap={this.submitFormEdit.bind(this)}/>,
     ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
@@ -250,6 +289,10 @@ class InjectPopover extends Component {
     const enableActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
       <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+    ]
+    const copyActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCopy.bind(this)}/>,
+      <FlatButton label="Copy" primary={true} onTouchTap={this.submitFormCopy.bind(this)}/>,
     ]
 
     let initPipe = R.pipe(
@@ -269,6 +312,7 @@ class InjectPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            <MenuItemLink label="Copy" onTouchTap={this.handleOpenCopy.bind(this)}/>
             {inject_enabled ?
               <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
               <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
@@ -322,6 +366,15 @@ class InjectPopover extends Component {
                 actions={enableActions}>
           <T>Do you want to enable this inject?</T>
         </Dialog>
+        <Dialog title="Copy" modal={false}
+                open={this.state.openCopy}
+                onRequestClose={this.handleCloseCopy.bind(this)}
+                actions={copyActions}>
+          <CopyForm ref="copyForm"
+                    incidents={this.props.incidents}
+                    onSubmit={this.onCopySubmit.bind(this)}
+                    onSubmitSuccess={this.handleCloseCopy.bind(this)}/>
+        </Dialog>
       </div>
     )
   }
@@ -335,12 +388,24 @@ InjectPopover.propTypes = {
   inject: PropTypes.object,
   injectAudiencesIds: PropTypes.array,
   fetchIncident: PropTypes.func,
+  addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
+  redirectToEvent: PropTypes.func,
+  selectIncident: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node,
   initialAttachments: PropTypes.array,
-  type: PropTypes.string
+  type: PropTypes.string,
+  incidents: PropTypes.array
 }
 
-export default connect(null, {fetchIncident, fetchInjectTypes, updateInject, deleteInject})(InjectPopover)
+export default connect(null, {
+  fetchIncident,
+  fetchInjectTypes,
+  addInject,
+  updateInject,
+  deleteInject,
+  redirectToEvent,
+  selectIncident
+})(InjectPopover)

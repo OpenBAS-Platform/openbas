@@ -12,7 +12,6 @@ import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {updateIncident, deleteIncident, selectIncident} from '../../../../../actions/Incident'
-import {fetchSubobjectives} from '../../../../../actions/Subobjective'
 import IncidentForm from './IncidentForm'
 import IncidentSubobjectives from './IncidentSubobjectives'
 
@@ -56,10 +55,6 @@ class IncidentPopover extends Component {
       finished: false,
       incidentData: null
     }
-  }
-
-  componentDidMount() {
-    this.props.fetchSubobjectives(this.props.exerciseId);
   }
 
   handlePopoverOpen(event) {
@@ -141,7 +136,7 @@ class IncidentPopover extends Component {
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             onChange={this.onSubobjectivesChange.bind(this)}
-            subobjectives={R.values(this.props.subobjectives)}
+            subobjectives={this.props.subobjectives}
             incidentSubobjectivesIds={this.props.incidentSubobjectivesIds}
           />
         )
@@ -216,14 +211,13 @@ IncidentPopover.propTypes = {
   incident: PropTypes.object,
   incident_types: PropTypes.object,
   incidentSubobjectivesIds: PropTypes.array,
-  subobjectives: PropTypes.object
+  subobjectives: PropTypes.array
 }
 
 const select = (state) => {
   return {
     incident_types: state.referential.entities.incident_types,
-    subobjectives: state.referential.entities.subobjectives,
   }
 }
 
-export default connect(select, {fetchSubobjectives, updateIncident, deleteIncident, selectIncident})(IncidentPopover)
+export default connect(select, {updateIncident, deleteIncident, selectIncident})(IncidentPopover)

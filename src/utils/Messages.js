@@ -23,7 +23,8 @@ export const i18n = {
       'Search': 'Rechercher',
       'Required': 'Obligatoire',
       'Close': 'Fermer',
-      'Export to XLS': 'Exporter en XLS'
+      'Export to XLS': 'Exporter en XLS',
+      'Copy': 'Copier'
     },
     en: {
       'TECHNICAL': 'Technique',

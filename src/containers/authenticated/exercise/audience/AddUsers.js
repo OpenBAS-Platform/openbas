@@ -57,7 +57,9 @@ class AddUsers extends Component {
   }
 
   addUser(user) {
-    this.setState({users: R.append(user, this.state.users)})
+    if( !this.props.audienceUsersIds.includes(user.user_id) && !this.state.users.includes(user) ) {
+      this.setState({users: R.append(user, this.state.users)})
+    }
   }
 
   removeUser(user) {

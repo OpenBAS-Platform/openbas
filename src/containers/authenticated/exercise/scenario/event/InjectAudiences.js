@@ -41,9 +41,11 @@ class InjectAudiences extends Component {
   }
 
   addAudience(audienceId) {
-    let audiencesIds = R.append(audienceId, this.state.audiencesIds)
-    this.setState({audiencesIds: audiencesIds})
-    this.submitAudiences(audiencesIds)
+    if (!this.state.audiencesIds.includes(audienceId)) {
+      let audiencesIds = R.append(audienceId, this.state.audiencesIds)
+      this.setState({audiencesIds: audiencesIds})
+      this.submitAudiences(audiencesIds)
+    }
   }
 
   removeAudience(audienceId) {

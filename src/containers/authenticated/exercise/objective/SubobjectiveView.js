@@ -9,10 +9,11 @@ const styles = {
   },
   'title': {
     fontSize: '16px',
-    fontWeight: '500'
+    fontWeight: '500',
+    margin: '0px 0px 10px 0px'
   },
   'story': {
-
+    textAlign: 'justify'
   }
 }
 
