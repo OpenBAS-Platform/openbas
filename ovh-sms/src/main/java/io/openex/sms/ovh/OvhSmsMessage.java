@@ -19,8 +19,10 @@ public class OvhSmsMessage {
 	private String coding = "8bit";
 	
 	private String priority = "high";
+
+	private String sender = "OpenEx";
 	
-	private boolean senderForResponse = true;
+	private boolean senderForResponse = false;
 	
 	private boolean noStopClause = true;
 	
@@ -53,12 +55,16 @@ public class OvhSmsMessage {
 		this.coding = coding;
 	}
 	
-	public String getPriority() {
-		return priority;
-	}
+	public String getPriority() { return priority; }
 	
-	public void setPriority(String priority) {
-		this.priority = priority;
+	public void setPriority(String priority) { this.priority = priority; }
+
+	public String getSender() {
+		return sender;
+	}
+
+	public void setSender(String sender) {
+		this.sender = sender;
 	}
 	
 	public boolean isSenderForResponse() {
