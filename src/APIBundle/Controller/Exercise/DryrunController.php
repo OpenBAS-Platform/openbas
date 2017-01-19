@@ -134,7 +134,6 @@ class DryrunController extends Controller
             });
 
             // create new injects
-            $dryinjects = array();
             $previousInject = null;
             $previousDryinject = null;
             foreach( $injects as $inject ) {

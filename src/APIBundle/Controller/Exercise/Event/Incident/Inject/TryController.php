@@ -57,29 +57,31 @@ class TryController extends Controller
             return $this->injectNotFound();
         }
 
-        $data = array();
-        $data['context']['id'] = $inject->getInjectId();
-        $data['context']['type'] = $inject->getInjectType();
-        //$data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
-        $data['data'] = json_decode($inject->getInjectContent(), true);
-        $data['data']['content_header'] = $inject->getInjectHeader();
-        $data['data']['content_footer'] = $inject->getInjectFooter();
-        $data['data']['users'] = array();
-        foreach( $exercise->getExerciseAnimationGroup()->getGroupUsers() as $user ) {
-            $userData = array();
-            $userData['user_firstname'] = $user->getUserFirstname();
-            $userData['user_lastname'] = $user->getUserLastname();
-            $userData['user_email'] = $user->getUserEmail();
-            $userData['user_phone'] = $user->getUserPhone();
-            $userData['user_organization'] = array();
-            $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
-            $data['data']['users'][] = $userData;
+        if( $exercise->getExerciseAnimationGroup() != null) {
+            $data = array();
+            $data['context']['id'] = $inject->getInjectId();
+            $data['context']['type'] = $inject->getInjectType();
+            //$data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
+            $data['data'] = json_decode($inject->getInjectContent(), true);
+            $data['data']['content_header'] = $inject->getInjectHeader();
+            $data['data']['content_footer'] = $inject->getInjectFooter();
+            $data['data']['users'] = array();
+            foreach ($exercise->getExerciseAnimationGroup()->getGroupUsers() as $user) {
+                $userData = array();
+                $userData['user_firstname'] = $user->getUserFirstname();
+                $userData['user_lastname'] = $user->getUserLastname();
+                $userData['user_email'] = $user->getUserEmail();
+                $userData['user_phone'] = $user->getUserPhone();
+                $userData['user_organization'] = array();
+                $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                $data['data']['users'][] = $userData;
+            }
+
+            $url = $this->getParameter('worker_url') . '/cxf/worker/' . $data['context']['type'];
+            $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
         }
 
-        $url = $this->getParameter('worker_url') . '/cxf/worker/' . $data['context']['type'];
-        $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
-
-        return "OK";
+        return ["result" => "ok"];
     }
 
     private function exerciseNotFound()
