@@ -147,6 +147,84 @@ class InjectController extends Controller
         return $response;
     }
 
+    /**
+     * @ApiDoc(
+     *    description="Shift injects of an exercise",
+     * )
+     *
+     * @Rest\View(serializerGroups={"inject"})
+     * @Rest\Put("/exercises/{exercise_id}/injects")
+     */
+    public function shiftExercisesInjectsAction(Request $request)
+    {
+        if( $request->request->get('start_date') === null ) {
+            return \FOS\RestBundle\View\View::create(['message' => 'Missing the date'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $startDate = new \DateTime($request->request->get('start_date'));
+
+        $em = $this->get('doctrine.orm.entity_manager');
+        $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        $this->denyAccessUnlessGranted('select', $exercise);
+
+        $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
+        /* @var $events Event[] */
+
+        $injects = array();
+        /* @var $injects Inject[] */
+
+        foreach ($events as $event) {
+            $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
+            /* @var $incidents Incident[] */
+
+            foreach ($incidents as $incident) {
+                $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+            }
+        }
+
+        // sort injects by date
+        usort($injects, function($a, $b) {
+            return $a->getInjectDate()->getTimestamp() - $b->getInjectDate()->getTimestamp();
+        });
+
+        $newInjects = array();
+        $previousInject = null;
+        $previousNewInject = null;
+        $first = false;
+
+        foreach( $injects as $inject ) {
+            $clonedInject = clone $inject;
+            if ($previousInject === null) {
+                $inject->setInjectDate($startDate);
+                $em->persist($inject);
+                $em->flush();
+            } else {
+                $interval = $previousInject->getInjectDate()->diff($inject->getInjectDate());
+                $inject->setInjectDate($previousNewInject->getInjectDate()->add($interval));
+                $em->persist($inject);
+                $em->flush();
+            }
+
+            $previousInject = $clonedInject;
+            $previousNewInject = $inject;
+            $newInjects[] = $inject;
+        }
+
+        foreach ($newInjects as &$newInject) {
+            $newInject->sanitizeUser();
+            $newInject->computeUsersNumber();
+            $newInject->setInjectExercise($exercise->getExerciseId());
+        }
+
+        return $newInjects;
+    }
+
     private function exerciseNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
