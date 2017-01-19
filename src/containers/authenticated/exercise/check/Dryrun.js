@@ -25,11 +25,12 @@ import DryinjectStatusView from './DryinjectStatusView'
 
 i18nRegister({
   fr: {
-    'You do not have any pending injects in this dryrun.': 'Vous n\'avez aucun inject en attente dans ce dryrun.',
-    'You do not have any processed injects in this dryrun.': 'Vous n\'avez aucun inject traité dans ce dryrun.',
-    'Pending injects': 'Injects en attente',
-    'Processed injects': 'Injects traités',
-    'Inject view': 'Vue de l\'inject',
+    'Dryrun': 'Simulation',
+    'You do not have any pending injects in this dryrun.': 'Vous n\'avez aucune injection en attente dans cette simulation.',
+    'You do not have any processed injects in this dryrun.': 'Vous n\'avez aucune injection traitée dans cette simulation.',
+    'Pending injects': 'Injections en attente',
+    'Processed injects': 'Injections traitées',
+    'Inject view': 'Vue de l\'injection',
     'Status': 'Statut'
   }
 })
@@ -165,7 +166,7 @@ class IndexExerciseDryrun extends Component {
 
     return (
       <div style={styles.container}>
-        <div style={styles.title}>Dryrun</div>
+        <div style={styles.title}><T>Dryrun</T></div>
         <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun} listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{audienceName}</div>
         <div className="clearfix"></div>

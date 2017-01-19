@@ -21,6 +21,7 @@ import ComcheckPopover from './ComcheckPopover'
 
 i18nRegister({
   fr: {
+    'Comcheck': 'Test de communication',
     'Name': 'Nom',
     'Email address': 'Adresse email',
     'Organization': 'Organisation',
@@ -221,7 +222,7 @@ class Comcheck extends Component {
 
     return <div>
       <div>
-        <div style={styles.title}>Comcheck</div>
+        <div style={styles.title}><T>Comcheck</T></div>
         <ComcheckPopover exerciseId={this.props.exerciseId} comcheck={this.props.comcheck}
                          listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{R.propOr('-', 'audience_name', this.props.audience)}</div>

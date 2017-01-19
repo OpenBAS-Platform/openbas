@@ -19,7 +19,7 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Do you want to delete this dryrun?': 'Souhaitez-vous supprimer ce dryrun ?'
+    'Do you want to delete this dryrun?': 'Souhaitez-vous supprimer cette simulation ?'
   }
 })
 

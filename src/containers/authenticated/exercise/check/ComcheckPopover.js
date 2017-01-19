@@ -19,7 +19,7 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Do you want to delete this comcheck?': 'Souhaitez-vous supprimer ce comcheck ?'
+    'Do you want to delete this comcheck?': 'Souhaitez-vous supprimer ce test de communication ?'
   }
 })
 

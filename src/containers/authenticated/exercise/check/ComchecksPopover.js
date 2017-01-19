@@ -20,7 +20,7 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Launch a comcheck': 'Lancer un comcheck'
+    'Launch a comcheck': 'Lancer un test de communication'
   }
 })
 

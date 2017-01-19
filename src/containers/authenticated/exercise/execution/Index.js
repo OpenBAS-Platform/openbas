@@ -26,13 +26,13 @@ import InjectStatusView from './InjectStatusView'
 
 i18nRegister({
   fr: {
-    'Next inject': 'Le prochain inject',
+    'Next inject': 'La prochaine injection',
     'Execution': 'Exécution',
-    'Pending injects': 'Injects en attente',
-    'Processed injects': 'Injects traités',
-    'You do not have any pending injects in this exercise.': 'Vous n\'avez aucun inject en attente dans cet exercice.',
-    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucun inject traité dans cet exercice.',
-    'Inject view': 'Vue de l\'inject',
+    'Pending injects': 'Injections en attente',
+    'Processed injects': 'Injections traités',
+    'You do not have any pending injects in this exercise.': 'Vous n\'avez aucune injection en attente dans cet exercice.',
+    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucune injection dans cet exercice.',
+    'Inject view': 'Vue de l\'injection',
     'Status': 'Statut'
   }
 })

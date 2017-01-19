@@ -16,8 +16,10 @@ import ComchecksPopover from './ComchecksPopover'
 
 i18nRegister({
   fr: {
-    'You do not have any dryruns in this exercise.': 'Vous n\'avez aucun dryrun dans cet exercice.',
-    'You do not have any comchecks in this exercise.': 'Vous n\'avez aucun comcheck dans cet exercice.'
+    'Dryruns': 'Simulations',
+    'Comchecks': 'Tests de communication',
+    'You do not have any dryruns in this exercise.': 'Vous n\'avez aucune simulation dans cet exercice.',
+    'You do not have any comchecks in this exercise.': 'Vous n\'avez aucun test de communication dans cet exercice.'
   }
 })
 
@@ -83,7 +85,7 @@ class IndexExcerciseDryrun extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.columnLeft}>
-          <div style={styles.title}>Dryruns</div>
+          <div style={styles.title}><T>Dryruns</T></div>
           <DryrunsPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
           <div className="clearfix"></div>
           {this.props.dryruns.length === 0 ?
@@ -112,7 +114,7 @@ class IndexExcerciseDryrun extends Component {
           </List>
         </div>
         <div style={styles.columnRight}>
-          <div style={styles.title}>Comchecks</div>
+          <div style={styles.title}><T>Comchecks</T></div>
           <ComchecksPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
           <div className="clearfix"></div>
           {this.props.comchecks.length === 0 ?

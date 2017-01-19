@@ -15,7 +15,7 @@ import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuI
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {fetchIncident, selectIncident} from '../../../../../actions/Incident'
 import {redirectToEvent} from '../../../../../actions/Application'
-import {fetchInjectTypes, addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
+import {fetchInjectTypes, addInject, updateInject, deleteInject, tryInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
@@ -39,11 +39,13 @@ i18nRegister({
     '1. Parameters': '1. Paramètres',
     '2. Content': '2. Contenu',
     '3. Audiences': '3. Audiences',
-    'Do you want to delete this inject?': 'Souhaitez-vous supprimer cet inject ?',
+    'Do you want to delete this inject?': 'Souhaitez-vous supprimer cette injection ?',
     'Enable': 'Activer',
     'Disable': 'Désactiver',
-    'Do you want to disable this inject?': 'Souhaitez-vous désactiver cet inject ?',
-    'Do you want to enable this inject?': 'Souhaitez-vous activer cet inject ?'
+    'Test': 'Tester',
+    'Do you want to test this inject?': 'Souhaitez-vous tester cette injection ?',
+    'Do you want to disable this inject?': 'Souhaitez-vous désactiver cette injection ?',
+    'Do you want to enable this inject?': 'Souhaitez-vous activer cette injection ?'
   }
 })
 
@@ -57,6 +59,7 @@ class InjectPopover extends Component {
       openDisable: false,
       openEnable: false,
       openCopy: false,
+      openTry: false,
       type: undefined,
       stepIndex: 0,
       finished: false,
@@ -159,7 +162,7 @@ class InjectPopover extends Component {
   }
 
   submitDisable() {
-    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, {'inject_enabled': false}, false)
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, {'inject_enabled': false})
     this.handleCloseDisable()
   }
 
@@ -173,7 +176,7 @@ class InjectPopover extends Component {
   }
 
   submitEnable() {
-    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, {'inject_enabled': true}, false)
+    this.props.updateInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id, {'inject_enabled': true})
     this.handleCloseEnable()
   }
 
@@ -213,8 +216,6 @@ class InjectPopover extends Component {
       R.assoc('inject_audiences', audiencesList)
     )(this.props.inject)
 
-    console.log(new_inject)
-
     this.props.addInject(this.props.exerciseId, incident.incident_event.event_id, data.incident_id, new_inject).then(() => {
       this.props.fetchIncident(this.props.exerciseId, incident.incident_event.event_id, data.incident_id).then(() => {
         this.props.redirectToEvent(this.props.exerciseId, incident.incident_event.event_id)
@@ -222,6 +223,20 @@ class InjectPopover extends Component {
     })
     this.props.selectIncident(this.props.exerciseId, incident.incident_event.event_id, data.incident_id)
     this.handleCloseCopy()
+  }
+
+  handleOpenTry() {
+    this.setState({openTry: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseTry() {
+    this.setState({openTry: false})
+  }
+
+  submitTry() {
+    this.props.tryInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, this.props.inject.inject_id)
+    this.handleCloseTry()
   }
 
   getStepContent(stepIndex, initialValues) {
@@ -298,6 +313,10 @@ class InjectPopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCopy.bind(this)}/>,
       <FlatButton label="Copy" primary={true} onTouchTap={this.submitFormCopy.bind(this)}/>,
     ]
+    const tryActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseTry.bind(this)}/>,
+      <FlatButton label="Test" primary={true} onTouchTap={this.submitTry.bind(this)}/>,
+    ]
 
     let initPipe = R.pipe(
       R.assoc('inject_date', dateFormat(R.path(['inject', 'inject_date'], this.props))),
@@ -320,6 +339,7 @@ class InjectPopover extends Component {
             {inject_enabled ?
               <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
               <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
+            <MenuItemButton label="Test" onTouchTap={this.handleOpenTry.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -379,6 +399,12 @@ class InjectPopover extends Component {
                     onSubmit={this.onCopySubmit.bind(this)}
                     onSubmitSuccess={this.handleCloseCopy.bind(this)}/>
         </Dialog>
+        <Dialog title="Test" modal={false}
+                open={this.state.openTry}
+                onRequestClose={this.handleCloseTry.bind(this)}
+                actions={tryActions}>
+          <T>Do you want to test this inject?</T>
+        </Dialog>
       </div>
     )
   }
@@ -395,6 +421,7 @@ InjectPopover.propTypes = {
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
+  tryInject: PropTypes.func,
   redirectToEvent: PropTypes.func,
   selectIncident: PropTypes.func,
   inject_types: PropTypes.object,
@@ -410,6 +437,7 @@ export default connect(null, {
   addInject,
   updateInject,
   deleteInject,
+  tryInject,
   redirectToEvent,
   selectIncident
 })(InjectPopover)

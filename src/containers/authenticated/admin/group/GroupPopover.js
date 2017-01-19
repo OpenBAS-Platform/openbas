@@ -30,7 +30,9 @@ i18nRegister({
     'Planner': 'Planificateur',
     'Observer': 'Observateur',
     'Update the group': 'Mettre à jour le groupe',
-    'Search for a user': 'Rechercher un utilisateur'
+    'Search for a user': 'Rechercher un utilisateur',
+    'Read/Write': 'Lecture/Ecriture',
+    'Read only': 'Lecture seule'
   }
 })
 
@@ -307,8 +309,8 @@ class GroupPopover extends Component {
             <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
               <TableRow>
                 <TableHeaderColumn><T>Exercise</T></TableHeaderColumn>
-                <TableHeaderColumn><T>Planner</T></TableHeaderColumn>
-                <TableHeaderColumn><T>Observer</T></TableHeaderColumn>
+                <TableHeaderColumn><T>Read/Write</T></TableHeaderColumn>
+                <TableHeaderColumn><T>Read only</T></TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody displayRowCheckbox={false}>

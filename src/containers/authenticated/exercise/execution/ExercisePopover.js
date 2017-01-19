@@ -26,7 +26,7 @@ i18nRegister({
     'Do you want to enable this exercise?': 'Souhaitez-vous activer cet exercice ?',
     'Disable': 'Désactiver',
     'Enable': 'Activer',
-    'Launch a dryrun': 'Lancer un dryrun'
+    'Launch a dryrun': 'Lancer une simulation'
   }
 })
 

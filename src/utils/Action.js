@@ -60,6 +60,7 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
   dispatch({type: Constants.DATA_FETCH_SUBMITTED})
   return api(schema).post(uri, data).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
+    dispatch({type: Constants.DATA_UPDATE_SUCCESS, payload: response.data})
     return response.data
   }).catch(function (data) {
     dispatch({type: Constants.DATA_FETCH_ERROR})

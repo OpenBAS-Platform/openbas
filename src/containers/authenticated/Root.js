@@ -13,7 +13,7 @@ import DocumentTitle from '../../components/DocumentTitle'
 
 i18nRegister({
   fr: {
-    'Data saved.': 'Données sauvegardées.'
+    'Action done.': 'Action effectuée.'
   }
 })
 
@@ -44,7 +44,7 @@ class RootAuthenticated extends Component {
                     onRequestClose={this.props.savedDismiss.bind(this)} message={
             <div>
               <Icon name={Constants.ICON_NAME_ACTION_DONE} color="#ffffff" type={Constants.ICON_TYPE_LEFT}/>
-              <T>Data saved.</T>
+              <T>Action done.</T>
             </div>}/>
           {this.props.children}
         </div>

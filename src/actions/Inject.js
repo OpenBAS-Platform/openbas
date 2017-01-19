@@ -34,6 +34,16 @@ export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (disp
   return delReferential(uri, 'injects', injectId)(dispatch)
 }
 
+export const tryInject = (exerciseId, eventId, incidentId, injectId) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/incidents/' + incidentId + '/injects/' + injectId + '/try'
+  return postReferential(null, uri, null)(dispatch)
+}
+
+export const shiftAllInjects = (exerciseId, data) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/injects'
+  return putReferential(schema.arrayOfInjects, uri, data)(dispatch)
+}
+
 export const fetchInjectTypes = () => (dispatch) => {
   return getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch)
 }

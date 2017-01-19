@@ -37,13 +37,13 @@ i18nRegister({
     'You do not have any audiences in this exercise.': 'Vous n\'avez aucune audience dans cet exercice.',
     'Scenario': 'Scénario',
     'You do not have any events in this exercise.': 'Vous n\'avez aucun événement dans cet exercice.',
-    'Inject view': 'Vue de l\'inject',
+    'Inject view': 'Vue de l\'injection',
     'Incident view': 'Vue de l\'incident',
     'Objective view': 'Vue de l\'objectif',
     'Audience view': 'Vue de l\'audience',
     'Event view': 'Vue de l\'événement',
     'View all': 'Voir tout',
-    'Audiences of the inject': 'Audiences de l\'inject'
+    'Audiences of the inject': 'Audiences de l\'injection'
   }
 })
 

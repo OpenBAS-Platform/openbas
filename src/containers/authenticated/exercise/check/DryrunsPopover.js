@@ -19,7 +19,7 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Launch a dryrun': 'Lancer un dryrun'
+    'Launch a dryrun': 'Lancer une simulation'
   }
 })
 

@@ -2,12 +2,14 @@ import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
 import {i18nRegister} from '../../../utils/Messages'
 import * as Constants from '../../../constants/ComponentTypes'
+import {Dialog} from '../../../components/Dialog'
 import {Popover} from '../../../components/Popover';
 import {Menu} from '../../../components/Menu'
-import {IconButton} from '../../../components/Button'
+import {IconButton, FlatButton} from '../../../components/Button'
 import {Icon} from '../../../components/Icon'
 import {MenuItemLink} from "../../../components/menu/MenuItem"
-import {downloadExportInjects} from '../../../actions/Inject'
+import {downloadExportInjects, shiftAllInjects} from '../../../actions/Inject'
+import ShiftForm from './ShiftForm'
 
 const style = {
   float: 'left',
@@ -16,14 +18,16 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Export injects to XLS': 'Export des injects en XLS'
+    'Export injects to XLS': 'Export des injections en XLS',
+    'Shift': 'Décaler',
+    'Shift all injects': 'Décaler toutes les injections'
   }
 })
 
 class ScenarioPopover extends Component {
   constructor(props) {
     super(props);
-    this.state = {openPopover: false}
+    this.state = {openPopover: false, openShift: false}
   }
 
   handlePopoverOpen(event) {
@@ -40,7 +44,29 @@ class ScenarioPopover extends Component {
     this.handlePopoverClose()
   }
 
+  handleOpenShift() {
+    this.setState({openShift: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseShift() {
+    this.setState({openShift: false})
+  }
+
+  onSubmitShift(data) {
+    return this.props.shiftAllInjects(this.props.exerciseId, data)
+  }
+
+  submitFormShift() {
+    this.refs.shiftForm.submit()
+  }
+
   render() {
+    const shiftActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseShift.bind(this)}/>,
+      <FlatButton label="Shift" primary={true} onTouchTap={this.submitFormShift.bind(this)}/>,
+    ]
+
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -50,8 +76,17 @@ class ScenarioPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Export injects to XLS" onTouchTap={this.handleDownloadInjects.bind(this)}/>
+            <MenuItemLink label="Shift all injects" onTouchTap={this.handleOpenShift.bind(this)}/>
           </Menu>
         </Popover>
+        <Dialog
+          title="Shift all injects"
+          modal={false}
+          open={this.state.openShift}
+          onRequestClose={this.handleCloseShift.bind(this)}
+          actions={shiftActions}>
+          <ShiftForm ref="shiftForm" onSubmitSuccess={this.handleCloseShift.bind(this)} onSubmit={this.onSubmitShift.bind(this)}/>
+        </Dialog>
       </div>
     )
   }
@@ -59,7 +94,8 @@ class ScenarioPopover extends Component {
 
 ScenarioPopover.propTypes = {
   exerciseId: PropTypes.string,
-  downloadExportInjects: PropTypes.func
+  downloadExportInjects: PropTypes.func,
+  shiftAllInjects: PropTypes.func
 }
 
-export default connect(null, {downloadExportInjects})(ScenarioPopover)
+export default connect(null, {downloadExportInjects, shiftAllInjects})(ScenarioPopover)
