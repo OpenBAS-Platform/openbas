@@ -5,6 +5,8 @@
             <constant>{{openex.token}}</constant>
         </setHeader>
         <to uri="{{openex.inject_fetch}}"/>
+        <!-- Remove authorization header to avoid any compatibility problem with execution modules -->
+        <removeHeader headerName="Authorization"/>
         <unmarshal>
             <json library="Gson" unmarshalTypeName="java.lang.Object"/>
         </unmarshal>
@@ -41,14 +43,15 @@
     </route>
     <route id="openex-callback">
         <from uri="direct:callback"/>
+        <!-- Setup request headers -->
         <setHeader headerName="Content-Type">
             <constant>application/json</constant>
         </setHeader>
-        <setHeader headerName="Authorization">
-            <constant>{{openex.token}}</constant>
-        </setHeader>
         <setHeader headerName="CamelHttpMethod">
             <constant>POST</constant>
+        </setHeader>
+        <setHeader headerName="Authorization">
+            <constant>{{openex.token}}</constant>
         </setHeader>
         <doTry>
             <setHeader headerName="CamelHttpUri">
