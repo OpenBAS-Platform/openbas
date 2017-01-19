@@ -36,6 +36,9 @@
                     <setHeader headerName="PgpKey">
                         <simple>${body[user_pgp_key]}</simple>
                     </setHeader>
+                    <setHeader headerName="contentType">
+                        <constant>text/html;charset=UTF-8</constant>
+                    </setHeader>
                     <!-- Put the current user as the marker model -->
                     <setHeader headerName="CamelFreemarkerDataModel">
                         <simple>${body}</simple>
