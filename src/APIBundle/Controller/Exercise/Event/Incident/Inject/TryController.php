@@ -57,6 +57,10 @@ class TryController extends Controller
             return $this->injectNotFound();
         }
 
+        $inject->setInjectExercise($exercise);
+        $inject->setInjectHeader($exercise->getExerciseMessageHeader());
+        $inject->setInjectFooter($exercise->getExerciseMessageFooter());
+
         if( $exercise->getExerciseAnimationGroup() != null) {
             $data = array();
             $data['context']['id'] = $inject->getInjectId();
