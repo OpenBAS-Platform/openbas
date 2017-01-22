@@ -365,7 +365,7 @@ class IndexExercise extends Component {
         <div className="clearfix"></div>
         <br /><br />
         <div style={styles.title}><T>Scenario</T></div>
-        <ScenarioPopover exerciseId={this.props.exerciseId}/>
+        <ScenarioPopover exerciseId={this.props.exerciseId} injects={this.props.injects}/>
         <div className="clearfix"></div>
         {this.props.events.length === 0 ?
           <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}

@@ -1,5 +1,7 @@
 import React, {PropTypes, Component} from 'react';
 import {connect} from 'react-redux';
+import R from 'ramda'
+import {timeDiff} from '../../../utils/Time'
 import {i18nRegister} from '../../../utils/Messages'
 import * as Constants from '../../../constants/ComponentTypes'
 import {Dialog} from '../../../components/Dialog'
@@ -54,6 +56,13 @@ class ScenarioPopover extends Component {
   }
 
   onSubmitShift(data) {
+    let firstInjectDate = R.pipe(
+      R.values,
+      R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
+      R.head,
+      R.prop('inject_date')
+    )(this.props.injects)
+    data.old_date = firstInjectDate
     return this.props.shiftAllInjects(this.props.exerciseId, data)
   }
 
@@ -95,7 +104,8 @@ class ScenarioPopover extends Component {
 ScenarioPopover.propTypes = {
   exerciseId: PropTypes.string,
   downloadExportInjects: PropTypes.func,
-  shiftAllInjects: PropTypes.func
+  shiftAllInjects: PropTypes.func,
+  injects: PropTypes.object
 }
 
 export default connect(null, {downloadExportInjects, shiftAllInjects})(ScenarioPopover)

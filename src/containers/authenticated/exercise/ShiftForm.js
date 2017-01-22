@@ -22,20 +22,20 @@ const validate = values => {
 }
 
 class ShiftForm extends Component {
-  raiseStartPicker() {
-    this.refs.startPicker.getWrappedInstance().refs.datePicker.openDialog()
+  raiseNewPicker() {
+    this.refs.newPicker.getWrappedInstance().refs.datePicker.openDialog()
   }
 
-  replaceStartValue(value) {
-    this.props.change('start_date', value)
+  replaceNewValue(value) {
+    this.props.change('new_date', value)
   }
 
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-       <FormField ref="startDate" name="start_date" fullWidth={true} type="text"
-                   label="First inject date" onClick={this.raiseStartPicker.bind(this)}/>
-        <DateTimePicker ref="startPicker" handleResult={this.replaceStartValue.bind(this)}/>
+       <FormField ref="newDate" name="new_date" fullWidth={true} type="text"
+                   label="First inject date" onClick={this.raiseNewPicker.bind(this)}/>
+        <DateTimePicker ref="newPicker" handleResult={this.replaceNewValue.bind(this)}/>
       </form>
     )
   }

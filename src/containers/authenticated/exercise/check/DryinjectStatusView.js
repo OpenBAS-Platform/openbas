@@ -54,7 +54,7 @@ class DryinjectStatusView extends Component {
         <div style={{clear: 'both'}}></div><br />
         <div style={styles.message}>
           {dryinject_message_lines.map(line => {
-            return <div>{line}</div>
+            return <div key={line}>{line}</div>
           })}
         </div>
       </div>
