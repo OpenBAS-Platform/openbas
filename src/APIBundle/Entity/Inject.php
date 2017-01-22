@@ -144,7 +144,7 @@ class Inject
         $this->inject_date = $date;
         return $this;
     }
-    
+
     public function getInjectAudiences()
     {
         return $this->inject_audiences;
@@ -211,8 +211,9 @@ class Inject
         return $this;
     }
 
-    public function sanitizeUser() {
-        if( $this->inject_user !== null ) {
+    public function sanitizeUser()
+    {
+        if ($this->inject_user !== null && !is_string($this->inject_user)) {
             $this->inject_user = $this->inject_user->getUserFirstname() . ' ' . $this->inject_user->getUserLastname();
         }
     }
@@ -227,7 +228,7 @@ class Inject
         $this->inject_event = $event;
         return $this;
     }
-    
+
     public function getInjectExercise()
     {
         return $this->inject_exercise;
@@ -272,9 +273,10 @@ class Inject
         return $this;
     }
 
-    public function computeUsersNumber() {
+    public function computeUsersNumber()
+    {
         $this->inject_users_number = 0;
-        foreach( $this->inject_audiences as $audience ) {
+        foreach ($this->inject_audiences as $audience) {
             $this->inject_users_number += count($audience->getAudienceUsers());
         }
     }

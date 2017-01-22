@@ -157,11 +157,13 @@ class InjectController extends Controller
      */
     public function shiftExercisesInjectsAction(Request $request)
     {
-        if( $request->request->get('start_date') === null ) {
-            return \FOS\RestBundle\View\View::create(['message' => 'Missing the date'], Response::HTTP_BAD_REQUEST);
+        if ($request->request->get('old_date') === null || $request->request->get('new_date') === null) {
+            return \FOS\RestBundle\View\View::create(['message' => 'Missing the dates'], Response::HTTP_BAD_REQUEST);
         }
 
-        $startDate = new \DateTime($request->request->get('start_date'));
+        $old_date = new \DateTime($request->request->get('old_date'));
+        $new_date = new \DateTime($request->request->get('new_date'));
+        $interval = $old_date->diff($new_date);
 
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -184,45 +186,28 @@ class InjectController extends Controller
             /* @var $incidents Incident[] */
 
             foreach ($incidents as $incident) {
-                $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+                $incidentInjects = $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]);
+                foreach ($incidentInjects as &$incidentInject) {
+                    $incidentInject->setInjectEvent($event->getEventId());
+                }
+                $injects = array_merge($injects, $incidentInjects);
             }
         }
 
-        // sort injects by date
-        usort($injects, function($a, $b) {
-            return $a->getInjectDate()->getTimestamp() - $b->getInjectDate()->getTimestamp();
-        });
-
-        $newInjects = array();
-        $previousInject = null;
-        $previousNewInject = null;
-        $first = false;
-
-        foreach( $injects as $inject ) {
-            $clonedInject = clone $inject;
-            if ($previousInject === null) {
-                $inject->setInjectDate($startDate);
-                $em->persist($inject);
-                $em->flush();
-            } else {
-                $interval = $previousInject->getInjectDate()->diff($inject->getInjectDate());
-                $inject->setInjectDate($previousNewInject->getInjectDate()->add($interval));
-                $em->persist($inject);
-                $em->flush();
-            }
-
-            $previousInject = $clonedInject;
-            $previousNewInject = $inject;
-            $newInjects[] = $inject;
+        foreach ($injects as &$inject) {
+            $newDate = new \DateTime($inject->getInjectDate()->add($interval)->format('Y-m-d H:i:s'));
+            $inject->setInjectDate($newDate);
+            $em->persist($inject);
+            $em->flush();
         }
 
-        foreach ($newInjects as &$newInject) {
-            $newInject->sanitizeUser();
-            $newInject->computeUsersNumber();
-            $newInject->setInjectExercise($exercise->getExerciseId());
+        foreach( $injects as &$inject) {
+            $inject->setInjectExercise($exercise->getExerciseId());
+            $inject->computeUsersNumber();
+            $inject->sanitizeUser();
         }
 
-        return $newInjects;
+        return $injects;
     }
 
     private function exerciseNotFound()
