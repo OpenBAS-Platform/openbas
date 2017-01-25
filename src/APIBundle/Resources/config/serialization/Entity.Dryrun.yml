@@ -10,7 +10,5 @@ APIBundle\Entity\Dryrun:
             groups: ['dryrun']
         dryrun_exercise:
             groups: ['dryrun']
-        dryrun_audience:
-            groups: ['dryrun']
         dryrun_dryinjects:
             groups: ['dryrun']

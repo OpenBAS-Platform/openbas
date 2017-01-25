@@ -11,7 +11,6 @@ class DryrunType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('dryrun_audience');
         $builder->add('dryrun_speed');
     }
 

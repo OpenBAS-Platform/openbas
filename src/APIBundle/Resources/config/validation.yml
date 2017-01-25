@@ -110,8 +110,6 @@ APIBundle\Entity\Comcheck:
 
 APIBundle\Entity\Dryrun:
     properties:
-        dryrun_audience:
-             - NotBlank: ~
         dryrun_speed:
             - NotBlank: ~
             - Type: integer

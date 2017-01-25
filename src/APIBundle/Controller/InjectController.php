@@ -187,21 +187,6 @@ class InjectController extends Controller
             $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
             $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
             $data['data']['users'] = array();
-            $audience = $dryinject->getDryinjectDryrun()->getDryrunAudience();
-            /* @var $audience Audience */
-            foreach ($audience->getAudienceUsers() as $user) {
-                if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
-                    $userData = array();
-                    $userData['user_firstname'] = $user->getUserFirstname();
-                    $userData['user_lastname'] = $user->getUserLastname();
-                    $userData['user_email'] = $user->getUserEmail();
-                    $userData['user_phone'] = $user->getUserPhone();
-                    $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
-                    $userData['user_organization'] = array();
-                    $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
-                    $data['data']['users'][] = $userData;
-                }
-            }
 
             if( $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup() != null ) {
                 foreach( $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user ) {
