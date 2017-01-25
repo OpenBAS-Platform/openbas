@@ -103,7 +103,7 @@ public class OvhSmsProducer extends DefaultAsyncProducer {
 	private String HashSHA1(String text) throws Exception {
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		byte[] sha1hash = new byte[40];
-		md.update(text.getBytes(), 0, text.length());
+		md.update(text.getBytes(ISO_8859_1), 0, text.length());
 		sha1hash = md.digest();
 		return convertToHex(sha1hash);
 	}
