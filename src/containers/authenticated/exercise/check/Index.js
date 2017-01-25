@@ -86,21 +86,19 @@ class IndexExcerciseDryrun extends Component {
       <div style={styles.container}>
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Dryruns</T></div>
-          <DryrunsPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
+          <DryrunsPopover exerciseId={this.props.exerciseId}/>
           <div className="clearfix"></div>
           {this.props.dryruns.length === 0 ?
             <div style={styles.empty}><T>You do not have any dryruns in this exercise.</T></div> : ""}
           <List>
             {this.props.dryruns.map(dryrun => {
-              let dryrun_audience = R.propOr({}, dryrun.dryrun_audience.audience_id, this.props.audiences)
-              let audienceName = R.propOr('-', 'audience_name', dryrun_audience)
               return (
                 <MainListItemLink
                   to={'/private/exercise/' + this.props.exerciseId + '/checks/dryrun/' + dryrun.dryrun_id}
                   key={dryrun.dryrun_id}
                   primaryText={
                     <div>
-                      <div style={styles.dryrun_audience}>{audienceName}</div>
+                      <div style={styles.dryrun_audience}><T>Dryrun</T> {dryrun.dryrun_id}</div>
                       <div style={styles.dryrun_date}>{dateFormat(dryrun.dryrun_date)}</div>
                       <div className="clearfix"></div>
                     </div>
@@ -175,14 +173,24 @@ const filterComchecks = (comchecks, exerciseId) => {
   return comchecksFilterAndSorting(comchecks)
 }
 
+const filterAudiences = (audiences, exerciseId) => {
+  let audiencesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.audience_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
+  )
+  return audiencesFilterAndSorting(audiences)
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId)
   let comchecks = filterComchecks(state.referential.entities.comchecks, exerciseId)
+  let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
 
   return {
     exerciseId,
-    audiences: state.referential.entities.audiences,
+    audiences,
     dryruns,
     comchecks
   }

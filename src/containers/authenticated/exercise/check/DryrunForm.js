@@ -7,7 +7,6 @@ import {MenuItemLink} from "../../../../components/menu/MenuItem"
 
 i18nRegister({
   fr: {
-    'Target audience': 'Audience cible',
     'Speed': 'Vitesse',
     '24x (1 day = 1 hour)': '24x (1 jour = 1 heure)',
     '48x (1 day = 30 minutes)': '48x (1 jour = 30 minutes)',
@@ -30,11 +29,6 @@ class DryrunForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <SelectField label={<T>Target audience</T>} name="dryrun_audience" fullWidth={true}>
-          {this.props.audiences.map(audience => {
-            return (<MenuItemLink key={audience.audience_id} value={audience.audience_id} label={<T>{audience.audience_name}</T>}/>)
-          })}
-        </SelectField>
         <SelectField label={<T>Speed</T>} name="dryrun_speed" fullWidth={true}>
           <MenuItemLink key="24x" value="24" label="24x (1 day = 1 hour)"/>
           <MenuItemLink key="48x" value="48" label="48x (1 day = 30 minutes)"/>
@@ -51,8 +45,7 @@ DryrunForm.propTypes = {
   submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
-  change: PropTypes.func,
-  audiences: PropTypes.array
+  change: PropTypes.func
 }
 
 export default reduxForm({form: 'DryrunForm', validate}, null, {change})(DryrunForm)

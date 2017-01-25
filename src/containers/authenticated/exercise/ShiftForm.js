@@ -6,7 +6,7 @@ import {i18nRegister} from '../../../utils/Messages'
 
 i18nRegister({
   fr: {
-    'First inject date': 'Date du premier inject'
+    'First inject date': 'Date de la première injection'
   }
 })
 

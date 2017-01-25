@@ -10,7 +10,7 @@ i18nRegister({
   fr: {
     'Messages header': 'En-tête des messages',
     'Messages footer': 'Pied des messages',
-    'Group in carbon copy': 'Groupe en copie conforme'
+    'Exercise control (animation)': 'Direction de l\'animation'
   }
 })
 
@@ -20,7 +20,7 @@ class TemplateForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="exercise_message_header" fullWidth={true} type="text" label="Messages header"/>
         <FormField name="exercise_message_footer" fullWidth={true} type="text" label="Messages footer"/>
-        <SelectField label={<T>Group in carbon copy (animation)</T>} name="exercise_animation_group" fullWidth={true}>
+        <SelectField label={<T>Exercise control (animation)</T>} name="exercise_animation_group" fullWidth={true}>
           <MenuItemLink value={null} label=""/>
           {this.props.groups.map(data => {
             return (<MenuItemLink key={data.group_id} value={data.group_id} label={data.group_name}/>)

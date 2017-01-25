@@ -86,7 +86,7 @@ class DryrunsPopover extends Component {
           open={this.state.openLaunch}
           onRequestClose={this.handleCloseLaunch.bind(this)}
           actions={launchActions}>
-          <DryrunForm ref="dryrunForm" audiences={this.props.audiences} onSubmit={this.onSubmitLaunch.bind(this)}/>
+          <DryrunForm ref="dryrunForm" onSubmit={this.onSubmitLaunch.bind(this)}/>
         </Dialog>
       </div>
     )
@@ -95,7 +95,6 @@ class DryrunsPopover extends Component {
 
 DryrunsPopover.propTypes = {
   exerciseId: PropTypes.string,
-  audiences: PropTypes.array,
   addDryrun: PropTypes.func,
   redirectToDryrun: PropTypes.func
 }

@@ -153,11 +153,7 @@ class IndexExerciseDryrun extends Component {
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseStatus.bind(this)}/>,
     ]
 
-    let audienceName = null
-    if (this.props.dryrun.dryrun_audience && this.props.audiences.length > 0) {
-      let dryrun_audience = R.find(a => a.audience_id === this.props.dryrun.dryrun_audience.audience_id)(this.props.audiences)
-      audienceName = R.propOr('-', 'audience_name', dryrun_audience)
-    }
+    let dryrun_id = R.propOr('', 'dryrun_id', this.props.dryrun)
     let dryrun_date = R.propOr('', 'dryrun_date', this.props.dryrun)
     let dryrun_finished = R.propOr(false, 'dryrun_finished', this.props.dryrun)
 
@@ -168,7 +164,7 @@ class IndexExerciseDryrun extends Component {
       <div style={styles.container}>
         <div style={styles.title}><T>Dryrun</T></div>
         <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun} listenDeletionCall={this.cancelStreamEvent}/>
-        <div style={styles.audience}>{audienceName}</div>
+        <div style={styles.audience}>{dryrun_id}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
         <div style={styles.state}>{dryrun_finished ?
