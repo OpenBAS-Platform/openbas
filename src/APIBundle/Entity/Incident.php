@@ -51,7 +51,7 @@ class Incident
      * @ORM\ManyToMany(targetEntity="Subobjective", inversedBy="incident_subobjectives")
      * @ORM\JoinTable(name="incidents_subobjectives",
      *      joinColumns={@ORM\JoinColumn(name="incident_id", referencedColumnName="incident_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="subobjective_id", referencedColumnName="subobjective_id", onDelete="RESTRICT")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="subobjective_id", referencedColumnName="subobjective_id", onDelete="CASCADE")}
      *      )
      * @var Subobjective[]
      */
