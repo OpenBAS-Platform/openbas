@@ -1,3 +1,6 @@
+import {registerPolyfills} from './utils/Polyfill'
+registerPolyfills()
+
 import React, {Component, PropTypes} from 'react'
 import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
@@ -15,7 +18,6 @@ import enLocaleData from 'react-intl/locale-data/en'
 import frLocaleData from 'react-intl/locale-data/fr'
 import {locale} from './utils/BrowserLanguage'
 import {i18n, debug} from './utils/Messages'
-import {registerPolyfills} from './utils/Polyfill'
 import {entitiesInitializer} from './reducers/Referential'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import * as Constants from './constants/ActionTypes'
@@ -47,7 +49,6 @@ import IndexExerciseComcheck from './containers/authenticated/exercise/check/Com
 import IndexExerciseLessons from './containers/authenticated/exercise/lessons/Index'
 import Immutable from 'seamless-immutable'
 
-registerPolyfills()
 injectTapEventPlugin()
 
 //Default application state
