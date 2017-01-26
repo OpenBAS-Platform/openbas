@@ -1,6 +1,3 @@
-import {registerPolyfills} from './utils/Polyfill'
-registerPolyfills()
-
 import React, {Component, PropTypes} from 'react'
 import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
