@@ -31,7 +31,7 @@ i18nRegister({
     'Pending injects': 'Injections en attente',
     'Processed injects': 'Injections traités',
     'You do not have any pending injects in this exercise.': 'Vous n\'avez aucune injection en attente dans cet exercice.',
-    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucune injection dans cet exercice.',
+    'You do not have any processed injects in this exercise.': 'Vous n\'avez aucune injection traitée dans cet exercice.',
     'Inject view': 'Vue de l\'injection',
     'Status': 'Statut'
   }
