@@ -1,6 +1,3 @@
-import {registerPolyfills} from './utils/Polyfill'
-registerPolyfills()
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';

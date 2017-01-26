@@ -8,6 +8,14 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <script type="text/javascript">
+      if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (searchString, position) {
+          position = position || 0;
+          return this.substr(position, searchString.length) === searchString;
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
