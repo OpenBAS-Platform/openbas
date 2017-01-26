@@ -98,7 +98,7 @@ class IndexExcerciseDryrun extends Component {
                   key={dryrun.dryrun_id}
                   primaryText={
                     <div>
-                      <div style={styles.dryrun_audience}><T>Dryrun</T> {dryrun.dryrun_id}</div>
+                      <div style={styles.dryrun_audience}><T>Dryrun</T></div>
                       <div style={styles.dryrun_date}>{dateFormat(dryrun.dryrun_date)}</div>
                       <div className="clearfix"></div>
                     </div>
@@ -113,13 +113,13 @@ class IndexExcerciseDryrun extends Component {
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Comchecks</T></div>
-          <ComchecksPopover exerciseId={this.props.exerciseId} audiences={R.values(this.props.audiences)}/>
+          <ComchecksPopover exerciseId={this.props.exerciseId} audiences={this.props.audiences}/>
           <div className="clearfix"></div>
           {this.props.comchecks.length === 0 ?
             <div style={styles.empty}><T>You do not have any comchecks in this exercise.</T></div> : ""}
           <List>
             {this.props.comchecks.map(comcheck => {
-              let comcheck_audience = R.propOr({}, comcheck.comcheck_audience.audience_id, this.props.audiences)
+              let comcheck_audience = R.find(a => a.audience_id === comcheck.comcheck_audience.audience_id, this.props.audiences)
               let audienceName = R.propOr('-', 'audience_name', comcheck_audience)
               return (
                 <MainListItemLink
@@ -147,7 +147,7 @@ class IndexExcerciseDryrun extends Component {
 
 IndexExcerciseDryrun.propTypes = {
   exerciseId: PropTypes.string,
-  audiences: PropTypes.object,
+  audiences: PropTypes.array,
   dryruns: PropTypes.array,
   comchecks: PropTypes.array,
   fetchAudiences: PropTypes.func,
