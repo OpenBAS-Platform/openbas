@@ -36,13 +36,6 @@ class Dryrun
     protected $dryrun_exercise;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Audience", inversedBy="audience_dryruns")
-     * @ORM\JoinColumn(name="dryrun_audience", referencedColumnName="audience_id", onDelete="CASCADE")
-     * @var Audience
-     */
-    protected $dryrun_audience;
-
-    /**
      * @ORM\OneToMany(targetEntity="Dryinject", mappedBy="dryinject_dryrun")
      * @var Incident[]
      */
@@ -103,18 +96,7 @@ class Dryrun
         $this->dryrun_exercise = $exercise;
         return $this;
     }
-
-    public function getDryrunAudience()
-    {
-        return $this->dryrun_audience;
-    }
-
-    public function setDryrunAudience($audience)
-    {
-        $this->dryrun_audience = $audience;
-        return $this;
-    }
-
+    
     public function getDryrunDryinjects()
     {
         return $this->dryrun_dryinjects;
