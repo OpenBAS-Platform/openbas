@@ -97,7 +97,10 @@ class UserController extends Controller
         $sheet->setCellValue('B1', 'Lastname');
         $sheet->setCellValue('C1', 'Organization');
         $sheet->setCellValue('D1', 'Email');
-        $sheet->setCellValue('E1', 'Phone');
+        $sheet->setCellValue('E1', 'Email (secured)');
+        $sheet->setCellValue('F1', 'Phone number (fix)');
+        $sheet->setCellValue('G1', 'Phone number (mobile)');
+        $sheet->setCellValue('H1', 'Phone number (secured)');
 
         $i = 2;
         foreach ($users as $user) {
@@ -105,8 +108,11 @@ class UserController extends Controller
             $sheet->setCellValue('A' . $i, $user->getUserFirstname());
             $sheet->setCellValue('B' . $i, $user->getUserLastname());
             $sheet->setCellValue('C' . $i, $user->getUserOrganization()->getOrganizationName());
-            $sheet->setCellValue('D' . $i, $user->getUserEmail());
-            $sheet->setCellValue('E' . $i, $user->getUserPhone());
+            $sheet->setCellValue('D' . $j, $user->getUserEmail());
+            $sheet->setCellValue('E' . $j, $user->getUserEmail2());
+            $sheet->setCellValue('F' . $j, $user->getUserPhone2());
+            $sheet->setCellValue('G' . $j, $user->getUserPhone());
+            $sheet->setCellValue('H' . $j, $user->getUserPhone3());
             $i++;
         }
 
