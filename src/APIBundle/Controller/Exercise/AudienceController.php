@@ -86,7 +86,10 @@ class AudienceController extends Controller
             $sheet->setCellValue('B1', 'Lastname');
             $sheet->setCellValue('C1', 'Organization');
             $sheet->setCellValue('D1', 'Email');
-            $sheet->setCellValue('E1', 'Phone');
+            $sheet->setCellValue('E1', 'Email (secured)');
+            $sheet->setCellValue('F1', 'Phone number (fix)');
+            $sheet->setCellValue('G1', 'Phone number (mobile)');
+            $sheet->setCellValue('H1', 'Phone number (secured)');
 
             $j = 2;
             foreach ($users as $user) {
@@ -95,7 +98,10 @@ class AudienceController extends Controller
                 $sheet->setCellValue('B' . $j, $user->getUserLastname());
                 $sheet->setCellValue('C' . $j, $user->getUserOrganization()->getOrganizationName());
                 $sheet->setCellValue('D' . $j, $user->getUserEmail());
-                $sheet->setCellValue('E' . $j, $user->getUserPhone());
+                $sheet->setCellValue('E' . $j, $user->getUserEmail2());
+                $sheet->setCellValue('F' . $j, $user->getUserPhone2());
+                $sheet->setCellValue('G' . $j, $user->getUserPhone());
+                $sheet->setCellValue('H' . $j, $user->getUserPhone3());
                 $j++;
             }
             $i++;
