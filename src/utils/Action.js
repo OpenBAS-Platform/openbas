@@ -25,11 +25,11 @@ const submitErrors = (data) => {
 }
 
 export const fileDownload = (uri) => () => {
-    return api().get(uri, {responseType: 'blob'}).then(function(response) {
-        const contentDisposition = response.headers['content-disposition']
-        var filename = R.last(contentDisposition.match(/filename="(.+)"/))
-        FileSaver.saveAs(response.data, filename);
-    })
+  return api().get(uri, {responseType: 'blob'}).then(function (response) {
+    const contentDisposition = response.headers['content-disposition']
+    var filename = R.last(contentDisposition.match(/filename="(.+)"/))
+    FileSaver.saveAs(response.data, filename);
+  })
 }
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {
@@ -45,7 +45,7 @@ export const getReferential = (schema, uri, noloading) => (dispatch) => {
 }
 
 export const putReferential = (schema, uri, data) => (dispatch) => {
-    dispatch({type: Constants.DATA_FETCH_SUBMITTED})
+  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
   return api(schema).put(uri, data).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
     dispatch({type: Constants.DATA_UPDATE_SUCCESS, payload: response.data})

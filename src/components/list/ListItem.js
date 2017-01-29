@@ -231,7 +231,7 @@ export const SecondaryListItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={true}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
-    innerDivStyle={{padding: '20px 20px 20px 60px'}}
+    innerDivStyle={{padding: '20px 10px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>
 )
 
