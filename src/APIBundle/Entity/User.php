@@ -36,7 +36,7 @@ class User implements UserInterface
     protected $user_email;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $user_email2;
 
