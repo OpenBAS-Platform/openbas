@@ -36,9 +36,24 @@ class User implements UserInterface
     protected $user_email;
 
     /**
+     * @ORM\Column(type="string")
+     */
+    protected $user_email2;
+
+    /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $user_phone;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone2;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone3;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -146,6 +161,17 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getUserEmail2()
+    {
+        return $this->user_email2;
+    }
+
+    public function setUserEmail2($email)
+    {
+        $this->user_email2 = $email;
+        return $this;
+    }
+
     public function getUserPhone()
     {
         return $this->user_phone;
@@ -154,6 +180,28 @@ class User implements UserInterface
     public function setUserPhone($phone)
     {
         $this->user_phone = $phone;
+        return $this;
+    }
+
+    public function getUserPhone2()
+    {
+        return $this->user_phone2;
+    }
+
+    public function setUserPhone2($phone)
+    {
+        $this->user_phone2 = $phone;
+        return $this;
+    }
+
+    public function getUserPhone3()
+    {
+        return $this->user_phone3;
+    }
+
+    public function setUserPhone3($phone)
+    {
+        $this->user_phone3 = $phone;
         return $this;
     }
 

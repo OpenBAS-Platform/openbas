@@ -8,7 +8,13 @@ APIBundle\Entity\User:
             groups: ['user', 'token']
         user_email:
             groups: ['user', 'token']
+        user_email2:
+            groups: ['user', 'token']
         user_phone:
+            groups: ['user', 'token']
+        user_phone2:
+            groups: ['user', 'token']
+        user_phone3:
             groups: ['user', 'token']
         user_pgp_key:
             groups: ['user', 'token']
