@@ -15,7 +15,7 @@ import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuI
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {fetchIncident, selectIncident} from '../../../../../actions/Incident'
 import {redirectToEvent} from '../../../../../actions/Application'
-import {fetchInjectTypes, addInject, updateInject, deleteInject, tryInject} from '../../../../../actions/Inject'
+import {addInject, updateInject, deleteInject, tryInject} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
@@ -433,7 +433,6 @@ InjectPopover.propTypes = {
 
 export default connect(null, {
   fetchIncident,
-  fetchInjectTypes,
   addInject,
   updateInject,
   deleteInject,
