@@ -1,5 +1,4 @@
 import React, {Component, PropTypes} from 'react'
-import cn from 'classnames'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import {injectIntl} from 'react-intl'
@@ -28,7 +27,7 @@ import ObjectiveView from './objective/ObjectiveView'
 import AudiencePopover from './AudiencePopover'
 import AudiencesPopover from './AudiencesPopover'
 import ScenarioPopover from './ScenarioPopover'
-import {List as VList, WindowScroller, AutoSizer} from 'react-virtualized'
+import {List as VList, AutoSizer} from 'react-virtualized'
 
 i18nRegister({
   fr: {
