@@ -136,11 +136,18 @@ class IndexExercise extends Component {
       openObjectives: false,
       openAudiences: false,
       currentInjectAudiences: [],
-      openInjectAudiences: false
+      openInjectAudiences: false,
+      computedVisibleHeight: 0
     }
   }
 
+   updateDimensions() {
+     this.setState({computedVisibleHeight: window.innerHeight - 64 - 20});
+   }
+
   componentDidMount() {
+    window.addEventListener("resize", this.updateDimensions.bind(this))
+    this.updateDimensions()
     this.props.fetchIncidentTypes()
     this.props.fetchObjectives(this.props.exerciseId)
     this.props.fetchSubobjectives(this.props.exerciseId)
@@ -148,6 +155,10 @@ class IndexExercise extends Component {
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
     this.props.fetchAllInjects(this.props.exerciseId)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDimensions)
   }
 
   selectIcon(type) {
@@ -564,7 +575,7 @@ class IndexExercise extends Component {
         <AutoSizer>
           {({width, height}) => (
             <VList
-              height={window.innerHeight - height - 64 - 20}
+              height={this.state.computedVisibleHeight - height}
               rowCount={R.length(eventsIncidentsInjects)}
               rowHeight={77}
               rowRenderer={rowRenderer}
