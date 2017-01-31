@@ -140,12 +140,11 @@ class IndexExercise extends Component {
     }
   }
 
-   updateDimensions() {
-     this.setState({computedVisibleHeight: window.innerHeight - 64 - 20});
-   }
-
   componentDidMount() {
-    window.addEventListener("resize", this.updateDimensions.bind(this))
+    this.updateDimensions = () => {
+      this.setState({computedVisibleHeight: window.innerHeight - 64 - 20});
+    }
+    window.addEventListener("resize", this.updateDimensions)
     this.updateDimensions()
     this.props.fetchIncidentTypes()
     this.props.fetchObjectives(this.props.exerciseId)
