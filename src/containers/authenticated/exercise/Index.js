@@ -22,7 +22,7 @@ import {fetchAllInjects} from '../../../actions/Inject'
 import EventView from './scenario/event/EventView'
 import IncidentView from './scenario/event/IncidentView'
 import InjectView from './scenario/event/InjectView'
-import AudienceView from './audience/AudienceView'
+import AudienceView from './audiences/audience/AudienceView'
 import ObjectiveView from './objective/ObjectiveView'
 import AudiencePopover from './AudiencePopover'
 import AudiencesPopover from './AudiencesPopover'
@@ -451,7 +451,7 @@ class IndexExercise extends Component {
             <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
           <ComponentList>
             {R.take(3, this.props.audiences).map(audience => {
-              let playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
+              let playersText = audience.audience_users_number + ' ' + this.props.intl.formatMessage({id: 'players'});
               return (
                 <MainListItem
                   rightIconButton={<AudiencePopover exerciseId={this.props.exerciseId} audience={audience}/>}
@@ -479,7 +479,7 @@ class IndexExercise extends Component {
             actions={audiencesActions}>
             <ComponentList>
               {this.props.audiences.map(audience => {
-                let playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
+                let playersText = audience.audience_users_number + ' ' + this.props.intl.formatMessage({id: 'players'});
                 return (
                   <MainSmallListItem
                     rightIconButton={<AudiencePopover exerciseId={this.props.exerciseId} audience={audience}/>}

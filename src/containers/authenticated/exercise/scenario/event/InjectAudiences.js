@@ -59,7 +59,7 @@ class InjectAudiences extends Component {
   }
 
   render() {
-    //region filter audience by active keyword
+    //region filter audiences by active keyword
     const keyword = this.state.searchTerm
     let filterByKeyword = n => keyword === '' || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     let filteredAudiences = R.filter(filterByKeyword, this.props.audiences)

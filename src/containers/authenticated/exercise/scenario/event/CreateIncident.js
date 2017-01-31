@@ -99,7 +99,7 @@ class CreateIncident extends Component {
 
     return (
       <div>
-        <AppBar title="Incidents"
+        <AppBar title={<T>Incidents</T>}
                 showMenuIconButton={false}
                 iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
                                                       onClick={this.handleOpenCreate.bind(this)}/>}/>

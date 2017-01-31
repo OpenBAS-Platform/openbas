@@ -1,4 +1,3 @@
-import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema'
 import {getReferential, fileDownload, putReferential, postReferential, delReferential} from '../utils/Action'
 
@@ -28,8 +27,4 @@ export const addAudience = (exerciseId, data) => (dispatch) => {
 export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/audiences/' + audienceId
   return delReferential(uri, 'audiences', audienceId)(dispatch)
-}
-
-export const selectAudience = (exercise_id, audience_id) => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_SELECT_AUDIENCE, payload: {exercise_id, audience_id}})
 }

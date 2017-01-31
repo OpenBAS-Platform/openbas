@@ -18,6 +18,7 @@ export const entitiesInitializer =
       dryruns: Immutable({}),
       dryinjects: Immutable({}),
       audiences: Immutable({}),
+      subaudiences: Immutable({}),
       events: Immutable({}),
       incidents: Immutable({}),
       incident_types: Immutable({}),

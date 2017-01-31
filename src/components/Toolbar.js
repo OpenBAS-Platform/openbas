@@ -20,6 +20,13 @@ const toolbarStyle = {
     right: 320,
     zIndex: '5000',
     backgroundColor: 'none',
+  },
+  [ Constants.TOOLBAR_TYPE_AUDIENCE ]: {
+    position: 'fixed',
+    top: 0,
+    right: 320,
+    zIndex: '5000',
+    backgroundColor: 'none',
   }
 }
 

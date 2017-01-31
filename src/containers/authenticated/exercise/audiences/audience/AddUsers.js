@@ -1,17 +1,17 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
-import {i18nRegister} from '../../../../utils/Messages'
-import * as Constants from '../../../../constants/ComponentTypes'
-import {updateAudience} from '../../../../actions/Audience'
-import {fetchUsers} from '../../../../actions/User'
-import {DialogTitleElement} from '../../../../components/Dialog'
-import {Chip} from '../../../../components/Chip'
-import {Avatar} from '../../../../components/Avatar'
-import {List} from '../../../../components/List'
-import {MainSmallListItem} from '../../../../components/list/ListItem'
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button'
-import {SimpleTextField} from '../../../../components/SimpleTextField'
+import {i18nRegister} from '../../../../../utils/Messages'
+import * as Constants from '../../../../../constants/ComponentTypes'
+import {updateSubaudience} from '../../../../../actions/Subaudience'
+import {fetchUsers} from '../../../../../actions/User'
+import {DialogTitleElement} from '../../../../../components/Dialog'
+import {Chip} from '../../../../../components/Chip'
+import {Avatar} from '../../../../../components/Avatar'
+import {List} from '../../../../../components/List'
+import {MainSmallListItem} from '../../../../../components/list/ListItem'
+import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button'
+import {SimpleTextField} from '../../../../../components/SimpleTextField'
 import CreateUser from './CreateUser'
 
 const styles = {
@@ -57,7 +57,7 @@ class AddUsers extends Component {
   }
 
   addUser(user) {
-    if( !this.props.audienceUsersIds.includes(user.user_id) && !this.state.users.includes(user) ) {
+    if( !this.props.subaudienceUsersIds.includes(user.user_id) && !this.state.users.includes(user) ) {
       this.setState({users: R.append(user, this.state.users)})
     }
   }
@@ -69,9 +69,9 @@ class AddUsers extends Component {
   submitAddUsers() {
     let usersList = R.pipe(
       R.map(u => u.user_id),
-      R.concat(this.props.audienceUsersIds)
+      R.concat(this.props.subaudienceUsersIds)
     )(this.state.users)
-    this.props.updateAudience(this.props.exerciseId, this.props.audienceId, {audience_users: usersList})
+    this.props.updateSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudienceId, {subaudience_users: usersList})
     this.handleCloseAddUsers()
   }
 
@@ -122,7 +122,7 @@ class AddUsers extends Component {
             <List>
               {filteredUsers.map(user => {
                 let disabled = R.find(u => u.user_id === user.user_id, this.state.users) !== undefined
-                  || this.props.audienceUsersIds.includes(user.user_id)
+                  || this.props.subaudienceUsersIds.includes(user.user_id)
                 let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
                 let organizationName = R.propOr('-', 'organization_name', user_organization)
                 return (
@@ -153,11 +153,12 @@ class AddUsers extends Component {
 AddUsers.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
+  subaudienceId: PropTypes.string,
   fetchUsers: PropTypes.func,
-  updateAudience: PropTypes.func,
+  updateSubaudience: PropTypes.func,
   users: PropTypes.object,
   organizations: PropTypes.object,
-  audienceUsersIds: PropTypes.array
+  subaudienceUsersIds: PropTypes.array
 }
 
 const select = (state) => {
@@ -167,4 +168,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchUsers, updateAudience})(AddUsers)
+export default connect(select, {fetchUsers, updateSubaudience})(AddUsers)

@@ -36,7 +36,8 @@ import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
 import IndexExerciseObjectives from './containers/authenticated/exercise/objective/Index'
-import IndexExerciseAudience from './containers/authenticated/exercise/audience/Index'
+import IndexExerciseAudiences from './containers/authenticated/exercise/audiences/Index'
+import IndexExerciseAudiencesAudience from './containers/authenticated/exercise/audiences/audience/Index'
 import IndexExerciseScenario from './containers/authenticated/exercise/scenario/Index'
 import IndexExerciseScenarioEvent from './containers/authenticated/exercise/scenario/event/Index'
 import IndexExerciseExecution from './containers/authenticated/exercise/execution/Index'
@@ -203,7 +204,8 @@ class App extends Component {
                   <Route path='objectives' component={IndexExerciseObjectives}/>
                   <Route path='scenario' component={IndexExerciseScenario}/>
                   <Route path='scenario/:eventId' component={IndexExerciseScenarioEvent}/>
-                  <Route path='audience' component={IndexExerciseAudience}/>
+                  <Route path='audiences' component={IndexExerciseAudiences}/>
+                  <Route path='audiences/:audienceId' component={IndexExerciseAudiencesAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
                   <Route path='settings' component={IndexExerciseSettings}/>
                   <Route path='profile' component={IndexUserProfile}/>

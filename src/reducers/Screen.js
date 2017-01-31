@@ -23,8 +23,8 @@ const screen = (state = Immutable({}), action) => {
       return state.set('saved', false)
     }
 
-    case Constants.APPLICATION_SELECT_AUDIENCE: {
-      return state.setIn(['exercise', action.payload.exercise_id, 'current_audience'], action.payload.audience_id)
+    case Constants.APPLICATION_SELECT_SUBAUDIENCE: {
+      return state.setIn(['exercise', action.payload.exercise_id, 'audience', action.payload.audience_id, 'current_subaudience'], action.payload.subaudience_id)
     }
 
     case Constants.APPLICATION_SELECT_INCIDENT: {

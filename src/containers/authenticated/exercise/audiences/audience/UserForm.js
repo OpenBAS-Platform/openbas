@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
-import {FormField} from '../../../../components/Field'
-import {AutoCompleteField} from '../../../../components/AutoComplete'
+import {FormField} from '../../../../../components/Field'
+import {AutoCompleteField} from '../../../../../components/AutoComplete'
 import AutoComplete from 'material-ui/AutoComplete'
-import {i18nRegister} from '../../../../utils/Messages'
+import {i18nRegister} from '../../../../../utils/Messages'
 
 i18nRegister({
   fr: {

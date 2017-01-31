@@ -17,7 +17,7 @@ i18nRegister({
     'Checks': 'Vérifications',
     'Objectives': 'Objectifs',
     'Scenario': 'Scénario',
-    'Audience': 'Audience',
+    'Audiences': 'Audiences',
     'Settings': 'Paramètres',
   }
 })
@@ -70,9 +70,9 @@ class LeftBar extends Component {
                         label="Scenario"
                         leftIcon={<Icon name={Constants.ICON_NAME_LOCAL_MOVIES}/>}/>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
-                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/audience'}
-                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/audience'}
-                        label="Audience"
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/audiences'}
+                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/audiences'}
+                        label="Audiences"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
                         active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}

@@ -51,6 +51,9 @@ export const arrayOfDryinjects = new schema.Array(dryinject)
 export const audience = new schema.Entity('audiences', {}, {idAttribute: 'audience_id'})
 export const arrayOfAudiences = new schema.Array(audience)
 
+export const subaudience = new schema.Entity('subaudiences', {}, {idAttribute: 'subaudience_id'})
+export const arrayOfSubaudiences = new schema.Array(subaudience)
+
 export const event = new schema.Entity('events', {}, {idAttribute: 'event_id'})
 export const arrayOfEvents = new schema.Array(event)
 

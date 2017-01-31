@@ -1,6 +1,6 @@
 import React, {PropTypes, Component} from 'react'
 import R from 'ramda'
-import Theme from '../../../../components/Theme'
+import Theme from '../../../../../components/Theme'
 
 const styles = {
   'container': {

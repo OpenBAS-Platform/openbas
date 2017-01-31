@@ -1,18 +1,18 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
-import * as Constants from '../../../../constants/ComponentTypes'
-import {Popover} from '../../../../components/Popover'
-import {Menu} from '../../../../components/Menu'
-import {Dialog} from '../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../components/Button'
-import {Icon} from '../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from '../../../../components/menu/MenuItem'
-import Theme from '../../../../components/Theme'
-import {updateUser} from '../../../../actions/User'
-import {updateAudience} from '../../../../actions/Audience'
+import {T} from '../../../../../components/I18n'
+import {i18nRegister} from '../../../../../utils/Messages'
+import * as Constants from '../../../../../constants/ComponentTypes'
+import {Popover} from '../../../../../components/Popover'
+import {Menu} from '../../../../../components/Menu'
+import {Dialog} from '../../../../../components/Dialog'
+import {IconButton, FlatButton} from '../../../../../components/Button'
+import {Icon} from '../../../../../components/Icon'
+import {MenuItemLink, MenuItemButton} from '../../../../../components/menu/MenuItem'
+import Theme from '../../../../../components/Theme'
+import {updateUser} from '../../../../../actions/User'
+import {updateSubaudience} from '../../../../../actions/Subaudience'
 import UserForm from './UserForm'
 
 const style = {
@@ -23,7 +23,7 @@ const style = {
 
 i18nRegister({
   fr: {
-    'Do you want to remove the user from this audience?': 'Souhaitez-vous supprimer l\'utilisateur de cette audience ?',
+    'Do you want to remove the user from this sub-audience?': 'Souhaitez-vous supprimer l\'utilisateur de cette sous-audience ?',
     'Update the user': 'Modifier l\'utilisateur',
     'Update the profile': 'Modifier le profil de l\'utilisateur',
     'Profile': 'Profil'
@@ -77,7 +77,7 @@ class UserPopover extends Component {
       R.filter(a => a.user_id !== this.props.user.user_id),
       R.map(u => u.user_id)
     )(this.props.audience.audience_users)
-    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {audience_users: user_ids})
+    this.props.updateSubaudience(this.props.exerciseId, this.props.audience.audience_id, this.props.subaudience.subaudience_id, {subaudience_users: user_ids})
     this.handleCloseDelete()
   }
 
@@ -109,7 +109,7 @@ class UserPopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!this.props.audience.audience_enabled)}/>
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!this.props.audience.audience_enabled || !this.props.subaudience.subaudience_enabled)}/>
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
@@ -121,7 +121,7 @@ class UserPopover extends Component {
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)}
                 actions={deleteActions}>
-          <T>Do you want to remove the user from this audience?</T>
+          <T>Do you want to remove the user from this sub-audience?</T>
         </Dialog>
         <Dialog title="Update the user" modal={false} open={this.state.openEdit}
                 autoScrollBodyContent={true}
@@ -147,10 +147,11 @@ UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   user: PropTypes.object,
   updateUser: PropTypes.func,
-  updateAudience: PropTypes.func,
+  updateSubaudience: PropTypes.func,
   audience: PropTypes.object,
+  subaudience: PropTypes.object,
   organizations: PropTypes.object,
   children: PropTypes.node
 }
 
-export default connect(select, {updateUser, updateAudience})(UserPopover)
+export default connect(select, {updateUser, updateSubaudience})(UserPopover)

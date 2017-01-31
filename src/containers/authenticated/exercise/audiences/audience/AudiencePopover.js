@@ -1,32 +1,30 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
-import * as Constants from '../../../../constants/ComponentTypes'
+import {T} from '../../../../../components/I18n'
+import {i18nRegister} from '../../../../../utils/Messages'
+import * as Constants from '../../../../../constants/ComponentTypes'
 import R from 'ramda'
-import {Popover} from '../../../../components/Popover'
-import {Menu} from '../../../../components/Menu'
-import {Dialog} from '../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../components/Button'
-import {Icon} from '../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import Theme from '../../../../components/Theme'
-import {addComcheck} from '../../../../actions/Comcheck'
-import {updateAudience, selectAudience, downloadExportAudience, deleteAudience} from '../../../../actions/Audience'
+import {Popover} from '../../../../../components/Popover'
+import {Menu} from '../../../../../components/Menu'
+import {Dialog} from '../../../../../components/Dialog'
+import {IconButton, FlatButton} from '../../../../../components/Button'
+import {Icon} from '../../../../../components/Icon'
+import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
+import {addComcheck} from '../../../../../actions/Comcheck'
+import {updateAudience, selectAudience, downloadExportAudience, deleteAudience} from '../../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
-import ComcheckForm from '../check/ComcheckForm'
+import ComcheckForm from '../../check/ComcheckForm'
 import {injectIntl} from 'react-intl'
 
 const style = {
-  float: 'left',
-  marginTop: '-14px'
+  margin: '8px -30px 0 0'
 }
 
 i18nRegister({
   fr: {
     'Update the audience': 'Modifier l\'audience',
-    'Do you want to delete this audience?': 'Souhaitez-vous supprimer cette audience?',
-    'Launch a comcheck': 'Lancer un comcheck',
+    'Do you want to delete this audience?': 'Souhaitez-vous supprimer cette audience ?',
+    'Launch a comcheck': 'Lancer un test de communication',
     'Communication check': 'Test de communication',
     'Hello': 'Bonjour',
     'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:': 'Ceci est un test de communication avant le début de l\'exercice. Merci de cliquer sur le lien ci-dessous afin de confirmer que vous avez bien reçu ce message :',
@@ -143,14 +141,6 @@ class AudiencePopover extends Component {
     return this.props.intl.formatMessage({id})
   }
 
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor
-    } else {
-      return Theme.palette.textColor
-    }
-  }
-
   handleDownloadAudience() {
     this.props.downloadExportAudience(this.props.exerciseId, this.props.audience.audience_id)
     this.handlePopoverClose()
@@ -190,7 +180,7 @@ class AudiencePopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!audience_enabled)}/>
+          <Icon color="#ffffff" name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
