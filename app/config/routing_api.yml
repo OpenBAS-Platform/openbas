@@ -94,6 +94,10 @@ exercises_audiences_subaudiences_users:
     type:     rest
     resource: APIBundle\Controller\Exercise\Audience\Subaudience\UserController
 
+exercises_subaudiences:
+    type:     rest
+    resource: APIBundle\Controller\Exercise\SubaudienceController
+
 exercises_events:
     type:     rest
     resource: APIBundle\Controller\Exercise\EventController

@@ -44,6 +44,7 @@ class SubaudienceController extends Controller
         foreach( $subaudiences as &$subaudience) {
             $subaudience->setSubaudienceExercise($exercise->getExerciseId());
         }
+
         return $subaudiences;
     }
 

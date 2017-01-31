@@ -93,7 +93,7 @@ APIBundle\Entity\Audience:
 
 APIBundle\Entity\Subaudience:
     properties:
-        saudience_name:
+        subaudience_name:
             - NotBlank: ~
             - Type: string
 

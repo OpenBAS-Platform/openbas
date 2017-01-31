@@ -78,11 +78,12 @@ class AudienceController extends Controller
 
         $i = 0;
         foreach( $audiences as $audience ) {
-            $users = [];
+            $users = array();
             foreach( $audience->getAudienceSubaudiences() as $subaudience) {
-                $subaudienceUsers = $subaudience->getSubaudienceUsers();
-                foreach( $subaudienceUsers as &$user) {
+                $subaudienceUsers = array();
+                foreach( $subaudience->getSubaudienceUsers() as $user) {
                     $user->setUserSubaudience($subaudience->getSubaudienceName());
+                    $subaudienceUsers[] = $user;
                 }
                 $users = array_merge($users, $subaudienceUsers);
             }

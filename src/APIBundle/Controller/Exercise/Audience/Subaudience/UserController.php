@@ -15,19 +15,20 @@ use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use APIBundle\Entity\Exercise;
 use APIBundle\Entity\Audience;
+use APIBundle\Entity\Subaudience;
 use PHPExcel;
 
 class UserController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List users of an subaudience"
+     *    description="List users of a subaudience"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users")
+     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/subaudiences/{subaudience_id}/users")
      */
-    public function getExercisesAudiencesUsersAction(Request $request)
+    public function getExercisesAudiencesSubaudiencesUsersAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -46,7 +47,14 @@ class UserController extends Controller
             return $this->audienceNotFound();
         }
 
-        $users = $audience->getAudienceUsers();
+        $subaudience = $em->getRepository('APIBundle:Subaudience')->find($request->get('subaudience_id'));
+        /* @var $subaudience Subaudience */
+
+        if (empty($subaudience) || $subaudience->getSubaudienceAudience() != $audience) {
+            return $this->subaudienceNotFound();
+        }
+
+        $users = $subaudience->getSubaudienceUsers();
 
         foreach ($users as &$user) {
             $user->setUserGravatar();
@@ -57,12 +65,12 @@ class UserController extends Controller
 
     /**
      * @ApiDoc(
-     *    description="List users of an audience (xls)"
+     *    description="List users of a subaudience (xls)"
      * )
      *
-     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users.xlsx")
+     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/subaudiences/{subaudience_id}/users.xlsx")
      */
-    public function getExercisesAudiencesUsersXlsxAction(Request $request)
+    public function getExercisesAudiencesSubaudiencesUsersXlsxAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -81,14 +89,21 @@ class UserController extends Controller
             return $this->audienceNotFound();
         }
 
-        $users = $audience->getAudienceUsers();
+        $subaudience = $em->getRepository('APIBundle:Subaudience')->find($request->get('subaudience_id'));
+        /* @var $subaudience Subaudience */
+
+        if (empty($subaudience) || $subaudience->getSubaudienceAudience() != $audience) {
+            return $this->subaudienceNotFound();
+        }
+
+        $users = $subaudience->getSubaudienceUsers();
         $xlsUsers = $this->get('phpexcel')->createPHPExcelObject();
         /* @var $xlsInjects PHPExcel */
 
         $xlsUsers->getProperties()
             ->setCreator("OpenEx")
             ->setLastModifiedBy("OpenEx")
-            ->setTitle("[{$exercise->getExerciseName()}] [{$audience->getAudienceName()}] Users list");
+            ->setTitle("[" . $this->str_to_noaccent($exercise->getExerciseName()) . "] [" . $this->str_to_noaccent($audience->getAudienceName()) . "] Users list");
 
         $sheet = $xlsUsers->getActiveSheet();
         $sheet->setTitle('Users');
@@ -108,11 +123,11 @@ class UserController extends Controller
             $sheet->setCellValue('A' . $i, $user->getUserFirstname());
             $sheet->setCellValue('B' . $i, $user->getUserLastname());
             $sheet->setCellValue('C' . $i, $user->getUserOrganization()->getOrganizationName());
-            $sheet->setCellValue('D' . $j, $user->getUserEmail());
-            $sheet->setCellValue('E' . $j, $user->getUserEmail2());
-            $sheet->setCellValue('F' . $j, $user->getUserPhone2());
-            $sheet->setCellValue('G' . $j, $user->getUserPhone());
-            $sheet->setCellValue('H' . $j, $user->getUserPhone3());
+            $sheet->setCellValue('D' . $i, $user->getUserEmail());
+            $sheet->setCellValue('E' . $i, $user->getUserEmail2());
+            $sheet->setCellValue('F' . $i, $user->getUserPhone2());
+            $sheet->setCellValue('G' . $i, $user->getUserPhone());
+            $sheet->setCellValue('H' . $i, $user->getUserPhone3());
             $i++;
         }
 
@@ -139,5 +154,31 @@ class UserController extends Controller
     private function audienceNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function subaudienceNotFound()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'Subaudience not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function str_to_noaccent($str)
+    {
+        $url = $str;
+        $url = preg_replace('#Ç#', 'C', $url);
+        $url = preg_replace('#ç#', 'c', $url);
+        $url = preg_replace('#è|é|ê|ë#', 'e', $url);
+        $url = preg_replace('#È|É|Ê|Ë#', 'E', $url);
+        $url = preg_replace('#à|á|â|ã|ä|å#', 'a', $url);
+        $url = preg_replace('#@|À|Á|Â|Ã|Ä|Å#', 'A', $url);
+        $url = preg_replace('#ì|í|î|ï#', 'i', $url);
+        $url = preg_replace('#Ì|Í|Î|Ï#', 'I', $url);
+        $url = preg_replace('#ð|ò|ó|ô|õ|ö#', 'o', $url);
+        $url = preg_replace('#Ò|Ó|Ô|Õ|Ö#', 'O', $url);
+        $url = preg_replace('#ù|ú|û|ü#', 'u', $url);
+        $url = preg_replace('#Ù|Ú|Û|Ü#', 'U', $url);
+        $url = preg_replace('#ý|ÿ#', 'y', $url);
+        $url = preg_replace('#Ý#', 'Y', $url);
+
+        return ($url);
     }
 }
