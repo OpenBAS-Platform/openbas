@@ -13,6 +13,7 @@ import {Icon} from '../../../../../components/Icon'
 import {FlatButton} from '../../../../../components/Button'
 import {SearchField} from '../../../../../components/SimpleTextField'
 import {fetchAudiences} from '../../../../../actions/Audience'
+import {fetchSubaudiences} from '../../../../../actions/Subaudience'
 import {fetchSubobjectives} from '../../../../../actions/Subobjective'
 import {fetchEvents} from '../../../../../actions/Event'
 import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
@@ -128,6 +129,7 @@ class Index extends Component {
   componentDidMount() {
     this.props.fetchSubobjectives(this.props.exerciseId)
     this.props.fetchAudiences(this.props.exerciseId)
+    this.props.fetchSubaudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidentTypes()
     this.props.fetchIncidents(this.props.exerciseId)
@@ -262,6 +264,7 @@ class Index extends Component {
               let inject_date = R.prop('inject_date', inject)
               let inject_type = R.propOr('-', 'inject_type', inject)
               let inject_audiences = R.propOr([], 'inject_audiences', inject)
+              let inject_subaudiences = R.propOr([], 'inject_subaudiences', inject)
               let inject_users_number = R.propOr('-', 'inject_users_number', inject)
               let inject_enabled = R.propOr(true, 'inject_enabled', inject)
               //Return the dom
@@ -277,7 +280,9 @@ class Index extends Component {
                     incidentId={incident.incident_id}
                     inject={inject}
                     injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
+                    injectSubaudiencesIds={inject_subaudiences.map(a => a.subaudience_id)}
                     audiences={this.props.audiences}
+                    subaudiences={this.props.subaudiences}
                     inject_types={this.props.inject_types}
                     incidents={this.props.allIncidents}
                   />
@@ -299,7 +304,7 @@ class Index extends Component {
             })}
           </List>
           <CreateInject exerciseId={exerciseId} eventId={eventId} incidentId={incident.incident_id}
-                        inject_types={this.props.inject_types} audiences={this.props.audiences}/>
+                        inject_types={this.props.inject_types} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
             <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
@@ -334,6 +339,7 @@ class Index extends Component {
 Index.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
+  subaudiences: PropTypes.array,
   eventId: PropTypes.string,
   event: PropTypes.object,
   incident_types: PropTypes.object,
@@ -344,6 +350,7 @@ Index.propTypes = {
   subobjectives: PropTypes.array,
   allIncidents: PropTypes.array,
   fetchAudiences: PropTypes.func,
+  fetchSubaudiences: PropTypes.func,
   fetchSubobjectives: PropTypes.func,
   fetchEvents: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
@@ -359,6 +366,15 @@ const filterAudiences = (audiences, exerciseId) => {
     R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
   )
   return audiencesFilterAndSorting(audiences)
+}
+
+const filterSubaudiences = (subaudiences, exerciseId) => {
+  let subaudiencesFilterAndSorting = R.pipe(
+    R.values,
+    R.filter(n => n.subaudience_exercise === exerciseId),
+    R.sort((a, b) => a.subaudience_name.localeCompare(b.subaudience_name))
+  )
+  return subaudiencesFilterAndSorting(subaudiences)
 }
 
 const filterSubobjectives = (subobjectives, exerciseId) => {
@@ -383,6 +399,7 @@ const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let eventId = ownProps.params.eventId
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
+  let subaudiences = filterSubaudiences(state.referential.entities.subaudiences, exerciseId)
   let subobjectives = filterSubobjectives(state.referential.entities.subobjectives, exerciseId)
   let event = R.prop(eventId, state.referential.entities.events)
   let incidents = filterIncidents(state.referential.entities.incidents, eventId)
@@ -399,6 +416,7 @@ const select = (state, ownProps) => {
     incident,
     incidents,
     audiences,
+    subaudiences,
     subobjectives,
     injects: state.referential.entities.injects,
     incident_types: state.referential.entities.incident_types,
@@ -409,6 +427,7 @@ const select = (state, ownProps) => {
 
 export default connect(select, {
   fetchAudiences,
+  fetchSubaudiences,
   fetchSubobjectives,
   fetchEvents,
   fetchIncidentTypes,

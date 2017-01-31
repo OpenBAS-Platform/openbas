@@ -110,7 +110,6 @@ class Index extends Component {
       old_date: this.state.initialStartDate,
       new_date: this.state.newStartDate
     }
-    console.log(data)
     this.props.shiftAllInjects(this.props.id, data)
     this.handleCloseShift()
   }
@@ -142,7 +141,6 @@ class Index extends Component {
     )
 
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
-    console.log(informationValues)
     const image = R.pathOr(null, ['exercise_image', 'file_url'], exercise)
 
     return (

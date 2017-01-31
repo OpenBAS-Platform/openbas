@@ -71,6 +71,12 @@ class CreateInject extends Component {
     this.setState({injectData: injectData})
   }
 
+  onSubaudiencesChange(data) {
+    let injectData = this.state.injectData
+    injectData.inject_subaudiences = data
+    this.setState({injectData: injectData})
+  }
+
   handleNext() {
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
@@ -131,9 +137,12 @@ class CreateInject extends Component {
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
-            onChange={this.onAudiencesChange.bind(this)}
+            onChangeAudiences={this.onAudiencesChange.bind(this)}
+            onChangeSubaudiences={this.onSubaudiencesChange.bind(this)}
             audiences={this.props.audiences}
+            subaudiences={this.props.subaudiences}
             injectAudiencesIds={[]}
+            injectSubaudiencesIds={[]}
           />
         )
       default:
@@ -194,6 +203,7 @@ class CreateInject extends Component {
 CreateInject.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
+  subaudiences: PropTypes.array,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
   inject_types: PropTypes.object,

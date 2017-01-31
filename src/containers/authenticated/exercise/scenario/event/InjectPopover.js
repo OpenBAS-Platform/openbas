@@ -114,6 +114,12 @@ class InjectPopover extends Component {
     this.setState({injectData: injectData})
   }
 
+  onSubaudiencesChange(data) {
+    let injectData = this.state.injectData
+    injectData.inject_subaudiences = data
+    this.setState({injectData: injectData})
+  }
+
   submitFormEdit() {
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
@@ -204,6 +210,7 @@ class InjectPopover extends Component {
   onCopySubmit(data) {
     let incident = R.find(i => i.incident_id === data.incident_id)(this.props.incidents)
     let audiencesList = R.map(a => a.audience_id, this.props.inject.inject_audiences)
+    let subaudiencesList = R.map(a => a.audience_id, this.props.inject.inject_subaudiences)
     let new_inject = R.pipe(
       R.dissoc('inject_id'),
       R.dissoc('inject_event'),
@@ -213,7 +220,8 @@ class InjectPopover extends Component {
       R.dissoc('inject_user'),
       R.dissoc('inject_users_number'),
       R.assoc('inject_title', this.props.inject.inject_title + ' (copy)'),
-      R.assoc('inject_audiences', audiencesList)
+      R.assoc('inject_audiences', audiencesList),
+      R.assoc('inject_subaudiences', subaudiencesList)
     )(this.props.inject)
 
     this.props.addInject(this.props.exerciseId, incident.incident_event.event_id, data.incident_id, new_inject).then(() => {
@@ -260,7 +268,7 @@ class InjectPopover extends Component {
             type={this.state.type ? this.state.type : this.props.inject.inject_type}
             onSubmit={this.onContentSubmit.bind(this)}
             onSubmitSuccess={this.selectAudiences.bind(this)}
-            onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
+            onContentAttacshmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
             attachments={this.state.injectAttachments}
           />
@@ -272,10 +280,13 @@ class InjectPopover extends Component {
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
-            onChange={this.onAudiencesChange.bind(this)}
+            onChangeAudiences={this.onAudiencesChange.bind(this)}
+            onChangeSubaudiences={this.onSubaudiencesChange.bind(this)}
             injectId={this.props.inject.inject_id}
             injectAudiencesIds={this.props.injectAudiencesIds}
+            injectSubaudiencesIds={this.props.injectSubaudiencesIds}
             audiences={this.props.audiences}
+            subaudiences={this.props.subaudiences}
           />
         )
       default:
@@ -413,10 +424,12 @@ class InjectPopover extends Component {
 InjectPopover.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
+  subaudiences: PropTypes.array,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
   inject: PropTypes.object,
   injectAudiencesIds: PropTypes.array,
+  injectSubaudiencesIds: PropTypes.array,
   fetchIncident: PropTypes.func,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,

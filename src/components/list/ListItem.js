@@ -21,13 +21,6 @@ const styles = {
     borderBottom: '1px solid #E0E0E0',
     backgroundColor: '#F0F0F0'
   },
-  'mainsmallitem': {
-    borderBottom: '1px solid #E0E0E0'
-  },
-  'mainsmallitemdisabled': {
-    borderBottom: '1px solid #E0E0E0',
-    backgroundColor: '#F0F0F0'
-  },
   'secondaryitem': {
     marginLeft: '30px',
     borderBottom: '1px solid #E0E0E0'
@@ -43,6 +36,22 @@ const styles = {
   },
   'tertiaryitemdisabled': {
     marginLeft: '60px',
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0'
+  },
+  'mainsmallitem': {
+    borderBottom: '1px solid #E0E0E0'
+  },
+  'mainsmallitemdisabled': {
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0'
+  },
+  'secondarysmallitem': {
+    marginLeft: '15px',
+    borderBottom: '1px solid #E0E0E0'
+  },
+  'secondarysmallitemdisabled': {
+    marginLeft: '15px',
     borderBottom: '1px solid #E0E0E0',
     backgroundColor: '#F0F0F0'
   }
@@ -275,7 +284,7 @@ TertiaryListItem.propTypes = {
   nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
 
-export const MainSmallListItem = (props) => (
+export const SecondarySmallListItem = (props) => (
   <MUIListItem
     primaryText={props.primaryText}
     secondaryText={props.secondaryText}
@@ -283,6 +292,32 @@ export const MainSmallListItem = (props) => (
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onClick={props.onClick}
+    disabled={props.disabled}
+    style={props.disabled ? styles.secondarysmallitemdisabled : styles.secondarysmallitem}
+    rightIconButton={props.rightIconButton}/>
+)
+
+SecondarySmallListItem.propTypes = {
+  primaryText: PropTypes.node,
+  secondaryText: PropTypes.node,
+  leftAvatar: PropTypes.element,
+  leftIcon: PropTypes.element,
+  rightIcon: PropTypes.element,
+  onClick: PropTypes.func,
+  disabled: PropTypes.bool,
+  rightIconButton: PropTypes.node,
+}
+
+export const MainSmallListItem = (props) => (
+  <MUIListItem
+    primaryText={props.primaryText}
+    secondaryText={props.secondaryText}
+    leftAvatar={props.leftAvatar}
+    leftIcon={props.leftIcon}
+    rightIcon={props.rightIcon}
+    nestedItems={props.nestedItems}
+    onClick={props.onClick}
+    initiallyOpen={true}
     disabled={props.disabled}
     style={props.disabled ? styles.mainsmallitemdisabled : styles.mainsmallitem}
     rightIconButton={props.rightIconButton}/>
@@ -296,7 +331,8 @@ MainSmallListItem.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
-  rightIconButton: PropTypes.node
+  rightIconButton: PropTypes.node,
+  nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
 
 export const HeaderItem = (props) => (

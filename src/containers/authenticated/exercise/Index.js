@@ -16,6 +16,7 @@ import {Avatar} from '../../../components/Avatar'
 import {fetchObjectives} from '../../../actions/Objective'
 import {fetchSubobjectives} from '../../../actions/Subobjective'
 import {fetchAudiences} from '../../../actions/Audience'
+import {fetchSubaudiences} from '../../../actions/Subaudience'
 import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
 import {fetchAllInjects} from '../../../actions/Inject'
@@ -150,6 +151,7 @@ class IndexExercise extends Component {
     this.props.fetchObjectives(this.props.exerciseId)
     this.props.fetchSubobjectives(this.props.exerciseId)
     this.props.fetchAudiences(this.props.exerciseId)
+    this.props.fetchSubaudiences(this.props.exerciseId)
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
     this.props.fetchAllInjects(this.props.exerciseId)
@@ -598,6 +600,7 @@ IndexExercise.propTypes = {
   fetchObjectives: PropTypes.func,
   fetchSubobjectives: PropTypes.func,
   fetchAudiences: PropTypes.func,
+  fetchSubaudiences: PropTypes.func,
   fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
   fetchAllInjects: PropTypes.func,
@@ -654,6 +657,7 @@ export default connect(select, {
   fetchObjectives,
   fetchSubobjectives,
   fetchAudiences,
+  fetchSubaudiences,
   fetchEvents,
   fetchIncidents,
   fetchIncidentTypes,

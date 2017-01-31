@@ -6,7 +6,7 @@ import * as Constants from '../../../../../constants/ComponentTypes'
 import {Chip} from '../../../../../components/Chip'
 import {Avatar} from '../../../../../components/Avatar'
 import {List} from '../../../../../components/List'
-import {MainSmallListItem} from '../../../../../components/list/ListItem'
+import {MainSmallListItem, SecondarySmallListItem} from '../../../../../components/list/ListItem'
 import {SimpleTextField} from '../../../../../components/SimpleTextField'
 import {Icon} from '../../../../../components/Icon'
 
@@ -33,7 +33,7 @@ i18nRegister({
 class InjectAudiences extends Component {
   constructor(props) {
     super(props);
-    this.state = {audiencesIds: this.props.injectAudiencesIds, searchTerm: ''}
+    this.state = {audiencesIds: this.props.injectAudiencesIds, subaudiencesIds: this.props.injectSubaudiencesIds, searchTerm: ''}
   }
 
   handleSearchAudiences(event, value) {
@@ -54,15 +54,33 @@ class InjectAudiences extends Component {
     this.submitAudiences(audiencesIds)
   }
 
+  addSubaudience(subaudienceId) {
+    if (!this.state.subaudiencesIds.includes(subaudienceId)) {
+      let subaudiencesIds = R.append(subaudienceId, this.state.subaudiencesIds)
+      this.setState({subaudiencesIds: subaudiencesIds})
+      this.submitSubaudiences(subaudiencesIds)
+    }
+  }
+
+  removeSubaudience(subaudienceId) {
+    let subaudiencesIds = R.filter(a => a !== subaudienceId, this.state.subaudiencesIds)
+    this.setState({subaudiencesIds: subaudiencesIds})
+    this.submitSubaudiences(subaudiencesIds)
+  }
+
   submitAudiences(audiences_ids) {
-    this.props.onChange(audiences_ids)
+    this.props.onChangeAudiences(audiences_ids)
+  }
+
+  submitSubaudiences(subaudiences_ids) {
+    this.props.onChangeSubaudiences(subaudiences_ids)
   }
 
   render() {
     //region filter audiences by active keyword
     const keyword = this.state.searchTerm
-    let filterByKeyword = n => keyword === '' || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    let filteredAudiences = R.filter(filterByKeyword, this.props.audiences)
+    let filterAudiencesByKeyword = n => keyword === '' || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    let filteredAudiences = R.filter(filterAudiencesByKeyword, this.props.audiences)
     //endregion
 
     return (
@@ -82,6 +100,20 @@ class InjectAudiences extends Component {
               </Chip>
             )
           })}
+          {this.state.subaudiencesIds.map(subaudienceId => {
+            let subaudience = R.find(a => a.subaudience_id === subaudienceId)(this.props.subaudiences)
+            let audience = R.find(a => a.audience_id === subaudience.subaudience_audience.audience_id)(this.props.audiences)
+            let audience_name = R.propOr('-', 'audience_name', audience)
+            let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
+            return (
+              <Chip key={subaudienceId} onRequestDelete={this.removeSubaudience.bind(this, subaudienceId)}
+                    type={Constants.CHIP_TYPE_LIST}>
+                <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
+                        type={Constants.AVATAR_TYPE_CHIP}/>
+                [{audience_name}] {subaudience_name}
+              </Chip>
+            )
+          })}
           <div className="clearfix"></div>
         </div>
         <div>
@@ -89,6 +121,26 @@ class InjectAudiences extends Component {
           <List>
             {filteredAudiences.map(audience => {
               let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined
+              let nestedItems = audience.audience_subaudiences.map(data => {
+                  let subaaudienceDisabled = R.find(subaudience_id => subaudience_id === data.subaudience_id, this.state.subaudiencesIds) !== undefined
+                  let subaudience = R.find(a => a.subaudience_id === data.subaudience_id)(this.props.subaudiences)
+                  let subaudience_id = R.propOr(data.subaudience_id, 'subaudience_id', subaudience)
+                  let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
+
+                  return <SecondarySmallListItem
+                    key={subaudience_id}
+                    disabled={subaaudienceDisabled}
+                    onClick={this.addSubaudience.bind(this, subaudience.subaudience_id)}
+                    primaryText={
+                      <div>
+                        <div style={styles.name}>{subaudience_name}</div>
+                        <div className="clearfix"></div>
+                      </div>
+                    }
+                    leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}/>
+                }
+              )
+
               return (
                 <MainSmallListItem
                   key={audience.audience_id}
@@ -101,6 +153,7 @@ class InjectAudiences extends Component {
                     </div>
                   }
                   leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}
+                  nestedItems={nestedItems}
                 />
               )
             })}
@@ -115,9 +168,12 @@ InjectAudiences.propTypes = {
   exerciseId: PropTypes.string,
   eventId: PropTypes.string,
   incidentId: PropTypes.string,
-  onChange: PropTypes.func,
+  onChangeAudiences: PropTypes.func,
+  onChangeSubaudiences: PropTypes.func,
   injectAudiencesIds: PropTypes.array,
+  injectSubaudiencesIds: PropTypes.array,
   audiences: PropTypes.array,
+  subaudiences: PropTypes.array
 }
 
 export default InjectAudiences
