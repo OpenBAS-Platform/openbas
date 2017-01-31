@@ -24,16 +24,6 @@ class Audience
     protected $audience_name;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User", inversedBy="user_audiences")
-     * @ORM\JoinTable(name="users_audiences",
-     *      joinColumns={@ORM\JoinColumn(name="audience_id", referencedColumnName="audience_id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="user_id", onDelete="CASCADE")}
-     *      )
-     * @var User[]
-     */
-    protected $audience_users;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_audiences")
      * @ORM\JoinColumn(name="audience_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
@@ -59,7 +49,6 @@ class Audience
 
     public function __construct()
     {
-        $this->audience_users = new ArrayCollection();
         $this->audience_injects = new ArrayCollection();
         $this->audience_subaudiences = new ArrayCollection();
     }
@@ -83,17 +72,6 @@ class Audience
     public function setAudienceName($name)
     {
         $this->audience_name = $name;
-        return $this;
-    }
-
-    public function getAudienceUsers()
-    {
-        return $this->audience_users;
-    }
-
-    public function setAudienceUsers($users)
-    {
-        $this->audience_users = $users;
         return $this;
     }
 

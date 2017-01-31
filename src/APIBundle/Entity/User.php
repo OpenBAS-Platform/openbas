@@ -81,12 +81,6 @@ class User implements UserInterface
     protected $user_groups;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Audience", mappedBy="audience_users")
-     * @var Audience[]
-     */
-    protected $user_audiences;
-
-    /**
      * @ORM\ManyToMany(targetEntity="Subaudience", mappedBy="subaudience_users")
      * @var Audience[]
      */
@@ -114,11 +108,11 @@ class User implements UserInterface
     protected $user_lang;
 
     protected $user_gravatar;
+    protected $user_subaudience;
 
     public function __construct()
     {
         $this->user_groups = new ArrayCollection();
-        $this->user_audiences = new ArrayCollection();
         $this->user_subaudiences = new ArrayCollection();
         $this->user_comchecks = new ArrayCollection();
         $this->user_injects = new ArrayCollection();
@@ -267,17 +261,6 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getUserAudiences()
-    {
-        return $this->user_audiences;
-    }
-
-    public function setUserAudiences($audiences)
-    {
-        $this->user_audiences = $audiences;
-        return $this;
-    }
-
     public function getUserSubaudiences()
     {
         return $this->user_subaudiences;
@@ -339,6 +322,17 @@ class User implements UserInterface
 
     public function setUserGravatar() {
         $this->user_gravatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user_email))) . '?d=mm';
+        return $this;
+    }
+
+    public function getUserSubaudience()
+    {
+        return $this->user_subaudience;
+    }
+
+    public function setUserSubaudience($subaudience)
+    {
+        $this->user_subaudience = $subaudience;
         return $this;
     }
 

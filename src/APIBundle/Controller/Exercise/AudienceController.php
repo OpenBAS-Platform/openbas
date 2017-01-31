@@ -74,7 +74,14 @@ class AudienceController extends Controller
 
         $i = 0;
         foreach( $audiences as $audience ) {
-            $users = $audience->getAudienceUsers();
+            $users = [];
+            foreach( $audience->getAudienceSubaudiences() as $subaudience) {
+                $subaudienceUsers = $subaudience->getSubaudienceUsers();
+                foreach( $subaudienceUsers as &$user) {
+                    $user->setUserSubaudience($subaudience->getSubaudienceName());
+                }
+                $users = array_merge($users, $subaudienceUsers);
+            }
 
             if( $i !== 0 ) {
                 $sheet = $xlsUsers->createSheet($i);
@@ -82,26 +89,28 @@ class AudienceController extends Controller
                 $sheet = $xlsUsers->getActiveSheet();
             }
             $sheet->setTitle(substr($audience->getAudienceName(), 0, 30));
-            $sheet->setCellValue('A1', 'Firstname');
-            $sheet->setCellValue('B1', 'Lastname');
-            $sheet->setCellValue('C1', 'Organization');
-            $sheet->setCellValue('D1', 'Email');
-            $sheet->setCellValue('E1', 'Email (secured)');
-            $sheet->setCellValue('F1', 'Phone number (fix)');
-            $sheet->setCellValue('G1', 'Phone number (mobile)');
-            $sheet->setCellValue('H1', 'Phone number (secured)');
+            $sheet->setCellValue('A1', 'Subaudience');
+            $sheet->setCellValue('B1', 'Firstname');
+            $sheet->setCellValue('C1', 'Lastname');
+            $sheet->setCellValue('D1', 'Organization');
+            $sheet->setCellValue('E1', 'Email');
+            $sheet->setCellValue('F1', 'Email (secured)');
+            $sheet->setCellValue('G1', 'Phone number (fix)');
+            $sheet->setCellValue('H1', 'Phone number (mobile)');
+            $sheet->setCellValue('I1', 'Phone number (secured)');
 
             $j = 2;
             foreach ($users as $user) {
                 $user->setUserGravatar();
-                $sheet->setCellValue('A' . $j, $user->getUserFirstname());
-                $sheet->setCellValue('B' . $j, $user->getUserLastname());
-                $sheet->setCellValue('C' . $j, $user->getUserOrganization()->getOrganizationName());
-                $sheet->setCellValue('D' . $j, $user->getUserEmail());
-                $sheet->setCellValue('E' . $j, $user->getUserEmail2());
-                $sheet->setCellValue('F' . $j, $user->getUserPhone2());
-                $sheet->setCellValue('G' . $j, $user->getUserPhone());
-                $sheet->setCellValue('H' . $j, $user->getUserPhone3());
+                $sheet->setCellValue('A' . $j, $user->getUserSubaudience());
+                $sheet->setCellValue('B' . $j, $user->getUserFirstname());
+                $sheet->setCellValue('C' . $j, $user->getUserLastname());
+                $sheet->setCellValue('D' . $j, $user->getUserOrganization()->getOrganizationName());
+                $sheet->setCellValue('E' . $j, $user->getUserEmail());
+                $sheet->setCellValue('F' . $j, $user->getUserEmail2());
+                $sheet->setCellValue('G' . $j, $user->getUserPhone2());
+                $sheet->setCellValue('H' . $j, $user->getUserPhone());
+                $sheet->setCellValue('I' . $j, $user->getUserPhone3());
                 $j++;
             }
             $i++;

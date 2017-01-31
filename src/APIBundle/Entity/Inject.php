@@ -298,7 +298,6 @@ class Inject
     {
         $this->inject_users_number = 0;
         foreach ($this->inject_audiences as $audience) {
-            $this->inject_users_number += count($audience->getAudienceUsers());
             foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
                 $this->inject_users_number += count($subaudience->getSubaudienceUsers());
             }

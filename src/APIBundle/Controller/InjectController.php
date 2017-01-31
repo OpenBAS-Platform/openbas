@@ -133,24 +133,6 @@ class InjectController extends Controller
             foreach ($inject->getInjectAudiences() as $audience) {
                 /* @var $audience Audience */
                 if ($audience->getAudienceEnabled() == true) {
-                    // list all users of the audience
-                    foreach ($audience->getAudienceUsers() as $user) {
-                        if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
-                            $userData = array();
-                            $userData['user_firstname'] = $user->getUserFirstname();
-                            $userData['user_lastname'] = $user->getUserLastname();
-                            $userData['user_email'] = $user->getUserEmail();
-                            $userData['user_email2'] = $user->getUserEmail2();
-                            $userData['user_phone'] = $user->getUserPhone();
-                            $userData['user_phone2'] = $user->getUserPhone2();
-                            $userData['user_phone3'] = $user->getUserPhone3();
-                            $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
-                            $userData['user_organization'] = array();
-                            $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
-                            $data['data']['users'][] = $userData;
-                        }
-                    }
-
                     // list subaudiences of the audience
                     foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
                         if ($subaudience->getSubaudienceEnabled() == true) {

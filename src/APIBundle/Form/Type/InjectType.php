@@ -19,6 +19,7 @@ class InjectType extends AbstractType
             'input' => 'datetime'
         ));
         $builder->add('inject_audiences');
+        $builder->add('inject_subaudiences');
         $builder->add('inject_type');
         $builder->add('inject_enabled');
     }
