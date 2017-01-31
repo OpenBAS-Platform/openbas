@@ -12,3 +12,5 @@ APIBundle\Entity\Audience:
             groups: ['audience']
         audience_subaudiences:
             groups: ['audience']
+        audience_users_number:
+            groups: ['audience']

@@ -38,6 +38,10 @@ class AudienceController extends Controller
 
         $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise]);
 
+        foreach( $audiences as &$audience ) {
+            $audience->computeUsersNumber();
+        }
+
         return $audiences;
     }
 
@@ -158,6 +162,7 @@ class AudienceController extends Controller
             return $this->audienceNotFound();
         }
 
+        $audience->computeUsersNumber();
         return $audience;
     }
 
@@ -191,6 +196,7 @@ class AudienceController extends Controller
             $audience->setAudienceEnabled(true);
             $em->persist($audience);
             $em->flush();
+            $audience->computeUsersNumber();
             return $audience;
         } else {
             return $form;
@@ -264,6 +270,7 @@ class AudienceController extends Controller
             $em->flush();
             $em->clear();
             $audience = $em->getRepository('APIBundle:Audience')->find($request->get('audience_id'));
+            $audience->computeUsersNumber();
             return $audience;
         } else {
             return $form;

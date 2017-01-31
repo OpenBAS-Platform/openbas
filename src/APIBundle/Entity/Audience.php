@@ -47,6 +47,8 @@ class Audience
      */
     protected $audience_subaudiences;
 
+    protected $audience_users_number;
+
     public function __construct()
     {
         $this->audience_injects = new ArrayCollection();
@@ -117,5 +119,24 @@ class Audience
     {
         $this->audience_subaudiences = $subaudiences;
         return $this;
+    }
+
+    public function getAudienceUsersNumber()
+    {
+        return $this->audience_users_number;
+    }
+
+    public function setAudienceUsersNumber($number)
+    {
+        $this->audience_users_number = $number;
+        return $this;
+    }
+
+    public function computeUsersNumber()
+    {
+        $this->audience_users_number = 0;
+        foreach ($this->audience_subaudiences as $subaudience) {
+            $this->audience_users_number += count($subaudience->getSubaudienceUsers());
+        }
     }
 }
