@@ -7,7 +7,7 @@ import Theme from '../../../components/Theme'
 import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
 import {dateFormat, timeDiff} from '../../../utils/Time'
-import {List} from '../../../components/List'
+import {List as ComponentList} from '../../../components/List'
 import {Dialog} from '../../../components/Dialog'
 import {MainListItem, SecondaryListItem, TertiaryListItem, MainSmallListItem} from '../../../components/list/ListItem'
 import {Icon} from '../../../components/Icon'
@@ -27,6 +27,7 @@ import ObjectiveView from './objective/ObjectiveView'
 import AudiencePopover from './AudiencePopover'
 import AudiencesPopover from './AudiencesPopover'
 import ScenarioPopover from './ScenarioPopover'
+import {List as VList, AutoSizer} from 'react-virtualized'
 
 i18nRegister({
   fr: {
@@ -109,6 +110,10 @@ const styles = {
   'more': {
     float: 'left',
     margin: '12px 0px 0px 5px'
+  },
+  'expendable': {
+    float: 'right',
+    margin: '10px 0px 0px 0px'
   }
 }
 
@@ -116,6 +121,7 @@ class IndexExercise extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      extendedElements: [],
       openViewEvent: false,
       currentEvent: {},
       openViewIncident: false,
@@ -129,11 +135,18 @@ class IndexExercise extends Component {
       openObjectives: false,
       openAudiences: false,
       currentInjectAudiences: [],
-      openInjectAudiences: false
+      openInjectAudiences: false,
+      computedVisibleHeight: 0
     }
   }
 
+   updateDimensions() {
+     this.setState({computedVisibleHeight: window.innerHeight - 64 - 20});
+   }
+
   componentDidMount() {
+    window.addEventListener("resize", this.updateDimensions.bind(this))
+    this.updateDimensions()
     this.props.fetchIncidentTypes()
     this.props.fetchObjectives(this.props.exerciseId)
     this.props.fetchSubobjectives(this.props.exerciseId)
@@ -141,6 +154,10 @@ class IndexExercise extends Component {
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
     this.props.fetchAllInjects(this.props.exerciseId)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateDimensions)
   }
 
   selectIcon(type) {
@@ -160,6 +177,14 @@ class IndexExercise extends Component {
     } else {
       return Theme.palette.textColor
     }
+  }
+
+  handleExtendLine(event_id, event) {
+    event.stopPropagation()
+    const isOpen = R.contains(event_id, this.state.extendedElements)
+    const extendedList = isOpen ? R.filter(e => e !== event_id, this.state.extendedElements) :
+      R.append(event_id, this.state.extendedElements)
+    this.setState({extendedElements: extendedList})
   }
 
   handleOpenViewEvent(event) {
@@ -219,7 +244,6 @@ class IndexExercise extends Component {
   }
 
   handleOpenInjectAudiences(audiences, event) {
-    console.log(event)
     event.stopPropagation()
     this.setState({currentInjectAudiences: audiences, openInjectAudiences: true})
   }
@@ -228,23 +252,143 @@ class IndexExercise extends Component {
     this.setState({openInjectAudiences: false})
   }
 
+  renderExtendCollapseButton(id) {
+    const isOpen = R.contains(id, this.state.extendedElements)
+    return <div onClick={this.handleExtendLine.bind(this, id)} style={styles.expendable}>
+      <Icon
+        name={isOpen ? Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_UP : Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN}/>
+    </div>
+  }
+
+  renderEvent(key, className, style, event) {
+    return <div key={key} className={className} style={style}>
+      <MainListItem
+        key={event.event_id}
+        onClick={this.handleOpenViewEvent.bind(this, event)}
+        leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}
+        primaryText={<div>{event.event_title}{this.renderExtendCollapseButton(event.event_id)}</div>}
+        secondaryText={event.event_description}
+      />
+    </div>
+  }
+
+  renderIncident(key, className, style, incident) {
+    let incident_id = R.propOr(Math.random(), 'incident_id', incident)
+    let incident_title = R.propOr('-', 'incident_title', incident)
+    let incident_story = R.propOr('-', 'incident_story', incident)
+    let incident_subobjectives = R.propOr([], 'incident_subobjectives', incident)
+    return <div key={key} className={className} style={style}>
+      <SecondaryListItem
+        key={incident_id}
+        onClick={this.handleOpenViewIncident.bind(this, incident)}
+        leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}/>}
+        primaryText={<div>
+          {incident_title}
+          {<div style={styles.subobjectives}>
+            {incident_subobjectives.map(sub => {
+              let subobjective = R.propOr({}, sub.subobjective_id, this.props.subobjectives)
+              let subobjective_id = R.propOr(sub.subobjective_id, 'subobjective_id', subobjective)
+              let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
+              return <IconButton key={subobjective_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={subobjective_title}
+                                 tooltipPosition="bottom-left">
+                <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>} size={32}/></IconButton>
+            })}
+          </div>}
+          {this.renderExtendCollapseButton(incident_id)}
+        </div>}
+        secondaryText={incident_story}/>
+    </div>
+  }
+
+  renderInject(key, className, style, inject) {
+    let inject_id = R.propOr(Math.random(), 'inject_id', inject)
+    let inject_title = R.propOr('-', 'inject_title', inject)
+    let inject_type = R.propOr('-', 'inject_type', inject)
+    let inject_date = R.propOr(undefined, 'inject_date', inject)
+    let inject_audiences = R.propOr([], 'inject_audiences', inject)
+    return <div key={key} className={className} style={style}>
+      <TertiaryListItem
+        key={inject_id}
+        onClick={this.handleOpenViewInject.bind(this, inject)}
+        leftIcon={this.selectIcon(inject_type)}
+        primaryText={<div>
+          {inject_title}
+          {<div style={styles.audiences}>
+            {R.take(4, inject_audiences).map(data3 => {
+              let audience = R.find(a => a.audience_id === data3.audience_id)(this.props.audiences)
+              let audience_id = R.propOr(data3.audience_id, 'audience_id', audience)
+              let audience_name = R.propOr('-', 'audience_name', audience)
+              return <IconButton key={audience_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={audience_name}
+                                 tooltipPosition="bottom-left">
+                <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}/></IconButton>
+            })}
+            {inject_audiences.length > 4 ?
+              <div onClick={this.handleOpenInjectAudiences.bind(this, inject_audiences)} style={styles.more}>
+                <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_HORIZ}/></div> : ""}
+          </div>}
+        </div>}
+        secondaryText={dateFormat(inject_date)}
+      />
+    </div>
+  }
+
   render() {
-    const viewEventActions = [<FlatButton label="Close" primary={true}
-                                          onTouchTap={this.handleCloseViewEvent.bind(this)}/>]
-    const viewIncidentActions = [<FlatButton label="Close" primary={true}
-                                             onTouchTap={this.handleCloseViewIncident.bind(this)}/>]
-    const viewInjectActions = [<FlatButton label="Close" primary={true}
-                                           onTouchTap={this.handleCloseViewInject.bind(this)}/>]
-    const viewAudienceActions = [<FlatButton label="Close" primary={true}
-                                             onTouchTap={this.handleCloseViewAudience.bind(this)}/>]
-    const viewObjectiveActions = [<FlatButton label="Close" primary={true}
-                                              onTouchTap={this.handleCloseViewObjective.bind(this)}/>]
-    const audiencesActions = [<FlatButton label="Close" primary={true}
-                                          onTouchTap={this.handleCloseAudiences.bind(this)}/>]
-    const objectivesActions = [<FlatButton label="Close" primary={true}
-                                           onTouchTap={this.handleCloseObjectives.bind(this)}/>]
-    const injectAudiencesActions = [<FlatButton label="Close" primary={true}
-                                           onTouchTap={this.handleCloseInjectAudiences.bind(this)}/>]
+    const viewEventActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewEvent.bind(this)}/>]
+    const viewIncidentActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewIncident.bind(this)}/>]
+    const viewInjectActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewInject.bind(this)}/>]
+    const viewAudienceActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewAudience.bind(this)}/>]
+    const viewObjectiveActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseViewObjective.bind(this)}/>]
+    const audiencesActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseAudiences.bind(this)}/>]
+    const objectivesActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseObjectives.bind(this)}/>]
+    const injectAudiencesActions =
+      [<FlatButton label="Close" primary={true} onTouchTap={this.handleCloseInjectAudiences.bind(this)}/>]
+
+    //Build a flatten list of elements
+    const eventsIncidentsInjects = R.flatten(
+      R.map(event => {
+        const incidents = R.pipe(
+          R.map(data => R.pathOr({incident_title: ''}, ['incidents', data.incident_id], this.props)),
+          R.filter(data => R.contains(event.event_id, this.state.extendedElements)),
+          R.sort((a, b) => a.incident_order > b.incident_order),
+          R.map(data => {
+            let incident_injects = R.propOr([], 'incident_injects', data)
+            const injects = R.pipe(
+              R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
+              R.filter(data => R.contains(data.inject_incident.incident_id, this.state.extendedElements)),
+              R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
+              R.map(data => {
+                return {type: 'inject', data}
+              })
+            )(incident_injects)
+            return [{type: 'incident', data}, injects]
+          })
+        )(event.event_incidents)
+        return [{type: 'event', data: event}, incidents]
+      }, this.props.events)
+    )
+
+    //Define the virtual rendering
+    const rowRenderer = ({index, key, style}) => {
+      const element = eventsIncidentsInjects[index]
+      switch (element.type) {
+        case 'event':
+          return this.renderEvent(key, "", style, element.data)
+        case 'incident':
+          return this.renderIncident(key, "", style, element.data)
+        case 'inject':
+          return this.renderInject(key, "", style, element.data)
+        default:
+          return <div></div>
+      }
+    }
+
     return (
       <div>
         <div style={styles.columnLeft}>
@@ -252,7 +396,7 @@ class IndexExercise extends Component {
           <div className="clearfix"></div>
           {this.props.objectives.length === 0 ?
             <div style={styles.empty}><T>You do not have any objectives in this exercise.</T></div> : ""}
-          <List>
+          <ComponentList>
             {R.take(3, this.props.objectives).map(objective => {
               return (
                 <MainListItem
@@ -264,7 +408,7 @@ class IndexExercise extends Component {
                 />
               )
             })}
-          </List>
+          </ComponentList>
           {this.props.objectives.length > 3 ?
             <div onClick={this.handleOpenObjectives.bind(this)} style={styles.expand}><Icon
               name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN}/></div> : ""}
@@ -275,9 +419,9 @@ class IndexExercise extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseAudiences.bind(this)}
             actions={objectivesActions}>
-            <List>
+            <ComponentList>
               {this.props.objectives.map(objective => {
-               return (
+                return (
                   <MainSmallListItem
                     key={objective.objective_id}
                     onClick={this.handleOpenViewObjective.bind(this, objective)}
@@ -287,7 +431,7 @@ class IndexExercise extends Component {
                   />
                 )
               })}
-            </List>
+            </ComponentList>
           </Dialog>
           <Dialog
             title="Objective view"
@@ -305,7 +449,7 @@ class IndexExercise extends Component {
           <div className="clearfix"></div>
           {this.props.audiences.length === 0 ?
             <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
-          <List>
+          <ComponentList>
             {R.take(3, this.props.audiences).map(audience => {
               let playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
               return (
@@ -322,7 +466,7 @@ class IndexExercise extends Component {
                 />
               )
             })}
-          </List>
+          </ComponentList>
           {this.props.audiences.length > 3 ?
             <div onClick={this.handleOpenAudiences.bind(this)} style={styles.expand}><Icon
               name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN}/></div> : ""}
@@ -333,7 +477,7 @@ class IndexExercise extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseAudiences.bind(this)}
             actions={audiencesActions}>
-            <List>
+            <ComponentList>
               {this.props.audiences.map(audience => {
                 let playersText = audience.audience_users.length + ' ' + this.props.intl.formatMessage({id: 'players'});
                 return (
@@ -350,7 +494,7 @@ class IndexExercise extends Component {
                   />
                 )
               })}
-            </List>
+            </ComponentList>
           </Dialog>
           <Dialog
             title="Audience view"
@@ -368,92 +512,8 @@ class IndexExercise extends Component {
         <ScenarioPopover exerciseId={this.props.exerciseId} injects={this.props.injects}/>
         <div className="clearfix"></div>
         {this.props.events.length === 0 ?
-          <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
-        <List>
-          {this.props.events.map(event => {
-            const incidents = R.pipe(
-              R.map(data => R.pathOr({incident_title: ''}, ['incidents', data.incident_id], this.props)),
-              R.sort((a, b) => a.incident_order > b.incident_order)
-            )(event.event_incidents)
-
-            let nestedItems = incidents.map(incident => {
-                let incident_id = R.propOr(Math.random(), 'incident_id', incident)
-                let incident_title = R.propOr('-', 'incident_title', incident)
-                let incident_story = R.propOr('-', 'incident_story', incident)
-                let incident_injects = R.propOr([], 'incident_injects', incident)
-                let incident_subobjectives = R.propOr([], 'incident_subobjectives', incident)
-
-                const injects = R.pipe(
-                  R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
-                  R.sort((a, b) => timeDiff(a.inject_date, b.inject_date))
-                )(incident_injects)
-
-                let nestedItems2 = injects.map(inject => {
-                    let inject_id = R.propOr(Math.random(), 'inject_id', inject)
-                    let inject_title = R.propOr('-', 'inject_title', inject)
-                    let inject_type = R.propOr('-', 'inject_type', inject)
-                    let inject_date = R.propOr(undefined, 'inject_date', inject)
-                    let inject_audiences = R.propOr([], 'inject_audiences', inject)
-
-                    return <TertiaryListItem
-                      key={inject_id}
-                      onClick={this.handleOpenViewInject.bind(this, inject)}
-                      leftIcon={this.selectIcon(inject_type)}
-                      primaryText={<div>
-                        {inject_title}
-                        {<div style={styles.audiences}>
-                          {R.take(5, inject_audiences).map(data3 => {
-                            let audience = R.find(a => a.audience_id === data3.audience_id)(this.props.audiences)
-                            let audience_id = R.propOr(data3.audience_id, 'audience_id', audience)
-                            let audience_name = R.propOr('-', 'audience_name', audience)
-                            return <IconButton key={audience_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={audience_name}
-                                               tooltipPosition="bottom-left">
-                              <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}/></IconButton>
-                          })}
-                          {inject_audiences.length > 5 ? <div onClick={this.handleOpenInjectAudiences.bind(this, inject_audiences)} style={styles.more}><Icon
-                              name={Constants.ICON_NAME_NAVIGATION_MORE_HORIZ}/></div>:""}
-                        </div>}
-                      </div>}
-                      secondaryText={dateFormat(inject_date)}
-                    />
-                  }
-                )
-                return <SecondaryListItem
-                  key={incident_id}
-                  onClick={this.handleOpenViewIncident.bind(this, incident)}
-                  leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}/>}
-                  primaryText={<div>
-                    {incident_title}
-                    {<div style={styles.subobjectives}>
-                      {incident_subobjectives.map(data4 => {
-                        let subobjective = R.propOr({}, data4.subobjective_id, this.props.subobjectives)
-                        let subobjective_id = R.propOr(data4.subobjective_id, 'subobjective_id', subobjective)
-                        let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
-                        return <IconButton key={subobjective_id} type={Constants.BUTTON_TYPE_SINGLE}
-                                           tooltip={subobjective_title}
-                                           tooltipPosition="bottom-left">
-                          <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
-                                  size={32}/></IconButton>
-                      })}
-                    </div>}
-                  </div>}
-                  secondaryText={incident_story}
-                  nestedItems={nestedItems2}/>
-              }
-            )
-
-            return (
-              <MainListItem
-                key={event.event_id}
-                onClick={this.handleOpenViewEvent.bind(this, event)}
-                leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT}/>}
-                primaryText={event.event_title}
-                secondaryText={event.event_description}
-                nestedItems={nestedItems}
-              />
-            )
-          })}
-        </List>
+          <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""
+        }
         <Dialog
           title="Event view"
           modal={false}
@@ -488,7 +548,7 @@ class IndexExercise extends Component {
           autoScrollBodyContent={true}
           onRequestClose={this.handleCloseInjectAudiences.bind(this)}
           actions={injectAudiencesActions}>
-          <List>
+          <ComponentList>
             {this.state.currentInjectAudiences.map(data => {
               let audience = R.find(a => a.audience_id === data.audience_id)(this.props.audiences)
               let audience_id = R.propOr(data.audience_id, 'audience_id', audience)
@@ -509,8 +569,19 @@ class IndexExercise extends Component {
                 />
               )
             })}
-          </List>
+          </ComponentList>
         </Dialog>
+        <AutoSizer>
+          {({width, height}) => (
+            <VList
+              height={this.state.computedVisibleHeight - height}
+              rowCount={R.length(eventsIncidentsInjects)}
+              rowHeight={77}
+              rowRenderer={rowRenderer}
+              width={width}
+            />
+          )}
+        </AutoSizer>
       </div>
     )
   }

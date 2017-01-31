@@ -1,5 +1,6 @@
 html {
   overflow-y:scroll;
+  height: 100%;
 }
 
 body {
@@ -9,6 +10,7 @@ body {
   font-size: 14px;
   font-weight: normal;
   line-height: 20px;
+  min-height: 100%;
 }
 
 input:-webkit-autofill {
