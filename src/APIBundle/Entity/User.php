@@ -87,6 +87,12 @@ class User implements UserInterface
     protected $user_audiences;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Subaudience", mappedBy="subaudience_users")
+     * @var Audience[]
+     */
+    protected $user_subaudiences;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     protected $user_admin = false;
@@ -113,6 +119,7 @@ class User implements UserInterface
     {
         $this->user_groups = new ArrayCollection();
         $this->user_audiences = new ArrayCollection();
+        $this->user_subaudiences = new ArrayCollection();
         $this->user_comchecks = new ArrayCollection();
         $this->user_injects = new ArrayCollection();
     }
@@ -268,6 +275,17 @@ class User implements UserInterface
     public function setUserAudiences($audiences)
     {
         $this->user_audiences = $audiences;
+        return $this;
+    }
+
+    public function getUserSubaudiences()
+    {
+        return $this->user_subaudiences;
+    }
+
+    public function setUserSubaudiences($subaudiences)
+    {
+        $this->user_subaudiences = $subaudiences;
         return $this;
     }
 

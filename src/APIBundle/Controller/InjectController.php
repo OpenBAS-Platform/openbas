@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller;
 
+use APIBundle\Entity\Subaudience;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -127,16 +128,69 @@ class InjectController extends Controller
             $data['data']['content_header'] = $inject->getInjectHeader();
             $data['data']['content_footer'] = $inject->getInjectFooter();
             $data['data']['users'] = array();
+
+            // list all audiences
             foreach ($inject->getInjectAudiences() as $audience) {
                 /* @var $audience Audience */
                 if ($audience->getAudienceEnabled() == true) {
+                    // list all users of the audience
                     foreach ($audience->getAudienceUsers() as $user) {
                         if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
                             $userData = array();
                             $userData['user_firstname'] = $user->getUserFirstname();
                             $userData['user_lastname'] = $user->getUserLastname();
                             $userData['user_email'] = $user->getUserEmail();
+                            $userData['user_email2'] = $user->getUserEmail2();
                             $userData['user_phone'] = $user->getUserPhone();
+                            $userData['user_phone2'] = $user->getUserPhone2();
+                            $userData['user_phone3'] = $user->getUserPhone3();
+                            $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                            $userData['user_organization'] = array();
+                            $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                            $data['data']['users'][] = $userData;
+                        }
+                    }
+
+                    // list subaudiences of the audience
+                    foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
+                        if ($subaudience->getSubaudienceEnabled() == true) {
+                            // list all users of the subaudience
+                            foreach ($subaudience->getSubaudienceUsers() as $user) {
+                                if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
+                                    $userData = array();
+                                    $userData['user_firstname'] = $user->getUserFirstname();
+                                    $userData['user_lastname'] = $user->getUserLastname();
+                                    $userData['user_email'] = $user->getUserEmail();
+                                    $userData['user_email2'] = $user->getUserEmail2();
+                                    $userData['user_phone'] = $user->getUserPhone();
+                                    $userData['user_phone2'] = $user->getUserPhone2();
+                                    $userData['user_phone3'] = $user->getUserPhone3();
+                                    $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                                    $userData['user_organization'] = array();
+                                    $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                                    $data['data']['users'][] = $userData;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // list subaudiences
+            foreach ($inject->getInjectSubaudiences() as $subaudience) {
+                /* @var $subaudience Subaudience */
+                if ($subaudience->getSubaudienceEnabled() == true) {
+                    // list all users of the subaudience
+                    foreach ($subaudience->getSubaudienceUsers() as $user) {
+                        if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
+                            $userData = array();
+                            $userData['user_firstname'] = $user->getUserFirstname();
+                            $userData['user_lastname'] = $user->getUserLastname();
+                            $userData['user_email'] = $user->getUserEmail();
+                            $userData['user_email2'] = $user->getUserEmail2();
+                            $userData['user_phone'] = $user->getUserPhone();
+                            $userData['user_phone2'] = $user->getUserPhone2();
+                            $userData['user_phone3'] = $user->getUserPhone3();
                             $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
                             $userData['user_organization'] = array();
                             $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
@@ -153,7 +207,10 @@ class InjectController extends Controller
                         $userData['user_firstname'] = $user->getUserFirstname();
                         $userData['user_lastname'] = $user->getUserLastname();
                         $userData['user_email'] = $user->getUserEmail();
+                        $userData['user_email2'] = $user->getUserEmail2();
                         $userData['user_phone'] = $user->getUserPhone();
+                        $userData['user_phone2'] = $user->getUserPhone2();
+                        $userData['user_phone3'] = $user->getUserPhone3();
                         $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
                         $userData['user_organization'] = array();
                         $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
@@ -195,7 +252,10 @@ class InjectController extends Controller
                         $userData['user_firstname'] = $user->getUserFirstname();
                         $userData['user_lastname'] = $user->getUserLastname();
                         $userData['user_email'] = $user->getUserEmail();
+                        $userData['user_email2'] = $user->getUserEmail2();
                         $userData['user_phone'] = $user->getUserPhone();
+                        $userData['user_phone2'] = $user->getUserPhone2();
+                        $userData['user_phone3'] = $user->getUserPhone3();
                         $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
                         $userData['user_organization'] = array();
                         $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();

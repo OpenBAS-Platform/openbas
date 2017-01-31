@@ -54,6 +54,16 @@ class Inject
     protected $inject_audiences;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Subaudience", inversedBy="subaudience_injects")
+     * @ORM\JoinTable(name="injects_subaudiences",
+     *     joinColumns={@ORM\JoinColumn(name="inject_id", referencedColumnName="inject_id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="subaudience_id", referencedColumnName="subaudience_id", onDelete="CASCADE")}
+     *     )
+     * @var Subaudience[]
+     */
+    protected $inject_subaudiences;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_injects")
      * @ORM\JoinColumn(name="inject_incident", referencedColumnName="incident_id", onDelete="CASCADE")
      * @var Incident
@@ -153,6 +163,17 @@ class Inject
     public function setInjectAudiences($audiences)
     {
         $this->inject_audiences = $audiences;
+        return $this;
+    }
+
+    public function getInjectSubaudiences()
+    {
+        return $this->inject_subaudiences;
+    }
+
+    public function setInjectSubaudiences($subaudiences)
+    {
+        $this->inject_subaudiences = $subaudiences;
         return $this;
     }
 
@@ -278,6 +299,12 @@ class Inject
         $this->inject_users_number = 0;
         foreach ($this->inject_audiences as $audience) {
             $this->inject_users_number += count($audience->getAudienceUsers());
+            foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
+                $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+            }
+        }
+        foreach( $this->inject_subaudiences as $subaudience) {
+            $this->inject_users_number += count($subaudience->getSubaudienceUsers());
         }
     }
 }

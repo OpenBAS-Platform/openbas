@@ -51,10 +51,17 @@ class Audience
      */
     protected $audience_injects;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Subaudience", mappedBy="subaudience_audience")
+     * @var Subaudience[]
+     */
+    protected $audience_subaudiences;
+
     public function __construct()
     {
         $this->audience_users = new ArrayCollection();
         $this->audience_injects = new ArrayCollection();
+        $this->audience_subaudiences = new ArrayCollection();
     }
 
     public function getAudienceId()
@@ -120,6 +127,17 @@ class Audience
     public function setAudienceInjects($injects)
     {
         $this->audience_injects = $injects;
+        return $this;
+    }
+
+    public function getAudienceSubaudiences()
+    {
+        return $this->audience_subaudiences;
+    }
+
+    public function setAudienceSubaudiences($subaudiences)
+    {
+        $this->audience_subaudiences = $subaudiences;
         return $this;
     }
 }

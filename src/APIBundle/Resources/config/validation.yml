@@ -91,6 +91,12 @@ APIBundle\Entity\Audience:
             - NotBlank: ~
             - Type: string
 
+APIBundle\Entity\Subaudience:
+    properties:
+        saudience_name:
+            - NotBlank: ~
+            - Type: string
+
 APIBundle\Entity\Comcheck:
     properties:
         comcheck_audience:
