@@ -109,7 +109,14 @@ class ComcheckController extends Controller
             $em->flush();
 
             // create individual statuses for all user of the audience
-            $users = $comcheck->getComcheckAudience()->getAudienceUsers();
+            $users = [];
+            foreach( $comcheck->getComcheckAudience()->getAudienceSubaudiences() as $subaudience) {
+                $subaudienceUsers = $subaudience->getSubaudienceUsers();
+                foreach( $subaudienceUsers as &$user) {
+                    $user->setUserSubaudience($subaudience->getSubaudienceName());
+                }
+                $users = array_merge($users, $subaudienceUsers);
+            }
 
             $link = $this->getParameter('protocol') . '://' . $request->getHost() . '/comcheck/' . '${user_comcheck_id}';
             $data = array();
@@ -132,7 +139,10 @@ class ComcheckController extends Controller
                 $userData['user_firstname'] = $user->getUserFirstname();
                 $userData['user_lastname'] = $user->getUserLastname();
                 $userData['user_email'] = $user->getUserEmail();
+                $userData['user_email2'] = $user->getUserEmail2();
                 $userData['user_phone'] = $user->getUserPhone();
+                $userData['user_phone2'] = $user->getUserPhone2();
+                $userData['user_phone3'] = $user->getUserPhone3();
                 $userData['user_organization'] = array();
                 $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;

@@ -7,18 +7,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-class AudienceType extends AbstractType
+class SubaudienceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('audience_name');
-        $builder->add('audience_enabled');
+        $builder->add('subaudience_name');
+        $builder->add('subaudience_users');
+        $builder->add('subaudience_enabled');
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'APIBundle\Entity\Audience',
+            'data_class' => 'APIBundle\Entity\Subaudience',
             'csrf_protection' => false
         ]);
     }

@@ -18,7 +18,7 @@ class SubobjectiveController extends Controller
 {
     /**
      * @ApiDoc(
-     *    description="List subobjectives of objective"
+     *    description="List subobjectives of an objective"
      * )
      *
      * @Rest\View(serializerGroups={"subobjective"})
@@ -44,6 +44,7 @@ class SubobjectiveController extends Controller
         }
 
         $subobjectives = $em->getRepository('APIBundle:Subobjective')->findBy(['subobjective_objective' => $objective]);
+        /* @var $subobjectives Subobjective[] */
 
         foreach( $subobjectives as &$subobjective) {
             $subobjective->setSubobjectiveExercise($exercise->getExerciseId());
@@ -117,14 +118,14 @@ class SubobjectiveController extends Controller
         $objective = $em->getRepository('APIBundle:Objective')->find($request->get('objective_id'));
         /* @var $objective Objective */
 
-        if (empty($objective)) {
+        if (empty($objective) || $objective->getObjectiveExercise() != $exercise) {
             return $this->objectiveNotFound();
         }
 
         $subobjective = $em->getRepository('APIBundle:Subobjective')->find($request->get('subobjective_id'));
-        /* @var $objective Subobjective */
+        /* @var $subobjective Subobjective */
 
-        if (empty($subobjective)) {
+        if (empty($subobjective) || $subobjective->getSubobjectiveObjective() != $objective) {
             return $this->subobjectiveNotFound();
         }
 
@@ -161,9 +162,9 @@ class SubobjectiveController extends Controller
         }
 
         $subobjective = $em->getRepository('APIBundle:Subobjective')->find($request->get('subobjective_id'));
-        /* @var $objective Subobjective */
+        /* @var $subobjective Subobjective */
 
-        if (empty($subobjective)) {
+        if (empty($subobjective) || $subobjective->getSubobjectiveObjective() != $objective) {
             return $this->subobjectiveNotFound();
         }
 
