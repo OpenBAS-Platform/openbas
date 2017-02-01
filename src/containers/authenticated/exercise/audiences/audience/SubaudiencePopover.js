@@ -1,6 +1,7 @@
 import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import {T} from '../../../../../components/I18n'
+import Theme from '../../../../../components/Theme'
 import {i18nRegister} from '../../../../../utils/Messages'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import R from 'ramda'
@@ -121,6 +122,14 @@ class SubaudiencePopover extends Component {
     this.handlePopoverClose()
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     let subaudience_enabled = R.propOr(true, 'subaudience_enabled', this.props.subaudience)
 
@@ -144,7 +153,7 @@ class SubaudiencePopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}  color={this.switchColor(!this.props.audience.audience_enabled ||!this.props.subaudience.subaudience_enabled)}/>
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
@@ -194,6 +203,7 @@ SubaudiencePopover.propTypes = {
   updateSubaudience: PropTypes.func,
   selectSubaudience: PropTypes.func,
   downloadExportSubaudience: PropTypes.func,
+  audience: PropTypes.object,
   subaudience: PropTypes.object,
   subaudiences: PropTypes.array,
   children: PropTypes.node,

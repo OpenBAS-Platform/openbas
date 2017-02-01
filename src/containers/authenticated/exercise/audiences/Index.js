@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import R from 'ramda'
+import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -40,6 +41,14 @@ class IndexAudiences extends Component {
     this.props.fetchAudiences(this.props.exerciseId);
   }
 
+  switchColor(disabled) {
+    if (disabled) {
+      return Theme.palette.disabledColor
+    } else {
+      return Theme.palette.textColor
+    }
+  }
+
   render() {
     return (
       <div style={styles.container}>
@@ -52,19 +61,19 @@ class IndexAudiences extends Component {
               <MainListItemLink
                 to={'/private/exercise/' + this.props.exerciseId + '/audiences/' + audience.audience_id}
                 key={audience.audience_id}
-                leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
+                leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} color={this.switchColor(!audience.audience_enabled)}/>}
                 primaryText={
-                  <div>
+                  <div style={{color: this.switchColor(!audience.audience_enabled)}}>
                     {audience.audience_name}
                   </div>
                 }
                 secondaryText={
-                  <div>
+                  <div style={{color: this.switchColor(!audience.audience_enabled)}}>
                     {audience.audience_users_number}&nbsp;
                     <T>players</T>
                   </div>
                 }
-                rightIcon={<Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}/>}
+                rightIcon={<Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT} color={this.switchColor(!audience.audience_enabled)}/>}
               />
             )
           })}

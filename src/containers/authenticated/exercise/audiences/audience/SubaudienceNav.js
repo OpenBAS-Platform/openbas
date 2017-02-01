@@ -31,13 +31,13 @@ class SubaudienceNav extends Component {
           {this.props.subaudiences.map(subaudience => {
             return (
               <ListItemLink
-                grey={!subaudience.subaudience_enabled}
+                grey={!subaudience.subaudience_enabled || !this.props.audience.audience_enabled}
                 type={Constants.LIST_ITEM_NOSPACE}
                 key={subaudience.subaudience_id}
                 active={this.props.selectedSubaudience === subaudience.subaudience_id}
                 onClick={this.handleChangeAudience.bind(this, subaudience.subaudience_id)}
                 label={subaudience.subaudience_name}
-                leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} color={this.switchColor(!subaudience.subaudience_enabled)}/>}
+                leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} color={this.switchColor(!subaudience.subaudience_enabled || !this.props.audience.audience_enabled)}/>}
               />
             )
           })}
@@ -50,6 +50,7 @@ class SubaudienceNav extends Component {
 SubaudienceNav.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
+  audience: PropTypes.object,
   selectedSubaudience: PropTypes.string,
   subaudiences: PropTypes.array,
   selectSubaudience: PropTypes.func

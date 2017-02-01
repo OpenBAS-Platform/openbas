@@ -207,11 +207,11 @@ class IndexAudience extends Component {
       )(subaudience.subaudience_users)
 
       return <div style={styles.container}>
-        <SubaudienceNav selectedSubaudience={subaudience.subaudience_id} exerciseId={exerciseId} audienceId={audienceId} subaudiences={subaudiences}/>
+        <SubaudienceNav selectedSubaudience={subaudience.subaudience_id} exerciseId={exerciseId} audienceId={audienceId} audience={audience} subaudiences={subaudiences}/>
         <div>
           <div style={styles.title}><span
             style={{color: this.switchColor(!audience.audience_enabled || !subaudience.subaudience_enabled)}}>{subaudience.subaudience_name}</span></div>
-          <SubaudiencePopover exerciseId={exerciseId} audienceId={audienceId} subaudience={subaudience} subaudiences={this.props.subaudiences}/>
+          <SubaudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience} subaudience={subaudience} subaudiences={this.props.subaudiences}/>
           <div style={styles.users}>{subaudience.subaudience_users.length} <T>user(s)</T></div>
           <div style={styles.search}>
             <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
@@ -287,7 +287,7 @@ class IndexAudience extends Component {
       </div>
     } else if (audience) {
       return <div style={styles.container}>
-        <SubaudienceNav exerciseId={exerciseId} audienceId={audienceId} subaudiences={subaudiences}/>
+        <SubaudienceNav exerciseId={exerciseId} audienceId={audienceId} audience={audience} subaudiences={subaudiences}/>
         <div style={styles.empty}><T>This audience is empty.</T></div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={audience_name}/>
