@@ -3518,7 +3518,7 @@ marked@^0.3.6:
 
 material-ui@^0.16.6:
   version "0.16.6"
-  resolved "https://registry.yarnpkg.com/material-ui/-/material-ui-0.16.6 .tgz#683a038c25a6d77e3703a53a4401f3af44bc1db1"
+  resolved "https://registry.yarnpkg.com/material-ui/-/material-ui-0.16.6.tgz#683a038c25a6d77e3703a53a4401f3af44bc1db1"
   dependencies:
     babel-runtime "^6.11.6"
     inline-style-prefixer "^2.0.1"
