@@ -13,6 +13,7 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Form\Type\AudienceType;
 use APIBundle\Entity\Audience;
 use PHPExcel;
+use APIBundle\Utils\Transform;
 
 class AudienceController extends Controller
 {
@@ -65,7 +66,7 @@ class AudienceController extends Controller
         $this->denyAccessUnlessGranted('select', $exercise);
 
 
-        $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise]);
+        $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
         /* @var $audiences Audience[] */
 
         $xlsUsers = $this->get('phpexcel')->createPHPExcelObject();
@@ -74,7 +75,7 @@ class AudienceController extends Controller
         $xlsUsers->getProperties()
             ->setCreator("OpenEx")
             ->setLastModifiedBy("OpenEx")
-            ->setTitle("[" . $this->str_to_noaccent($exercise->getExerciseName()) . "] Users list");
+            ->setTitle("[" . Transform::strToNoAccent($exercise->getExerciseName()) . "] Users list");
 
         $i = 0;
         foreach( $audiences as $audience ) {
@@ -125,7 +126,7 @@ class AudienceController extends Controller
         $response = $this->get('phpexcel')->createStreamedResponse($writer);
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            "[" . $this->str_to_noaccent($exercise->getExerciseName()) . "] Users list.xlsx"
+            "[" . Transform::strToNoAccent($exercise->getExerciseName()) . "] Users list.xlsx"
         );
 
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
@@ -286,26 +287,5 @@ class AudienceController extends Controller
     private function audienceNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function str_to_noaccent($str)
-    {
-        $url = $str;
-        $url = preg_replace('#Ç#', 'C', $url);
-        $url = preg_replace('#ç#', 'c', $url);
-        $url = preg_replace('#è|é|ê|ë#', 'e', $url);
-        $url = preg_replace('#È|É|Ê|Ë#', 'E', $url);
-        $url = preg_replace('#à|á|â|ã|ä|å#', 'a', $url);
-        $url = preg_replace('#@|À|Á|Â|Ã|Ä|Å#', 'A', $url);
-        $url = preg_replace('#ì|í|î|ï#', 'i', $url);
-        $url = preg_replace('#Ì|Í|Î|Ï#', 'I', $url);
-        $url = preg_replace('#ð|ò|ó|ô|õ|ö#', 'o', $url);
-        $url = preg_replace('#Ò|Ó|Ô|Õ|Ö#', 'O', $url);
-        $url = preg_replace('#ù|ú|û|ü#', 'u', $url);
-        $url = preg_replace('#Ù|Ú|Û|Ü#', 'U', $url);
-        $url = preg_replace('#ý|ÿ#', 'y', $url);
-        $url = preg_replace('#Ý#', 'Y', $url);
-
-        return ($url);
     }
 }
