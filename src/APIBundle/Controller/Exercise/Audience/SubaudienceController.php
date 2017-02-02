@@ -23,7 +23,7 @@ class SubaudienceController extends Controller
      * @Rest\View(serializerGroups={"subaudience"})
      * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/subaudiences")
      */
-    public function getExercisesAudienceSubaudiencesAction(Request $request)
+    public function getExercisesAudiencesSubaudiencesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -61,7 +61,7 @@ class SubaudienceController extends Controller
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"subaudience"})
      * @Rest\Post("/exercises/{exercise_id}/audiences/{audience_id}/subaudiences")
      */
-    public function postExercisesAudienceSubaudiencesAction(Request $request)
+    public function postExercisesAudiencesSubaudiencesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -101,9 +101,9 @@ class SubaudienceController extends Controller
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"subaudience"})
-     * @Rest\Delete("/exercises/{exercise_id}/audiences/{audience_id}/subaudience/{subaudience_id}")
+     * @Rest\Delete("/exercises/{exercise_id}/audiences/{audience_id}/subaudiences/{subaudience_id}")
      */
-    public function removeExercisesObjectiveSubobjectiveAction(Request $request)
+    public function removeExercisesAudiencesSubaudienceAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
@@ -142,7 +142,7 @@ class SubaudienceController extends Controller
      * @Rest\View(serializerGroups={"subaudience"})
      * @Rest\Put("/exercises/{exercise_id}/audiences/{audience_id}/subaudiences/{subaudience_id}")
      */
-    public function updateExercisesAudienceSubaudienceAction(Request $request)
+    public function updateExercisesAudiencesSubaudienceAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
         $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
