@@ -2,6 +2,7 @@ import React, {PropTypes, Component} from 'react'
 import {connect} from 'react-redux'
 import {T} from '../../../../../components/I18n'
 import {i18nRegister} from '../../../../../utils/Messages'
+import {redirectToAudiences} from '../../../../../actions/Application'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import R from 'ramda'
 import {Popover} from '../../../../../components/Popover'
@@ -103,9 +104,7 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.exerciseId, this.props.audience.audience_id).then(() => {
-      this.props.selectAudience(this.props.exerciseId, undefined)
-    })
+    this.props.deleteAudience(this.props.exerciseId, this.props.audience.audience_id).then(() => this.props.redirectToAudiences(this.props.exerciseId))
     this.handleCloseDelete()
   }
 
@@ -241,6 +240,7 @@ AudiencePopover.propTypes = {
   updateAudience: PropTypes.func,
   selectAudience: PropTypes.func,
   downloadExportAudience: PropTypes.func,
+  redirectToAudiences: PropTypes.func,
   addComcheck: PropTypes.func,
   audience: PropTypes.object,
   audiences: PropTypes.array,
@@ -248,4 +248,4 @@ AudiencePopover.propTypes = {
   intl: PropTypes.object
 }
 
-export default connect(null, {updateAudience, selectAudience, downloadExportAudience, deleteAudience, addComcheck})(injectIntl(AudiencePopover))
+export default connect(null, {updateAudience, selectAudience, downloadExportAudience, deleteAudience, addComcheck, redirectToAudiences})(injectIntl(AudiencePopover))

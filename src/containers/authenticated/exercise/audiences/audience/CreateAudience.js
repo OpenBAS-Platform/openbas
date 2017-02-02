@@ -28,7 +28,7 @@ class CreateAudience extends Component {
   }
 
   onSubmit(data) {
-    return this.props.addAudience(this.props.exerciseId, data)
+    return this.props.addAudience(this.props.exerciseId, data).then(() => {this.props.onCreate()})
   }
 
   submitForm() {
@@ -60,7 +60,8 @@ class CreateAudience extends Component {
 
 CreateAudience.propTypes = {
   exerciseId: PropTypes.string,
-  addAudience: PropTypes.func
+  addAudience: PropTypes.func,
+  onCreate: PropTypes.func
 }
 
 export default connect(null, {addAudience})(CreateAudience);

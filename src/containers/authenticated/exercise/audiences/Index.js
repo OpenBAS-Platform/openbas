@@ -7,6 +7,7 @@ import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchAudiences} from '../../../../actions/Audience'
+import {SearchField} from '../../../../components/SimpleTextField'
 import {Icon} from '../../../../components/Icon'
 import {List} from '../../../../components/List'
 import {MainListItemLink} from '../../../../components/list/ListItem';
@@ -26,6 +27,9 @@ const styles = {
     float: 'left',
     fontSize: '13px',
     textTransform: 'uppercase'
+  },
+  'search': {
+    float: 'right',
   }
 }
 
@@ -40,7 +44,7 @@ i18nRegister({
 class IndexAudiences extends Component {
   constructor(props) {
     super(props)
-    this.state = {itemsNumber: 0, displayedNumber: 0, initialNumber: 0}
+    this.state = {searchTerm: '', itemsNumber: 0, displayedNumber: 0, initialNumber: 0}
   }
 
   componentDidMount() {
@@ -51,6 +55,15 @@ class IndexAudiences extends Component {
     this.props.fetchAudiences(this.props.exerciseId).then(() => {
       this.setState({itemsNumber: this.props.audiences.length})
     })
+  }
+
+  onCreate() {
+    this.setState({itemsNumber: this.state.itemsNumber+1})
+    this.handleInfiniteLoad()
+  }
+
+  handleSearchAudiences(event, value) {
+    this.setState({searchTerm: value})
   }
 
   computeInitialNumbersOfRows() {
@@ -75,9 +88,18 @@ class IndexAudiences extends Component {
   }
 
   render() {
+    const keyword = this.state.searchTerm
+    let filterByKeyword = n => keyword === '' || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+    let filteredAudiences = R.filter(filterByKeyword, this.props.audiences)
+
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Audiences</T></div>
+        <div style={styles.search}>
+          <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
+                       onChange={this.handleSearchAudiences.bind(this)}
+                       styletype={Constants.FIELD_TYPE_RIGHT}/>
+        </div>
         <div className="clearfix"></div>
         {this.props.audiences.length === 0 ?
           <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
@@ -87,7 +109,7 @@ class IndexAudiences extends Component {
                     infiniteLoadBeginEdgeOffset={200}
                     useWindowAsScrollContainer={true}
                     onInfiniteLoad={this.handleInfiniteLoad.bind(this)}>
-            {R.take(this.state.displayedNumber, this.props.audiences).map(audience => {
+            {R.take(this.state.displayedNumber, filteredAudiences).map(audience => {
               return (
                 <MainListItemLink
                   to={'/private/exercise/' + this.props.exerciseId + '/audiences/' + audience.audience_id}
@@ -112,7 +134,7 @@ class IndexAudiences extends Component {
             })}
           </Infinite>
         </List>
-        <CreateAudience exerciseId={this.props.exerciseId}/>
+        <CreateAudience exerciseId={this.props.exerciseId} onCreate={this.onCreate.bind(this)}/>
       </div>
     )
   }
