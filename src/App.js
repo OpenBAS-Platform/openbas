@@ -90,7 +90,6 @@ export const api = (schema) => {
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     const toImmutable = response.config.responseType === undefined //=== json
-    console.log(schema, response.data)
     var dataNormalize = schema ? normalize(response.data, schema) : response.data
     debug("api", {from: response.request.responseURL, data: {raw: response.data, normalize: dataNormalize}})
     response.data = toImmutable ? Immutable(dataNormalize) : dataNormalize

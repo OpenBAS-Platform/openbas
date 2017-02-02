@@ -31,6 +31,8 @@ const styles = {
     return {
       backgroundImage: 'url("' + image + '")',
       backgroundSize: '100%',
+      backgroundRepeat: 'none',
+      backgroundPosition: 'top',
       height: '150px',
       position: 'relative'
     }

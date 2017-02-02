@@ -32,7 +32,7 @@ i18nRegister({
 
 class ObjectivePopover extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       openDelete: false,
       openEdit: false,

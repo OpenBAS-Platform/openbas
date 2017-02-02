@@ -84,17 +84,26 @@ const styles = {
   'name': {
     float: 'left',
     width: '25%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'mail': {
     float: 'left',
     width: '35%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'org': {
     float: 'left',
     width: '25%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'admin': {
     float: 'left',
@@ -176,7 +185,7 @@ class Index extends Component {
           <div className="clearfix"></div>
         </div>}/>
 
-        {users.map(user => {
+        {R.take(20, users).map(user => {
           let user_id = R.propOr(Math.random(), 'user_id', user)
           let user_firstname = R.propOr('-', 'user_firstname', user)
           let user_lastname = R.propOr('-', 'user_lastname', user)

@@ -90,16 +90,25 @@ const styles = {
   'name': {
     float: 'left',
     width: '30%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'mail': {
     float: 'left',
     width: '40%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'org': {
     float: 'left',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'comcheck': {
     float: 'left',
@@ -269,7 +278,7 @@ class IndexAudience extends Component {
           </List>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={audience_name}/>
-            <AudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience}/>
+            <AudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience} audiences={this.props.audiences}/>
             {comchecks}
           </Toolbar>
           <Dialog
@@ -291,7 +300,7 @@ class IndexAudience extends Component {
         <div style={styles.empty}><T>This audience is empty.</T></div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={audience_name}/>
-          <AudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience}/>
+          <AudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience} audiences={this.props.audiences}/>
           {comchecks}
         </Toolbar>
       </div>

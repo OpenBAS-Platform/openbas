@@ -109,9 +109,11 @@ class IndexObjective extends Component {
                   secondaryText={subobjective_description}/>
               }
             )
+            console.log(nestedItems)
 
             return (
               <MainListItem
+                initiallyOpen={true}
                 key={objective.objective_id}
                 onClick={this.handleOpenObjective.bind(this, objective)}
                 leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}/>}

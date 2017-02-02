@@ -18,16 +18,25 @@ const styles = {
   'name': {
     float: 'left',
     width: '30%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'mail': {
     float: 'left',
     width: '40%',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'org': {
     float: 'left',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
 }
 
@@ -120,7 +129,7 @@ class AddUsers extends Component {
           </div>
           <div>
             <List>
-              {filteredUsers.map(user => {
+              {R.take(10, filteredUsers).map(user => {
                 let disabled = R.find(u => u.user_id === user.user_id, this.state.users) !== undefined
                   || this.props.subaudienceUsersIds.includes(user.user_id)
                 let user_organization = R.propOr({}, user.user_organization, this.props.organizations)

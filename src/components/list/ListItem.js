@@ -179,7 +179,7 @@ export const MainListItem = (props) => (
     onClick={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
-    initiallyOpen={true}
+    initiallyOpen={props.initiallyOpen}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
     innerDivStyle={{padding: '20px 10px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>
@@ -194,6 +194,7 @@ MainListItem.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
+  initiallyOpen: PropTypes.bool,
   rightIconButton: PropTypes.node,
   nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
@@ -209,7 +210,7 @@ export const MainListItemLink = (props) => (
     onClick={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
-    initiallyOpen={true}
+    initiallyOpen={props.initiallyOpen}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
     innerDivStyle={{padding: '20px 10px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>
@@ -224,6 +225,7 @@ MainListItemLink.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
+  initiallyOpen: PropTypes.bool,
   rightIconButton: PropTypes.node,
   nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
@@ -238,7 +240,7 @@ export const SecondaryListItem = (props) => (
     onClick={props.onClick}
     disabled={props.disabled}
     nestedItems={props.nestedItems}
-    initiallyOpen={true}
+    initiallyOpen={props.initiallyOpen}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
     innerDivStyle={{padding: '20px 10px 20px 60px'}}
     rightIconButton={props.rightIconButton}/>
@@ -252,6 +254,7 @@ SecondaryListItem.propTypes = {
   rightIcon: PropTypes.element,
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
+  initiallyOpen: PropTypes.bool,
   rightIconButton: PropTypes.node,
   nestedItems: PropTypes.arrayOf(PropTypes.node)
 }
