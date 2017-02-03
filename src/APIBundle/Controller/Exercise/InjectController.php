@@ -105,7 +105,7 @@ class InjectController extends Controller
         $xlsInjects->getProperties()
             ->setCreator("OpenEx")
             ->setLastModifiedBy("OpenEx")
-            ->setTitle("[{$exercise->getExerciseName()}] Injects list");
+            ->setTitle("[" . $this->str_to_noaccent($exercise->getExerciseName()) . "] Injects list");
 
         $sheet = $xlsInjects->getActiveSheet();
         $sheet->setTitle('Injects');
@@ -136,7 +136,7 @@ class InjectController extends Controller
         $response = $this->get('phpexcel')->createStreamedResponse($writer);
         $dispositionHeader = $response->headers->makeDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            "[{$exercise->getExerciseName()}] Injects list.xlsx"
+            "[" . $this->str_to_noaccent($exercise->getExerciseName()) . "] Injects list.xlsx"
         );
 
         $response->headers->set('Content-Type', 'text/vnd.ms-excel; charset=utf-8');
@@ -201,7 +201,7 @@ class InjectController extends Controller
             $em->flush();
         }
 
-        foreach( $injects as &$inject) {
+        foreach ($injects as &$inject) {
             $inject->setInjectExercise($exercise->getExerciseId());
             $inject->computeUsersNumber();
             $inject->sanitizeUser();
@@ -213,5 +213,26 @@ class InjectController extends Controller
     private function exerciseNotFound()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function str_to_noaccent($str)
+    {
+        $url = $str;
+        $url = preg_replace('#Ç#', 'C', $url);
+        $url = preg_replace('#ç#', 'c', $url);
+        $url = preg_replace('#è|é|ê|ë#', 'e', $url);
+        $url = preg_replace('#È|É|Ê|Ë#', 'E', $url);
+        $url = preg_replace('#à|á|â|ã|ä|å#', 'a', $url);
+        $url = preg_replace('#@|À|Á|Â|Ã|Ä|Å#', 'A', $url);
+        $url = preg_replace('#ì|í|î|ï#', 'i', $url);
+        $url = preg_replace('#Ì|Í|Î|Ï#', 'I', $url);
+        $url = preg_replace('#ð|ò|ó|ô|õ|ö#', 'o', $url);
+        $url = preg_replace('#Ò|Ó|Ô|Õ|Ö#', 'O', $url);
+        $url = preg_replace('#ù|ú|û|ü#', 'u', $url);
+        $url = preg_replace('#Ù|Ú|Û|Ü#', 'U', $url);
+        $url = preg_replace('#ý|ÿ#', 'y', $url);
+        $url = preg_replace('#Ý#', 'Y', $url);
+
+        return ($url);
     }
 }

@@ -15,6 +15,7 @@ use APIBundle\Entity\Objective;
 use APIBundle\Entity\Outcome;
 use APIBundle\Entity\Result;
 use APIBundle\Entity\InjectStatus;
+use APIBundle\Entity\Subaudience;
 use APIBundle\Entity\Token;
 use APIBundle\Entity\User;
 use APIBundle\Entity\Organization;
@@ -126,11 +127,17 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->joinGroup($userJerry, $groupCockroachPlanners);
         $output->writeln('Jerry is joining group \'Cockroach planners\'');
 
-        $audienceDefence = $this->createAudience('National defence forces', $exercisePotatoes, [$userSam, $userJane]);
+        $audienceDefence = $this->createAudience('National defence forces', $exercisePotatoes);
         $output->writeln('Creating audience \'National defence forces\'');
 
-        $audienceMedia = $this->createAudience('Communication team', $exercisePotatoes, [$userSam, $userJane, $userJerry]);
+        $subaudienceAirforce = $this->createSubaudience('Air force', $audienceDefence, [$userSam, $userJane]);
+        $output->writeln('Creating subaudience \'Air force\' in audience\'National defence forces\'');
+
+        $audienceMedia = $this->createAudience('Communication team', $exercisePotatoes);
         $output->writeln('Creating audience \'Communication team\'');
+
+        $subaudiencePress = $this->createSubaudience('Press relations', $audienceMedia, [$userSam, $userJane, $userJerry]);
+        $output->writeln('Creating subaudience \'Press relations\' in audience\'Communication team\'');
 
         $this->createObjective(
             'Train the government to respond to a potatoes attack',
@@ -326,16 +333,27 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $file;
     }
 
-    private function createAudience($name, $exercise, $users) {
+    private function createAudience($name, $exercise) {
         $audience = new Audience();
         $audience->setAudienceName($name);
         $audience->setAudienceExercise($exercise);
-        $audience->setAudienceUsers($users);
 
         $this->em->persist($audience);
         $this->em->flush();
 
         return $audience;
+    }
+
+    private function createSubaudience($name, $audience, $users) {
+        $subaudience = new Subaudience();
+        $subaudience->setSubaudienceName($name);
+        $subaudience->setSubaudienceAudience($audience);
+        $subaudience->setSubaudienceUsers($users);
+
+        $this->em->persist($subaudience);
+        $this->em->flush();
+
+        return $subaudience;
     }
 
     private function createObjective($title, $description, $priority, $exercise) {

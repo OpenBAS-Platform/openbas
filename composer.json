@@ -31,7 +31,8 @@
     "friendsofsymfony/rest-bundle": "*",
     "nelmio/api-doc-bundle": "*",
     "nategood/httpful": "*",
-    "liuggio/excelbundle": "*"
+    "liuggio/excelbundle": "*",
+    "doctrine/doctrine-migrations-bundle": "^1.0"
   },
   "require-dev": {
     "sensio/generator-bundle": "*",

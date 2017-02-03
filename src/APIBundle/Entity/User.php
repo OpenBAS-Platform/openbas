@@ -38,7 +38,22 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", nullable=true)
      */
+    protected $user_email2;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
     protected $user_phone;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone2;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone3;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -66,10 +81,10 @@ class User implements UserInterface
     protected $user_groups;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Audience", mappedBy="audience_users")
+     * @ORM\ManyToMany(targetEntity="Subaudience", mappedBy="subaudience_users")
      * @var Audience[]
      */
-    protected $user_audiences;
+    protected $user_subaudiences;
 
     /**
      * @ORM\Column(type="boolean")
@@ -93,11 +108,12 @@ class User implements UserInterface
     protected $user_lang;
 
     protected $user_gravatar;
+    protected $user_subaudience;
 
     public function __construct()
     {
         $this->user_groups = new ArrayCollection();
-        $this->user_audiences = new ArrayCollection();
+        $this->user_subaudiences = new ArrayCollection();
         $this->user_comchecks = new ArrayCollection();
         $this->user_injects = new ArrayCollection();
     }
@@ -146,6 +162,17 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getUserEmail2()
+    {
+        return $this->user_email2;
+    }
+
+    public function setUserEmail2($email)
+    {
+        $this->user_email2 = $email;
+        return $this;
+    }
+
     public function getUserPhone()
     {
         return $this->user_phone;
@@ -154,6 +181,28 @@ class User implements UserInterface
     public function setUserPhone($phone)
     {
         $this->user_phone = $phone;
+        return $this;
+    }
+
+    public function getUserPhone2()
+    {
+        return $this->user_phone2;
+    }
+
+    public function setUserPhone2($phone)
+    {
+        $this->user_phone2 = $phone;
+        return $this;
+    }
+
+    public function getUserPhone3()
+    {
+        return $this->user_phone3;
+    }
+
+    public function setUserPhone3($phone)
+    {
+        $this->user_phone3 = $phone;
         return $this;
     }
 
@@ -212,14 +261,14 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getUserAudiences()
+    public function getUserSubaudiences()
     {
-        return $this->user_audiences;
+        return $this->user_subaudiences;
     }
 
-    public function setUserAudiences($audiences)
+    public function setUserSubaudiences($subaudiences)
     {
-        $this->user_audiences = $audiences;
+        $this->user_subaudiences = $subaudiences;
         return $this;
     }
 
@@ -273,6 +322,17 @@ class User implements UserInterface
 
     public function setUserGravatar() {
         $this->user_gravatar = 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->user_email))) . '?d=mm';
+        return $this;
+    }
+
+    public function getUserSubaudience()
+    {
+        return $this->user_subaudience;
+    }
+
+    public function setUserSubaudience($subaudience)
+    {
+        $this->user_subaudience = $subaudience;
         return $this;
     }
 
