@@ -32,11 +32,11 @@
     "nelmio/api-doc-bundle": "*",
     "nategood/httpful": "*",
     "liuggio/excelbundle": "*",
-    "doctrine/doctrine-migrations-bundle": "^1.0"
+    "doctrine/doctrine-migrations-bundle": "*"
   },
   "require-dev": {
     "sensio/generator-bundle": "*",
-    "symfony/phpunit-bridge": "*"
+    "symfony/phpunit-bridge": "3.2.1"
   },
   "scripts": {
     "symfony-scripts-install": [
