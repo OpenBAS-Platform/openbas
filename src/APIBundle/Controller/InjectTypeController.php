@@ -24,6 +24,19 @@ class InjectTypeController extends Controller
     {
         $url = $this->getParameter('worker_url') . '/cxf/contracts';
         $contracts = json_decode(file_get_contents($url), true);
+
+        $other = array();
+        $other['type'] = 'other';
+        $other['fields'] = array();
+        $other['fields'][] = array(
+            'name' => 'content',
+            'type' => 'textarea',
+            'cardinality' => '1',
+            'mandatory' => true,
+        );
+
+        $contracts[] = $other;
+
         $output = json_encode($contracts);
         return new Response($output);
     }
