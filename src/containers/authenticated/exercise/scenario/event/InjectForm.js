@@ -16,12 +16,12 @@ i18nRegister({
     'Type': 'Type',
     'ovh-sms': 'Sms (Ovh)',
     'email': 'Email',
-    'other': 'Autre'
+    'other': 'Manuel'
   },
   en: {
     'ovh-sms': 'Sms (Ovh)',
     'email': 'Email',
-    'other': 'Other'
+    'other': 'Manual'
   }
 })
 
