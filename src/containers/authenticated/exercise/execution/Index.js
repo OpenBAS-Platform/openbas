@@ -241,13 +241,13 @@ class IndexExecution extends Component {
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Pending injects</T> {countdown}</div>
           <div className="clearfix"></div>
-          {this.props.injectsPending.length === 0 ?
-            <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
           <List>
             <Infinite elementHeight={62}
                       containerHeight={window.innerHeight - 230}
                       infiniteLoadBeginEdgeOffset={200}
                       onInfiniteLoad={this.handleRightInfiniteLoad.bind(this)}>
+              {this.props.injectsPending.length === 0 ?
+                <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
               {R.take(this.state.leftDisplayedNumber, this.props.injectsPending).map(inject => {
                 let injectId = R.propOr(Math.random(), 'inject_id', inject)
                 let inject_title = R.propOr('-', 'inject_title', inject)
@@ -301,13 +301,13 @@ class IndexExecution extends Component {
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Processed injects</T></div>
           <div className="clearfix"></div>
-          {this.props.injectsProcessed.length === 0 ?
-            <div style={styles.empty}><T>You do not have any processed injects in this exercise.</T></div> : ""}
           <List>
             <Infinite elementHeight={62}
                       containerHeight={window.innerHeight - 230}
                       infiniteLoadBeginEdgeOffset={200}
                       onInfiniteLoad={this.handleLeftInfiniteLoad.bind(this)}>
+              {this.props.injectsProcessed.length === 0 ?
+                <div style={styles.empty}><T>You do not have any processed injects in this exercise.</T></div> : ""}
               {R.take(this.state.rightDisplayedNumber, this.props.injectsProcessed).map(inject => {
                 let color = '#4CAF50'
                 if (inject.inject_status.status_name === 'ERROR') {
