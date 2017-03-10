@@ -355,13 +355,13 @@ class IndexExercise extends Component {
             </List>
           </Dialog>
           <Dialog
-            title="Audience view"
+            title={R.propOr('-', 'audience_name', this.state.currentAudience)}
             modal={false}
             open={this.state.openViewAudience}
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseViewAudience.bind(this)}
             actions={viewAudienceActions}>
-            <AudienceView audience={this.state.currentAudience}/>
+            <AudienceView audience={this.state.currentAudience} subaudiences={this.props.subaudiences}/>
           </Dialog>
         </div>
         <div className="clearfix"></div>
@@ -583,12 +583,13 @@ const select = (state, ownProps) => {
   return {
     exerciseId,
     objectives,
-    audiences,
-    events,
     subobjectives: state.referential.entities.subobjectives,
+    audiences,
+    subaudiences: state.referential.entities.subaudiences,
+    events,
     incidents: state.referential.entities.incidents,
     incident_types: state.referential.entities.incident_types,
-    injects: state.referential.entities.injects
+    injects: state.referential.entities.injects,
   }
 }
 

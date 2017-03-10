@@ -109,7 +109,6 @@ class IndexObjective extends Component {
                   secondaryText={subobjective_description}/>
               }
             )
-            console.log(nestedItems)
 
             return (
               <MainListItem
