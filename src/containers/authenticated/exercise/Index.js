@@ -291,7 +291,7 @@ class IndexExercise extends Component {
             </List>
           </Dialog>
           <Dialog
-            title="Objective view"
+            title={R.propOr('-', 'objective_title', this.state.currentObjective)}
             modal={false}
             open={this.state.openViewObjective}
             autoScrollBodyContent={true}
@@ -460,7 +460,7 @@ class IndexExercise extends Component {
           })}
         </List>
         <Dialog
-          title="Event view"
+          title={R.propOr('-', 'event_title', this.state.currentEvent)}
           modal={false}
           open={this.state.openViewEvent}
           autoScrollBodyContent={true}
@@ -469,7 +469,7 @@ class IndexExercise extends Component {
           <EventView event={this.state.currentEvent}/>
         </Dialog>
         <Dialog
-          title="Incident view"
+          title={R.propOr('-', 'incident_title', this.state.currentIncident)}
           modal={false}
           open={this.state.openViewIncident}
           autoScrollBodyContent={true}
@@ -478,7 +478,7 @@ class IndexExercise extends Component {
           <IncidentView incident={this.state.currentIncident} incident_types={this.props.incident_types}/>
         </Dialog>
         <Dialog
-          title="Inject view"
+          title={R.propOr('-', 'inject_title', this.state.currentInject)}
           modal={false}
           open={this.state.openViewInject}
           autoScrollBodyContent={true}

@@ -18,14 +18,10 @@ const styles = {
 }
 
 class ObjectiveView extends Component {
-
   render() {
-    let objective_title = R.propOr('-', 'objective_title', this.props.objective)
     let objective_description = R.propOr('-', 'objective_description', this.props.objective)
-
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{objective_title}</div>
         <div style={styles.story}>{objective_description}</div>
       </div>
     )

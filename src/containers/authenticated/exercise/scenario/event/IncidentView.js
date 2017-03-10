@@ -25,14 +25,11 @@ const styles = {
 class IncidentView extends Component {
 
   render() {
-    let incident_title = R.propOr('-', 'incident_title', this.props.incident)
     let incident_type = R.propOr('-', 'incident_type', this.props.incident)
     let incident_type_name = R.pathOr('-', [incident_type, 'type_name'], this.props.incident_types)
     let incident_story = R.propOr('-', 'incident_story', this.props.incident)
-
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{incident_title}</div>
         <div style={styles.type}><T>{incident_type_name}</T></div>
         <div style={styles.story}>{incident_story}</div>
       </div>

@@ -19,12 +19,9 @@ const styles = {
 class EventView extends Component {
 
   render() {
-    let event_title = R.propOr('-', 'event_title', this.props.event)
     let event_description = R.propOr('-', 'event_description', this.props.event)
-
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{event_title}</div>
         <div style={styles.story}>{event_description}</div>
       </div>
     )

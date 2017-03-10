@@ -130,7 +130,7 @@ class IndexObjective extends Component {
           })}
         </List>
         <Dialog
-          title="Objective view"
+          title={R.propOr('-', 'objective_title', this.state.currentObjective)}
           modal={false}
           open={this.state.openObjective}
           autoScrollBodyContent={true}
@@ -139,7 +139,7 @@ class IndexObjective extends Component {
           <ObjectiveView objective={this.state.currentObjective} />
         </Dialog>
         <Dialog
-          title="Subobjective view"
+          title={R.propOr('-', 'subobjective_title', this.state.currentSubobjective)}
           modal={false}
           open={this.state.openSubobjective}
           autoScrollBodyContent={true}
