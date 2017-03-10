@@ -27,6 +27,7 @@ i18nRegister({
     'body': 'Message',
     'message': 'Message',
     'encrypted': 'Chiffrement',
+    'content': 'Contenu',
     'Add an attachment': 'Ajouter une pièce jointe',
     'No content available for this inject type.': 'Aucun contenu disponible pour ce type d\'injection'
   },
@@ -34,7 +35,8 @@ i18nRegister({
     'sender': 'Sender',
     'subject': 'Subject',
     'body': 'Message',
-    'message': 'Message'
+    'message': 'Message',
+    'content': 'Content'
   }
 })
 

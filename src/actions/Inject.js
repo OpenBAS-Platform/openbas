@@ -47,3 +47,9 @@ export const shiftAllInjects = (exerciseId, data) => (dispatch) => {
 export const fetchInjectTypes = () => (dispatch) => {
   return getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch)
 }
+
+export const injectDone = (injectId) => (dispatch) => {
+  var data = {'status': 'SUCCESS', 'message': 'Manual validation'}
+  var uri = '/api/injects/' + injectId + '/status'
+  return postReferential(null, uri, data)(dispatch)
+}

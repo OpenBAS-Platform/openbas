@@ -9,13 +9,15 @@ i18nRegister({
     'sender': 'Expéditeur',
     'body': 'Message',
     'encrypted': 'Chiffré',
-    'attachments': 'Pièces jointes'
+    'attachments': 'Pièces jointes',
+    'content': 'Contenu'
   },
   en: {
     'sender': 'Sender',
     'body': 'Message',
     'encrypted': 'Encrypted',
-    'attachments': 'Attachments'
+    'attachments': 'Attachments',
+    'content': 'Content'
   }
 })
 
@@ -37,7 +39,7 @@ class InjectView extends Component {
       })
     )(inject_content)
 
-    let displayedAsText = ['sender', 'subject', 'body', 'message']
+    let displayedAsText = ['sender', 'subject', 'body', 'message', 'content']
     let displayedAsList = ['attachments']
 
     return (

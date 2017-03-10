@@ -310,7 +310,7 @@ class Index extends Component {
             <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
           </Toolbar>
           <Dialog
-            title="Inject view"
+            title={R.propOr('-', 'inject_title', this.state.currentInject)}
             modal={false}
             open={this.state.openView}
             autoScrollBodyContent={true}

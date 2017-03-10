@@ -15,7 +15,7 @@ import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuI
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {fetchIncident, selectIncident} from '../../../../../actions/Incident'
 import {redirectToEvent} from '../../../../../actions/Application'
-import {addInject, updateInject, deleteInject, tryInject} from '../../../../../actions/Inject'
+import {addInject, updateInject, deleteInject, tryInject, injectDone} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
@@ -45,7 +45,10 @@ i18nRegister({
     'Test': 'Tester',
     'Do you want to test this inject?': 'Souhaitez-vous tester cette injection ?',
     'Do you want to disable this inject?': 'Souhaitez-vous désactiver cette injection ?',
-    'Do you want to enable this inject?': 'Souhaitez-vous activer cette injection ?'
+    'Do you want to enable this inject?': 'Souhaitez-vous activer cette injection ?',
+    'Mark as done': 'Marquer comme fait',
+    'Done': 'Fait',
+    'Do you want to mark this inject as done?': 'Souhaitez-vous marquer cette injection comme réalisée ?'
   }
 })
 
@@ -58,6 +61,7 @@ class InjectPopover extends Component {
       openPopover: false,
       openDisable: false,
       openEnable: false,
+      openDone: false,
       openCopy: false,
       openTry: false,
       type: undefined,
@@ -207,6 +211,20 @@ class InjectPopover extends Component {
     this.refs.copyForm.submit()
   }
 
+  handleOpenDone() {
+    this.setState({openDone: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseDone() {
+    this.setState({openDone: false})
+  }
+
+  submitDone() {
+    this.props.injectDone(this.props.inject.inject_id)
+    this.handleCloseDone()
+  }
+
   onCopySubmit(data) {
     let incident = R.find(i => i.incident_id === data.incident_id)(this.props.incidents)
     let audiencesList = R.map(a => a.audience_id, this.props.inject.inject_audiences)
@@ -328,6 +346,10 @@ class InjectPopover extends Component {
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseTry.bind(this)}/>,
       <FlatButton label="Test" primary={true} onTouchTap={this.submitTry.bind(this)}/>,
     ]
+    const doneActions = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDone.bind(this)}/>,
+      <FlatButton label="Done" primary={true} onTouchTap={this.submitDone.bind(this)}/>,
+    ]
 
     let initPipe = R.pipe(
       R.assoc('inject_date', dateFormat(R.path(['inject', 'inject_date'], this.props))),
@@ -335,6 +357,7 @@ class InjectPopover extends Component {
     )
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined
     let inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject)
+    let inject_type = R.propOr(true, 'inject_type', this.props.inject)
 
     return (
       <div style={styles[this.props.type]}>
@@ -350,6 +373,9 @@ class InjectPopover extends Component {
             {inject_enabled ?
               <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
               <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
+            {inject_type === 'other' ?
+              <MenuItemButton label="Mark as done" onTouchTap={this.handleOpenDone.bind(this)}/> : ''
+            }
             <MenuItemButton label="Test" onTouchTap={this.handleOpenTry.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
@@ -401,6 +427,12 @@ class InjectPopover extends Component {
                 actions={enableActions}>
           <T>Do you want to enable this inject?</T>
         </Dialog>
+        <Dialog title="Done" modal={false}
+                open={this.state.openDone}
+                onRequestClose={this.handleCloseDone.bind(this)}
+                actions={doneActions}>
+          <T>Do you want to mark this inject as done?</T>
+        </Dialog>
         <Dialog title="Copy" modal={false}
                 open={this.state.openCopy}
                 onRequestClose={this.handleCloseCopy.bind(this)}
@@ -437,6 +469,7 @@ InjectPopover.propTypes = {
   tryInject: PropTypes.func,
   redirectToEvent: PropTypes.func,
   selectIncident: PropTypes.func,
+  injectDone: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node,
   initialAttachments: PropTypes.array,
@@ -449,6 +482,7 @@ export default connect(null, {
   addInject,
   updateInject,
   deleteInject,
+  injectDone,
   tryInject,
   redirectToEvent,
   selectIncident

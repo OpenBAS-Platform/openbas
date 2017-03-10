@@ -289,7 +289,7 @@ class IndexExecution extends Component {
             </Infinite>
           </List>
           <Dialog
-            title="Inject view"
+            title={R.propOr('-', 'inject_title', this.state.currentInject)}
             modal={false}
             open={this.state.openView}
             autoScrollBodyContent={true}
