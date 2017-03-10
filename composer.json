@@ -17,7 +17,7 @@
     }
   },
   "require": {
-    "php": ">=5.5.9",
+    "php": ">=7.0.15",
     "symfony/symfony": "3.2.*",
     "doctrine/orm": "*",
     "doctrine/doctrine-bundle": "*",
@@ -36,7 +36,7 @@
   },
   "require-dev": {
     "sensio/generator-bundle": "*",
-    "symfony/phpunit-bridge": "3.2.1"
+    "symfony/phpunit-bridge": "*"
   },
   "scripts": {
     "symfony-scripts-install": [
