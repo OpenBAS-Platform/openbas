@@ -1,5 +1,6 @@
 import React, {PropTypes, Component} from 'react'
 import R from 'ramda'
+import Theme from '../../../../components/Theme'
 import {i18nRegister} from '../../../../utils/Messages'
 import {T} from '../../../../components/I18n'
 
@@ -8,18 +9,21 @@ i18nRegister({
     'sender': 'Expéditeur',
     'body': 'Message',
     'encrypted': 'Chiffré',
-    'attachments': 'Pièces jointes'
+    'attachments': 'Pièces jointes',
+    'content': 'Contenu'
   },
   en: {
     'sender': 'Sender',
     'body': 'Message',
     'encrypted': 'Encrypted',
-    'attachments': 'Attachments'
+    'attachments': 'Attachments',
+    'content': 'Content'
   }
 })
 
 const styles = {
   'container': {
+    color: Theme.palette.textColor,
     padding: '10px 0px 10px 0px'
   }
 }
@@ -35,7 +39,7 @@ class DryinjectView extends Component {
       })
     )(dryinject_content)
 
-    let displayedAsText = ['sender', 'subject', 'body', 'message']
+    let displayedAsText = ['sender', 'subject', 'body', 'message', 'content']
     let displayedAsList = ['attachments']
 
     return (

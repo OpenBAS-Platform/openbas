@@ -25,6 +25,7 @@ import ActionDone from 'material-ui/svg-icons/action/done'
 import ActionDoneAll from 'material-ui/svg-icons/action/done-all'
 import ActionDescription from 'material-ui/svg-icons/action/description'
 import ActionRowing from 'material-ui/svg-icons/action/rowing'
+import ActionInput from 'material-ui/svg-icons/action/input'
 import NavigationMoreVert from 'material-ui/svg-icons/navigation/more-vert'
 import NavigationMoreHoriz from 'material-ui/svg-icons/navigation/more-horiz'
 import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
@@ -141,6 +142,8 @@ export const Icon = (props) => {
       return (<ActionDescription style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_ACTION_ROWING:
       return (<ActionRowing style={mergeStyle} color={props.color} />)
+    case Constants.ICON_NAME_ACTION_INPUT:
+      return (<ActionInput style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_VERT:
       return (<NavigationMoreVert style={mergeStyle} color={props.color} />)
     case Constants.ICON_NAME_NAVIGATION_MORE_HORIZ:

@@ -9,7 +9,7 @@ import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'
 import {Icon} from '../../../../components/Icon'
-import {MenuItemButton, MenuItemLink} from "../../../../components/menu/MenuItem"
+import {MenuItemButton, MenuItemLink} from '../../../../components/menu/MenuItem'
 import {updateExercise} from '../../../../actions/Exercise'
 import {addDryrun} from '../../../../actions/Dryrun'
 import {redirectToDryrun} from '../../../../actions/Application'

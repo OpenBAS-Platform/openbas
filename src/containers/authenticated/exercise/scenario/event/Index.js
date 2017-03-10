@@ -179,6 +179,8 @@ class Index extends Component {
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       case 'ovh-sms':
         return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+      case 'other':
+        return <Icon name={Constants.ICON_NAME_ACTION_INPUT} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       default:
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
     }

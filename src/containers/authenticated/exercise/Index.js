@@ -221,7 +221,6 @@ class IndexExercise extends Component {
   }
 
   handleOpenInjectAudiences(audiences, event) {
-    console.log(event)
     event.stopPropagation()
     this.setState({currentInjectAudiences: audiences, openInjectAudiences: true})
   }

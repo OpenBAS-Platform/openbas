@@ -49,7 +49,7 @@ export const fetchInjectTypes = () => (dispatch) => {
 }
 
 export const injectDone = (injectId) => (dispatch) => {
-  var data = {'status': 'SUCCESS', 'message': 'Manual validation'}
+  var data = {'status': 'SUCCESS', 'message': ['Manual validation']}
   var uri = '/api/injects/' + injectId + '/status'
   return postReferential(null, uri, data)(dispatch)
 }

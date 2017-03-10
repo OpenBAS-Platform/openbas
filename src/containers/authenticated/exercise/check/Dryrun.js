@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
+import Infinite from 'react-infinite'
 import R from 'ramda'
 import Rx from 'rxjs/Rx'
 import {FIVE_SECONDS, timeDiff} from '../../../../utils/Time'
@@ -22,6 +23,7 @@ import {fetchDryinjects} from '../../../../actions/Dryinject'
 import DryrunPopover from './DryrunPopover'
 import DryinjectView from './DryinjectView'
 import DryinjectStatusView from './DryinjectStatusView'
+import DryinjectPopover from './DryinjectPopover'
 
 i18nRegister({
   fr: {
@@ -41,14 +43,14 @@ const styles = {
   },
   'columnLeft': {
     float: 'left',
-    width: '48%',
+    width: '49%',
     margin: 0,
     padding: 0,
     textAlign: 'left'
   },
   'columnRight': {
     float: 'right',
-    width: '48%',
+    width: '49%',
     margin: 0,
     padding: 0,
     textAlign: 'left'
@@ -72,7 +74,7 @@ const styles = {
     float: 'right',
   },
   'empty': {
-    marginTop: 30,
+    marginTop: 40,
     fontSize: '18px',
     fontWeight: 500,
     textAlign: 'left'
@@ -83,35 +85,59 @@ const styles = {
   },
   'dryinject_date': {
     float: 'right',
-    width: '130px',
-    padding: '5px 0 0 0'
+    padding: '5px 30px 0 0'
   }
 }
 
 class IndexExerciseDryrun extends Component {
   constructor(props) {
     super(props);
-    this.state = {openView: false, currentDryinject: {}, openStatus: false, currentStatus: {}}
+    this.state = {
+      openView: false,
+      currentDryinject: {},
+      openStatus: false,
+      currentStatus: {},
+      leftItemsNumber: 0,
+      leftDisplayedNumber: 0,
+      leftInitialNumber: 0,
+      rightItemsNumber: 0,
+      rightDisplayedNumber: 0,
+      rightInitialNumber: 0
+    }
   }
 
   componentDidMount() {
+    this.setState({
+      leftInitialNumber: this.computeInitialNumbersOfRows(),
+      rightInitialNumber: this.computeInitialNumbersOfRows(),
+      leftDisplayedNumber: this.computeInitialNumbersOfRows(),
+      rightDisplayedNumber: this.computeInitialNumbersOfRows(),
+    })
     this.props.fetchAudiences(this.props.exerciseId)
     //Scheduler listener
     const initialStream = Rx.Observable.of(1) //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
-    const cancelStream = Rx.Observable.create(obs => {this.cancelStreamEvent = () => {obs.next(1)}})
+    const cancelStream = Rx.Observable.create(obs => {
+      this.cancelStreamEvent = () => {
+        obs.next(1)
+      }
+    })
     this.subscription = initialStream
       .merge(intervalStream)
       .takeUntil(cancelStream)
       .exhaustMap(() => Promise.all([
         this.props.fetchDryrun(this.props.exerciseId, this.props.dryrunId, true),
-        this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true)
+        this.props.fetchDryinjects(this.props.exerciseId, this.props.dryrunId, true).then(() => {
+          this.setState({
+            leftItemsNumber: this.props.dryinjectsPending.length,
+            rightItemsNumber: this.props.dryinjectsProcessed.length
+          })})
       ])).subscribe()
   }
 
   componentWillReceiveProps(nextProps) {
     let dryrun_finished = R.propOr(false, 'dryrun_finished', nextProps.dryrun)
-    if(dryrun_finished) this.cancelStreamEvent()
+    if (dryrun_finished) this.cancelStreamEvent()
   }
 
   componentWillUnmount() {
@@ -124,6 +150,8 @@ class IndexExerciseDryrun extends Component {
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       case 'ovh-sms':
         return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+      case 'other':
+        return <Icon name={Constants.ICON_NAME_ACTION_INPUT} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       default:
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
     }
@@ -145,6 +173,28 @@ class IndexExerciseDryrun extends Component {
     this.setState({openStatus: false})
   }
 
+  computeInitialNumbersOfRows() {
+    return Math.round(window.innerHeight / 62) + 1
+  }
+
+  handleLeftInfiniteLoad() {
+    let remainder = this.state.leftItemsNumber - this.state.leftDisplayedNumber
+    if (remainder >= this.state.leftInitialNumber) {
+      this.setState({leftDisplayedNumber: this.state.leftDisplayedNumber + this.state.leftInitialNumber})
+    } else if (remainder > 0) {
+      this.setState({leftDisplayedNumber: this.state.leftDisplayedNumber + remainder})
+    }
+  }
+
+  handleRightInfiniteLoad() {
+    let remainder = this.state.rightItemsNumber - this.state.rightDisplayedNumber
+    if (remainder >= this.state.rightInitialNumber) {
+      this.setState({rightDisplayedNumber: this.state.rightDisplayedNumber + this.state.rightInitialNumber})
+    } else if (remainder > 0) {
+      this.setState({rightDisplayedNumber: this.state.rightDisplayedNumber + remainder})
+    }
+  }
+
   render() {
     const viewActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
@@ -163,7 +213,8 @@ class IndexExerciseDryrun extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Dryrun</T></div>
-        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun} listenDeletionCall={this.cancelStreamEvent}/>
+        <DryrunPopover exerciseId={this.props.exerciseId} dryrun={this.props.dryrun}
+                       listenDeletionCall={this.cancelStreamEvent}/>
         <div style={styles.audience}>{dryrun_id}</div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
@@ -175,68 +226,79 @@ class IndexExerciseDryrun extends Component {
         <LinearProgress mode={this.props.dryinjectsProcessed.length === 0 ? 'indeterminate' : 'determinate'} min={0}
                         max={this.props.dryinjectsPending.length + this.props.dryinjectsProcessed.length}
                         value={this.props.dryinjectsProcessed.length}/>
-        <br /><br />
+        <br />
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Pending injects</T> {countdown}</div>
           <div className="clearfix"></div>
-          {this.props.dryinjectsPending.length === 0 ?
-            <div style={styles.empty}><T>You do not have any pending injects in this dryrun.</T></div> : ""}
           <List>
-            {this.props.dryinjectsPending.map(dryinject => {
-              return (
-                <MainListItem
-                  key={dryinject.dryinject_id}
-                  onClick={this.handleOpenView.bind(this, dryinject)}
-                  primaryText={
-                    <div>
-                      <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
-                      <div style={styles.dryinject_date}>{dateFormat(dryinject.dryinject_date)}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                  leftIcon={this.selectIcon(dryinject.dryinject_type)}
-                />
-              )
-            })}
+            <Infinite elementHeight={62}
+                      containerHeight={window.innerHeight - 230}
+                      infiniteLoadBeginEdgeOffset={200}
+                      onInfiniteLoad={this.handleLeftInfiniteLoad.bind(this)}>
+              {this.props.dryinjectsPending.length === 0 ?
+                <div style={styles.empty}><T>You do not have any pending injects in this dryrun.</T></div> : ""}
+              {R.take(this.state.leftDisplayedNumber, this.props.dryinjectsPending).map(dryinject => {
+                return (
+                  <MainListItem
+                    key={dryinject.dryinject_id}
+                    onClick={this.handleOpenView.bind(this, dryinject)}
+                    primaryText={
+                      <div>
+                        <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
+                        <div style={styles.dryinject_date}>{dateFormat(dryinject.dryinject_date)}</div>
+                        <div className="clearfix"></div>
+                      </div>
+                    }
+                    leftIcon={this.selectIcon(dryinject.dryinject_type)}
+                    rightIconButton={<DryinjectPopover dryinject={dryinject}/>}
+                  />
+                )
+              })}
+            </Infinite>
           </List>
           <Dialog
-            title="Inject view"
+            title={R.propOr('-', 'dryinject_title', this.state.currentDryinject)}
             modal={false}
             open={this.state.openView}
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-            <DryinjectView dryinject={this.state.currentDryinject} />
+            <DryinjectView dryinject={this.state.currentDryinject}/>
           </Dialog>
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Processed injects</T></div>
           <div className="clearfix"></div>
-          {this.props.dryinjectsProcessed.length === 0 ?
-            <div style={styles.empty}><T>You do not have any processed injects in this dryrun.</T></div> : ""}
           <List>
-            {this.props.dryinjectsProcessed.map(dryinject => {
-              let color = '#4CAF50'
-              if (dryinject.dryinject_status.status_name === 'ERROR') {
-                color = '#F44336'
-              } else if (dryinject.dryinject_status.status_name === 'PARTIAL') {
-                color = '#FF5722'
-              }
-              return (
-                <MainListItem
-                  key={dryinject.dryinject_id}
-                  onClick={this.handleOpenStatus.bind(this, dryinject)}
-                  primaryText={
-                    <div>
-                      <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
-                      <div style={styles.dryinject_date}>{dateFormat(dryinject.dryinject_date)}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                  leftIcon={this.selectIcon(dryinject.dryinject_type, color)}
-                />
-              )
-            })}
+            <Infinite elementHeight={62}
+                      containerHeight={window.innerHeight - 230}
+                      infiniteLoadBeginEdgeOffset={200}
+                      onInfiniteLoad={this.handleRightInfiniteLoad.bind(this)}>
+              {this.props.dryinjectsProcessed.length === 0 ?
+                <div style={styles.empty}><T>You do not have any processed injects in this dryrun.</T></div> : ""}
+              {R.take(this.state.rightDisplayedNumber, this.props.dryinjectsProcessed).map(dryinject => {
+                let color = '#4CAF50'
+                if (dryinject.dryinject_status.status_name === 'ERROR') {
+                  color = '#F44336'
+                } else if (dryinject.dryinject_status.status_name === 'PARTIAL') {
+                  color = '#FF5722'
+                }
+                return (
+                  <MainListItem
+                    key={dryinject.dryinject_id}
+                    onClick={this.handleOpenStatus.bind(this, dryinject)}
+                    primaryText={
+                      <div>
+                        <div style={styles.dryinject_title}>{dryinject.dryinject_title}</div>
+                        <div style={styles.dryinject_date}>{dateFormat(dryinject.dryinject_date)}</div>
+                        <div className="clearfix"></div>
+                      </div>
+                    }
+                    leftIcon={this.selectIcon(dryinject.dryinject_type, color)}
+                  />
+                )
+              })}
+            </Infinite>
           </List>
           <Dialog
             title="Status"
@@ -245,7 +307,7 @@ class IndexExerciseDryrun extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseStatus.bind(this)}
             actions={statusActions}>
-            <DryinjectStatusView dryinject={this.state.currentStatus} />
+            <DryinjectStatusView dryinject={this.state.currentStatus}/>
           </Dialog>
         </div>
       </div>

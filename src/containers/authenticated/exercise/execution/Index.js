@@ -44,14 +44,14 @@ const styles = {
   },
   'columnLeft': {
     float: 'left',
-    width: '48%',
+    width: '49%',
     margin: 0,
     padding: 0,
     textAlign: 'left'
   },
   'columnRight': {
     float: 'right',
-    width: '48%',
+    width: '49%',
     margin: 0,
     padding: 0,
     textAlign: 'left'
@@ -83,7 +83,10 @@ const styles = {
   },
   'inject_title': {
     float: 'left',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
   },
   'inject_date': {
     float: 'right',
@@ -140,6 +143,8 @@ class IndexExecution extends Component {
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       case 'ovh-sms':
         return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+      case 'other':
+        return <Icon name={Constants.ICON_NAME_ACTION_INPUT} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       default:
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
     }
@@ -190,12 +195,9 @@ class IndexExecution extends Component {
 
   handleLeftInfiniteLoad() {
     let remainder = this.state.leftItemsNumber - this.state.leftDisplayedNumber
-    console.log(remainder)
     if (remainder >= this.state.leftInitialNumber) {
-      console.log('NEW STATE')
       this.setState({leftDisplayedNumber: this.state.leftDisplayedNumber + this.state.leftInitialNumber})
     } else if (remainder > 0) {
-      console.log('NEW STATE')
       this.setState({leftDisplayedNumber: this.state.leftDisplayedNumber + remainder})
     }
   }
@@ -245,7 +247,7 @@ class IndexExecution extends Component {
             <Infinite elementHeight={62}
                       containerHeight={window.innerHeight - 230}
                       infiniteLoadBeginEdgeOffset={200}
-                      onInfiniteLoad={this.handleRightInfiniteLoad.bind(this)}>
+                      onInfiniteLoad={this.handleLeftInfiniteLoad.bind(this)}>
               {this.props.injectsPending.length === 0 ?
                 <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
               {R.take(this.state.leftDisplayedNumber, this.props.injectsPending).map(inject => {
@@ -305,7 +307,7 @@ class IndexExecution extends Component {
             <Infinite elementHeight={62}
                       containerHeight={window.innerHeight - 230}
                       infiniteLoadBeginEdgeOffset={200}
-                      onInfiniteLoad={this.handleLeftInfiniteLoad.bind(this)}>
+                      onInfiniteLoad={this.handleRightInfiniteLoad.bind(this)}>
               {this.props.injectsProcessed.length === 0 ?
                 <div style={styles.empty}><T>You do not have any processed injects in this exercise.</T></div> : ""}
               {R.take(this.state.rightDisplayedNumber, this.props.injectsProcessed).map(inject => {
