@@ -17,7 +17,7 @@
     }
   },
   "require": {
-    "php": ">=5.5.9",
+    "php": ">=7.0.15",
     "symfony/symfony": "3.2.*",
     "doctrine/orm": "*",
     "doctrine/doctrine-bundle": "*",
@@ -32,7 +32,7 @@
     "nelmio/api-doc-bundle": "*",
     "nategood/httpful": "*",
     "liuggio/excelbundle": "*",
-    "doctrine/doctrine-migrations-bundle": "^1.0"
+    "doctrine/doctrine-migrations-bundle": "*"
   },
   "require-dev": {
     "sensio/generator-bundle": "*",
