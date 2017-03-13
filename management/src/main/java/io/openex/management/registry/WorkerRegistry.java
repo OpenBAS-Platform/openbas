@@ -27,7 +27,6 @@ public class WorkerRegistry implements IWorkerRegistry {
 	
 	@Override
 	public void addWorker(Executor executor) throws Exception {
-		System.out.println("WORKER ADD [" + executor.name() + "]");
 		workers.put(executor.name(), executor);
 		for (IWorkerListener listener : listeners.values()) {
 			listener.onWorkerAdded(executor);
@@ -36,7 +35,6 @@ public class WorkerRegistry implements IWorkerRegistry {
 	
 	@Override
 	public void removeWorker(Executor executor) throws Exception {
-		System.out.println("WORKER REMOVE [" + executor.name() + "]");
 		workers.remove(executor.name());
 		for (IWorkerListener listener : listeners.values()) {
 			listener.onWorkerRemoved(executor);

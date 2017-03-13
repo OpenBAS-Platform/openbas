@@ -19,12 +19,17 @@
             <groupId>io.openex</groupId>
             <artifactId>worker-management</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-freemarker</artifactId>
             <version>${camel.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.7</version>
             <scope>provided</scope>
         </dependency>
 	</dependencies>
@@ -34,7 +39,7 @@
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
-                <version>4.0.7</version>
+                <version>4.1.0</version>
                 <executions>
                     <execution>
                         <id>plugin-feature</id>

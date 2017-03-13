@@ -5,16 +5,12 @@
     xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0"
     name="worker-features">
 
-    <repository>mvn:org.apache.cxf.dosgi/cxf-dosgi/2.0.0/xml/features</repository>
     <repository>mvn:io.openex/worker-management/${pom.version}/xml/features</repository>
     <repository>mvn:io.openex/worker-scheduler/${pom.version}/xml/features</repository>
     <repository>mvn:io.openex/worker-email/${pom.version}/xml/features</repository>
     <repository>mvn:io.openex/worker-ovh-sms/${pom.version}/xml/features</repository>
 
     <feature name="worker-features" version="${pom.version}">
-        <bundle>mvn:com.google.guava/guava/20.0</bundle>
-        <feature>scr</feature>
-        <feature>cxf-dosgi-provider-rs</feature>
         <feature>worker-management</feature>
         <feature>worker-scheduler</feature>
         <feature>worker-email</feature>

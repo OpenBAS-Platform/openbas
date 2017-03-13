@@ -14,7 +14,7 @@
             <!-- scope is compile so all features (there is only one) are installed into startup.properties and the feature repo itself is not added in etc/org.apache.karaf.features.cfg file -->
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>framework</artifactId>
-            <version>4.0.7</version>
+            <version>4.1.0</version>
             <type>kar</type>
         </dependency>
         <dependency>
@@ -22,7 +22,7 @@
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>standard</artifactId>
             <classifier>features</classifier>
-            <version>4.0.7</version>
+            <version>4.1.0</version>
             <type>xml</type>
             <scope>runtime</scope>
         </dependency>
@@ -31,7 +31,7 @@
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>spring</artifactId>
             <classifier>features</classifier>
-            <version>4.0.7</version>
+            <version>4.1.0</version>
             <type>xml</type>
             <scope>runtime</scope>
         </dependency>
@@ -82,7 +82,7 @@
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
-                <version>4.0.7</version>
+                <version>4.1.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <bootFeatures>

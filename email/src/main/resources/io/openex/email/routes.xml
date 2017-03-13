@@ -1,8 +1,9 @@
-<routes xmlns="http://camel.apache.org/schema/spring">
+<routes xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <route id="openex-email">
-        <from uri="direct:email"/>
+        <from uri="direct:openex_email"/>
         <setHeader headerName="From">
-            <simple>{{openex.worker_email_sender}}</simple>
+            <simple>{{openex_email.sender}}</simple>
         </setHeader>
         <setHeader headerName="subject">
             <simple>${body[subject]}</simple>
@@ -51,7 +52,7 @@
                     <!-- Add attachments -->
                     <bean ref="attachments-handler"/>
                     <!-- Send the email -->
-                    <to uri="{{openex.worker_email_transport}}://{{openex.worker_email_host}}?password={{openex.worker_email_password}}&amp;username={{openex.worker_email_user}}&amp;sslContextParameters=#ssl-handler"/>
+                    <to uri="{{openex_email.transport}}://{{openex_email.host}}?password={{openex_email.password}}&amp;username={{openex_email.user}}&amp;sslContextParameters=#ssl-handler"/>
                     <!-- Output message for callback -->
                     <setBody>
                         <simple>${header.To} success</simple>

@@ -19,7 +19,7 @@
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
-                <version>4.0.7</version>
+                <version>4.1.0</version>
                 <extensions>true</extensions>
                 <configuration>
                     <startLevel>80</startLevel>

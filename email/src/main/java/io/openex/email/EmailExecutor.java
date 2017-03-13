@@ -17,8 +17,12 @@ import static io.openex.management.contract.ContractType.Richtextarea;
 @SuppressWarnings("PackageAccessibility")
 class EmailExecutor implements Executor {
 	
+	/**
+	 * Module identifier. Property file need to be named like this too.
+	 * @return
+	 */
 	public String name() {
-		return "email";
+		return "openex_email";
 	}
 	
 	@Override

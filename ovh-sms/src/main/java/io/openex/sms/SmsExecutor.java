@@ -13,7 +13,7 @@ import static io.openex.management.contract.ContractType.Textarea;
 class SmsExecutor implements Executor {
 	
 	public String name() {
-		return "ovh-sms";
+		return "openex_ovh_sms";
 	}
 	
 	@Override

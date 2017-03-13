@@ -11,7 +11,7 @@ import org.apache.camel.component.http4.HttpComponent;
 class SchedulerExecutor implements Executor {
 	
 	public String name() {
-		return "scheduler";
+		return "openex_scheduler";
 	}
 	
 	@Override

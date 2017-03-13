@@ -2,7 +2,6 @@ package io.openex.management.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.openex.management.Executor;
 import io.openex.management.IOpenexContext;
 import io.openex.management.registry.IWorkerRegistry;
 import org.apache.camel.builder.ProxyBuilder;
@@ -14,11 +13,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static io.openex.management.helper.OpenexPropertyUtils.isWorkerEnable;
 
 @Path("")
 @Component(service = WorkerRest.class,
@@ -47,17 +47,17 @@ public class WorkerRest {
 	@Produces(MediaType.APPLICATION_JSON)
 	public String heartbeat() {
 		Set<String> workers = workerRegistry.workers().values().stream()
-				.filter(executor -> executor.contract() != null)
-				.map(Executor::name).collect(Collectors.toSet());
+				.map(executor -> executor.name() + ":" + (isWorkerEnable(executor.name()) ? "enable" : "disable"))
+				.collect(Collectors.toSet());
 		return gson.toJson(new RestHeartbeat(workers));
 	}
 	
 	@GET
 	@Path("/contracts")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getContracts() throws IOException {
+	public String getContracts() throws Exception {
 		List<RestContract> contracts = workerRegistry.workers().values().stream()
-				.filter(executor -> executor.contract() != null)
+				.filter(executor -> executor.contract() != null && isWorkerEnable(executor.name()))
 				.map(executor -> new RestContract(executor.name(), executor.contract().getFields()))
 				.collect(Collectors.toList());
 		return gson.toJson(contracts);

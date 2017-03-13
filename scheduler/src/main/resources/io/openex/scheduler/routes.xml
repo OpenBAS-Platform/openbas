@@ -1,10 +1,11 @@
-<routes xmlns="http://camel.apache.org/schema/spring">
+<routes xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <route id="openex-scheduler">
         <from uri="timer:simple?period=5s"/>
         <setHeader headerName="Authorization">
             <constant>{{openex.token}}</constant>
         </setHeader>
-        <to uri="{{openex.inject_fetch}}"/>
+        <to uri="{{openex_scheduler.uri}}"/>
         <!-- Remove authorization header to avoid any compatibility problem with execution modules -->
         <removeHeader headerName="Authorization"/>
         <unmarshal>
