@@ -24,7 +24,6 @@ class EmailExecutor implements Executor {
 	@Override
 	public Contract contract() {
 		return Contract.build()
-				.mandatory("sender")
 				.mandatory("subject")
 				.mandatory("body", Richtextarea)
 				.optional("encrypted", Checkbox)

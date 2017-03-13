@@ -2,7 +2,7 @@
     <route id="openex-email">
         <from uri="direct:email"/>
         <setHeader headerName="From">
-            <simple>${body[sender]}</simple>
+            <simple>{{openex.worker_email_sender}}</simple>
         </setHeader>
         <setHeader headerName="subject">
             <simple>${body[subject]}</simple>
