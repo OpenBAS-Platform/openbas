@@ -102,7 +102,7 @@
                                 <copy todir="src/main/filtered-resources/openex"
                                       overwrite="true" flatten="true">
                                     <fileset dir="../">
-                                        <include name="**/openex_*.properties"/>
+                                        <include name="**/openex*.properties"/>
                                     </fileset>
                                 </copy>
                             </target>

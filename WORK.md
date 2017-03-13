@@ -5,6 +5,7 @@ etc/org.ops4j.pax.url.mvn.cfg => org.ops4j.pax.url.mvn.defaultLocalRepoAsRemote=
 mvn install
 karaf debug
 feature:repo-add mvn:io.openex/worker-features/1.0.0-SNAPSHOT/xml/features
+feature:uninstall worker-features
 feature:install worker-features
 bundle:watch *
 log:display
