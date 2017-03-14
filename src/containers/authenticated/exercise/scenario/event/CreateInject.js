@@ -29,7 +29,7 @@ class CreateInject extends Component {
       open: false,
       stepIndex: 0,
       finished: false,
-      type: null,
+      type: 'openex_manual',
       injectData: null,
       injectAttachments: []
     }
