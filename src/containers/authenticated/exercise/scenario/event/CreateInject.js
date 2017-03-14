@@ -116,6 +116,7 @@ class CreateInject extends Component {
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
+            initialValues={{inject_type: 'openex_manual'}}
             types={this.props.inject_types}/>
         )
       case 1:
