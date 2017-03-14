@@ -1,7 +1,6 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import Rx from 'rxjs/Rx'
-import Infinite from 'react-infinite'
 import {FIVE_SECONDS, timeDiff} from '../../../../utils/Time'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
@@ -96,40 +95,23 @@ const styles = {
 
 class IndexExecution extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       openView: false,
       currentInject: {},
       openStatus: false,
-      currentStatus: {},
-      leftItemsNumber: 0,
-      leftDisplayedNumber: 0,
-      leftInitialNumber: 0,
-      rightItemsNumber: 0,
-      rightDisplayedNumber: 0,
-      rightInitialNumber: 0
+      currentStatus: {}
     }
   }
 
   componentDidMount() {
-    this.setState({
-      leftInitialNumber: this.computeInitialNumbersOfRows(),
-      rightInitialNumber: this.computeInitialNumbersOfRows(),
-      leftDisplayedNumber: this.computeInitialNumbersOfRows(),
-      rightDisplayedNumber: this.computeInitialNumbersOfRows(),
-    })
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchInjectTypes()
     const initialStream = Rx.Observable.of(1); //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
     this.subscription = initialStream
       .merge(intervalStream)
-      .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId, true).then(() => {
-        this.setState({
-          leftItemsNumber: this.props.injectsPending.length,
-          rightItemsNumber: this.props.injectsProcessed.length
-        })
-      })) //Fetch only if previous call finished
+      .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId, true)) //Fetch only if previous call finished
       .subscribe()
   }
 
@@ -139,11 +121,11 @@ class IndexExecution extends Component {
 
   selectIcon(type, color) {
     switch (type) {
-      case 'email':
+      case 'openex_email':
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
-      case 'ovh-sms':
+      case 'openex_ovh_sms':
         return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
-      case 'other':
+      case 'openex_manual':
         return <Icon name={Constants.ICON_NAME_ACTION_INPUT} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       default:
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
@@ -189,28 +171,6 @@ class IndexExecution extends Component {
     this.setState({openStatus: false})
   }
 
-  computeInitialNumbersOfRows() {
-    return Math.round(window.innerHeight / 62) + 1
-  }
-
-  handleLeftInfiniteLoad() {
-    let remainder = this.state.leftItemsNumber - this.state.leftDisplayedNumber
-    if (remainder >= this.state.leftInitialNumber) {
-      this.setState({leftDisplayedNumber: this.state.leftDisplayedNumber + this.state.leftInitialNumber})
-    } else if (remainder > 0) {
-      this.setState({leftDisplayedNumber: this.state.leftDisplayedNumber + remainder})
-    }
-  }
-
-  handleRightInfiniteLoad() {
-    let remainder = this.state.rightItemsNumber - this.state.rightDisplayedNumber
-    if (remainder >= this.state.rightInitialNumber) {
-      this.setState({rightDisplayedNumber: this.state.rightDisplayedNumber + this.state.rightInitialNumber})
-    } else if (remainder > 0) {
-      this.setState({rightDisplayedNumber: this.state.rightDisplayedNumber + remainder})
-    }
-  }
-
   render() {
     const viewActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
@@ -244,51 +204,48 @@ class IndexExecution extends Component {
           <div style={styles.title}><T>Pending injects</T> {countdown}</div>
           <div className="clearfix"></div>
           <List>
-            <Infinite elementHeight={62}
-                      containerHeight={window.innerHeight - 230}
-                      infiniteLoadBeginEdgeOffset={200}
-                      onInfiniteLoad={this.handleLeftInfiniteLoad.bind(this)}>
-              {this.props.injectsPending.length === 0 ?
-                <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
-              {R.take(this.state.leftDisplayedNumber, this.props.injectsPending).map(inject => {
-                let injectId = R.propOr(Math.random(), 'inject_id', inject)
-                let inject_title = R.propOr('-', 'inject_title', inject)
-                let inject_date = R.prop('inject_date', inject)
-                let inject_type = R.propOr('-', 'inject_type', inject)
-                let inject_audiences = R.propOr([], 'inject_audiences', inject)
-                let inject_enabled = R.propOr(true, 'inject_enabled', inject)
-                return (
-                  <MainListItem
-                    key={injectId}
-                    onClick={this.handleOpenView.bind(this, inject)}
-                    primaryText={
-                      <div>
-                        <div style={styles.inject_title}><span
-                          style={{color: this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED')}}>{inject_title}</span>
-                        </div>
-                        <div style={styles.inject_date}><span
-                          style={{color: this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject_date)}</span>
-                        </div>
-                        <div className="clearfix"></div>
+            {this.props.injectsPending.length === 0 ?
+              <div style={styles.empty}><T>You do not have any pending injects in this exercise.</T></div> : ""}
+            {R.take(30, this.props.injectsPending).map(inject => {
+              let injectId = R.propOr(Math.random(), 'inject_id', inject)
+              let inject_title = R.propOr('-', 'inject_title', inject)
+              let inject_date = R.prop('inject_date', inject)
+              let inject_type = R.propOr('-', 'inject_type', inject)
+              let inject_audiences = R.propOr([], 'inject_audiences', inject)
+              let inject_enabled = R.propOr(true, 'inject_enabled', inject)
+              let injectType = R.propOr(false, inject_type, this.props.inject_types)
+              let injectDisabled = injectType ? false : true
+              return (
+                <MainListItem
+                  key={injectId}
+                  onClick={this.handleOpenView.bind(this, inject)}
+                  primaryText={
+                    <div>
+                      <div style={styles.inject_title}><span
+                        style={{color: this.switchColor(!inject_enabled || injectDisabled || exerciseStatus === 'CANCELED')}}>{inject_title}</span>
                       </div>
-                    }
-                    leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || exerciseStatus === 'CANCELED'))}
-                    rightIconButton={
-                      <InjectPopover
-                        type={Constants.INJECT_EXEC}
-                        exerciseId={this.props.exerciseId}
-                        eventId={inject.inject_event}
-                        incidentId={inject.inject_incident.incident_id}
-                        inject={inject}
-                        injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
-                        audiences={this.props.audiences}
-                        inject_types={this.props.inject_types}
-                      />
-                    }
-                  />
-                )
-              })}
-            </Infinite>
+                      <div style={styles.inject_date}><span
+                        style={{color: this.switchColor(!inject_enabled || injectDisabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject_date)}</span>
+                      </div>
+                      <div className="clearfix"></div>
+                    </div>
+                  }
+                  leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || injectDisabled || exerciseStatus === 'CANCELED'))}
+                  rightIconButton={
+                    <InjectPopover
+                      type={Constants.INJECT_EXEC}
+                      exerciseId={this.props.exerciseId}
+                      eventId={inject.inject_event}
+                      incidentId={inject.inject_incident.incident_id}
+                      inject={inject}
+                      injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
+                      audiences={this.props.audiences}
+                      inject_types={this.props.inject_types}
+                    />
+                  }
+                />
+              )
+            })}
           </List>
           <Dialog
             title={R.propOr('-', 'inject_title', this.state.currentInject)}
@@ -304,35 +261,30 @@ class IndexExecution extends Component {
           <div style={styles.title}><T>Processed injects</T></div>
           <div className="clearfix"></div>
           <List>
-            <Infinite elementHeight={62}
-                      containerHeight={window.innerHeight - 230}
-                      infiniteLoadBeginEdgeOffset={200}
-                      onInfiniteLoad={this.handleRightInfiniteLoad.bind(this)}>
-              {this.props.injectsProcessed.length === 0 ?
-                <div style={styles.empty}><T>You do not have any processed injects in this exercise.</T></div> : ""}
-              {R.take(this.state.rightDisplayedNumber, this.props.injectsProcessed).map(inject => {
-                let color = '#4CAF50'
-                if (inject.inject_status.status_name === 'ERROR') {
-                  color = '#F44336'
-                } else if (inject.inject_status.status_name === 'PARTIAL') {
-                  color = '#FF5722'
-                }
-                return (
-                  <MainListItem
-                    key={inject.inject_id}
-                    onClick={this.handleOpenStatus.bind(this, inject)}
-                    primaryText={
-                      <div>
-                        <div style={styles.inject_title}>{inject.inject_title}</div>
-                        <div style={styles.inject_date}>{dateFormat(inject.inject_date)}</div>
-                        <div className="clearfix"></div>
-                      </div>
-                    }
-                    leftIcon={this.selectIcon(inject.inject_type, color)}
-                  />
-                )
-              })}
-            </Infinite>
+            {this.props.injectsProcessed.length === 0 ?
+              <div style={styles.empty}><T>You do not have any processed injects in this exercise.</T></div> : ""}
+            {R.take(30, this.props.injectsProcessed).map(inject => {
+              let color = '#4CAF50'
+              if (inject.inject_status.status_name === 'ERROR') {
+                color = '#F44336'
+              } else if (inject.inject_status.status_name === 'PARTIAL') {
+                color = '#FF5722'
+              }
+              return (
+                <MainListItem
+                  key={inject.inject_id}
+                  onClick={this.handleOpenStatus.bind(this, inject)}
+                  primaryText={
+                    <div>
+                      <div style={styles.inject_title}>{inject.inject_title}</div>
+                      <div style={styles.inject_date}>{dateFormat(inject.inject_date)}</div>
+                      <div className="clearfix"></div>
+                    </div>
+                  }
+                  leftIcon={this.selectIcon(inject.inject_type, color)}
+                />
+              )
+            })}
           </List>
           <Dialog
             title="Status"

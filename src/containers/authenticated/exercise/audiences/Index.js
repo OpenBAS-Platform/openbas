@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import Infinite from 'react-infinite'
 import R from 'ramda'
 import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
@@ -44,14 +43,10 @@ i18nRegister({
 class IndexAudiences extends Component {
   constructor(props) {
     super(props)
-    this.state = {searchTerm: '', itemsNumber: 0, displayedNumber: 0, initialNumber: 0}
+    this.state = {searchTerm: '', itemsNumber: 0}
   }
 
   componentDidMount() {
-    this.setState({
-      initialNumber: this.computeInitialNumbersOfRows(),
-      displayedNumber: this.computeInitialNumbersOfRows(),
-    })
     this.props.fetchAudiences(this.props.exerciseId).then(() => {
       this.setState({itemsNumber: this.props.audiences.length})
     })
@@ -59,15 +54,10 @@ class IndexAudiences extends Component {
 
   onCreate() {
     this.setState({itemsNumber: this.state.itemsNumber+1})
-    this.handleInfiniteLoad()
   }
 
   handleSearchAudiences(event, value) {
     this.setState({searchTerm: value})
-  }
-
-  computeInitialNumbersOfRows() {
-    return Math.round(window.innerHeight / 77) + 1
   }
 
   switchColor(disabled) {
@@ -75,15 +65,6 @@ class IndexAudiences extends Component {
       return Theme.palette.disabledColor
     } else {
       return Theme.palette.textColor
-    }
-  }
-
-  handleInfiniteLoad() {
-    let remainder = this.state.itemsNumber - this.state.displayedNumber
-    if (remainder >= this.state.initialNumber) {
-      this.setState({displayedNumber: this.state.displayedNumber + this.state.initialNumber})
-    } else if (remainder > 0) {
-      this.setState({displayedNumber:  this.state.displayedNumber + remainder})
     }
   }
 
@@ -104,12 +85,7 @@ class IndexAudiences extends Component {
         {this.props.audiences.length === 0 ?
           <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
         <List>
-          <Infinite elementHeight={77}
-                    containerHeight={window.innerHeight}
-                    infiniteLoadBeginEdgeOffset={200}
-                    useWindowAsScrollContainer={true}
-                    onInfiniteLoad={this.handleInfiniteLoad.bind(this)}>
-            {R.take(this.state.displayedNumber, filteredAudiences).map(audience => {
+            {filteredAudiences.map(audience => {
               return (
                 <MainListItemLink
                   to={'/private/exercise/' + this.props.exerciseId + '/audiences/' + audience.audience_id}
@@ -132,7 +108,6 @@ class IndexAudiences extends Component {
                 />
               )
             })}
-          </Infinite>
         </List>
         <CreateAudience exerciseId={this.props.exerciseId} onCreate={this.onCreate.bind(this)}/>
       </div>
