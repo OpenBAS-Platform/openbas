@@ -26,7 +26,7 @@ class InjectTypeController extends Controller
         $contracts = json_decode(file_get_contents($url), true);
 
         $other = array();
-        $other['type'] = 'other';
+        $other['type'] = 'manual';
         $other['fields'] = array();
         $other['fields'][] = array(
             'name' => 'content',
