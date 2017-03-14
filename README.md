@@ -50,8 +50,7 @@ $ mkdir openex
 Copy the 2 configuration files in the just created directory: 
 ```bash
 $ cd /your/worker/path
-$ cp distribution/src/main/filtered-resources/openex/openex_mail.properties /your/karaf/path/openex
-$ cp distribution/src/main/filtered-resources/openex/openex_scheduler.properties /your/karaf/path/openex
+$ cp distribution/src/main/filtered-resources/openex/*.properties /your/karaf/path/openex
 ```
 
 Modify these files with your own parameters.
