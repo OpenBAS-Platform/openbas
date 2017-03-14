@@ -2,8 +2,8 @@ import React, {Component, PropTypes} from 'react'
 import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
 import {SelectField} from '../../../../../components/SelectField'
-import {MenuItemLink} from '../../../../../components/menu/MenuItem'
 import {i18nRegister} from '../../../../../utils/Messages'
+import MenuItem from 'material-ui/MenuItem'
 
 i18nRegister({
   fr: {
@@ -28,7 +28,7 @@ class CopyForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <SelectField label="Incident" name="incident_id" fullWidth={true}>
           {R.values(this.props.incidents).map(data => {
-            return (<MenuItemLink key={data.incident_id} value={data.incident_id} label={data.incident_title}/>)
+            return (<MenuItem key={data.incident_id} value={data.incident_id} primaryText={data.incident_title}/>)
           })}
         </SelectField>
       </form>

@@ -31,6 +31,8 @@ const MenuItemButtonIntl = (props) => (
 )
 export const MenuItemButton = injectIntl(MenuItemButtonIntl)
 
+export const MenuTest = (props) => (<MenuItem value={'ff0000'} primaryText="Red"/>)
+
 MenuItemButtonIntl.propTypes = {
   label: PropTypes.string.isRequired,
   intl: PropTypes.object,

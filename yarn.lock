@@ -3472,11 +3472,11 @@ marked@^0.3.6:
   version "0.3.6"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
 
-material-ui@0.16.6:
-  version "0.16.6"
-  resolved "https://registry.yarnpkg.com/material-ui/-/material-ui-0.16.6.tgz#683a038c25a6d77e3703a53a4401f3af44bc1db1"
+material-ui@0.17.1:
+  version "0.17.1"
+  resolved "https://registry.yarnpkg.com/material-ui/-/material-ui-0.17.1.tgz#37f9b9c073afa1603b8fb900d620b41699663176"
   dependencies:
-    babel-runtime "^6.11.6"
+    babel-runtime "^6.18.0"
     inline-style-prefixer "^2.0.1"
     keycode "^2.1.1"
     lodash.merge "^4.6.0"
@@ -3484,7 +3484,7 @@ material-ui@0.16.6:
     react-addons-create-fragment "^15.0.0"
     react-addons-transition-group "^15.0.0"
     react-event-listener "^0.4.0"
-    recompose "^0.21.0"
+    recompose "^0.22.0"
     simple-assign "^0.1.0"
     warning "^3.0.0"
 
@@ -4631,9 +4631,9 @@ readline2@^1.0.1:
     is-fullwidth-code-point "^1.0.0"
     mute-stream "0.0.5"
 
-recompose@^0.21.0:
-  version "0.21.2"
-  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.21.2.tgz#ff3fbdb2397b1c77c47d451be2a63b9295d44681"
+recompose@^0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.22.0.tgz#f099d18385882ca41d9eec891718dadddc3204ef"
   dependencies:
     change-emitter "^0.1.2"
     fbjs "^0.8.1"
