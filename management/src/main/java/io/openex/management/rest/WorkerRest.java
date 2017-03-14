@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static io.openex.management.helper.OpenexPropertyUtils.isWorkerEnable;
 
-@Path("")
+@Path("/")
 @Component(service = WorkerRest.class,
 		property = {
 				"service.exported.interfaces=*",
@@ -43,7 +43,7 @@ public class WorkerRest {
 	}
 	
 	@GET
-	@Path("/heartbeat")
+	@Path("heartbeat")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String heartbeat() {
 		Set<String> workers = workerRegistry.workers().values().stream()
@@ -53,7 +53,7 @@ public class WorkerRest {
 	}
 	
 	@GET
-	@Path("/contracts")
+	@Path("contracts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getContracts() throws Exception {
 		List<RestContract> contracts = workerRegistry.workers().values().stream()
@@ -64,7 +64,7 @@ public class WorkerRest {
 	}
 	
 	@POST
-	@Path("/worker/{id}")
+	@Path("worker/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@SuppressWarnings("unchecked")
