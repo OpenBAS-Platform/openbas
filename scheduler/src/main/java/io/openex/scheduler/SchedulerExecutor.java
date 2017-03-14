@@ -10,7 +10,7 @@ import org.apache.camel.component.http4.HttpComponent;
 @SuppressWarnings("PackageAccessibility")
 class SchedulerExecutor implements Executor {
 	
-	public String name() {
+	public String id() {
 		return "openex_scheduler";
 	}
 	

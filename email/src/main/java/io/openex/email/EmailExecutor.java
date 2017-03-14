@@ -21,7 +21,7 @@ class EmailExecutor implements Executor {
 	 * Module identifier. Property file need to be named like this too.
 	 * @return
 	 */
-	public String name() {
+	public String id() {
 		return "openex_email";
 	}
 	

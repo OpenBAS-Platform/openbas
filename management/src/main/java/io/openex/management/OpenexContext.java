@@ -53,15 +53,15 @@ public class OpenexContext implements IOpenexContext {
 	}
 	
 	private void unregisterCamelModule(Executor executor) throws Exception {
-		System.out.println("UnregisterCamelModule [" + executor.name() + "]");
+		System.out.println("UnregisterCamelModule [" + executor.id() + "]");
 		unregisterExecutorComponent(executor);
 		context.removeRouteDefinitions(context.loadRoutesDefinition(executor.routes()).getRoutes());
 	}
 	
 	private void registerCamelModule(Executor executor) throws Exception {
 		unregisterCamelModule(executor);
-		if(OpenexPropertyUtils.isWorkerEnable(executor.name())) {
-			System.out.println("RegisterCamelModule [" + executor.name() + "] activated");
+		if(OpenexPropertyUtils.isWorkerEnable(executor.id())) {
+			System.out.println("RegisterCamelModule [" + executor.id() + "] activated");
 			registerExecutorComponent(executor);
 			context.addRouteDefinitions(context.loadRoutesDefinition(executor.routes()).getRoutes());
 		}
