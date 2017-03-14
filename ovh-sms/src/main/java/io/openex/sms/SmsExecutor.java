@@ -12,7 +12,7 @@ import static io.openex.management.contract.ContractType.Textarea;
 @SuppressWarnings("PackageAccessibility")
 class SmsExecutor implements Executor {
 	
-	public String name() {
+	public String id() {
 		return "openex_ovh_sms";
 	}
 	

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static io.openex.management.helper.OpenexPropertyUtils.isWorkerEnable;
 
-@Path("")
+@Path("/")
 @Component(service = WorkerRest.class,
 		property = {
 				"service.exported.interfaces=*",
@@ -43,28 +43,28 @@ public class WorkerRest {
 	}
 	
 	@GET
-	@Path("/heartbeat")
+	@Path("heartbeat")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String heartbeat() {
 		Set<String> workers = workerRegistry.workers().values().stream()
-				.map(executor -> executor.name() + ":" + (isWorkerEnable(executor.name()) ? "enable" : "disable"))
+				.map(executor -> executor.id() + ":" + (isWorkerEnable(executor.id()) ? "enable" : "disable"))
 				.collect(Collectors.toSet());
 		return gson.toJson(new RestHeartbeat(workers));
 	}
 	
 	@GET
-	@Path("/contracts")
+	@Path("contracts")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getContracts() throws Exception {
 		List<RestContract> contracts = workerRegistry.workers().values().stream()
-				.filter(executor -> executor.contract() != null && isWorkerEnable(executor.name()))
-				.map(executor -> new RestContract(executor.name(), executor.contract().getFields()))
+				.filter(executor -> executor.contract() != null && isWorkerEnable(executor.id()))
+				.map(executor -> new RestContract(executor.id(), executor.contract().getFields()))
 				.collect(Collectors.toList());
 		return gson.toJson(contracts);
 	}
 	
 	@POST
-	@Path("/worker/{id}")
+	@Path("worker/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@SuppressWarnings("unchecked")

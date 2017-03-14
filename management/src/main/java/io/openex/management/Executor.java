@@ -9,7 +9,7 @@ import java.io.InputStream;
 @SuppressWarnings("PackageAccessibility")
 public interface Executor {
 	
-	String name();
+	String id();
 	
 	Contract contract();
 	
