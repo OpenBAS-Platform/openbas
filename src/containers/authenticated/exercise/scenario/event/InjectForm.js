@@ -14,14 +14,14 @@ i18nRegister({
     'Description': 'Description',
     'Date and time': 'Date et heure',
     'Type': 'Type',
-    'ovh-sms': 'Sms (Ovh)',
-    'email': 'Email',
-    'other': 'Manuel'
+    'openex_ovh_sms': 'SMS (OVH)',
+    'openex_email': 'Email',
+    'openex_manual': 'Manuel'
   },
   en: {
-    'ovh-sms': 'Sms (Ovh)',
-    'email': 'Email',
-    'other': 'Manual'
+    'openex_ovh_sms': 'SMS (OVH)',
+    'openex_email': 'Email',
+    'openex_manual': 'Manual'
   }
 })
 

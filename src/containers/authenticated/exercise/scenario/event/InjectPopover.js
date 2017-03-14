@@ -358,26 +358,27 @@ class InjectPopover extends Component {
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined
     let inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject)
     let inject_type = R.propOr(true, 'inject_type', this.props.inject)
+    let injectType = R.propOr(false, inject_type, this.props.inject_types)
+    let injectDisabled = injectType ? false : true
 
     return (
       <div style={styles[this.props.type]}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!inject_enabled)}/>
+          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!inject_enabled || injectDisabled)}/>
         </IconButton>
         <Popover open={this.state.openPopover}
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemLink label="Copy" onTouchTap={this.handleOpenCopy.bind(this)}/>
-            {inject_enabled ?
-              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
-              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
-            {inject_type === 'other' ?
+            {injectDisabled===false?<MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>:''}
+            {injectDisabled===false?<MenuItemLink label="Copy" onTouchTap={this.handleOpenCopy.bind(this)}/>:''}
+            {inject_enabled && injectDisabled===false?<MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/>:''}
+            {!inject_enabled && injectDisabled===false?<MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>:''}
+            {inject_type === 'openex_manual' ?
               <MenuItemButton label="Mark as done" onTouchTap={this.handleOpenDone.bind(this)}/> : ''
             }
-            <MenuItemButton label="Test" onTouchTap={this.handleOpenTry.bind(this)}/>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+            {injectDisabled===false?<MenuItemButton label="Test" onTouchTap={this.handleOpenTry.bind(this)}/>:''}
+             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <DialogTitleElement

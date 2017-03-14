@@ -175,11 +175,11 @@ class Index extends Component {
 
   selectIcon(type, color) {
     switch (type) {
-      case 'email':
+      case 'openex_email':
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
-      case 'ovh-sms':
+      case 'openex_ovh_sms':
         return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
-      case 'other':
+      case 'openex_manual':
         return <Icon name={Constants.ICON_NAME_ACTION_INPUT} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
       default:
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
@@ -269,10 +269,12 @@ class Index extends Component {
               let inject_subaudiences = R.propOr([], 'inject_subaudiences', inject)
               let inject_users_number = R.propOr('-', 'inject_users_number', inject)
               let inject_enabled = R.propOr(true, 'inject_enabled', inject)
+              let injectType = R.propOr(false, inject_type, this.props.inject_types)
+              let injectDisabled = injectType ? false : true
               //Return the dom
               return <MainListItem
                 key={injectId}
-                leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled))}
+                leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || injectDisabled))}
                 onClick={this.handleOpenView.bind(this, inject)}
                 rightIconButton={
                   <InjectPopover
@@ -292,13 +294,13 @@ class Index extends Component {
                 primaryText={
                   <div>
                     <div style={styles.inject_title}><span
-                      style={{color: this.switchColor(!inject_enabled)}}>{inject_title}</span></div>
+                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_title}</span></div>
                     <div style={styles.inject_date}><span
-                      style={{color: this.switchColor(!inject_enabled)}}>{dateFormat(inject_date)}</span></div>
+                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{dateFormat(inject_date)}</span></div>
                     <div style={styles.inject_user}><span
-                      style={{color: this.switchColor(!inject_enabled)}}>{inject_user}</span></div>
+                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_user}</span></div>
                     <div style={styles.inject_audiences}><span
-                      style={{color: this.switchColor(!inject_enabled)}}>{inject_users_number.toString()}</span></div>
+                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_users_number.toString()}</span></div>
                     <div className="clearfix"></div>
                   </div>
                 }
