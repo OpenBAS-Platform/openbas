@@ -160,9 +160,7 @@ class InjectAudiences extends Component {
             {this.state.selectAll ? '' :
               filteredAudiences.map(audience => {
                 let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined
-                let nestedItems = []
-                {!disabled ?
-                    nestedItems = audience.audience_subaudiences.map(data => {
+                    let nestedItems = !disabled ? audience.audience_subaudiences.map(data => {
                         let subaaudienceDisabled = R.find(subaudience_id => subaudience_id === data.subaudience_id, this.state.subaudiencesIds) !== undefined
                         let subaudience = R.find(a => a.subaudience_id === data.subaudience_id)(this.props.subaudiences)
                         let subaudience_id = R.propOr(data.subaudience_id, 'subaudience_id', subaudience)
@@ -181,7 +179,6 @@ class InjectAudiences extends Component {
                           leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}/>
                       }
                     ) : ''
-                }
 
                 return (
                   <MainSmallListItem
