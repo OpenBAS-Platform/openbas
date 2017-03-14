@@ -28,7 +28,7 @@ class CreateAudience extends Component {
   }
 
   onSubmit(data) {
-    return this.props.addAudience(this.props.exerciseId, data).then(() => {this.props.onCreate()})
+    return this.props.addAudience(this.props.exerciseId, data)
   }
 
   submitForm() {

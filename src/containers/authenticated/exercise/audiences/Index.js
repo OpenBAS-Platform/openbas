@@ -43,17 +43,11 @@ i18nRegister({
 class IndexAudiences extends Component {
   constructor(props) {
     super(props)
-    this.state = {searchTerm: '', itemsNumber: 0}
+    this.state = {searchTerm: ''}
   }
 
   componentDidMount() {
-    this.props.fetchAudiences(this.props.exerciseId).then(() => {
-      this.setState({itemsNumber: this.props.audiences.length})
-    })
-  }
-
-  onCreate() {
-    this.setState({itemsNumber: this.state.itemsNumber+1})
+    this.props.fetchAudiences(this.props.exerciseId)
   }
 
   handleSearchAudiences(event, value) {
@@ -109,7 +103,7 @@ class IndexAudiences extends Component {
               )
             })}
         </List>
-        <CreateAudience exerciseId={this.props.exerciseId} onCreate={this.onCreate.bind(this)}/>
+        <CreateAudience exerciseId={this.props.exerciseId}/>
       </div>
     )
   }
