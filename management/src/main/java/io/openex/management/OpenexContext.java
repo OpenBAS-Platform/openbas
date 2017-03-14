@@ -19,6 +19,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,15 +30,16 @@ import java.util.stream.Collectors;
 @Component
 @SuppressWarnings({"PackageAccessibility", "unused"})
 public class OpenexContext implements IOpenexContext {
-	
+	private static Logger logger = LoggerFactory.getLogger(OpenexContext.class);
 	private static final String OPENEX_CONTEXT_KEY = "OpenexContext";
+	
 	private DefaultCamelContext context = new DefaultCamelContext();
 	private IWorkerRegistry workerRegistry;
 	private ConfigWatch configWatch = new ConfigWatch(this);
 	
 	@Activate
 	private void starter() throws Exception {
-		System.out.println("START [OpenexContext]");
+		logger.info("Starting [OpenexContext]");
 		workerRegistry.addListener(OPENEX_CONTEXT_KEY, new IWorkerListener() {
 			@Override
 			public void onWorkerAdded(Executor executor) throws Exception {
@@ -53,7 +56,7 @@ public class OpenexContext implements IOpenexContext {
 	}
 	
 	private void unregisterCamelModule(Executor executor) throws Exception {
-		System.out.println("UnregisterCamelModule [" + executor.id() + "]");
+		logger.info("Unregister camel module [" + executor.id() + "]");
 		unregisterExecutorComponent(executor);
 		context.removeRouteDefinitions(context.loadRoutesDefinition(executor.routes()).getRoutes());
 	}
@@ -61,7 +64,7 @@ public class OpenexContext implements IOpenexContext {
 	private void registerCamelModule(Executor executor) throws Exception {
 		unregisterCamelModule(executor);
 		if(OpenexPropertyUtils.isWorkerEnable(executor.id())) {
-			System.out.println("RegisterCamelModule [" + executor.id() + "] activated");
+			logger.info("Register camel module [" + executor.id() + "] activated");
 			registerExecutorComponent(executor);
 			context.addRouteDefinitions(context.loadRoutesDefinition(executor.routes()).getRoutes());
 		}
@@ -74,7 +77,7 @@ public class OpenexContext implements IOpenexContext {
 	
 	@Deactivate
 	public void stop() throws Exception {
-		System.out.println("STOP [OpenexContext]");
+		logger.info("Stopping [OpenexContext]");
 		configWatch.interrupt();
 		context.stop();
 	}

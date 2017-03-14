@@ -3,6 +3,8 @@ package io.openex.management.config;
 import io.openex.management.Executor;
 import io.openex.management.IOpenexContext;
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.*;
 
@@ -11,6 +13,7 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 @SuppressWarnings("PackageAccessibility")
 public class ConfigWatch extends Thread {
+	private static Logger logger = LoggerFactory.getLogger(ConfigWatch.class);
 	
 	private IOpenexContext openexContext;
 	
@@ -21,7 +24,7 @@ public class ConfigWatch extends Thread {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
-		System.out.println("ConfigWatcher [STARTING]");
+		logger.info("ConfigWatcher [STARTING]");
 		try {
 			WatchService watchService = FileSystems.getDefault().newWatchService();
 			Path path = Paths.get(System.getProperty("karaf.home") + "/openex/");
@@ -45,7 +48,7 @@ public class ConfigWatch extends Thread {
 					Path filename = ev.context();
 					String workerId = FilenameUtils.removeExtension(filename.toFile().getName());
 					Executor executor = openexContext.getWorkerRegistry().workers().get(workerId);
-					System.out.println("ConfigWatcher [Refresh " + workerId + "]");
+					logger.info("ConfigWatcher [Refresh " + workerId + "]");
 					openexContext.refreshCamelModule(executor);
 				}
 				
