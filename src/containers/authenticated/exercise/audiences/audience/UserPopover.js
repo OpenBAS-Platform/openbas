@@ -76,7 +76,7 @@ class UserPopover extends Component {
       R.values,
       R.filter(a => a.user_id !== this.props.user.user_id),
       R.map(u => u.user_id)
-    )(this.props.audience.audience_users)
+    )(this.props.subaudience.subaudience_users)
     this.props.updateSubaudience(this.props.exerciseId, this.props.audience.audience_id, this.props.subaudience.subaudience_id, {subaudience_users: user_ids})
     this.handleCloseDelete()
   }
