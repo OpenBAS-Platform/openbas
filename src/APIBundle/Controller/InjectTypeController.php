@@ -22,10 +22,15 @@ class InjectTypeController extends Controller
      */
     public function getInjectTypesAction(Request $request)
     {
-        $url = $this->getParameter('worker_url') . '/cxf/contracts';
+        $logger = $this->get('logger');
+
+        $contracts = array();
         try {
+            $url = $this->getParameter('worker_url') . '/cxf/contracts';
             $contracts = json_decode(@file_get_contents($url), true);
-        } catch(\Exception $e) {}
+        } catch (\Exception $e) {
+            $logger->info('Contracts can not be retrieved from worker');
+        }
 
         $other = array();
         $other['type'] = 'openex_manual';
