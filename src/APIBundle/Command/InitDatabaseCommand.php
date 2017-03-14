@@ -184,7 +184,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'A potatoes headquarters conversation is intercepted',
             json_encode($content),
             new \DateTime('2018-01-01 08:01:00'),
-            'email',
+            'openex_email',
             $incidentCapital,
             $userAdmin
         );
@@ -197,7 +197,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'A potato is arriving at the airport ',
             json_encode($content),
             new \DateTime('2018-01-01 08:15:00'),
-            'email',
+            'openex_email',
             $incidentCapital,
             $userAdmin
         );
@@ -210,7 +210,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'A potato has been detected by CCTV',
             json_encode($content),
             new \DateTime('2018-01-01 08:45:00'),
-            'email',
+            'openex_email',
             $incidentCapital,
             $userAdmin
         );
