@@ -23,7 +23,9 @@ class InjectTypeController extends Controller
     public function getInjectTypesAction(Request $request)
     {
         $url = $this->getParameter('worker_url') . '/cxf/contracts';
-        $contracts = json_decode(file_get_contents($url), true);
+        try {
+            $contracts = json_decode(@file_get_contents($url), true);
+        } catch(\Exception $e) {}
 
         $other = array();
         $other['type'] = 'openex_manual';
