@@ -371,10 +371,10 @@ class InjectPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             {injectDisabled===false?<MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>:''}
-            {injectDisabled===false?<MenuItemLink label="Copy" onTouchTap={this.handleOpenCopy.bind(this)}/>:''}
+            {injectDisabled===false && this.props.location !== 'run' ?<MenuItemLink label="Copy" onTouchTap={this.handleOpenCopy.bind(this)}/>:''}
             {inject_enabled && injectDisabled===false?<MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/>:''}
             {!inject_enabled && injectDisabled===false?<MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>:''}
-            {inject_type === 'openex_manual' ?
+            {inject_type === 'openex_manual' && this.props.location === 'run' ?
               <MenuItemButton label="Mark as done" onTouchTap={this.handleOpenDone.bind(this)}/> : ''
             }
             {injectDisabled===false?<MenuItemButton label="Test" onTouchTap={this.handleOpenTry.bind(this)}/>:''}
@@ -475,7 +475,8 @@ InjectPopover.propTypes = {
   children: PropTypes.node,
   initialAttachments: PropTypes.array,
   type: PropTypes.string,
-  incidents: PropTypes.array
+  incidents: PropTypes.array,
+  location: PropTypes.string
 }
 
 export default connect(null, {

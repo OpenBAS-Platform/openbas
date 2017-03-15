@@ -40,7 +40,7 @@ class CreateInject extends Component {
   }
 
   handleClose() {
-    this.setState({open: false, stepIndex: 0, finished: false, type: null, injectData: null, injectAttachments: []})
+    this.setState({open: false, stepIndex: 0, finished: false, type: 'openex_manual', injectData: null, injectAttachments: []})
   }
 
   onGlobalSubmit(data) {
@@ -78,6 +78,7 @@ class CreateInject extends Component {
   }
 
   handleNext() {
+    console.log(this.props.type)
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
     } else if (this.state.stepIndex === 1) {

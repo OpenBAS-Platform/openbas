@@ -241,6 +241,7 @@ class IndexExecution extends Component {
                       injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
                       audiences={this.props.audiences}
                       inject_types={this.props.inject_types}
+                      location="run"
                     />
                   }
                 />
