@@ -1,5 +1,6 @@
 package io.openex.email;
 
+import com.google.common.base.Throwables;
 import io.openex.email.attachment.EmailAttachment;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -31,13 +32,13 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 @SuppressWarnings("PackageAccessibility")
 public class EmailPgp {
 	
-	public static final String GPG = ".gpg";
+	private static final String GPG = ".gpg";
 	
 	@SuppressWarnings({"unused", "unchecked"})
 	public void process(Exchange exchange) {
 		Message in = exchange.getIn();
-		PGPPublicKey pgpKey = pgpKeyFromExchange(exchange);
-		if (pgpKey != null) {
+		try {
+			PGPPublicKey pgpKey = pgpKeyFromExchange(exchange);
 			//encode message
 			in.setBody(encrypt(in.getBody().toString(), pgpKey));
 			//encode attachments
@@ -46,26 +47,26 @@ public class EmailPgp {
 					.map(e -> new EmailAttachment(e.getName() + GPG, encrypt(e.getData(), pgpKey), e.getContentType()))
 					.collect(Collectors.toList());
 			exchange.setProperty(ATTACHMENTS_CONTENT, encodedFilesContent);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
-	private PGPPublicKey pgpKeyFromExchange(Exchange exchange) {
+	private PGPPublicKey pgpKeyFromExchange(Exchange exchange) throws IOException {
+		String user = exchange.getIn().getHeader("To", String.class);
 		String base64PgpKey = exchange.getIn().getHeader("PgpKey", String.class);
 		if (base64PgpKey != null) {
 			byte[] pgpKey = Base64.decode(base64PgpKey);
 			InputStream in = new ByteArrayInputStream(pgpKey);
-			try {
-				in = PGPUtil.getDecoderStream(in);
-				PGPPublicKeyRing keyRing = new JcaPGPPublicKeyRing(in);
-				Spliterator<PGPPublicKey> splitIterator = spliteratorUnknownSize(keyRing.getPublicKeys(), Spliterator.ORDERED);
-				Stream<PGPPublicKey> targetStream = StreamSupport.stream(splitIterator, false);
-				return targetStream.filter(pgpPublicKey -> pgpPublicKey.isEncryptionKey() && !pgpPublicKey.isMasterKey())
-						.findFirst().orElseThrow(() -> new IllegalArgumentException("Invalid PGP public key"));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			InputStream decoderStream = PGPUtil.getDecoderStream(in);
+			PGPPublicKeyRing keyRing = new JcaPGPPublicKeyRing(decoderStream);
+			Spliterator<PGPPublicKey> splitIterator = spliteratorUnknownSize(keyRing.getPublicKeys(), Spliterator.ORDERED);
+			Stream<PGPPublicKey> targetStream = StreamSupport.stream(splitIterator, false);
+			return targetStream.filter(pgpPublicKey -> pgpPublicKey.isEncryptionKey() && !pgpPublicKey.isMasterKey())
+					.findFirst().orElseThrow(() -> new IllegalArgumentException(user + " error: Invalid PGP public key"));
+		} else {
+			throw new IllegalArgumentException(user + " error: PGP key not provided");
 		}
-		return null;
 	}
 	
 	private String encrypt(String clearData, PGPPublicKey encKey) {
