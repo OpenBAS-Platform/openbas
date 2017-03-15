@@ -78,7 +78,6 @@ class CreateInject extends Component {
   }
 
   handleNext() {
-    console.log(this.props.type)
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
     } else if (this.state.stepIndex === 1) {
