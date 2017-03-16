@@ -282,13 +282,13 @@ class IndexAudience extends Component {
             {comchecks}
           </Toolbar>
           <Dialog
-            title="User view"
+            title={this.state.currentUser.user_firstname + ' ' + this.state.currentUser.user_lastname}
             modal={false}
             open={this.state.openView}
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-            <UserView user={this.state.currentUser} />
+            <UserView user={this.state.currentUser} organizations={this.props.organizations} />
           </Dialog>
           <AddUsers exerciseId={exerciseId} audienceId={audienceId} subaudienceId={subaudience.subaudience_id}
                     subaudienceUsersIds={subaudience.subaudience_users.map(u => u.user_id)}/>

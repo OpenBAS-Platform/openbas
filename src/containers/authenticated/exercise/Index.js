@@ -11,8 +11,7 @@ import {List} from '../../../components/List'
 import {Dialog} from '../../../components/Dialog'
 import {MainListItem, SecondaryListItem, TertiaryListItem, MainSmallListItem} from '../../../components/list/ListItem'
 import {Icon} from '../../../components/Icon'
-import {IconButton, FlatButton} from '../../../components/Button'
-import {Avatar} from '../../../components/Avatar'
+import {FlatButton} from '../../../components/Button'
 import {fetchObjectives} from '../../../actions/Objective'
 import {fetchSubobjectives} from '../../../actions/Subobjective'
 import {fetchAudiences} from '../../../actions/Audience'
@@ -382,7 +381,6 @@ class IndexExercise extends Component {
                 let incident_title = R.propOr('-', 'incident_title', incident)
                 let incident_story = R.propOr('-', 'incident_story', incident)
                 let incident_injects = R.propOr([], 'incident_injects', incident)
-                let incident_subobjectives = R.propOr([], 'incident_subobjectives', incident)
 
                 const injects = R.pipe(
                   R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
@@ -394,29 +392,12 @@ class IndexExercise extends Component {
                     let inject_title = R.propOr('-', 'inject_title', inject)
                     let inject_type = R.propOr('-', 'inject_type', inject)
                     let inject_date = R.propOr(undefined, 'inject_date', inject)
-                    let inject_audiences = R.propOr([], 'inject_audiences', inject)
 
                     return <TertiaryListItem
                       key={inject_id}
                       onClick={this.handleOpenViewInject.bind(this, inject)}
                       leftIcon={this.selectIcon(inject_type)}
-                      primaryText={<div>
-                        {inject_title}
-                        {<div style={styles.audiences}>
-                          {R.take(5, inject_audiences).map(data3 => {
-                            let audience = R.find(a => a.audience_id === data3.audience_id)(this.props.audiences)
-                            let audience_id = R.propOr(data3.audience_id, 'audience_id', audience)
-                            let audience_name = R.propOr('-', 'audience_name', audience)
-                            return <IconButton key={audience_id} type={Constants.BUTTON_TYPE_SINGLE} tooltip={audience_name}
-                                               tooltipPosition="bottom-left">
-                              <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}/></IconButton>
-                          })}
-                          {inject_audiences.length > 5 ?
-                            <div onClick={this.handleOpenInjectAudiences.bind(this, inject_audiences)} style={styles.more}>
-                              <Icon
-                                name={Constants.ICON_NAME_NAVIGATION_MORE_HORIZ}/></div> : ""}
-                        </div>}
-                      </div>}
+                      primaryText={inject_title}
                       secondaryText={dateFormat(inject_date)}
                     />
                   }
@@ -426,21 +407,7 @@ class IndexExercise extends Component {
                   key={incident_id}
                   onClick={this.handleOpenViewIncident.bind(this, incident)}
                   leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS}/>}
-                  primaryText={<div>
-                    {incident_title}
-                    {<div style={styles.subobjectives}>
-                      {incident_subobjectives.map(data4 => {
-                        let subobjective = R.propOr({}, data4.subobjective_id, this.props.subobjectives)
-                        let subobjective_id = R.propOr(data4.subobjective_id, 'subobjective_id', subobjective)
-                        let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
-                        return <IconButton key={subobjective_id} type={Constants.BUTTON_TYPE_SINGLE}
-                                           tooltip={subobjective_title}
-                                           tooltipPosition="bottom-left">
-                          <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
-                                  size={32}/></IconButton>
-                      })}
-                    </div>}
-                  </div>}
+                  primaryText={incident_title}
                   secondaryText={incident_story}
                   nestedItems={nestedItems2}/>
               }
@@ -484,7 +451,7 @@ class IndexExercise extends Component {
           autoScrollBodyContent={true}
           onRequestClose={this.handleCloseViewInject.bind(this)}
           actions={viewInjectActions}>
-          <InjectView inject={this.state.currentInject}/>
+          <InjectView inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={R.values(this.props.subaudiences)} />
         </Dialog>
         <Dialog
           title="Audiences of the inject"
@@ -531,6 +498,7 @@ IndexExercise.propTypes = {
   objectives: PropTypes.array,
   subobjectives: PropTypes.object,
   audiences: PropTypes.array,
+  subaudiences: PropTypes.array,
   events: PropTypes.array,
   incidents: PropTypes.object,
   incident_types: PropTypes.object,
