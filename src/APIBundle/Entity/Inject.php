@@ -296,14 +296,18 @@ class Inject
 
     public function computeUsersNumber()
     {
+        $audiences = array();
         $this->inject_users_number = 0;
         foreach ($this->inject_audiences as $audience) {
+            $audiences[] = $audience->getAudienceId();
             foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
                 $this->inject_users_number += count($subaudience->getSubaudienceUsers());
             }
         }
         foreach( $this->inject_subaudiences as $subaudience) {
-            $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+            if( !in_array($subaudience->getSubaudienceAudience()->getAudienceId(), $audiences) ) {
+                $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+            }
         }
     }
 }
