@@ -39,12 +39,11 @@ public class OvhSmsProducer extends DefaultAsyncProducer {
 		try {
 			Message in = exchange.getIn();
 			String ovhSmsPhone = in.getHeader("OvhSmsPhone", String.class);
-			if(Strings.isNullOrEmpty(ovhSmsPhone)) throw new Exception("No user_phone provided");
 			String message = in.getBody(String.class);
 			String ovhResponse = sendSms(ovhSmsPhone, message);
 			in.setBody(ovhResponse);
 		} catch (Exception e) {
-			exchange.setException(e);
+			throw new RuntimeException(e);
 		} finally {
 			callback.done(true);
 		}

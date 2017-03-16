@@ -19,9 +19,9 @@
                     </setHeader>
                     <choice>
                         <when>
-                            <simple>${body[user_phone]} == ""</simple>
+                            <simple>${body[user_phone]} == null || ${body[user_phone]} == ""</simple>
                             <throwException exceptionType="java.lang.Exception"
-                                            message="${header.Email} error. No phone number"/>
+                                            message="${header.Email} error: No phone number"/>
                         </when>
                         <otherwise>
                             <setHeader headerName="OvhSmsPhone">
@@ -34,10 +34,17 @@
                             <!-- Translate the template in the body -->
                             <to uri="freemarker:from_header"/>
                             <!-- Send the SMS -->
-                            <to uri="ovhSms:send?ak={{openex_ovh_sms.ak}}&amp;as={{openex_ovh_sms.as}}&amp;ck={{openex_ovh_sms.ck}}&amp;service={{openex_ovh_sms.service}}"/>
+                            <doTry>
+                                <to uri="ovhSms:send?ak={{openex_ovh_sms.ak}}&amp;as={{openex_ovh_sms.as}}&amp;ck={{openex_ovh_sms.ck}}&amp;service={{openex_ovh_sms.service}}"/>
+                                <doCatch>
+                                    <exception>java.lang.Exception</exception>
+                                    <throwException exceptionType="java.lang.Exception"
+                                                    message="${header.Email} (${header.OvhSmsPhone}) error: ${exception.message}"/>
+                                </doCatch>
+                            </doTry>
                             <!-- Output message for callback -->
                             <setBody>
-                                <simple>${header.OvhSmsPhone} (${header.Email}) success</simple>
+                                <simple>${header.Email} (${header.OvhSmsPhone}) success</simple>
                             </setBody>
                         </otherwise>
                     </choice>

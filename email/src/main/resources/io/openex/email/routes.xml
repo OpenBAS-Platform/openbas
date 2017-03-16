@@ -52,7 +52,14 @@
                     <!-- Add attachments -->
                     <bean ref="attachments-handler"/>
                     <!-- Send the email -->
-                    <to uri="{{openex_email.transport}}://{{openex_email.host}}?password={{openex_email.password}}&amp;username={{openex_email.user}}&amp;sslContextParameters=#ssl-handler"/>
+                    <doTry>
+                        <to uri="{{openex_email.transport}}://{{openex_email.host}}?password={{openex_email.password}}&amp;username={{openex_email.user}}&amp;sslContextParameters=#ssl-handler"/>
+                        <doCatch>
+                            <exception>java.lang.Exception</exception>
+                            <throwException exceptionType="java.lang.Exception"
+                                            message="${header.To} error: ${exception.message}"/>
+                        </doCatch>
+                    </doTry>
                     <!-- Output message for callback -->
                     <setBody>
                         <simple>${header.To} success</simple>
