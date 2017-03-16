@@ -75,7 +75,11 @@ class TryController extends Controller
                 $userData['user_firstname'] = $user->getUserFirstname();
                 $userData['user_lastname'] = $user->getUserLastname();
                 $userData['user_email'] = $user->getUserEmail();
+                $userData['user_email2'] = $user->getUserEmail2();
                 $userData['user_phone'] = $user->getUserPhone();
+                $userData['user_phone2'] = $user->getUserPhone2();
+                $userData['user_phone3'] = $user->getUserPhone3();
+                $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
                 $userData['user_organization'] = array();
                 $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;
