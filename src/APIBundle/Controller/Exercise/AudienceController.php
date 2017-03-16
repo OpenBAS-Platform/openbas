@@ -100,10 +100,11 @@ class AudienceController extends Controller
             $sheet->setCellValue('C1', 'Lastname');
             $sheet->setCellValue('D1', 'Organization');
             $sheet->setCellValue('E1', 'Email');
-            $sheet->setCellValue('F1', 'Email (secured)');
+            $sheet->setCellValue('F1', 'Email (secondary)');
             $sheet->setCellValue('G1', 'Phone number (fix)');
             $sheet->setCellValue('H1', 'Phone number (mobile)');
-            $sheet->setCellValue('I1', 'Phone number (secured)');
+            $sheet->setCellValue('I1', 'Phone number (secondary)');
+            $sheet->setCellValue('J1', 'PGP Key');
 
             $j = 2;
             foreach ($users as $user) {
@@ -117,6 +118,7 @@ class AudienceController extends Controller
                 $sheet->setCellValue('G' . $j, $user->getUserPhone2());
                 $sheet->setCellValue('H' . $j, $user->getUserPhone());
                 $sheet->setCellValue('I' . $j, $user->getUserPhone3());
+                $sheet->setCellValue('J' . $j, (strlen($user->getUserPgpKey()) > 5? 'YES':'NO'));
                 $j++;
             }
             $i++;

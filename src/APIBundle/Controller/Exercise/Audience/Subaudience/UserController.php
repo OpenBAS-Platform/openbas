@@ -117,6 +117,7 @@ class UserController extends Controller
         $sheet->setCellValue('F1', 'Phone number (fix)');
         $sheet->setCellValue('G1', 'Phone number (mobile)');
         $sheet->setCellValue('H1', 'Phone number (secured)');
+        $sheet->setCellValue('I1', 'PGP Key');
 
         $i = 2;
         foreach ($users as $user) {
@@ -129,6 +130,7 @@ class UserController extends Controller
             $sheet->setCellValue('F' . $i, $user->getUserPhone2());
             $sheet->setCellValue('G' . $i, $user->getUserPhone());
             $sheet->setCellValue('H' . $i, $user->getUserPhone3());
+            $sheet->setCellValue('I' . $i, (strlen($user->getUserPgpKey()) > 5? 'YES':'NO'));
             $i++;
         }
 
