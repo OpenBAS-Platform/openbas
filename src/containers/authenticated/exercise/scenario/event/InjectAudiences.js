@@ -89,16 +89,17 @@ class InjectAudiences extends Component {
     this.props.onChangeSubaudiences(subaudiences_ids)
   }
 
-
   toggleAll(event, value) {
     this.setState({selectAll: value})
     if (value === true) {
       let audiencesIds = this.props.audiences.map(a => a.audience_id)
       this.submitAudiences(audiencesIds)
-      this.setState({selectAll: true})
+      this.submitSubaudiences([])
+      this.setState({selectAll: true, audiencesIds: audiencesIds, subaudiencesIds: []})
     } else {
       this.setState({audiencesIds: [], subaudiencesIds: []})
       this.submitAudiences([])
+      this.submitSubaudiences([])
     }
   }
 

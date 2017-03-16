@@ -31,6 +31,7 @@ const styles = {
 class DryinjectView extends Component {
   render() {
     let dryinject_content = JSON.parse(R.propOr(null, 'dryinject_content', this.props.dryinject))
+    let dryinject_description = R.propOr('', 'dryinject_description', this.props.dryinject)
 
     let dryinject_fields = R.pipe(
       R.toPairs(),
@@ -42,21 +43,28 @@ class DryinjectView extends Component {
     let displayedAsText = ['sender', 'subject', 'body', 'message', 'content']
     let displayedAsList = ['attachments']
 
+    console.log(this.props.dryinject)
     return (
       <div style={styles.container}>
+        <div>
+          <strong><T>Description</T></strong><br />
+          <div>{dryinject_description}</div>
+        </div>
+        <br />
         {dryinject_fields.map(field => {
           if (R.indexOf(field.key, displayedAsText) !== -1) {
             return <div key={field.key}>
-              <strong><i><T>{field.key}</T></i></strong><br />
+              <strong><T>{field.key}</T></strong><br />
               <div dangerouslySetInnerHTML={{__html: field.value}}></div>
               <br />
             </div>
           } else if (R.indexOf(field.key, displayedAsList) !== -1) {
             return <div key={field.key}>
-              <strong><i><T>{field.key}</T></i></strong><br />
+              <strong><T>{field.key}</T></strong><br />
               {field.value.map(v => {
                 return <div key={v.file_name} dangerouslySetInnerHTML={{__html: v.file_name}}></div>
               })}
+              <br />
             </div>
           } else {
             return ''
@@ -68,7 +76,7 @@ class DryinjectView extends Component {
 }
 
 DryinjectView.propTypes = {
-  dryinject: PropTypes.object
+  dryinject: PropTypes.object,
 }
 
 export default DryinjectView

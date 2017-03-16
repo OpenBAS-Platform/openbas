@@ -18,6 +18,7 @@ import {FlatButton} from '../../../../components/Button'
 import {CircularSpinner} from '../../../../components/Spinner'
 import Countdown from '../../../../components/Countdown'
 import {fetchAudiences} from '../../../../actions/Audience'
+import {fetchSubaudiences} from '../../../../actions/Subaudience'
 import {fetchAllInjects, fetchInjectTypes} from '../../../../actions/Inject'
 import ExercisePopover from './ExercisePopover'
 import InjectPopover from '../scenario/event/InjectPopover'
@@ -106,6 +107,7 @@ class IndexExecution extends Component {
 
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
+    this.props.fetchSubaudiences(this.props.exerciseId)
     this.props.fetchInjectTypes()
     const initialStream = Rx.Observable.of(1); //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
@@ -255,7 +257,7 @@ class IndexExecution extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-            <InjectView inject={this.state.currentInject}/>
+            <InjectView inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
           </Dialog>
         </div>
         <div style={styles.columnRight}>
@@ -306,12 +308,14 @@ IndexExecution.propTypes = {
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
   audiences: PropTypes.array,
+  subaudiences: PropTypes.array,
   inject_types: PropTypes.object,
   injectsPending: PropTypes.array,
   injectsProcessed: PropTypes.array,
   nextInject: PropTypes.string,
   fetchAllInjects: PropTypes.func,
   fetchAudiences: PropTypes.func,
+  fetchSubaudiences: PropTypes.func,
   fetchInjectTypes: PropTypes.func
 }
 
@@ -352,7 +356,6 @@ const filterInjectsProcessed = (state, ownProps) => {
 const filterAudiences = (state, ownProps) => {
   const audiences = state.referential.entities.audiences
   const exerciseId = ownProps.params.exerciseId
-
   let audiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.audience_exercise.exercise_id === exerciseId),
@@ -374,8 +377,9 @@ const select = () => {
     nextInject: nextInjectToExecute,
     injectsProcessed: filterInjectsProcessed,
     audiences: filterAudiences,
+    subaudiences: (state) => R.values(state.referential.entities.subaudiences),
     inject_types: (state) => state.referential.entities.inject_types
   })
 }
 
-export default connect(select, {fetchAudiences, fetchAllInjects, fetchInjectTypes})(IndexExecution)
+export default connect(select, {fetchAudiences, fetchSubaudiences, fetchAllInjects, fetchInjectTypes})(IndexExecution)
