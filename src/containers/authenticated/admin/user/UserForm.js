@@ -10,14 +10,14 @@ import AutoComplete from 'material-ui/AutoComplete'
 i18nRegister({
   fr: {
     'Email address': 'Adresse email',
-    'Email address (secured)': 'Adresse email (sécurisée)',
+    'Email address (secondary)': 'Adresse email (secondaire)',
     'Firstname': 'Prénom',
     'Lastname': 'Nom',
     'Organization': 'Organisation',
     'Administrator': 'Administrateur',
     'Phone number (fix)': 'Numéro de téléphone (fixe)',
     'Phone number (mobile)': 'Numéro de téléphone (mobile)',
-    'Phone number (secured)': 'Numéro de téléphone (sécurisé)',
+    'Phone number (secondary)': 'Numéro de téléphone (secondaire)',
     'PGP public key': 'Clé publique PGP'
   }
 })
@@ -29,14 +29,14 @@ class UserForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="user_email" fullWidth={true} type="text" label="Email address"/>
-        <FormField name="user_email2" fullWidth={true} type="text" label="Email address (secured)"/>
+        <FormField name="user_email2" fullWidth={true} type="text" label="Email address (secondary)"/>
         <FormField name="user_firstname" fullWidth={true} type="text" label="Firstname"/>
         <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
                            type="text" label="Organization" dataSource={dataSource}/>
         <FormField name="user_phone2" fullWidth={true} type="text" label="Phone number (fix)"/>
         <FormField name="user_phone" fullWidth={true} type="text" label="Phone number (mobile)"/>
-        <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secured)"/>
+        <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secondary)"/>
         <FormField name="user_pgp_key" fullWidth={true} multiLine={true} rows={5} type="text" label="PGP public key"/>
         <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>
         <ToggleField name="user_admin" label="Administrator" />

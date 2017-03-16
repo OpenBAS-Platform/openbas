@@ -7,7 +7,7 @@ i18nRegister({
   fr: {
     'Phone number (fix)': 'Numéro de téléphone (fixe)',
     'Phone number (mobile)': 'Numéro de téléphone (mobile)',
-    'Phone number (secured)': 'Numéro de téléphone (sécurisé)',
+    'Phone number (secondary)': 'Numéro de téléphone (secondaire)',
     'PHP public key': 'Clé publique PGP'
   }
 })
@@ -19,7 +19,7 @@ class ProfileForm extends Component {
         {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
         <FormField name="user_phone2" fullWidth={true} type="text" label="Phone number (fix)"/>
         <FormField name="user_phone" fullWidth={true} type="text" label="Phone number (mobile)"/>
-        <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secured)"/>
+        <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secondary)"/>
         <FormField name="user_pgp_key" fullWidth={true} multiLine={true} rows={5} type="text" label="PGP public key"/>
       </form>
     )

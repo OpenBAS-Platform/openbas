@@ -286,7 +286,7 @@ class InjectPopover extends Component {
             type={this.state.type ? this.state.type : this.props.inject.inject_type}
             onSubmit={this.onContentSubmit.bind(this)}
             onSubmitSuccess={this.selectAudiences.bind(this)}
-            onContentAttacshmentAdd={this.onContentAttachmentAdd.bind(this)}
+            onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
             attachments={this.state.injectAttachments}
           />
