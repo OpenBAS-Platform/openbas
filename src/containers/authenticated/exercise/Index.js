@@ -498,7 +498,7 @@ IndexExercise.propTypes = {
   objectives: PropTypes.array,
   subobjectives: PropTypes.object,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.array,
+  subaudiences: PropTypes.object,
   events: PropTypes.array,
   incidents: PropTypes.object,
   incident_types: PropTypes.object,

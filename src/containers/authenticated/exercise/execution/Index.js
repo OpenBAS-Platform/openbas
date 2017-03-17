@@ -214,6 +214,7 @@ class IndexExecution extends Component {
               let inject_date = R.prop('inject_date', inject)
               let inject_type = R.propOr('-', 'inject_type', inject)
               let inject_audiences = R.propOr([], 'inject_audiences', inject)
+              let inject_subaudiences = R.propOr([], 'inject_subaudiences', inject)
               let inject_enabled = R.propOr(true, 'inject_enabled', inject)
               let injectType = R.propOr(false, inject_type, this.props.inject_types)
               let injectDisabled = injectType ? false : true
@@ -241,7 +242,9 @@ class IndexExecution extends Component {
                       incidentId={inject.inject_incident.incident_id}
                       inject={inject}
                       injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
+                      injectSubaudiencesIds={inject_subaudiences.map(a => a.subaudience_id)}
                       audiences={this.props.audiences}
+                      subaudiences={R.values(this.props.subaudiences)}
                       inject_types={this.props.inject_types}
                       location="run"
                     />

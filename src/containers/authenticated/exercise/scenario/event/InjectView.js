@@ -15,7 +15,8 @@ i18nRegister({
     'encrypted': 'Chiffré',
     'attachments': 'Pièces jointes',
     'content': 'Contenu',
-    'Target audiences': 'Audiences cibles'
+    'Target audiences': 'Audiences cibles',
+    'All audiences': 'Toutes les audiences'
   },
   en: {
     'sender': 'Sender',
@@ -76,6 +77,9 @@ class InjectView extends Component {
         })}
         <div style={styles.audiences}>
           <strong><T>Target audiences</T></strong>
+          {this.props.inject.inject_audiences.length === this.props.audiences.length ? <div>
+              <T>All audiences</T>
+            </div> :
           <List>
             {this.props.inject.inject_audiences.map(data => {
               let audience = R.find(a => a.audience_id === data.audience_id)(this.props.audiences)
@@ -107,7 +111,7 @@ class InjectView extends Component {
                 />
               )
             })}
-          </List>
+          </List>}
         </div>
       </div>
     )
