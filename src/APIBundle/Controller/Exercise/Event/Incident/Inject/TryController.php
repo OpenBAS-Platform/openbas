@@ -87,9 +87,11 @@ class TryController extends Controller
 
             $url = $this->getParameter('worker_url') . '/cxf/worker/' . $data['context']['type'];
             $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
+            $response = json_decode($response->raw_body, true);
+            return ["result" => $response];
         }
 
-        return ["result" => "ok"];
+        return ["result" => 'Error, no exercise planners group is defined is the exercise settings'];
     }
 
     private function exerciseNotFound()
