@@ -3,11 +3,11 @@ package io.openex.email.attachment;
 import org.apache.camel.Exchange;
 
 import javax.activation.DataHandler;
+import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.openex.email.attachment.EmailDownloader.ATTACHMENTS_CONTENT;
 
@@ -22,7 +22,14 @@ public class EmailAttacher {
 		List<EmailAttachment> filesContent = (List) exchange.getProperty(ATTACHMENTS_CONTENT, new ArrayList<>());
 		for (EmailAttachment attachment : filesContent) {
 			ByteArrayDataSource bds = new ByteArrayDataSource(attachment.getData(), attachment.getContentType());
-			exchange.getIn().addAttachment(attachment.getName(), new DataHandler(bds));
+			String fileName = attachment.getName();
+			try {
+				fileName = MimeUtility.encodeText(attachment.getName(), "UTF-8", null);
+			} catch (UnsupportedEncodingException e) {
+				//Nothing to here, just send the email with the standard charset
+			} finally {
+				exchange.getIn().addAttachment(fileName, new DataHandler(bds));
+			}
 		}
 	}
 }
