@@ -17,8 +17,7 @@ public class EmailAttacher {
 	
 	@SuppressWarnings({"unused", "unchecked"})
 	public void process(Exchange exchange) {
-		List<EmailAttachment> filesContent = (List) exchange.getProperty(ATTACHMENTS_CONTENT, new ArrayList<>());exchange.setProperty(Exchange.CHARSET_NAME, "UTF-8");
-		
+		List<EmailAttachment> filesContent = (List) exchange.getProperty(ATTACHMENTS_CONTENT, new ArrayList<>());
 		for (EmailAttachment attachment : filesContent) {
 			ByteArrayDataSource bds = new ByteArrayDataSource(attachment.getData(), attachment.getContentType());
 			exchange.getIn().addAttachmentObject(attachment.getName(), new DefaultAttachment(bds));
