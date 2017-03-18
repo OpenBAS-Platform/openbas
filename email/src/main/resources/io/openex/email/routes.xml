@@ -37,6 +37,9 @@
                     <setHeader headerName="contentType">
                         <constant>text/html;charset=UTF-8</constant>
                     </setHeader>
+                    <setHeader headerName="CamelCharsetName">
+                        <constant>UTF-8</constant>
+                    </setHeader>
                     <!-- Put the current user as the marker model -->
                     <setHeader headerName="CamelFreemarkerDataModel">
                         <simple>${body}</simple>
@@ -52,6 +55,7 @@
                     <!-- Add attachments -->
                     <bean ref="attachments-handler"/>
                     <!-- Send the email -->
+                    <removeHeaders pattern="attachments|PgpKey"/>
                     <doTry>
                         <to uri="{{openex_email.transport}}://{{openex_email.host}}?password={{openex_email.password}}&amp;username={{openex_email.user}}&amp;sslContextParameters=#ssl-handler"/>
                         <doCatch>
