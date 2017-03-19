@@ -8,6 +8,7 @@ const renderSliderField = ({input, step, min, max, onSliderChange}) => (
     min={min}
     max={max}
     {...input}
+    onDragStart={() => {/*disable the dragging propagation*/}}
     onChange={(event, newValue) => {
       onSliderChange && onSliderChange(event, newValue)
       input.onChange(newValue)

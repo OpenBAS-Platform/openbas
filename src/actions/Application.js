@@ -5,7 +5,7 @@ import {api} from '../App'
 import {postReferential, getReferential, delReferential} from '../utils/Action'
 
 export const askToken = (username, password) => (dispatch) => {
-  var data = {login: username, password: password};
+  const data = {login: username, password: password};
   return postReferential(schema.token, '/api/tokens', data)(dispatch).then(data => {
     dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data});
   })  
