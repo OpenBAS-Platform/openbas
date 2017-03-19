@@ -1,17 +1,25 @@
 import React, {PropTypes, Component} from 'react'
 import R from 'ramda'
 import Theme from '../../../../../components/Theme'
+import {T} from '../../../../../components/I18n'
+import {i18nRegister} from '../../../../../utils/Messages'
+
+i18nRegister({
+  fr: {
+    'PGP Key is set': 'Clé PGP renseignée',
+  }
+})
 
 const styles = {
   'container': {
     color: Theme.palette.textColor,
     padding: '10px 0px 10px 0px'
   },
-  'title': {
-    fontSize: '16px',
-    fontWeight: '500'
+  'image': {
+    float: 'left',
+    margin: '0px 10px 0px 0px'
   },
-  'story': {
+  'info': {
 
   }
 }
@@ -19,21 +27,32 @@ const styles = {
 class UserView extends Component {
 
   render() {
-    let user_firstname = R.propOr('-', 'user_firstname', this.props.user)
-    let user_lastname = R.propOr('-', 'user_lastname', this.props.user)
     let user_email = R.propOr('-', 'user_email', this.props.user)
+    let user_gravatar = R.propOr('', 'user_gravatar', this.props.user)
+    let user_phone = R.propOr('', 'user_phone', this.props.user)
+    let user_phone2 = R.propOr('', 'user_phone2', this.props.user)
+    let user_pgp_key = R.propOr(false, 'user_pgp_key', this.props.user)
+    let user_organization = R.propOr({}, this.props.user.user_organization, this.props.organizations)
+    let organizationName = R.propOr('-', 'organization_name', user_organization)
 
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{user_firstname} {user_lastname}</div>
-        <div style={styles.story}>{user_email}</div>
+        <div style={styles.image}><img src={user_gravatar} alt="Avatar"/></div>
+        <div style={styles.info}>
+          <div><strong>{user_email}</strong></div>
+          <div>{organizationName}</div>
+          <div>{user_phone2}</div>
+          <div>{user_phone}</div>
+          <div>{user_pgp_key ? <T>PGP Key is set</T> : ''}</div>
+        </div>
       </div>
     )
   }
 }
 
 UserView.propTypes = {
-  user: PropTypes.object
+  user: PropTypes.object,
+  organizations: PropTypes.object
 }
 
 export default UserView

@@ -320,7 +320,7 @@ class Index extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-              <InjectView inject={this.state.currentInject} />
+              <InjectView inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
             </Dialog>
         </div>
       </div>

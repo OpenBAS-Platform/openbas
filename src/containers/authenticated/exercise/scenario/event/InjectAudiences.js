@@ -4,6 +4,7 @@ import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Chip} from '../../../../../components/Chip'
+import {Toggle} from '../../../../../components/Toggle'
 import {Avatar} from '../../../../../components/Avatar'
 import {List} from '../../../../../components/List'
 import {MainSmallListItem, SecondarySmallListItem} from '../../../../../components/list/ListItem'
@@ -37,7 +38,14 @@ class InjectAudiences extends Component {
     this.state = {
       audiencesIds: this.props.injectAudiencesIds,
       subaudiencesIds: this.props.injectSubaudiencesIds,
-      searchTerm: ''
+      searchTerm: '',
+      selectAll: false
+    }
+  }
+
+  componentDidMount() {
+    if (this.state.audiencesIds.length === this.props.audiences.length) {
+      this.setState({selectAll: true})
     }
   }
 
@@ -53,21 +61,10 @@ class InjectAudiences extends Component {
     }
   }
 
-  addAllAudiences() {
-    let audiencesIds = this.props.audiences.map(a => a.audience_id)
-    this.setState({audiencesIds: audiencesIds})
-    this.submitAudiences(audiencesIds)
-  }
-
   removeAudience(audienceId) {
     let audiencesIds = R.filter(a => a !== audienceId, this.state.audiencesIds)
     this.setState({audiencesIds: audiencesIds})
     this.submitAudiences(audiencesIds)
-  }
-
-  removeAllAudiences() {
-    this.setState({audiencesIds: []})
-    this.submitAudiences([])
   }
 
   addSubaudience(subaudienceId) {
@@ -92,6 +89,20 @@ class InjectAudiences extends Component {
     this.props.onChangeSubaudiences(subaudiences_ids)
   }
 
+  toggleAll(event, value) {
+    this.setState({selectAll: value})
+    if (value === true) {
+      let audiencesIds = this.props.audiences.map(a => a.audience_id)
+      this.submitAudiences(audiencesIds)
+      this.submitSubaudiences([])
+      this.setState({selectAll: true, audiencesIds: audiencesIds, subaudiencesIds: []})
+    } else {
+      this.setState({audiencesIds: [], subaudiencesIds: []})
+      this.submitAudiences([])
+      this.submitSubaudiences([])
+    }
+  }
+
   render() {
     //region filter audiences by active keyword
     const keyword = this.state.searchTerm
@@ -101,16 +112,15 @@ class InjectAudiences extends Component {
 
     return (
       <div>
-        <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience"
-                         onChange={this.handleSearchAudiences.bind(this)} styletype={Constants.FIELD_TYPE_INLINE}/>
+        <Toggle name="all" label={<strong><T>All audiences</T></strong>} onToggle={this.toggleAll.bind(this)}
+                toggled={this.state.selectAll}/>
+        <br />
+        {this.state.selectAll ? '' :
+          <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience"
+                           onChange={this.handleSearchAudiences.bind(this)} styletype={Constants.FIELD_TYPE_INLINE}/>}
         <div>
-          {this.state.audiencesIds.length === this.props.audiences.length ?
-            <Chip key="all" onRequestDelete={this.removeAllAudiences.bind(this)}
-                  type={Constants.CHIP_TYPE_LIST}>
-              <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
-                      type={Constants.AVATAR_TYPE_CHIP}/>
-              <T>All audiences</T>
-            </Chip> : this.state.audiencesIds.map(audienceId => {
+          {this.state.selectAll ? '' :
+            this.state.audiencesIds.map(audienceId => {
               let audience = R.find(a => a.audience_id === audienceId)(this.props.audiences)
               let audience_name = R.propOr('-', 'audience_name', audience)
               return (
@@ -122,75 +132,71 @@ class InjectAudiences extends Component {
                 </Chip>
               )
             })}
-          {this.state.subaudiencesIds.map(subaudienceId => {
-            let subaudience = R.find(a => a.subaudience_id === subaudienceId)(this.props.subaudiences)
-            let audience = R.find(a => a.audience_id === subaudience.subaudience_audience.audience_id)(this.props.audiences)
-            let audience_name = R.propOr('-', 'audience_name', audience)
-            let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
-            return (
-              <Chip key={subaudienceId} onRequestDelete={this.removeSubaudience.bind(this, subaudienceId)}
-                    type={Constants.CHIP_TYPE_LIST}>
-                <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
-                        type={Constants.AVATAR_TYPE_CHIP}/>
-                [{audience_name}] {subaudience_name}
-              </Chip>
-            )
-          })}
+          {this.state.selectAll ? '' :
+            this.state.subaudiencesIds.map(subaudienceId => {
+              let subaudience = R.find(a => a.subaudience_id === subaudienceId)(this.props.subaudiences)
+              let audience = R.find(a => a.audience_id === subaudience.subaudience_audience.audience_id)(this.props.audiences)
+              let audience_name = R.propOr('-', 'audience_name', audience)
+              let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
+              let disabled = R.find(audience_id => audience_id === subaudience.subaudience_audience.audience_id, this.state.audiencesIds) !== undefined
+
+              if (!disabled) {
+                return (
+                  <Chip key={subaudienceId} onRequestDelete={this.removeSubaudience.bind(this, subaudienceId)}
+                        type={Constants.CHIP_TYPE_LIST}>
+                    <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
+                            type={Constants.AVATAR_TYPE_CHIP}/>
+                    [{audience_name}] {subaudience_name}
+                  </Chip>
+                )
+              } else {
+                return (<div></div>)
+              }
+            })}
           <div className="clearfix"></div>
         </div>
         <div>
           {filteredAudiences.length === 0 ? <div style={styles.empty}><T>No audience found.</T></div> : ""}
           <List>
-            <MainSmallListItem
-              key="all"
-              disabled={this.state.audiencesIds.length === this.props.audiences.length}
-              onClick={this.addAllAudiences.bind(this)}
-              primaryText={
-                <div>
-                  <div style={styles.name}><T>All audiences</T></div>
-                  <div className="clearfix"></div>
-                </div>
-              }
-              leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}
-            />
-            {filteredAudiences.map(audience => {
-              let disabled = this.state.audiencesIds.length === this.props.audiences.length ? false : R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined
-              let nestedItems = audience.audience_subaudiences.map(data => {
-                  let subaaudienceDisabled = R.find(subaudience_id => subaudience_id === data.subaudience_id, this.state.subaudiencesIds) !== undefined
-                  let subaudience = R.find(a => a.subaudience_id === data.subaudience_id)(this.props.subaudiences)
-                  let subaudience_id = R.propOr(data.subaudience_id, 'subaudience_id', subaudience)
-                  let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
+            {this.state.selectAll ? '' :
+              filteredAudiences.map(audience => {
+                let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined
+                    let nestedItems = !disabled ? audience.audience_subaudiences.map(data => {
+                        let subaaudienceDisabled = R.find(subaudience_id => subaudience_id === data.subaudience_id, this.state.subaudiencesIds) !== undefined
+                        let subaudience = R.find(a => a.subaudience_id === data.subaudience_id)(this.props.subaudiences)
+                        let subaudience_id = R.propOr(data.subaudience_id, 'subaudience_id', subaudience)
+                        let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
 
-                  return <SecondarySmallListItem
-                    key={subaudience_id}
-                    disabled={subaaudienceDisabled}
-                    onClick={this.addSubaudience.bind(this, subaudience.subaudience_id)}
+                        return <SecondarySmallListItem
+                          key={subaudience_id}
+                          disabled={subaaudienceDisabled}
+                          onClick={this.addSubaudience.bind(this, subaudience.subaudience_id)}
+                          primaryText={
+                            <div>
+                              <div style={styles.name}>{subaudience_name}</div>
+                              <div className="clearfix"></div>
+                            </div>
+                          }
+                          leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}/>
+                      }
+                    ) : ''
+
+                return (
+                  <MainSmallListItem
+                    key={audience.audience_id}
+                    disabled={disabled}
+                    onClick={this.addAudience.bind(this, audience.audience_id)}
                     primaryText={
                       <div>
-                        <div style={styles.name}>{subaudience_name}</div>
+                        <div style={styles.name}>{audience.audience_name}</div>
                         <div className="clearfix"></div>
                       </div>
                     }
-                    leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}/>
-                }
-              )
-
-              return (
-                <MainSmallListItem
-                  key={audience.audience_id}
-                  disabled={disabled}
-                  onClick={this.addAudience.bind(this, audience.audience_id)}
-                  primaryText={
-                    <div>
-                      <div style={styles.name}>{audience.audience_name}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                  leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}
-                  nestedItems={nestedItems}
-                />
-              )
-            })}
+                    leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}
+                    nestedItems={nestedItems}
+                  />
+                )
+              })}
           </List>
         </div>
       </div>

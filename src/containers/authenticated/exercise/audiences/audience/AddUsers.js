@@ -33,7 +33,7 @@ const styles = {
   },
   'org': {
     float: 'left',
-    width: '35%',
+    width: '25%',
     padding: '5px 0 0 0',
     whiteSpace: 'nowrap',
     overflow: 'hidden',

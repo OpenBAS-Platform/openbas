@@ -37,7 +37,9 @@ export const DialogTitleElementIntl = (props) => (
     modal={props.modal}
     open={props.open}
     contentStyle={props.contentStyle}
+    bodyStyle={props.bodyStyle}
     style={props.style}
+    autoDetectWindowHeight={props.autoDetectWindowHeight}
     onRequestClose={props.onRequestClose}
     autoScrollBodyContent={props.autoScrollBodyContent}
     actions={props.actions}
@@ -54,8 +56,10 @@ DialogTitleElementIntl.propTypes = {
   onRequestClose: PropTypes.func,
   intl: PropTypes.object,
   autoScrollBodyContent: PropTypes.bool,
+  autoDetectWindowHeight: PropTypes.bool,
   actions: PropTypes.node,
   children: PropTypes.node,
   contentStyle: PropTypes.object,
+  bodyStyle: PropTypes.object,
   style: PropTypes.object
 }

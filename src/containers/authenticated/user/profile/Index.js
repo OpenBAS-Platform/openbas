@@ -62,8 +62,8 @@ class Index extends Component {
     var organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     var initPipe = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
-      R.pick(['user_firstname', 'user_lastname', 'user_lang', 'user_email', 'user_email2',
-        'user_organization', 'user_phone', 'user_phone2', 'user_phone3', 'user_php_key'])
+      R.pick(['user_firstname', 'user_lastname', 'user_lang', 'user_email', 'user_email2', 'user_organization',
+        'user_phone', 'user_phone2', 'user_phone3', 'user_pgp_key'])
     )
     const informationValues = this.props.user !== undefined ? initPipe(this.props.user) : undefined
 

@@ -3,6 +3,10 @@ import R from 'ramda'
 import Theme from '../../../../../components/Theme'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
+import * as Constants from '../../../../../constants/ComponentTypes'
+import {MainSmallListItem} from '../../../../../components/list/ListItem'
+import {List} from '../../../../../components/List'
+import {Icon} from '../../../../../components/Icon'
 
 i18nRegister({
   fr: {
@@ -10,7 +14,9 @@ i18nRegister({
     'body': 'Message',
     'encrypted': 'Chiffré',
     'attachments': 'Pièces jointes',
-    'content': 'Contenu'
+    'content': 'Contenu',
+    'Target audiences': 'Audiences cibles',
+    'All audiences': 'Toutes les audiences'
   },
   en: {
     'sender': 'Sender',
@@ -25,13 +31,14 @@ const styles = {
   'container': {
     color: Theme.palette.textColor,
     padding: '10px 0px 10px 0px'
-  }
+  },
+  'audiences': {}
 }
 
 class InjectView extends Component {
   render() {
     let inject_content = JSON.parse(R.propOr(null, 'inject_content', this.props.inject))
-
+    let inject_description = R.propOr('', 'inject_description', this.props.inject)
     let inject_fields = R.pipe(
       R.toPairs(),
       R.map(d => {
@@ -44,31 +51,77 @@ class InjectView extends Component {
 
     return (
       <div style={styles.container}>
+        <div>
+          <strong><T>Description</T></strong><br />
+          <div>{inject_description}</div>
+        </div>
+        <br />
         {inject_fields.map(field => {
           if (R.indexOf(field.key, displayedAsText) !== -1) {
             return <div key={field.key}>
-              <strong><i><T>{field.key}</T></i></strong><br />
+              <strong><T>{field.key}</T></strong><br />
               <div dangerouslySetInnerHTML={{__html: field.value}}></div>
               <br />
             </div>
           } else if (R.indexOf(field.key, displayedAsList) !== -1) {
             return <div key={field.key}>
-              <strong><i><T>{field.key}</T></i></strong><br />
+              <strong><T>{field.key}</T></strong><br />
               {field.value.map(v => {
                 return <div key={v.file_name} dangerouslySetInnerHTML={{__html: v.file_name}}></div>
               })}
+              <br />
             </div>
           } else {
             return ''
           }
         })}
+        <div style={styles.audiences}>
+          <strong><T>Target audiences</T></strong>
+          {this.props.inject.inject_audiences.length === this.props.audiences.length ? <div>
+              <T>All audiences</T>
+            </div> :
+          <List>
+            {this.props.inject.inject_audiences.map(data => {
+              let audience = R.find(a => a.audience_id === data.audience_id)(this.props.audiences)
+              let audience_id = R.propOr('-', 'audience_id', audience)
+              let audience_name = R.propOr('-', 'audience_name', audience)
+
+              return (
+                <MainSmallListItem
+                  key={audience_id}
+                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
+                  primaryText={audience_name}
+                />
+              )
+            })}
+
+            {this.props.inject.inject_subaudiences.map(data => {
+              let subaudience = R.find(a => a.subaudience_id === data.subaudience_id)(this.props.subaudiences)
+              let subaudience_id = R.propOr(data.subaudience_id, 'subaudience_id', subaudience)
+              let audience = R.find(a => a.audience_id === subaudience.subaudience_audience.audience_id)(this.props.audiences)
+              let audience_name = R.propOr('-', 'audience_name', audience)
+              let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
+              let subaudienceName = '[' + audience_name + '] ' + subaudience_name
+
+              return (
+                <MainSmallListItem
+                  key={subaudience_id}
+                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}
+                  primaryText={subaudienceName}
+                />
+              )
+            })}
+          </List>}
+        </div>
       </div>
     )
   }
 }
 
 InjectView.propTypes = {
-  inject: PropTypes.object
+  inject: PropTypes.object,
+  subaudiences: PropTypes.array,
+  audiences: PropTypes.array
 }
 
 export default InjectView
