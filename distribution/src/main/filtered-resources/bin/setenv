@@ -11,3 +11,6 @@ export JAVA_MAX_MEM=1024m
 
 # Enable/set the std/err redirection when using bin/start
 export KARAF_REDIRECT=output.log
+
+# Worker must work in UT8
+export KARAF_OPTS=-Dfile.encoding=UTF-8
