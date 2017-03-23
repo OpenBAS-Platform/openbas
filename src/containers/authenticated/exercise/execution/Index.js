@@ -20,6 +20,7 @@ import Countdown from '../../../../components/Countdown'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchSubaudiences} from '../../../../actions/Subaudience'
 import {fetchAllInjects, fetchInjectTypes} from '../../../../actions/Inject'
+import {downloadFile} from '../../../../actions/File'
 import ExercisePopover from './ExercisePopover'
 import InjectPopover from '../scenario/event/InjectPopover'
 import InjectView from '../scenario/event/InjectView'
@@ -173,6 +174,10 @@ class IndexExecution extends Component {
     this.setState({openStatus: false})
   }
 
+  downloadAttachment(file_id) {
+    return this.props.downloadFile(file_id)
+  }
+
   render() {
     const viewActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
@@ -260,7 +265,7 @@ class IndexExecution extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-            <InjectView inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
+            <InjectView downloadAttachment={this.downloadAttachment.bind(this)} inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
           </Dialog>
         </div>
         <div style={styles.columnRight}>
@@ -319,7 +324,8 @@ IndexExecution.propTypes = {
   fetchAllInjects: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchSubaudiences: PropTypes.func,
-  fetchInjectTypes: PropTypes.func
+  fetchInjectTypes: PropTypes.func,
+  downloadFile: PropTypes.func
 }
 
 const filterInjectsPending = (state, ownProps) => {
@@ -385,4 +391,4 @@ const select = () => {
   })
 }
 
-export default connect(select, {fetchAudiences, fetchSubaudiences, fetchAllInjects, fetchInjectTypes})(IndexExecution)
+export default connect(select, {fetchAudiences, fetchSubaudiences, fetchAllInjects, fetchInjectTypes, downloadFile})(IndexExecution)

@@ -18,6 +18,7 @@ import {fetchAudiences} from '../../../actions/Audience'
 import {fetchSubaudiences} from '../../../actions/Subaudience'
 import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
+import {downloadFile} from '../../../actions/File'
 import {fetchAllInjects} from '../../../actions/Inject'
 import EventView from './scenario/event/EventView'
 import IncidentView from './scenario/event/IncidentView'
@@ -226,6 +227,10 @@ class IndexExercise extends Component {
 
   handleCloseInjectAudiences() {
     this.setState({openInjectAudiences: false})
+  }
+
+  downloadAttachment(file_id) {
+    return this.props.downloadFile(file_id)
   }
 
   render() {
@@ -451,7 +456,7 @@ class IndexExercise extends Component {
           autoScrollBodyContent={true}
           onRequestClose={this.handleCloseViewInject.bind(this)}
           actions={viewInjectActions}>
-          <InjectView inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={R.values(this.props.subaudiences)} />
+          <InjectView downloadAttachment={this.downloadAttachment.bind(this)} inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={R.values(this.props.subaudiences)} />
         </Dialog>
         <Dialog
           title="Audiences of the inject"
@@ -511,7 +516,8 @@ IndexExercise.propTypes = {
   fetchIncidents: PropTypes.func,
   fetchAllInjects: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
-  intl: PropTypes.object
+  intl: PropTypes.object,
+  downloadFile: PropTypes.func
 }
 
 const filterObjectives = (objectives, exerciseId) => {
@@ -568,5 +574,6 @@ export default connect(select, {
   fetchEvents,
   fetchIncidents,
   fetchIncidentTypes,
-  fetchAllInjects
+  fetchAllInjects,
+  downloadFile
 })(injectIntl(IndexExercise))

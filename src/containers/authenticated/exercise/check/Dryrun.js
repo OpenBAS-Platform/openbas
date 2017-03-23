@@ -19,6 +19,7 @@ import Countdown from '../../../../components/Countdown'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryrun} from '../../../../actions/Dryrun'
 import {fetchDryinjects} from '../../../../actions/Dryinject'
+import {downloadFile} from '../../../../actions/File'
 import DryrunPopover from './DryrunPopover'
 import DryinjectView from './DryinjectView'
 import DryinjectStatusView from './DryinjectStatusView'
@@ -156,6 +157,10 @@ class IndexExerciseDryrun extends Component {
     this.setState({openStatus: false})
   }
 
+  downloadAttachment(file_id) {
+    return this.props.downloadFile(file_id)
+  }
+
   render() {
     const viewActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
@@ -218,7 +223,7 @@ class IndexExerciseDryrun extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-            <DryinjectView dryinject={this.state.currentDryinject}/>
+            <DryinjectView downloadAttachment={this.downloadAttachment.bind(this)} dryinject={this.state.currentDryinject}/>
           </Dialog>
         </div>
         <div style={styles.columnRight}>
@@ -274,7 +279,8 @@ IndexExerciseDryrun.propTypes = {
   dryinjectsProcessed: PropTypes.array,
   fetchAudiences: PropTypes.func,
   fetchDryinjects: PropTypes.func,
-  fetchDryrun: PropTypes.func
+  fetchDryrun: PropTypes.func,
+  downloadFile: PropTypes.func
 }
 
 const filterAudiences = (audiences, exerciseId) => {
@@ -322,4 +328,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {fetchAudiences, fetchDryrun, fetchDryinjects})(IndexExerciseDryrun)
+export default connect(select, {fetchAudiences, fetchDryrun, fetchDryinjects, downloadFile})(IndexExerciseDryrun)
