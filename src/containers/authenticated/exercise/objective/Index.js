@@ -48,13 +48,13 @@ const styles = {
 
 class IndexObjective extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {openObjective: false, currentObjective: {}, openSubobjective: false, currentSubobjective: {}}
   }
 
   componentDidMount() {
-    this.props.fetchObjectives(this.props.exerciseId);
-    this.props.fetchSubobjectives(this.props.exerciseId);
+    this.props.fetchObjectives(this.props.exerciseId)
+    this.props.fetchSubobjectives(this.props.exerciseId)
   }
 
   handleOpenObjective(objective) {

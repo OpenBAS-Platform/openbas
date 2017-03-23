@@ -6,6 +6,7 @@ import {T} from '../../../../../components/I18n'
 import {dateToISO} from '../../../../../utils/Time'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchIncident} from '../../../../../actions/Incident'
+import {downloadFile} from '../../../../../actions/File'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
 import {DialogTitleElement} from '../../../../../components/Dialog';
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
@@ -47,12 +48,13 @@ class CreateInject extends Component {
     this.setState({injectData: data})
   }
 
-  onContentAttachmentAdd(name, url) {
-    let attachment = {'file_name': name, 'file_url': url}
+  onContentAttachmentAdd(id, name, url) {
+    let attachment = {'file_id': id, 'file_name': name, 'file_url': url}
     this.setState({injectAttachments: R.append(attachment, this.state.injectAttachments)})
   }
 
-  onContentAttachmentDelete(name) {
+  onContentAttachmentDelete(name, event) {
+    event.stopPropagation()
     this.setState({injectAttachments: R.filter(a => a.file_name !== name, this.state.injectAttachments)})
   }
 
@@ -107,6 +109,10 @@ class CreateInject extends Component {
     this.setState({stepIndex: 2, finished: true})
   }
 
+  downloadAttachment(file_id) {
+    return this.props.downloadFile(file_id)
+  }
+
   getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
@@ -129,6 +135,7 @@ class CreateInject extends Component {
             onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
+            downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}/>
         )
       case 2:
@@ -212,6 +219,7 @@ CreateInject.propTypes = {
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
+  downloadFile: PropTypes.func
 }
 
-export default connect(null, {fetchIncident, addInject, updateInject, deleteInject})(CreateInject);
+export default connect(null, {fetchIncident, addInject, updateInject, deleteInject, downloadFile})(CreateInject);

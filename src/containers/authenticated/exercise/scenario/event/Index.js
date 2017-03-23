@@ -15,6 +15,7 @@ import {SearchField} from '../../../../../components/SimpleTextField'
 import {fetchAudiences} from '../../../../../actions/Audience'
 import {fetchSubaudiences} from '../../../../../actions/Subaudience'
 import {fetchSubobjectives} from '../../../../../actions/Subobjective'
+import {downloadFile} from '../../../../../actions/File'
 import {fetchEvents} from '../../../../../actions/Event'
 import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
 import {fetchInjectTypes, fetchInjects} from '../../../../../actions/Inject'
@@ -202,6 +203,10 @@ class Index extends Component {
     this.setState({openView: false})
   }
 
+  downloadAttachment(file_id) {
+    return this.props.downloadFile(file_id)
+  }
+
   render() {
     const viewActions = [
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
@@ -320,7 +325,7 @@ class Index extends Component {
             autoScrollBodyContent={true}
             onRequestClose={this.handleCloseView.bind(this)}
             actions={viewActions}>
-              <InjectView inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
+              <InjectView downloadAttachment={this.downloadAttachment.bind(this)} inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
             </Dialog>
         </div>
       </div>
@@ -361,6 +366,7 @@ Index.propTypes = {
   fetchIncidents: PropTypes.func,
   fetchInjectTypes: PropTypes.func,
   fetchInjects: PropTypes.func,
+  downloadFile: PropTypes.func
 }
 
 const filterAudiences = (audiences, exerciseId) => {
@@ -437,5 +443,6 @@ export default connect(select, {
   fetchIncidentTypes,
   fetchIncidents,
   fetchInjectTypes,
-  fetchInjects
+  fetchInjects,
+  downloadFile
 })(Index);

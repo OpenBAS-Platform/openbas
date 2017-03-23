@@ -3,8 +3,8 @@ import {connect} from 'react-redux'
 import R from 'ramda'
 import {i18nRegister} from '../../utils/Messages'
 import * as Constants from '../../constants/ComponentTypes'
-import {fetchFiles, addFile, deleteFile} from '../../actions/File'
-import {IconButton, LinkIconButton} from '../../components/Button'
+import {fetchFiles, addFile, deleteFile, downloadFile} from '../../actions/File'
+import {IconButton} from '../../components/Button'
 import {GridList, GridTile} from '../../components/GridList'
 import {Icon} from '../../components/Icon'
 import {FloatingActionsButtonCreate} from '../../components/Button';
@@ -60,6 +60,10 @@ class FileGallery extends Component {
     return this.props.deleteFile(file_id)
   }
 
+  handleFileDownload(file_id) {
+    return this.props.downloadFile(file_id)
+  }
+
   render() {
     const keyword = this.state.searchTerm
     let filterByKeyword = n => keyword === '' ||
@@ -80,9 +84,9 @@ class FileGallery extends Component {
                 title={file.file_name}
                 actionIcon={
                   <div style={{width: '100px'}}>
-                    <LinkIconButton to={file.file_url} target="_blank">
+                    <IconButton onClick={this.handleFileDownload.bind(this, file.file_id)}>
                       <Icon color="white" name={Constants.ICON_NAME_FILE_FILE_DOWNLOAD}/>
-                    </LinkIconButton>
+                    </IconButton>
                     <IconButton onClick={this.handleFileDelete.bind(this, file.file_id)}>
                       <Icon color="white" name={Constants.ICON_NAME_ACTION_DELETE}/>
                     </IconButton>
@@ -109,7 +113,8 @@ FileGallery.propTypes = {
   fetchFiles: PropTypes.func,
   fileSelector: PropTypes.func,
   addFile: PropTypes.func,
-
+  deleteFile: PropTypes.func,
+  downloadFile: PropTypes.func,
 }
 
 const select = (state) => {
@@ -118,4 +123,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchFiles, addFile, deleteFile})(FileGallery);
+export default connect(select, {fetchFiles, addFile, deleteFile, downloadFile})(FileGallery);

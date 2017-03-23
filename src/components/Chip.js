@@ -22,7 +22,7 @@ const chipLabelStyle = {
 }
 
 export const Chip = (props) => (
-  <MUIChip backgroundColor={props.backgroundColor} style={chipStyle[props.type]} labelStyle={chipLabelStyle[props.type]}
+  <MUIChip backgroundColor={props.backgroundColor} style={chipStyle[props.type]} labelStyle={chipLabelStyle[props.type]} onClick={props.onClick}
            onRequestDelete={props.onRequestDelete}>
     {props.children}
   </MUIChip>
@@ -32,5 +32,6 @@ Chip.propTypes = {
   type: PropTypes.string,
   backgroundColor: PropTypes.string,
   onRequestDelete: PropTypes.func,
+  onClick: PropTypes.func,
   children: PropTypes.node
 }

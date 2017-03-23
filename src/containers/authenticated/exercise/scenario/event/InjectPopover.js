@@ -14,6 +14,7 @@ import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {fetchIncident, selectIncident} from '../../../../../actions/Incident'
+import {downloadFile} from '../../../../../actions/File'
 import {redirectToEvent} from '../../../../../actions/Application'
 import {addInject, updateInject, deleteInject, tryInject, injectDone} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
@@ -107,12 +108,13 @@ class InjectPopover extends Component {
     this.setState({injectData: injectData})
   }
 
-  onContentAttachmentAdd(name, url) {
-    let attachment = {'file_name': name, 'file_url': url}
+  onContentAttachmentAdd(id, name, url) {
+    let attachment = {'file_id': id, 'file_name': name, 'file_url': url}
     this.setState({injectAttachments: R.append(attachment, this.state.injectAttachments)})
   }
 
-  onContentAttachmentDelete(name) {
+  onContentAttachmentDelete(name, event) {
+    event.stopPropagation()
     this.setState({injectAttachments: R.filter(a => a.file_name !== name, this.state.injectAttachments)})
   }
 
@@ -273,6 +275,10 @@ class InjectPopover extends Component {
     this.setState({openResult: false})
   }
 
+  downloadAttachment(file_id) {
+    return this.props.downloadFile(file_id)
+  }
+
   getStepContent(stepIndex, initialValues) {
     switch (stepIndex) {
       case 0:
@@ -296,6 +302,7 @@ class InjectPopover extends Component {
             onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
+            downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}
           />
         )
@@ -498,7 +505,8 @@ InjectPopover.propTypes = {
   initialAttachments: PropTypes.array,
   type: PropTypes.string,
   incidents: PropTypes.array,
-  location: PropTypes.string
+  location: PropTypes.string,
+  downloadFile: PropTypes.func
 }
 
 export default connect(null, {
@@ -509,5 +517,6 @@ export default connect(null, {
   injectDone,
   tryInject,
   redirectToEvent,
-  selectIncident
+  selectIncident,
+  downloadFile
 })(InjectPopover)

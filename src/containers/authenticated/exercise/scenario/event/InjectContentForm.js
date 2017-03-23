@@ -66,7 +66,7 @@ class InjectContentForm extends Component {
   }
 
   handleFileSelection(file) {
-    this.props.onContentAttachmentAdd(file.file_name, file.file_url)
+    this.props.onContentAttachmentAdd(file.file_id, file.file_name, file.file_url)
     this.handleCloseGallery()
   }
 
@@ -93,11 +93,12 @@ class InjectContentForm extends Component {
               <div>
                 {this.props.attachments.map(attachment => {
                   let file_name = R.propOr('-', 'file_name', attachment)
+                  let file_id = R.propOr('-', 'file_id', attachment)
                   //let file_url = R.propOr('-', 'file_url', attachment)
                   // TODO: chip is clickable to download the file
                   return (
                     <Chip key={file_name} onRequestDelete={this.props.onContentAttachmentDelete.bind(this, file_name)}
-                          type={Constants.CHIP_TYPE_LIST}>
+                          type={Constants.CHIP_TYPE_LIST} onClick={this.props.downloadAttachment.bind(this, file_id)}>
                       <Avatar icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>} size={32}
                               type={Constants.AVATAR_TYPE_CHIP}/>
                       {file_name}
@@ -128,7 +129,8 @@ InjectContentForm.propTypes = {
   type: PropTypes.string,
   onContentAttachmentAdd: PropTypes.func,
   onContentAttachmentDelete: PropTypes.func,
-  attachments: PropTypes.array
+  attachments: PropTypes.array,
+  downloadAttachment: PropTypes.func
 }
 
 var formComponent = reduxForm({form: 'InjectContentForm', validate}, null, {change})(InjectContentForm)
