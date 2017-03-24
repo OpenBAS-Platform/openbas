@@ -64,7 +64,7 @@ class DryinjectView extends Component {
               {field.value.map(v => {
                 let file_name = R.propOr('-', 'file_name', v)
                 let file_id = R.propOr('-', 'file_id', v)
-                return <div key={v.file_name} style={styles.link} dangerouslySetInnerHTML={{__html: file_name}} onClick={this.props.downloadAttachment.bind(this, file_id)}></div>
+                return <div key={v.file_name} style={styles.link} dangerouslySetInnerHTML={{__html: file_name}} onClick={this.props.downloadAttachment.bind(this, file_id, file_name)}></div>
               })}
               <br />
             </div>

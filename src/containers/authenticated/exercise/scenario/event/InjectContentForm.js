@@ -98,7 +98,7 @@ class InjectContentForm extends Component {
                   // TODO: chip is clickable to download the file
                   return (
                     <Chip key={file_name} onRequestDelete={this.props.onContentAttachmentDelete.bind(this, file_name)}
-                          type={Constants.CHIP_TYPE_LIST} onClick={this.props.downloadAttachment.bind(this, file_id)}>
+                          type={Constants.CHIP_TYPE_LIST} onClick={this.props.downloadAttachment.bind(this, file_id, file_name)}>
                       <Avatar icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>} size={32}
                               type={Constants.AVATAR_TYPE_CHIP}/>
                       {file_name}

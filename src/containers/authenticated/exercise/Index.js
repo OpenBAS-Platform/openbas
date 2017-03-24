@@ -229,8 +229,8 @@ class IndexExercise extends Component {
     this.setState({openInjectAudiences: false})
   }
 
-  downloadAttachment(file_id) {
-    return this.props.downloadFile(file_id)
+  downloadAttachment(file_id, file_name) {
+    return this.props.downloadFile(file_id, file_name)
   }
 
   render() {

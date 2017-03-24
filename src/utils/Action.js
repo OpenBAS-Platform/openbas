@@ -24,10 +24,8 @@ const submitErrors = (data) => {
   return new SubmissionError(errorsExtractor(data))
 }
 
-export const fileDownload = (uri) => () => {
+export const fileDownload = (uri, filename) => () => {
   return api().get(uri, {responseType: 'blob'}).then(function (response) {
-    const contentDisposition = response.headers['content-disposition']
-    var filename = R.last(contentDisposition.match(/filename="(.+)"/))
     FileSaver.saveAs(response.data, filename);
   })
 }

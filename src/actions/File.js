@@ -16,6 +16,6 @@ export const deleteFile = (fileId) => (dispatch) => {
   return delReferential(uri, 'files', fileId)(dispatch)
 }
 
-export const downloadFile = (fileId) => (dispatch) => {
-  return fileDownload('/api/files/' + fileId)(dispatch)
+export const downloadFile = (fileId, filename) => (dispatch) => {
+  return fileDownload('/api/files/' + fileId, filename)(dispatch)
 }

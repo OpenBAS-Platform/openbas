@@ -157,8 +157,8 @@ class IndexExerciseDryrun extends Component {
     this.setState({openStatus: false})
   }
 
-  downloadAttachment(file_id) {
-    return this.props.downloadFile(file_id)
+  downloadAttachment(file_id, file_name) {
+    return this.props.downloadFile(file_id, file_name)
   }
 
   render() {

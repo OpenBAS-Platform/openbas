@@ -60,8 +60,8 @@ class FileGallery extends Component {
     return this.props.deleteFile(file_id)
   }
 
-  handleFileDownload(file_id) {
-    return this.props.downloadFile(file_id)
+  handleFileDownload(file_id, file_name) {
+    return this.props.downloadFile(file_id, file_name)
   }
 
   render() {
@@ -84,7 +84,7 @@ class FileGallery extends Component {
                 title={file.file_name}
                 actionIcon={
                   <div style={{width: '100px'}}>
-                    <IconButton onClick={this.handleFileDownload.bind(this, file.file_id)}>
+                    <IconButton onClick={this.handleFileDownload.bind(this, file.file_id, file.file_name)}>
                       <Icon color="white" name={Constants.ICON_NAME_FILE_FILE_DOWNLOAD}/>
                     </IconButton>
                     <IconButton onClick={this.handleFileDelete.bind(this, file.file_id)}>
