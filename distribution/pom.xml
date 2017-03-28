@@ -6,7 +6,7 @@
 
     <groupId>io.openex</groupId>
     <artifactId>worker-distribution</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>karaf-assembly</packaging>
 
     <dependencies>
@@ -39,7 +39,7 @@
             <groupId>io.openex</groupId>
             <artifactId>worker-features</artifactId>
             <classifier>features</classifier>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0</version>
             <type>xml</type>
             <scope>runtime</scope>
         </dependency>

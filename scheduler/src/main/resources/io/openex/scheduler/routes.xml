@@ -5,7 +5,7 @@
         <setHeader headerName="Authorization">
             <constant>{{openex.token}}</constant>
         </setHeader>
-        <to uri="{{openex_scheduler.uri}}"/>
+        <to uri="{{openex.api}}{{openex_scheduler.uri}}"/>
         <!-- Remove authorization header to avoid any compatibility problem with execution modules -->
         <removeHeader headerName="Authorization"/>
         <unmarshal>
@@ -13,16 +13,21 @@
         </unmarshal>
         <split executorServiceRef="openex-worker-thread-profile" streaming="true">
             <simple>${body}</simple>
+            <!-- Save current data to variables -->
+            <setHeader headerName="inject-data">
+                <simple>${body[data]}</simple>
+            </setHeader>
             <setHeader headerName="router-header">
                 <simple>${body[context][type]}</simple>
             </setHeader>
-            <!-- Inside property to navigate through all exchanges -->
             <setProperty propertyName="router-callback">
                 <simple>${body[context][callback_url]}</simple>
             </setProperty>
+            <!-- Inject must be in_progress during processing -->
+            <to uri="direct:progress"/>
             <!-- Send only data to workers -->
             <setBody>
-                <simple>${body[data]}</simple>
+                <simple>${header.inject-data}</simple>
             </setBody>
             <doTry>
                 <dynamicRouter ignoreInvalidEndpoints="true">
@@ -41,6 +46,14 @@
                 </doFinally>
             </doTry>
         </split>
+    </route>
+    <route id="openex-progress">
+        <from uri="direct:progress"/>
+        <setBody>
+            <simple>In progress</simple>
+        </setBody>
+        <bean ref="openexCallback" method="progress"/>
+        <to uri="direct:callback"/>
     </route>
     <route id="openex-callback">
         <from uri="direct:callback"/>
