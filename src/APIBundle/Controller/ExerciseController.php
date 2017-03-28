@@ -6,6 +6,7 @@ use APIBundle\Entity\Exercise;
 use APIBundle\Entity\Grant;
 use APIBundle\Form\Type\ExerciseType;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,9 +40,6 @@ class ExerciseController extends Controller
         }
 
         foreach ($exercises as &$exercise) {
-            if ($exercise->getExerciseImage() !== null) {
-                $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-            }
             $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
 
@@ -79,10 +77,6 @@ class ExerciseController extends Controller
         }
 
         $this->denyAccessUnlessGranted('select', $exercise);
-
-        if ($exercise->getExerciseImage() !== null) {
-            $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-        }
 
         $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
         /* @var $events Event[] */
@@ -131,9 +125,6 @@ class ExerciseController extends Controller
             $exercise->setExerciseMessageFooter('EXERCISE - EXERCISE - EXERCISE');
             $em->persist($exercise);
             $em->flush();
-            if ($exercise->getExerciseImage() !== null) {
-                $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-            }
             return $exercise;
         } else {
             return $form;
@@ -189,9 +180,6 @@ class ExerciseController extends Controller
             $em->flush();
             $em->clear();
             $exercise = $em->getRepository('APIBundle:Exercise')->find($request->get('exercise_id'));
-            if ($exercise->getExerciseImage() !== null) {
-                $exercise->getExerciseImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-            }
             $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
 
@@ -213,11 +201,11 @@ class ExerciseController extends Controller
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function statusNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Status not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Status not found'], Response::HTTP_NOT_FOUND);
     }
 }

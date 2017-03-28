@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller\Exercise;
 
+use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,13 +37,6 @@ class EventController extends Controller
 
         $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
         /* @var $events Event[] */
-
-        foreach( $events as &$event) {
-            if( $event->getEventImage() !== null ) {
-                $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-            }
-        }
-
         return $events;
     }
 
@@ -71,10 +65,6 @@ class EventController extends Controller
 
         if (empty($event) || $event->getEventExercise() !== $exercise ) {
             return $this->eventNotFound();
-        }
-
-        if( $event->getEventImage() !== null ) {
-            $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
         }
         return $event;
     }
@@ -111,10 +101,6 @@ class EventController extends Controller
             $event->setEventOrder(0);
             $em->persist($event);
             $em->flush();
-
-            if( $event->getEventImage() !== null ) {
-                $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-            }
             return $event;
         } else {
             return $form;
@@ -187,11 +173,7 @@ class EventController extends Controller
             $em->persist($event);
             $em->flush();
             $em->clear();
-            $event = $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
-            if( $event->getEventImage() !== null ) {
-                $event->getEventImage()->buildUrl($this->getParameter('protocol'), $request->getHost());
-            }
-            return $event;
+            return $em->getRepository('APIBundle:Event')->find($request->get('event_id'));
         } else {
             return $form;
         }
@@ -199,11 +181,11 @@ class EventController extends Controller
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function eventNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 }

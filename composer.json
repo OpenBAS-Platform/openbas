@@ -1,5 +1,6 @@
 {
-  "name": "openex",
+  "name": "openex-api",
+  "version": "1.0.0",
   "license": "creative common",
   "type": "project",
   "autoload": {

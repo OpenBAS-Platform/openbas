@@ -3,6 +3,7 @@
 namespace APIBundle\Controller\Anonymous;
 
 use APIBundle\Entity\Dryinject;
+use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,6 +42,6 @@ class ComcheckStatusController extends Controller
 
     private function statusNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Status not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Status not found'], Response::HTTP_NOT_FOUND);
     }
 }
