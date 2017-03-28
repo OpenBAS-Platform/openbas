@@ -1,5 +1,5 @@
 import * as schema from './Schema'
-import {getReferential, fileDownload, putReferential, postReferential, delReferential} from '../utils/Action'
+import {getReferential, fileSave, putReferential, postReferential, delReferential} from '../utils/Action'
 
 export const fetchAudiences = (exerciseId) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/audiences'
@@ -7,11 +7,11 @@ export const fetchAudiences = (exerciseId) => (dispatch) => {
 }
 
 export const downloadExportAudiences = (exerciseId) => (dispatch) => {
-  return fileDownload('/api/exercises/' + exerciseId + '/audiences.xlsx')(dispatch)
+  return fileSave('/api/exercises/' + exerciseId + '/audiences.xlsx')(dispatch)
 }
 
 export const downloadExportAudience = (exerciseId, audienceId) => (dispatch) => {
-  return fileDownload('/api/exercises/' + exerciseId + '/audiences/' + audienceId + '/users.xlsx')(dispatch)
+  return fileSave('/api/exercises/' + exerciseId + '/audiences/' + audienceId + '/users.xlsx')(dispatch)
 }
 
 export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {

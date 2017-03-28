@@ -4,6 +4,7 @@ import {Link} from 'react-router'
 import R from 'ramda'
 import {dateFormat, timeDiff} from '../../utils/Time'
 import {fetchExercises} from '../../actions/Exercise'
+import {dataFile} from '../../actions/File'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
@@ -62,7 +63,7 @@ class IndexAuthenticated extends Component {
           {this.props.exercises.map(exercise => {
             let start_date = dateFormat(exercise.exercise_start_date, 'MMM D, YYYY')
             let end_date = dateFormat(exercise.exercise_end_date, 'MMM D, YYYY')
-            let file_url = R.pathOr(null, ['exercise_image', 'file_url'], exercise)
+            let file_id = R.pathOr(null, ['exercise_image', 'file_id'], exercise)
             return (
               <Link to={'/private/exercise/' + exercise.exercise_id} key={exercise.exercise_id}>
                 <Exercise
@@ -73,7 +74,7 @@ class IndexAuthenticated extends Component {
                   endDate={end_date}
                   status={exercise.exercise_status}
                   organizer={exercise.exercise_organizer}
-                  image={file_url}
+                  image_id={file_id}
                 />
               </Link>
             )
@@ -95,6 +96,7 @@ const sortExercises = (exercises) => {
 IndexAuthenticated.propTypes = {
   exercises: PropTypes.array,
   fetchExercises: PropTypes.func,
+  dataFile: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
   userAdmin: PropTypes.bool
@@ -108,4 +110,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {redirectToHome, fetchExercises})(IndexAuthenticated);
+export default connect(select, {redirectToHome, fetchExercises, dataFile})(IndexAuthenticated);

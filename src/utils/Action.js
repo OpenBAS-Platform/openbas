@@ -24,10 +24,14 @@ const submitErrors = (data) => {
   return new SubmissionError(errorsExtractor(data))
 }
 
-export const fileDownload = (uri, filename) => () => {
+export const fileSave = (uri, filename) => () => {
   return api().get(uri, {responseType: 'blob'}).then(function (response) {
     FileSaver.saveAs(response.data, filename);
   })
+}
+
+export const fileDownload = (uri) => () => {
+  return api().get(uri, {responseType: 'blob'})
 }
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {

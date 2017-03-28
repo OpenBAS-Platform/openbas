@@ -303,9 +303,9 @@ class Index extends Component {
                     <div style={styles.inject_date}><span
                       style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{dateFormat(inject_date)}</span></div>
                     <div style={styles.inject_user}><span
-                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_user}</span></div>
+                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_user}</span></div>
                     <div style={styles.inject_audiences}><span
-                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_users_number.toString()}</span></div>
+                      style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_users_number.toString()}</span></div>
                     <div className="clearfix"></div>
                   </div>
                 }

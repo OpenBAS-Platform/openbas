@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import * as Constants from "../constants/ComponentTypes";
 import {Paper} from './Paper'
+import {BackgroundImage} from './Image'
 
 const styles = {
   header: {
@@ -27,15 +28,9 @@ const styles = {
     fontWeight: 300,
     color: '#808080'
   },
-  body: function (image) {
-    return {
-      backgroundImage: 'url("' + image + '")',
-      backgroundSize: '100%',
-      backgroundRepeat: 'none',
-      backgroundPosition: 'top',
-      height: '150px',
-      position: 'relative'
-    }
+  backgroundImage: {
+    height: '150px',
+    position: 'relative'
   },
   hover: {
     position: 'absolute',
@@ -73,7 +68,7 @@ export const Exercise = (props) => (
     <div style={styles.header}>
       <div style={styles.title}>{props.name}</div>
       <div style={styles.subtitle}>{props.subtitle}</div>
-      </div>
+    </div>
     <div style={styles.subHeader}>
       <div style={styles.line}>
         <div style={styles.dateLeft}>{props.startDate}</div>
@@ -87,11 +82,11 @@ export const Exercise = (props) => (
         <div className="clearfix"></div>
       </div>
     </div>
-    <div style={styles.body(props.image)}>
+    <BackgroundImage style={styles.backgroundImage} image_id={props.image_id}>
       <div className="exerciseHover" style={styles.hover}>
         <p style={styles.description}>{props.description}</p>
       </div>
-    </div>
+    </BackgroundImage>
   </Paper>
 )
 
@@ -104,5 +99,5 @@ Exercise.propTypes = {
   startDate: PropTypes.string,
   endDate: PropTypes.string,
   status: PropTypes.string,
-  image: PropTypes.string
+  image_id: PropTypes.string
 }

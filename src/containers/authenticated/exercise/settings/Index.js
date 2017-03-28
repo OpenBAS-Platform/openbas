@@ -6,6 +6,7 @@ import {fetchGroups} from '../../../../actions/Group'
 import {redirectToHome} from '../../../../actions/Application'
 import {Paper} from '../../../../components/Paper'
 import {Button, FlatButton} from '../../../../components/Button'
+import {Image} from '../../../../components/Image'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import {Dialog} from '../../../../components/Dialog'
@@ -141,7 +142,7 @@ class Index extends Component {
     )
 
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
-    const image = R.pathOr(null, ['exercise_image', 'file_url'], exercise)
+    const image_id = R.pathOr(null, ['exercise_image', 'file_id'], exercise)
 
     return (
       <div>
@@ -172,7 +173,7 @@ class Index extends Component {
           <div style={styles.PaperContent}>
             <h2>Image</h2>
             <br />
-            {image ? <img src={image} alt="Exercise logo" style={styles.image}/> : ""}
+            {image_id ? <Image image_id={image_id} alt="Exercise logo" style={styles.image}/> : ""}
             <br /><br />
             <Button label='Change the image' onClick={this.handleOpenGallery.bind(this)}/>
             <Dialog modal={false} open={this.state.openGallery} onRequestClose={this.handleCloseGallery.bind(this)}>

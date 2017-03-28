@@ -5,6 +5,7 @@ import {i18nRegister} from '../../utils/Messages'
 import * as Constants from '../../constants/ComponentTypes'
 import {fetchFiles, addFile, deleteFile, downloadFile} from '../../actions/File'
 import {IconButton} from '../../components/Button'
+import {Image} from '../../components/Image'
 import {GridList, GridTile} from '../../components/GridList'
 import {Icon} from '../../components/Icon'
 import {FloatingActionsButtonCreate} from '../../components/Button';
@@ -78,11 +79,9 @@ class FileGallery extends Component {
                          styletype={Constants.FIELD_TYPE_INLINE}/>
         <GridList cellHeight={180} padding={20} type={Constants.GRIDLIST_TYPE_GALLERY}>
           {filteredFiles.map(file => {
+            let type = file.file_type
             return (
-              <GridTile
-                key={file.file_id}
-                title={file.file_name}
-                actionIcon={
+              <GridTile key={file.file_id} title={file.file_name} actionIcon={
                   <div style={{width: '100px'}}>
                     <IconButton onClick={this.handleFileDownload.bind(this, file.file_id, file.file_name)}>
                       <Icon color="white" name={Constants.ICON_NAME_FILE_FILE_DOWNLOAD}/>
@@ -92,9 +91,9 @@ class FileGallery extends Component {
                     </IconButton>
                   </div>
                 }>
-                {file.file_type === 'png' || file.file_type === 'jpg' || file.file_type === 'jpeg' || file.file_type === 'gif' ?
-                  <img src={file.file_url} alt="Gallery" style={styles.image}
-                       onClick={this.handleFileSelect.bind(this, file)}/> :
+                {type === 'png' || type === 'jpg' || type === 'jpeg' || type === 'gif' ?
+                  <Image image_id={file.file_id} alt="Gallery" style={styles.image}
+                         onClick={this.handleFileSelect.bind(this, file)} /> :
                   <img src="/images/file_icon.png" alt="Gallery" style={styles.image}
                        onClick={this.handleFileSelect.bind(this, file)}/>}
               </GridTile>

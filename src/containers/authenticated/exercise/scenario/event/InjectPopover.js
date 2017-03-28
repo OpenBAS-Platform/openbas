@@ -108,9 +108,8 @@ class InjectPopover extends Component {
     this.setState({injectData: injectData})
   }
 
-  onContentAttachmentAdd(id, name, url) {
-    let attachment = {'file_id': id, 'file_name': name, 'file_url': url}
-    this.setState({injectAttachments: R.append(attachment, this.state.injectAttachments)})
+  onContentAttachmentAdd(file) {
+    this.setState({injectAttachments: R.append(file, this.state.injectAttachments)})
   }
 
   onContentAttachmentDelete(name, event) {
@@ -474,7 +473,7 @@ class InjectPopover extends Component {
           <div>
             <div><strong>{this.state.injectResult ? this.state.injectResult.status: ''}</strong></div><br />
             {this.state.injectResult ? this.state.injectResult.message.map(line => {
-              return <div>{line}</div>
+              return <div key={Math.random()}>{line}</div>
             }) : ''}
           </div>
         </Dialog>

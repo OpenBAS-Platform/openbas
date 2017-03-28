@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {FormattedMessage} from 'react-intl';
+import React, {PropTypes} from 'react'
+import {FormattedMessage} from 'react-intl'
 
 export const T = (props) => {
   const id = props.children.replace(/(:(\w+))/g,"{$2}")

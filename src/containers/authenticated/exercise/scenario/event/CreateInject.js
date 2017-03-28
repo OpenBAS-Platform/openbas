@@ -48,9 +48,8 @@ class CreateInject extends Component {
     this.setState({injectData: data})
   }
 
-  onContentAttachmentAdd(id, name, url) {
-    let attachment = {'file_id': id, 'file_name': name, 'file_url': url}
-    this.setState({injectAttachments: R.append(attachment, this.state.injectAttachments)})
+  onContentAttachmentAdd(file) {
+    this.setState({injectAttachments: R.append(file, this.state.injectAttachments)})
   }
 
   onContentAttachmentDelete(name, event) {
