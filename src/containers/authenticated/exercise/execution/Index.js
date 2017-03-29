@@ -333,7 +333,7 @@ const filterInjectsPending = (state, ownProps) => {
   const exerciseId = ownProps.params.exerciseId
   let injectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === 'PENDING'),
+    R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === null),
     R.sort((a, b) => timeDiff(a.inject_date, b.inject_date))
   )
   return injectsFilterAndSorting(injects)

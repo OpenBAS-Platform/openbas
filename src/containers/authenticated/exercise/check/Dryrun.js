@@ -295,7 +295,7 @@ const filterAudiences = (audiences, exerciseId) => {
 const filterDryinjectsPending = (dryinjects, dryrunId) => {
   let dryinjectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && n.dryinject_status.status_name === 'PENDING'),
+    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && n.dryinject_status.status_name === null),
     R.sort((a, b) => timeDiff(a.dryinject_date, b.dryinject_date))
   )
   return dryinjectsFilterAndSorting(dryinjects)
