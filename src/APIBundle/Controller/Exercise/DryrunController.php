@@ -166,7 +166,6 @@ class DryrunController extends Controller
 
                     // create the dryinject status
                     $status = new DryinjectStatus();
-                    $status->setStatusName('PENDING');
                     $status->setStatusDate(new \DateTime());
                     $status->setStatusDryinject($dryinject);
                     $em->persist($status);

@@ -96,7 +96,7 @@ class Dryrun
         $this->dryrun_exercise = $exercise;
         return $this;
     }
-    
+
     public function getDryrunDryinjects()
     {
         return $this->dryrun_dryinjects;
@@ -130,11 +130,13 @@ class Dryrun
         return $this;
     }
 
-    public function computeDryRunFinished($dryinjects) {
+    public function computeDryRunFinished($dryinjects)
+    {
         /* @var $dryinjects Dryinject[] */
         $finished = true;
-        foreach( $dryinjects as $dryinject ) {
-            if( $dryinject->getDryinjectStatus()->getStatusName() == 'PENDING' ) {
+        foreach ($dryinjects as $dryinject) {
+            $statusName = $dryinject->getDryinjectStatus()->getStatusName();
+            if ($statusName == null || $statusName == 'PENDING') {
                 $finished = false;
             }
         }

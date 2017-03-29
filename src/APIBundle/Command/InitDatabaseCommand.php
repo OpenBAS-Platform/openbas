@@ -424,7 +424,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
     private function createInjectStatus($inject) {
         $status = new InjectStatus();
-        $status->setStatusName('PENDING');
         $status->setStatusDate(new \DateTime());
         $status->setStatusInject($inject);
 
