@@ -9,7 +9,7 @@ import java.util.List;
  */
 @SuppressWarnings({"FieldCanBeLocal", "unused", "PackageAccessibility"})
 class OpenexCallbackMessage {
-	static final String STATUS_PROGRESS = "PROGRESS";
+	static final String STATUS_PENDING = "PENDING";
 	static final String STATUS_PARTIAL = "PARTIAL";
 	static final String STATUS_ERROR = "ERROR";
 	static final String STATUS_SUCCESS = "SUCCESS";

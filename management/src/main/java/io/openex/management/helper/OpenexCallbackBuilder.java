@@ -4,7 +4,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 
 import static io.openex.management.helper.OpenexCallbackMessage.STATUS_ERROR;
-import static io.openex.management.helper.OpenexCallbackMessage.STATUS_PROGRESS;
+import static io.openex.management.helper.OpenexCallbackMessage.STATUS_PENDING;
 import static io.openex.management.helper.OpenexCallbackMessage.STATUS_SUCCESS;
 import static java.util.Collections.singletonList;
 
@@ -19,8 +19,8 @@ public class OpenexCallbackBuilder {
 		buildMessage(exchange, STATUS_ERROR);
 	}
 	
-	public void progress(Exchange exchange) {
-		buildMessage(exchange, STATUS_PROGRESS);
+	public void pending(Exchange exchange) {
+		buildMessage(exchange, STATUS_PENDING);
 	}
 	
 	private void buildMessage(Exchange exchange, String status) {

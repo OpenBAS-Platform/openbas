@@ -9,5 +9,6 @@
     <feature name="worker-scheduler" version="${pom.version}">
         <feature>camel-http4</feature>
         <feature>camel-gson</feature>
+        <feature>camel-quartz2</feature>
     </feature>
 </features>

@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component(name = "OpenexContext")
 @SuppressWarnings({"PackageAccessibility", "unused"})
 public class OpenexContext implements IOpenexContext {
 	private static Logger logger = LoggerFactory.getLogger(OpenexContext.class);
@@ -55,6 +55,13 @@ public class OpenexContext implements IOpenexContext {
 		createContext();
 	}
 	
+	@Deactivate
+	public void stop() throws Exception {
+		logger.info("Stopping [OpenexContext]");
+		configWatch.interrupt();
+		context.stop();
+	}
+	
 	private void unregisterCamelModule(Executor executor) throws Exception {
 		logger.info("Unregister camel module [" + executor.id() + "]");
 		unregisterExecutorComponent(executor);
@@ -73,13 +80,6 @@ public class OpenexContext implements IOpenexContext {
 	public void refreshCamelModule(Executor executor) throws Exception {
 		refreshPropertiesComponent();
 		registerCamelModule(executor);
-	}
-	
-	@Deactivate
-	public void stop() throws Exception {
-		logger.info("Stopping [OpenexContext]");
-		configWatch.interrupt();
-		context.stop();
 	}
 	
 	//region utils
