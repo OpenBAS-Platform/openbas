@@ -14,9 +14,9 @@
         <split executorServiceRef="openex-worker-thread-profile" streaming="true">
             <simple>${body}</simple>
             <!-- Save current data to variables -->
-            <setHeader headerName="inject-data">
+            <setProperty propertyName="inject-data">
                 <simple>${body[data]}</simple>
-            </setHeader>
+            </setProperty>
             <setHeader headerName="router-header">
                 <simple>${body[context][type]}</simple>
             </setHeader>
@@ -27,7 +27,7 @@
             <to uri="direct:pending"/>
             <!-- Send only data to workers -->
             <setBody>
-                <simple>${header.inject-data}</simple>
+                <simple>${property.inject-data}</simple>
             </setBody>
             <doTry>
                 <dynamicRouter ignoreInvalidEndpoints="true">
