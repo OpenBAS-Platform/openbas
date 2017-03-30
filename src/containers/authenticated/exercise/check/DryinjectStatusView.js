@@ -3,7 +3,7 @@ import R from 'ramda'
 import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
-import {dateFormat} from '../../../../utils/Time'
+import {dateFormat, convertToCountdown} from '../../../../utils/Time'
 
 i18nRegister({
   fr: {
@@ -46,10 +46,11 @@ class DryinjectStatusView extends Component {
   render() {
     let dryinject_status = R.propOr('-', 'dryinject_status', this.props.dryinject)
     let dryinject_message_lines = JSON.parse(R.propOr(null, 'status_message', dryinject_status))
+    let time = convertToCountdown(dryinject_status.status_execution)
 
     return (
       <div style={styles.container}>
-        <div style={styles.title}><T>{dryinject_status.status_name}</T></div>
+        <div style={styles.title}><T>{dryinject_status.status_name}</T> ({time})</div>
         <div style={styles.date}>{dateFormat(dryinject_status.status_date)}</div>
         <div style={{clear: 'both'}}></div><br />
         <div style={styles.message}>

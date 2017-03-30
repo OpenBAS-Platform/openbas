@@ -23,7 +23,6 @@ import {downloadFile} from '../../../../actions/File'
 import DryrunPopover from './DryrunPopover'
 import DryinjectView from './DryinjectView'
 import DryinjectStatusView from './DryinjectStatusView'
-import DryinjectPopover from './DryinjectPopover'
 
 i18nRegister({
   fr: {
@@ -199,6 +198,10 @@ class IndexExerciseDryrun extends Component {
             {this.props.dryinjectsPending.length === 0 ?
               <div style={styles.empty}><T>You do not have any pending injects in this dryrun.</T></div> : ""}
             {R.take(30, this.props.dryinjectsPending).map(dryinject => {
+              let inject_in_progress = R.path(['inject_status', 'status_name'], dryinject) === 'PENDING'
+              let injectIcon = inject_in_progress ?
+                <CircularSpinner size={20} type={Constants.SPINNER_TYPE_INJECT} color={Theme.palette.primary1Color}/> :
+                this.selectIcon(dryinject.dryinject_type)
               return (
                 <MainListItem
                   key={dryinject.dryinject_id}
@@ -210,8 +213,7 @@ class IndexExerciseDryrun extends Component {
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(dryinject.dryinject_type)}
-                  rightIconButton={<DryinjectPopover dryinject={dryinject}/>}
+                  leftIcon={injectIcon}
                 />
               )
             })}
@@ -295,7 +297,12 @@ const filterAudiences = (audiences, exerciseId) => {
 const filterDryinjectsPending = (dryinjects, dryrunId) => {
   let dryinjectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.dryinject_dryrun.dryrun_id === dryrunId && n.dryinject_status.status_name === null),
+    R.filter(n => {
+      let statusName = n.dryinject_status.status_name
+      let identifiedInject = n.dryinject_dryrun.dryrun_id === dryrunId
+      let isPendingInject = statusName === null || statusName === 'PENDING'
+      return identifiedInject && isPendingInject
+    }),
     R.sort((a, b) => timeDiff(a.dryinject_date, b.dryinject_date))
   )
   return dryinjectsFilterAndSorting(dryinjects)

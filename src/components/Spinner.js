@@ -6,6 +6,13 @@ const styles = {
   [ Constants.SPINNER_TYPE_NAV ]: {
     margin: '10px 0 0 8px',
     textAlign: 'center'
+  },
+  [ Constants.SPINNER_TYPE_INJECT]: {
+    top: 8,
+    margin: 12,
+    left: 4,
+    padding: 0,
+    position: 'absolute'
   }
 }
 

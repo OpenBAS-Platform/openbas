@@ -30,7 +30,7 @@ class Countdown extends Component {
   constructor(props) {
     super(props);
     this.state = {startDate: now()}
-    var options = this.translate(' ms| s| m| h| d| w| m| y| d| c| m')
+    let options = this.translate(' ms| s| m| h| d| w| m| y| d| c| m')
     countdown.setLabels(options, options, ', ', ', ', this.translate('now'));
   }
 

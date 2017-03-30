@@ -116,6 +116,7 @@ export const FIELD_TYPE_RIGHT = 'FIELD_TYPE_RIGHT'
 
 //region SPINNER
 export const SPINNER_TYPE_NAV = 'SPINNER_TYPE_NAV'
+export const SPINNER_TYPE_INJECT = 'SPINNER_TYPE_INJECT'
 //endregion
 
 //region COUNTDOWN

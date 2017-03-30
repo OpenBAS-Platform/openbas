@@ -221,8 +221,11 @@ class IndexExecution extends Component {
               let inject_audiences = R.propOr([], 'inject_audiences', inject)
               let inject_subaudiences = R.propOr([], 'inject_subaudiences', inject)
               let inject_enabled = R.propOr(true, 'inject_enabled', inject)
-              let injectType = R.propOr(false, inject_type, this.props.inject_types)
-              let injectDisabled = injectType ? false : true
+              let injectNotSupported = R.propOr(false, inject_type, this.props.inject_types) ? false : true
+              let inject_in_progress = R.path(['inject_status', 'status_name'], inject) === 'PENDING'
+              let injectIcon = inject_in_progress ?
+                <CircularSpinner size={20} type={Constants.SPINNER_TYPE_INJECT} color={Theme.palette.primary1Color}/> :
+                this.selectIcon(inject_type, this.switchColor(!inject_enabled || injectNotSupported || exerciseStatus === 'CANCELED'))
               return (
                 <MainListItem
                   key={injectId}
@@ -230,16 +233,16 @@ class IndexExecution extends Component {
                   primaryText={
                     <div>
                       <div style={styles.inject_title}><span
-                        style={{color: this.switchColor(!inject_enabled || injectDisabled || exerciseStatus === 'CANCELED')}}>{inject_title}</span>
+                        style={{color: this.switchColor(!inject_enabled || injectNotSupported || exerciseStatus === 'CANCELED')}}>{inject_title}</span>
                       </div>
                       <div style={styles.inject_date}><span
-                        style={{color: this.switchColor(!inject_enabled || injectDisabled || exerciseStatus === 'CANCELED')}}>{dateFormat(inject_date)}</span>
+                        style={{color: this.switchColor(!inject_enabled || injectNotSupported || exerciseStatus === 'CANCELED')}}>{dateFormat(inject_date)}</span>
                       </div>
                       <div className="clearfix"></div>
                     </div>
                   }
-                  leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || injectDisabled || exerciseStatus === 'CANCELED'))}
-                  rightIconButton={
+                  leftIcon={injectIcon}
+                  rightIconButton={!inject_in_progress ?
                     <InjectPopover
                       type={Constants.INJECT_EXEC}
                       exerciseId={this.props.exerciseId}
@@ -252,7 +255,7 @@ class IndexExecution extends Component {
                       subaudiences={R.values(this.props.subaudiences)}
                       inject_types={this.props.inject_types}
                       location="run"
-                    />
+                    /> : null
                   }
                 />
               )
@@ -333,7 +336,12 @@ const filterInjectsPending = (state, ownProps) => {
   const exerciseId = ownProps.params.exerciseId
   let injectsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.inject_exercise === exerciseId && n.inject_status.status_name === null),
+    R.filter(n => {
+      let statusName = n.inject_status.status_name
+      let identifiedInject = n.inject_exercise === exerciseId
+      let isPendingInject = statusName === null || statusName === 'PENDING'
+      return identifiedInject && isPendingInject
+    }),
     R.sort((a, b) => timeDiff(a.inject_date, b.inject_date))
   )
   return injectsFilterAndSorting(injects)

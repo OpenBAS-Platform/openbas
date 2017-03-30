@@ -3,7 +3,7 @@ import R from 'ramda'
 import Theme from '../../../../components/Theme'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
-import {dateFormat} from '../../../../utils/Time'
+import {dateFormat, convertToCountdown} from '../../../../utils/Time'
 
 i18nRegister({
   fr: {
@@ -46,15 +46,16 @@ class InjectStatusView extends Component {
   render() {
     let inject_status = R.propOr('-', 'inject_status', this.props.inject)
     let inject_message_lines = JSON.parse(R.propOr(null, 'status_message', inject_status))
+    let time = convertToCountdown(inject_status.status_execution)
 
     return (
       <div style={styles.container}>
-        <div style={styles.title}><T>{inject_status.status_name}</T></div>
+        <div style={styles.title}><T>{inject_status.status_name}</T> ({time})</div>
         <div style={styles.date}>{dateFormat(inject_status.status_date)}</div>
         <div style={{clear: 'both'}}></div><br />
         <div style={styles.message}>
           {inject_message_lines.map(line => {
-            return <div>{line}</div>
+            return <div key={Math.random()}>{line}</div>
           })}
           </div>
       </div>

@@ -34,12 +34,19 @@ export const dateFormat = (data, specificFormat) => {
 }
 
 export const dateToISO = (date) => {
-  var momentDate = parse(date, openexDateFormat, true)
+  let momentDate = parse(date, openexDateFormat, true)
   return momentDate.isValid() ? momentDate.format() : 'invalid-date'
 }
 
 export const dateFromNow = (dateString) => {
   return dateString ? countdown(parse(dateString).toDate()).toString() : "-"
+}
+
+export const convertToCountdown = (durationInMillis) => {
+  if (durationInMillis === null) return '-'
+  let end = now()
+  let start = moment(end).subtract(durationInMillis, 'ms')
+  return countdown(start.toDate(), end.toDate()).toString()
 }
 
 export const logDate = () => {
