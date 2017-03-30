@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller;
 
+use APIBundle\Entity\DryinjectStatus;
 use APIBundle\Entity\Subaudience;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -272,9 +273,11 @@ class InjectController extends Controller
             return $this->injectNotFound();
         }
 
+        /** @var InjectStatus $status */
         $status = $inject->getInjectStatus();
         $status->setStatusName($request->request->get('status'));
         $status->setStatusMessage(json_encode($request->request->get('message')));
+        $status->setStatusExecution($request->request->get('execution'));
         $status->setStatusDate(new \DateTime());
 
         $em->persist($status);
@@ -303,9 +306,11 @@ class InjectController extends Controller
             return $this->dryinjectNotFound();
         }
 
+        /** @var DryinjectStatus $status */
         $status = $dryinject->getDryinjectStatus();
         $status->setStatusName($request->request->get('status'));
         $status->setStatusMessage(json_encode($request->request->get('message')));
+        $status->setStatusExecution($request->request->get('execution'));
         $status->setStatusDate(new \DateTime());
 
         $em->persist($status);

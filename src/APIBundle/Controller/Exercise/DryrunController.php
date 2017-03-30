@@ -2,8 +2,12 @@
 
 namespace APIBundle\Controller\Exercise;
 
+use APIBundle\Controller\InjectTypeController;
 use APIBundle\Entity\DryinjectStatus;
+use Doctrine\ORM\EntityRepository;
+use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +45,8 @@ class DryrunController extends Controller
 
         $dryruns = $em->getRepository('APIBundle:Dryrun')->findBy(['dryrun_exercise' => $exercise]);
 
-        foreach( $dryruns as &$dryrun) {
+        foreach ($dryruns as &$dryrun) {
+            /** @var Dryrun $dryrun */
             $dryinjects = $em->getRepository('APIBundle:Dryinject')->findBy(['dryinject_dryrun' => $dryrun]);
             $dryrun->computeDryRunFinished($dryinjects);
         }
@@ -72,7 +77,7 @@ class DryrunController extends Controller
         $dryrun = $em->getRepository('APIBundle:Dryrun')->find($request->get('dryrun_id'));
         /* @var $dryrun Dryrun */
 
-        if (empty($dryrun) || $dryrun->getDryrunExercise() !== $exercise ) {
+        if (empty($dryrun) || $dryrun->getDryrunExercise() !== $exercise) {
             return $this->dryrunNotFound();
         }
 
@@ -113,67 +118,85 @@ class DryrunController extends Controller
             $em->flush();
 
             // get all injects
-            $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
+            $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
 
-            $injects = array();
             /* @var $injects Inject[] */
+            $injects = array();
 
+            //TODO Maybe we can replace this loops by getting all injects with correct join query
             foreach ($events as $event) {
                 $incidents = $em->getRepository('APIBundle:Incident')->findBy(['incident_event' => $event]);
                 /* @var $incidents Incident[] */
 
                 foreach ($incidents as $incident) {
-                    $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]));
+                    /** @var EntityRepository $injectRepo */
+                    $injectRepo = $em->getRepository('APIBundle:Inject');
+                    /** Copy only enabled and automatic injects (handler by worker) */
+                    $executableInjects = $injectRepo
+                        ->createQueryBuilder('i')
+                        ->where('i.inject_enabled = true')
+                        ->andWhere('i.inject_type != :inject_type_parameter')
+                        ->setParameter('inject_type_parameter', InjectTypeController::$INJECT_TYPE_MANUAL)
+                        ->andWhere('i.inject_incident = :incident_id_parameter')
+                        ->setParameter('incident_id_parameter', $incident)
+                        ->getQuery()->getResult();
+                    $injects = array_merge($injects, $executableInjects);
                 }
             }
 
-            // sort injects by date
-            usort($injects, function($a, $b) {
+            //No need to dryRun an empty exercise
+            if (count($injects) == 0) {
+                $form->get('dryrun_speed')->addError(new FormError('Please create some injects first'));
+                return $form;
+            }
+
+            // sort injects executableInjects date
+            usort($injects, function ($a, $b) {
+                /** @var Inject $a */
+                /** @var Inject $b */
                 return $a->getInjectDate()->getTimestamp() - $b->getInjectDate()->getTimestamp();
             });
 
             // create new injects
+            /** @var Inject $previousInject */
             $previousInject = null;
-            $previousDryinject = null;
-            foreach( $injects as $inject ) {
-                if( $inject->getInjectEnabled() == true ) {
-                    $dryinject = new Dryinject();
-                    $dryinject->setDryinjectTitle($inject->getInjectTitle());
-                    $dryinject->setDryinjectContent($inject->getInjectContent());
-                    $dryinject->setDryinjectType($inject->getInjectType());
-                    $dryinject->setDryinjectDryrun($dryrun);
+            /** @var Dryinject $previousDryInject */
+            $previousDryInject = null;
 
-                    // set the first inject to now
-                    if ($previousInject === null) {
-                        $dryinject->setDryinjectDate(new \DateTime());
-                    } else {
-                        // compute the interval in seconds from the previous inject
-                        $previousDate = $previousInject->getInjectDate()->getTimestamp();
-                        $currentDate = $inject->getInjectDate()->getTimestamp();
-                        $intervalInSeconds = $currentDate - $previousDate;
+            foreach ($injects as $inject) {
+                $dryInject = new Dryinject();
+                $dryInject->setDryinjectTitle($inject->getInjectTitle());
+                $dryInject->setDryinjectContent($inject->getInjectContent());
+                $dryInject->setDryinjectType($inject->getInjectType());
+                $dryInject->setDryinjectDryrun($dryrun);
 
-                        // accelerate the interval and create the interval object
-                        $newInterval = new \DateInterval('PT' . round($intervalInSeconds / $dryrun->getDryrunSpeed()) . 'S');
-
-                        // set the new datetime
-                        $dryinject->setDryinjectDate($previousDryinject->getDryinjectDate()->add($newInterval));
-                    }
-
-                    // create the dryinject
-                    $em->persist($dryinject);
-                    $em->flush();
-
-                    // create the dryinject status
-                    $status = new DryinjectStatus();
-                    $status->setStatusDate(new \DateTime());
-                    $status->setStatusDryinject($dryinject);
-                    $em->persist($status);
-                    $em->flush();
-
-                    $previousInject = $inject;
-                    $previousDryinject = $dryinject;
+                // set the first inject to now
+                if ($previousInject === null) {
+                    $dryInject->setDryinjectDate(new \DateTime());
+                } else {
+                    // compute the interval in seconds from the previous inject
+                    $previousDate = $previousInject->getInjectDate()->getTimestamp();
+                    $currentDate = $inject->getInjectDate()->getTimestamp();
+                    $intervalInSeconds = $currentDate - $previousDate;
+                    // accelerate the interval and create the interval object
+                    $newInterval = new \DateInterval('PT' . round($intervalInSeconds / $dryrun->getDryrunSpeed()) . 'S');
+                    // set the new datetime
+                    $dryInject->setDryinjectDate($previousDryInject->getDryinjectDate()->add($newInterval));
                 }
+
+                // create the dryInject
+                $em->persist($dryInject);
+                $em->flush();
+
+                // create the dryInject status
+                $status = new DryinjectStatus();
+                $status->setStatusDryinject($dryInject);
+                $em->persist($status);
+                $em->flush();
+
+                $previousInject = $inject;
+                $previousDryInject = $dryInject;
             }
 
             $id = $dryrun->getDryrunId();
@@ -208,7 +231,7 @@ class DryrunController extends Controller
         $dryrun = $em->getRepository('APIBundle:Dryrun')->find($request->get('dryrun_id'));
         /* @var $dryrun Dryrun */
 
-        if (empty($dryrun) || $dryrun->getDryrunExercise() !== $exercise ) {
+        if (empty($dryrun) || $dryrun->getDryrunExercise() !== $exercise) {
             return $this->dryrunNotFound();
         }
 
@@ -218,11 +241,11 @@ class DryrunController extends Controller
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function dryrunNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Dryrun not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Dryrun not found'], Response::HTTP_NOT_FOUND);
     }
 }

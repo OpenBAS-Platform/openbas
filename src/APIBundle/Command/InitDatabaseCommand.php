@@ -424,12 +424,9 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
     private function createInjectStatus($inject) {
         $status = new InjectStatus();
-        $status->setStatusDate(new \DateTime());
         $status->setStatusInject($inject);
-
         $this->em->persist($status);
         $this->em->flush();
-
         return $status;
     }
 }

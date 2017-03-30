@@ -14,6 +14,8 @@ use APIBundle\Entity\Event;
 
 class InjectTypeController extends Controller
 {
+    public static $INJECT_TYPE_MANUAL = 'openex_manual';
+
     /**
      * @ApiDoc(
      *    description="List inject types"
@@ -33,7 +35,7 @@ class InjectTypeController extends Controller
         }
 
         $other = array();
-        $other['type'] = 'openex_manual';
+        $other['type'] = self::$INJECT_TYPE_MANUAL;
         $other['fields'] = array();
         $other['fields'][] = array(
             'name' => 'content',
