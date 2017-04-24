@@ -1,5 +1,6 @@
-import React, {PropTypes} from 'react';
-import MUIToggle from 'material-ui/Toggle';
+import React from 'react'
+import PropTypes from 'prop-types'
+import MUIToggle from 'material-ui/Toggle'
 import {Field} from 'redux-form'
 
 const renderToggleField = ({input, label}) => (

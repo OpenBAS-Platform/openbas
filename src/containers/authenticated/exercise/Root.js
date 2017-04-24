@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {redirectToExercise, toggleLeftBar} from '../../../actions/Application'
 import * as Constants from '../../../constants/ComponentTypes'
@@ -68,7 +69,7 @@ RootAuthenticated.propTypes = {
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToExercise: PropTypes.func,
-  children: React.PropTypes.node,
+  children: PropTypes.node,
   fetchExercise: PropTypes.func.isRequired,
   params: PropTypes.object
 }

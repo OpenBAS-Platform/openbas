@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
 import R from 'ramda'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
-import {Popover} from '../../../../components/Popover';
+import {Popover} from '../../../../components/Popover'
 import {Menu} from '../../../../components/Menu'
 import {Dialog} from '../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../components/Button'

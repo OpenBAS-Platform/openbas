@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import R from 'ramda'
 import {dateFormat} from '../../../../../utils/Time'
 import {connect} from 'react-redux'

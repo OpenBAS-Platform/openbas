@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import {T} from '../../../../components/I18n'
@@ -7,7 +8,7 @@ import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchEvents} from '../../../../actions/Event'
 import {Icon} from '../../../../components/Icon'
 import {List} from '../../../../components/List'
-import {MainListItemLink} from '../../../../components/list/ListItem';
+import {MainListItemLink} from '../../../../components/list/ListItem'
 import CreateEvent from './event/CreateEvent'
 
 const styles = {

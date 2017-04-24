@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import ReactDocumentTitle from 'react-document-title'
 import {injectIntl} from 'react-intl'
+import PropTypes from 'prop-types'
 
 class DocumentTitle extends Component {
   render() {
@@ -14,9 +15,9 @@ class DocumentTitle extends Component {
 }
 
 DocumentTitle.propTypes = {
-  title: React.PropTypes.string.isRequired,
-  intl: React.PropTypes.object,
-  children: React.PropTypes.node
+  title: PropTypes.string.isRequired,
+  intl: PropTypes.object,
+  children: PropTypes.node
 }
 
 export default injectIntl(DocumentTitle);

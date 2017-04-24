@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import * as Constants from '../../../constants/ComponentTypes'
 import {AppBar} from '../../../components/AppBar'
@@ -50,7 +51,7 @@ RootUser.propTypes = {
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
-  children: React.PropTypes.node
+  children: PropTypes.node
 }
 
 export default connect(null, {redirectToHome})(RootUser);

@@ -1,10 +1,11 @@
-import React, {PropTypes, Component} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {selectSubaudience} from '../../../../../actions/Subaudience'
 import {Drawer} from '../../../../../components/Drawer'
 import {List} from '../../../../../components/List'
-import {ListItemLink} from '../../../../../components/list/ListItem';
+import {ListItemLink} from '../../../../../components/list/ListItem'
 import {Icon} from '../../../../../components/Icon'
 import Theme from '../../../../../components/Theme'
 import CreateSubaudience from './CreateSubaudience'

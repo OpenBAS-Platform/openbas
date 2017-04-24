@@ -1,9 +1,10 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
 import * as Constants from '../../constants/ComponentTypes'
 import R from 'ramda'
-import {Popover} from '../../components/Popover';
-import {Avatar} from '../../components/Avatar';
+import {Popover} from '../../components/Popover'
+import {Avatar} from '../../components/Avatar'
 import {Menu} from '../../components/Menu'
 import {MenuItemLink, MenuItemButton} from "../../components/menu/MenuItem"
 import {logout, fetchToken} from '../../actions/Application'

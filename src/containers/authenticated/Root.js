@@ -10,6 +10,7 @@ import {i18nRegister} from '../../utils/Messages'
 import * as Constants from '../../constants/ComponentTypes'
 import {Icon} from '../../components/Icon'
 import DocumentTitle from '../../components/DocumentTitle'
+import PropTypes from 'prop-types'
 
 i18nRegister({
   fr: {
@@ -22,7 +23,7 @@ class RootAuthenticated extends Component {
   componentDidMount() {
     if (process.env.NODE_ENV !== 'development') {
       const initialStream = Rx.Observable.of(1); //Fetch on loading
-      var intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
+      const intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
       this.subscription = initialStream
         .merge(intervalStream)
         .exhaustMap(() => this.props.fetchWorkerStatus()) //Fetch only if previous call finished
@@ -54,10 +55,10 @@ class RootAuthenticated extends Component {
 }
 
 RootAuthenticated.propTypes = {
-  children: React.PropTypes.node,
-  savedPopupOpen: React.PropTypes.bool,
-  fetchWorkerStatus: React.PropTypes.func,
-  savedDismiss: React.PropTypes.func
+  children: PropTypes.node,
+  savedPopupOpen: PropTypes.bool,
+  fetchWorkerStatus: PropTypes.func,
+  savedDismiss: PropTypes.func
 }
 
 const select = (state) => {
