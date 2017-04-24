@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import DocumentTitle from '../../components/DocumentTitle'
+import PropTypes from 'prop-types'
 
 class RootAnonymous extends Component {
   render() {
@@ -12,7 +13,7 @@ class RootAnonymous extends Component {
 }
 
 RootAnonymous.propTypes = {
-  children: React.PropTypes.node
+  children: PropTypes.node
 }
 
 export default RootAnonymous;

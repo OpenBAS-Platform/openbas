@@ -34,14 +34,12 @@ export const GridTile = (props) => (
   <MUIGridTile
     title={props.title}
     subtitle={props.subtitle}
-    actionIcon={props.actionIcon}
-  >
+    actionIcon={props.actionIcon}>
     {props.children}
     </MUIGridTile>
 )
 
 GridTile.propTypes = {
-  key: PropTypes.string,
   title: PropTypes.node,
   subtitle: PropTypes.node,
   actionIcon: PropTypes.element,

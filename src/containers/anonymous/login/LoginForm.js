@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import {reduxForm} from 'redux-form'
 import {FormField} from '../../../components/Field'
 import {Button} from '../../../components/Button'

@@ -1,9 +1,10 @@
-import React, {PropTypes, Component} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Drawer} from '../../../../components/Drawer'
-import {List} from 'material-ui/List';
-import {ListItemLink} from '../../../../components/list/ListItem';
+import {List} from 'material-ui/List'
+import {ListItemLink} from '../../../../components/list/ListItem'
 import {AppBar} from '../../../../components/AppBar'
 import {Icon} from '../../../../components/Icon'
 import {redirectToExercise, toggleLeftBar} from '../../../../actions/Application'

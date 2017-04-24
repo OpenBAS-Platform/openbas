@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
 import {FormField} from '../../../../../components/Field'
 import {T} from '../../../../../components/I18n'
 import {SelectField} from '../../../../../components/SelectField'
 import {i18nRegister} from '../../../../../utils/Messages'
-import {MenuItemLink} from "../../../../../components/menu/MenuItem"
+import MenuItem from 'material-ui/MenuItem'
 
 i18nRegister({
   fr: {
@@ -45,12 +46,12 @@ class IncidentForm extends Component {
         <FormField name="incident_title" fullWidth={true} type="text" label="Title"/>
         <SelectField label={<T>Type</T>} name="incident_type" fullWidth={true}>
           {R.values(this.props.types).map(type => {
-            return (<MenuItemLink key={type.type_id} value={type.type_id} label={<T>{type.type_name}</T>}/>)
+            return (<MenuItem key={type.type_id} value={type.type_id} primaryText={<T>{type.type_name}</T>}/>)
           })}
         </SelectField>
         <SelectField label={<T>Significance</T>} name="incident_weight" fullWidth={true}>
           {weights.map(weight => {
-            return (<MenuItemLink key={weight.weight_id} value={weight.weight_id} label={<T>{weight.weight_name}</T>}/>)
+            return (<MenuItem key={weight.weight_id} value={weight.weight_id} primaryText={<T>{weight.weight_name}</T>}/>)
           })}
         </SelectField>
         <FormField name="incident_story" fullWidth={true} multiLine={true} rows={3} type="text" label="Story"/>

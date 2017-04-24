@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import {FormField} from '../../../../components/Field'
 import {SelectField} from '../../../../components/SelectField'
-import {MenuItemLink} from '../../../../components/menu/MenuItem'
+import MenuItem from 'material-ui/MenuItem'
 import {i18nRegister} from '../../../../utils/Messages'
 import {T} from '../../../../components/I18n'
 
@@ -21,9 +22,9 @@ class TemplateForm extends Component {
         <FormField name="exercise_message_header" fullWidth={true} type="text" label="Messages header"/>
         <FormField name="exercise_message_footer" fullWidth={true} type="text" label="Messages footer"/>
         <SelectField label={<T>Exercise control (animation)</T>} name="exercise_animation_group" fullWidth={true}>
-          <MenuItemLink value={null} label=""/>
+          <MenuItem value={null} primaryText=""/>
           {this.props.groups.map(data => {
-            return (<MenuItemLink key={data.group_id} value={data.group_id} label={data.group_name}/>)
+            return (<MenuItem key={data.group_id} value={data.group_id} primaryText={data.group_name}/>)
           })}
         </SelectField>
       </form>

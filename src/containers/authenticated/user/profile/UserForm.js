@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
 import {FormField} from '../../../../components/Field'
 import {T} from '../../../../components/I18n'
 import {SelectField} from '../../../../components/SelectField'
 import {i18nRegister} from '../../../../utils/Messages'
-import {MenuItemLink} from "../../../../components/menu/MenuItem"
+import MenuItem from 'material-ui/MenuItem'
 import {AutoCompleteField} from '../../../../components/AutoComplete'
 import AutoComplete from 'material-ui/AutoComplete'
 
@@ -34,9 +35,9 @@ class UserForm extends Component {
         <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
                            type="text" label="Organization" dataSource={dataSource}/>
         <SelectField label={<T>Language</T>} name="user_lang" fullWidth={true}>
-          <MenuItemLink key="auto" value="auto" label={<T>Automatic</T>}/>
-          <MenuItemLink key="en" value="en" label="English"/>
-          <MenuItemLink key="fr" value="fr" label="Français"/>
+          <MenuItem key="auto" value="auto" primaryText={<T>Automatic</T>}/>
+          <MenuItem key="en" value="en" primaryText="English"/>
+          <MenuItem key="fr" value="fr" primaryText="Français"/>
         </SelectField>
       </form>
     )

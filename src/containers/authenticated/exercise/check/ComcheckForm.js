@@ -1,8 +1,9 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import {FormField, RichTextField} from '../../../../components/Field'
 import {SelectField} from '../../../../components/SelectField'
-import {MenuItemLink} from "../../../../components/menu/MenuItem"
+import MenuItem from 'material-ui/MenuItem'
 import DateTimePicker from '../../../../components/DateTimePicker'
 import {i18nRegister} from '../../../../utils/Messages'
 import {T} from '../../../../components/I18n'
@@ -42,7 +43,7 @@ class ComcheckForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <SelectField label={<T>Target audience</T>} name="comcheck_audience" fullWidth={true}>
           {this.props.audiences.map(audience => {
-            return (<MenuItemLink key={audience.audience_id} value={audience.audience_id} label={<T>{audience.audience_name}</T>}/>)
+            return (<MenuItem key={audience.audience_id} value={audience.audience_id} primaryText={<T>{audience.audience_name}</T>}/>)
           })}
         </SelectField>
         <DateTimePicker ref="endPicker" handleResult={this.replaceEndValue.bind(this)}/>

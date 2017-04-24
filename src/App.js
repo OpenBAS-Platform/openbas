@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import axios from 'axios'
 import {createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
@@ -46,6 +47,7 @@ import IndexExerciseDryrun from './containers/authenticated/exercise/check/Dryru
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
 import IndexExerciseLessons from './containers/authenticated/exercise/lessons/Index'
 import Immutable from 'seamless-immutable'
+import { createLogger } from 'redux-logger'
 
 injectTapEventPlugin()
 
@@ -70,13 +72,13 @@ if (process.env.NODE_ENV === 'development') {
 let store
 const baseHistory = browserHistory
 const routingMiddleware = routerMiddleware(baseHistory)
+const logger = createLogger({
+  predicate: (getState, action) => !action.type.startsWith('DATA_FETCH') && !action.type.startsWith('@@redux-form')
+});
 //Only compose the store if devTools are available
 if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
-  const createLogger = require(`redux-logger`);
   store = createStore(rootReducer, initialState, compose(
-    applyMiddleware(routingMiddleware, thunk, createLogger({
-      predicate: (getState, action) => !action.type.startsWith('DATA_FETCH') && !action.type.startsWith('@@redux-form')
-    })),
+    applyMiddleware(routingMiddleware, thunk, logger),
     window.devToolsExtension && window.devToolsExtension()
   ))
 } else {
