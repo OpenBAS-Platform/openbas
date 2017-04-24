@@ -2,7 +2,7 @@ import * as schema from './Schema'
 import {getReferential, fileSave, putReferential, postReferential, delReferential} from '../utils/Action'
 
 export const fetchAudiences = (exerciseId) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/audiences'
+  let uri = '/api/exercises/' + exerciseId + '/audiences'
   return getReferential(schema.arrayOfAudiences, uri)(dispatch)
 }
 
