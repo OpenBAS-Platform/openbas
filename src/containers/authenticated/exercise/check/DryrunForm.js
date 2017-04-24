@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import {T} from '../../../../components/I18n'
 import {SelectField} from '../../../../components/SelectField'

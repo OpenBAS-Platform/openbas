@@ -1,4 +1,5 @@
-import React, {PropTypes, Component} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -78,7 +79,7 @@ NavBar.propTypes = {
   pathname: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
   open: PropTypes.bool,
-  loading: React.PropTypes.bool
+  loading: PropTypes.bool
 }
 
 const select = (state) => {

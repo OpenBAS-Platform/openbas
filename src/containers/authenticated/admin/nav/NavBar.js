@@ -1,4 +1,4 @@
-import React, {PropTypes, Component} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Link} from 'react-router'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -9,6 +9,7 @@ import {IconListItemLink} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {AppBar} from '../../../../components/AppBar'
 import {toggleLeftBar} from '../../../../actions/Application'
+import PropTypes from 'prop-types'
 
 const styles = {
   exit: {
@@ -55,7 +56,7 @@ NavBar.propTypes = {
   pathname: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
   open: PropTypes.bool,
-  loading: React.PropTypes.bool
+  loading: PropTypes.bool
 }
 
 const select = (state) => {

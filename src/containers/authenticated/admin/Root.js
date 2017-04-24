@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {i18nRegister} from '../../../utils/Messages'
 import {T} from '../../../components/I18n'
@@ -8,6 +8,7 @@ import {AppBar} from '../../../components/AppBar'
 import NavBar from './nav/NavBar'
 import LeftBar from './nav/LeftBar'
 import UserPopover from './../UserPopover'
+import PropTypes from 'prop-types'
 
 i18nRegister({
   fr: {
@@ -65,7 +66,7 @@ RootAuthenticated.propTypes = {
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToAdmin: PropTypes.func,
-  children: React.PropTypes.node,
+  children: PropTypes.node,
   params: PropTypes.object
 }
 

@@ -1,5 +1,6 @@
-import React, {PropTypes, Component} from 'react';
-import {connect} from 'react-redux';
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
+import {connect} from 'react-redux'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover'

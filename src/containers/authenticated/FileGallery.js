@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from 'react'
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import R from 'ramda'
 import {i18nRegister} from '../../utils/Messages'
@@ -108,8 +109,7 @@ FileGallery.propTypes = {
   files: PropTypes.object,
   fetchFiles: PropTypes.func,
   fileSelector: PropTypes.func,
-  addFile: PropTypes.func,
-
+  addFile: PropTypes.func
 }
 
 const select = (state) => {
