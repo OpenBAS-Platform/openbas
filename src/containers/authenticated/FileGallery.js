@@ -29,7 +29,6 @@ i18nRegister({
   }
 })
 
-
 class FileGallery extends Component {
   constructor(props) {
     super(props);
