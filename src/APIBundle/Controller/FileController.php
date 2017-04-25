@@ -105,7 +105,7 @@ class FileController extends Controller
         if ($file) {
             $em->remove($file);
             $em->flush();
-            unlink($this->get('kernel')->getRootDir() . '/files/' . $file->getFilePath());
+            @unlink($this->get('kernel')->getRootDir() . '/files/' . $file->getFilePath());
         }
     }
 
