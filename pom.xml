@@ -28,6 +28,7 @@
 
     <properties>
         <camel.version>2.18.0</camel.version>
+        <karaf.version>4.1.1</karaf.version>
         <scanPath>io.openex</scanPath>
     </properties>
 
