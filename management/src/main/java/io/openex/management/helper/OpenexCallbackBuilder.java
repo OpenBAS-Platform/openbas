@@ -1,8 +1,10 @@
 package io.openex.management.helper;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 
 import static io.openex.management.helper.OpenexCallbackMessage.STATUS_ERROR;
+import static io.openex.management.helper.OpenexCallbackMessage.STATUS_PENDING;
 import static io.openex.management.helper.OpenexCallbackMessage.STATUS_SUCCESS;
 import static java.util.Collections.singletonList;
 
@@ -17,9 +19,16 @@ public class OpenexCallbackBuilder {
 		buildMessage(exchange, STATUS_ERROR);
 	}
 	
+	public void pending(Exchange exchange) {
+		buildMessage(exchange, STATUS_PENDING);
+	}
+	
 	private void buildMessage(Exchange exchange, String status) {
-		String currentBody = exchange.getIn().getBody().toString();
-		OpenexCallbackMessage openexCallbackMessage = new OpenexCallbackMessage(status, singletonList(currentBody));
-		exchange.getIn().setBody(openexCallbackMessage.toJson());
+		long executionDuration = OpenexPropertyUtils.computeExecutionDuration(exchange);
+		Message in = exchange.getIn();
+		String currentBody = in.getBody().toString();
+		OpenexCallbackMessage openexCallbackMessage = //
+				new OpenexCallbackMessage(status, executionDuration, singletonList(currentBody));
+		in.setBody(openexCallbackMessage.toJson());
 	}
 }

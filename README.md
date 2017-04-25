@@ -66,6 +66,6 @@ $ ./karaf
 *Launch services*:
 
 ```bash
-$ feature:repo-add mvn:io.openex/worker-features/1.0.0-SNAPSHOT/xml/features
+$ feature:repo-add mvn:io.openex/worker-features/1.0.0/xml/features
 $ feature:install worker-features
 ```

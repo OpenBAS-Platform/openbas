@@ -1,5 +1,8 @@
 package io.openex.management.helper;
 
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+
 import java.io.FileInputStream;
 import java.util.Properties;
 
@@ -16,5 +19,11 @@ public class OpenexPropertyUtils {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	@SuppressWarnings("PackageAccessibility")
+	static long computeExecutionDuration(Exchange exchange) {
+		long startTime = exchange.getProperty(Exchange.CREATED_TIMESTAMP, Long.class);
+		return System.currentTimeMillis() - startTime;
 	}
 }

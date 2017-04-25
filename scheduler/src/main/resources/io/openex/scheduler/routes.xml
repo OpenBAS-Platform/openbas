@@ -1,11 +1,11 @@
 <routes xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <route id="openex-scheduler">
-        <from uri="timer:simple?period=5s"/>
+        <from uri="quartz://openexScheduler?cron=0+0/1+*+*+*+?"/>
         <setHeader headerName="Authorization">
             <constant>{{openex.token}}</constant>
         </setHeader>
-        <to uri="{{openex_scheduler.uri}}"/>
+        <to uri="{{openex.api}}{{openex_scheduler.uri}}"/>
         <!-- Remove authorization header to avoid any compatibility problem with execution modules -->
         <removeHeader headerName="Authorization"/>
         <unmarshal>
@@ -13,16 +13,21 @@
         </unmarshal>
         <split executorServiceRef="openex-worker-thread-profile" streaming="true">
             <simple>${body}</simple>
+            <!-- Save current data to variables -->
+            <setProperty propertyName="inject-data">
+                <simple>${body[data]}</simple>
+            </setProperty>
             <setHeader headerName="router-header">
                 <simple>${body[context][type]}</simple>
             </setHeader>
-            <!-- Inside property to navigate through all exchanges -->
             <setProperty propertyName="router-callback">
                 <simple>${body[context][callback_url]}</simple>
             </setProperty>
+            <!-- Inject must be in_progress during processing -->
+            <to uri="direct:pending"/>
             <!-- Send only data to workers -->
             <setBody>
-                <simple>${body[data]}</simple>
+                <simple>${property.inject-data}</simple>
             </setBody>
             <doTry>
                 <dynamicRouter ignoreInvalidEndpoints="true">
@@ -41,6 +46,14 @@
                 </doFinally>
             </doTry>
         </split>
+    </route>
+    <route id="openex-pending">
+        <from uri="direct:pending"/>
+        <setBody>
+            <simple>In progress</simple>
+        </setBody>
+        <bean ref="openexCallback" method="pending"/>
+        <to uri="direct:callback"/>
     </route>
     <route id="openex-callback">
         <from uri="direct:callback"/>

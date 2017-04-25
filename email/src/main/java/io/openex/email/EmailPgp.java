@@ -1,6 +1,5 @@
 package io.openex.email;
 
-import com.google.common.base.Throwables;
 import io.openex.email.attachment.EmailAttachment;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;

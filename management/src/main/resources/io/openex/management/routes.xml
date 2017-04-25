@@ -10,9 +10,18 @@
             <setBody>
                 <simple>${body[data]}</simple>
             </setBody>
-            <dynamicRouter ignoreInvalidEndpoints="true">
-                <method ref="openexRouter" method="forward"/>
-            </dynamicRouter>
+            <doTry>
+                <dynamicRouter ignoreInvalidEndpoints="true">
+                    <method ref="openexRouter" method="forward"/>
+                </dynamicRouter>
+                <doCatch>
+                    <exception>java.lang.Exception</exception>
+                    <setBody>
+                        <simple>Technical error: ${exception.message}</simple>
+                    </setBody>
+                    <bean ref="openexCallback" method="error"/>
+                </doCatch>
+            </doTry>
         </threads>
     </route>
 </routes>

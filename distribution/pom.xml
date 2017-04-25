@@ -6,15 +6,20 @@
 
     <groupId>io.openex</groupId>
     <artifactId>worker-distribution</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>karaf-assembly</packaging>
+
+    <properties>
+        <karaf.version>4.1.1</karaf.version>
+        <worker.version>1.0.0</worker.version>
+    </properties>
 
     <dependencies>
         <dependency>
             <!-- scope is compile so all features (there is only one) are installed into startup.properties and the feature repo itself is not added in etc/org.apache.karaf.features.cfg file -->
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>framework</artifactId>
-            <version>4.1.0</version>
+            <version>${karaf.version}</version>
             <type>kar</type>
         </dependency>
         <dependency>
@@ -22,7 +27,7 @@
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>standard</artifactId>
             <classifier>features</classifier>
-            <version>4.1.0</version>
+            <version>${karaf.version}</version>
             <type>xml</type>
             <scope>runtime</scope>
         </dependency>
@@ -31,7 +36,7 @@
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>spring</artifactId>
             <classifier>features</classifier>
-            <version>4.1.0</version>
+            <version>${karaf.version}</version>
             <type>xml</type>
             <scope>runtime</scope>
         </dependency>
@@ -39,7 +44,7 @@
             <groupId>io.openex</groupId>
             <artifactId>worker-features</artifactId>
             <classifier>features</classifier>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${worker.version}</version>
             <type>xml</type>
             <scope>runtime</scope>
         </dependency>
@@ -82,7 +87,7 @@
             <plugin>
                 <groupId>org.apache.karaf.tooling</groupId>
                 <artifactId>karaf-maven-plugin</artifactId>
-                <version>4.1.0</version>
+                <version>${karaf.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <bootFeatures>
