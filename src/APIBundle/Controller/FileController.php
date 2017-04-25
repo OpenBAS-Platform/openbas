@@ -2,16 +2,16 @@
 
 namespace APIBundle\Controller;
 
+use APIBundle\Entity\File;
+use APIBundle\Entity\User;
+use FOS\RestBundle\View\View;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use APIBundle\Entity\File;
+use FOS\RestBundle\Controller\Annotations as Rest;
 
 class FileController extends Controller
 {
@@ -26,14 +26,7 @@ class FileController extends Controller
     public function getFilesAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $files = $em->getRepository('APIBundle:File')->findBy(array(), array('file_id' => 'DESC'));
-        /* @var $files File[] */
-
-        foreach ($files as &$file) {
-            $file->buildUrl($this->getParameter('protocol'), $request->getHost());
-        }
-
-        return $files;
+        return $em->getRepository('APIBundle:File')->findBy(array(), array('file_id' => 'DESC'));
     }
 
     /**
@@ -53,10 +46,8 @@ class FileController extends Controller
             return $this->fileNotFound();
         }
 
-        // temporary store the file with the real name
-        copy($this->get('kernel')->getRootDir() . '/../web/upload/' . $file->getFilePath(), '/tmp/' . $file->getFileName());
-
-        return $this->file('/tmp/' . $file->getFileName());
+        return $this->file($this->get('kernel')->getRootDir() . '/files/' . $file->getFilePath(),
+            $file->getFileName());
     }
 
     /**
@@ -71,26 +62,21 @@ class FileController extends Controller
     {
         $em = $this->get('doctrine.orm.entity_manager');
         if (count($_FILES) == 0) {
-            return \FOS\RestBundle\View\View::create(['message' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
+            return View::create(['message' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         } else {
             $file = new File();
             foreach ($_FILES as $f) {
                 $uploadedFile = new UploadedFile($f['tmp_name'], $f['name']);
-                $type = $uploadedFile->guessExtension();
-                if ($type === null) {
-                    $type = 'unknown';
-                }
+                $type = $uploadedFile->guessExtension() ? $uploadedFile->guessExtension() : 'unknown';
                 $file->setFileType($type);
                 $filePath = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
-                $uploadedFile->move($this->get('kernel')->getRootDir() . '/../web/upload', $filePath);
+                $uploadedFile->move($this->get('kernel')->getRootDir() . '/files', $filePath);
                 $file->setFileName($f['name']);
                 $file->setFilePath($filePath);
                 $em->persist($file);
                 $em->flush();
                 break;
             }
-
-            $file->buildUrl($this->getParameter('protocol'), $request->getHost());
             return $file;
         }
     }
@@ -106,10 +92,12 @@ class FileController extends Controller
     public function removeFileAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
+        /** @var User $user */
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
-        if (!$user->isAdmin())
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+        if (!$user->isAdmin()) {
+            throw new AccessDeniedHttpException();
+        }
 
         $file = $em->getRepository('APIBundle:File')->find($request->get('file_id'));
         /* @var $file File */
@@ -117,12 +105,12 @@ class FileController extends Controller
         if ($file) {
             $em->remove($file);
             $em->flush();
-            unlink($this->get('kernel')->getRootDir() . '/../web/upload/' . $file->getFilePath());
+            @unlink($this->get('kernel')->getRootDir() . '/files/' . $file->getFilePath());
         }
     }
 
     private function fileNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
     }
 }

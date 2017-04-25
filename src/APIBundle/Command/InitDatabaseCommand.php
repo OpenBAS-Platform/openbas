@@ -178,7 +178,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $outcomeSpy = $this->createOutcome($incidentSpy);
         $output->writeln('Creating outcome for incident \'A potato has been detected in the national security agency\'');
 
-        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Conversation interception', 'body' => 'A conversation between the potatoes chief and an agent');
+        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Conversation interception', 'body' => 'A conversation between the potatoes chief and an agent', 'encrypted' => false);
         $injectIntercept = $this->createInject(
             'Potatoes headquarters conversation',
             'A potatoes headquarters conversation is intercepted',
@@ -191,7 +191,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->createInjectStatus($injectIntercept);
         $output->writeln('Creating inject \'Potatoes headquarters conversation\'');
 
-        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Potato confirmed in flight PO345', 'body' => 'A potato is arriving at the airport, according to the flight passengers records.');
+        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Potato confirmed in flight PO345', 'body' => 'A potato is arriving at the airport, according to the flight passengers records.', 'encrypted' => false);
         $injectArrival = $this->createInject(
             'Potato arrival at the airport',
             'A potato is arriving at the airport ',
@@ -204,7 +204,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->createInjectStatus($injectArrival);
         $output->writeln('Creating inject \'Potato arrival at the airport\'');
 
-        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Potato filmed by CCTV', 'body' => 'A potato has been detected by the CCTV of the airport');
+        $content = array('sender' => 'no-reply@openex.io', 'subject' => 'Potato filmed by CCTV', 'body' => 'A potato has been detected by the CCTV of the airport', 'encrypted' => false);
         $injectCamera = $this->createInject(
             'A potato has been detected',
             'A potato has been detected by CCTV',
@@ -424,13 +424,9 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
     private function createInjectStatus($inject) {
         $status = new InjectStatus();
-        $status->setStatusName('PENDING');
-        $status->setStatusDate(new \DateTime());
         $status->setStatusInject($inject);
-
         $this->em->persist($status);
         $this->em->flush();
-
         return $status;
     }
 }

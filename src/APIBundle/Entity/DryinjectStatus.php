@@ -35,9 +35,14 @@ class DryinjectStatus
     protected $status_message;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     protected $status_date;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $status_execution;
 
     public function getStatusId()
     {
@@ -91,6 +96,17 @@ class DryinjectStatus
     public function setStatusDate($date)
     {
         $this->status_date = $date;
+        return $this;
+    }
+
+    public function getStatusExecution()
+    {
+        return $this->status_execution;
+    }
+
+    public function setStatusExecution($status_execution)
+    {
+        $this->status_execution = $status_execution;
         return $this;
     }
 }

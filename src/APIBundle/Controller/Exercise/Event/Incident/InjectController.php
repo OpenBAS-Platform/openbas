@@ -110,8 +110,6 @@ class InjectController extends Controller
             $em->flush();
 
             $status = new InjectStatus();
-            $status->setStatusName('PENDING');
-            $status->setStatusDate(new \DateTime());
             $status->setStatusInject($inject);
             $em->persist($status);
             $em->flush();

@@ -4,6 +4,7 @@ namespace APIBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\Tests\StringableObject;
 
 /**
  * @ORM\Entity()
@@ -39,7 +40,6 @@ class File
      */
     protected $file_tags;
 
-    protected $file_url;
 
     public function __construct()
     {
@@ -90,17 +90,6 @@ class File
         return $this;
     }
 
-    public function getFileUrl()
-    {
-        return $this->file_url;
-    }
-
-    public function setFileUrl($url)
-    {
-        $this->file_url = $url;
-        return $this;
-    }
-
     public function getFileTags()
     {
         return $this->file_tags;
@@ -110,10 +99,5 @@ class File
     {
         $this->file_tags = $tags;
         return $this;
-    }
-
-    public function buildUrl($protocol, $hostname)
-    {
-        $this->file_url = $protocol . '://' . $hostname . '/upload/' . $this->file_path;
     }
 }

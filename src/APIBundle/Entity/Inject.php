@@ -2,6 +2,7 @@
 
 namespace APIBundle\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -144,6 +145,9 @@ class Inject
         return $this;
     }
 
+    /**
+     * @return DateTime
+     */
     public function getInjectDate()
     {
         return $this->inject_date;
