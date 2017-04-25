@@ -8,3 +8,5 @@ APIBundle\Entity\InjectStatus:
             groups: ['injectStatus', 'inject']
         status_date:
             groups: ['injectStatus', 'inject']
+        status_execution:
+            groups: ['injectStatus', 'inject']

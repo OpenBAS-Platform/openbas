@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller;
 
+use APIBundle\Entity\DryinjectStatus;
 use APIBundle\Entity\Subaudience;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,7 +80,6 @@ class InjectController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
 
         $injects = array();
-        $dryinjects = array();
         $dateStart = new \DateTime();
         $dateStart->modify('-60 minutes');
         $dateEnd = new \DateTime();
@@ -96,7 +96,7 @@ class InjectController extends Controller
                     $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->createQueryBuilder('i')
                         ->leftJoin('i.inject_status', 's')
                         ->where('s.status_inject = i.inject_id')
-                        ->andWhere('s.status_name = \'PENDING\'')
+                        ->andWhere('s.status_name is NULL')
                         ->andWhere('i.inject_enabled = 1')
                         ->andWhere('i.inject_type != \'other\'')
                         ->andWhere('i.inject_incident = :incident')
@@ -208,7 +208,7 @@ class InjectController extends Controller
         $dryinjects = $em->getRepository('APIBundle:Dryinject')->createQueryBuilder('i')
             ->leftJoin('i.dryinject_status', 's')
             ->where('s.status_dryinject = i.dryinject_id')
-            ->andWhere('s.status_name = \'PENDING\'')
+            ->andWhere('s.status_name is NULL')
             ->andWhere('i.dryinject_type != \'other\'')
             ->andWhere('i.dryinject_date BETWEEN :start AND :end')
             ->orderBy('i.dryinject_date', 'ASC')
@@ -273,9 +273,11 @@ class InjectController extends Controller
             return $this->injectNotFound();
         }
 
+        /** @var InjectStatus $status */
         $status = $inject->getInjectStatus();
         $status->setStatusName($request->request->get('status'));
         $status->setStatusMessage(json_encode($request->request->get('message')));
+        $status->setStatusExecution($request->request->get('execution'));
         $status->setStatusDate(new \DateTime());
 
         $em->persist($status);
@@ -304,9 +306,11 @@ class InjectController extends Controller
             return $this->dryinjectNotFound();
         }
 
+        /** @var DryinjectStatus $status */
         $status = $dryinject->getDryinjectStatus();
         $status->setStatusName($request->request->get('status'));
         $status->setStatusMessage(json_encode($request->request->get('message')));
+        $status->setStatusExecution($request->request->get('execution'));
         $status->setStatusDate(new \DateTime());
 
         $em->persist($status);

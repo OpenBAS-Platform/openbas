@@ -17,6 +17,7 @@
 /vendor/
 /web/bundles/
 /.idea
-!/web/upload/default_exercise.png
-!/web/upload/default_event.png
+!/app/files/default_exercise.png
+!/app/files/default_event.png
+/app/files
 /web/upload/
