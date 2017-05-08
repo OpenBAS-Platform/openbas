@@ -7,6 +7,7 @@
 
     <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
     <feature name="worker-scheduler" version="${pom.version}">
+        <feature>scr</feature>
         <feature>camel-http4</feature>
         <feature>camel-gson</feature>
         <feature>camel-quartz2</feature>

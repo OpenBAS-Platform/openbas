@@ -12,5 +12,5 @@ SET JAVA_MIN_MEM=512m
 rem Maximum memory for the JVM
 SET JAVA_MAX_MEM=1024m
 
-# Worker must work in UT8
+rem Worker must work in UT8
 SET KARAF_OPTS=-Dfile.encoding=UTF-8

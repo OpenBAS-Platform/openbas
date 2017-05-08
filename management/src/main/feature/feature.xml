@@ -9,6 +9,7 @@
     <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
 
     <feature name="worker-management" version="${pom.version}">
+        <feature>scr</feature>
         <feature>cxf-dosgi-provider-rs</feature>
         <feature>camel-core</feature>
     </feature>

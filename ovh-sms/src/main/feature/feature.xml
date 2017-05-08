@@ -7,6 +7,7 @@
 
     <repository>mvn:org.apache.camel.karaf/apache-camel/2.18.0/xml/features</repository>
     <feature name="worker-ovh-sms" version="${pom.version}">
+        <feature>scr</feature>
         <feature>camel-freemarker</feature>
     </feature>
 </features>
