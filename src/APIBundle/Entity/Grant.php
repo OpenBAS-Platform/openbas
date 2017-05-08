@@ -32,7 +32,7 @@ class Grant
     protected $grant_exercise;
 
     /**
-     * @ORM\Column(type="string", columnDefinition="ENUM('ADMIN', 'PLANNER', 'PLAYER', 'OBSERVER')")
+     * @ORM\Column(type="string")
      */
     protected $grant_name;
 

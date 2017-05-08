@@ -17,10 +17,10 @@ swiftmailer:
 
 doctrine:
     dbal:
-        driver:   pdo_mysql
+        driver:   pdo_pgsql
         host:     "localhost"
-        port:     "3306"
+        port:     "5432"
         dbname:   "openex"
-        user:     "root"
+        user:     "postgres"
         password: ""
         server_version: '5.7'
