@@ -17,6 +17,7 @@ matrix:
 before-install:
   - composer self-update
   - psql -c 'create database openex;' -U postgres
+  - psql -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";' -U postgres
 
 install:
   - composer install
