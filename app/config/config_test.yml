@@ -19,8 +19,6 @@ doctrine:
     dbal:
         driver:   pdo_pgsql
         host:     "localhost"
-        port:     "5432"
         dbname:   "openex"
         user:     "postgres"
         password: ""
-        server_version: '5.7'
