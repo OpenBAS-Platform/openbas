@@ -2,7 +2,7 @@ language: php
 sudo: false
 
 services:
-  - mysql
+  - postgresql
 
 cache:
   directories:
@@ -11,10 +11,12 @@ cache:
 matrix:
   fast_finish: true
   include:
+    - php: 5.5
     - php: 7.0
 
 before-install:
   - composer self-update
+  - psql -c 'create database openex;' -U postgres
 
 install:
   - composer install
