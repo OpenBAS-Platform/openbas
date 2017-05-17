@@ -38,7 +38,7 @@ class InjectController extends Controller
         /* @var $exercises Exercise[] */
 
         $injects = array();
-        foreach( $exercises as $exercise ) {
+        foreach ($exercises as $exercise) {
             $events = $em->getRepository('APIBundle:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
 
@@ -97,7 +97,7 @@ class InjectController extends Controller
                         ->leftJoin('i.inject_status', 's')
                         ->where('s.status_inject = i.inject_id')
                         ->andWhere('s.status_name is NULL')
-                        ->andWhere('i.inject_enabled = 1')
+                        ->andWhere('i.inject_enabled = true')
                         ->andWhere('i.inject_type != \'other\'')
                         ->andWhere('i.inject_incident = :incident')
                         ->andWhere('i.inject_date BETWEEN :start AND :end')
@@ -131,27 +131,56 @@ class InjectController extends Controller
             $data['data']['users'] = array();
 
             // list all audiences
-            foreach ($inject->getInjectAudiences() as $audience) {
-                /* @var $audience Audience */
-                if ($audience->getAudienceEnabled() == true) {
-                    // list subaudiences of the audience
-                    foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
-                        if ($subaudience->getSubaudienceEnabled() == true) {
-                            // list all users of the subaudience
-                            foreach ($subaudience->getSubaudienceUsers() as $user) {
-                                if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
-                                    $userData = array();
-                                    $userData['user_firstname'] = $user->getUserFirstname();
-                                    $userData['user_lastname'] = $user->getUserLastname();
-                                    $userData['user_email'] = $user->getUserEmail();
-                                    $userData['user_email2'] = $user->getUserEmail2();
-                                    $userData['user_phone'] = $user->getUserPhone();
-                                    $userData['user_phone2'] = $user->getUserPhone2();
-                                    $userData['user_phone3'] = $user->getUserPhone3();
-                                    $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
-                                    $userData['user_organization'] = array();
-                                    $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
-                                    $data['data']['users'][] = $userData;
+            if ($inject->getInjectAllAudiences() == true) {
+                foreach ($inject->getInjectExercise()->getExerciseAudiences() as $audience) {
+                    if ($audience->getAudienceEnabled() == true) {
+                        // list subaudiences of the audience
+                        foreach ($audience->getAudienceSubaudiences() as $subaudience) {
+                            if ($subaudience->getSubaudienceEnabled() == true) {
+                                // list all users of the subaudience
+                                foreach ($subaudience->getSubaudienceUsers() as $user) {
+                                    if (array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false) {
+                                        $userData = array();
+                                        $userData['user_firstname'] = $user->getUserFirstname();
+                                        $userData['user_lastname'] = $user->getUserLastname();
+                                        $userData['user_email'] = $user->getUserEmail();
+                                        $userData['user_email2'] = $user->getUserEmail2();
+                                        $userData['user_phone'] = $user->getUserPhone();
+                                        $userData['user_phone2'] = $user->getUserPhone2();
+                                        $userData['user_phone3'] = $user->getUserPhone3();
+                                        $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                                        $userData['user_organization'] = array();
+                                        $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                                        $data['data']['users'][] = $userData;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                foreach ($inject->getInjectAudiences() as $audience) {
+                    /* @var $audience Audience */
+                    if ($audience->getAudienceEnabled() == true) {
+                        // list subaudiences of the audience
+                        foreach ($audience->getAudienceSubaudiences() as $subaudience) {
+                            if ($subaudience->getSubaudienceEnabled() == true) {
+                                // list all users of the subaudience
+                                foreach ($subaudience->getSubaudienceUsers() as $user) {
+                                    if (array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false) {
+                                        $userData = array();
+                                        $userData['user_firstname'] = $user->getUserFirstname();
+                                        $userData['user_lastname'] = $user->getUserLastname();
+                                        $userData['user_email'] = $user->getUserEmail();
+                                        $userData['user_email2'] = $user->getUserEmail2();
+                                        $userData['user_phone'] = $user->getUserPhone();
+                                        $userData['user_phone2'] = $user->getUserPhone2();
+                                        $userData['user_phone3'] = $user->getUserPhone3();
+                                        $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
+                                        $userData['user_organization'] = array();
+                                        $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                                        $data['data']['users'][] = $userData;
+                                    }
                                 }
                             }
                         }
@@ -165,7 +194,7 @@ class InjectController extends Controller
                 if ($subaudience->getSubaudienceEnabled() == true) {
                     // list all users of the subaudience
                     foreach ($subaudience->getSubaudienceUsers() as $user) {
-                        if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
+                        if (array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false) {
                             $userData = array();
                             $userData['user_firstname'] = $user->getUserFirstname();
                             $userData['user_lastname'] = $user->getUserLastname();
@@ -183,9 +212,9 @@ class InjectController extends Controller
                 }
             }
 
-            if( $inject->getInjectExercise()->getExerciseAnimationGroup() != null ) {
-                foreach( $inject->getInjectExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user ) {
-                    if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
+            if ($inject->getInjectExercise()->getExerciseAnimationGroup() != null) {
+                foreach ($inject->getInjectExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user) {
+                    if (array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false) {
                         $userData = array();
                         $userData['user_firstname'] = $user->getUserFirstname();
                         $userData['user_lastname'] = $user->getUserLastname();
@@ -228,9 +257,9 @@ class InjectController extends Controller
             $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
             $data['data']['users'] = array();
 
-            if( $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup() != null ) {
-                foreach( $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user ) {
-                    if( array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false ) {
+            if ($dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup() != null) {
+                foreach ($dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user) {
+                    if (array_search($user->getUserEmail(), array_column($data['data']['users'], 'user_email')) === false) {
                         $userData = array();
                         $userData['user_firstname'] = $user->getUserFirstname();
                         $userData['user_lastname'] = $user->getUserLastname();

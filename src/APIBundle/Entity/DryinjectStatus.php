@@ -25,7 +25,7 @@ class DryinjectStatus
     protected $status_dryinject;
 
     /**
-     * @ORM\Column(type="string", columnDefinition="ENUM('SUCCESS', 'PARTIAL', 'ERROR', 'PENDING')")
+     * @ORM\Column(type="string")
      */
     protected $status_name;
 

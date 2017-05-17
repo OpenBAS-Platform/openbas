@@ -97,12 +97,6 @@ class User implements UserInterface
     protected $user_status = 1;
 
     /**
-     * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_users")
-     * @var User[]
-     */
-    protected $user_injects;
-
-    /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $user_lang;

@@ -25,7 +25,7 @@ class InjectStatus
     protected $status_inject;
 
     /**
-     * @ORM\Column(type="string", columnDefinition="ENUM('SUCCESS', 'PARTIAL', 'ERROR', 'PENDING')")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $status_name;
 
