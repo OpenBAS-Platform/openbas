@@ -65,6 +65,11 @@ class Inject
     protected $inject_subaudiences;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $inject_all_audiences = false;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_injects")
      * @ORM\JoinColumn(name="inject_incident", referencedColumnName="incident_id", onDelete="CASCADE")
      * @var Incident
@@ -178,6 +183,17 @@ class Inject
     public function setInjectSubaudiences($subaudiences)
     {
         $this->inject_subaudiences = $subaudiences;
+        return $this;
+    }
+
+    public function getInjectAllAudiences()
+    {
+        return $this->inject_all_audiences;
+    }
+
+    public function setInjectAllAudiences($all_audiences)
+    {
+        $this->inject_all_audiences = $all_audiences;
         return $this;
     }
 
