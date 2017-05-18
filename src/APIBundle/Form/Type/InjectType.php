@@ -22,6 +22,7 @@ class InjectType extends AbstractType
         $builder->add('inject_subaudiences');
         $builder->add('inject_type');
         $builder->add('inject_enabled');
+        $builder->add('inject_all_audiences');
     }
 
     public function configureOptions(OptionsResolver $resolver)

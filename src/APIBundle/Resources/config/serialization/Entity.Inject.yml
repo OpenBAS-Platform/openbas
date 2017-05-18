@@ -22,6 +22,8 @@ APIBundle\Entity\Inject:
             groups: ['inject']
         inject_subaudiences:
             groups: ['inject']
+        inject_all_audiences:
+            groups: ['inject']
         inject_user:
             groups: ['inject']
         inject_exercise:
