@@ -37,7 +37,8 @@
   },
   "require-dev": {
     "sensio/generator-bundle": "*",
-    "symfony/phpunit-bridge": "*"
+    "symfony/phpunit-bridge": "*",
+    "phpunit/phpunit": "*"
   },
   "scripts": {
     "symfony-scripts-install": [
