@@ -33,7 +33,7 @@ To contribute to the API development, please follow the next steps to deploy it.
 *Prerequisites*:
 
 - Install a webserver and PHP (>= 5.6)
-- Install MySQL (>= 5.5)
+- Install PostgreSQL (>= 9.2)
 
 *Installation*:
 
