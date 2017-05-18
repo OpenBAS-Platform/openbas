@@ -40,7 +40,7 @@ class InjectAudiences extends Component {
       audiencesIds: this.props.injectAudiencesIds,
       subaudiencesIds: this.props.injectSubaudiencesIds,
       searchTerm: '',
-      selectAll: false
+      selectAll: this.props.selectAll
     }
   }
 
@@ -82,6 +82,11 @@ class InjectAudiences extends Component {
     this.submitSubaudiences(subaudiencesIds)
   }
 
+  toggleAll(event, value) {
+    this.setState({selectAll: value})
+    this.submitSelectAll(value)
+  }
+
   submitAudiences(audiences_ids) {
     this.props.onChangeAudiences(audiences_ids)
   }
@@ -90,18 +95,8 @@ class InjectAudiences extends Component {
     this.props.onChangeSubaudiences(subaudiences_ids)
   }
 
-  toggleAll(event, value) {
-    this.setState({selectAll: value})
-    if (value === true) {
-      let audiencesIds = this.props.audiences.map(a => a.audience_id)
-      this.submitAudiences(audiencesIds)
-      this.submitSubaudiences([])
-      this.setState({selectAll: true, audiencesIds: audiencesIds, subaudiencesIds: []})
-    } else {
-      this.setState({audiencesIds: [], subaudiencesIds: []})
-      this.submitAudiences([])
-      this.submitSubaudiences([])
-    }
+  submitSelectAll(selectAll) {
+    this.props.onChangeSelectAll(selectAll)
   }
 
   render() {
@@ -211,10 +206,12 @@ InjectAudiences.propTypes = {
   incidentId: PropTypes.string,
   onChangeAudiences: PropTypes.func,
   onChangeSubaudiences: PropTypes.func,
+  onChangeSelectAll: PropTypes.func,
   injectAudiencesIds: PropTypes.array,
   injectSubaudiencesIds: PropTypes.array,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.array
+  subaudiences: PropTypes.array,
+  selectAll: PropTypes.bool
 }
 
 export default InjectAudiences

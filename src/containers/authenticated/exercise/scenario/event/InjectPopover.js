@@ -130,6 +130,12 @@ class InjectPopover extends Component {
     this.setState({injectData: injectData})
   }
 
+  onSelectAllAudiences(value) {
+    let injectData = this.state.injectData
+    injectData.inject_all_audiences = value
+    this.setState({injectData: injectData})
+  }
+
   submitFormEdit() {
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
@@ -315,11 +321,13 @@ class InjectPopover extends Component {
             incidentId={this.props.incidentId}
             onChangeAudiences={this.onAudiencesChange.bind(this)}
             onChangeSubaudiences={this.onSubaudiencesChange.bind(this)}
+            onChangeSelectAll={this.onSelectAllAudiences.bind(this)}
             injectId={this.props.inject.inject_id}
             injectAudiencesIds={this.props.injectAudiencesIds}
             injectSubaudiencesIds={this.props.injectSubaudiencesIds}
             audiences={this.props.audiences}
             subaudiences={this.props.subaudiences}
+            selectAll={this.props.inject.inject_all_audiences}
           />
         )
       default:

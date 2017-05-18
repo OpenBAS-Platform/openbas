@@ -84,7 +84,7 @@ class InjectView extends Component {
         })}
         <div style={styles.audiences}>
           <strong><T>Target audiences</T></strong>
-          {this.props.inject.inject_audiences.length === this.props.audiences.length ? <div>
+          {this.props.inject.inject_all_audiences === true ? <div>
               <T>All audiences</T>
             </div> :
           <List>

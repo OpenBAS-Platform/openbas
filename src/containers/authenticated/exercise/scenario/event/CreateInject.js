@@ -79,6 +79,12 @@ class CreateInject extends Component {
     this.setState({injectData: injectData})
   }
 
+  onSelectAllAudiences(value) {
+    let injectData = this.state.injectData
+    injectData.inject_all_audiences = value
+    this.setState({injectData: injectData})
+  }
+
   handleNext() {
     if (this.state.stepIndex === 0) {
       this.refs.injectForm.submit()
@@ -147,10 +153,12 @@ class CreateInject extends Component {
             incidentId={this.props.incidentId}
             onChangeAudiences={this.onAudiencesChange.bind(this)}
             onChangeSubaudiences={this.onSubaudiencesChange.bind(this)}
+            onChangeSelectAll={this.onSelectAllAudiences.bind(this)}
             audiences={this.props.audiences}
             subaudiences={this.props.subaudiences}
             injectAudiencesIds={[]}
             injectSubaudiencesIds={[]}
+            selectAll={false}
           />
         )
       default:
