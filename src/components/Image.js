@@ -10,11 +10,20 @@ class ReactBackgroundImage extends Component {
     this.state = {imgData: null}
   }
 
-  componentDidMount() {
+  fetchImageData(image_id) {
     let _this = this
     let urlCreator = window.URL || window.webkitURL
-    this.props.dataFile(this.props.image_id)
-      .then(response => _this.setState({imgData: urlCreator.createObjectURL(response.data)}))
+    this.props.dataFile(image_id).then(response => _this.setState({imgData: urlCreator.createObjectURL(response.data)}))
+  }
+
+  componentDidMount() {
+    this.fetchImageData(this.props.image_id)
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.image_id !== this.props.image_id) {
+      this.fetchImageData(this.props.image_id)
+    }
   }
 
   buildStyle() {
@@ -49,11 +58,20 @@ class ReactImage extends Component {
     this.state = {imgData: null}
   }
 
-  componentDidMount() {
+  fetchImageData(image_id) {
     let _this = this
     let urlCreator = window.URL || window.webkitURL
-    this.props.dataFile(this.props.image_id)
-      .then(response => _this.setState({imgData: urlCreator.createObjectURL(response.data)}))
+    this.props.dataFile(image_id).then(response => _this.setState({imgData: urlCreator.createObjectURL(response.data)}))
+  }
+
+  componentDidMount() {
+    this.fetchImageData(this.props.image_id)
+  }
+
+  componentDidUpdate(prevProps) {
+    if(prevProps.image_id !== this.props.image_id) {
+        this.fetchImageData(this.props.image_id)
+    }
   }
 
   render() {
