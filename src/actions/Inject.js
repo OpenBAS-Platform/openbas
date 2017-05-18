@@ -12,7 +12,7 @@ export const fetchAllInjects = (exerciseId, noloading) => (dispatch) => {
 }
 
 export const downloadExportInjects = (exerciseId) => (dispatch) => {
-    return fileSave('/api/exercises/' + exerciseId + '/injects.xlsx')(dispatch)
+    return fileSave('/api/exercises/' + exerciseId + '/injects.xlsx', 'injects.xlsx')(dispatch)
 }
 
 export const fetchGlobalInjects = () => (dispatch) => {

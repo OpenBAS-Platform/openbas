@@ -7,11 +7,11 @@ export const fetchAudiences = (exerciseId) => (dispatch) => {
 }
 
 export const downloadExportAudiences = (exerciseId) => (dispatch) => {
-  return fileSave('/api/exercises/' + exerciseId + '/audiences.xlsx')(dispatch)
+  return fileSave('/api/exercises/' + exerciseId + '/audiences.xlsx', 'audiences.xlsx')(dispatch)
 }
 
 export const downloadExportAudience = (exerciseId, audienceId) => (dispatch) => {
-  return fileSave('/api/exercises/' + exerciseId + '/audiences/' + audienceId + '/users.xlsx')(dispatch)
+  return fileSave('/api/exercises/' + exerciseId + '/audiences/' + audienceId + '/users.xlsx', 'users.xlsx')(dispatch)
 }
 
 export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
