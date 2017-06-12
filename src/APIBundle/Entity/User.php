@@ -21,17 +21,22 @@ class User implements UserInterface
     protected $user_id;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", unique=true)
+     */
+    protected $user_login;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $user_firstname;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $user_lastname;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      */
     protected $user_email;
 
@@ -120,6 +125,17 @@ class User implements UserInterface
     public function setUserId($id)
     {
         $this->user_id = $id;
+        return $this;
+    }
+
+    public function getUserLogin()
+    {
+        return $this->user_login;
+    }
+
+    public function setUserLogin($login)
+    {
+        $this->user_login = $login;
         return $this;
     }
 
