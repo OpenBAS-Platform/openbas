@@ -26,17 +26,17 @@ class User implements UserInterface
     protected $user_login;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      */
     protected $user_firstname;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      */
     protected $user_lastname;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="string")
      */
     protected $user_email;
 

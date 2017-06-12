@@ -33,6 +33,9 @@ class TokenController extends Controller
             if (!$user) {
                 $user = new User();
                 $user->setUserLogin($apacheAuthUser);
+                $user->setUserEmail($apacheAuthUser);
+                $user->setUserFirstname($apacheAuthUser);
+                $user->setUserLastname('Doe');
                 $user->setUserAdmin(false);
                 $user->setUserStatus(1);
                 $user->setUserLang('auto');
