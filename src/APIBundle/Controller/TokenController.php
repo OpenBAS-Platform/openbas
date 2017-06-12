@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller;
 
+use APIBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,32 @@ class TokenController extends Controller
      */
     public function postTokensAction(Request $request)
     {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $apacheAuthUser = $request->server->get('REMOTE_USER');
+        if( $apacheAuthUser !== null ) {
+            $user = $em->getRepository('APIBundle:User')->findOneBy(['user_login' => $apacheAuthUser]);
+            if (!$user) {
+                $user = new User();
+                $user->setUserLogin($apacheAuthUser);
+                $user->setUserAdmin(false);
+                $user->setUserStatus(1);
+                $user->setUserLang('auto');
+                $em->persist($user);
+                $em->flush();
+                $user->setUserGravatar();
+            }
+
+            $token = new Token();
+            $token->setTokenValue(base64_encode(random_bytes(50)));
+            $token->setTokenCreatedAt(new \DateTime('now'));
+            $token->setTokenUser($user);
+
+            $em->persist($token);
+            $em->flush();
+
+            return $token;
+        }
+
         $credentials = new Credentials();
         $form = $this->createForm(CredentialsType::class, $credentials);
 
@@ -34,8 +61,7 @@ class TokenController extends Controller
             return $form;
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
-        $user = $em->getRepository('APIBundle:User')->findOneBy(['user_email' => $credentials->getLogin()]);
+        $user = $em->getRepository('APIBundle:User')->findOneBy(['user_login' => $credentials->getLogin()]);
 
         if (!$user) {
             return $this->invalidCredentials();

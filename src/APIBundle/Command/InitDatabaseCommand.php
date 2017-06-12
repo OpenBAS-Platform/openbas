@@ -238,6 +238,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
 
     private function createUser($login, $password, $firstname, $lastname, $admin, $organization) {
         $user = new User();
+        $user->setUserLogin($login);
         $user->setUserFirstname($firstname);
         $user->setUserLastname($lastname);
         $user->setUserEmail($login);

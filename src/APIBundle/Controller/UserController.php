@@ -36,7 +36,8 @@ class UserController extends Controller
             $users = $em->getRepository('APIBundle:User')->findAll();
         } else {
             $users = $em->getRepository('APIBundle:User')->createQueryBuilder('o')
-                ->where('o.user_firstname LIKE :keyword')
+                ->where('o.user_login LIKE :keyword')
+                ->orWhere('o.user_firstname LIKE :keyword')
                 ->orWhere('o.user_lastname LIKE :keyword')
                 ->orWhere('o.user_email LIKE :keyword')
                 ->orWhere('o.user_phone LIKE :keyword')
@@ -93,6 +94,7 @@ class UserController extends Controller
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->submit($request->request->all());
+        $user->setUserLogin($user->getUserEmail());
         if ($form->isValid()) {
             $organization = $em->getRepository('APIBundle:Organization')->findOneBy(['organization_name' => $request->request->get('user_organization')]);
             if( empty($organization) ) {

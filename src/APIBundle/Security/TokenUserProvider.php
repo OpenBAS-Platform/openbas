@@ -24,9 +24,9 @@ class TokenUserProvider implements UserProviderInterface
         return $this->tokenRepository->findOneBy(['token_value' => $tokenHeader]);
     }
 
-    public function loadUserByUsername($email)
+    public function loadUserByUsername($login)
     {
-        return $this->userRepository->findBy(['user_email' => $email]);
+        return $this->userRepository->findBy(['user_login' => $login]);
     }
 
     public function refreshUser(UserInterface $user)
