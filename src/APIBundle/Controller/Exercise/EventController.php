@@ -224,29 +224,28 @@ class EventController extends Controller
             }
         }
 
-        $incidentType = $em->getRepository('APIBundle:IncidentType')->findBy(['type_name' => 'STRATEGIC']);
+        $incidentType = $em->getRepository('APIBundle:IncidentType')->findOneBy(['type_name' => 'STRATEGIC']);
         $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
 
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
-        $objPHPExcel = $objReader->load($this->get('kernel')->getRootDir() . '/files' . $filePath);
+        $objPHPExcel = $objReader->load($this->get('kernel')->getRootDir() . '/files/' . $filePath);
 
-        $i = 0;
         foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
             $incident = new Incident();
             $incident->setIncidentExercise($exercise);
             $incident->setIncidentEvent($event);
-            $incident->setIncidentOrder($i);
+            $incident->setIncidentOrder(0);
             $incident->setIncidentType($incidentType);
             $incident->setIncidentTitle($worksheet->getTitle());
+            $incident->setIncidentStory('Imported');
+            $incident->setIncidentWeight(1);
             $em->persist($incident);
 
             $outcome = new Outcome();
             $outcome->setOutcomeIncident($incident);
             $outcome->setOutComeResult(0);
             $em->persist($outcome);
-            $em->flush();
 
-            $j = 0;
             foreach ($worksheet->getRowIterator() as $row) {
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(false);
@@ -255,23 +254,46 @@ class EventController extends Controller
                 $inject->setInjectIncident($incident);
                 $inject->setInjectEnabled(true);
                 $inject->setInjectUser($connectedUser);
+                $inject->setInjectType('openex_manual');
+
+                $i = 0;
+                foreach ($cellIterator as $cell) {
+                    switch( $i ) {
+                        case 0:
+                            $inject->setInjectTitle($cell->getValue());
+                            break;
+                        case 1:
+                            $inject->setInjectDescription($cell->getValue());
+                            break;
+                        case 3:
+                            $timestamp = strtotime($cell->getValue());
+                            $date = new \DateTime();
+                            $date->setTimestamp($timestamp);
+                            $inject->setInjectDate($date);
+                            break;
+                        case 4:
+                            if( strlen($cell->getValue()) > 0 ) {
+                                $inject->setInjectType($cell->getValue());
+                            }
+                            break;
+                        case 5:
+                            if( strlen($cell->getValue()) > 0 ) {
+                                $inject->setInjectContent($cell->getValue());
+                            }
+                            break;
+                    }
+                    $i++;
+                }
                 $em->persist($inject);
                 $em->flush();
 
                 $status = new InjectStatus();
                 $status->setStatusInject($inject);
                 $em->persist($status);
-                $em->flush();
-
-                foreach ($cellIterator as $cell) {
-
-                }
-
-                $j++;
             }
-
-            $i++;
         }
+
+        return $event;
     }
 
     private function exerciseNotFound()
