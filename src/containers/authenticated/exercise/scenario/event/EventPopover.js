@@ -12,7 +12,7 @@ import {Dialog} from '../../../../../components/Dialog'
 import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {updateEvent, deleteEvent} from '../../../../../actions/Event'
+import {updateEvent, deleteEvent, importEvent} from '../../../../../actions/Event'
 import EventForm from './EventForm'
 
 const style = {
@@ -22,7 +22,8 @@ const style = {
 i18nRegister({
   fr: {
     'Update the event': 'Modifier l\'événement',
-    'Do you want to delete this event?': 'Souhaitez-vous supprimer cet événement ?'
+    'Do you want to delete this event?': 'Souhaitez-vous supprimer cet événement ?',
+    'Import': 'Importer'
   }
 })
 
@@ -83,6 +84,17 @@ class EventPopover extends Component {
     this.handleCloseDelete()
   }
 
+  openFileDialog() {
+    this.refs.fileUpload.click()
+  }
+
+  handleFileChange() {
+    let data = new FormData();
+    data.append('file', this.refs.fileUpload.files[0])
+    this.props.importEvent(this.props.exerciseId, this.props.eventId, data).then(() => this.props.reloadEvent())
+    this.handlePopoverClose()
+  }
+
   render() {
     const editActions = [
       <FlatButton
@@ -119,9 +131,11 @@ class EventPopover extends Component {
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
+            <MenuItemLink label="Import" onTouchTap={this.openFileDialog.bind(this)}/>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
+          <input type="file" ref="fileUpload" style={{"display": "none"}} onChange={this.handleFileChange.bind(this)}/>
         </Popover>
         <Dialog
           title="Confirmation"
@@ -158,7 +172,9 @@ EventPopover.propTypes = {
   deleteEvent: PropTypes.func,
   updateEvent: PropTypes.func,
   redirectToScenario: PropTypes.func,
-  children: PropTypes.node
+  importEvent: PropTypes.func,
+  children: PropTypes.node,
+  reloadEvent: PropTypes.func
 }
 
-export default connect(null, {updateEvent, deleteEvent, redirectToScenario})(EventPopover)
+export default connect(null, {updateEvent, deleteEvent, importEvent, redirectToScenario})(EventPopover)

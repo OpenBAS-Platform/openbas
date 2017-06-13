@@ -30,8 +30,16 @@ const styles = {
 }
 
 class DryinjectView extends Component {
+  readJSON(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  }
+
   render() {
-    let dryinject_content = JSON.parse(R.propOr(null, 'dryinject_content', this.props.dryinject))
+    let dryinject_content = this.readJSON(R.propOr(null, 'dryinject_content', this.props.dryinject))
     let dryinject_description = R.propOr('', 'dryinject_description', this.props.dryinject)
 
     let dryinject_fields = R.pipe(

@@ -74,7 +74,15 @@ class InjectPopover extends Component {
       finished: false,
       injectData: null,
       injectResult: false,
-      injectAttachments: R.propOr([], 'attachments', JSON.parse(R.propOr(null, 'inject_content', this.props.inject)))
+      injectAttachments: R.propOr([], 'attachments', this.readJSON(R.propOr(null, 'inject_content', this.props.inject)))
+    }
+  }
+
+  readJSON(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
     }
   }
 
@@ -301,7 +309,7 @@ class InjectPopover extends Component {
         return (
           <InjectContentForm
             ref="contentForm"
-            initialValues={JSON.parse(initialValues.inject_content)}
+            initialValues={this.readJSON(initialValues.inject_content)}
             types={this.props.inject_types}
             type={this.state.type ? this.state.type : this.props.inject.inject_type}
             onSubmit={this.onContentSubmit.bind(this)}

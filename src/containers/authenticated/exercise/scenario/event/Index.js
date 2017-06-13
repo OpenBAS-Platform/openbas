@@ -139,6 +139,11 @@ class Index extends Component {
     this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
   }
 
+  reloadEvent() {
+    this.props.fetchIncidents(this.props.exerciseId)
+    this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
+  }
+
   handleSearchInjects(event, value) {
     this.setState({searchTerm: value})
   }
@@ -317,7 +322,7 @@ class Index extends Component {
                         inject_types={this.props.inject_types} audiences={this.props.audiences} subaudiences={this.props.subaudiences}/>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
-            <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
+            <EventPopover exerciseId={exerciseId} eventId={eventId} event={event} reloadEvent={this.reloadEvent.bind(this)}/>
           </Toolbar>
           <Dialog
             title={R.propOr('-', 'inject_title', this.state.currentInject)}
@@ -337,7 +342,7 @@ class Index extends Component {
         <div style={styles.empty}><T>This event is empty.</T></div>
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
-          <EventPopover exerciseId={exerciseId} eventId={eventId} event={event}/>
+          <EventPopover exerciseId={exerciseId} eventId={eventId} event={event} reloadEvent={this.reloadEvent.bind(this)}/>
         </Toolbar>
       </div>
     } else {

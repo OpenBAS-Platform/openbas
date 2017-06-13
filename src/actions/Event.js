@@ -20,3 +20,8 @@ export const deleteEvent = (exerciseId, eventId) => (dispatch) => {
   var uri = '/api/exercises/' + exerciseId + '/events/' + eventId
   return delReferential(uri, 'events', eventId)(dispatch)
 }
+
+export const importEvent = (exerciseId, eventId, data) => (dispatch) => {
+  var uri = '/api/exercises/' + exerciseId + '/events/' + eventId + '/import'
+  return postReferential(schema.event, uri, data)(dispatch)
+}

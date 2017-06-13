@@ -43,10 +43,17 @@ const styles = {
 }
 
 class DryinjectStatusView extends Component {
+  readJSON(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  }
 
   render() {
     let dryinject_status = R.propOr('-', 'dryinject_status', this.props.dryinject)
-    let dryinject_message_lines = JSON.parse(R.propOr(null, 'status_message', dryinject_status))
+    let dryinject_message_lines = this.readJSON(R.propOr(null, 'status_message', dryinject_status))
     let time = convertToCountdown(dryinject_status.status_execution)
 
     return (

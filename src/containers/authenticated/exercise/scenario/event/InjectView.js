@@ -41,8 +41,16 @@ const styles = {
 }
 
 class InjectView extends Component {
+  readJSON(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  }
+
   render() {
-    let inject_content = JSON.parse(R.propOr(null, 'inject_content', this.props.inject))
+    let inject_content = this.readJSON(R.propOr(null, 'inject_content', this.props.inject))
     let inject_description = R.propOr('', 'inject_description', this.props.inject)
     let inject_fields = R.pipe(
       R.toPairs(),

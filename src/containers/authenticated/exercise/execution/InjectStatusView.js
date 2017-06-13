@@ -43,10 +43,17 @@ const styles = {
 }
 
 class InjectStatusView extends Component {
+  readJSON(str) {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return null;
+    }
+  }
 
   render() {
     let inject_status = R.propOr('-', 'inject_status', this.props.inject)
-    let inject_message_lines = JSON.parse(R.propOr(null, 'status_message', inject_status))
+    let inject_message_lines = this.readJSON(R.propOr(null, 'status_message', inject_status))
     let time = convertToCountdown(inject_status.status_execution)
 
     return (

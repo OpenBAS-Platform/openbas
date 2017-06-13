@@ -19,7 +19,7 @@ i18nRegister({
     'Phone number (fix)': 'Numéro de téléphone (fixe)',
     'Phone number (mobile)': 'Numéro de téléphone (mobile)',
     'Phone number (secondary)': 'Numéro de téléphone (secondaire)',
-    'PGP public key': 'Clé publique PGP'
+    'PGP public key': 'Clé publique PGP',
   }
 })
 

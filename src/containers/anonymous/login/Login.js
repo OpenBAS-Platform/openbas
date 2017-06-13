@@ -35,6 +35,9 @@ const styles = {
 }
 
 class Login extends Component {
+  componentDidMount() {
+    this.props.askToken(null, null)
+  }
 
   onSubmit(data) {
     return this.props.askToken(data.username, data.password)
@@ -70,6 +73,5 @@ const select = (state, ownProps) => {
     demo
   }
 }
-
 
 export default connect(select, {askToken})(Login);
