@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {T} from '../../../../../components/I18n'
 import {i18nRegister} from '../../../../../utils/Messages'
-import {redirectToAudiences} from '../../../../../actions/Application'
+import {redirectToAudiences, redirectToComcheck} from '../../../../../actions/Application'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import R from 'ramda'
 import {Popover} from '../../../../../components/Popover'
@@ -71,7 +71,9 @@ class AudiencePopover extends Component {
   }
 
   onSubmitComcheck(data) {
-    return this.props.addComcheck(this.props.exerciseId, data)
+    return this.props.addComcheck(this.props.exerciseId, data).then((payload) => {
+      this.props.redirectToComcheck(this.props.exerciseId, payload.result)
+    })
   }
 
   submitFormComcheck() {
@@ -242,6 +244,7 @@ AudiencePopover.propTypes = {
   selectAudience: PropTypes.func,
   downloadExportAudience: PropTypes.func,
   redirectToAudiences: PropTypes.func,
+  redirectToComcheck: PropTypes.func,
   addComcheck: PropTypes.func,
   audience: PropTypes.object,
   audiences: PropTypes.array,
@@ -249,4 +252,4 @@ AudiencePopover.propTypes = {
   intl: PropTypes.object
 }
 
-export default connect(null, {updateAudience, selectAudience, downloadExportAudience, deleteAudience, addComcheck, redirectToAudiences})(injectIntl(AudiencePopover))
+export default connect(null, {updateAudience, selectAudience, downloadExportAudience, deleteAudience, addComcheck, redirectToAudiences, redirectToComcheck})(injectIntl(AudiencePopover))

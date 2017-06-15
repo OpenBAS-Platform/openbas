@@ -2,10 +2,17 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import * as Constants from '../../../constants/ComponentTypes'
+import {i18nRegister} from '../../../utils/Messages'
 import {addExercise} from '../../../actions/Exercise'
 import {Dialog} from '../../../components/Dialog';
 import {FlatButton, FloatingActionsButtonCreate} from '../../../components/Button';
 import ExerciseForm from './ExerciseForm'
+
+i18nRegister({
+  fr: {
+    'Create a new exercise': 'Créer un exercice'
+  }
+})
 
 class CreateExercise extends Component {
   constructor(props) {

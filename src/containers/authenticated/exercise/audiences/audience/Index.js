@@ -183,19 +183,6 @@ class IndexAudience extends Component {
       <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
     ]
 
-    let comchecks = null
-    if (this.props.comchecks.length > 0) {
-      comchecks = (
-        <div style={styles.comcheck}>
-          <LinkIconButton
-            to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + this.props.comchecks[0].comcheck_id}
-            tooltip="Comcheck currently running"
-            toolti  pPosition="bottom-left"><Icon color="#E91E63"
-                                                name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}/></LinkIconButton>
-        </div>
-      )
-    }
-
     let {exerciseId, audienceId, audience, subaudience, subaudiences} = this.props
     let audience_name = R.propOr('-', 'audience_name', audience)
 
@@ -280,7 +267,6 @@ class IndexAudience extends Component {
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
             <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={audience_name}/>
             <AudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience} audiences={this.props.audiences}/>
-            {comchecks}
           </Toolbar>
           <Dialog
             title={this.state.currentUser.user_firstname + ' ' + this.state.currentUser.user_lastname}
@@ -302,7 +288,6 @@ class IndexAudience extends Component {
         <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
           <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={audience_name}/>
           <AudiencePopover exerciseId={exerciseId} audienceId={audienceId} audience={audience} audiences={this.props.audiences}/>
-          {comchecks}
         </Toolbar>
       </div>
     } else {
