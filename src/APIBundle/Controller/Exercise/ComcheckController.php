@@ -112,10 +112,10 @@ class ComcheckController extends Controller
             $users = [];
             foreach( $comcheck->getComcheckAudience()->getAudienceSubaudiences() as $subaudience) {
                 $subaudienceUsers = $subaudience->getSubaudienceUsers();
-                foreach( $subaudienceUsers as &$user) {
+                foreach( $subaudienceUsers as $user) {
                     $user->setUserSubaudience($subaudience->getSubaudienceName());
+                    $users[$user->getUserId()] = $user;
                 }
-                $users = array_merge($users, $subaudienceUsers);
             }
 
             $link = $this->getParameter('protocol') . '://' . $request->getHost() . '/comcheck/' . '${user_comcheck_id}';
@@ -125,7 +125,8 @@ class ComcheckController extends Controller
             $data['data']['subject'] = '[' . strtoupper($exercise->getExerciseName()) . '] ' . $comcheck->getComcheckSubject();
             $data['data']['body'] = $comcheck->getComcheckMessage() . '<br /><br /><a href="' . $link . '">' . $link . '</a><br /><br />' . $comcheck->getComcheckFooter();
             $data['data']['users'] = array();
-            foreach( $users as $user ) {
+
+            foreach( $users as $key => $user ) {
                 $status = new ComcheckStatus();
                 $status->setStatusComcheck($comcheck);
                 $status->setStatusUser($user);
