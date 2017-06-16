@@ -78,7 +78,7 @@ class IndexAudiences extends Component {
         </div>
         <div className="clearfix"></div>
         {this.props.audiences.length === 0 ?
-          <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
+          <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
         <List>
             {filteredAudiences.map(audience => {
               return (

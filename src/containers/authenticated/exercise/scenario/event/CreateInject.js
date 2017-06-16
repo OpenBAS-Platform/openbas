@@ -60,9 +60,7 @@ class CreateInject extends Component {
 
   onContentSubmit(data) {
     let injectData = this.state.injectData
-    if( this.state.injectAttachments.length > 0 ) {
-      data.attachments = this.state.injectAttachments
-    }
+    data.attachments = this.state.injectAttachments
     injectData.inject_content = JSON.stringify(data)
     this.setState({injectData: injectData})
   }
