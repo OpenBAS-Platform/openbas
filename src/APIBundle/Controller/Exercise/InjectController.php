@@ -14,6 +14,7 @@ use APIBundle\Form\Type\InjectType;
 use APIBundle\Entity\Event;
 use APIBundle\Entity\Incident;
 use APIBundle\Entity\Inject;
+use APIBundle\Entity\Audience;
 use PHPExcel;
 
 class InjectController extends Controller
@@ -55,9 +56,12 @@ class InjectController extends Controller
             }
         }
 
+        $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
+        /* @var $audiences Audience[] */
+
         foreach ($injects as &$inject) {
             $inject->sanitizeUser();
-            $inject->computeUsersNumber();
+            $inject->computeUsersNumber($audiences);
             $inject->setInjectExercise($exercise->getExerciseId());
         }
         return $injects;

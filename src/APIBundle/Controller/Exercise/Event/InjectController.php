@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller\Exercise\Event;
 
+use APIBundle\Entity\Audience;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -55,9 +56,12 @@ class InjectController extends Controller
             $injects = array_merge($injects, $incidentInjects);
         }
 
+        $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
+        /* @var $audiences Audience[] */
+
         foreach( $injects as &$inject ) {
             $inject->sanitizeUser();
-            $inject->computeUsersNumber();
+            $inject->computeUsersNumber($audiences);
             $inject->setInjectExercise($exercise->getExerciseId());
         }
         return $injects;

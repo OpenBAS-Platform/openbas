@@ -2,6 +2,7 @@
 
 namespace APIBundle\Controller\Exercise\Event\Incident;
 
+use APIBundle\Entity\Audience;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -53,9 +54,12 @@ class InjectController extends Controller
 
         $injects = $em->getRepository('APIBundle:Inject')->findBy(['inject_incident' => $incident]);
 
+        $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
+        /* @var $audiences Audience[] */
+
         foreach( $injects as &$inject ) {
             $inject->sanitizeUser();
-            $inject->computeUsersNumber();
+            $inject->computeUsersNumber($audiences);
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
         }
@@ -114,8 +118,11 @@ class InjectController extends Controller
             $em->persist($status);
             $em->flush();
 
+            $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
+            /* @var $audiences Audience[] */
+
             $inject->sanitizeUser();
-            $inject->computeUsersNumber();
+            $inject->computeUsersNumber($audiences);
             $inject->setInjectStatus($status);
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
@@ -215,13 +222,16 @@ class InjectController extends Controller
         $form = $this->createForm(InjectType::class, $inject);
         $form->submit($request->request->all(), false);
 
+        $audiences = $em->getRepository('APIBundle:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
+        /* @var $audiences Audience[] */
+
         if ($form->isValid()) {
             $em->persist($inject);
             $em->flush();
             $em->clear();
             $inject = $em->getRepository('APIBundle:Inject')->find($request->get('inject_id'));
             $inject->sanitizeUser();
-            $inject->computeUsersNumber();
+            $inject->computeUsersNumber($audiences);
             $inject->setInjectEvent($event->getEventId());
             $inject->setInjectExercise($exercise->getExerciseId());
             return $inject;
