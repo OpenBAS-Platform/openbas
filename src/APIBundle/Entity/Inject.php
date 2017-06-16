@@ -314,19 +314,28 @@ class Inject
         return $this;
     }
 
-    public function computeUsersNumber()
+    public function computeUsersNumber($audiences = [])
     {
-        $audiences = array();
+
         $this->inject_users_number = 0;
-        foreach ($this->inject_audiences as $audience) {
-            $audiences[] = $audience->getAudienceId();
-            foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
-                $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+        if( $this->getInjectAllAudiences() ) {
+            foreach ($audiences as $audience) {
+                foreach( $audience->getAudienceSubaudiences() as $subaudience ) {
+                    $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+                }
             }
-        }
-        foreach( $this->inject_subaudiences as $subaudience) {
-            if( !in_array($subaudience->getSubaudienceAudience()->getAudienceId(), $audiences) ) {
-                $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+        } else {
+            $audiences = array();
+            foreach ($this->inject_audiences as $audience) {
+                $audiences[] = $audience->getAudienceId();
+                foreach ($audience->getAudienceSubaudiences() as $subaudience) {
+                    $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+                }
+            }
+            foreach ($this->inject_subaudiences as $subaudience) {
+                if (!in_array($subaudience->getSubaudienceAudience()->getAudienceId(), $audiences)) {
+                    $this->inject_users_number += count($subaudience->getSubaudienceUsers());
+                }
             }
         }
     }
