@@ -24,7 +24,8 @@ class SchedulerExecutor implements Executor {
 	public ImmutableMap<String, Component> components() {
 		QuartzComponent quartzComponent = new QuartzComponent();
 		quartzComponent.setEnableJmx(false); //Standalone scheduler, no need to register it in mbean
-		return ImmutableMap.of("http", new HttpComponent(), "quartz", quartzComponent);
+		HttpComponent httpComponent = new HttpComponent();
+		return ImmutableMap.of("http", httpComponent, "https", httpComponent, "quartz", quartzComponent);
 	}
 	
 	@Override
