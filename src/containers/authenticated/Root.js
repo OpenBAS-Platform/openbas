@@ -1,10 +1,7 @@
 import React, {Component} from 'react'
-import Rx from 'rxjs/Rx'
 import {connect} from 'react-redux'
-import {fetchWorkerStatus} from '../../actions/Application'
 import {savedDismiss} from '../../actions/Application'
 import {Snackbar} from '../../components/Snackbar'
-import {ONE_MINUTE} from '../../utils/Time'
 import {T} from '../../components/I18n'
 import {i18nRegister} from '../../utils/Messages'
 import * as Constants from '../../constants/ComponentTypes'
@@ -19,24 +16,6 @@ i18nRegister({
 })
 
 class RootAuthenticated extends Component {
-
-  componentDidMount() {
-    if (process.env.NODE_ENV !== 'development') {
-      const initialStream = Rx.Observable.of(1); //Fetch on loading
-      const intervalStream = Rx.Observable.interval(ONE_MINUTE) //Fetch every minute
-      this.subscription = initialStream
-        .merge(intervalStream)
-        .exhaustMap(() => this.props.fetchWorkerStatus()) //Fetch only if previous call finished
-        .subscribe()
-    }
-  }
-
-  componentWillUnmount() {
-    if (process.env.NODE_ENV !== 'development') {
-      this.subscription.unsubscribe()
-    }
-  }
-
   render() {
     return (
       <DocumentTitle title='OpenEx - Crisis management exercises platform'>
@@ -57,7 +36,6 @@ class RootAuthenticated extends Component {
 RootAuthenticated.propTypes = {
   children: PropTypes.node,
   savedPopupOpen: PropTypes.bool,
-  fetchWorkerStatus: PropTypes.func,
   savedDismiss: PropTypes.func
 }
 
@@ -67,4 +45,4 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchWorkerStatus, savedDismiss})(RootAuthenticated)
+export default connect(select, {savedDismiss})(RootAuthenticated)

@@ -366,7 +366,7 @@ const filterInjectsProcessed = (state, ownProps) => {
       n.inject_status.status_name === 'ERROR' ||
       n.inject_status.status_name === 'PARTIAL')
     ),
-    R.sort((a, b) => timeDiff(a.inject_date, b.inject_date))
+    R.sort((a, b) => timeDiff(b.inject_date, a.inject_date))
   )
   return injectsFilterAndSorting(injects)
 }
