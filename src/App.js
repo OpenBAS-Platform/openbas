@@ -129,18 +129,6 @@ const UserIsAuthenticated = UserAuthWrapper({
   failureRedirectPath: '/login',
   wrapperDisplayName: 'UserIsAuthenticated',
 })
-const PlatformWorkerAccessible = UserAuthWrapper({
-  authSelector: state => state.app.worker,
-  predicate: worker => worker.status === "RUNNING",
-  failureRedirectPath: '/unreachable',
-  allowRedirectBack: false
-})
-const PlatformWorkerNotAccessible = UserAuthWrapper({
-  authSelector: state => state.app.worker,
-  predicate: worker => worker.status !== "RUNNING",
-  failureRedirectPath: '/private',
-  allowRedirectBack: false
-})
 const UserIsNotAuthenticated = UserAuthWrapper({
   authSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,
@@ -182,9 +170,8 @@ class App extends Component {
                 <IndexRoute component={UserIsNotAuthenticated(Login)}/>
                 <Route path='/login' component={UserIsNotAuthenticated(Login)}/>
                 <Route path='/comcheck/:statusId' component={IndexComcheck}/>
-                <Route path='/unreachable' component={PlatformWorkerNotAccessible(NoWorker)}/>
               </Route>
-              <Route path='/private' component={PlatformWorkerAccessible(UserIsAuthenticated(RootAuthenticated))}>
+              <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
                 <Route path='admin' component={RootAdmin}>
                   <Route path='index' component={IndexAdmin}/>
