@@ -129,6 +129,12 @@ const UserIsAuthenticated = UserAuthWrapper({
   failureRedirectPath: '/login',
   wrapperDisplayName: 'UserIsAuthenticated',
 })
+const UserIsAdmin = UserAuthWrapper({
+  authSelector: state => authenticationToken(state),
+  predicate: logged => logged.admin === true,
+  failureRedirectPath: '/private',
+  allowRedirectBack: false
+})
 const UserIsNotAuthenticated = UserAuthWrapper({
   authSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,
@@ -173,7 +179,7 @@ class App extends Component {
               </Route>
               <Route path='/private' component={UserIsAuthenticated(RootAuthenticated)}>
                 <IndexRoute component={IndexAuthenticated}/>
-                <Route path='admin' component={RootAdmin}>
+                <Route path='admin' component={UserIsAdmin(RootAdmin)}>
                   <Route path='index' component={IndexAdmin}/>
                   <Route path='users' component={IndexAdminUsers}/>
                   <Route path='groups' component={IndexAdminGroups}/>

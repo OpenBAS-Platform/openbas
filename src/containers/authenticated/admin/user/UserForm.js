@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
+import {T} from '../../../../components/I18n'
 import {ToggleField} from '../../../../components/ToggleField'
 import {FormField} from '../../../../components/Field'
 import {AutoCompleteField} from '../../../../components/AutoComplete'
@@ -39,8 +40,8 @@ class UserForm extends Component {
         <FormField name="user_phone" fullWidth={true} type="text" label="Phone number (mobile)"/>
         <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secondary)"/>
         <FormField name="user_pgp_key" fullWidth={true} multiLine={true} rows={5} type="text" label="PGP public key"/>
-        <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>
-        <ToggleField name="user_admin" label="Administrator" />
+        {this.props.editing ? "" : <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>}
+        <ToggleField name="user_admin" label={<T>Administrator</T>}/>
       </form>
     )
   }
@@ -53,7 +54,8 @@ UserForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  organizations: PropTypes.object
+  organizations: PropTypes.object,
+  editing: PropTypes.boolean
 }
 
 export default reduxForm({form: 'UserForm'}, null, {change})(UserForm)

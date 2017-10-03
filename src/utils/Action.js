@@ -26,7 +26,7 @@ const submitErrors = (data) => {
 
 export const fileSave = (uri, filename) => () => {
   return api().get(uri, {responseType: 'blob'}).then(function (response) {
-    FileSaver.saveAs(response.data, filename);
+    FileSaver.saveAs(response.data, filename)
   })
 }
 

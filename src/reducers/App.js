@@ -9,7 +9,8 @@ const app = (state = Immutable({}), action) => {
     case Constants.IDENTITY_LOGIN_SUCCESS: {
       const token = action.payload.entities.tokens[action.payload.result]
       const user_lang = action.payload.entities.users[token.token_user].user_lang
-      var logged = {token: token.token_id, auth: token.token_value, user: token.token_user, lang: user_lang}
+      const user_admin = action.payload.entities.users[token.token_user].user_admin
+      var logged = {token: token.token_id, auth: token.token_value, user: token.token_user, lang: user_lang, admin: user_admin}
       localStorage.setItem('logged', JSON.stringify(logged))
       return state.set('logged', logged)
     }

@@ -306,7 +306,7 @@ class GroupPopover extends Component {
         <Dialog title="Manage grants" modal={false} open={this.state.openGrants}
                 onRequestClose={this.handleCloseGrants.bind(this)}
                 actions={grantsActions}>
-          <Table selectable={false}>
+          <Table selectable={false} style={{marginTop: '5px'}}>
             <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
               <TableRow>
                 <TableHeaderColumn><T>Exercise</T></TableHeaderColumn>

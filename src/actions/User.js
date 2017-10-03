@@ -12,7 +12,7 @@ export const addUser = (data) => (dispatch) => {
 
 export const updateUser = (userId, data) => (dispatch) => {
   return putReferential(schema.user, '/api/users/' + userId, data)(dispatch).then(data => {
-      dispatch({type: Constants.LANG_UPDATE_ON_USER_CHANGE, payload: data});
+      dispatch({type: Constants.LANG_UPDATE_ON_USER_CHANGE, payload: data})
   })
 }
 

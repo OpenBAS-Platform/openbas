@@ -35,7 +35,7 @@ class LeftBar extends Component {
 
   render() {
     return (
-      <Drawer width={200} docked={false} open={this.props.open} zindex={100}
+      <Drawer width={200} docked={false} open={this.props.open} zindex={40}
               onRequestChange={this.handleToggle.bind(this)}>
         <AppBar title="OpenEx" type={Constants.APPBAR_TYPE_LEFTBAR} onTitleTouchTap={this.redirectToHome.bind(this)}
                 onLeftIconButtonTouchTap={this.handleToggle.bind(this)}/>

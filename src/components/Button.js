@@ -19,7 +19,8 @@ const buttonStyle = {
   [ Constants.BUTTON_TYPE_FLOATING ]: {
     position: 'fixed',
     bottom: 30,
-    right: 30
+    right: 30,
+    zIndex: '5000'
   },
   [ Constants.BUTTON_TYPE_FLOATING_PADDING ]: {
     position: 'fixed',

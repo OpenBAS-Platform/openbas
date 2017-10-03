@@ -8,7 +8,7 @@ const renderToggleField = ({input, label}) => (
     label={label}
     toggled={input.value}
     {...input}
-    onToggle={(value) => {
+    onToggle={(event, value) => {
       input.onChange(value)
     }}
   />

@@ -13,11 +13,14 @@ import {Icon} from '../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
 import {updateUser, deleteUser} from '../../../../actions/User'
 import UserForm from './UserForm'
+import UserPasswordForm from './UserPasswordForm'
 
 i18nRegister({
   fr: {
     'Do you want to delete this user?': 'Souhaitez-vous supprimer cet utilisateur ?',
-    'Update the user': 'Mettre à jour l\'utilisateur'
+    'Update the user': 'Mettre à jour l\'utilisateur',
+    'Update the user password': 'Mettre à jour le mot de passe de l\'utilisateur',
+    'Modify password': 'Modifier le mot de passe',
   }
 })
 
@@ -33,6 +36,7 @@ class UserPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
+      openEditPassword: false,
       openPopover: false
     }
   }
@@ -56,11 +60,31 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
+    if (data.user_admin !== true) {
+      data.user_admin = false
+    }
     return this.props.updateUser(this.props.user.user_id, data)
   }
 
   submitFormEdit() {
     this.refs.userForm.submit()
+  }
+
+  handleOpenEditPassword() {
+    this.setState({openEditPassword: true})
+    this.handlePopoverClose()
+  }
+
+  handleCloseEditPassword() {
+    this.setState({openEditPassword: false})
+  }
+
+  onSubmitEditPassword(data) {
+    return this.props.updateUser(this.props.user.user_id, {'user_plain_password': data.user_plain_password})
+  }
+
+  submitFormEditPassword() {
+    this.refs.userPasswordForm.submit()
   }
 
   handleOpenDelete() {
@@ -81,6 +105,10 @@ class UserPopover extends Component {
     const editActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
       <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+    ]
+    const editPassword = [
+      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEditPassword.bind(this)}/>,
+      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEditPassword.bind(this)}/>,
     ]
     const deleteActions = [
       <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
@@ -103,6 +131,7 @@ class UserPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            <MenuItemLink label="Modify password" onTouchTap={this.handleOpenEditPassword.bind(this)}/>
             <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
@@ -116,9 +145,18 @@ class UserPopover extends Component {
                 onRequestClose={this.handleCloseEdit.bind(this)}
                 actions={editActions}>
           <UserForm ref="userForm" initialValues={initialValues}
+                    editing={true}
                     organizations={this.props.organizations}
                     onSubmit={this.onSubmitEdit.bind(this)}
                     onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+        </Dialog>
+        <Dialog title="Update the user password" modal={false} open={this.state.openEditPassword}
+                autoScrollBodyContent={true}
+                onRequestClose={this.handleCloseEditPassword.bind(this)}
+                actions={editPassword}>
+          <UserPasswordForm ref="userPasswordForm"
+                            onSubmit={this.onSubmitEditPassword.bind(this)}
+                            onSubmitSuccess={this.handleCloseEditPassword.bind(this)}/>
         </Dialog>
       </div>
     )

@@ -52,7 +52,8 @@ class CreateUser extends Component {
                 open={this.state.openCreate}
                 onRequestClose={this.handleCloseCreate.bind(this)}
                 actions={actionsCreateUser}>
-          <UserForm ref="userForm" onSubmit={this.onSubmitCreate.bind(this)} organizations={this.props.organizations}
+          <UserForm ref="userForm" editing={false} onSubmit={this.onSubmitCreate.bind(this)}
+                    organizations={this.props.organizations}
                     onSubmitSuccess={this.handleCloseCreate.bind(this)}/>
         </Dialog>
       </div>
