@@ -63,8 +63,8 @@ class LogsPopover extends Component {
 
   render() {
     const createActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton label="Create" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton key="create" label="Create" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
     ]
 
     return (
@@ -75,7 +75,7 @@ class LogsPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Add an entry" onTouchTap={this.handleOpenCreate.bind(this)}/>
+            <MenuItemLink label="Add an entry" onClick={this.handleOpenCreate.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog

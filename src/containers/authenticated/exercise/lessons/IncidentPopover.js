@@ -70,8 +70,8 @@ class IncidentPopover extends Component {
 
   render() {
     const editActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/>,
     ]
 
     let initialValues = R.pick(['outcome_result', 'outcome_comment'], this.props.incident.incident_outcome)
@@ -83,7 +83,7 @@ class IncidentPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog title="Update the outcome" modal={false} open={this.state.openEdit}

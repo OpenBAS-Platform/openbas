@@ -133,10 +133,10 @@ class IndexExerciseLessons extends Component {
 
   render() {
     const outcomeActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseOutcome.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseOutcome.bind(this)}/>,
     ]
     const logActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseLog.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseLog.bind(this)}/>,
     ]
 
     return (
