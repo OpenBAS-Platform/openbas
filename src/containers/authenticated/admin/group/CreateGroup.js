@@ -39,8 +39,8 @@ class CreateGroup extends Component {
 
   render() {
     const actionsCreateGroup = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton label="Create group" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton key="create" label="Create group" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
     ]
 
     return (

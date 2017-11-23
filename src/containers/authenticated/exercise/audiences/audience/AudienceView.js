@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchUsers} from '../../../../../actions/User'
 import {fetchOrganizations} from '../../../../../actions/Organization'

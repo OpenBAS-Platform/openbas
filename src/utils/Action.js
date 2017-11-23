@@ -2,7 +2,7 @@ import * as Constants from '../constants/ActionTypes'
 import {SubmissionError} from 'redux-form'
 import Immutable from 'seamless-immutable'
 import {api} from '../App'
-import R from 'ramda'
+import * as R from 'ramda'
 import FileSaver from 'file-saver'
 
 const submitErrors = (data) => {

@@ -1,6 +1,6 @@
 import {createSelectorCreator, createStructuredSelector, defaultMemoize} from 'reselect'
 import {debug} from './Messages'
-import R from 'ramda'
+import * as R from 'ramda'
 
 const customComparator = (previousState, state) => {
     var equals = R.equals(previousState, state);

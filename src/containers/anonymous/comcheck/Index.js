@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import {fetchComcheckStatus} from '../../../actions/Comcheck'
 import {Toolbar, ToolbarGroup, ToolbarTitle} from '../../../components/Toolbar'
 import {i18nRegister} from '../../../utils/Messages'

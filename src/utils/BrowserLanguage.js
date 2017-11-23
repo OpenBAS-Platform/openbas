@@ -1,4 +1,4 @@
-import R from 'ramda'
+import * as R from 'ramda'
 // These window.navigator contain language information
 // 1. languages -> Array of preferred languages (eg ["en-US", "zh-CN", "ja-JP"]) Firefox^32, Chrome^32
 // 2. language  -> Preferred language as String (eg "en-US") Firefox^5, IE^11, Safari,

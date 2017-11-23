@@ -1,16 +1,17 @@
 import * as Constants from '../constants/ActionTypes'
 import Immutable from 'seamless-immutable'
-import R from 'ramda'
+import * as R from 'ramda'
 
 const app = (state = Immutable({}), action) => {
 
   switch (action.type) {
 
     case Constants.IDENTITY_LOGIN_SUCCESS: {
+      console.log("TREST " + action.payload)
       const token = action.payload.entities.tokens[action.payload.result]
       const user_lang = action.payload.entities.users[token.token_user].user_lang
       const user_admin = action.payload.entities.users[token.token_user].user_admin
-      var logged = {token: token.token_id, auth: token.token_value, user: token.token_user, lang: user_lang, admin: user_admin}
+      let logged = {token: token.token_id, auth: token.token_value, user: token.token_user, lang: user_lang, admin: user_admin}
       localStorage.setItem('logged', JSON.stringify(logged))
       return state.set('logged', logged)
     }

@@ -1,4 +1,5 @@
-import React, {Component, PropTypes} from "react"
+import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from "react-redux"
 import {dataFile} from "../actions/File"
 
@@ -44,7 +45,7 @@ ReactBackgroundImage.propTypes = {
   image_id: PropTypes.string,
   style: PropTypes.object,
   dataFile: PropTypes.func,
-  children: React.PropTypes.node
+  children: PropTypes.node
 }
 
 export const BackgroundImage = connect(null, {dataFile})(ReactBackgroundImage);

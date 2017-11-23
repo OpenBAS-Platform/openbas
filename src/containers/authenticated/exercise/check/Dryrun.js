@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import Rx from 'rxjs/Rx'
 import {FIVE_SECONDS, timeDiff} from '../../../../utils/Time'
 import {i18nRegister} from '../../../../utils/Messages'

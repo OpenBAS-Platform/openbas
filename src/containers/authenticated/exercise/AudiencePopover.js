@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import {T} from '../../../components/I18n'
 import {i18nRegister} from '../../../utils/Messages'
 import * as Constants from '../../../constants/ComponentTypes'
@@ -79,12 +79,12 @@ class AudiencePopover extends Component {
     let audience_enabled = R.propOr(true, 'audience_enabled', this.props.audience)
 
     const disableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+      <FlatButton label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
+      <FlatButton label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
     ]
     const enableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+      <FlatButton label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
+      <FlatButton label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
     ]
 
     return (

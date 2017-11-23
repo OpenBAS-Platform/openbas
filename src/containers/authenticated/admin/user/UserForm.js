@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
-import R from 'ramda'
+import * as R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
 import {T} from '../../../../components/I18n'
 import {ToggleField} from '../../../../components/ToggleField'

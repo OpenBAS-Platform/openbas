@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
-import R from 'ramda'
+import * as R from 'ramda'
 import {FormField} from '../../../../../components/Field'
 import {AutoCompleteField} from '../../../../../components/AutoComplete'
 import AutoComplete from 'material-ui/AutoComplete'

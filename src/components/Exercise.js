@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 import * as Constants from "../constants/ComponentTypes";
 import {Paper} from './Paper'
 import {BackgroundImage} from './Image'

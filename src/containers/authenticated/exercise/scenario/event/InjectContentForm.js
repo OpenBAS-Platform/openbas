@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
-import R from 'ramda'
+import * as R from 'ramda'
 import {FormField, RichTextField} from '../../../../../components/Field'
 import {T} from '../../../../../components/I18n'
 import {i18nRegister} from '../../../../../utils/Messages'

@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
-import R from 'ramda'
+import * as R from 'ramda'
 import {SelectField} from '../../../../../components/SelectField'
 import {i18nRegister} from '../../../../../utils/Messages'
 import MenuItem from 'material-ui/MenuItem'

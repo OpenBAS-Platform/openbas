@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
-import R from 'ramda'
+import * as R from 'ramda'
 import {FormField} from '../../../../../components/Field'
 import {SelectField} from '../../../../../components/SelectField'
 import DateTimePicker from '../../../../../components/DateTimePicker'

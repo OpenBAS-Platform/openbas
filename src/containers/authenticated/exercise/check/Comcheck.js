@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import Rx from 'rxjs/Rx'
 import {FIVE_SECONDS} from '../../../../utils/Time'
 import Theme from '../../../../components/Theme'

@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 import * as Constants from '../constants/ComponentTypes'
 import LocalMovies from 'material-ui/svg-icons/maps/local-movies'
 import HardwareComputer from 'material-ui/svg-icons/hardware/computer'

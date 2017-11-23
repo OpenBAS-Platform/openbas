@@ -5,7 +5,7 @@ import {T} from '../../../../../components/I18n'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {redirectToAudiences, redirectToComcheck} from '../../../../../actions/Application'
 import * as Constants from '../../../../../constants/ComponentTypes'
-import R from 'ramda'
+import * as R from 'ramda'
 import {Popover} from '../../../../../components/Popover'
 import {Menu} from '../../../../../components/Menu'
 import {Dialog} from '../../../../../components/Dialog'
@@ -13,7 +13,7 @@ import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
 import {addComcheck} from '../../../../../actions/Comcheck'
-import {updateAudience, selectAudience, downloadExportAudience, deleteAudience} from '../../../../../actions/Audience'
+import {updateAudience, downloadExportAudience, deleteAudience} from '../../../../../actions/Audience'
 import AudienceForm from './AudienceForm'
 import ComcheckForm from '../../check/ComcheckForm'
 import {injectIntl} from 'react-intl'
@@ -241,7 +241,6 @@ AudiencePopover.propTypes = {
   exerciseId: PropTypes.string,
   deleteAudience: PropTypes.func,
   updateAudience: PropTypes.func,
-  selectAudience: PropTypes.func,
   downloadExportAudience: PropTypes.func,
   redirectToAudiences: PropTypes.func,
   redirectToComcheck: PropTypes.func,
@@ -252,4 +251,4 @@ AudiencePopover.propTypes = {
   intl: PropTypes.object
 }
 
-export default connect(null, {updateAudience, selectAudience, downloadExportAudience, deleteAudience, addComcheck, redirectToAudiences, redirectToComcheck})(injectIntl(AudiencePopover))
+export default connect(null, {updateAudience, downloadExportAudience, deleteAudience, addComcheck, redirectToAudiences, redirectToComcheck})(injectIntl(AudiencePopover))

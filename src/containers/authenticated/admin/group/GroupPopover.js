@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
@@ -197,20 +197,20 @@ class GroupPopover extends Component {
 
   render() {
     const grantsActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseGrants.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitGrants.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseGrants.bind(this)}/>,
+      <FlatButton key="update" label="Update" primary={true} onClick={this.submitGrants.bind(this)}/>,
     ]
     const usersActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseUsers.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitAddUsers.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseUsers.bind(this)}/>,
+      <FlatButton key="update" label="Update" primary={true} onClick={this.submitAddUsers.bind(this)}/>,
     ]
     const editActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/>,
     ]
     const deleteActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
     ]
 
     let initialValues = R.pick(['group_name'], this.props.group) //Pickup only needed fields
@@ -232,10 +232,10 @@ class GroupPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemLink label="Manage users" onTouchTap={this.handleOpenUsers.bind(this)}/>
-            <MenuItemLink label="Manage grants" onTouchTap={this.handleOpenGrants.bind(this)}/>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
+            <MenuItemLink label="Manage users" onClick={this.handleOpenUsers.bind(this)}/>
+            <MenuItemLink label="Manage grants" onClick={this.handleOpenGrants.bind(this)}/>
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}

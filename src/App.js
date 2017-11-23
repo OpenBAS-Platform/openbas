@@ -7,7 +7,7 @@ import rootReducer from './reducers'
 import {Provider, connect} from 'react-redux'
 import {Router, Route, IndexRoute, browserHistory} from 'react-router'
 import {syncHistoryWithStore, routerActions, routerMiddleware} from 'react-router-redux'
-import {UserAuthWrapper} from 'redux-auth-wrapper'
+import {connectedReduxRedirect} from 'redux-auth-wrapper/history3/redirect'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {normalize} from 'normalizr'
 import theme from './components/Theme'
@@ -19,8 +19,7 @@ import {i18n, debug} from './utils/Messages'
 import {entitiesInitializer} from './reducers/Referential'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import * as Constants from './constants/ActionTypes'
-import R from 'ramda'
-import injectTapEventPlugin from 'react-tap-event-plugin'
+import * as R from 'ramda'
 import RootAnonymous from './containers/anonymous/Root'
 import Login from './containers/anonymous/login/Login'
 import IndexComcheck from './containers/anonymous/comcheck/Index'
@@ -47,8 +46,6 @@ import IndexExerciseComcheck from './containers/authenticated/exercise/check/Com
 import IndexExerciseLessons from './containers/authenticated/exercise/lessons/Index'
 import Immutable from 'seamless-immutable'
 import { createLogger } from 'redux-logger'
-
-injectTapEventPlugin()
 
 //Default application state
 const initialState = {
@@ -86,12 +83,12 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 
 //Axios API
 export const api = (schema) => {
-  var token = R.path(['logged', 'auth'], store.getState().app)
+  let token = R.path(['logged', 'auth'], store.getState().app)
   const instance = axios.create({headers: {'Authorization': token, responseType: 'json'}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     const toImmutable = response.config.responseType === undefined //=== json
-    var dataNormalize = schema ? normalize(response.data, schema) : response.data
+    let dataNormalize = schema ? normalize(response.data, schema) : response.data
     debug("api", {from: response.request.responseURL, data: {raw: response.data, normalize: dataNormalize}})
     response.data = toImmutable ? Immutable(dataNormalize) : dataNormalize
     return response
@@ -123,26 +120,27 @@ const history = syncHistoryWithStore(baseHistory, store)
 
 //region authentication
 const authenticationToken = (state) => state.app.logged
-const UserIsAuthenticated = UserAuthWrapper({
-  authSelector: state => authenticationToken(state),
+const UserIsAuthenticated = connectedReduxRedirect({
+  redirectPath: '/login',
+  authenticatedSelector: state => authenticationToken(state),
   redirectAction: routerActions.replace,
-  failureRedirectPath: '/login',
-  wrapperDisplayName: 'UserIsAuthenticated',
+  wrapperDisplayName: 'UserIsAuthenticated'
 })
-const UserIsAdmin = UserAuthWrapper({
-  authSelector: state => authenticationToken(state),
-  predicate: logged => logged.admin === true,
-  failureRedirectPath: '/private',
-  allowRedirectBack: false
+
+const UserIsAdmin = connectedReduxRedirect({
+  authenticatedSelector: state => authenticationToken(state).admin === true,
+  redirectPath: '/private',
+  allowRedirectBack: false,
+  wrapperDisplayName: 'UserIsAdmin'
 })
-const UserIsNotAuthenticated = UserAuthWrapper({
-  authSelector: state => authenticationToken(state),
+const UserIsNotAuthenticated = connectedReduxRedirect({
+  redirectPath: '/private',
+  authenticatedSelector: state => authenticationToken(state) === null || authenticationToken(state) === undefined,
   redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsNotAuthenticated',
-  predicate: token => token === null || token === undefined,
-  failureRedirectPath: (state, ownProps) => ownProps.location.query.redirect || 'private',
   allowRedirectBack: false
 })
+
 //endregion
 
 class IntlWrapper extends Component {

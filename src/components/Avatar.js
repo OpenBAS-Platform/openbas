@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 import * as Constants from '../constants/ComponentTypes'
 import MUIAvatar from 'material-ui/Avatar';
 
@@ -29,7 +30,7 @@ export const Avatar = (props) => (
     src={props.src}
     icon={props.icon}
     size={props.size}
-    onTouchTap={props.onTouchTap}
+    onClick={props.onClick}
     style={avatarStyle[props.type]}
   />
 )
@@ -37,7 +38,7 @@ export const Avatar = (props) => (
 Avatar.propTypes = {
   src: PropTypes.string,
   icon: PropTypes.node,
-  onTouchTap: PropTypes.func,
+  onClick: PropTypes.func,
   size: PropTypes.number,
   type: PropTypes.string
 }

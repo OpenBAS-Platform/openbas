@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import ReactDocumentTitle from 'react-document-title'
 import {injectIntl} from 'react-intl'
-import PropTypes from 'prop-types'
 
 class DocumentTitle extends Component {
   render() {

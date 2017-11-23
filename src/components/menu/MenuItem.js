@@ -10,7 +10,7 @@ const MenuItemLinkIntl = (props) => (
     containerElement={<Link to={props.to}/>}
     disabled={props.disabled}
     value={props.value}
-    onTouchTap={props.onTouchTap}/>
+    onClick={props.onClick}/>
 )
 export const MenuItemLink = injectIntl(MenuItemLinkIntl)
 
@@ -19,14 +19,14 @@ MenuItemLinkIntl.propTypes = {
   to: PropTypes.string,
   disabled: PropTypes.bool,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onTouchTap: PropTypes.func,
+  onClick: PropTypes.func,
   intl: PropTypes.object
 }
 
 const MenuItemButtonIntl = (props) => (
   <MenuItem
     primaryText={props.intl.formatMessage({id: props.label})}
-    onTouchTap={props.onTouchTap}
+    onClick={props.onClick}
     disabled={props.disabled}
   />
 )
@@ -36,5 +36,5 @@ MenuItemButtonIntl.propTypes = {
   label: PropTypes.string.isRequired,
   intl: PropTypes.object,
   disabled: PropTypes.bool,
-  onTouchTap: PropTypes.func
+  onClick: PropTypes.func
 }

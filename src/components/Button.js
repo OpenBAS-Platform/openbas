@@ -1,4 +1,5 @@
-import React, {PropTypes} from 'react'
+import React from 'react'
+import PropTypes from 'prop-types'
 import {Link} from 'react-router'
 import * as Constants from '../constants/ComponentTypes'
 import MUIRaisedButton from 'material-ui/RaisedButton'
@@ -71,7 +72,6 @@ const FlatButtonIntl = (props) => (
                  style={buttonStyle[props.type]}
                  disabled={props.disabled}
                  onClick={props.onClick}
-                 onTouchTap={props.onTouchTap}
   />
 )
 export const FlatButton = injectIntl(FlatButtonIntl)
@@ -83,8 +83,7 @@ FlatButtonIntl.propTypes = {
   disabled: PropTypes.bool,
   primary: PropTypes.bool,
   secondary: PropTypes.bool,
-  onClick: PropTypes.func,
-  onTouchTap: PropTypes.func
+  onClick: PropTypes.func
 }
 
 export const LinkFlatButtonIntl = (props) => (

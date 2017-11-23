@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import * as Constants from '../../constants/ComponentTypes'
-import R from 'ramda'
+import * as R from 'ramda'
 import {Popover} from '../../components/Popover'
 import {Avatar} from '../../components/Avatar'
 import {Menu} from '../../components/Menu'
@@ -49,16 +49,16 @@ class UserPopover extends Component {
       <div>
         <Avatar
           src={this.props.userGravatar}
-          onTouchTap={this.handleOpen.bind(this)}
+          onClick={this.handleOpen.bind(this)}
           type={Constants.AVATAR_TYPE_TOPBAR}
         />
         <Popover open={this.state.open}
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Profile" onTouchTap={this.handleClose.bind(this)} to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
-            {this.props.userAdmin ? <MenuItemLink label="Admin" onTouchTap={this.handleClose.bind(this)} to='/private/admin/index'/> :""}
-            <MenuItemButton label="Sign out" onTouchTap={this.logoutClick.bind(this)}/>
+            <MenuItemLink label="Profile" to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
+            {this.props.userAdmin ? <MenuItemLink label="Admin" to='/private/admin/index'/> :""}
+            <MenuItemButton label="Sign out" onClick={this.props.logout}/>
           </Menu>
         </Popover>
       </div>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import R from 'ramda'
+import * as R from 'ramda'
 import {dateFormat} from '../../../../../utils/Time'
 import {connect} from 'react-redux'
 import {i18nRegister} from '../../../../../utils/Messages'

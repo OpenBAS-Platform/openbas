@@ -1,8 +1,8 @@
-import React, {PropTypes} from 'react';
-import * as Constants from '../constants/ComponentTypes'
+import React from 'react'
+import PropTypes from 'prop-types'
+
 import {
   Card as MUICard,
-  CardActions as MUICardActions,
   CardHeader as MUICardHeader,
   CardMedia as MUICardMedia,
   CardTitle as MUICardTitle,

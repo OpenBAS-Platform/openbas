@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import R from 'ramda'
+import * as R from 'ramda'
 import * as Constants from '../../../constants/ComponentTypes'
 import Theme from '../../../components/Theme'
 import {T} from '../../../components/I18n'
