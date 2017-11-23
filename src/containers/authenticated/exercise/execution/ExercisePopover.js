@@ -97,16 +97,16 @@ class ExercisePopover extends Component {
     let exercise_disabled = R.propOr(false, 'exercise_canceled', this.props.exercise)
 
     const disableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
+      <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
     ]
     const enableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
+      <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
     ]
     const dryrunActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDryrun.bind(this)}/>,
-      <FlatButton label="Launch" primary={true} onTouchTap={this.submitFormDryrun.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDryrun.bind(this)}/>,
+      <FlatButton key="launch" label="Launch" primary={true} onClick={this.submitFormDryrun.bind(this)}/>,
     ]
 
     return (
@@ -117,10 +117,10 @@ class ExercisePopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-              <MenuItemLink label="Launch a dryrun" onTouchTap={this.handleOpenDryrun.bind(this)}/>
+              <MenuItemLink label="Launch a dryrun" onClick={this.handleOpenDryrun.bind(this)}/>
             {exercise_disabled ?
-              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/> :
-              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/>}
+              <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/> :
+              <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/>}
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false}

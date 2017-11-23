@@ -92,12 +92,12 @@ class UserPopover extends Component {
 
   render() {
     const editActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/>,
     ]
     const deleteActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
     ]
     
     var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
@@ -115,8 +115,8 @@ class UserPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}

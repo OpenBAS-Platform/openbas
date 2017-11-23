@@ -59,8 +59,8 @@ class ComcheckPopover extends Component {
 
   render() {
     const deleteActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
     ]
 
     return (
@@ -71,7 +71,7 @@ class ComcheckPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false}

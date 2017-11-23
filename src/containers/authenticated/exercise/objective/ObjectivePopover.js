@@ -107,38 +107,44 @@ class ObjectivePopover extends Component {
   render() {
     const editActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseEdit.bind(this)}
+        onClick={this.handleCloseEdit.bind(this)}
       />,
       <FlatButton
+        key="update"
         label="Update"
         primary={true}
-        onTouchTap={this.submitFormEdit.bind(this)}
+        onClick={this.submitFormEdit.bind(this)}
       />,
     ]
     const deleteActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseDelete.bind(this)}
+        onClick={this.handleCloseDelete.bind(this)}
       />,
       <FlatButton
+        key="delete"
         label="Delete"
         primary={true}
-        onTouchTap={this.submitDelete.bind(this)}
+        onClick={this.submitDelete.bind(this)}
       />,
     ]
     const createSubobjectiveActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseCreateSubobjective.bind(this)}
+        onClick={this.handleCloseCreateSubobjective.bind(this)}
       />,
       <FlatButton
+        key="create"
         label="Create"
         primary={true}
-        onTouchTap={this.submitFormCreateSubobjective.bind(this)}
+        onClick={this.submitFormCreateSubobjective.bind(this)}
       />,
     ]
 
@@ -152,9 +158,9 @@ class ObjectivePopover extends Component {
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Add a subobjective" onTouchTap={this.handleOpenCreateSubobjective.bind(this)}/>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+            <MenuItemLink label="Add a subobjective" onClick={this.handleOpenCreateSubobjective.bind(this)}/>
+            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog

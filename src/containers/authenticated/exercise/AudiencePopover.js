@@ -96,8 +96,8 @@ class AudiencePopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             {audience_enabled ?
-              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
-              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
+              <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/> :
+              <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/>}
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false}

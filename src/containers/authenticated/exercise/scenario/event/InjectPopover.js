@@ -351,36 +351,36 @@ class InjectPopover extends Component {
 
   render() {
     const editActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true}
-                  onTouchTap={this.submitFormEdit.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton key="update" label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true}
+                  onClick={this.submitFormEdit.bind(this)}/>,
     ]
     const deleteActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
     ]
     const disableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
+      <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
     ]
     const enableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
+      <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
     ]
     const copyActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCopy.bind(this)}/>,
-      <FlatButton label="Copy" primary={true} onTouchTap={this.submitFormCopy.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCopy.bind(this)}/>,
+      <FlatButton key="copy" label="Copy" primary={true} onClick={this.submitFormCopy.bind(this)}/>,
     ]
     const tryActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseTry.bind(this)}/>,
-      <FlatButton label="Test" primary={true} onTouchTap={this.submitTry.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseTry.bind(this)}/>,
+      <FlatButton key="test" label="Test" primary={true} onClick={this.submitTry.bind(this)}/>,
     ]
     const doneActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDone.bind(this)}/>,
-      <FlatButton label="Done" primary={true} onTouchTap={this.submitDone.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDone.bind(this)}/>,
+      <FlatButton key="done" label="Done" primary={true} onClick={this.submitDone.bind(this)}/>,
     ]
     const resultActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseResult.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseResult.bind(this)}/>,
     ]
 
     let initPipe = R.pipe(
@@ -403,18 +403,18 @@ class InjectPopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             {!injectNotSupported ?
-              <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/> : ''}
+              <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ''}
             {!injectNotSupported && this.props.location !== 'run' ?
-              <MenuItemLink label="Copy" onTouchTap={this.handleOpenCopy.bind(this)}/> : ''}
+              <MenuItemLink label="Copy" onClick={this.handleOpenCopy.bind(this)}/> : ''}
             {inject_enabled && !injectNotSupported ?
-              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> : ''}
+              <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/> : ''}
             {!inject_enabled && !injectNotSupported ?
-              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/> : ''}
+              <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/> : ''}
             {inject_type === 'openex_manual' && this.props.location === 'run' ?
-              <MenuItemButton label="Mark as done" onTouchTap={this.handleOpenDone.bind(this)}/> : ''}
+              <MenuItemButton label="Mark as done" onClick={this.handleOpenDone.bind(this)}/> : ''}
             {!injectNotSupported ?
-              <MenuItemButton label="Test" onTouchTap={this.handleOpenTry.bind(this)}/> : ''}
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+              <MenuItemButton label="Test" onClick={this.handleOpenTry.bind(this)}/> : ''}
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <DialogTitleElement

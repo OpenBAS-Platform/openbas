@@ -98,26 +98,30 @@ class EventPopover extends Component {
   render() {
     const editActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseEdit.bind(this)}
+        onClick={this.handleCloseEdit.bind(this)}
       />,
       <FlatButton
+        key="update"
         label="Update"
         primary={true}
-        onTouchTap={this.submitFormEdit.bind(this)}
+        onClick={this.submitFormEdit.bind(this)}
       />,
     ]
     const deleteActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseDelete.bind(this)}
+        onClick={this.handleCloseDelete.bind(this)}
       />,
       <FlatButton
+        key="delete"
         label="Delete"
         primary={true}
-        onTouchTap={this.submitDelete.bind(this)}
+        onClick={this.submitDelete.bind(this)}
       />,
     ]
 
@@ -131,9 +135,9 @@ class EventPopover extends Component {
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Import" onTouchTap={this.openFileDialog.bind(this)}/>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+            <MenuItemLink label="Import" onClick={this.openFileDialog.bind(this)}/>
+            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
           <input type="file" ref="fileUpload" style={{"display": "none"}} onChange={this.handleFileChange.bind(this)}/>
         </Popover>

@@ -39,15 +39,15 @@ class CreateUser extends Component {
 
   render() {
     const actionsCreateUser = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton label="Create user" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton key="create" label="Create user" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
     ]
 
     return (
       <div>
         <FlatButton label="Create a new user"
                     secondary={true}
-                    onTouchTap={this.handleOpenCreate.bind(this)}
+                    onClick={this.handleOpenCreate.bind(this)}
                     type={Constants.BUTTON_TYPE_DIALOG_LEFT}/>
         <Dialog title="Create a new user"
                 modal={false}

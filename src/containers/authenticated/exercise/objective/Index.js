@@ -76,10 +76,10 @@ class IndexObjective extends Component {
 
   render() {
     const objectiveActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseObjective.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseObjective.bind(this)}/>,
     ]
     const subobjectiveActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseSubobjective.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseSubobjective.bind(this)}/>,
     ]
 
     let {exerciseId, objectives} = this.props

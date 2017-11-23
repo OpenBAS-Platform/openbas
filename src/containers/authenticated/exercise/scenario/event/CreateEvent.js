@@ -38,8 +38,8 @@ class CreateEvent extends Component {
 
   render() {
     const actions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleClose.bind(this)}/>,
-      <FlatButton label="Create" primary={true} onTouchTap={this.submitForm.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleClose.bind(this)}/>,
+      <FlatButton key="create" label="Create" primary={true} onClick={this.submitForm.bind(this)}/>,
     ]
 
     return (

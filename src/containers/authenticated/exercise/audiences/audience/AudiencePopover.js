@@ -159,24 +159,24 @@ class AudiencePopover extends Component {
     }
 
     const comcheckActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseComcheck.bind(this)}/>,
-      <FlatButton label="Launch" primary={true} onTouchTap={this.submitFormComcheck.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseComcheck.bind(this)}/>,
+      <FlatButton key="launch" label="Launch" primary={true} onClick={this.submitFormComcheck.bind(this)}/>,
     ]
     const editActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton label="Update" primary={true} onTouchTap={this.submitFormEdit.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
+      <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/>,
     ]
     const deleteActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
     ]
     const disableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton label="Disable" primary={true} onTouchTap={this.submitDisable.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
+      <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
     ]
     const enableActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton label="Enable" primary={true} onTouchTap={this.submitEnable.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
+      <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
     ]
 
     return (
@@ -187,13 +187,13 @@ class AudiencePopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Launch a comcheck" onTouchTap={this.handleOpenComcheck.bind(this)}/>
-            <MenuItemLink label="Edit" onTouchTap={this.handleOpenEdit.bind(this)}/>
+            <MenuItemLink label="Launch a comcheck" onClick={this.handleOpenComcheck.bind(this)}/>
+            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
             {audience_enabled ?
-              <MenuItemButton label="Disable" onTouchTap={this.handleOpenDisable.bind(this)}/> :
-              <MenuItemButton label="Enable" onTouchTap={this.handleOpenEnable.bind(this)}/>}
-            <MenuItemLink label="Export to XLS" onTouchTap={this.handleDownloadAudience.bind(this)}/>
-            <MenuItemButton label="Delete" onTouchTap={this.handleOpenDelete.bind(this)}/>
+              <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/> :
+              <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/>}
+            <MenuItemLink label="Export to XLS" onClick={this.handleDownloadAudience.bind(this)}/>
+            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false}

@@ -180,7 +180,7 @@ class IndexAudience extends Component {
 
   render() {
     const viewActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseView.bind(this)}/>,
     ]
 
     let {exerciseId, audienceId, audience, subaudience, subaudiences} = this.props

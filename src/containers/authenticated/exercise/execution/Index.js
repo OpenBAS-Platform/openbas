@@ -181,10 +181,10 @@ class IndexExecution extends Component {
 
   render() {
     const viewActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseView.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseView.bind(this)}/>,
     ]
     const statusActions = [
-      <FlatButton label="Close" primary={true} onTouchTap={this.handleCloseStatus.bind(this)}/>,
+      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseStatus.bind(this)}/>,
     ]
 
     let exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise)

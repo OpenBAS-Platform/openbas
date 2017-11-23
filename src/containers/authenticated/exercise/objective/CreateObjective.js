@@ -39,14 +39,16 @@ class CreateObjective extends Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleClose.bind(this)}
+        onClick={this.handleClose.bind(this)}
       />,
       <FlatButton
+        key="create"
         label="Create"
         primary={true}
-        onTouchTap={this.submitForm.bind(this)}
+        onClick={this.submitForm.bind(this)}
       />,
     ];
 

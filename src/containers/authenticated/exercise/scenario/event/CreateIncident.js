@@ -93,9 +93,9 @@ class CreateIncident extends Component {
 
   render() {
     const actions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton label={this.state.stepIndex === 1 ? "Create" : "Next"} primary={true}
-                  onTouchTap={this.handleNext.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton key="create" label={this.state.stepIndex === 1 ? "Create" : "Next"} primary={true}
+                  onClick={this.handleNext.bind(this)}/>,
     ]
 
     return (

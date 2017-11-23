@@ -236,21 +236,21 @@ class IndexExercise extends Component {
 
   render() {
     const viewEventActions = [<FlatButton label="Close" primary={true}
-                                          onTouchTap={this.handleCloseViewEvent.bind(this)}/>]
+                                          onClick={this.handleCloseViewEvent.bind(this)}/>]
     const viewIncidentActions = [<FlatButton label="Close" primary={true}
-                                             onTouchTap={this.handleCloseViewIncident.bind(this)}/>]
+                                             onClick={this.handleCloseViewIncident.bind(this)}/>]
     const viewInjectActions = [<FlatButton label="Close" primary={true}
-                                           onTouchTap={this.handleCloseViewInject.bind(this)}/>]
+                                           onClick={this.handleCloseViewInject.bind(this)}/>]
     const viewAudienceActions = [<FlatButton label="Close" primary={true}
-                                             onTouchTap={this.handleCloseViewAudience.bind(this)}/>]
+                                             onClick={this.handleCloseViewAudience.bind(this)}/>]
     const viewObjectiveActions = [<FlatButton label="Close" primary={true}
-                                              onTouchTap={this.handleCloseViewObjective.bind(this)}/>]
+                                              onClick={this.handleCloseViewObjective.bind(this)}/>]
     const audiencesActions = [<FlatButton label="Close" primary={true}
-                                          onTouchTap={this.handleCloseAudiences.bind(this)}/>]
+                                          onClick={this.handleCloseAudiences.bind(this)}/>]
     const objectivesActions = [<FlatButton label="Close" primary={true}
-                                           onTouchTap={this.handleCloseObjectives.bind(this)}/>]
+                                           onClick={this.handleCloseObjectives.bind(this)}/>]
     const injectAudiencesActions = [<FlatButton label="Close" primary={true}
-                                                onTouchTap={this.handleCloseInjectAudiences.bind(this)}/>]
+                                                onClick={this.handleCloseInjectAudiences.bind(this)}/>]
     return (
       <div>
         <div style={styles.columnLeft}>

@@ -45,8 +45,8 @@ class CreateSubaudience extends Component {
 
   render() {
     const actions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton label="Create" primary={true} onTouchTap={this.submitFormCreate.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
+      <FlatButton key="create" label="Create" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
     ]
 
     return (

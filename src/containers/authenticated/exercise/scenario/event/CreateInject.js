@@ -167,14 +167,16 @@ class CreateInject extends Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleClose.bind(this)}
+        onClick={this.handleClose.bind(this)}
       />,
       <FlatButton
+        key="create"
         label={this.state.stepIndex === 2 ? "Create" : "Next"}
         primary={true}
-        onTouchTap={this.handleNext.bind(this)}
+        onClick={this.handleNext.bind(this)}
       />,
     ]
 

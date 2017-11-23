@@ -73,8 +73,8 @@ class ScenarioPopover extends Component {
 
   render() {
     const shiftActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseShift.bind(this)}/>,
-      <FlatButton label="Shift" primary={true} onTouchTap={this.submitFormShift.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseShift.bind(this)}/>,
+      <FlatButton key="shift" label="Shift" primary={true} onClick={this.submitFormShift.bind(this)}/>,
     ]
 
     return (
@@ -85,8 +85,8 @@ class ScenarioPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Export injects to XLS" onTouchTap={this.handleDownloadInjects.bind(this)}/>
-            <MenuItemLink label="Shift all injects" onTouchTap={this.handleOpenShift.bind(this)}/>
+            <MenuItemLink label="Export injects to XLS" onClick={this.handleDownloadInjects.bind(this)}/>
+            <MenuItemLink label="Shift all injects" onClick={this.handleOpenShift.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog

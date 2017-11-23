@@ -118,12 +118,12 @@ class Index extends Component {
 
   render() {
     const deleteActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton label="Delete" primary={true} onTouchTap={this.submitDelete.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
+      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
     ]
     const shiftActions = [
-      <FlatButton label="No" primary={true} onTouchTap={this.handleCloseShift.bind(this)}/>,
-      <FlatButton label="Reschedule" primary={true} onTouchTap={this.submitShift.bind(this)}/>,
+      <FlatButton key="no" label="No" primary={true} onClick={this.handleCloseShift.bind(this)}/>,
+      <FlatButton key="reschedule" label="Reschedule" primary={true} onClick={this.submitShift.bind(this)}/>,
     ]
 
     const {exercise} = this.props

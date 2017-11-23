@@ -88,9 +88,9 @@ class AddUsers extends Component {
 
   render() {
     const actions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseAddUsers.bind(this)}/>,
-      <FlatButton label="Add these users" primary={true} onTouchTap={this.submitAddUsers.bind(this)}/>,
-      <CreateUser exerciseId={this.props.exerciseId} />
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseAddUsers.bind(this)}/>,
+      <FlatButton key="add" label="Add these users" primary={true} onClick={this.submitAddUsers.bind(this)}/>,
+      <CreateUser key="create" exerciseId={this.props.exerciseId} />
     ]
 
     //region filter users by active keyword

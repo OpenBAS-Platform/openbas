@@ -77,8 +77,8 @@ class DryrunsPopover extends Component {
     }
 
     const launchActions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleCloseLaunch.bind(this)}/>,
-      <FlatButton label="Launch" primary={true} onTouchTap={this.submitFormLaunch.bind(this)}/>,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseLaunch.bind(this)}/>,
+      <FlatButton key="launch" label="Launch" primary={true} onClick={this.submitFormLaunch.bind(this)}/>,
     ]
 
     return (
@@ -89,7 +89,7 @@ class DryrunsPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Launch a comcheck" onTouchTap={this.handleOpenLaunch.bind(this)}/>
+            <MenuItemLink label="Launch a comcheck" onClick={this.handleOpenLaunch.bind(this)}/>
           </Menu>
         </Popover>
         <Dialog

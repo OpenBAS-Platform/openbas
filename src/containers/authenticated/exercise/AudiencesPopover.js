@@ -50,7 +50,7 @@ class AudiencesPopover extends Component {
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Export audiences to XLS" onTouchTap={this.handleDownloadAudiences.bind(this)}/>
+            <MenuItemLink label="Export audiences to XLS" onClick={this.handleDownloadAudiences.bind(this)}/>
           </Menu>
         </Popover>
       </div>

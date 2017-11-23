@@ -95,26 +95,30 @@ class SubobjectivePopover extends Component {
   render() {
     const editActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseEdit.bind(this)}
+        onClick={this.handleCloseEdit.bind(this)}
       />,
       <FlatButton
+        key="update"
         label="Update"
         primary={true}
-        onTouchTap={this.submitFormEdit.bind(this)}
+        onClick={this.submitFormEdit.bind(this)}
       />,
     ];
     const deleteActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
-        onTouchTap={this.handleCloseDelete.bind(this)}
+        onClick={this.handleCloseDelete.bind(this)}
       />,
       <FlatButton
+        key="delete"
         label="Delete"
         primary={true}
-        onTouchTap={this.submitDelete.bind(this)}
+        onClick={this.submitDelete.bind(this)}
       />,
     ];
 

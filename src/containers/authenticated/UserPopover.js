@@ -41,6 +41,7 @@ class UserPopover extends Component {
   }
 
   logoutClick() {
+    this.handleClose();
     this.props.logout()
   }
 
@@ -56,9 +57,9 @@ class UserPopover extends Component {
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handleClose.bind(this)}>
           <Menu multiple={false}>
-            <MenuItemLink label="Profile" to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
+            <MenuItemLink label="Profile" onClick={this.handleClose.bind(this)} to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
             {this.props.userAdmin ? <MenuItemLink label="Admin" to='/private/admin/index'/> :""}
-            <MenuItemButton label="Sign out" onClick={this.props.logout}/>
+            <MenuItemButton label="Sign out" onClick={this.logoutClick.bind(this)}/>
           </Menu>
         </Popover>
       </div>

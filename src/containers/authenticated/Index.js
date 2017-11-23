@@ -54,7 +54,6 @@ class IndexAuthenticated extends Component {
         <AppBar
           title="OpenEx"
           type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
-          onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
           iconElementRight={<UserPopover/>}
           iconElementLeft={<img src="/images/logo_white.png" alt="logo" style={styles.logo}/>}

@@ -8,7 +8,7 @@ export const askToken = (username, password) => (dispatch) => {
   const data = {login: username, password: password};
   return postReferential(schema.token, '/api/tokens', data)(dispatch).then(data => {
     dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data});
-  })  
+  })
 }
 
 export const fetchToken = () => (dispatch, getState) => {

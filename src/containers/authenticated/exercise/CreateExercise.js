@@ -38,8 +38,8 @@ class CreateExercise extends Component {
 
   render() {
     const actions = [
-      <FlatButton label="Cancel" primary={true} onTouchTap={this.handleClose.bind(this)}/>,
-      <FlatButton label="Create" primary={true} onTouchTap={this.submitForm.bind(this)}/>,
+      <FlatButton label="Cancel" primary={true} onClick={this.handleClose.bind(this)}/>,
+      <FlatButton label="Create" primary={true} onClick={this.submitForm.bind(this)}/>,
     ]
 
     return (
