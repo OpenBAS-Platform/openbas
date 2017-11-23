@@ -30,6 +30,7 @@ i18nRegister({
     'Exercise log': 'Journal d\'exercice',
     'You do not have any entries in the exercise log.': 'Vous n\'avez aucune entrée dans le journal de cet exercice.',
     'Outcome view': 'Vue du résultat',
+    'No comment for this incident.': 'Aucun commentaire pour cet incident.',
     'Log view': 'Vue de l\'entrée'
   }
 })
