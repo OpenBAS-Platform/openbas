@@ -36,7 +36,7 @@ const styles = {
 
 class Login extends Component {
   componentDidMount() {
-    //this.props.askToken(null, null)
+    this.props.askToken(null, null)
   }
 
   onSubmit(data) {
