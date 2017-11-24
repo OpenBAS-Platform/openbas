@@ -29,6 +29,7 @@ const renderAutoCompleteField = ({input, label, fullWidth, hint, onFocus, onClic
                    onClick={onClick}
                    searchText={input.value}
                    onNewRequest={(value) => input.onChange(value)}
+                   onUpdateInput={(value) => input.onChange(value)}
                    {...input}
   />)
 
