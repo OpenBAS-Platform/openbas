@@ -15,12 +15,12 @@ matrix:
     - php: 7.0
 
 before-install:
-  - phpenv config-add travis.php.ini
   - composer self-update
 
 install:
   - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
-  - composer --memory=4G install
+  - phpenv config-add travis.php.ini
+  - composer install
   - php bin/console doctrine:database:create --env=test
   - php bin/console doctrine:schema:create --env=test
   - php bin/console app:db-init --env=test
