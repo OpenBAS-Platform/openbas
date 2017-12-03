@@ -15,6 +15,7 @@ matrix:
     - php: 7.0
 
 before-install:
+  - phpenv config-add travis.php.ini
   - composer self-update
 
 install:
