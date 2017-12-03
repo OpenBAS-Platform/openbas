@@ -25,7 +25,7 @@ services:
 
     token_authenticator:
         class:     APIBundle\Security\TokenAuthenticator
-        arguments: ["@security.http_utils"]
+        arguments: ["@security.http_utils", "@doctrine.orm.entity_manager"]
         public:    false
 
     exercise_voter:
