@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
-import {askToken} from '../../../actions/Application'
+import {askToken, checkKerberos} from '../../../actions/Application'
 import {T} from '../../../components/I18n'
 import {Toolbar, ToolbarGroup, ToolbarTitle} from '../../../components/Toolbar'
 import LoginForm from './LoginForm'
@@ -36,7 +36,7 @@ const styles = {
 
 class Login extends Component {
   componentDidMount() {
-    this.props.askToken(null, null)
+    this.props.checkKerberos();
   }
 
   onSubmit(data) {
@@ -63,7 +63,8 @@ class Login extends Component {
 
 Login.propTypes = {
   demo: PropTypes.string,
-  askToken: PropTypes.func
+  askToken: PropTypes.func,
+  checkKerberos: PropTypes.func
 }
 
 const select = (state, ownProps) => {
@@ -74,4 +75,4 @@ const select = (state, ownProps) => {
   }
 }
 
-export default connect(select, {askToken})(Login);
+export default connect(select, {askToken, checkKerberos})(Login);

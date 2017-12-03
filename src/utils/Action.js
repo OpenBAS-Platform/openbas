@@ -40,6 +40,7 @@ export const getReferential = (schema, uri, noloading) => (dispatch) => {
   }
   return api(schema).get(uri).then(function (response) {
     dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
+    return response.data
   })
 }
 

@@ -7,7 +7,6 @@ const app = (state = Immutable({}), action) => {
   switch (action.type) {
 
     case Constants.IDENTITY_LOGIN_SUCCESS: {
-      console.log("TREST " + action.payload)
       const token = action.payload.entities.tokens[action.payload.result]
       const user_lang = action.payload.entities.users[token.token_user].user_lang
       const user_admin = action.payload.entities.users[token.token_user].user_admin

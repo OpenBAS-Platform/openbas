@@ -11,6 +11,12 @@ export const askToken = (username, password) => (dispatch) => {
   })
 }
 
+export const checkKerberos = () => (dispatch) => {
+  return getReferential(schema.token, '/api/tokens/kerberos')(dispatch).then(data => {
+    dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data});
+  })
+}
+
 export const fetchToken = () => (dispatch, getState) => {
   return getReferential(schema.token, '/api/tokens/' + getState().app.logged.token)(dispatch)
 }
