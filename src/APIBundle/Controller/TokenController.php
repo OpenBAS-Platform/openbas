@@ -17,6 +17,49 @@ class TokenController extends Controller
 {
     /**
      * @ApiDoc(
+     *    description="Get a Kerberos token",
+     * )
+     *
+     * @Rest\View(serializerGroups={"token"})
+     * @Rest\Get("/tokens/kerberos")
+     */
+    public function getKerberosTokenAction(Request $request)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $apacheAuthUser = $request->server->get('REMOTE_USER');
+
+        if( $apacheAuthUser === null ) {
+            return $this->noKerberos();
+        }
+
+        $user = $em->getRepository('APIBundle:User')->findOneBy(['user_login' => $apacheAuthUser]);
+        if (!$user) {
+            $user = new User();
+            $user->setUserLogin($apacheAuthUser);
+            $user->setUserEmail($apacheAuthUser);
+            $user->setUserFirstname($apacheAuthUser);
+            $user->setUserLastname('Doe');
+            $user->setUserAdmin(false);
+            $user->setUserStatus(1);
+            $user->setUserLang('auto');
+            $em->persist($user);
+            $em->flush();
+            $user->setUserGravatar();
+        }
+
+        $token = new Token();
+        $token->setTokenValue(base64_encode(random_bytes(50)));
+        $token->setTokenCreatedAt(new \DateTime('now'));
+        $token->setTokenUser($user);
+
+        $em->persist($token);
+        $em->flush();
+
+        return $token;
+    }
+
+    /**
+     * @ApiDoc(
      *    description="Create a token",
      *   input={"class"=CredentialsType::class, "name"=""}
      * )
@@ -27,34 +70,6 @@ class TokenController extends Controller
     public function postTokensAction(Request $request)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $apacheAuthUser = $request->server->get('REMOTE_USER');
-        if( $apacheAuthUser !== null ) {
-            $user = $em->getRepository('APIBundle:User')->findOneBy(['user_login' => $apacheAuthUser]);
-            if (!$user) {
-                $user = new User();
-                $user->setUserLogin($apacheAuthUser);
-                $user->setUserEmail($apacheAuthUser);
-                $user->setUserFirstname($apacheAuthUser);
-                $user->setUserLastname('Doe');
-                $user->setUserAdmin(false);
-                $user->setUserStatus(1);
-                $user->setUserLang('auto');
-                $em->persist($user);
-                $em->flush();
-                $user->setUserGravatar();
-            }
-
-            $token = new Token();
-            $token->setTokenValue(base64_encode(random_bytes(50)));
-            $token->setTokenCreatedAt(new \DateTime('now'));
-            $token->setTokenUser($user);
-
-            $em->persist($token);
-            $em->flush();
-
-            return $token;
-        }
-
         $credentials = new Credentials();
         $form = $this->createForm(CredentialsType::class, $credentials);
 
@@ -140,5 +155,10 @@ class TokenController extends Controller
     private function invalidCredentials()
     {
         return \FOS\RestBundle\View\View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);
+    }
+
+    private function noKerberos()
+    {
+        return \FOS\RestBundle\View\View::create(['message' => 'Kerberos is not detected'], Response::HTTP_BAD_REQUEST);
     }
 }
