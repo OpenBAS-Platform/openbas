@@ -7,13 +7,15 @@ import {postReferential, getReferential, delReferential} from '../utils/Action'
 export const askToken = (username, password) => (dispatch) => {
   const data = {login: username, password: password};
   return postReferential(schema.token, '/api/tokens', data)(dispatch).then(data => {
-    dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data});
+    dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data})
   })
 }
 
 export const checkKerberos = () => (dispatch) => {
   return getReferential(schema.token, '/api/tokens/kerberos')(dispatch).then(data => {
-    dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data});
+    dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data})
+  }).catch(function () {
+    dispatch({type: Constants.IDENTITY_LOGIN_FAILED, payload: {status: 'ERROR'}})
   })
 }
 
@@ -25,23 +27,23 @@ export const fetchWorkerStatus = () => (dispatch) => {
   return api().get('/api/worker_status').then(function (response) {
     dispatch({type: Constants.DATA_FETCH_WORKER_STATUS, payload: response.data})
   }).catch(function () {
-    dispatch({type: Constants.DATA_FETCH_WORKER_STATUS, payload: {status: 'ERROR'}});
+    dispatch({type: Constants.DATA_FETCH_WORKER_STATUS, payload: {status: 'ERROR'}})
   })
 }
 
 export const logout = () => (dispatch, getState) => {
   let token_id = getState().app.logged.token
   return delReferential('/api/tokens/' + token_id, 'tokens', token_id)(dispatch).then(() => {
-    dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS});
+    dispatch({type: Constants.IDENTITY_LOGOUT_SUCCESS})
   })
 }
 
 export const toggleLeftBar = () => (dispatch) => {
-  dispatch({type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED});
+  dispatch({type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED})
 }
 
 export const savedDismiss = () => (dispatch) => {
-  dispatch({type: Constants.DATA_SAVED_DISMISS});
+  dispatch({type: Constants.DATA_SAVED_DISMISS})
 }
 
 export const redirectToHome  = () => (dispatch) => {
