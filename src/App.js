@@ -84,7 +84,7 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 //Axios API
 export const api = (schema) => {
   let token = R.path(['logged', 'auth'], store.getState().app)
-  const instance = axios.create({withCredentials: true, headers: {'Authorization': token, responseType: 'json'}})
+  const instance = axios.create({withCredentials: true, headers: {'X-Authorization-Token': token, responseType: 'json'}})
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     const toImmutable = response.config.responseType === undefined //=== json
