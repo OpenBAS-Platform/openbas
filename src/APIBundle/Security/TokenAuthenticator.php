@@ -81,10 +81,10 @@ class TokenAuthenticator implements SimplePreAuthenticatorInterface, Authenticat
             );
         }
 
-        $tokenHeader = $request->headers->get('Authorization');
+        $tokenHeader = $request->headers->get('X-Authorization-Token');
 
         if (!$tokenHeader) {
-            throw new BadCredentialsException('Authorization header is required');
+            throw new BadCredentialsException('X-Authorization-Token header is required');
         }
 
         return new PreAuthenticatedToken(
