@@ -47,13 +47,16 @@ class TokenController extends Controller
             $user->setUserGravatar();
         }
 
-        $token = new Token();
-        $token->setTokenValue(base64_encode(random_bytes(50)));
-        $token->setTokenCreatedAt(new \DateTime('now'));
-        $token->setTokenUser($user);
+        $token = $em->getRepository('APIBundle:Token')->findOneBy(['token_user' => $user->getUserId()]);
+        if (!$token) {
+            $token = new Token();
+            $token->setTokenValue(base64_encode(random_bytes(50)));
+            $token->setTokenCreatedAt(new \DateTime('now'));
+            $token->setTokenUser($user);
 
-        $em->persist($token);
-        $em->flush();
+            $em->persist($token);
+            $em->flush();
+        }
 
         return $token;
     }
