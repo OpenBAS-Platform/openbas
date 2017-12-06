@@ -63,7 +63,7 @@ class TokenAuthenticator implements SimplePreAuthenticatorInterface, Authenticat
                 $user->setUserGravatar();
             }
 
-            $token = $this->em->getRepository('APIBundle:Token')->findOneBy(['token_user' => $user]);
+            $token = $this->em->getRepository('APIBundle:Token')->findOneBy(['token_user' => $user->getUserId()]);
             if (!$token) {
                 $token = new Token();
                 $token->setTokenValue(base64_encode(random_bytes(50)));

@@ -29,9 +29,9 @@ class InjectTypeController extends Controller
         $contracts = array();
         try {
             $url = $this->getParameter('worker_url') . '/cxf/contracts';
-            $contracts = json_decode(@file_get_contents($url), true);
+            $contracts = json_decode(file_get_contents($url), true);
         } catch (\Exception $e) {
-            $logger->info('Contracts can not be retrieved from worker');
+            $logger->error('Contracts can not be retrieved from worker: ' . $e->getMessage());
         }
 
         $other = array();
