@@ -2,12 +2,12 @@
         xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
     <route id="openex-scheduler">
         <from uri="quartz://openexScheduler?cron=0+0/1+*+*+*+?"/>
-        <setHeader headerName="Authorization">
+        <setHeader headerName="X-Authorization-Token">
             <constant>{{openex.token}}</constant>
         </setHeader>
         <to uri="{{openex.api}}{{openex_scheduler.uri}}"/>
         <!-- Remove authorization header to avoid any compatibility problem with execution modules -->
-        <removeHeader headerName="Authorization"/>
+        <removeHeader headerName="X-Authorization-Token"/>
         <unmarshal>
             <json library="Gson" unmarshalTypeName="java.lang.Object"/>
         </unmarshal>
@@ -64,7 +64,7 @@
         <setHeader headerName="CamelHttpMethod">
             <constant>POST</constant>
         </setHeader>
-        <setHeader headerName="Authorization">
+        <setHeader headerName="X-Authorization-Token">
             <constant>{{openex.token}}</constant>
         </setHeader>
         <doTry>

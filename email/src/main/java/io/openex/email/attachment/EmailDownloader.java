@@ -18,7 +18,7 @@ import java.util.Map;
 @SuppressWarnings({"PackageAccessibility", "WeakerAccess"})
 public class EmailDownloader {
 	
-	public static final String AUTHORIZATION = "Authorization";
+	public static final String AUTHORIZATION = "X-Authorization-Token";
 	public static final String FILE_NAME = "file_name";
 	public static final String FILE_ID = "file_id";
 	public static final String ATTACHMENTS = "attachments";
