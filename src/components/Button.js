@@ -21,13 +21,13 @@ const buttonStyle = {
     position: 'fixed',
     bottom: 30,
     right: 30,
-    zIndex: '5000'
+    zIndex: '1000'
   },
   [ Constants.BUTTON_TYPE_FLOATING_PADDING ]: {
     position: 'fixed',
     bottom: 30,
     right: 330,
-    zIndex: '5000'
+    zIndex: '1000'
   },
   [ Constants.BUTTON_TYPE_DIALOG_LEFT ]: {
     float: 'left',
