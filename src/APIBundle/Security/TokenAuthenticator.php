@@ -46,8 +46,17 @@ class TokenAuthenticator implements SimplePreAuthenticatorInterface, Authenticat
             return;
         }
 
+        $tokenHeader = $request->headers->get('X-Authorization-Token');
+        if( strlen($tokenHeader) > 0 ) {
+            return new PreAuthenticatedToken(
+                'anon.',
+                $tokenHeader,
+                $providerKey
+            );
+        }
+
         $apacheAuthUser = $request->server->get('REMOTE_USER');
-        if ($apacheAuthUser !== null) {
+        if (strlen($apacheAuthUser) > 0) {
             $user = $this->em->getRepository('APIBundle:User')->findOneBy(['user_login' => $apacheAuthUser]);
             if (!$user) {
                 $user = new User();
@@ -81,17 +90,7 @@ class TokenAuthenticator implements SimplePreAuthenticatorInterface, Authenticat
             );
         }
 
-        $tokenHeader = $request->headers->get('X-Authorization-Token');
-
-        if (!$tokenHeader) {
-            throw new BadCredentialsException('X-Authorization-Token header is required');
-        }
-
-        return new PreAuthenticatedToken(
-            'anon.',
-            $tokenHeader,
-            $providerKey
-        );
+        throw new BadCredentialsException('X-Authorization-Token header is required');
     }
 
     public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey)
