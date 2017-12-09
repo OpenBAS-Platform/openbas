@@ -7,7 +7,7 @@ import {injectIntl} from 'react-intl'
 
 const styles = {
   global: {
-    display: 'none'
+    display: 'none',
   },
   picker: {
     position: 'absolute',
@@ -47,7 +47,8 @@ class DateTimePicker extends Component {
           floatingLabelText="Date"
           locale={this.props.intl.locale}
           cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
-          style={styles.global}/>
+          style={styles.global}
+          dialogContainerStyle={{zIndex: 2100}}/>
         <TimePicker
           name="Time"
           autoOk={true}
@@ -58,7 +59,8 @@ class DateTimePicker extends Component {
           cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
           floatingLabelText="Time"
           okLabel={<div style={{display: 'none'}}></div>}
-          style={styles.global}/>
+          style={styles.global}
+          dialogStyle={{zIndex: 2100}}/>
       </div>
     )
   }
