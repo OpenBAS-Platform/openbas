@@ -30,7 +30,7 @@
     "sensio/framework-extra-bundle": "*",
     "incenteev/composer-parameter-handler": "*",
     "friendsofsymfony/rest-bundle": "*",
-    "nelmio/api-doc-bundle": "*",
+    "nelmio/api-doc-bundle": "2.*",
     "nategood/httpful": "*",
     "liuggio/excelbundle": "*",
     "doctrine/doctrine-migrations-bundle": "*"
