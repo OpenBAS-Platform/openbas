@@ -1,0 +1,73 @@
+{
+  "name": "openex-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "react-scripts": "1.0.17",
+    "redux-logger": "^3.0.6"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "countdown": "^2.6.0",
+    "file-saver": "^1.3.3",
+    "material-ui": "0.19.4",
+    "moment": "^2.19.2",
+    "moment-timezone": "^0.5.14",
+    "normalizr": "^3.2.0",
+    "prop-types": "^15.6.0",
+    "ramda": "^0.25.0",
+    "react": "16.1.1",
+    "react-addons-shallow-compare": "^15.6.2",
+    "react-document-title": "^2.0.3",
+    "react-dom": "16.1.1",
+    "react-intl": "^2.4.0",
+    "react-redux": "^5.0.6",
+    "react-router": "^3.2.0",
+    "react-router-redux": "^4.0.8",
+    "react-rte": "^0.15.0",
+    "redux": "^3.7.2",
+    "redux-auth-wrapper": "^2.0.2",
+    "redux-form": "^7.1.2",
+    "redux-thunk": "^2.2.0",
+    "reselect": "^3.0.1",
+    "rxjs": "^5.5.2",
+    "seamless-immutable": "^7.1.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://dev.local.openex.io/",
+  "eslintConfig": {
+    "plugins": [
+      "react"
+    ],
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
+    "globals": {
+      "it": true,
+      "require": true,
+      "window": true,
+      "navigator": true,
+      "document": true,
+      "console": true,
+      "localStorage": true,
+      "Promise": true,
+      "module": true,
+      "process": true
+    },
+    "rules": {
+      "no-console": 0
+    }
+  }
+}

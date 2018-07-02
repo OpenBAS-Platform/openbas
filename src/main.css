@@ -1,0 +1,116 @@
+html {
+  overflow-y:scroll;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+  min-height: 100%;
+}
+
+input:-webkit-autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+}
+
+hr {
+  margin: 0;
+  padding: 0;
+  border: none;
+  height: 1px;
+  color: #E0E0E0;
+  background-color: #E0E0E0;
+}
+
+h2 {
+  margin: 10px 0 20px 0 !important;
+  -webkit-margin-before: 0 !important;
+  -webkit-margin-after: 0 !important;
+  font-size: 20px;
+}
+
+h3 {
+  padding: 24px 24px 5px 21px !important;
+}
+
+h4 {
+  padding: 10px !important;
+}
+
+div.exercise:hover {
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 14px 60px, rgba(0, 0, 0, 0.3) 0px 10px 30px !important;
+}
+
+div.event:hover {
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 14px 60px, rgba(0, 0, 0, 0.3) 0px 10px 30px !important;
+}
+
+div.line {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  margin-left: -110px;
+}
+
+div.line ul {
+  margin: 0;
+  padding: 0;
+}
+
+div.line li {
+  width: 10px;
+  height: 10px;
+  text-align: center;
+  line-height: 5px;
+  border-radius: 5px;
+  background: #ff4081;
+  margin: 0 100px 0 100px;
+  display: inline-block;
+  color: white;
+  position: relative;
+}
+
+div.line li:first-child {
+  margin-left: 0;
+}
+
+div.line li:last-child {
+  margin-right: 0;
+}
+
+div.line li::before{
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -200px;
+  width: 200px;
+  height: 2px;
+  background: #ff4081;
+  z-index: 10;
+}
+
+div.line li:first-child::before {
+  display: none;
+}
+
+div.line .active {
+  background: #ff4081;
+}
+
+div.line .active ~ li {
+  background: #ff4081;
+}
+
+div.line .active ~ li::before {
+  background: #ff4081;
+}
+
+div.clearfix {
+  clear: both;
+}
