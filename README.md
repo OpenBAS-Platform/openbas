@@ -1,53 +1,94 @@
 # OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex-api.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex-api)
 
-Website: http://openex.io
+Website: https://www.openex.io
 
-OpenEx is a global open source platform allowing organizations to plan, schedule and conduct exercises. OpenEx is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and a UX oriented frontend.
+OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises. OpenEx is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and an UX oriented frontend.
 
 ## Releases download
 
-The releases are available on the [OpenEx website](http://www.openex.io) in the [releases section](http://openex.io/download). The website also provides a full [documentation](http://www.openex.io/documentation) about installation, usage and administration of the platform.   
+The releases are available on the [Github releases page](https://github.com/LuatixHQ/openex/releases).
 
 ## Status & Bugs
 
 Currently OpenEx is under heavy development, if you wish to report bugs or ask for new features, you can find the product bug tracker here: https://projects.luatix.org/projects/openex or directly use the Github issues module.
 
-## Softwares
+## Installation
 
-#### API [[openex-api](https://github.com/LuatixHQ/openex-api)]
+### Docker
 
-The API is the link between the frontend, the database and the worker, built with the [Symfony framework](https://symfony.com).
+*Coming soon*
 
-#### Frontend [[openex-frontend](https://github.com/LuatixHQ/openex-frontend)]
+### Manual installation
 
-The frontend is the user interface of the product, built with the [ReactJS framework](https://facebook.github.io/react).
-
-#### Worker [[openex-worker](https://github.com/LuatixHQ/openex-worker)]
-
-The worker is the executor that send incidents and injects, built with the [Karaf framework](http://karaf.apache.org).
-
-## Development
-
-To contribute to the API development, please follow the next steps to deploy it.
-
-*Prerequisites*:
-
-- Install a webserver and PHP (>= 5.6)
-- Install PostgreSQL (>= 9.2)
-
-*Installation*:
-
+*Installation of dependencies*:
 ```bash
-$ git clone https://github.com/Luatix/openex-api.git
-$ cd openex-api
-$ composer install
+sudo apt-get install apache2 libapache2-mod-php7.0 postgresql openjdk-8-jre
+sudo apt-get install php7.0-xml php7.0-mbstring php7.0-ldap php7.0-json php7.0-curl php7.0-pgsql
 ```
 
-*Database initialization*:
-
+*Creation of the user and the database with extension*:
 ```bash
+su postgres
+psql
+CREATE USER "openex"
+CREATE DATABASE "openex" OWNER "openex";
+ALTER USER "openex" WITH ENCRYPTED PASSWORD "user password";
+\c openex
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+```
+
+*Download the application files*:
+```bash
+mkdir /path/to/your/app && cd /path/to/your/app
+https://github.com/LuatixHQ/openex/archive/v1.0.3.tar.gz
+tar xvfz v1.0.3.tar.gz
+```
+
+The OpenEx main application is based on Symfony, you have to configure your virtualhost against the *openex-app/web* directory.
+
+*Install the main application and create the database schema*:
+```bash
+cd openex-app
+composer install
 php bin/console doctrine:schema:create
 php bin/console app:db-init
 ```
 
-The API is now up and running.
+During the database initialization, the administrator token will be displayed.
+
+*Configure the worker*:
+```bash
+cd openex-worker/openex
+```
+
+*File openex.properties*:
+```bash
+# Openex
+openex.api=http://url_of_the_application/api
+openex.token=administrator_token
+```
+
+You have to configure the file *openex_email.properties* with your own parameters. The file *openex_ovh_sms.properties* is for using the [OVH API](https://www.ovh.com) to send SMS.
+
+*Launch the worker*:
+```bash
+cd openex-worker/bin
+./start
+```
+
+## Development installation
+
+*Download the application files*:
+```bash
+mkdir /path/to/your/app && cd /path/to/your/app
+git clone https://github.com/Luatix/openex.git
+```
+
+Configure the application as descriped in the production installation, where the *api* folder is the Symfony application and the *worker* the Apache Karaf application.
+
+*Start the frontend*:
+```bash
+cd frontend
+yarn install
+yarn start
+```
