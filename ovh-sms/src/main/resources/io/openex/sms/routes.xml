@@ -1,0 +1,62 @@
+<routes xmlns="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <route id="openex-ovh-sms">
+        <from uri="direct:openex_ovh_sms"/>
+        <!-- Handler specific header/footer -->
+        <bean ref="sms-headers-handler"/>
+        <!-- Prepare template -->
+        <setHeader headerName="CamelFreemarkerTemplate">
+            <simple>${body[message]}</simple>
+        </setHeader>
+        <choice>
+            <when>
+                <simple>${body[users].size} > 0</simple>
+                <!-- Send a mail for each user (openexStrategy is mandatory) -->
+                <split streaming="true" parallelProcessing="true" strategyRef="openexStrategy">
+                    <simple>${body[users]}</simple>
+                    <setHeader headerName="Email">
+                        <simple>${body[user_email]}</simple>
+                    </setHeader>
+                    <choice>
+                        <when>
+                            <simple>${body[user_phone]} == null || ${body[user_phone]} == ""</simple>
+                            <throwException exceptionType="java.lang.Exception"
+                                            message="${header.Email} error: No phone number"/>
+                        </when>
+                        <otherwise>
+                            <setHeader headerName="OvhSmsPhone">
+                                <simple>${body[user_phone]}</simple>
+                            </setHeader>
+                            <!-- Put the current user as the marker model -->
+                            <setHeader headerName="CamelFreemarkerDataModel">
+                                <simple>${body}</simple>
+                            </setHeader>
+                            <!-- Translate the template in the body -->
+                            <to uri="freemarker:from_header"/>
+                            <!-- Send the SMS -->
+                            <doTry>
+                                <to uri="ovhSms:send?ak={{openex_ovh_sms.ak}}&amp;as={{openex_ovh_sms.as}}&amp;ck={{openex_ovh_sms.ck}}&amp;service={{openex_ovh_sms.service}}"/>
+                                <doCatch>
+                                    <exception>java.lang.Exception</exception>
+                                    <throwException exceptionType="java.lang.Exception"
+                                                    message="${header.Email} (${header.OvhSmsPhone}) error: ${exception.message}"/>
+                                </doCatch>
+                            </doTry>
+                            <!-- Output message for callback -->
+                            <setBody>
+                                <simple>${header.Email} (${header.OvhSmsPhone}) success</simple>
+                            </setBody>
+                        </otherwise>
+                    </choice>
+                </split>
+            </when>
+            <otherwise>
+                <!-- If no users, forge a success callback message -->
+                <setBody>
+                    <constant>Empty audience</constant>
+                </setBody>
+                <bean ref="openexCallback" method="success"/>
+            </otherwise>
+        </choice>
+    </route>
+</routes>
