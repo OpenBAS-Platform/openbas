@@ -93,7 +93,7 @@ class InjectController extends Controller
                 /* @var $incidents Incident[] */
 
                 foreach ($incidents as $incident) {
-                    $injects = array_merge($injects, $em->getRepository('APIBundle:Inject')->createQueryBuilder('i')
+                    $incidentInjects = $em->getRepository('APIBundle:Inject')->createQueryBuilder('i')
                         ->leftJoin('i.inject_status', 's')
                         ->where('s.status_inject = i.inject_id')
                         ->andWhere('s.status_name is NULL')
@@ -106,15 +106,15 @@ class InjectController extends Controller
                         ->setParameter('start', $dateStart)
                         ->setParameter('end', $dateEnd)
                         ->getQuery()
-                        ->getResult());
-                }
-
-                // enrich injects
-                foreach ($injects as &$inject) {
-                    /* @var $inject Inject */
-                    $inject->setInjectExercise($exercise);
-                    $inject->setInjectHeader($exercise->getExerciseMessageHeader());
-                    $inject->setInjectFooter($exercise->getExerciseMessageFooter());
+                        ->getResult();
+                    // enrich injects
+                    foreach ($incidentInjects as &$incidentInject) {
+                        /* @var $incidentInject Inject */
+                        $incidentInject->setInjectExercise($exercise);
+                        $incidentInject->setInjectHeader($exercise->getExerciseMessageHeader());
+                        $incidentInject->setInjectFooter($exercise->getExerciseMessageFooter());
+                    }
+                    $injects = array_merge($injects, $incidentInjects);
                 }
             }
         }
