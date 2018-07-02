@@ -1,0 +1,27 @@
+<routes xmlns="http://camel.apache.org/schema/spring">
+    <route>
+        <from uri="direct:remote"/>
+        <log message="Received ${body}:${threadName}"/>
+        <threads executorServiceRef="openex-remote-thread-profile">
+            <log message="Processing ${body}:${threadName}"/>
+            <setHeader headerName="router-header">
+                <simple>${body[route-id]}</simple>
+            </setHeader>
+            <setBody>
+                <simple>${body[data]}</simple>
+            </setBody>
+            <doTry>
+                <dynamicRouter ignoreInvalidEndpoints="true">
+                    <method ref="openexRouter" method="forward"/>
+                </dynamicRouter>
+                <doCatch>
+                    <exception>java.lang.Exception</exception>
+                    <setBody>
+                        <simple>Technical error: ${exception.message}</simple>
+                    </setBody>
+                    <bean ref="openexCallback" method="error"/>
+                </doCatch>
+            </doTry>
+        </threads>
+    </route>
+</routes>
