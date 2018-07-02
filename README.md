@@ -1,4 +1,4 @@
-# OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex-api.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex-api)
+# OpenEx - Open Exercises Platform [![Build Status](https://api.travis-ci.org/LuatixHQ/openex-api.svg?branch=master)](https://travis-ci.org/LuatixHQ/openex)
 
 Website: https://www.openex.io
 
@@ -40,7 +40,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 *Download the application files*:
 ```bash
 mkdir /path/to/your/app && cd /path/to/your/app
-https://github.com/LuatixHQ/openex/archive/v1.0.3.tar.gz
+wget https://github.com/LuatixHQ/openex/releases/download/v1.0.0/openex-release-1.0.0.tar.gz
 tar xvfz v1.0.3.tar.gz
 ```
 
