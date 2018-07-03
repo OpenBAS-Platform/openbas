@@ -20,16 +20,21 @@ Currently OpenEx is under heavy development, if you wish to report bugs or ask f
 
 ### Manual installation
 
-*Installation of dependencies*:
+*Prerequisites*:
+
+- Install a webserver and PHP (>= 5.6)
+- Install MySQL (>= 5.5)
+
+*Installation of dependencies (Ubuntu 16.04)*:
 ```bash
-sudo apt-get install apache2 libapache2-mod-php7.0 postgresql openjdk-8-jre
-sudo apt-get install php7.0-xml php7.0-mbstring php7.0-ldap php7.0-json php7.0-curl php7.0-pgsql
+$ sudo apt-get install apache2 libapache2-mod-php7.0 postgresql openjdk-8-jre
+$ sudo apt-get install php7.0-xml php7.0-mbstring php7.0-ldap php7.0-json php7.0-curl php7.0-pgsql
 ```
 
 *Creation of the user and the database with extension*:
 ```bash
-su postgres
-psql
+$ su postgres
+$ psql
 CREATE USER "openex"
 CREATE DATABASE "openex" OWNER "openex";
 ALTER USER "openex" WITH ENCRYPTED PASSWORD "user password";
@@ -39,26 +44,26 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 *Download the application files*:
 ```bash
-mkdir /path/to/your/app && cd /path/to/your/app
-wget https://github.com/LuatixHQ/openex/releases/download/v1.0.0/openex-release-1.0.0.tar.gz
-tar xvfz v1.0.3.tar.gz
+$ mkdir /path/to/your/app && cd /path/to/your/app
+$ wget https://github.com/LuatixHQ/openex/releases/download/v1.0.3/openex-release-1.0.3.tar.gz
+$ tar xvfz openex-release-1.0.3.tar.gz
 ```
 
 The OpenEx main application is based on Symfony, you have to configure your virtualhost against the *openex-app/web* directory.
 
 *Install the main application and create the database schema*:
 ```bash
-cd openex-app
-composer install
-php bin/console doctrine:schema:create
-php bin/console app:db-init
+$ cd openex-app
+$ composer install
+$ php bin/console doctrine:schema:create
+$ php bin/console app:db-init
 ```
 
 During the database initialization, the administrator token will be displayed.
 
 *Configure the worker*:
 ```bash
-cd openex-worker/openex
+$ cd openex-worker/openex
 ```
 
 *File openex.properties*:
@@ -72,23 +77,23 @@ You have to configure the file *openex_email.properties* with your own parameter
 
 *Launch the worker*:
 ```bash
-cd openex-worker/bin
-./start
+$ cd openex-worker/bin
+$ ./start
 ```
 
 ## Development installation
 
 *Download the application files*:
 ```bash
-mkdir /path/to/your/app && cd /path/to/your/app
-git clone https://github.com/Luatix/openex.git
+$ mkdir /path/to/your/app && cd /path/to/your/app
+$ git clone https://github.com/Luatix/openex.git
 ```
 
 Configure the application as descriped in the production installation, where the *api* folder is the Symfony application and the *worker* the Apache Karaf application.
 
 *Start the frontend*:
 ```bash
-cd frontend
-yarn install
-yarn start
+$ cd frontend
+$ yarn install
+$ yarn start
 ```
