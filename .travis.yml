@@ -20,8 +20,6 @@ matrix:
         - php bin/console doctrine:database:create --env=test
         - php bin/console doctrine:schema:create --env=test
         - php bin/console app:db-init --env=test
-      before_script:
-        - cd api
       script:
         - phpunit
 
@@ -45,8 +43,6 @@ matrix:
         - sudo apt-get install -y -qq yarn
       install:
         - yarn install
-      before_script:
-        - cd frontend
       script:
         - npm run build
 
