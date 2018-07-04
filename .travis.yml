@@ -1,17 +1,15 @@
 matrix:
   include:
     - language: php
+      php:
+        - '7.0'
+        - '5.5' 
       sudo: false
       services:
         - postgresql
       cache:
         directories:
           - $HOME/.composer/cache/files
-      matrix:
-        fast_finish: true
-        include:
-          - php: 5.5
-          - php: 7.0
       before-install:
         - cd api
         - composer self-update
