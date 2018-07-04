@@ -52,8 +52,9 @@ matrix:
         directories:
           - .autoconf
           - $HOME/.m2
-      before_script:
+      before_install:
         - cd worker
+        - mvn install
       script:
         - mvn test
 
