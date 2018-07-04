@@ -279,7 +279,7 @@ class IndexExercise extends Component {
             modal={false}
             open={this.state.openObjectives}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseAudiences.bind(this)}
+            onRequestClose={this.handleCloseObjectives.bind(this)}
             actions={objectivesActions}>
             <List>
               {this.props.objectives.map(objective => {

@@ -32,8 +32,8 @@ const appBarTitleStyle = {
 export const AppBar = (props) => (
   <MUIAppBar
     title={props.title}
-    onTitleTouchTap={props.onTitleTouchTap}
-    onLeftIconButtonTouchTap={props.onLeftIconButtonTouchTap}
+    onTitleClick={props.onTitleTouchTap}
+    onLeftIconButtonClick={props.onLeftIconButtonTouchTap}
     iconElementRight={props.iconElementRight}
     iconElementLeft={props.iconElementLeft}
     showMenuIconButton={props.showMenuIconButton}
