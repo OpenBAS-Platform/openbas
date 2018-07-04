@@ -91,8 +91,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Potatoes attack',
             'Major crisis exercise',
             'A massive potatoes attack, this is crisis.',
-            new \DateTime('2018-01-01 08:00:00'),
-            new \DateTime('2018-01-10 18:00:00'),
+            new \DateTime('2019-01-01 08:00:00'),
+            new \DateTime('2019-01-10 18:00:00'),
             $userAdmin,
             $fileExercise
         );
@@ -102,8 +102,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Cockroach invasion',
             'Minor crisis exercise',
             'A massive cockroach invasion, this is crisis.',
-            new \DateTime('2018-01-01 08:00:00'),
-            new \DateTime('2018-01-10 18:00:00'),
+            new \DateTime('2019-01-01 08:00:00'),
+            new \DateTime('2019-01-10 18:00:00'),
             $userAdmin,
             $fileExercise
         );
@@ -183,7 +183,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Potatoes headquarters conversation',
             'A potatoes headquarters conversation is intercepted',
             json_encode($content),
-            new \DateTime('2018-01-01 08:01:00'),
+            new \DateTime('2019-01-01 08:01:00'),
             'openex_email',
             $incidentCapital,
             $userAdmin
@@ -196,7 +196,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Potato arrival at the airport',
             'A potato is arriving at the airport ',
             json_encode($content),
-            new \DateTime('2018-01-01 08:15:00'),
+            new \DateTime('2019-01-01 08:15:00'),
             'openex_email',
             $incidentCapital,
             $userAdmin
@@ -209,7 +209,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'A potato has been detected',
             'A potato has been detected by CCTV',
             json_encode($content),
-            new \DateTime('2018-01-01 08:45:00'),
+            new \DateTime('2019-01-01 08:45:00'),
             'openex_email',
             $incidentCapital,
             $userAdmin
