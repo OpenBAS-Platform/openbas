@@ -20,8 +20,6 @@ The releases are available on the [Github releases page](https://github.com/Luat
 
 Currently OpenEx is under heavy development, if you wish to report bugs or ask for new features, you can find the product bug tracker here: https://projects.luatix.org/projects/openex or directly use the Github issues module.
 
-## Luatix
+## About
 
 OpenEx is a product powered by the [Luatix](https://www.luatix.org) non-profit organization.
-
-
