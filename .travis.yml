@@ -11,11 +11,11 @@ matrix:
         directories:
           - $HOME/.composer/cache/files
       before-install:
-        - cd api
         - composer self-update
       install:
         - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
         - phpenv config-add travis.php.ini
+        - cd api
         - composer install
         - php bin/console doctrine:database:create --env=test
         - php bin/console doctrine:schema:create --env=test
