@@ -10,15 +10,15 @@ OpenEx is an open source platform allowing organizations to plan, schedule and c
 
 The releases are available on the [Github releases page](https://github.com/LuatixHQ/openex/releases).
 
-## Status & Bugs
-
-Currently OpenEx is under heavy development, if you wish to report bugs or ask for new features, you can find the product bug tracker here: https://projects.luatix.org/projects/openex or directly use the Github issues module.
-
 ## Installation
 
 * [Use Docker](docker)
 * [Install OpenEx manually](docs/Installation.md)
 * [Install OpenEx for development](docs/Development.md)
+
+## Status & Bugs
+
+Currently OpenEx is under heavy development, if you wish to report bugs or ask for new features, you can find the product bug tracker here: https://projects.luatix.org/projects/openex or directly use the Github issues module.
 
 ## Luatix
 
