@@ -54,6 +54,7 @@ matrix:
           - $HOME/.m2
       before_install:
         - cd worker
+      install:
         - mvn install
       script:
         - mvn test
