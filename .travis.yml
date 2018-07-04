@@ -1,8 +1,6 @@
 matrix:
   include:
     - language: php
-      before_script:
-        - cd api
       sudo: false
       services:
         - postgresql
@@ -15,6 +13,7 @@ matrix:
           - php: 5.5
           - php: 7.0
       before-install:
+        - cd api
         - composer self-update
       install:
         - psql template1 -c 'CREATE EXTENSION "uuid-ossp";' -U postgres
@@ -23,12 +22,12 @@ matrix:
         - php bin/console doctrine:database:create --env=test
         - php bin/console doctrine:schema:create --env=test
         - php bin/console app:db-init --env=test
+      before_script:
+        - cd api
       script:
         - phpunit
 
     - language: node_js
-      before_script:
-        - cd frontend
       sudo: required
       dist: trusty
       node_js:
@@ -41,20 +40,22 @@ matrix:
         - node_modules
         - $HOME/.yarn-cache
       before_install:
+        - cd frontend
         - sudo apt-key adv --fetch-keys http://dl.yarnpkg.com/debian/pubkey.gpg
         - echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
         - sudo apt-get update -qq
         - sudo apt-get install -y -qq yarn
       install:
         - yarn install
+      before_script:
+        - cd frontend
       script:
         - npm run build
 
     - language: java
+      jdk: oraclejdk8
       before_script:
         - cd worker
-      jdk:
-        - oraclejdk8
       script:
         - mvn test
 
