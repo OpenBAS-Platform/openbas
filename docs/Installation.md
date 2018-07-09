@@ -4,7 +4,7 @@
 
 - PHP (>= 5.6)
 - MySQL (>= 5.5)
-- JAVA (>= 8 && < 10)
+- JAVA (== 8)
 
 *Installation of dependencies (Ubuntu 16.04)*:
 ```bash
