@@ -1,18 +1,18 @@
-# Use the official Docker Hub Ubuntu 16.04 base image
-FROM ubuntu:16.04
+# Use the official Docker Hub Ubuntu 18.04 base image
+FROM ubuntu:18.04
 
 # Update the base image
-RUN apt-get update && apt-get -y upgrade && apt-get -y dist-upgrade
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y upgrade && apt-get -y dist-upgrade
 
-# Setup install environment and OpenEx dependencies
-RUN apt-get -y install apache2 libapache2-mod-php7.0 postgresql openjdk-8-jre sudo rsyslog wget
+# Setup install environment and OpenCTI dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install apache2 libapache2-mod-php7.2 sudo rsyslog wget openjdk-8-jre
 
 # Enable the Apache rewrite module
 RUN a2enmod rewrite
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Install PHP dependencies
-RUN apt-get -y install php7.0-xml php7.0-pgsql php7.0-ldap php7.0-json php7.0-curl composer
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install php7.2-cli php7.2-xml php7.2-pgsql php7.2-ldap php7.2-json php7.2-curl composer
 
 # Create the database
 COPY sql/init.sql /

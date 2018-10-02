@@ -1,0 +1,34 @@
+version: '3'
+services:
+  pgsql:
+    image: postgres
+    environment:
+      - POSTGRES_USER=opencti
+      - POSTGRES_PASSWORD=opencti
+      - POSTGRES_DB=opencti
+    volumes:
+      - "./sql:/docker-entrypoint-initdb.d:ro"
+    restart: always
+  mongodb:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=opencti
+      - MONGO_INITDB_ROOT_PASSWORD=opencti
+    restart: always
+  opencti:
+    image: luatix/opencti
+    build:
+      context: .
+    environment:
+      - RUN_USER=www-data
+      - RUN_GROUP=www-data
+      - APP_URL=http://localhost:8080
+    ports:
+      - "8080:80"
+    depends_on:
+      - pgsql
+      - mongodb
+    links:
+     - pgsql:pgsql
+     - mongodb:mongodb
+    restart: always
