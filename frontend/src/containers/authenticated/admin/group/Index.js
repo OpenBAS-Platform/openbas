@@ -10,7 +10,7 @@ import {fetchUsers} from '../../../../actions/User'
 import {fetchOrganizations} from '../../../../actions/Organization'
 import {fetchExercises} from '../../../../actions/Exercise'
 import {List} from '../../../../components/List'
-import {MainListItem, HeaderItem} from '../../../../components/list/ListItem';
+import {MainListItem, HeaderItem} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import CreateGroup from './CreateGroup'
 import GroupPopover from './GroupPopover'

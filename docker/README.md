@@ -1,11 +1,11 @@
 ## Docker installation
 
-OpenEx provides a *Dockerfile* allowing you to create an OpenEx docker image.
+OpenEx provides a script *build.sh* wich using the *docker-compose* command allowing you to deploy the application in docker containers.
 
 *Clone the repository*:
 ```bash
 $ mkdir /path/to/your/app && cd /path/to/your/app
-$ git clone https://github.com/Luatix/openex.git
+$ git clone https://github.com/LuatixHQ/openex.git
 $ cd openex/docker
 ```
 
@@ -24,10 +24,9 @@ openex_email.user=smtp_server_username
 openex_email.password=smtp_server_password
 ```
 
-*Build and run*:
+*Run*:
 ```bash
-$ docker build -t openex .
-$ docker run -d --restart=always -p 8080:80 --name openex openex
+$ ./run.sh
 ```
 
 You can now go to http://localhost:8080 and log in with username *admin@openex.io* and password *admin*.

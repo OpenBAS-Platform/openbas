@@ -12,7 +12,7 @@ import {List} from '../../../../components/List'
 import Theme from '../../../../components/Theme'
 import {Dialog} from '../../../../components/Dialog'
 import {FlatButton} from '../../../../components/Button'
-import {MainListItem} from '../../../../components/list/ListItem';
+import {MainListItem} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
 import {CircularSpinner} from '../../../../components/Spinner'

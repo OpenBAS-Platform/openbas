@@ -9,7 +9,7 @@ import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
-import {MainListItem} from '../../../../components/list/ListItem';
+import {MainListItem} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {LinearProgress} from '../../../../components/LinearProgress'
 import {Dialog} from '../../../../components/Dialog'

@@ -7,7 +7,7 @@ import {
   CardMedia as MUICardMedia,
   CardTitle as MUICardTitle,
   CardText as MUICardText
-} from 'material-ui/Card';
+} from 'material-ui/Card'
 
 export const Card = (props) => (
   <MUICard>{props.children}</MUICard>

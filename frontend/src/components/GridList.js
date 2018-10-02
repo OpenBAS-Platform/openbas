@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'react'
 import PropTypes from 'prop-types'
-import {GridList as MUIGridList, GridTile as MUIGridTile} from 'material-ui/GridList';
+import {GridList as MUIGridList, GridTile as MUIGridTile} from 'material-ui/GridList'
 import * as Constants from '../constants/ComponentTypes'
 
 const GridListStyle = {

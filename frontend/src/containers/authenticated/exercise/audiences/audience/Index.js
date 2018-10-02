@@ -16,7 +16,7 @@ import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
 import {Dialog} from '../../../../../components/Dialog'
 import Theme from '../../../../../components/Theme'
 import {List} from '../../../../../components/List'
-import {AvatarListItem, AvatarHeaderItem} from '../../../../../components/list/ListItem';
+import {AvatarListItem, AvatarHeaderItem} from '../../../../../components/list/ListItem'
 import {Avatar} from '../../../../../components/Avatar'
 import {Icon} from '../../../../../components/Icon'
 import {SearchField} from '../../../../../components/SimpleTextField'

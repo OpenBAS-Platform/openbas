@@ -4,8 +4,8 @@ import {connect} from 'react-redux'
 import {i18nRegister} from '../../../../../utils/Messages'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {addEvent} from '../../../../../actions/Event'
-import {Dialog} from '../../../../../components/Dialog';
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button';
+import {Dialog} from '../../../../../components/Dialog'
+import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button'
 import EventForm from './EventForm'
 
 i18nRegister({
