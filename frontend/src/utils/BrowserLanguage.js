@@ -19,4 +19,4 @@ var detectedLocale = R.pipe(
   R.find((x) => R.contains(x, availableLanguages)) //Returns first language matched in available languages
 )
 
-export const locale = detectedLocale(window.navigator) || 'en'; //If no locale is detected, fallback to 'en'
+export const locale = detectedLocale(window.navigator) || 'en' //If no locale is detected, fallback to 'en'

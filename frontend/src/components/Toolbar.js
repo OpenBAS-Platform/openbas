@@ -5,7 +5,7 @@ import {
   ToolbarGroup as MUIToolbarGroup,
   ToolbarSeparator as MUIToolbarSeparator,
   ToolbarTitle as MUIToolbarTitle
-} from 'material-ui/Toolbar';
+} from 'material-ui/Toolbar'
 import Theme from './Theme'
 import * as Constants from '../constants/ComponentTypes'
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import MUISnackbar from 'material-ui/Snackbar';
+import MUISnackbar from 'material-ui/Snackbar'
 
 export const Snackbar = (props) => (
   <MUISnackbar

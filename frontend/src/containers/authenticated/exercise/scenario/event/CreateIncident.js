@@ -5,8 +5,8 @@ import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {addIncident, selectIncident} from '../../../../../actions/Incident'
-import {DialogTitleElement} from '../../../../../components/Dialog';
-import {FlatButton} from '../../../../../components/Button';
+import {DialogTitleElement} from '../../../../../components/Dialog'
+import {FlatButton} from '../../../../../components/Button'
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {ActionButtonCreate} from '../../../../../components/Button'
 import {AppBar} from '../../../../../components/AppBar'

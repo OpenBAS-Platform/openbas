@@ -1,7 +1,7 @@
-import {combineReducers} from 'redux';
-import app from './App';
-import referential from './Referential';
-import screen from './Screen';
+import {combineReducers} from 'redux'
+import app from './App'
+import referential from './Referential'
+import screen from './Screen'
 import {routerReducer} from 'react-router-redux'
 import {reducer as formReducer} from 'redux-form'
 

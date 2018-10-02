@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import * as Constants from '../constants/ComponentTypes'
-import MUIAvatar from 'material-ui/Avatar';
+import MUIAvatar from 'material-ui/Avatar'
 
 const avatarStyle = {
   [ Constants.AVATAR_TYPE_TOPBAR ]: {

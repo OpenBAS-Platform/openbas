@@ -3,8 +3,8 @@ import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {addUser} from '../../../../../actions/User'
-import {Dialog} from '../../../../../components/Dialog';
-import {FlatButton} from '../../../../../components/Button';
+import {Dialog} from '../../../../../components/Dialog'
+import {FlatButton} from '../../../../../components/Button'
 import UserForm from './UserForm'
 import * as Constants from '../../../../../constants/ComponentTypes'
 

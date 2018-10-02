@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import MUIToggle from 'material-ui/Toggle';
+import MUIToggle from 'material-ui/Toggle'
 
 export const Toggle = (props) => (
   <MUIToggle

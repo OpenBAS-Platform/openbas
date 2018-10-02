@@ -9,9 +9,9 @@ import * as Constants from '../../../../../constants/ComponentTypes'
 import {fetchIncident} from '../../../../../actions/Incident'
 import {downloadFile} from '../../../../../actions/File'
 import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
-import {DialogTitleElement} from '../../../../../components/Dialog';
+import {DialogTitleElement} from '../../../../../components/Dialog'
 import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button';
+import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'

@@ -7,7 +7,7 @@ import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {Dialog} from '../../../../components/Dialog'
-import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem';
+import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {FlatButton} from '../../../../components/Button'
 import {fetchObjectives} from '../../../../actions/Objective'

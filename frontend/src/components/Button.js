@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import {Link} from 'react-router'
 import * as Constants from '../constants/ComponentTypes'
 import MUIRaisedButton from 'material-ui/RaisedButton'
-import MUIFloatingActionButton from 'material-ui/FloatingActionButton';
-import MUIFlatButton from 'material-ui/FlatButton';
-import MUIIconButton from 'material-ui/IconButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
+import MUIFloatingActionButton from 'material-ui/FloatingActionButton'
+import MUIFlatButton from 'material-ui/FlatButton'
+import MUIIconButton from 'material-ui/IconButton'
+import ContentAdd from 'material-ui/svg-icons/content/add'
 import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import {injectIntl} from 'react-intl'
 

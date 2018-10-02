@@ -9,7 +9,7 @@ import {IconButton} from '../../components/Button'
 import {Image} from '../../components/Image'
 import {GridList, GridTile} from '../../components/GridList'
 import {Icon} from '../../components/Icon'
-import {FloatingActionsButtonCreate} from '../../components/Button';
+import {FloatingActionsButtonCreate} from '../../components/Button'
 import {SimpleTextField} from '../../components/SimpleTextField'
 
 const styles = {

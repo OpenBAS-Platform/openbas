@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import MUIDrawer from 'material-ui/Drawer';
-import {zIndex} from 'material-ui/styles';
+import MUIDrawer from 'material-ui/Drawer'
+import {zIndex} from 'material-ui/styles'
 
 export const Drawer = (props) => (
   <MUIDrawer

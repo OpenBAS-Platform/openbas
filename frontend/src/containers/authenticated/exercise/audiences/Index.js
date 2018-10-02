@@ -10,7 +10,7 @@ import {fetchAudiences} from '../../../../actions/Audience'
 import {SearchField} from '../../../../components/SimpleTextField'
 import {Icon} from '../../../../components/Icon'
 import {List} from '../../../../components/List'
-import {MainListItemLink} from '../../../../components/list/ListItem';
+import {MainListItemLink} from '../../../../components/list/ListItem'
 import CreateAudience from './audience/CreateAudience'
 
 const styles = {

@@ -7,7 +7,7 @@ import {i18nRegister} from '../../../../utils/Messages'
 import {dateFormat} from '../../../../utils/Time'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
-import {MainListItemLink} from '../../../../components/list/ListItem';
+import {MainListItemLink} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryruns} from '../../../../actions/Dryrun'

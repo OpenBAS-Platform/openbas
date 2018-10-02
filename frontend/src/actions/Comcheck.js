@@ -2,31 +2,31 @@ import * as schema from './Schema'
 import {getReferential, postReferential, delReferential} from '../utils/Action'
 
 export const fetchComchecks = (exerciseId, noloading) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/comchecks'
-  return getReferential(schema.arrayOfComchecks, uri, noloading)(dispatch)
+    let uri = '/api/exercises/' + exerciseId + '/comchecks'
+    return getReferential(schema.arrayOfComchecks, uri, noloading)(dispatch)
 }
 
 export const fetchComcheck = (exerciseId, comcheckId, noloading) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId
-  return getReferential(schema.comcheck, uri, noloading)(dispatch)
+    let uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId
+    return getReferential(schema.comcheck, uri, noloading)(dispatch)
 }
 
 export const addComcheck = (exerciseId, data) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/comchecks'
-  return postReferential(schema.comcheck, uri, data)(dispatch)
+    let uri = '/api/exercises/' + exerciseId + '/comchecks'
+    return postReferential(schema.comcheck, uri, data)(dispatch)
 }
 
 export const deleteComcheck = (exerciseId, comcheckId) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId
-  return delReferential(uri, 'comchecks', comcheckId)(dispatch)
+    let uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId
+    return delReferential(uri, 'comchecks', comcheckId)(dispatch)
 }
 
 export const fetchComcheckStatuses = (exerciseId, comcheckId, noloading) => (dispatch) => {
-  var uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId + '/statuses'
-  return getReferential(schema.arrayOfComcheckStatuses, uri, noloading)(dispatch)
+    let uri = '/api/exercises/' + exerciseId + '/comchecks/' + comcheckId + '/statuses'
+    return getReferential(schema.arrayOfComcheckStatuses, uri, noloading)(dispatch)
 }
 
 export const fetchComcheckStatus = (statusId) => (dispatch) => {
-  var uri = '/api/anonymous/comcheck/' + statusId
-  return getReferential(schema.comcheckStatus, uri)(dispatch)
+    let uri = '/api/anonymous/comcheck/' + statusId
+    return getReferential(schema.comcheckStatus, uri)(dispatch)
 }

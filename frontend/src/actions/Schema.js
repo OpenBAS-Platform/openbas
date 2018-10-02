@@ -70,13 +70,13 @@ export const outcome = new schema.Entity('outcomes', {}, {idAttribute: 'outcome_
 export const arrayOfOutcomes = new schema.Array(outcome)
 
 token.define({
-  token_user: user
+    token_user: user
 })
 
 user.define({
-  user_organization: organization
+    user_organization: organization
 })
 
 incident.define({
-  incident_type: incidentType
+    incident_type: incidentType
 })

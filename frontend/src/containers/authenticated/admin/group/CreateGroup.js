@@ -2,8 +2,8 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {addGroup} from '../../../../actions/Group'
-import {Dialog} from '../../../../components/Dialog';
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button';
+import {Dialog} from '../../../../components/Dialog'
+import {FlatButton, FloatingActionsButtonCreate} from '../../../../components/Button'
 import UserForm from './GroupForm'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {i18nRegister} from '../../../../utils/Messages'
