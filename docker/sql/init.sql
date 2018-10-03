@@ -115,3 +115,6 @@ ALTER TABLE comchecks_statuses ADD CONSTRAINT FK_A25F787295A4A46F FOREIGN KEY (s
 ALTER TABLE users ADD CONSTRAINT FK_1483A5E941221F7E FOREIGN KEY (user_organization) REFERENCES organizations (organization_id) ON DELETE RESTRICT NOT DEFERRABLE INITIALLY IMMEDIATE;
 INSERT INTO users (user_id, user_login, user_firstname, user_lastname, user_email, user_password, user_admin, user_status, user_lang) VALUES ('3cc8da56-db62-4a52-8ac3-00224b755d9e', 'admin@openex.io', 'John', 'Doe', 'admin@openex.io', '$2y$12$ifjMJqEIzOE9M9AO7HMVtu2wyJX6/NVCL4r4rbl.bUPfUauNiZLo6', TRUE, 1, 'auto');
 INSERT INTO tokens (token_id, token_user, token_value, token_created_at) VALUES ('a0c1e118-72ce-45ba-9574-79a3434d2136', '3cc8da56-db62-4a52-8ac3-00224b755d9e', 'TOKEN_TO_REPLACE', '2018-01-01 00:00:00');
+INSERT INTO incident_types (type_id, type_name) VALUES ('73caeb4b-93fa-4d49-9945-56ca83376629', 'TECHNICAL');
+INSERT INTO incident_types (type_id, type_name) VALUES ('8e525981-7c72-4e3f-a951-76150d078d8e', 'OPERATIONAL');
+INSERT INTO incident_types (type_id, type_name) VALUES ('f094182d-df37-4536-bf99-8ea8ee8e415c', 'STRATEGIC');
