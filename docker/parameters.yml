@@ -1,5 +1,5 @@
 parameters:
-    database_host: 127.0.0.1
+    database_host: pgsql
     database_port: 5432
     database_name: openex
     database_user: openex
