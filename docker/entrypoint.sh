@@ -17,7 +17,6 @@ chown -R ${RUN_USER}:${RUN_GROUP} /var/openex
 # Doctrine migration & creation
 cd /var/openex
 sudo -H -u ${RUN_USER} php bin/console doctrine:migrations:migrate -n
-sudo -H -u ${RUN_USER} php bin/console doctrine:mongodb:schema:create
 
 # Start Worker
 sudo -H -u ${RUN_USER} /var/openex/openex-worker/bin/start &

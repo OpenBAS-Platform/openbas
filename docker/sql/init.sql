@@ -1,4 +1,4 @@
-\c opencti
+\c openex
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE injects_statuses (status_id VARCHAR(255) NOT NULL, status_inject VARCHAR(255) DEFAULT NULL, status_name VARCHAR(255) DEFAULT NULL, status_message TEXT DEFAULT NULL, status_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, status_execution INT DEFAULT NULL, PRIMARY KEY(status_id));
 CREATE UNIQUE INDEX UNIQ_658A47A864E0DBD ON injects_statuses (status_inject);

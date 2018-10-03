@@ -28,7 +28,7 @@ RUN rm -Rf /var/www/html && ln -s /var/openex/openex-app/web /var/www/html
 
 # Expose and entrypoint
 COPY entrypoint.sh /
-RUN chmod +x /entrypoint.sh 
+RUN chmod +x /entrypoint.sh
 VOLUME /var/openex/openex-app/app/files
 VOLUME /var/openex/openex-worker/openex
 EXPOSE 80/tcp
