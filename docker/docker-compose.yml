@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - "./properties:/var/openex/openex-worker/openex:ro"  
+      - "./properties:/var/openex/openex-worker/openex:rw"  
     depends_on:
       - pgsql
     links:
