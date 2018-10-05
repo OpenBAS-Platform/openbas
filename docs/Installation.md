@@ -3,13 +3,13 @@
 *Prerequisites*:
 
 - PHP (>= 5.6)
-- MySQL (>= 5.5)
+- PostgreSQL (>= 9.2)
 - JAVA (== 8)
 
-*Installation of dependencies (Ubuntu 16.04)*:
+*Installation of dependencies (Ubuntu 18.04)*:
 ```bash
-$ sudo apt-get install apache2 libapache2-mod-php7.0 postgresql openjdk-8-jre
-$ sudo apt-get install php7.0-xml php7.0-mbstring php7.0-ldap php7.0-json php7.0-curl php7.0-pgsql
+$ sudo apt-get install apache2 libapache2-mod-php7.2 postgresql openjdk-8-jre
+$ sudo apt-get install php7.2-xml php7.2-mbstring php7.2-ldap php7.2-json php7.2-curl php7.2-pgsql
 ```
 
 *Creation of the user and the database with extension*:
