@@ -1,7 +1,8 @@
 {
   "name": "openex-frontend",
-  "version": "1.0.0",
-  "private": true,
+  "author": "Luatix",
+  "license": "AGPL-3.0-or-later",
+  "version": "1.0.3",
   "devDependencies": {
     "react-scripts": "1.0.17",
     "redux-logger": "^3.0.6"

@@ -1,7 +1,8 @@
 {
   "name": "openex-api",
-  "version": "1.0.0",
-  "license": "creative common",
+  "version": "1.0.3",
+  "author": "Luatix",
+  "license": "AGPL-3.0-or-later",
   "type": "project",
   "autoload": {
     "psr-4": {
