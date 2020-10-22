@@ -5,6 +5,9 @@
         <setHeader headerName="From">
             <simple>{{openex_email.sender}}</simple>
         </setHeader>
+        <setHeader headerName="Reply-To">
+            <simple>${body[replyto]}</simple>
+        </setHeader>
         <setHeader headerName="subject">
             <simple>${body[subject]}</simple>
         </setHeader>

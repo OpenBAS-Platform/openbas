@@ -23,13 +23,15 @@
 
     <groupId>io.openex</groupId>
     <artifactId>worker</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>pom</packaging>
 
     <properties>
         <camel.version>2.18.0</camel.version>
         <karaf.version>4.1.1</karaf.version>
         <scanPath>io.openex</scanPath>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <modules>

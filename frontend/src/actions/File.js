@@ -23,3 +23,8 @@ export const downloadFile = (fileId, filename) => (dispatch) => {
 export const dataFile = (fileId) => (dispatch) => {
     return fileDownload('/api/files/' + fileId)(dispatch)
 }
+
+export const getImportFileSheetsName = (fileId) => (dispatch) => {
+    let uri = '/api/files/sheets/' + fileId 
+    return getReferential(schema.fileSheet, uri)(dispatch)   
+}

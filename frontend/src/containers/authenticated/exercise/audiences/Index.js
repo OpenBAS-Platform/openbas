@@ -7,6 +7,7 @@ import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchAudiences} from '../../../../actions/Audience'
+import {fetchGroups} from '../../../../actions/Group'
 import {SearchField} from '../../../../components/SimpleTextField'
 import {Icon} from '../../../../components/Icon'
 import {List} from '../../../../components/List'
@@ -49,6 +50,7 @@ class IndexAudiences extends Component {
 
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId)
+    this.props.fetchGroups()
   }
 
   handleSearchAudiences(event, value) {
@@ -72,21 +74,29 @@ class IndexAudiences extends Component {
       <div style={styles.container}>
         <div style={styles.title}><T>Audiences</T></div>
         <div style={styles.search}>
-          <SearchField name="keyword" fullWidth={true} type="text" hintText="Search"
-                       onChange={this.handleSearchAudiences.bind(this)}
-                       styletype={Constants.FIELD_TYPE_RIGHT}/>
+          <SearchField
+            name="keyword"
+            fullWidth={true}
+            type="text"
+            hintText="Search"
+            onChange={this.handleSearchAudiences.bind(this)}
+            styletype={Constants.FIELD_TYPE_RIGHT}
+          />
         </div>
         <div className="clearfix"></div>
-        {this.props.audiences.length === 0 ?
-          <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div> : ""}
+        {
+          this.props.audiences.length === 0 ?
+            <div style={styles.empty}><T>You do not have any audiences in this exercise.</T></div>
+          :
+            ""
+        }
         <List>
             {filteredAudiences.map(audience => {
               return (
                 <MainListItemLink
                   to={'/private/exercise/' + this.props.exerciseId + '/audiences/' + audience.audience_id}
                   key={audience.audience_id}
-                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}
-                                  color={this.switchColor(!audience.audience_enabled)}/>}
+                  leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} color={this.switchColor(!audience.audience_enabled)}/>}
                   primaryText={
                     <div style={{color: this.switchColor(!audience.audience_enabled)}}>
                       {audience.audience_name}
@@ -98,13 +108,21 @@ class IndexAudiences extends Component {
                       <T>players</T>
                     </div>
                   }
-                  rightIcon={<Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
-                                   color={this.switchColor(!audience.audience_enabled)}/>}
+                  rightIcon={
+                    <Icon
+                      name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
+                      color={this.switchColor(!audience.audience_enabled)}
+                    />
+                  }
                 />
               )
             })}
         </List>
-        <CreateAudience exerciseId={this.props.exerciseId}/>
+
+        {this.props.userCanUpdate ?
+          <CreateAudience exerciseId={this.props.exerciseId}/>
+          : ""
+        }
       </div>
     )
   }
@@ -113,7 +131,9 @@ class IndexAudiences extends Component {
 IndexAudiences.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
+  fetchGroups: PropTypes.func,
   fetchAudiences: PropTypes.func.isRequired,
+  userCanUpdate: PropTypes.bool
 }
 
 const filteredAudiences = (audiences, exerciseId) => {
@@ -125,14 +145,48 @@ const filteredAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences)
 }
 
+const checkUserCanUpdate = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
+
+  return userCanUpdate
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let audiences = filteredAudiences(state.referential.entities.audiences, exerciseId)
+  let userCanUpdate = checkUserCanUpdate(state, ownProps)
 
   return {
     exerciseId,
-    audiences
+    audiences,
+    userCanUpdate
   }
 }
 
-export default connect(select, {fetchAudiences})(IndexAudiences);
+export default connect(select, {
+  fetchAudiences,
+  fetchGroups
+})(IndexAudiences);

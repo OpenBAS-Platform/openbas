@@ -114,3 +114,73 @@ div.line .active ~ li::before {
 div.clearfix {
   clear: both;
 }
+
+.time-line-ctnr .time-line {
+  position: relative;
+  margin: 0 0 0px 0;
+  padding: 0;
+  list-style: none;
+}
+.time-line-ctnr .time-line:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -10px;
+  width: 2px;
+  background: #3498db;
+  left: 32px;
+  border-radius: 2px;
+}
+.time-line-ctnr .time-line > .time-label > span {
+  font-weight: 600;
+  padding: 5px 10px;
+  display: inline-block;
+  background-color: #e74c3c;
+  color: #fff;
+  border-radius: 2px;
+  font-size: 14px;
+}
+.time-line-ctnr .time-line > li {
+  position: relative;
+  margin-bottom: 10px;
+  margin-right: 0;
+}
+.time-line-ctnr .time-line > li > .time-line-item {
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  background: #fff;
+  color: #444;
+  margin-right: 15px;
+  position: relative;
+  margin-left: 50px;
+}
+.time-line-ctnr .time-line > li > .time-line-item > .time-line-header,
+.time-line-ctnr .time-line > li > .time-line-item .time {
+  font-size: 14px;
+  padding: 6px 10px;
+}
+.time-line-ctnr .time-line > li > .time-line-item .time {
+  font-size: 12px;
+  color: #999;
+  float: right;
+}
+.time-line-ctnr .time-line > li > .time-line-item .time-line-header {
+  margin: 0;
+  color: #555;
+  border-bottom: 1px solid #f4f4f4;
+  line-height: 1.1;
+}
+.time-line-ctnr .time-line > li > .fa {
+  position: absolute;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  color: #666;
+  background: #ecf0f1;
+  left: 28px;
+  top: 9px;
+  border: 2px solid #3498db;
+  display: inline-block;
+  box-sizing: border-box;
+}

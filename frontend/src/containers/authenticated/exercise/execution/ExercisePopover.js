@@ -95,14 +95,15 @@ class ExercisePopover extends Component {
 
   render() {
     let exercise_disabled = R.propOr(false, 'exercise_canceled', this.props.exercise)
+    let exercise_is_updatable = R.propOr(false, 'user_can_update', this.props.exercise)
 
     const disableActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
+      exercise_is_updatable ? <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/> : ""
     ]
     const enableActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
+      exercise_is_updatable ? <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/> : ""
     ]
     const dryrunActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDryrun.bind(this)}/>,
@@ -118,9 +119,10 @@ class ExercisePopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
               <MenuItemLink label="Launch a dryrun" onClick={this.handleOpenDryrun.bind(this)}/>
-            {exercise_disabled ?
-              <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/> :
-              <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/>}
+              {(exercise_is_updatable)
+              ?
+               (exercise_disabled) ? <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/> : <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/>
+              : ""}
           </Menu>
         </Popover>
         <Dialog title="Confirmation" modal={false}

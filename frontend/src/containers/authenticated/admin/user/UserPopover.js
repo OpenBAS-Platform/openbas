@@ -119,7 +119,7 @@ class UserPopover extends Component {
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
       R.assoc('user_organization', organization_name), //Reformat organization
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_email2', 'user_organization', 'user_phone', 'user_phone2', 'user_phone3', 'user_pgp_key', 'user_admin'])
+      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_email2', 'user_organization', 'user_phone', 'user_phone2', 'user_phone3', 'user_pgp_key', 'user_admin', 'user_planificateur'])
     )(this.props.user)
 
     return (

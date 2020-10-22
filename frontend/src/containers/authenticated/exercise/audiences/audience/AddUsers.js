@@ -52,29 +52,45 @@ i18nRegister({
 class AddUsers extends Component {
   constructor(props) {
     super(props);
-    this.state = {openAddUsers: false, searchTerm: '', users: []}
+    this.state = {
+      openAddUsers: false,
+      searchTerm: '',
+      users: []
+    }
   }
 
   handleOpenAddUsers() {
-    this.setState({openAddUsers: true})
+    this.setState({
+      openAddUsers: true
+    })
   }
 
   handleCloseAddUsers() {
-    this.setState({openAddUsers: false, searchTerm: '', users: []})
+    this.setState({
+      openAddUsers: false,
+      searchTerm: '',
+      users: []
+    })
   }
 
   handleSearchUsers(event, value) {
-    this.setState({searchTerm: value})
+    this.setState({
+      searchTerm: value
+    })
   }
 
   addUser(user) {
-    if( !this.props.subaudienceUsersIds.includes(user.user_id) && !this.state.users.includes(user) ) {
-      this.setState({users: R.append(user, this.state.users)})
+    if (!this.props.subaudienceUsersIds.includes(user.user_id) && !this.state.users.includes(user)) {
+      this.setState({
+        users: R.append(user, this.state.users)
+      })
     }
   }
 
   removeUser(user) {
-    this.setState({users: R.filter(u => u.user_id !== user.user_id, this.state.users)})
+    this.setState({
+      users: R.filter(u => u.user_id !== user.user_id, this.state.users)
+    })
   }
 
   submitAddUsers() {
@@ -82,7 +98,12 @@ class AddUsers extends Component {
       R.map(u => u.user_id),
       R.concat(this.props.subaudienceUsersIds)
     )(this.state.users)
-    this.props.updateSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudienceId, {subaudience_users: usersList})
+    this.props.updateSubaudience(
+      this.props.exerciseId,
+      this.props.audienceId,
+      this.props.subaudienceId,
+      {subaudience_users: usersList}
+    )
     this.handleCloseAddUsers()
   }
 
@@ -96,33 +117,48 @@ class AddUsers extends Component {
     //region filter users by active keyword
     const keyword = this.state.searchTerm
     let filterByKeyword = n => keyword === '' ||
-    n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-    n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-    n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+      n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
+      n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
     let filteredUsers = R.filter(filterByKeyword, R.values(this.props.users))
     //endregion
 
     return (
       <div>
-        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
-                                     onClick={this.handleOpenAddUsers.bind(this)}/>
+        <FloatingActionsButtonCreate
+          type={Constants.BUTTON_TYPE_FLOATING_PADDING}
+          onClick={this.handleOpenAddUsers.bind(this)}
+        />
         <DialogTitleElement
-          title={<SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a user"
-                                  onChange={this.handleSearchUsers.bind(this)}
-                                  styletype={Constants.FIELD_TYPE_INTITLE} />}
+          title={
+            <SimpleTextField
+              name="keyword"
+              fullWidth={true}
+              type="text"
+              hintText="Search for a user"
+              onChange={this.handleSearchUsers.bind(this)}
+              styletype={Constants.FIELD_TYPE_INTITLE}
+            />
+          }
           modal={false}
           open={this.state.openAddUsers}
           onRequestClose={this.handleCloseAddUsers.bind(this)}
           autoScrollBodyContent={true}
-          actions={actions}>
+          actions={actions}
+        >
           <div>
             {this.state.users.map(user => {
               return (
                 <Chip
                   key={user.user_id}
                   onRequestDelete={this.removeUser.bind(this, user)}
-                  type={Constants.CHIP_TYPE_LIST}>
-                  <Avatar src={user.user_gravatar} size={32} type={Constants.AVATAR_TYPE_CHIP}/>
+                  type={Constants.CHIP_TYPE_LIST}
+                >
+                  <Avatar
+                    src={user.user_gravatar}
+                    size={32}
+                    type={Constants.AVATAR_TYPE_CHIP}
+                  />
                   {user.user_firstname} {user.user_lastname}
                 </Chip>
               )
@@ -179,4 +215,7 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchUsers, updateSubaudience})(AddUsers)
+export default connect(select, {
+  fetchUsers,
+  updateSubaudience
+})(AddUsers)

@@ -59,6 +59,14 @@ class NavBar extends Component {
                             to={'/private/exercise/' + this.props.id + '/audiences'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
+          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/documents'}
+                            to={'/private/exercise/' + this.props.id + '/documents'}
+                            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                                            name={Constants.ICON_NAME_ACTION_DOCUMENTS}/>}/>
+          <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/statistics'}
+                            to={'/private/exercise/' + this.props.id + '/statistics'}
+                            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                                            name={Constants.ICON_NAME_EDITOR_INSERT_CHART}/>}/>
           <IconListItemLink active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}
                             to={'/private/exercise/' + this.props.id + '/settings'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
@@ -79,6 +87,7 @@ NavBar.propTypes = {
   pathname: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
   open: PropTypes.bool,
+  exercise_type: PropTypes.string,
   loading: PropTypes.bool
 }
 

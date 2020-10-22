@@ -29,11 +29,13 @@ import RootAdmin from './containers/authenticated/admin/Root'
 import IndexAdmin from './containers/authenticated/admin/Index'
 import IndexAdminUsers from './containers/authenticated/admin/user/Index'
 import IndexAdminGroups from './containers/authenticated/admin/group/Index'
+import IndexAdminTests from './containers/authenticated/admin/tests/Index'
 import RootUser from './containers/authenticated/user/Root'
 import IndexUserProfile from './containers/authenticated/user/profile/Index'
 import RootExercise from './containers/authenticated/exercise/Root'
 import IndexExercise from './containers/authenticated/exercise/Index'
 import IndexExerciseSettings from './containers/authenticated/exercise/settings/Index'
+import IndexExerciseDocuments from './containers/authenticated/exercise/documents/Index'
 import IndexExerciseObjectives from './containers/authenticated/exercise/objective/Index'
 import IndexExerciseAudiences from './containers/authenticated/exercise/audiences/Index'
 import IndexExerciseAudiencesAudience from './containers/authenticated/exercise/audiences/audience/Index'
@@ -44,8 +46,9 @@ import IndexExerciseChecks from './containers/authenticated/exercise/check/Index
 import IndexExerciseDryrun from './containers/authenticated/exercise/check/Dryrun'
 import IndexExerciseComcheck from './containers/authenticated/exercise/check/Comcheck'
 import IndexExerciseLessons from './containers/authenticated/exercise/lessons/Index'
+import IndexExerciseStatistics from './containers/authenticated/exercise/statistics/Index'
 import Immutable from 'seamless-immutable'
-import { createLogger } from 'redux-logger'
+import {createLogger} from 'redux-logger'
 
 //Default application state
 const initialState = {
@@ -84,7 +87,10 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
 //Axios API
 export const api = (schema) => {
   let token = R.path(['logged', 'auth'], store.getState().app)
-  const instance = axios.create({withCredentials: true, headers: {'X-Authorization-Token': token, responseType: 'json'}})
+  const instance = axios.create({
+    withCredentials: true,
+    headers: {'X-Authorization-Token': token, responseType: 'json'}
+  })
   //Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(function (response) {
     const toImmutable = response.config.responseType === undefined //=== json
@@ -122,7 +128,7 @@ const history = syncHistoryWithStore(baseHistory, store)
 const authenticationToken = (state) => state.app.logged
 const UserIsAuthenticated = connectedReduxRedirect({
   redirectPath: '/login',
-  authenticatedSelector: state => authenticationToken(state),
+  authenticatedSelector: state => !(authenticationToken(state) === null || authenticationToken(state) === undefined),
   redirectAction: routerActions.replace,
   wrapperDisplayName: 'UserIsAuthenticated'
 })
@@ -163,6 +169,7 @@ const select = (state) => {
 const ConnectedIntl = connect(select)(IntlWrapper)
 
 addLocaleData([...enLocaleData, ...frLocaleData]);
+
 class App extends Component {
   render() {
     return (
@@ -181,6 +188,7 @@ class App extends Component {
                   <Route path='index' component={IndexAdmin}/>
                   <Route path='users' component={IndexAdminUsers}/>
                   <Route path='groups' component={IndexAdminGroups}/>
+                  <Route path='tests' component={IndexAdminTests}/>
                 </Route>
                 <Route path='user' component={RootUser}>
                   <Route path='profile' component={IndexUserProfile}/>
@@ -199,6 +207,8 @@ class App extends Component {
                   <Route path='audiences' component={IndexExerciseAudiences}/>
                   <Route path='audiences/:audienceId' component={IndexExerciseAudiencesAudience}/>
                   <Route path='calendar' component={IndexExercise}/>
+                  <Route path='documents' component={IndexExerciseDocuments}/>
+                  <Route path='statistics' component={IndexExerciseStatistics}/>
                   <Route path='settings' component={IndexExerciseSettings}/>
                   <Route path='profile' component={IndexUserProfile}/>
                 </Route>

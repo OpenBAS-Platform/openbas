@@ -6,6 +6,7 @@ import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {fetchEvents} from '../../../../actions/Event'
+import {fetchGroups} from '../../../../actions/Group'
 import {Icon} from '../../../../components/Icon'
 import {List} from '../../../../components/List'
 import {MainListItemLink} from '../../../../components/list/ListItem'
@@ -38,6 +39,7 @@ i18nRegister({
 class IndexScenario extends Component {
   componentDidMount() {
     this.props.fetchEvents(this.props.exerciseId);
+    this.props.fetchGroups()
   }
 
   render() {
@@ -64,7 +66,11 @@ class IndexScenario extends Component {
             )
           })}
         </List>
-        <CreateEvent exerciseId={this.props.exerciseId}/>
+
+        {this.props.userCanUpdate ?
+          <CreateEvent exerciseId={this.props.exerciseId}/>
+          : ""
+        }
       </div>
     )
   }
@@ -73,7 +79,9 @@ class IndexScenario extends Component {
 IndexScenario.propTypes = {
   exerciseId: PropTypes.string,
   events: PropTypes.array,
+  fetchGroups: PropTypes.func,
   fetchEvents: PropTypes.func.isRequired,
+  userCanUpdate: PropTypes.bool
 }
 
 const filteredEvents = (events, exerciseId) => {
@@ -85,14 +93,48 @@ const filteredEvents = (events, exerciseId) => {
   return eventsFilterAndSorting(events)
 }
 
+const checkUserCanUpdate = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
+
+  return userCanUpdate
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let events = filteredEvents(state.referential.entities.events, exerciseId)
+  let userCanUpdate = checkUserCanUpdate(state, ownProps)
 
   return {
     exerciseId,
-    events
+    events,
+    userCanUpdate,
   }
 }
 
-export default connect(select, {fetchEvents})(IndexScenario);
+export default connect(select, {
+  fetchEvents,
+  fetchGroups
+})(IndexScenario);

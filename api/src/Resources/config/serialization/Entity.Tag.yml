@@ -1,0 +1,6 @@
+App\Entity\Tag:
+    attributes:
+        tag_id:
+            groups: ['tag']
+        tag_name:
+            groups: ['tag']

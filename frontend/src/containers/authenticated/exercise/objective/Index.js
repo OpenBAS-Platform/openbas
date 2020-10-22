@@ -12,6 +12,7 @@ import {Icon} from '../../../../components/Icon'
 import {FlatButton} from '../../../../components/Button'
 import {fetchObjectives} from '../../../../actions/Objective'
 import {fetchSubobjectives} from '../../../../actions/Subobjective'
+import {fetchGroups} from '../../../../actions/Group'
 import ObjectivePopover from './ObjectivePopover'
 import SubobjectivePopover from './SubobjectivePopover'
 import CreateObjective from './CreateObjective'
@@ -28,7 +29,9 @@ i18nRegister({
 })
 
 const styles = {
-  container: {},
+  'container': {
+    paddingBottom: '50px'
+  },
   'empty': {
     marginTop: 30,
     fontSize: '18px',
@@ -56,6 +59,7 @@ class IndexObjective extends Component {
   componentDidMount() {
     this.props.fetchObjectives(this.props.exerciseId)
     this.props.fetchSubobjectives(this.props.exerciseId)
+    this.props.fetchGroups()
   }
 
   handleOpenObjective(objective) {
@@ -99,7 +103,15 @@ class IndexObjective extends Component {
                 return <SecondaryListItem
                   key={subobjective_id}
                   onClick={this.handleOpenSubobjective.bind(this, subobjective)}
-                  rightIconButton={<SubobjectivePopover exerciseId={exerciseId} objectiveId={objective.objective_id} subobjective={subobjective}/>}
+                  rightIconButton={
+                    this.props.userCanUpdate ?
+                      <SubobjectivePopover
+                        exerciseId={exerciseId}
+                        objectiveId={objective.objective_id}
+                        subobjective={subobjective}
+                      />
+                      : ""
+                  }
                   leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
                   primaryText={
                     <div>
@@ -117,7 +129,11 @@ class IndexObjective extends Component {
                 key={objective.objective_id}
                 onClick={this.handleOpenObjective.bind(this, objective)}
                 leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}/>}
-                rightIconButton={<ObjectivePopover exerciseId={exerciseId} objective={objective}/>}
+                rightIconButton={
+                  this.props.userCanUpdate ?
+                    <ObjectivePopover exerciseId={exerciseId} objective={objective}/>
+                    : ""
+                }
                 primaryText={
                   <div>
                     <span style={styles.priority}>{objective.objective_priority}</span>
@@ -130,6 +146,7 @@ class IndexObjective extends Component {
             )
           })}
         </List>
+
         <Dialog
           title={R.propOr('-', 'objective_title', this.state.currentObjective)}
           modal={false}
@@ -139,6 +156,7 @@ class IndexObjective extends Component {
           actions={objectiveActions}>
           <ObjectiveView objective={this.state.currentObjective} />
         </Dialog>
+
         <Dialog
           title={R.propOr('-', 'subobjective_title', this.state.currentSubobjective)}
           modal={false}
@@ -148,14 +166,16 @@ class IndexObjective extends Component {
           actions={subobjectiveActions}>
           <SubobjectiveView subobjective={this.state.currentSubobjective} />
         </Dialog>
-        <CreateObjective exerciseId={exerciseId}/>
+
+        {this.props.userCanUpdate ? <CreateObjective exerciseId={exerciseId}/> : "" }
       </div>
     } else {
       return <div style={styles.container}>
         <div style={styles.title}><T>Objectives</T></div>
         <div className="clearfix"></div>
         <div style={styles.empty}><T>You do not have any objectives in this exercise.</T></div>
-        <CreateObjective exerciseId={exerciseId}/>
+
+        {this.props.userCanUpdate ? <CreateObjective exerciseId={exerciseId}/> : "" }
       </div>
     }
   }
@@ -167,6 +187,7 @@ IndexObjective.propTypes = {
   subobjectives: PropTypes.object,
   fetchObjectives: PropTypes.func.isRequired,
   fetchSubobjectives: PropTypes.func.isRequired,
+  userCanUpdate: PropTypes.bool
 }
 
 const filterObjectives = (objectives, exerciseId) => {
@@ -187,15 +208,51 @@ const filterSubobjectives = (subobjectives) => {
   return subobjectivesSorting(subobjectives)
 }
 
+const checkUserCanUpdate = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
+
+  return userCanUpdate
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let objectives = filterObjectives(state.referential.entities.objectives, exerciseId)
   let subobjectives = filterSubobjectives(state.referential.entities.subobjectives)
+  let userCanUpdate = checkUserCanUpdate(state, ownProps)
+
   return {
     exerciseId,
     objectives,
-    subobjectives
+    subobjectives,
+    userCanUpdate
   }
 }
 
-export default connect(select, {fetchObjectives, fetchSubobjectives})(IndexObjective);
+export default connect(select, {
+  fetchObjectives,
+  fetchSubobjectives,
+  fetchGroups
+})(IndexObjective);

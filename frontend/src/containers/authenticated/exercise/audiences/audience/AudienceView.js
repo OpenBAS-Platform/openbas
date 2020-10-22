@@ -38,7 +38,7 @@ class AudienceView extends Component {
     }
 
     let subaudiences = []
-    if( this.props.audience ) {
+    if (this.props.audience) {
       subaudiences = filterSubaudiences(this.props.subaudiences, this.props.audience.audience_id)
     }
 
@@ -55,15 +55,14 @@ class AudienceView extends Component {
                 let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
                 let organizationName = R.propOr('-', 'organization_name', user_organization)
 
-                return <SecondarySmallListItem
-                  key={user_id}
-                  leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
-                  primaryText={
-                    <div>
-                      {user_firstname} {user_lastname}
-                    </div>
-                  }
-                  secondaryText={organizationName}/>
+                return (
+                  <SecondarySmallListItem
+                    key={user_id}
+                    leftAvatar={<Avatar type={Constants.AVATAR_TYPE_MAINLIST} src={user_gravatar}/>}
+                    primaryText={<div>{user_firstname} {user_lastname}</div>}
+                    secondaryText={organizationName}
+                  />
+                )
               }
             )
 
@@ -99,4 +98,7 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {fetchUsers, fetchOrganizations})(AudienceView)
+export default connect(select, {
+  fetchUsers,
+  fetchOrganizations
+})(AudienceView)

@@ -1,0 +1,38 @@
+App\Entity\Inject:
+    attributes:
+        inject_id:
+            groups: ['inject', 'audience', 'subaudience', 'incident']
+        inject_title:
+            groups: ['inject']
+        inject_description:
+            groups: ['inject']
+        inject_content:
+            groups: ['inject']
+        inject_date:
+            groups: ['inject']
+        inject_type:
+            groups: ['inject']
+        inject_status:
+            groups: ['inject']
+        inject_enabled:
+            groups: ['inject']
+        inject_incident:
+            groups: ['inject']
+        inject_audiences:
+            groups: ['inject']
+        inject_subaudiences:
+            groups: ['inject']
+        inject_all_audiences:
+            groups: ['inject']
+        inject_user:
+            groups: ['inject']
+        inject_exercise:
+            groups: ['inject']
+        inject_event:
+            groups: ['inject']
+        inject_users_number:
+            groups: ['inject']
+        user_can_update:
+            groups: ['inject']
+        user_can_delete:
+            groups: ['inject']

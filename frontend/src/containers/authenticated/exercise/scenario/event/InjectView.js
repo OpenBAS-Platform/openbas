@@ -71,21 +71,33 @@ class InjectView extends Component {
         <br />
         {inject_fields.map(field => {
           if (R.indexOf(field.key, displayedAsText) !== -1) {
-            return <div key={field.key}>
-              <strong><T>{field.key}</T></strong><br />
-              <div dangerouslySetInnerHTML={{__html: field.value}}></div>
-              <br />
-            </div>
+            return (
+              <div key={field.key}>
+                <strong><T>{field.key}</T></strong><br />
+                <div dangerouslySetInnerHTML={{__html: field.value}}></div>
+                <br />
+              </div>
+            )
           } else if (R.indexOf(field.key, displayedAsList) !== -1) {
-            return <div key={field.key}>
-              <strong><T>{field.key}</T></strong><br />
-              {field.value.map(v => {
-                let file_name = R.propOr('-', 'file_name', v)
-                let file_id = R.propOr('-', 'file_id', v)
-                return <div key={v.file_name} style={styles.link} dangerouslySetInnerHTML={{__html: file_name}} onClick={this.props.downloadAttachment.bind(this, file_id, file_name)}></div>
-              })}
-              <br />
-            </div>
+            return (
+              <div key={field.key}>
+                <strong><T>{field.key}</T></strong>
+                <br />
+                {field.value.map(v => {
+                  let document_name = R.propOr('-', 'document_name', v)
+                  let document_id = R.propOr('-', 'document_id', v)
+                  return (
+                    <div
+                      key={v.document_name}
+                      style={styles.link}
+                      dangerouslySetInnerHTML={{__html: document_name}}
+                      onClick={this.props.downloadAttachment.bind(this, document_id, document_name)}
+                    ></div>
+                  )
+                })}
+                <br />
+              </div>
+            )
           } else {
             return ''
           }

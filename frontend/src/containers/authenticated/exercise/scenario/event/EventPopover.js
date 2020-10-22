@@ -13,7 +13,9 @@ import {IconButton, FlatButton} from '../../../../../components/Button'
 import {Icon} from '../../../../../components/Icon'
 import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
 import {updateEvent, deleteEvent, importEvent} from '../../../../../actions/Event'
+import {getPlanificateurUserForEvent, updatePlanificateurUserForEvent} from '../../../../../actions/Planificateurs'
 import EventForm from './EventForm'
+import PlanificateurEvent from '../../planificateurs/PlanificateurEvent'
 
 const style = {
   margin: '8px -30px 0 0'
@@ -33,15 +35,49 @@ class EventPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openPopover: false
+      exerciseOwner: '',
+      openPlanificateur: false,
+      planificateursEvent: []
     }
   }
 
   handlePopoverOpen(event) {
     event.stopPropagation()
+
     this.setState({
       openPopover: true,
       anchorEl: event.currentTarget,
+    })
+  }
+
+  handleClosePlanificateur() {
+    this.setState({openPlanificateur: false})
+  }
+
+  submitFormPlanificateur() {
+      this.props.updatePlanificateurUserForEvent(this.props.exerciseId, this.props.eventId, this.state.planificateursEvent)
+      this.setState({openPlanificateur: false})
+  }
+
+  handleOpenPlanificateur() {
+    this.props.getPlanificateurUserForEvent(this.props.exerciseId, this.props.eventId).then(data => {
+
+        this.setState({planificateursEvent: []})
+        let listePlanificateursEvent = [...this.state.planificateursEvent]
+        data.result.forEach(function(planificateur) {
+
+            let dataPlanificateur = {
+                user_id: planificateur.user_id,
+                user_firstname: planificateur.user_firstname,
+                user_lastname: planificateur.user_lastname,
+                user_email: planificateur.user_email,
+                is_planificateur_event: planificateur.is_planificateur_event
+            }
+            listePlanificateursEvent.push(dataPlanificateur)
+        })
+        this.setState({planificateursEvent: listePlanificateursEvent})
+        this.setState({openPopover: false})
+        this.setState({openPlanificateur: true})
     })
   }
 
@@ -60,6 +96,17 @@ class EventPopover extends Component {
     this.setState({
       openEdit: false
     })
+  }
+
+  handleCheckPlanificateur(userId, eventId, isChecked ) {
+
+      let liste_planificateurs = [...this.state.planificateursEvent]
+      liste_planificateurs.forEach(function(user) {
+          if (user.user_id === userId) {
+              user.is_planificateur_event = isChecked;
+          }
+      })
+      this.setState({planificateursEvent:liste_planificateurs})
   }
 
   onSubmitEdit(data) {
@@ -96,36 +143,23 @@ class EventPopover extends Component {
   }
 
   render() {
+    let event_is_updatable = R.propOr(true, 'user_can_update', this.props.event)
+    let event_is_deletable = R.propOr(true, 'user_can_delete', this.props.event)
+    let userCanUpdate = this.props.userCanUpdate
+
     const editActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      <FlatButton
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEdit.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)} />,
+      event_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)} />: ""
     ]
     const deleteActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      <FlatButton
-        key="delete"
-        label="Delete"
-        primary={true}
-        onClick={this.submitDelete.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)} />,
+      event_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)} />: ""
     ]
 
     let initialValues = R.pick(['event_title', 'event_description', 'event_order'], this.props.event)
+    let exerciseOwnerId = this.props.exerciseOwnerId
+    let userId = this.props.userId
+
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -134,13 +168,27 @@ class EventPopover extends Component {
         <Popover open={this.state.openPopover}
                  anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
+          {(event_is_updatable || event_is_deletable) && userCanUpdate
+          ?
           <Menu multiple={false}>
             <MenuItemLink label="Import" onClick={this.openFileDialog.bind(this)}/>
-            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
+            {(exerciseOwnerId === userId) ? <MenuItemLink label="Liste des planificateurs" onClick={this.handleOpenPlanificateur.bind(this)}/> : ""}
+            {event_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>: ""}
+            {event_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
           </Menu>
+          : ""}
           <input type="file" ref="fileUpload" style={{"display": "none"}} onChange={this.handleFileChange.bind(this)}/>
         </Popover>
+
+        <PlanificateurEvent
+            planificateursEvent={this.state.planificateursEvent}
+            eventId={this.props.eventId}
+            handleCheckPlanificateur={this.handleCheckPlanificateur.bind(this)}
+            openPlanificateur={this.state.openPlanificateur}
+            handleClosePlanificateur={this.handleClosePlanificateur.bind(this)}
+            submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
+        />
+
         <Dialog
           title="Confirmation"
           modal={false}
@@ -178,7 +226,20 @@ EventPopover.propTypes = {
   redirectToScenario: PropTypes.func,
   importEvent: PropTypes.func,
   children: PropTypes.node,
-  reloadEvent: PropTypes.func
+  reloadEvent: PropTypes.func,
+  getPlanificateurUserForEvent: PropTypes.func,
+  updatePlanificateurUserForEvent: PropTypes.func,
+  userCanUpdate: PropTypes.bool
 }
 
-export default connect(null, {updateEvent, deleteEvent, importEvent, redirectToScenario})(EventPopover)
+const select = (state, ownProps) => {
+    var userId = R.path(['logged', 'user'], state.app)
+    let exercise = R.prop(ownProps.exerciseId, state.referential.entities.exercises)
+    let exerciseOwnerId = R.prop('exercise_owner_id', exercise)
+  return {
+    exerciseOwnerId: exerciseOwnerId,
+    userId: userId
+  }
+}
+
+export default connect(select, {updatePlanificateurUserForEvent, getPlanificateurUserForEvent, updateEvent, deleteEvent, importEvent, redirectToScenario})(EventPopover)

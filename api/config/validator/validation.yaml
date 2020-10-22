@@ -1,0 +1,169 @@
+App\Entity\User:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: user_email
+    properties:
+        user_firstname:
+            - NotBlank: ~
+            - Type: string
+        user_lastname:
+            - NotBlank: ~
+            - Type: string
+        user_organization:
+            - NotBlank: ~
+        user_email:
+            - NotBlank: ~
+            - Email: ~
+        user_plain_password:
+            - Type: string
+
+App\Entity\Organization:
+    properties:
+        organization_name:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Group:
+    properties:
+        group_name:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Grant:
+    properties:
+        grant_name:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Credentials:
+    properties:
+        login:
+            - NotBlank: ~
+            - Type: string
+        password:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Exercise:
+    properties:
+        exercise_name:
+            - NotBlank: ~
+            - Type: string
+        exercise_subtitle:
+            - NotBlank: ~
+            - Type: string
+        exercise_description:
+            - NotBlank: ~
+            - Type: string
+        exercise_start_date:
+            - DateTime: ~
+            - NotBlank: ~
+        exercise_end_date:
+            - DateTime: ~
+            - NotBlank: ~
+
+App\Entity\Objective:
+    properties:
+        objective_title:
+            - NotBlank: ~
+            - Type: string
+        objective_description:
+            - NotBlank: ~
+            - Type: string
+        objective_priority:
+            - NotBlank: ~
+            - Type: integer
+
+App\Entity\Subobjective:
+    properties:
+        subobjective_title:
+            - NotBlank: ~
+            - Type: string
+        subobjective_description:
+            - NotBlank: ~
+            - Type: string
+        subobjective_priority:
+            - NotBlank: ~
+            - Type: integer
+
+App\Entity\Audience:
+    properties:
+        audience_name:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Subaudience:
+    properties:
+        subaudience_name:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Comcheck:
+    properties:
+        comcheck_audience:
+            - NotBlank: ~
+        comcheck_end_date:
+            - NotBlank: ~
+            - DateTime: ~
+        comcheck_subject:
+            - NotBlank: ~
+            - Type: string
+        comcheck_message:
+            - NotBlank: ~
+            - Type: string
+        comcheck_footer:
+            - NotBlank: ~
+            - Type: string
+
+App\Entity\Dryrun:
+    properties:
+        dryrun_speed:
+            - NotBlank: ~
+            - Type: integer
+
+App\Entity\Event:
+    properties:
+        event_title:
+            - NotBlank: ~
+            - Type: string
+        event_description:
+            - NotBlank: ~
+            - Type: string
+        event_order:
+            - Type: integer
+
+App\Entity\Incident:
+    properties:
+        incident_title:
+            - NotBlank: ~
+            - Type: string
+        incident_story:
+            - NotBlank: ~
+            - Type: string
+        incident_weight:
+            - NotBlank: ~
+        incident_order:
+            - Type: integer
+
+App\Entity\Inject:
+    properties:
+        inject_title:
+            - NotBlank: ~
+            - Type: string
+        inject_description:
+            - NotBlank: ~
+            - Type: string
+        inject_content:
+            - NotBlank: ~
+            - Type: string
+        inject_date:
+            - NotBlank: ~
+            - DateTime: ~
+
+App\Entity\Log:
+    properties:
+        log_title:
+            - NotBlank: ~
+            - Type: string
+        log_content:
+            - NotBlank: ~
+            - Type: string

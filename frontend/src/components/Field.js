@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import MUITextField from 'material-ui/TextField'
 import {Field} from 'redux-form'
 import {injectIntl} from 'react-intl'
-import RichTextEditor from 'react-rte'
+import CKEditor4 from 'ckeditor4-react'
 
 const styles = {
   global: {
@@ -22,6 +22,9 @@ const styles = {
     content: {
       color: 'black'
     }
+  },
+  minHeight: {
+    minHeight: '300px'
   }
 }
 
@@ -65,6 +68,7 @@ export const FormFieldIntl = (props) => (
          rows={props.rows}
          type={props.type}
          onFocus={props.onFocus}
+         onBlur={props.onBlur}
          onClick={props.onClick}
          onChange={props.onChange}
          component={renderTextField}/>
@@ -82,45 +86,66 @@ FormFieldIntl.propTypes = {
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
   onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
   onClick: PropTypes.func,
   onChange: PropTypes.func,
 }
 
-class renderRichEditor extends Component {
-
+class renderCKEditor extends Component {
   constructor(props) {
     super(props);
-    this.state = {value: RichTextEditor.createValueFromString(props.input.value, 'html')}
+
+    this.state = {
+      value: '',
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.onEditorChange = this.onEditorChange.bind(this);
+
+    // Get ckeditor file locally:
+    CKEditor4.editorUrl = '/ckeditor/ckeditor.js'
+    // Default location:
+    //CKEditor4.editorUrl = 'https://cdn.ckeditor.com/4.11.4/full/ckeditor.js'
   }
 
-  onChange(value) {
-    this.setState({value});
-    this.props.input.onChange(value.toString('html'))
+  onEditorChange(evt) {
+    this.setState({value: evt.editor.getData()});
+    this.props.input.onChange(evt.editor.getData().toString('html'))
   }
 
-  render () {
-    return (<div>
-      <div style={styles.richText.header}>{this.props.label}</div>
-      <div style={styles.richText.content}>
-        <RichTextEditor value={this.state.value} onChange={this.onChange.bind(this)}/>
+  handleChange(changeEvent) {
+    this.setState({value: changeEvent.target.value});
+  }
+
+  render() {
+    return (
+      <div style={styles.minHeight}>
+        <CKEditor4
+          data={this.props.input.value}
+          onChange={this.onEditorChange}
+        />
       </div>
-    </div>);
+    );
   }
 }
 
-renderRichEditor.propTypes = {
+renderCKEditor.propTypes = {
   input: PropTypes.object,
   label: PropTypes.string.isRequired,
 }
 
-const RichTextFieldIntl = (props) => (
-  <Field name={props.name} label={props.intl.formatMessage({id: props.label})} component={renderRichEditor}/>
+const CKEditorFieldIntl = (props) => (
+  <Field
+    name={props.name}
+    label={props.intl.formatMessage({id: props.label})}
+    component={renderCKEditor}
+  />
 )
 
-RichTextFieldIntl.propTypes = {
+CKEditorFieldIntl.propTypes = {
   intl: PropTypes.object,
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired
 }
 
-export const RichTextField = injectIntl(RichTextFieldIntl)
+export const CKEditorField = injectIntl(CKEditorFieldIntl)
