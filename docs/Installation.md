@@ -54,6 +54,11 @@ openex.api=http://url_of_the_application/api
 openex.token=administrator_token
 ```
 
+To get administrator token, please run this SQL query:
+```
+SELECT u.user_login, t.token_value FROM tokens t LEFT JOIN users u ON u.user_id = t.token_user WHERE u.user_admin = true;
+```
+
 You have to configure the file *openex_email.properties* with your own parameters. The file *openex_ovh_sms.properties* is for using the [OVH API](https://www.ovh.com) to send SMS.
 
 *Launch the worker*:
