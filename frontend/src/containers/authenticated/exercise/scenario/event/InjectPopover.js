@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import * as R from 'ramda'
 import {i18nRegister} from '../../../../../utils/Messages'
 import {T} from '../../../../../components/I18n'
-import {dateFormat, dateToISO} from '../../../../../utils/Time'
+import {dayFormat, timeFormat, dateToISO} from '../../../../../utils/Time'
 import Theme from '../../../../../components/Theme'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Popover} from '../../../../../components/Popover'
@@ -17,7 +17,7 @@ import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
 import {fetchIncident, selectIncident} from '../../../../../actions/Incident'
 import {downloadFile} from '../../../../../actions/File'
 import {redirectToEvent} from '../../../../../actions/Application'
-import {addInject, updateInject, deleteInject, tryInject, injectDone} from '../../../../../actions/Inject'
+import {addInject, updateInject, deleteInject, tryInject, injectDone, fetchInjectTypesExerciseSimple} from '../../../../../actions/Inject'
 import InjectForm from './InjectForm'
 import InjectContentForm from './InjectContentForm'
 import InjectAudiences from './InjectAudiences'
@@ -74,6 +74,7 @@ class InjectPopover extends Component {
       finished: false,
       injectData: null,
       injectResult: false,
+      inject_types: {},
       injectAttachments: R.propOr([], 'attachments', this.readJSON(R.propOr(null, 'inject_content', this.props.inject)))
     }
   }
@@ -88,67 +89,113 @@ class InjectPopover extends Component {
 
   handlePopoverOpen(event) {
     event.stopPropagation()
-    this.setState({openPopover: true, anchorEl: event.currentTarget})
+    this.setState({
+      openPopover: true,
+      anchorEl: event.currentTarget
+    })
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
+    this.setState({
+      openPopover: false
+    })
+  }
+
+  handleInitializeInject() {
+    this.props.fetchInjectTypesExerciseSimple().then(value => {
+      this.setState({
+        inject_types: value.result
+      })
+    })
   }
 
   handleOpenEdit() {
-    this.setState({openEdit: true})
+    if (this.state.stepIndex === 0) {
+        this.handleInitializeInject()
+    }
+    this.setState({
+      openEdit: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false, stepIndex: 0, finished: false, injectData: null})
+    this.setState({
+      openEdit: false,
+      stepIndex: 0,
+      finished: false,
+      injectData: null
+    })
   }
 
   onGlobalSubmit(data) {
-    this.setState({injectData: data})
+    this.setState({
+      injectData: data
+    })
   }
 
   onContentSubmit(data) {
     let injectData = this.state.injectData
     data.attachments = this.state.injectAttachments
     injectData.inject_content = JSON.stringify(data)
-    this.setState({injectData: injectData})
+    this.setState({
+      injectData: injectData
+    })
   }
 
   onContentAttachmentAdd(file) {
-    this.setState({injectAttachments: R.append(file, this.state.injectAttachments)})
+    this.setState({
+      injectAttachments: R.append(file, this.state.injectAttachments)
+    })
   }
 
   onContentAttachmentDelete(name, event) {
     event.stopPropagation()
-    this.setState({injectAttachments: R.filter(a => a.file_name !== name, this.state.injectAttachments)})
+    this.setState({
+      injectAttachments: R.filter(
+        a => a.file_name !== name,
+        this.state.injectAttachments
+      )
+    })
   }
 
   onAudiencesChange(data) {
     let injectData = this.state.injectData
     injectData.inject_audiences = data
-    this.setState({injectData: injectData})
+    this.setState({
+      injectData: injectData
+    })
   }
 
   onSubaudiencesChange(data) {
     let injectData = this.state.injectData
     injectData.inject_subaudiences = data
-    this.setState({injectData: injectData})
+    this.setState({
+      injectData: injectData
+    })
   }
 
   onSelectAllAudiences(value) {
     let injectData = this.state.injectData
     injectData.inject_all_audiences = value
-    this.setState({injectData: injectData})
+    this.setState({
+      injectData: injectData
+    })
   }
 
   submitFormEdit() {
-    if (this.state.stepIndex === 0) {
-      this.refs.injectForm.submit()
-    } else if (this.state.stepIndex === 1) {
-      this.refs.contentForm.getWrappedInstance().submit()
-    } else if (this.state.stepIndex === 2) {
-      this.updateInject()
+    switch (this.state.stepIndex) {
+      case 0:
+        this.refs.injectForm.submit()
+        break;
+      case 1:
+        this.refs.contentForm.getWrappedInstance().submit()
+        break;
+      case 2:
+        this.updateInject()
+        break;
+      default:
+
     }
   }
 
@@ -159,16 +206,22 @@ class InjectPopover extends Component {
   }
 
   onInjectTypeChange(event, index, value) {
-    this.setState({type: value})
+    this.setState({
+      type: value
+    })
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
+    this.setState({
+      openDelete: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({
+      openDelete: false
+    })
   }
 
   submitDelete() {
@@ -179,12 +232,16 @@ class InjectPopover extends Component {
   }
 
   handleOpenDisable() {
-    this.setState({openDisable: true})
+    this.setState({
+      openDisable: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseDisable() {
-    this.setState({openDisable: false})
+    this.setState({
+      openDisable: false
+    })
   }
 
   submitDisable() {
@@ -193,12 +250,16 @@ class InjectPopover extends Component {
   }
 
   handleOpenEnable() {
-    this.setState({openEnable: true})
+    this.setState({
+      openEnable: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseEnable() {
-    this.setState({openEnable: false})
+    this.setState({
+      openEnable: false
+    })
   }
 
   submitEnable() {
@@ -207,20 +268,28 @@ class InjectPopover extends Component {
   }
 
   selectContent() {
-    this.setState({stepIndex: 1})
+    this.setState({
+      stepIndex: 1
+    })
   }
 
   selectAudiences() {
-    this.setState({stepIndex: 2, finished: true})
+    this.setState({
+      stepIndex: 2, finished: true
+    })
   }
 
   handleOpenCopy() {
-    this.setState({openCopy: true})
+    this.setState({
+      openCopy: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseCopy() {
-    this.setState({openCopy: false})
+    this.setState({
+      openCopy: false
+    })
   }
 
   submitFormCopy() {
@@ -228,12 +297,16 @@ class InjectPopover extends Component {
   }
 
   handleOpenDone() {
-    this.setState({openDone: true})
+    this.setState({
+      openDone: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseDone() {
-    this.setState({openDone: false})
+    this.setState({
+      openDone: false
+    })
   }
 
   submitDone() {
@@ -263,17 +336,22 @@ class InjectPopover extends Component {
         this.props.redirectToEvent(this.props.exerciseId, incident.incident_event.event_id)
       })
     })
+
     this.props.selectIncident(this.props.exerciseId, incident.incident_event.event_id, data.incident_id)
     this.handleCloseCopy()
   }
 
   handleOpenTry() {
-    this.setState({openTry: true})
+    this.setState({
+      openTry: true
+    })
     this.handlePopoverClose()
   }
 
   handleCloseTry() {
-    this.setState({openTry: false})
+    this.setState({
+      openTry: false
+    })
   }
 
   submitTry() {
@@ -284,7 +362,9 @@ class InjectPopover extends Component {
   }
 
   handleCloseResult() {
-    this.setState({openResult: false})
+    this.setState({
+      openResult: false
+    })
   }
 
   downloadAttachment(file_id, file_name) {
@@ -301,14 +381,14 @@ class InjectPopover extends Component {
             onSubmitSuccess={this.selectContent.bind(this)}
             initialValues={initialValues}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
-            types={this.props.inject_types}/>
+            types={this.state.inject_types}/>
         )
       case 1:
         return (
           <InjectContentForm
             ref="contentForm"
             initialValues={this.readJSON(initialValues.inject_content)}
-            types={this.props.inject_types}
+            types={this.state.inject_types}
             type={this.state.type ? this.state.type : this.props.inject.inject_type}
             onSubmit={this.onContentSubmit.bind(this)}
             onSubmitSuccess={this.selectAudiences.bind(this)}
@@ -350,22 +430,26 @@ class InjectPopover extends Component {
   }
 
   render() {
+
+    let inject_is_updatable = R.propOr(true, 'user_can_update', this.props.inject)
+    let inject_is_deletable = R.propOr(true, 'user_can_delete', this.props.inject)
+    let userCanUpdate = this.props.userCanUpdate
+
     const editActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton key="update" label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true}
-                  onClick={this.submitFormEdit.bind(this)}/>,
+      inject_is_updatable && userCanUpdate ? <FlatButton key="update" label={this.state.stepIndex === 2 ? "Update" : "Next"} primary={true} onClick={this.submitFormEdit.bind(this)}/> : ""
     ]
     const deleteActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
+      inject_is_deletable && userCanUpdate ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/> : ""
     ]
     const disableActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
+      inject_is_updatable && userCanUpdate ? <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>: ""
     ]
     const enableActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
+      inject_is_updatable && userCanUpdate ? <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>: ""
     ]
     const copyActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCopy.bind(this)}/>,
@@ -384,23 +468,34 @@ class InjectPopover extends Component {
     ]
 
     let initPipe = R.pipe(
-      R.assoc('inject_date', dateFormat(R.path(['inject', 'inject_date'], this.props))),
-      R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date', 'inject_type'])
+      R.assoc('inject_date_only', dayFormat(R.path(['inject', 'inject_date'], this.props))),
+      R.assoc('inject_time', timeFormat(R.path(['inject', 'inject_date'], this.props))),
+      R.pick(['inject_title', 'inject_description', 'inject_content', 'inject_date_only', 'inject_time', 'inject_type', 'inject_date'])
     )
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined
     let inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject)
     let inject_type = R.propOr(true, 'inject_type', this.props.inject)
-    let injectNotSupported = R.propOr(false, inject_type, this.props.inject_types) ? false : true
+    let injectNotSupported = !R.propOr(false, inject_type, this.props.inject_types)
+
+    if (!userCanUpdate) {
+      return ""
+    }
 
     return (
       <div style={styles[this.props.type]}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-                color={this.switchColor(!inject_enabled || injectNotSupported)}/>
+          <Icon
+            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
+            color={this.switchColor(!inject_enabled || injectNotSupported)}
+          />
         </IconButton>
-        <Popover open={this.state.openPopover}
-                 anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handlePopoverClose.bind(this)}>
+
+        {userCanUpdate ?
+        <Popover
+          open={this.state.openPopover}
+          anchorEl={this.state.anchorEl}
+          onRequestClose={this.handlePopoverClose.bind(this)}
+        >
           <Menu multiple={false}>
             {!injectNotSupported ?
               <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ''}
@@ -414,9 +509,13 @@ class InjectPopover extends Component {
               <MenuItemButton label="Mark as done" onClick={this.handleOpenDone.bind(this)}/> : ''}
             {!injectNotSupported ?
               <MenuItemButton label="Test" onClick={this.handleOpenTry.bind(this)}/> : ''}
-            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
+            {inject_is_deletable ?
+              <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/> : ""}
           </Menu>
         </Popover>
+        : ""
+      }
+
         <DialogTitleElement
           title="Confirmation"
           modal={false}
@@ -425,6 +524,7 @@ class InjectPopover extends Component {
           actions={deleteActions}>
           <T>Do you want to delete this inject?</T>
         </DialogTitleElement>
+
         <DialogTitleElement
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
@@ -449,50 +549,72 @@ class InjectPopover extends Component {
           modal={false}
           open={this.state.openEdit}
           onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}>
+          actions={editActions}
+        >
           <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
         </DialogTitleElement>
-        <Dialog title="Confirmation" modal={false}
-                open={this.state.openDisable}
-                onRequestClose={this.handleCloseDisable.bind(this)}
-                actions={disableActions}>
+
+        <Dialog
+          title="Confirmation"
+          modal={false}
+          open={this.state.openDisable}
+          onRequestClose={this.handleCloseDisable.bind(this)}
+          actions={disableActions}
+        >
           <T>Do you want to disable this inject?</T>
         </Dialog>
-        <Dialog title="Confirmation" modal={false}
-                open={this.state.openEnable}
-                onRequestClose={this.handleCloseEnable.bind(this)}
-                actions={enableActions}>
+        <Dialog
+          title="Confirmation"
+          modal={false}
+          open={this.state.openEnable}
+          onRequestClose={this.handleCloseEnable.bind(this)}
+          actions={enableActions}
+        >
           <T>Do you want to enable this inject?</T>
         </Dialog>
-        <Dialog title="Done" modal={false}
-                open={this.state.openDone}
-                onRequestClose={this.handleCloseDone.bind(this)}
-                actions={doneActions}>
+        <Dialog
+          title="Done"
+          modal={false}
+          open={this.state.openDone}
+          onRequestClose={this.handleCloseDone.bind(this)}
+          actions={doneActions}
+        >
           <T>Do you want to mark this inject as done?</T>
         </Dialog>
-        <Dialog title="Copy" modal={false}
-                open={this.state.openCopy}
-                onRequestClose={this.handleCloseCopy.bind(this)}
-                actions={copyActions}>
-          <CopyForm ref="copyForm"
-                    incidents={this.props.incidents}
-                    onSubmit={this.onCopySubmit.bind(this)}
-                    onSubmitSuccess={this.handleCloseCopy.bind(this)}/>
+        <Dialog
+          title="Copy"
+          modal={false}
+          open={this.state.openCopy}
+          onRequestClose={this.handleCloseCopy.bind(this)}
+          actions={copyActions}
+        >
+          <CopyForm
+            ref="copyForm"
+            incidents={this.props.incidents}
+            onSubmit={this.onCopySubmit.bind(this)}
+            onSubmitSuccess={this.handleCloseCopy.bind(this)}
+          />
         </Dialog>
-        <Dialog title="Test" modal={false}
-                open={this.state.openTry}
-                onRequestClose={this.handleCloseTry.bind(this)}
-                actions={tryActions}>
+        <Dialog
+          title="Test"
+          modal={false}
+          open={this.state.openTry}
+          onRequestClose={this.handleCloseTry.bind(this)}
+          actions={tryActions}
+        >
           <T>Do you want to test this inject?</T>
         </Dialog>
-        <Dialog title="Inject test result" modal={false}
-                open={this.state.openResult}
-                onRequestClose={this.handleCloseResult.bind(this)}
-                actions={resultActions}>
+        <Dialog
+          title="Inject test result"
+          modal={false}
+          open={this.state.openResult}
+          onRequestClose={this.handleCloseResult.bind(this)}
+          actions={resultActions}
+        >
           <div>
             <div><strong>{this.state.injectResult ? this.state.injectResult.status : ''}</strong></div>
             <br />
-            {this.state.injectResult ? this.state.injectResult.message.map(line => {
+            {this.state.injectResult && this.state.injectResult.message ? this.state.injectResult.message.map(line => {
               return <div key={Math.random()}>{line}</div>
             }) : ''}
           </div>
@@ -503,6 +625,7 @@ class InjectPopover extends Component {
 }
 
 InjectPopover.propTypes = {
+  fetchInjectTypesExerciseSimple: PropTypes.func,
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
   subaudiences: PropTypes.array,
@@ -525,7 +648,8 @@ InjectPopover.propTypes = {
   type: PropTypes.string,
   incidents: PropTypes.array,
   location: PropTypes.string,
-  downloadFile: PropTypes.func
+  downloadFile: PropTypes.func,
+  userCanUpdate: PropTypes.bool
 }
 
 export default connect(null, {
@@ -537,5 +661,6 @@ export default connect(null, {
   tryInject,
   redirectToEvent,
   selectIncident,
-  downloadFile
+  downloadFile,
+  fetchInjectTypesExerciseSimple
 })(InjectPopover)

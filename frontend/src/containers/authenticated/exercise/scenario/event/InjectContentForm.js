@@ -2,10 +2,11 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {reduxForm, change} from 'redux-form'
 import * as R from 'ramda'
-import {FormField, RichTextField} from '../../../../../components/Field'
+import {FormField, CKEditorField} from '../../../../../components/Field'
 import {T} from '../../../../../components/I18n'
 import {i18nRegister} from '../../../../../utils/Messages'
-import FileGallery from '../../../FileGallery'
+import {FlatButton} from '../../../../../components/Button'
+import DocumentGallery from '../../../DocumentGallery'
 import * as Constants from '../../../../../constants/ComponentTypes'
 import {Button} from '../../../../../components/Button'
 import {Dialog} from '../../../../../components/Dialog'
@@ -16,8 +17,11 @@ import {Avatar} from '../../../../../components/Avatar'
 import {injectIntl} from 'react-intl'
 
 const styles = {
-  'attachment': {
+  attachment: {
     margin: '10px 0px 0px -4px',
+  },
+  variables: {
+    fontSize: '14px'
   }
 }
 
@@ -43,19 +47,54 @@ i18nRegister({
 
 const validate = (values, props) => {
   const errors = {}
-  R.filter(f => f.mandatory, props.types[props.type].fields).forEach(field => {
-    const value = values[field.name]
-    if (!value) {
-      errors[field.name] = props.intl.formatMessage({id: 'Required'})
-    }
-  })
+  let current_type = undefined
+
+  if (Array.isArray(props.types)) {
+    props.types.forEach(type => {
+      if (type.type === props.type) {
+        current_type = type
+      }
+    })
+  }
+
+  if (current_type && Array.isArray(current_type.fields)) {
+    current_type.fields.forEach(field => {
+      const value = values[field.name]
+      if (field.mandatory && !value) {
+        errors[field.name] = props.intl.formatMessage({id: 'Required'})
+      }
+    })
+  }
+
   return errors
 }
 
 class InjectContentForm extends Component {
   constructor(props) {
     super(props);
-    this.state = {openGallery: false}
+
+    this.state = {
+      openGallery: false,
+      current_type: null
+    }
+
+    // dirty hack to get types
+    // when editing inject
+    if (Array.isArray(this.props.types)) {
+      this.props.types.forEach(type => {
+        if (type.type === this.props.type) {
+          // eslint-disable-next-line
+          this.state.current_type = type
+        }
+      })
+    // when creating inject
+    } else {
+      if (this.props.types[this.props.type]) {
+        // eslint-disable-next-line
+        this.state.current_type = this.props.types[this.props.type]
+      }
+    }
+
   }
 
   handleOpenGallery() {
@@ -71,44 +110,124 @@ class InjectContentForm extends Component {
     this.handleCloseGallery()
   }
 
+  handleDocumentSelection(selectedDocument) {
+    this.props.onContentAttachmentAdd(selectedDocument)
+    this.handleCloseGallery()
+  }
+
   render() {
     if (this.props.type === null) {
       return (<div><T>No content available for this inject type.</T></div>)
     }
 
+    const documentGalleryActions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onClick={this.handleCloseGallery.bind(this)}
+      />
+    ]
+
+    if (!this.state.current_type || !this.state.current_type.fields) {
+      return (<div><T>No type available for this inject.</T></div>)
+    }
+
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.types[this.props.type].fields.map(field => {
-          if (field.type === 'textarea') {
-            return <FormField key={field.name} name={field.name} fullWidth={true} multiLine={true} rows={3} type="text" label={field.name}/>
-          } else if (field.type === 'richtextarea') {
-            return <RichTextField key={field.name} name={field.name} label={field.name}/>
-          } else if (field.type === 'checkbox') {
-            return <div><br /><ToggleField key={field.name} name={field.name} label={<T>{field.name}</T>}/></div>
-          } else if (field.type === 'attachment') {
-            return <div key={field.name} style={styles.attachment}>
-              <Button label='Add an attachment' onClick={this.handleOpenGallery.bind(this)}/>
-              <Dialog modal={false} open={this.state.openGallery} onRequestClose={this.handleCloseGallery.bind(this)}>
-                <FileGallery fileSelector={this.handleFileSelection.bind(this)}/>
-              </Dialog>
-              <div>
-                {this.props.attachments.map(attachment => {
-                  let file_name = R.propOr('-', 'file_name', attachment)
-                  let file_id = R.propOr('-', 'file_id', attachment)
-                  return (
-                    <Chip key={file_name} onRequestDelete={this.props.onContentAttachmentDelete.bind(this, file_name)}
-                          type={Constants.CHIP_TYPE_LIST} onClick={this.props.downloadAttachment.bind(this, file_id, file_name)}>
-                      <Avatar icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>} size={32}
-                              type={Constants.AVATAR_TYPE_CHIP}/>
-                      {file_name}
-                    </Chip>
-                  )
-                })}
-                <div className="clearfix"></div>
-              </div>
-            </div>
-          } else {
-            return <FormField key={field.name} name={field.name} fullWidth={true} type="text" label={field.name}/>
+        {this.state.current_type.fields.map(field => {
+          switch (field.type) {
+            case 'textarea':
+              return <FormField
+                key={field.name}
+                name={field.name}
+                fullWidth={true}
+                multiLine={true}
+                rows={3}
+                type="text"
+                label={field.name}
+              />
+            case 'richtextarea':
+              return (
+                <div key={field.name}>
+                  <label>
+                    Message
+                    <CKEditorField
+                      key={field.name}
+                      name={field.name}
+                      label={field.name}
+                    />
+                  </label>
+                  <div style={styles.variables}>
+                    Les variables disponibles sont :
+                    <kbd>{'{{'}NOM{'}}'}</kbd>, <kbd>{'{{'}PRENOM{'}}'}</kbd> et <kbd>{'{{'}ORGANISATION{'}}'}</kbd>.
+                  </div>
+                </div>
+              )
+            case 'checkbox':
+              return (
+                <div key={field.name}>
+                  <br/>
+                  <ToggleField
+                    key={field.name}
+                    name={field.name}
+                    label={<T>{field.name}</T>}
+                  />
+                </div>
+              )
+            case 'attachment':
+              return (
+                <div
+                  key={field.name}
+                  style={styles.attachment}
+                >
+                  <Button
+                    label='Add an attachment'
+                    onClick={this.handleOpenGallery.bind(this)}
+                  />
+                  <Dialog
+                    modal={false}
+                    actions={documentGalleryActions}
+                    title="Selection d'un document"
+                    open={this.state.openGallery}
+                    onRequestClose={this.handleCloseGallery.bind(this)}
+                    contentStyle={{'width': '600px;', 'maxWidth': '70%'}}
+                  >
+                    <DocumentGallery fileSelector={this.handleDocumentSelection.bind(this)}/>
+                  </Dialog>
+                  <div>
+                    {this.props.attachments.map(attachment => {
+                      let document_name = R.propOr('-', 'document_name', attachment)
+                      let document_id = R.propOr('-', 'document_id', attachment)
+                      return (
+                        <Chip
+                          key={document_name}
+                          onRequestDelete={this.props.onContentAttachmentDelete.bind(this, document_name)}
+                          type={Constants.CHIP_TYPE_LIST}
+                          onClick={this.props.downloadAttachment.bind(this, document_id, document_name)}
+                        >
+                          <Avatar
+                            icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>}
+                            size={32}
+                            type={Constants.AVATAR_TYPE_CHIP}
+                          />
+                          {document_name}
+                        </Chip>
+                      )
+                    })}
+                    <div className="clearfix"></div>
+                  </div>
+                </div>
+              )
+            default:
+              return (
+                <FormField
+                  key={field.name}
+                  name={field.name}
+                  fullWidth={true}
+                  type="text"
+                  label={field.name}
+                />
+              )
           }
         })}
       </form>

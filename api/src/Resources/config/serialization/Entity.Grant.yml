@@ -1,0 +1,10 @@
+App\Entity\Grant:
+    attributes:
+        grant_id:
+            groups: ['grant', 'group', 'user', 'exercise']
+        grant_group:
+            groups: ['grant', 'user', 'exercise']
+        grant_exercise:
+            groups: ['grant', 'user', 'group']
+        grant_name:
+            groups: ['grant', 'group', 'user', 'exercise']

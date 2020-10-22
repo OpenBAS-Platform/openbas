@@ -105,47 +105,20 @@ class ObjectivePopover extends Component {
   }
 
   render() {
+    let objective_is_updatable = R.propOr(true, 'user_can_update', this.props.objective)
+    let objective_is_deletable = R.propOr(true, 'user_can_delete', this.props.objective)
+    
     const editActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      <FlatButton
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEdit.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
+      objective_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)} />: ""
     ]
     const deleteActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      <FlatButton
-        key="delete"
-        label="Delete"
-        primary={true}
-        onClick={this.submitDelete.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)} />,
+      objective_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)} />: ""
     ]
     const createSubobjectiveActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCreateSubobjective.bind(this)}
-      />,
-      <FlatButton
-        key="create"
-        label="Create"
-        primary={true}
-        onClick={this.submitFormCreateSubobjective.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreateSubobjective.bind(this)} />,
+      <FlatButton key="create" label="Create" primary={true} onClick={this.submitFormCreateSubobjective.bind(this)} />,
     ]
 
     let initialValues = R.pick(['objective_title', 'objective_description', 'objective_priority'], this.props.objective)
@@ -159,8 +132,8 @@ class ObjectivePopover extends Component {
                  onRequestClose={this.handlePopoverClose.bind(this)}>
           <Menu multiple={false}>
             <MenuItemLink label="Add a subobjective" onClick={this.handleOpenCreateSubobjective.bind(this)}/>
-            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
+            {objective_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ""}
+            {objective_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
           </Menu>
         </Popover>
         <Dialog

@@ -17,6 +17,7 @@ i18nRegister({
     'Lastname': 'Nom',
     'Organization': 'Organisation',
     'Administrator': 'Administrateur',
+    'Planner': 'Planificateur',
     'Phone number (fix)': 'Numéro de téléphone (fixe)',
     'Phone number (mobile)': 'Numéro de téléphone (mobile)',
     'Phone number (secondary)': 'Numéro de téléphone (secondaire)',
@@ -41,7 +42,8 @@ class UserForm extends Component {
         <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secondary)"/>
         <FormField name="user_pgp_key" fullWidth={true} multiLine={true} rows={5} type="text" label="PGP public key"/>
         {this.props.editing ? "" : <FormField name="user_plain_password" fullWidth={true} type="password" label="Password"/>}
-        <ToggleField name="user_admin" label={<T>Administrator</T>}/>
+        <ToggleField name="user_admin" label={<T>Administrator</T>}/><br/>
+        <ToggleField name="user_planificateur" label={<T>Planner</T>}/><br/>
       </form>
     )
   }

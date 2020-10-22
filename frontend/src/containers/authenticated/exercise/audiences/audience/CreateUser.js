@@ -45,18 +45,26 @@ class CreateUser extends Component {
 
     return (
       <div>
-        <FlatButton label="Create a new user"
-                    secondary={true}
-                    onClick={this.handleOpenCreate.bind(this)}
-                    type={Constants.BUTTON_TYPE_DIALOG_LEFT}/>
-        <Dialog title="Create a new user"
-                modal={false}
-                open={this.state.openCreate}
-                autoScrollBodyContent={true}
-                onRequestClose={this.handleCloseCreate.bind(this)}
-                actions={actionsCreateUser}>
-          <UserForm ref="userForm" onSubmit={this.onSubmitCreate.bind(this)} organizations={this.props.organizations}
-                    onSubmitSuccess={this.handleCloseCreate.bind(this)}/>
+        <FlatButton
+          label="Create a new user"
+          secondary={true}
+          onClick={this.handleOpenCreate.bind(this)}
+          type={Constants.BUTTON_TYPE_DIALOG_LEFT}
+        />
+        <Dialog
+          title="Create a new user"
+          modal={false}
+          open={this.state.openCreate}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseCreate.bind(this)}
+          actions={actionsCreateUser}
+        >
+          <UserForm
+            ref="userForm"
+            onSubmit={this.onSubmitCreate.bind(this)}
+            organizations={this.props.organizations}
+            onSubmitSuccess={this.handleCloseCreate.bind(this)}
+          />
         </Dialog>
       </div>
     )
@@ -75,4 +83,6 @@ const select = (state) => {
   }
 }
 
-export default connect(select, {addUser})(CreateUser);
+export default connect(select, {
+  addUser
+})(CreateUser);

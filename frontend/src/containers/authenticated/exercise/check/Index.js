@@ -9,6 +9,7 @@ import * as Constants from '../../../../constants/ComponentTypes'
 import {List} from '../../../../components/List'
 import {MainListItemLink} from '../../../../components/list/ListItem'
 import {Icon} from '../../../../components/Icon'
+import {fetchGroups} from '../../../../actions/Group'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchDryruns} from '../../../../actions/Dryrun'
 import {fetchComchecks} from '../../../../actions/Comcheck'
@@ -77,6 +78,7 @@ const styles = {
 
 class IndexExcerciseDryrun extends Component {
   componentDidMount() {
+    this.props.fetchGroups()
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchDryruns(this.props.exerciseId)
     this.props.fetchComchecks(this.props.exerciseId)
@@ -87,7 +89,10 @@ class IndexExcerciseDryrun extends Component {
       <div style={styles.container}>
         <div style={styles.columnLeft}>
           <div style={styles.title}><T>Dryruns</T></div>
-          <DryrunsPopover exerciseId={this.props.exerciseId}/>
+          {this.props.userCanUpdate ?
+            <DryrunsPopover exerciseId={this.props.exerciseId}/>
+            : ""
+          }
           <div className="clearfix"></div>
           {this.props.dryruns.length === 0 ?
             <div style={styles.empty}><T>You do not have any dryruns in this exercise.</T></div> : ""}
@@ -114,7 +119,10 @@ class IndexExcerciseDryrun extends Component {
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Comchecks</T></div>
-          <ComchecksPopover exerciseId={this.props.exerciseId} audiences={this.props.audiences}/>
+          {this.props.userCanUpdate ?
+            <ComchecksPopover exerciseId={this.props.exerciseId} audiences={this.props.audiences}/>
+            : ""
+          }
           <div className="clearfix"></div>
           {this.props.comchecks.length === 0 ?
             <div style={styles.empty}><T>You do not have any comchecks in this exercise.</T></div> : ""}
@@ -148,9 +156,11 @@ class IndexExcerciseDryrun extends Component {
 
 IndexExcerciseDryrun.propTypes = {
   exerciseId: PropTypes.string,
+  userCanUpdate: PropTypes.bool,
   audiences: PropTypes.array,
   dryruns: PropTypes.array,
   comchecks: PropTypes.array,
+  fetchGroups: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchDryruns: PropTypes.func,
   fetchComchecks: PropTypes.func
@@ -183,18 +193,54 @@ const filterAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences)
 }
 
+const checkUserCanUpdate = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
+
+  return userCanUpdate
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId)
   let comchecks = filterComchecks(state.referential.entities.comchecks, exerciseId)
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
+  let userCanUpdate = checkUserCanUpdate(state, ownProps)
 
   return {
     exerciseId,
+    userCanUpdate,
     audiences,
     dryruns,
     comchecks
   }
 }
 
-export default connect(select, {fetchAudiences, fetchDryruns, fetchComchecks})(IndexExcerciseDryrun)
+export default connect(select, {
+  fetchGroups,
+  fetchAudiences,
+  fetchDryruns,
+  fetchComchecks
+})(IndexExcerciseDryrun)

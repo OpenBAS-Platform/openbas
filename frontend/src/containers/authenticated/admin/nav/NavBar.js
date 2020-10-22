@@ -41,6 +41,10 @@ class NavBar extends Component {
                             to={'/private/admin/groups'}
                             leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
                                             name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
+          <IconListItemLink active={this.props.pathname.includes('/private/admin/tests')}
+                            to={'/private/admin/tests'}
+                            leftIcon={<Icon type={Constants.ICON_TYPE_NAVBAR}
+                                            name={Constants.ICON_NAME_TESTS}/>}/>                                                
         </List>
         <div style={styles.exit}>
           <Link to='/private' key='exit'>

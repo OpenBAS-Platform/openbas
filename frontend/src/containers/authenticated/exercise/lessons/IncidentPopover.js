@@ -75,17 +75,22 @@ class IncidentPopover extends Component {
     ]
 
     let initialValues = R.pick(['outcome_result', 'outcome_comment'], this.props.incident.incident_outcome)
+    let incident_is_updatable = R.propOr(false, 'user_can_update', this.props.incident)
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)} type={Constants.BUTTON_TYPE_MAINLIST2}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
-        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handlePopoverClose.bind(this)}>
-          <Menu multiple={false}>
-            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
-          </Menu>
-        </Popover>
+
+        {incident_is_updatable 
+        ?        
+          <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl} onRequestClose={this.handlePopoverClose.bind(this)}>
+            <Menu multiple={false}>
+              <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
+            </Menu>
+          </Popover>
+        :""}
+          
         <Dialog title="Update the outcome" modal={false} open={this.state.openEdit}
                 onRequestClose={this.handleCloseEdit.bind(this)}
                 actions={editActions}>

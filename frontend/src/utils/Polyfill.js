@@ -14,6 +14,8 @@ if (!Array.prototype.includes) {
 
 //For IE11
 
+require('core-js/fn/object/keys')
+
 if (!Array.prototype.fill) {
   require('core-js/fn/array/fill')
 }

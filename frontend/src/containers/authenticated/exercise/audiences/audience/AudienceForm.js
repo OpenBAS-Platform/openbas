@@ -40,4 +40,8 @@ AudienceForm.propTypes = {
   change: PropTypes.func
 }
 
-export default reduxForm({form: 'AudienceForm', validate}, null, {change})(AudienceForm)
+export default reduxForm(
+  {form: 'AudienceForm', validate},
+  null,
+  {change}
+)(AudienceForm)

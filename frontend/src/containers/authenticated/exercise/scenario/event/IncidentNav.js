@@ -17,7 +17,13 @@ class IncidentNav extends Component {
   render() {
     return (
       <Drawer width={300} docked={true} open={true} openSecondary={true} zindex={50}>
-        <CreateIncident exerciseId={this.props.exerciseId} eventId={this.props.eventId} incident_types={this.props.incident_types} subobjectives={this.props.subobjectives}/>
+          <CreateIncident
+            exerciseId={this.props.exerciseId}
+            eventId={this.props.eventId}
+            incident_types={this.props.incident_types}
+            subobjectives={this.props.subobjectives}
+            can_create={this.props.can_create}
+          />
         <List>
           {this.props.incidents.map(incident => {
             return (
@@ -44,7 +50,8 @@ IncidentNav.propTypes = {
   incident_types: PropTypes.object,
   incidents: PropTypes.array,
   subobjectives: PropTypes.array,
-  selectIncident: PropTypes.func
+  selectIncident: PropTypes.func,
+  can_create: PropTypes.bool
 }
 
 export default connect(null, {selectIncident})(IncidentNav);

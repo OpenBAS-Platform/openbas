@@ -16,6 +16,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {FlatButton} from '../../../../components/Button'
 import {fetchIncidents} from '../../../../actions/Incident'
 import {fetchLogs} from '../../../../actions/Log'
+import {fetchGroups} from '../../../../actions/Group'
 import {equalsSelector} from '../../../../utils/Selectors'
 import LogsPopover from './LogsPopover'
 import LogPopover from './LogPopover'
@@ -103,6 +104,7 @@ class IndexExerciseLessons extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchGroups()
     const initialStream = Rx.Observable.of(1); //Fetch on loading
     const intervalStream = Rx.Observable.interval(FIVE_SECONDS) //Fetch every five seconds
     this.subscription = initialStream
@@ -183,7 +185,10 @@ class IndexExerciseLessons extends Component {
         </div>
         <div style={styles.columnRight}>
           <div style={styles.title}><T>Exercise log</T></div>
-          <LogsPopover exerciseId={this.props.exerciseId}/>
+          {this.props.userCanUpdate ?
+            <LogsPopover exerciseId={this.props.exerciseId}/>
+            : ""
+          }
           <div className="clearfix"></div>
           {this.props.logs.length === 0 ?
             <div style={styles.empty}><T>You do not have any entries in the exercise log.</T></div> : ""}
@@ -227,6 +232,8 @@ IndexExerciseLessons.propTypes = {
   exerciseId: PropTypes.string,
   logs: PropTypes.array,
   incidents: PropTypes.array,
+  userCanUpdate: PropTypes.bool,
+  fetchGroups: PropTypes.func,
   fetchLogs: PropTypes.func,
   fetchIncidents: PropTypes.func
 }
@@ -258,13 +265,47 @@ const exerciseStatusSelector = (state, ownProps) => {
   return R.path([exerciseId, 'exercise_status'], state.referential.entities.exercises)
 }
 
+const checkUserCanUpdate = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
+
+  return userCanUpdate
+}
+
 const select = () => {
   return equalsSelector({ //Prevent view to refresh is nothing as changed (Using reselect)
     exerciseId: (state, ownProps) => ownProps.params.exerciseId,
     logs: filterLogs,
+    userCanUpdate: checkUserCanUpdate,
     incidents: filterIncidents,
     exercise_status: exerciseStatusSelector
   })
 }
 
-export default connect(select, {fetchLogs, fetchIncidents})(IndexExerciseLessons)
+export default connect(select, {
+  fetchGroups,
+  fetchLogs,
+  fetchIncidents
+})(IndexExerciseLessons)

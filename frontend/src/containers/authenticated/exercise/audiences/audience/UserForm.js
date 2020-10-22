@@ -23,15 +23,21 @@ i18nRegister({
 
 class UserForm extends Component {
   render() {
-    let dataSource  = R.map(val => val.organization_name, R.values(this.props.organizations))
+    let dataSource = R.map(val => val.organization_name, R.values(this.props.organizations))
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField name="user_email" fullWidth={true} type="text" label="Email address"/>
         <FormField name="user_email2" fullWidth={true} type="text" label="Email address (secondary)"/>
         <FormField name="user_firstname" fullWidth={true} type="text" label="Firstname"/>
         <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>
-        <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
-                           type="text" label="Organization" dataSource={dataSource}/>
+        <AutoCompleteField
+          filter={AutoComplete.caseInsensitiveFilter}
+          name="user_organization"
+          fullWidth={true}
+          type="text"
+          label="Organization"
+          dataSource={dataSource}
+        />
         <FormField name="user_phone2" fullWidth={true} type="text" label="Phone number (fix)"/>
         <FormField name="user_phone" fullWidth={true} type="text" label="Phone number (mobile)"/>
         <FormField name="user_phone3" fullWidth={true} type="text" label="Phone number (secondary)"/>
@@ -51,4 +57,6 @@ UserForm.propTypes = {
   organizations: PropTypes.object
 }
 
-export default reduxForm({form: 'UserForm'}, null, {change})(UserForm)
+export default reduxForm({form: 'UserForm'}, null, {
+  change
+})(UserForm)

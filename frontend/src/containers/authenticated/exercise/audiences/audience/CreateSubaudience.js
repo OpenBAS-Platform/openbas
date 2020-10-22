@@ -51,15 +51,36 @@ class CreateSubaudience extends Component {
 
     return (
       <div>
-        <AppBar title={<T>Sub-audiences</T>} showMenuIconButton={false}
-                iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                                                      onClick={this.handleOpenCreate.bind(this)} />}/>
-        <Dialog title="Create a new sub-audience" modal={false}
-                open={this.state.openCreate}
-                onRequestClose={this.handleCloseCreate.bind(this)}
-                actions={actions}>
-          <SubaudienceForm ref="subaudienceForm" onSubmit={this.onSubmitCreate.bind(this)}
-                        onSubmitSuccess={this.handleCloseCreate.bind(this)} />
+        {
+          (this.props.can_create) ?
+            <AppBar
+              title={<T>Sub-audiences</T>}
+              showMenuIconButton={false}
+              iconElementRight={
+                <ActionButtonCreate
+                  type={Constants.BUTTON_TYPE_CREATE_RIGHT}
+                  onClick={this.handleOpenCreate.bind(this)}
+                />
+              }
+            />
+          :
+            <AppBar
+              title={<T>Sub-audiences</T>}
+              showMenuIconButton={false}
+            />
+        }
+        <Dialog
+          title="Create a new sub-audience"
+          modal={false}
+          open={this.state.openCreate}
+          onRequestClose={this.handleCloseCreate.bind(this)}
+          actions={actions}
+        >
+          <SubaudienceForm
+            ref="subaudienceForm"
+            onSubmit={this.onSubmitCreate.bind(this)}
+            onSubmitSuccess={this.handleCloseCreate.bind(this)}
+          />
         </Dialog>
       </div>
     );
@@ -70,7 +91,11 @@ CreateSubaudience.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
   addSubaudience: PropTypes.func,
-  selectSubaudience: PropTypes.func
+  selectSubaudience: PropTypes.func,
+  can_create: PropTypes.bool
 }
 
-export default connect(null, {addSubaudience, selectSubaudience})(CreateSubaudience);
+export default connect(null, {
+  addSubaudience,
+  selectSubaudience
+})(CreateSubaudience);

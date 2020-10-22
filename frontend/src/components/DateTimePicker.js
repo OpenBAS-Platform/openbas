@@ -22,14 +22,13 @@ class DateTimePicker extends Component {
   }
 
   handleDateChange(event, date) {
-    var buildDateStr = dayFormat(date) + ' ' + timeFormat(this.state.datetime)
+    var buildDateStr = dayFormat(date)
     this.setState({datetime: parse(buildDateStr).toDate()})
-    this.refs.timePicker.openDialog()
+    this.props.handleResult(buildDateStr)
   }
 
   handleTimeChange(event, time) {
-    var buildDateStr = dayFormat(this.state.datetime) + ' ' + timeFormat(time)
-    this.setState({datetime: parse(buildDateStr).toDate()})
+    var buildDateStr = timeFormat(time)
     this.props.handleResult(buildDateStr)
   }
 
@@ -48,7 +47,9 @@ class DateTimePicker extends Component {
           locale={this.props.intl.locale}
           cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
           style={styles.global}
-          dialogContainerStyle={{zIndex: 2100}}/>
+          dialogContainerStyle={{zIndex: 2100}}
+        />
+
         <TimePicker
           name="Time"
           autoOk={true}
@@ -60,7 +61,8 @@ class DateTimePicker extends Component {
           floatingLabelText="Time"
           okLabel={<div style={{display: 'none'}}></div>}
           style={styles.global}
-          dialogStyle={{zIndex: 2100}}/>
+          dialogStyle={{zIndex: 2100}}
+        />
       </div>
     )
   }

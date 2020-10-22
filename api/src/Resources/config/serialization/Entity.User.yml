@@ -1,0 +1,42 @@
+App\Entity\User:
+    attributes:
+        user_id:
+            groups: ['user', 'token', 'group', 'subaudience', 'organization', 'comcheckStatus']
+        user_login:
+            groups: ['user', 'token']
+        user_firstname:
+            groups: ['user', 'token']
+        user_lastname:
+            groups: ['user', 'token']
+        user_email:
+            groups: ['user', 'token']
+        user_email2:
+            groups: ['user', 'token']
+        user_phone:
+            groups: ['user', 'token']
+        user_phone2:
+            groups: ['user', 'token']
+        user_phone3:
+            groups: ['user', 'token']
+        user_pgp_key:
+            groups: ['user', 'token']
+        user_organization:
+            groups: ['user', 'token']
+        user_gravatar:
+            groups: ['user', 'token']
+        user_admin:
+            groups: ['user', 'token']
+        user_planificateur:
+            groups: ['user', 'token']            
+        user_lang:
+            groups: ['user', 'token']
+        user_subaudiences:
+            groups: ['user', 'token']
+        user_subaudience:
+            groups: ['user', 'token']
+        user_groups:
+            groups: ['user']
+        user_can_update:
+            groups: ['user']
+        user_can_delete:
+            groups: ['user']            

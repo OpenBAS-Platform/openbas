@@ -93,33 +93,16 @@ class SubobjectivePopover extends Component {
   }
 
   render() {
+    let subobjective_is_updatable = R.propOr(true, 'user_can_update', this.props.subobjective)
+    let subobjective_is_deletable = R.propOr(true, 'user_can_delete', this.props.subobjective)
+        
     const editActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      <FlatButton
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEdit.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)} />,
+      subobjective_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)} />: ""
     ];
     const deleteActions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      <FlatButton
-        key="delete"
-        label="Delete"
-        primary={true}
-        onClick={this.submitDelete.bind(this)}
-      />,
+      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)} />,
+      subobjective_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)} />: ""
     ];
 
     let initialValues = R.pick(['subobjective_title', 'subobjective_description', 'subobjective_priority'], this.props.subobjective)
@@ -128,14 +111,17 @@ class SubobjectivePopover extends Component {
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
-        <Popover open={this.state.openPopover}
-                 anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handlePopoverClose.bind(this)}>
-          <Menu multiple={false}>
-            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
-          </Menu>
-        </Popover>
+        
+        {(subobjective_is_updatable || subobjective_is_deletable)
+        ?
+          <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl} onRequestClose={this.handlePopoverClose.bind(this)}>
+            <Menu multiple={false}>
+              {subobjective_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>: ""}
+              {subobjective_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
+            </Menu>
+          </Popover>
+        : ""}       
+          
         <Dialog
           title="Confirmation"
           modal={false}

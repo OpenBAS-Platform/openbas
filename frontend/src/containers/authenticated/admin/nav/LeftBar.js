@@ -14,7 +14,8 @@ i18nRegister({
   fr: {
     'Home': 'Accueil',
     'Users': 'Utilisateurs',
-    'Groups': 'Groupes'
+    'Groups': 'Groupes',
+    'Tests': 'Tests'
   }
 })
 
@@ -50,6 +51,11 @@ class LeftBar extends Component {
                         onClick={this.handleToggle.bind(this)} to={'/private/admin/groups'}
                         label="Groups"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/admin/tests'}
+                        onClick={this.handleToggle.bind(this)} to={'/private/admin/tests'}
+                        label="Tests"
+                        leftIcon={<Icon name={Constants.ICON_NAME_TESTS}/>}/>                                
         </List>
       </Drawer>
     );

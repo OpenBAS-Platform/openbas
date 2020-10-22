@@ -91,15 +91,20 @@ class UserPopover extends Component {
   }
 
   render() {
+    let subaudience_is_updatable = R.propOr(true, 'user_can_update', this.props.subaudience)
+    let subaudience_is_deletable = R.propOr(true, 'user_can_delete', this.props.subaudience)
+    let user_is_updatable = R.propOr(true, 'user_can_update', this.props.user)
+    let user_is_deletable = R.propOr(true, 'user_can_delete', this.props.user)
+
     const editActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/>,
+      subaudience_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/> : ""
     ]
     const deleteActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
+      subaudience_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
     ]
-    
+
     var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
     let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
     let initialValues = R.pipe(
@@ -110,28 +115,52 @@ class UserPopover extends Component {
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} color={this.switchColor(!this.props.audience.audience_enabled || !this.props.subaudience.subaudience_enabled)}/>
+          <Icon
+            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
+            color={this.switchColor(!this.props.audience.audience_enabled || !this.props.subaudience.subaudience_enabled)}
+          />
         </IconButton>
-        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handlePopoverClose.bind(this)}>
-          <Menu multiple={false}>
-            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
-          </Menu>
-        </Popover>
-        <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
-                onRequestClose={this.handleCloseDelete.bind(this)}
-                actions={deleteActions}>
+
+        {
+          (user_is_updatable || user_is_deletable) ?
+            <Popover
+              open={this.state.openPopover}
+              anchorEl={this.state.anchorEl}
+              onRequestClose={this.handlePopoverClose.bind(this)}
+            >
+              <Menu multiple={false}>
+                {user_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ""}
+                {user_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/> : ""}
+              </Menu>
+            </Popover>
+          :
+            ""
+        }
+
+        <Dialog
+          title="Confirmation"
+          modal={false}
+          open={this.state.openDelete}
+          onRequestClose={this.handleCloseDelete.bind(this)}
+          actions={deleteActions}
+        >
           <T>Do you want to remove the user from this sub-audience?</T>
         </Dialog>
-        <Dialog title="Update the user" modal={false} open={this.state.openEdit}
-                autoScrollBodyContent={true}
-                onRequestClose={this.handleCloseEdit.bind(this)}
-                actions={editActions}>
-          <UserForm ref="userForm" initialValues={initialValues}
-                    organizations={this.props.organizations}
-                    onSubmit={this.onSubmitEdit.bind(this)}
-                    onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+        <Dialog
+          title="Update the user"
+          modal={false}
+          open={this.state.openEdit}
+          autoScrollBodyContent={true}
+          onRequestClose={this.handleCloseEdit.bind(this)}
+          actions={editActions}
+        >
+          <UserForm
+            ref="userForm"
+            initialValues={initialValues}
+            organizations={this.props.organizations}
+            onSubmit={this.onSubmitEdit.bind(this)}
+            onSubmitSuccess={this.handleCloseEdit.bind(this)}
+          />
         </Dialog>
       </div>
     )
@@ -155,4 +184,7 @@ UserPopover.propTypes = {
   children: PropTypes.node
 }
 
-export default connect(select, {updateUser, updateSubaudience})(UserPopover)
+export default connect(select, {
+  updateUser,
+  updateSubaudience
+})(UserPopover)

@@ -70,7 +70,7 @@ class ReactImage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.image_id !== this.props.image_id) {
+    if (prevProps.image_id !== this.props.image_id) {
         this.fetchImageData(this.props.image_id)
     }
   }

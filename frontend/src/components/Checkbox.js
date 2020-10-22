@@ -7,6 +7,7 @@ export const Checkbox = (props) => (
     label={props.label}
     onCheck={props.onCheck}
     defaultChecked={props.defaultChecked}
+    name={props.name ? props.name : ''}
   />
 )
 
@@ -14,4 +15,5 @@ Checkbox.propTypes = {
   label: PropTypes.node,
   defaultChecked: PropTypes.bool,
   onCheck: PropTypes.func,
+  name: PropTypes.string 
 }

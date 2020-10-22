@@ -1,0 +1,3 @@
+comcheck_statuses:
+    type:     rest
+    resource: App\Controller\Anonymous\ComcheckStatusController
