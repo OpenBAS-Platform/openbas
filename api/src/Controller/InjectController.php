@@ -211,9 +211,9 @@ class InjectController extends BaseController
     public function getInjectData($request, $inject, $user)
     {
         $data = array();
-        $data['context']['id'] = $inject->getInjectId();
-        $data['context']['type'] = $inject->getInjectType();
-        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
+        $data['id'] = $inject->getInjectId();
+        $data['type'] = $inject->getInjectType();
+        $data['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/injects/' . $inject->getInjectId() . '/status';
         $data['data'] = $this->getPersonalInjectContent(json_decode($inject->getInjectContent(), true), $user);
         $data['data']['content_header'] = $inject->getInjectHeader();
         $data['data']['content_footer'] = $inject->getInjectFooter();
@@ -254,9 +254,9 @@ class InjectController extends BaseController
     public function getDryInjectData($request, $dryinject, $user)
     {
         $data = array();
-        $data['context']['id'] = $dryinject->getDryinjectId();
-        $data['context']['type'] = $dryinject->getDryinjectType();
-        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
+        $data['id'] = $dryinject->getDryinjectId();
+        $data['type'] = $dryinject->getDryinjectType();
+        $data['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
         $data['data'] = $this->getPersonalInjectContent(json_decode($dryinject->getDryinjectContent(), true), $user);
         $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
         $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
