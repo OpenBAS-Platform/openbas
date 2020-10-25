@@ -1,15 +1,14 @@
 package io.openex.player.injects.manual;
 
-import io.openex.player.model.Execution;
-import io.openex.player.model.InjectData;
+import io.openex.player.model.inject.InjectBase;
+import io.openex.player.utils.Executor;
 
-public class ManualInject extends InjectData {
+public class ManualInject extends InjectBase {
     private String content;
 
     @Override
-    public void process(Execution execution) {
-        execution.addMessage("EXECUTING MANUAL DATA" + content);
-        System.out.println("EXECUTING MANUAL DATA" + content);
+    public Class<? extends Executor<ManualInject>> executor() {
+        return ManualExecutor.class;
     }
 
     public String getContent() {

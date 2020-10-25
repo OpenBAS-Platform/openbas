@@ -1,4 +1,4 @@
-package io.openex.player.model;
+package io.openex.player.model.execution;
 
 public enum ExecutionStatus {
     PARTIAL,

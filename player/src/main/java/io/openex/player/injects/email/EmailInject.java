@@ -2,30 +2,32 @@ package io.openex.player.injects.email;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.player.model.Execution;
-import io.openex.player.model.InjectData;
-import io.openex.player.model.User;
+import io.openex.player.injects.email.model.EmailInjectAttachment;
+import io.openex.player.model.audience.User;
+import io.openex.player.model.inject.InjectBase;
+import io.openex.player.utils.Executor;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EmailInject extends InjectData {
+public class EmailInject extends InjectBase {
+
+    private static final String HEADER_STYLE = "style=\"text-align: center; margin-bottom: 10px;\">";
+    private static final String FOOTER_STYLE = "style=\"text-align: center; margin-top: 10px;\">";
+    private static final String START_DIV = "<div ";
+    private static final String END_DIV = "</div>";
+
     private String subject;
     private String body;
     private String replyTo;
     private String contentHeader;
     private String contentFooter;
     private List<User> users;
-    private List<EmailAttachment> attachments;
+    private List<EmailInjectAttachment> attachments;
 
     @Override
-    public void process(Execution execution) {
-        users.stream().parallel().forEach(user -> {
-
-        });
-
-        execution.addMessage("EXECUTING EMAIL DATA" + subject);
-        System.out.println("EXECUTING EMAIL DATA" + subject);
+    public Class<? extends Executor<EmailInject>> executor() {
+        return EmailExecutor.class;
     }
 
     public String getSubject() {
@@ -37,18 +39,26 @@ public class EmailInject extends InjectData {
     }
 
     public String getBody() {
-        return body;
+        StringBuilder data = new StringBuilder();
+        if (contentHeader != null) {
+            data.append(START_DIV).append(HEADER_STYLE).append(contentHeader).append(END_DIV);
+        }
+        data.append(body);
+        if (contentFooter != null) {
+            data.append(START_DIV).append(FOOTER_STYLE).append(contentFooter).append(END_DIV);
+        }
+        return data.toString();
     }
 
     public void setBody(String body) {
         this.body = body;
     }
 
-    public List<EmailAttachment> getAttachments() {
+    public List<EmailInjectAttachment> getAttachments() {
         return attachments;
     }
 
-    public void setAttachments(List<EmailAttachment> attachments) {
+    public void setAttachments(List<EmailInjectAttachment> attachments) {
         this.attachments = attachments;
     }
 

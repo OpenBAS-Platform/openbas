@@ -15,6 +15,9 @@ public class OpenExConfig {
     @NotNull
     private String token;
 
+    @NotNull
+    private String attachmentUri;
+
     public String getApi() {
         return api;
     }
@@ -27,5 +30,12 @@ public class OpenExConfig {
     }
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getAttachmentUri() {
+        return attachmentUri;
+    }
+    public void setAttachmentUri(String attachmentUri) {
+        this.attachmentUri = attachmentUri;
     }
 }

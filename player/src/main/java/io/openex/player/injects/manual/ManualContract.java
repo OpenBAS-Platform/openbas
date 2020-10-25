@@ -2,7 +2,7 @@ package io.openex.player.injects.manual;
 
 import io.openex.player.contract.ContractDef;
 import io.openex.player.model.Contract;
-import io.openex.player.model.InjectData;
+import io.openex.player.model.inject.InjectBase;
 
 @SuppressWarnings("unused")
 public class ManualContract extends Contract {
@@ -16,7 +16,7 @@ public class ManualContract extends Contract {
     public ContractDef definition() { return null; }
 
     @Override
-    public Class<? extends InjectData> dataClass() {
+    public Class<? extends InjectBase> dataClass() {
         return ManualInject.class;
     }
 }

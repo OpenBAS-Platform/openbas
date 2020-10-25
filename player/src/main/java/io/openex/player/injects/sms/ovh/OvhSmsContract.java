@@ -2,7 +2,7 @@ package io.openex.player.injects.sms.ovh;
 
 import io.openex.player.contract.ContractDef;
 import io.openex.player.model.Contract;
-import io.openex.player.model.InjectData;
+import io.openex.player.model.inject.InjectBase;
 
 import static io.openex.player.contract.ContractType.Textarea;
 
@@ -18,7 +18,7 @@ public class OvhSmsContract extends Contract {
     }
 
     @Override
-    public Class<? extends InjectData> dataClass() {
+    public Class<? extends InjectBase> dataClass() {
         return OvhSmsInject.class;
     }
 }

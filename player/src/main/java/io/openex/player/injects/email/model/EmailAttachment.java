@@ -1,4 +1,4 @@
-package io.openex.email.attachment;
+package io.openex.player.injects.email.model;
 
 /**
  * Created by Julien on 23/12/2016.

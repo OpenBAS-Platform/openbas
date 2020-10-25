@@ -1,8 +1,8 @@
-package io.openex.player.model;
+package io.openex.player.model.inject;
 
-public class Inject {
+public class InjectWrapper {
     private InjectContext context;
-    private InjectData inject;
+    private InjectBase inject;
 
     public InjectContext getContext() {
         return context;
@@ -12,11 +12,11 @@ public class Inject {
         this.context = context;
     }
 
-    public InjectData getInject() {
+    public InjectBase getInject() {
         return inject;
     }
 
-    public void setInject(InjectData inject) {
+    public void setInject(InjectBase inject) {
         this.inject = inject;
     }
 }

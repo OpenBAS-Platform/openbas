@@ -17,8 +17,7 @@ public class Discovery {
 
     public Discovery() {
         Reflections reflections = new Reflections("io.openex.player.injects");
-        Set<Class<? extends Contract>> contractList =
-                reflections.getSubTypesOf(Contract.class);
+        Set<Class<? extends Contract>> contractList = reflections.getSubTypesOf(Contract.class);
         contracts = contractList.stream().map(aClass -> {
             try {
                 return (Contract) aClass.getConstructors()[0].newInstance();

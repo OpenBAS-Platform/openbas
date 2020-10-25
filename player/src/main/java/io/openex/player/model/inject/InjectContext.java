@@ -1,13 +1,8 @@
-package io.openex.player.model;
+package io.openex.player.model.inject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.openex.player.injects.email.EmailInject;
-import io.openex.player.injects.manual.ManualInject;
-import io.openex.player.injects.sms.ovh.OvhSmsInject;
 
 public class InjectContext {
 

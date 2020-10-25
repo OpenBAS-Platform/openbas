@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.player.config.OpenExConfig;
 import io.openex.player.model.*;
+import io.openex.player.model.execution.Execution;
+import io.openex.player.model.inject.InjectBase;
+import io.openex.player.model.inject.InjectContext;
+import io.openex.player.model.inject.InjectWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +25,13 @@ import java.util.stream.Collectors;
 
 @Component
 public class HttpCaller {
+    public static final String AUTHORIZATION = "X-Authorization-Token";
 
     private final OpenExConfig config;
-    private final HttpClient client = HttpClient.newHttpClient();
     private final HttpRequest injectsRequest;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final HttpClient client = HttpClient.newHttpClient();
+
     @Resource
     private Discovery discovery;
 
@@ -34,7 +40,7 @@ public class HttpCaller {
         this.config = config;
         injectsRequest = HttpRequest.newBuilder().version(HttpClient.Version.HTTP_1_1)
                 .uri(new URI(config.getApi()))
-                .header("X-Authorization-Token", config.getToken())
+                .header(AUTHORIZATION, config.getToken())
                 .header("Content-Type", "application/json; charset=UTF-8")
                 .build();
     }
@@ -43,23 +49,23 @@ public class HttpCaller {
         String reportData = mapper.writeValueAsString(execution);
         HttpRequest httpRequest = HttpRequest.newBuilder().version(HttpClient.Version.HTTP_1_1)
                 .uri(new URI(callbackUrl))
-                .header("X-Authorization-Token", config.getToken())
-                .header("Content-Type", "application/json")
+                .header(AUTHORIZATION, config.getToken())
+                .header("Content-Type", "application/json; charset=UTF-8")
                 .POST(HttpRequest.BodyPublishers.ofString(reportData))
                 .build();
         client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
     }
 
-    public List<Inject> getInjects() throws IOException, InterruptedException {
+    public List<InjectWrapper> getInjects() throws IOException, InterruptedException {
         Map<String, Contract> contractsById = discovery.contractsById();
         HttpResponse<String> response = client.send(injectsRequest, HttpResponse.BodyHandlers.ofString());
         InjectContext[] injectContexts = mapper.readValue(response.body(), InjectContext[].class);
         return Arrays.stream(injectContexts).map(injectContext -> {
-            Inject execution = new Inject();
+            InjectWrapper execution = new InjectWrapper();
             execution.setContext(injectContext);
             Contract contract = contractsById.get(injectContext.getType());
             try {
-                InjectData injectData = mapper.readValue(injectContext.getData(), contract.dataClass());
+                InjectBase injectData = mapper.readValue(injectContext.getData(), contract.dataClass());
                 execution.setInject(injectData);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();

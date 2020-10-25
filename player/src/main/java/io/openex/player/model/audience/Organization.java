@@ -1,4 +1,4 @@
-package io.openex.player.model;
+package io.openex.player.model.audience;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

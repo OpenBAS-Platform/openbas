@@ -1,17 +1,16 @@
 package io.openex.player.injects.sms.ovh;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.openex.player.model.Execution;
-import io.openex.player.model.InjectData;
+import io.openex.player.model.inject.InjectBase;
+import io.openex.player.utils.Executor;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OvhSmsInject extends InjectData {
+public class OvhSmsInject extends InjectBase {
     private String message;
 
     @Override
-    public void process(Execution execution) {
-        execution.addMessage("EXECUTING OVH SMS DATA" + message);
-        System.out.println("EXECUTING OVH SMS DATA" + message);
+    public Class<? extends Executor<OvhSmsInject>> executor() {
+        return OvhSmsExecutor.class;
     }
 
     public String getMessage() {

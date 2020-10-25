@@ -1,14 +1,18 @@
-package io.openex.player.injects.email;
+package io.openex.player.injects.email.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class EmailAttachment {
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EmailInjectAttachment {
     private String id;
     private String name;
     private String description;
     private String type;
     private String path;
-    private String tags;
+    private List<String> tags;
 
     @JsonProperty("file_id")
     public String getId() {
@@ -56,11 +60,11 @@ public class EmailAttachment {
     }
 
     @JsonProperty("file_liste_tags")
-    public String getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(String tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
