@@ -55,7 +55,7 @@ public class EmailService {
         return resolved;
     }
 
-    public void sendMessage(User user, String from, String subject, String content, List<EmailAttachment> attachments) throws Exception {
+    public void sendEmail(User user, String from, String subject, String content, List<EmailAttachment> attachments) throws Exception {
         System.out.println("Sending mail to " + user.getEmail());
         Map<String, Object> model = user.toMarkerMap();
         Template template = new Template("email", new StringReader(content), new Configuration(Configuration.VERSION_2_3_30));

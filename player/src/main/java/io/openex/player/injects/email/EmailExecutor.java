@@ -31,7 +31,7 @@ public class EmailExecutor implements Executor<EmailInject> {
         users.stream().parallel().forEach(user -> {
             String email = user.getEmail();
             try {
-                eMailService.sendMessage(user, replyTo, subject, body, attachments);
+                eMailService.sendEmail(user, replyTo, subject, body, attachments);
                 execution.addMessage("Mail sent to " + email);
             } catch (Exception e) {
                 // TODO ADD AN ERROR LOGGER
