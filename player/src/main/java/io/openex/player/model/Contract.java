@@ -6,6 +6,8 @@ import io.openex.player.model.inject.InjectBase;
 
 public abstract class Contract {
 
+    public abstract boolean expose();
+
     public abstract String id();
 
     public abstract ContractDef definition();

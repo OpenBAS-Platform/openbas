@@ -3,7 +3,7 @@ package io.openex.player.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.player.config.OpenExConfig;
-import io.openex.player.model.*;
+import io.openex.player.model.Contract;
 import io.openex.player.model.execution.Execution;
 import io.openex.player.model.inject.InjectBase;
 import io.openex.player.model.inject.InjectContext;
@@ -11,7 +11,6 @@ import io.openex.player.model.inject.InjectWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,8 +31,8 @@ public class HttpCaller {
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient client = HttpClient.newHttpClient();
 
-    @Resource
-    private Discovery discovery;
+    @Autowired
+    private List<Contract> contracts;
 
     @Autowired
     public HttpCaller(OpenExConfig config) throws URISyntaxException {
@@ -57,7 +56,7 @@ public class HttpCaller {
     }
 
     public List<InjectWrapper> getInjects() throws IOException, InterruptedException {
-        Map<String, Contract> contractsById = discovery.contractsById();
+        Map<String, Contract> contractsById = contracts.stream().collect(Collectors.toMap(Contract::id, contract -> contract));
         HttpResponse<String> response = client.send(injectsRequest, HttpResponse.BodyHandlers.ofString());
         InjectContext[] injectContexts = mapper.readValue(response.body(), InjectContext[].class);
         return Arrays.stream(injectContexts).map(injectContext -> {
@@ -68,6 +67,7 @@ public class HttpCaller {
                 InjectBase injectData = mapper.readValue(injectContext.getData(), contract.dataClass());
                 execution.setInject(injectData);
             } catch (JsonProcessingException e) {
+                // TODO ADD ERROR LOGGER
                 e.printStackTrace();
             }
             return execution;

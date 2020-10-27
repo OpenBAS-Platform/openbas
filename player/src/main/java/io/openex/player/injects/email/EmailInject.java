@@ -3,7 +3,6 @@ package io.openex.player.injects.email;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.player.injects.email.model.EmailInjectAttachment;
-import io.openex.player.model.audience.User;
 import io.openex.player.model.inject.InjectBase;
 import io.openex.player.utils.Executor;
 
@@ -22,7 +21,6 @@ public class EmailInject extends InjectBase {
     private String replyTo;
     private String contentHeader;
     private String contentFooter;
-    private List<User> users;
     private List<EmailInjectAttachment> attachments;
 
     @Override
@@ -78,14 +76,6 @@ public class EmailInject extends InjectBase {
 
     public void setContentFooter(String contentFooter) {
         this.contentFooter = contentFooter;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
     }
 
     @JsonProperty("replyto")

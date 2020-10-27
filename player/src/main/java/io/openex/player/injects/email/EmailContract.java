@@ -3,12 +3,16 @@ package io.openex.player.injects.email;
 import io.openex.player.contract.ContractDef;
 import io.openex.player.model.Contract;
 import io.openex.player.model.inject.InjectBase;
+import org.springframework.stereotype.Component;
 
 import static io.openex.player.contract.ContractCardinality.Multiple;
 import static io.openex.player.contract.ContractType.*;
 
-@SuppressWarnings("unused")
+@Component
 public class EmailContract extends Contract {
+
+    @Override
+    public boolean expose() { return true; }
 
     @Override
     public String id() {

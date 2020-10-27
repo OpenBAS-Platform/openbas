@@ -32,7 +32,7 @@ public class InjectsHandlingJob implements Job {
                 Executor<InjectBase> executor = (Executor<InjectBase>) context.getBean(executorClass);
                 Execution execution = executor.execute(inject.getInject());
                 String callbackUrl = inject.getContext().getCallbackUrl();
-                // httpCaller.executionReport(execution, callbackUrl);
+                httpCaller.executionReport(execution, callbackUrl);
             }
         } catch (Exception e) {
             throw new JobExecutionException(e);

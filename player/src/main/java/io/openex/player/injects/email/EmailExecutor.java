@@ -34,7 +34,7 @@ public class EmailExecutor implements Executor<EmailInject> {
                 eMailService.sendMessage(user, replyTo, subject, body, attachments);
                 execution.addMessage("Mail sent to " + email);
             } catch (Exception e) {
-                e.printStackTrace();
+                // TODO ADD AN ERROR LOGGER
                 errors.incrementAndGet();
                 execution.addMessage(e.getMessage());
             }
