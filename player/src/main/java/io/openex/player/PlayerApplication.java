@@ -18,18 +18,18 @@ public class PlayerApplication {
         SpringApplication.run(PlayerApplication.class, args);
     }
 
-    //@Bean
-    //public JobDetail injectsJobDetail() {
-    //    return JobBuilder.newJob(InjectsHandlingJob.class).storeDurably().withIdentity("injectsJob").build();
-    //}
-    //
-    //@Bean
-    //public Trigger injectsJobTrigger() {
-    //    return newTrigger()
-    //            .forJob(injectsJobDetail())
-    //            .withIdentity("injectsTrigger")
-    //            .withSchedule(cronSchedule("0/30 * * * * ?"))
-    //            .build();
-    //
-    //}
+    @Bean
+    public JobDetail injectsJobDetail() {
+        return JobBuilder.newJob(InjectsHandlingJob.class).storeDurably().withIdentity("injectsJob").build();
+    }
+
+    @Bean
+    public Trigger injectsJobTrigger() {
+        return newTrigger()
+                .forJob(injectsJobDetail())
+                .withIdentity("injectsTrigger")
+                .withSchedule(cronSchedule("0 0/1 * * * ?"))
+                .build();
+
+    }
 }
