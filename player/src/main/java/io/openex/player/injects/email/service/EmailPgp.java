@@ -1,6 +1,5 @@
 package io.openex.player.injects.email.service;
 
-import io.openex.player.injects.email.model.EmailAttachment;
 import io.openex.player.model.audience.User;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
@@ -15,9 +14,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.List;
 import java.util.Spliterator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -26,18 +23,9 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 @Component
 public class EmailPgp {
 
-    private static final String GPG = ".gpg";
-
     public String encryptText(User user, String message) throws IOException {
         PGPPublicKey pgpKey = userPgpKey(user);
         return encrypt(message, pgpKey);
-    }
-
-    public List<EmailAttachment> encryptAttachments(User user, List<EmailAttachment> attachments) throws IOException {
-        PGPPublicKey pgpKey = userPgpKey(user);
-        return attachments.stream()
-                .map(e -> new EmailAttachment(e.getName() + GPG, encrypt(e.getData(), pgpKey), e.getContentType()))
-                .collect(Collectors.toList());
     }
 
     private PGPPublicKey userPgpKey(User user) throws IOException {
@@ -63,7 +51,7 @@ public class EmailPgp {
             OutputStream out = new ArmoredOutputStream(bOut);
             PGPEncryptedDataGenerator encGen = new PGPEncryptedDataGenerator(
                     new BcPGPDataEncryptorBuilder(PGPEncryptedDataGenerator.CAST5)
-                            .setSecureRandom(new SecureRandom()));
+                            .setSecureRandom(new SecureRandom()).setWithIntegrityPacket(true));
             encGen.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(encKey));
             OutputStream encOut = encGen.open(out, compressedData.length);
             encOut.write(compressedData);

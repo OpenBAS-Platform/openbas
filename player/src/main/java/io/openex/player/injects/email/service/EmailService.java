@@ -9,13 +9,16 @@ import io.openex.player.model.audience.User;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.StringUtils;
 
-import javax.mail.internet.MimeMessage;
+import javax.activation.DataHandler;
+import javax.mail.Message;
+import javax.mail.Multipart;
+import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
+import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -58,17 +61,53 @@ public class EmailService {
         Template template = new Template("email", new StringReader(content), new Configuration(Configuration.VERSION_2_3_30));
         String body = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
         MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(from);
-        helper.setTo(user.getEmail());
-        helper.setSubject(subject);
-        boolean needEncrypt = !StringUtils.isEmpty(user.getPgpKey());
-        helper.setText(needEncrypt ? emailPgp.encryptText(user, body) : body, true);
-        List<EmailAttachment> attachmentsToSent = needEncrypt ? emailPgp.encryptAttachments(user, attachments) : attachments;
-        for (EmailAttachment attachment : attachmentsToSent) {
+        message.setFrom(from);
+        message.setSubject(subject);
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+        Multipart mailMultipart = new MimeMultipart("alternative");
+        // Add mail content
+        MimeBodyPart bodyPart = new MimeBodyPart();
+        bodyPart.setContent(body, "text/html;charset=utf-8");
+        mailMultipart.addBodyPart(bodyPart);
+        // Add Attachments
+        for (EmailAttachment attachment : attachments) {
+            MimeBodyPart aBodyPart = new MimeBodyPart();
+            aBodyPart.setFileName(attachment.getName());
+            aBodyPart.setHeader("Content-Type", attachment.getContentType());
             ByteArrayDataSource bds = new ByteArrayDataSource(attachment.getData(), attachment.getContentType());
-            helper.addAttachment(attachment.getName(), bds);
+            aBodyPart.setDataHandler(new DataHandler(bds));
+            mailMultipart.addBodyPart(aBodyPart);
         }
-        emailSender.send(message);
+        message.setContent(mailMultipart);
+        // Crypt if needed
+        boolean needEncrypt = !StringUtils.isEmpty(user.getPgpKey());
+        if (needEncrypt) {
+            // Need to create another email that will wrap everything.
+            MimeMessage encMessage = emailSender.createMimeMessage();
+            encMessage.setFrom(from);
+            encMessage.setSubject(subject);
+            encMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+            Multipart encMultipart = new MimeMultipart("encrypted; protocol=\"application/pgp-encrypted\"");
+            // This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
+            InternetHeaders headers = new InternetHeaders();
+            headers.addHeader("Content-Type", "application/pgp-encrypted");
+            MimeBodyPart mimeExPart = new MimeBodyPart(headers, "Version: 1".getBytes());
+            mimeExPart.setDescription("PGP/MIME version identification");
+            encMultipart.addBodyPart(mimeExPart);
+            // Export and crypt to basic email
+            ByteArrayOutputStream multiEncStream = new ByteArrayOutputStream();
+            message.writeTo(multiEncStream);
+            String encryptedEmail = emailPgp.encryptText(user, multiEncStream.toString());
+            MimeBodyPart encBodyPart = new MimeBodyPart();
+            encBodyPart.setDisposition("inline");
+            encBodyPart.setFileName("openpgp-encrypted-message.asc");
+            encBodyPart.setContent(encryptedEmail, "application/octet-stream");
+            encMultipart.addBodyPart(encBodyPart);
+            // Fill the message with the multipart content
+            encMessage.setContent(encMultipart);
+            emailSender.send(encMessage);
+        } else {
+            emailSender.send(message);
+        }
     }
 }
