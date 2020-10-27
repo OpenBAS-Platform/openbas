@@ -1,6 +1,7 @@
-package io.openex.player.injects.sms.ovh;
+package io.openex.player.injects.ovh_sms;
 
 import io.openex.player.contract.ContractDef;
+import io.openex.player.injects.ovh_sms.config.OvhSmsConfig;
 import io.openex.player.model.Contract;
 import io.openex.player.model.inject.InjectBase;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package io.openex.player.injects.sms.ovh;
+package io.openex.player.injects.ovh_sms.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

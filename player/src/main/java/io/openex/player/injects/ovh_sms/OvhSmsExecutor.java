@@ -1,6 +1,6 @@
-package io.openex.player.injects.sms.ovh;
+package io.openex.player.injects.ovh_sms;
 
-import io.openex.player.injects.sms.ovh.service.OvhSmsService;
+import io.openex.player.injects.ovh_sms.service.OvhSmsService;
 import io.openex.player.model.audience.User;
 import io.openex.player.model.execution.Execution;
 import io.openex.player.model.execution.ExecutionStatus;
@@ -19,7 +19,7 @@ public class OvhSmsExecutor implements Executor<OvhSmsInject> {
     private OvhSmsService smsService;
 
     @Override
-    public void process(OvhSmsInject inject, Execution execution) throws Exception {
+    public void process(OvhSmsInject inject, Execution execution) {
         String message = inject.getMessage();
         List<User> users = inject.getUsers();
         int numberOfExpected = users.size();
@@ -31,8 +31,8 @@ public class OvhSmsExecutor implements Executor<OvhSmsInject> {
                 execution.addMessage("Sms fail for " + user.getEmail() + ": no phone number");
             } else {
                 try {
-                    smsService.sendSms(phone, message);
-                    execution.addMessage("Sms sent to " + user.getEmail() + " through " + phone);
+                    String callResult = smsService.sendSms(user, message);
+                    execution.addMessage("Sms sent to " + user.getEmail() + " through " + phone + " (" + callResult + ")");
                 } catch (Exception e) {
                     // TODO ADD AN ERROR LOGGER
                     errors.incrementAndGet();

@@ -1,18 +1,24 @@
-package io.openex.player.injects.sms.ovh.service;
+package io.openex.player.injects.ovh_sms.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openex.player.injects.sms.ovh.OvhSmsConfig;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import io.openex.player.injects.ovh_sms.config.OvhSmsConfig;
+import io.openex.player.model.audience.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.Map;
 
 import static java.util.Collections.singletonList;
 
@@ -26,31 +32,19 @@ public class OvhSmsService {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @SuppressWarnings({"StringBufferMayBeStringBuilder", "ForLoopReplaceableByForEach"})
-    private static String convertToHex(byte[] data) {
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < data.length; i++) {
-            int halfbyte = (data[i] >>> 4) & 0x0F;
-            int two_halfs = 0;
-            do {
-                if ((0 <= halfbyte) && (halfbyte <= 9))
-                    buf.append((char) ('0' + halfbyte));
-                else
-                    buf.append((char) ('a' + (halfbyte - 10)));
-                halfbyte = data[i] & 0x0F;
-            } while (two_halfs++ < 1);
-        }
-        return buf.toString();
-    }
+    public String sendSms(User user, String message) throws Exception {
+        System.out.println("Sending sms to " + user.getEmail() + " - " + user.getPhone());
+        Map<String, Object> model = user.toMarkerMap();
+        Template template = new Template("sms", new StringReader(message), new Configuration(Configuration.VERSION_2_3_30));
+        String smsMessage = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
 
-    public String sendSms(String phone, String message) throws Exception {
         URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs/");
-        String isoMessage = new String(message.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-        OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(phone), isoMessage);
-        String BODY = mapper.writeValueAsString(ovhSmsMessage);
+        String isoMessage = new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
+        OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(user.getPhone()), isoMessage);
+        String smsBody = mapper.writeValueAsString(ovhSmsMessage);
 
         long Timestamp = new Date().getTime() / 1000;
-        String toSign = config.getAs() + "+" + config.getCk() + "+" + METHOD + "+" + QUERY + "+" + BODY + "+" + Timestamp;
+        String toSign = config.getAs() + "+" + config.getCk() + "+" + METHOD + "+" + QUERY + "+" + smsBody + "+" + Timestamp;
         String signature = "$1$" + HashSHA1(toSign);
 
         HttpURLConnection req = (HttpURLConnection) QUERY.openConnection();
@@ -61,10 +55,10 @@ public class OvhSmsService {
         req.setRequestProperty("X-Ovh-Signature", signature);
         req.setRequestProperty("X-Ovh-Timestamp", "" + Timestamp);
 
-        if (!BODY.isEmpty()) {
+        if (!smsBody.isEmpty()) {
             req.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(req.getOutputStream());
-            wr.writeBytes(BODY);
+            wr.writeBytes(smsBody);
             wr.flush();
             wr.close();
         }
@@ -88,6 +82,23 @@ public class OvhSmsService {
             throw new Exception(ovhResponse);
         }
         return ovhResponse;
+    }
+
+    @SuppressWarnings({"StringBufferMayBeStringBuilder", "ForLoopReplaceableByForEach"})
+    private static String convertToHex(byte[] data) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < data.length; i++) {
+            int halfbyte = (data[i] >>> 4) & 0x0F;
+            int two_halfs = 0;
+            do {
+                if ((0 <= halfbyte) && (halfbyte <= 9))
+                    buf.append((char) ('0' + halfbyte));
+                else
+                    buf.append((char) ('a' + (halfbyte - 10)));
+                halfbyte = data[i] & 0x0F;
+            } while (two_halfs++ < 1);
+        }
+        return buf.toString();
     }
 
     @SuppressWarnings("UnusedAssignment")

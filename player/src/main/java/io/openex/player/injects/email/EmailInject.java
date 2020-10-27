@@ -5,22 +5,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.player.injects.email.model.EmailInjectAttachment;
 import io.openex.player.model.inject.InjectBase;
 import io.openex.player.utils.Executor;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EmailInject extends InjectBase {
 
-    private static final String HEADER_STYLE = "style=\"text-align: center; margin-bottom: 10px;\">";
-    private static final String FOOTER_STYLE = "style=\"text-align: center; margin-top: 10px;\">";
-    private static final String START_DIV = "<div ";
+    private static final String HEADER_DIV = "<div style=\"text-align: center; margin-bottom: 10px;\">";
+    private static final String FOOTER_DIV = "<div style=\"text-align: center; margin-top: 10px;\">";
+    private static final String START_DIV = "<div>";
     private static final String END_DIV = "</div>";
 
     private String subject;
     private String body;
     private String replyTo;
-    private String contentHeader;
-    private String contentFooter;
     private List<EmailInjectAttachment> attachments;
 
     @Override
@@ -38,12 +37,14 @@ public class EmailInject extends InjectBase {
 
     public String getBody() {
         StringBuilder data = new StringBuilder();
-        if (contentHeader != null) {
-            data.append(START_DIV).append(HEADER_STYLE).append(contentHeader).append(END_DIV);
+        String header = getContentHeader();
+        if (!StringUtils.isEmpty(header)) {
+            data.append(HEADER_DIV).append(header).append(END_DIV);
         }
-        data.append(body);
-        if (contentFooter != null) {
-            data.append(START_DIV).append(FOOTER_STYLE).append(contentFooter).append(END_DIV);
+        data.append(START_DIV).append(body).append(END_DIV);
+        String footer = getContentFooter();
+        if (!StringUtils.isEmpty(footer)) {
+            data.append(FOOTER_DIV).append(footer).append(END_DIV);
         }
         return data.toString();
     }
@@ -58,24 +59,6 @@ public class EmailInject extends InjectBase {
 
     public void setAttachments(List<EmailInjectAttachment> attachments) {
         this.attachments = attachments;
-    }
-
-    @JsonProperty("content_header")
-    public String getContentHeader() {
-        return contentHeader;
-    }
-
-    public void setContentHeader(String contentHeader) {
-        this.contentHeader = contentHeader;
-    }
-
-    @JsonProperty("content_footer")
-    public String getContentFooter() {
-        return contentFooter;
-    }
-
-    public void setContentFooter(String contentFooter) {
-        this.contentFooter = contentFooter;
     }
 
     @JsonProperty("replyto")

@@ -11,10 +11,10 @@ public class User {
 
     private String firstname;
     private String lastname;
-    private Organization organization;
     private String email;
     private String phone;
     private String pgpKey;
+    private Organization organization;
 
     public Map<String, Object> toMarkerMap() {
         Map<String, Object> map = new HashMap<>();

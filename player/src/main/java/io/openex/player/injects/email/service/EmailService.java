@@ -64,7 +64,7 @@ public class EmailService {
         message.setFrom(from);
         message.setSubject(subject);
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
-        Multipart mailMultipart = new MimeMultipart("alternative");
+        Multipart mailMultipart = new MimeMultipart("mixed");
         // Add mail content
         MimeBodyPart bodyPart = new MimeBodyPart();
         bodyPart.setContent(body, "text/html;charset=utf-8");

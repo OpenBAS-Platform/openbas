@@ -1,4 +1,4 @@
-package io.openex.player.injects.sms.ovh.service;
+package io.openex.player.injects.ovh_sms.service;
 
 import java.util.List;
 
