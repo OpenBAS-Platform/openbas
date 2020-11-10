@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export JAVA_HOME=C:\Program Files\Java\jdk1.8.0_191
+
 # Karaf home folder
 export KARAF_HOME=
 
