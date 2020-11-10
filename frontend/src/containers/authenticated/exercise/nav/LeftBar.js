@@ -19,6 +19,7 @@ i18nRegister({
     'Objectives': 'Objectifs',
     'Scenario': 'Scénario',
     'Audiences': 'Audiences',
+    'Statistics': 'Statistiques',
     'Settings': 'Paramètres',
   }
 })
@@ -76,6 +77,16 @@ class LeftBar extends Component {
                         label="Audiences"
                         leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>}/>
           <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/documents'}
+                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/documents'}
+                        label="Documents"
+                        leftIcon={<Icon name={Constants.ICON_NAME_ACTION_DOCUMENTS}/>}/>
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
+                        active={this.props.pathname === '/private/exercise/' + this.props.id + '/statistics'}
+                        onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/statistics'}
+                        label="Statistics"
+                        leftIcon={<Icon name={Constants.ICON_NAME_EDITOR_INSERT_CHART}/>}/>
+          <ListItemLink type={Constants.LIST_ITEM_NOSPACE}
                         active={this.props.pathname === '/private/exercise/' + this.props.id + '/settings'}
                         onClick={this.handleToggle.bind(this)} to={'/private/exercise/' + this.props.id + '/settings'}
                         label="Settings"
@@ -88,6 +99,7 @@ class LeftBar extends Component {
 
 LeftBar.propTypes = {
   id: PropTypes.string.isRequired,
+  exercise_type: PropTypes.string,
   pathname: PropTypes.string.isRequired,
   toggleLeftBar: PropTypes.func,
   open: PropTypes.bool,

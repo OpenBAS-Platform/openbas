@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
+import * as R from 'ramda'
 import {T} from '../../../../components/I18n'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
@@ -58,9 +59,11 @@ class ComcheckPopover extends Component {
   }
 
   render() {
+    let comcheck_is_deletable = R.propOr(true, 'user_can_delete', this.props.comcheck)
+      
     const deleteActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
+      comcheck_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
     ]
 
     return (
@@ -70,9 +73,11 @@ class ComcheckPopover extends Component {
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
+        { comcheck_is_deletable ? 
           <Menu multiple={false}>
             <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
+         : ""}
         </Popover>
         <Dialog title="Confirmation" modal={false}
                 open={this.state.openDelete}

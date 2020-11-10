@@ -77,14 +77,15 @@ class AudiencePopover extends Component {
 
   render() {
     let audience_enabled = R.propOr(true, 'audience_enabled', this.props.audience)
+    let audience_is_updatable= R.propOr(true, 'user_can_update', this.props.audience)
 
     const disableActions = [
       <FlatButton label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
-      <FlatButton label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>,
+      audience_is_updatable ? <FlatButton label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>: ""
     ]
     const enableActions = [
       <FlatButton label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
-      <FlatButton label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>,
+      audience_is_updatable ? <FlatButton label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>: ""
     ]
 
     return (
@@ -94,11 +95,15 @@ class AudiencePopover extends Component {
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
-          <Menu multiple={false}>
-            {audience_enabled ?
-              <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/> :
-              <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/>}
-          </Menu>
+         {audience_is_updatable ?
+            <Menu multiple={false}>
+              {audience_is_updatable ?
+                audience_enabled ?
+                    <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/> :
+                    <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/>
+              : ""}
+            </Menu>
+          : ""}
         </Popover>
         <Dialog title="Confirmation" modal={false}
                 open={this.state.openDisable}

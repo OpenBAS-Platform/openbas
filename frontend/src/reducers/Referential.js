@@ -26,6 +26,10 @@ export const entitiesInitializer =
       inject_types: Immutable({}),
       inject_statuses: Immutable({}),
       logs: Immutable({}),
+      planificateurs_audiences: Immutable({}),
+      planificateurs_events: Immutable({}),
+      tag: Immutable({}),
+      documents: Immutable({}),
       outcomes: Immutable({})
     })
   })

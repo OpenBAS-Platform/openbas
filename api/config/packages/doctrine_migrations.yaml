@@ -1,0 +1,4 @@
+doctrine_migrations:
+  migrations_paths:
+    'App\Migrations': '%kernel.project_dir%/src/Migrations'
+  connection: default

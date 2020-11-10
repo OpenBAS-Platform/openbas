@@ -1,0 +1,4 @@
+.idea
+*.iml
+*.patch
+api/app/config/parameters.yml

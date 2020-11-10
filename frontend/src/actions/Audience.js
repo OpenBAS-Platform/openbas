@@ -6,6 +6,11 @@ export const fetchAudiences = (exerciseId) => (dispatch) => {
     return getReferential(schema.arrayOfAudiences, uri)(dispatch)
 }
 
+export const fetchAudience = (audienceId, exerciseId) => (dispatch) => {
+  let uri = '/api/exercises/' + exerciseId + '/audiences/' + audienceId
+  return getReferential(schema.audience, uri)(dispatch)
+}
+
 export const downloadExportAudiences = (exerciseId) => (dispatch) => {
     return fileSave('/api/exercises/' + exerciseId + '/audiences.xlsx', 'audiences.xlsx')(dispatch)
 }
@@ -27,4 +32,9 @@ export const addAudience = (exerciseId, data) => (dispatch) => {
 export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
     let uri = '/api/exercises/' + exerciseId + '/audiences/' + audienceId
     return delReferential(uri, 'audiences', audienceId)(dispatch)
+}
+
+export const copyAudienceToExercise = (exerciseId, audienceId, data) => (dispatch) => {
+    let uri = '/api/exercises/' + exerciseId + '/copy-audience/' +  audienceId  
+    return putReferential(schema.audience, uri, data)(dispatch)
 }

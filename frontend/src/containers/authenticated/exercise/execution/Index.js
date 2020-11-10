@@ -18,6 +18,7 @@ import {Dialog} from '../../../../components/Dialog'
 import {FlatButton} from '../../../../components/Button'
 import {CircularSpinner} from '../../../../components/Spinner'
 import Countdown from '../../../../components/Countdown'
+import {fetchGroups} from '../../../../actions/Group'
 import {fetchAudiences} from '../../../../actions/Audience'
 import {fetchSubaudiences} from '../../../../actions/Subaudience'
 import {fetchAllInjects, fetchInjectTypes} from '../../../../actions/Inject'
@@ -32,7 +33,7 @@ i18nRegister({
     'Next inject': 'La prochaine injection',
     'Execution': 'Exécution',
     'Pending injects': 'Injections en attente',
-    'Processed injects': 'Injections traités',
+    'Processed injects': 'Injections traitées',
     'You do not have any pending injects in this exercise.': 'Vous n\'avez aucune injection en attente dans cet exercice.',
     'You do not have any processed injects in this exercise.': 'Vous n\'avez aucune injection traitée dans cet exercice.',
     'Inject view': 'Vue de l\'injection',
@@ -108,6 +109,7 @@ class IndexExecution extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchGroups()
     this.props.fetchAudiences(this.props.exerciseId)
     this.props.fetchSubaudiences(this.props.exerciseId)
     this.props.fetchInjectTypes()
@@ -192,7 +194,13 @@ class IndexExecution extends Component {
     return (
       <div style={styles.container}>
         <div style={styles.title}><T>Execution</T></div>
-        <ExercisePopover exerciseId={this.props.exerciseId} exercise={this.props.exercise}/>
+        {this.props.userCanUpdate ?
+          <ExercisePopover
+            exerciseId={this.props.exerciseId}
+            exercise={this.props.exercise}
+          />
+          : ""
+        }
         <div style={styles.status}><T>{exerciseStatus}</T></div>
         <div className="clearfix"></div>
         <div style={styles.subtitle}>
@@ -205,7 +213,8 @@ class IndexExecution extends Component {
         <br />
         <LinearProgress
           mode={this.props.injectsProcessed.length === 0 && exerciseStatus === 'RUNNING' ? 'indeterminate' : 'determinate'}
-          min={0} max={this.props.injectsPending.length + this.props.injectsProcessed.length}
+          min={0}
+          max={this.props.injectsPending.length + this.props.injectsProcessed.length}
           value={this.props.injectsProcessed.length}/>
         <br />
         <div style={styles.columnLeft}>
@@ -243,7 +252,7 @@ class IndexExecution extends Component {
                     </div>
                   }
                   leftIcon={injectIcon}
-                  rightIconButton={!inject_in_progress ?
+                  rightIconButton={(!inject_in_progress && this.props.userCanUpdate) ?
                     <InjectPopover
                       type={Constants.INJECT_EXEC}
                       exerciseId={this.props.exerciseId}
@@ -325,10 +334,12 @@ IndexExecution.propTypes = {
   injectsPending: PropTypes.array,
   injectsProcessed: PropTypes.array,
   nextInject: PropTypes.string,
+  fetchGroups: PropTypes.func,
   fetchAllInjects: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchSubaudiences: PropTypes.func,
   fetchInjectTypes: PropTypes.func,
+  userCanUpdate: PropTypes.bool,
   downloadFile: PropTypes.func
 }
 
@@ -387,6 +398,35 @@ const exerciseSelector = (state, ownProps) => {
   return R.prop(exerciseId, state.referential.entities.exercises)
 }
 
+const checkUserCanUpdate = (state, ownProps) => {
+  let exerciseId = ownProps.params.exerciseId
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
+
+  return userCanUpdate
+}
+
 const select = () => {
   return equalsSelector({ //Prevent view to refresh is nothing as changed (Using reselect)
     exerciseId: (state, ownProps) => ownProps.params.exerciseId,
@@ -396,8 +436,16 @@ const select = () => {
     injectsProcessed: filterInjectsProcessed,
     audiences: filterAudiences,
     subaudiences: (state) => R.values(state.referential.entities.subaudiences),
+    userCanUpdate: checkUserCanUpdate,
     inject_types: (state) => state.referential.entities.inject_types
   })
 }
 
-export default connect(select, {fetchAudiences, fetchSubaudiences, fetchAllInjects, fetchInjectTypes, downloadFile})(IndexExecution)
+export default connect(select, {
+  fetchGroups,
+  fetchAudiences,
+  fetchSubaudiences,
+  fetchAllInjects,
+  fetchInjectTypes,
+  downloadFile
+})(IndexExecution)

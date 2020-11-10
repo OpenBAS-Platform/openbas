@@ -9,11 +9,11 @@ import {dataFile} from '../../actions/File'
 import * as Constants from '../../constants/ComponentTypes'
 import {AppBar} from '../../components/AppBar'
 import {Exercise} from '../../components/Exercise'
-import CreateExercise from './exercise/CreateExercise'
 import UserPopover from './UserPopover'
 import {redirectToHome} from '../../actions/Application'
 import {T} from '../../components/I18n'
 import {i18nRegister} from '../../utils/Messages'
+import CreateExercise from './exercise/CreateExercise'
 
 i18nRegister({
   fr: {
@@ -80,7 +80,8 @@ class IndexAuthenticated extends Component {
             )
           })}
         </div>
-        {this.props.userAdmin ? <CreateExercise /> :""}
+
+        {this.props.userAdmin ? <CreateExercise exerciseId={this.props.exerciseId} injects={this.props.injects} exercise={this.props.exercise}/> :""}
       </div>
     )
   }

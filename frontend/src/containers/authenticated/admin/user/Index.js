@@ -22,6 +22,7 @@ i18nRegister({
     'Email address': 'Adresse email',
     'Organization': 'Organisation',
     'Administrator': 'Administrateur',
+    'Planner': 'Planificateur'
   }
 })
 
@@ -38,14 +39,14 @@ const styles = {
     },
     'user_firstname': {
       float: 'left',
-      width: '25%',
+      width: '20%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'
     },
     'user_email': {
       float: 'left',
-      width: '35%',
+      width: '30%',
       fontSize: '12px',
       textTransform: 'uppercase',
       fontWeight: '700'
@@ -58,6 +59,14 @@ const styles = {
       fontWeight: '700'
     },
     'user_admin': {
+      textAlign: 'center',
+      float: 'left',
+      width: '10%',
+      fontSize: '12px',
+      textTransform: 'uppercase',
+      fontWeight: '700'
+    },
+    'user_planificateur': {
       textAlign: 'center',
       float: 'left',
       width: '10%',
@@ -84,7 +93,7 @@ const styles = {
   },
   'name': {
     float: 'left',
-    width: '25%',
+    width: '20%',
     padding: '5px 0 0 0',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -92,7 +101,7 @@ const styles = {
   },
   'mail': {
     float: 'left',
-    width: '35%',
+    width: '30%',
     padding: '5px 0 0 0',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -107,6 +116,12 @@ const styles = {
     textOverflow: 'ellipsis'
   },
   'admin': {
+    float: 'left',
+    textAlign: 'center',
+    width: '10%',
+    padding: '5px 0 0 0'
+  },
+  'planificateur': {
     float: 'left',
     textAlign: 'center',
     width: '10%',
@@ -183,6 +198,7 @@ class Index extends Component {
           {this.SortHeader('user_email', 'Email address')}
           {this.SortHeader('user_organization', 'Organization')}
           {this.SortHeader('user_admin', 'Administrator')}
+          {this.SortHeader('user_planificateur', 'Planner')}
           <div className="clearfix"></div>
         </div>}/>
 
@@ -193,6 +209,7 @@ class Index extends Component {
           let user_email = R.propOr('-', 'user_email', user)
           let user_gravatar = R.propOr('', 'user_gravatar', user)
           let user_admin = R.propOr('-', 'user_admin', user)
+          let user_planificateur = R.propOr('-', 'user_planificateur', user)
           let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
           let organizationName = R.propOr('-', 'organization_name', user_organization)
 
@@ -206,6 +223,9 @@ class Index extends Component {
                 <div style={styles.mail}>{user_email}</div>
                 <div style={styles.org}>{organizationName}</div>
                 <div style={styles.admin}>{user_admin ?
+                  <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}/> :
+                  <Icon name={Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE}/>}</div>
+                <div style={styles.planificateur}>{user_planificateur ?
                   <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}/> :
                   <Icon name={Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE}/>}</div>
                 <div className="clearfix"></div>

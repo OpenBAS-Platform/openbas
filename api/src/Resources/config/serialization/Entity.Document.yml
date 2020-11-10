@@ -1,0 +1,16 @@
+App\Entity\Document:
+  attributes:
+    document_id:
+      groups: [ 'document' ]
+    document_name:
+      groups: [ 'document' ]
+    document_description:
+      groups: [ 'document' ]
+    document_type:
+      groups: [ 'document' ]
+    document_path:
+      groups: [ 'document' ]
+    document_liste_tags:
+      groups: [ 'document' ]
+    document_liste_tags_exercise:
+      groups: [ 'document' ]

@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {T} from '../../../../components/I18n'
+import * as R from 'ramda'
 import {i18nRegister} from '../../../../utils/Messages'
 import * as Constants from '../../../../constants/ComponentTypes'
 import {Popover} from '../../../../components/Popover'
@@ -55,9 +56,11 @@ class DryrunPopover extends Component {
   }
 
   render() {
+    let dryrun_is_deletable = R.propOr(true, 'user_can_update', this.props.dryrun)
+
     const deleteActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
+      dryrun_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
     ]
 
     return (
@@ -67,9 +70,11 @@ class DryrunPopover extends Component {
         </IconButton>
         <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
                  onRequestClose={this.handlePopoverClose.bind(this)}>
+        { dryrun_is_deletable ? 
           <Menu multiple={false}>
             <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
           </Menu>
+         : ""}
         </Popover>
         <Dialog title="Confirmation" modal={false}
                 open={this.state.openDelete}

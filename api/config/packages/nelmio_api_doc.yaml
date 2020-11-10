@@ -1,0 +1,11 @@
+nelmio_api_doc:
+  documentation:
+    info:
+      title: OpenEx API
+      description: API of OpenEx, the Crisis management exercises platform.
+      version: 2.0.0
+  areas: # to filter documented areas
+    path_patterns:
+      - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+    host_patterns:
+      - ^api\.

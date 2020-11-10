@@ -100,10 +100,16 @@ class CreateIncident extends Component {
 
     return (
       <div>
-        <AppBar title={<T>Incidents</T>}
+        {(this.props.can_create) ?
+            <AppBar title={<T>Incidents</T>}
                 showMenuIconButton={false}
                 iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                                                      onClick={this.handleOpenCreate.bind(this)}/>}/>
+                onClick={this.handleOpenCreate.bind(this)}/>}/>
+        :
+           <AppBar title={<T>Incidents</T>}
+                showMenuIconButton={false}/>
+        }
+
         <DialogTitleElement
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
@@ -138,6 +144,7 @@ CreateIncident.propTypes = {
   subobjectives: PropTypes.array,
   addIncident: PropTypes.func,
   selectIncident: PropTypes.func,
+  can_create: PropTypes.bool
 }
 
 export default connect(null, {addIncident, selectIncident})(CreateIncident);

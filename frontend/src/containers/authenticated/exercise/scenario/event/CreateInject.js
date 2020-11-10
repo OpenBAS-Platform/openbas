@@ -42,11 +42,39 @@ class CreateInject extends Component {
   }
 
   handleClose() {
-    this.setState({open: false, stepIndex: 0, finished: false, type: 'openex_manual', injectData: null, injectAttachments: []})
+    this.setState({
+      open: false,
+      stepIndex: 0,
+      finished: false,
+      type: 'openex_manual',
+      injectData: null,
+      injectAttachments: []
+    })
   }
 
   onGlobalSubmit(data) {
+    data.inject_date = this.convertDate(data.inject_date_only + ' ' + data.inject_time);
+
+    delete data.inject_date_only
+    delete data.inject_time
+
     this.setState({injectData: data})
+  }
+
+  convertDate(dateToConvert) {
+    let regexDateFr = RegExp('^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$')
+    let regexDateEn = RegExp('^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$')
+    let timeSplitted, dateSplitted, split, newDate;
+
+    if (regexDateFr.test(dateToConvert)) {
+      split = dateToConvert.split(' ');
+      dateSplitted = split[0].split('/')
+      timeSplitted = split[1]
+      newDate = dateSplitted[2] + '-' + dateSplitted[1] + '-' + dateSplitted[0] + ' ' + timeSplitted
+      return newDate
+    } else if (regexDateEn.test(dateToConvert)) {
+      return dateToConvert
+    }
   }
 
   onContentAttachmentAdd(file) {
@@ -84,12 +112,18 @@ class CreateInject extends Component {
   }
 
   handleNext() {
-    if (this.state.stepIndex === 0) {
-      this.refs.injectForm.submit()
-    } else if (this.state.stepIndex === 1) {
-      this.refs.contentForm.getWrappedInstance().submit()
-    } else if (this.state.stepIndex === 2) {
-      this.createInject()
+    switch (this.state.stepIndex) {
+      case 0:
+        this.refs.injectForm.submit()
+        break;
+      case 1:
+        this.refs.contentForm.getWrappedInstance().submit()
+        break;
+      case 2:
+        this.createInject()
+        break;
+      default:
+        break;
     }
   }
 
@@ -182,8 +216,10 @@ class CreateInject extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING_PADDING}
-                                     onClick={this.handleOpen.bind(this)}/>
+        <FloatingActionsButtonCreate
+          type={Constants.BUTTON_TYPE_FLOATING_PADDING}
+          onClick={this.handleOpen.bind(this)}
+        />
         <DialogTitleElement
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
@@ -208,7 +244,8 @@ class CreateInject extends Component {
           open={this.state.open}
           onRequestClose={this.handleClose.bind(this)}
           autoScrollBodyContent={true}
-          actions={actions}>
+          actions={actions}
+        >
           <div>{this.getStepContent(this.state.stepIndex)}</div>
         </DialogTitleElement>
       </div>

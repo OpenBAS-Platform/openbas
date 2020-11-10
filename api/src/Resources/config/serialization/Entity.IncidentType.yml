@@ -1,0 +1,6 @@
+App\Entity\IncidentType:
+  attributes:
+    type_id:
+      groups: [ 'IncidentType', 'incident' ]
+    type_name:
+      groups: [ 'IncidentType', 'incident' ]

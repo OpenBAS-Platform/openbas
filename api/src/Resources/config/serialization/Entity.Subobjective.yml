@@ -1,0 +1,20 @@
+App\Entity\Subobjective:
+  attributes:
+    subobjective_id:
+      groups: [ 'subobjective', 'objective', 'incident' ]
+    subobjective_title:
+      groups: [ 'subobjective' ]
+    subobjective_description:
+      groups: [ 'subobjective' ]
+    subobjective_priority:
+      groups: [ 'subobjective' ]
+    subobjective_objective:
+      groups: [ 'subobjective' ]
+    subobjective_incidents:
+      groups: [ 'subobjective' ]
+    subobjective_exercise:
+      groups: [ 'subobjective' ]
+    user_can_update:
+      groups: [ 'subobjective' ]
+    user_can_delete:
+      groups: [ 'subobjective' ]

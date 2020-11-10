@@ -44,7 +44,10 @@ class CreateAudience extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate type={Constants.BUTTON_TYPE_FLOATING} onClick={this.handleOpen.bind(this)}/>
+        <FloatingActionsButtonCreate
+          type={Constants.BUTTON_TYPE_FLOATING}
+          onClick={this.handleOpen.bind(this)}
+        />
         <Dialog
           title="Create a new audience"
           modal={false}
@@ -52,7 +55,11 @@ class CreateAudience extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
-          <AudienceForm ref="audienceForm" onSubmit={this.onSubmit.bind(this)} onSubmitSuccess={this.handleClose.bind(this)}/>
+          <AudienceForm
+            ref="audienceForm"
+            onSubmit={this.onSubmit.bind(this)}
+            onSubmitSuccess={this.handleClose.bind(this)}
+          />
         </Dialog>
       </div>
     )
@@ -65,4 +72,6 @@ CreateAudience.propTypes = {
   onCreate: PropTypes.func
 }
 
-export default connect(null, {addAudience})(CreateAudience);
+export default connect(null, {
+  addAudience
+})(CreateAudience);

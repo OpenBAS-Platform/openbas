@@ -147,14 +147,16 @@ class IncidentPopover extends Component {
   }
 
   render() {
+    let incident_is_updatable = R.propOr(true, 'user_can_update', this.props.incident) 
+    let incident_is_deletable = R.propOr(true, 'user_can_delete', this.props.incident) 
+      
     const editActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      <FlatButton key="update" label={this.state.stepIndex === 1 ? "Update" : "Next"} primary={true}
-                  onClick={this.handleNext.bind(this)}/>,
+      incident_is_updatable ? <FlatButton key="update" label={this.state.stepIndex === 1 ? "Update" : "Next"} primary={true} onClick={this.handleNext.bind(this)}/>: ""
     ]
     const deleteActions = [
       <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>,
+      incident_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
     ]
 
     let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type', 'incident_weight', 'incident_order'], this.props.incident)
@@ -164,13 +166,17 @@ class IncidentPopover extends Component {
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
         </IconButton>
-        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handlePopoverClose.bind(this)}>
-          <Menu multiple={false}>
-            <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>
-            <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>
-          </Menu>
-        </Popover>
+        
+        {(incident_is_updatable || incident_is_deletable)
+        ?
+          <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl} onRequestClose={this.handlePopoverClose.bind(this)}>
+            <Menu multiple={false}>
+              {incident_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>: ""}
+              {incident_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
+            </Menu>          
+          </Popover>
+        : ""}
+        
         <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
                 onRequestClose={this.handleCloseDelete.bind(this)} actions={deleteActions}>
           <T>Do you want to delete this incident?</T>

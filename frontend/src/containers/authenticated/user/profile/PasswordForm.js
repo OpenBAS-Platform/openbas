@@ -5,7 +5,7 @@ import {FormField} from '../../../../components/Field'
 
 const validate = values => {
   const errors = {}
-  if( !values.user_plain_password || values.user_plain_password !== values.password_confirmation ) {
+  if (!values.user_plain_password || values.user_plain_password !== values.password_confirmation) {
     errors.user_plain_password = 'Passwords do no match'
   }
 

@@ -1,0 +1,8 @@
+App\Entity\Parameter:
+  attributes:
+    parameter_id:
+      groups: [ 'parameter' ]
+    parameter_key:
+      groups: [ 'parameter' ]
+    parameter_value:
+      groups: [ 'parameter' ]

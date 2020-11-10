@@ -1,0 +1,37 @@
+security:
+  # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+  encoders:
+    App\Entity\User:
+      algorithm: 'auto'
+  providers:
+    token_user_provider:
+      id: token_user_provider
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    doc:
+      pattern: ^/api/doc
+      security: false
+
+    auth:
+      pattern: ^/api/auth
+      security: false
+
+    comcheck:
+      pattern: ^/api/comcheck
+      security: false
+
+    api:
+      pattern: ^/api
+      stateless: true
+      guard:
+        authenticators:
+          - token_authenticator
+      provider: token_user_provider
+      anonymous: ~
+
+    frontend:
+      pattern: ^/
+      security: false

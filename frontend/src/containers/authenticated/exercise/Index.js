@@ -21,6 +21,8 @@ import {fetchEvents} from '../../../actions/Event'
 import {fetchIncidents, fetchIncidentTypes} from '../../../actions/Incident'
 import {downloadFile} from '../../../actions/File'
 import {fetchAllInjects} from '../../../actions/Inject'
+import {fetchExercise} from '../../../actions/Exercise'
+import {fetchGroups} from '../../../actions/Group'
 import EventView from './scenario/event/EventView'
 import IncidentView from './scenario/event/IncidentView'
 import InjectView from './scenario/event/InjectView'
@@ -137,6 +139,7 @@ class IndexExercise extends Component {
 
   componentDidMount() {
     this.props.fetchIncidentTypes()
+    this.props.fetchGroups()
     this.props.fetchObjectives(this.props.exerciseId)
     this.props.fetchSubobjectives(this.props.exerciseId)
     this.props.fetchAudiences(this.props.exerciseId)
@@ -144,10 +147,11 @@ class IndexExercise extends Component {
     this.props.fetchEvents(this.props.exerciseId)
     this.props.fetchIncidents(this.props.exerciseId)
     this.props.fetchAllInjects(this.props.exerciseId)
+    this.props.fetchExercise(this.props.exerciseId)
   }
 
   selectIcon(type) {
-    switch (type) {
+    switch ( type ) {
       case 'email':
         return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST}/>
       case 'ovh-sms':
@@ -235,22 +239,15 @@ class IndexExercise extends Component {
   }
 
   render() {
-    const viewEventActions = [<FlatButton label="Close" primary={true}
-                                          onClick={this.handleCloseViewEvent.bind(this)}/>]
-    const viewIncidentActions = [<FlatButton label="Close" primary={true}
-                                             onClick={this.handleCloseViewIncident.bind(this)}/>]
-    const viewInjectActions = [<FlatButton label="Close" primary={true}
-                                           onClick={this.handleCloseViewInject.bind(this)}/>]
-    const viewAudienceActions = [<FlatButton label="Close" primary={true}
-                                             onClick={this.handleCloseViewAudience.bind(this)}/>]
-    const viewObjectiveActions = [<FlatButton label="Close" primary={true}
-                                              onClick={this.handleCloseViewObjective.bind(this)}/>]
-    const audiencesActions = [<FlatButton label="Close" primary={true}
-                                          onClick={this.handleCloseAudiences.bind(this)}/>]
-    const objectivesActions = [<FlatButton label="Close" primary={true}
-                                           onClick={this.handleCloseObjectives.bind(this)}/>]
-    const injectAudiencesActions = [<FlatButton label="Close" primary={true}
-                                                onClick={this.handleCloseInjectAudiences.bind(this)}/>]
+    const viewEventActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseViewEvent.bind(this)}/>]
+    const viewIncidentActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseViewIncident.bind(this)}/>]
+    const viewInjectActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseViewInject.bind(this)}/>]
+    const viewAudienceActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseViewAudience.bind(this)}/>]
+    const viewObjectiveActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseViewObjective.bind(this)}/>]
+    const audiencesActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseAudiences.bind(this)}/>]
+    const objectivesActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseObjectives.bind(this)}/>]
+    const injectAudiencesActions = [<FlatButton label="Close" primary={true} onClick={this.handleCloseInjectAudiences.bind(this)}/>]
+
     return (
       <div>
         <div style={styles.columnLeft}>
@@ -369,9 +366,16 @@ class IndexExercise extends Component {
           </Dialog>
         </div>
         <div className="clearfix"></div>
-        <br /><br />
+        <br/><br/>
         <div style={styles.title}><T>Scenario</T></div>
-        <ScenarioPopover exerciseId={this.props.exerciseId} injects={this.props.injects}/>
+        <ScenarioPopover
+          exerciseId={this.props.exerciseId}
+          injects={this.props.injects}
+          exercise={this.props.exercise}
+          exerciseStartDate={this.props.exerciseStartDate}
+          exerciseEndDate={this.props.exerciseEndDate}
+          userCanUpdate={this.props.userCanUpdate}
+        />
         <div className="clearfix"></div>
         {this.props.events.length === 0 ?
           <div style={styles.empty}><T>You do not have any events in this exercise.</T></div> : ""}
@@ -457,7 +461,8 @@ class IndexExercise extends Component {
           autoScrollBodyContent={true}
           onRequestClose={this.handleCloseViewInject.bind(this)}
           actions={viewInjectActions}>
-          <InjectView downloadAttachment={this.downloadAttachment.bind(this)} inject={this.state.currentInject} audiences={this.props.audiences} subaudiences={R.values(this.props.subaudiences)} />
+          <InjectView downloadAttachment={this.downloadAttachment.bind(this)} inject={this.state.currentInject}
+                      audiences={this.props.audiences} subaudiences={R.values(this.props.subaudiences)}/>
         </Dialog>
         <Dialog
           title="Audiences of the inject"
@@ -509,6 +514,8 @@ IndexExercise.propTypes = {
   incidents: PropTypes.object,
   incident_types: PropTypes.object,
   injects: PropTypes.object,
+  exercise: PropTypes.object,
+  fetchGroups: PropTypes.func,
   fetchObjectives: PropTypes.func,
   fetchSubobjectives: PropTypes.func,
   fetchAudiences: PropTypes.func,
@@ -516,6 +523,7 @@ IndexExercise.propTypes = {
   fetchEvents: PropTypes.func,
   fetchIncidents: PropTypes.func,
   fetchAllInjects: PropTypes.func,
+  fetchExercise: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
   intl: PropTypes.object,
   downloadFile: PropTypes.func
@@ -525,7 +533,7 @@ const filterObjectives = (objectives, exerciseId) => {
   let objectivesFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.objective_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.objective_priority > b.objective_priority),
+    R.sort((a, b) => a.objective_priority > b.objective_priority)
   )
   return objectivesFilterAndSorting(objectives)
 }
@@ -534,7 +542,7 @@ const filterAudiences = (audiences, exerciseId) => {
   let audiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter(n => n.audience_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
   )
   return audiencesFilterAndSorting(audiences)
 }
@@ -548,14 +556,59 @@ const filterEvents = (events, exerciseId) => {
   return eventsFilterAndSorting(events)
 }
 
+const getExerciseStartDate = (exercises) => {
+  let exercise = R.pipe(
+    R.values
+  )(exercises)
+  if (exercise.length > 0) {
+    return exercise[0].exercise_start_date
+  }
+}
+
+const getExerciseEndDate = (exercises) => {
+  let exercise = R.pipe(
+    R.values
+  )(exercises)
+  if (exercise.length > 0) {
+    return exercise[0].exercise_end_date
+  }
+}
+
 const select = (state, ownProps) => {
   let exerciseId = ownProps.params.exerciseId
   let objectives = filterObjectives(state.referential.entities.objectives, exerciseId)
   let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
   let events = filterEvents(state.referential.entities.events, exerciseId)
+  let exerciseStartDate = getExerciseStartDate(state.referential.entities.exercises)
+  let exerciseEndDate = getExerciseEndDate(state.referential.entities.exercises)
+
+  let userId = R.path(['logged', 'user'], state.app)
+  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+
+  let userCanUpdate = isAdmin
+  if (!userCanUpdate) {
+    let groupValues = R.values(state.referential.entities.groups)
+    groupValues.forEach((group) => {
+      group.group_grants.forEach((grant) => {
+        if (
+          grant
+          && grant.grant_exercise
+          && (grant.grant_exercise.exercise_id === exerciseId)
+          && (grant.grant_name === 'PLANNER')
+        ) {
+          group.group_users.forEach((user) => {
+            if (user && (user.user_id === userId)) {
+              userCanUpdate = true
+            }
+          })
+        }
+      })
+    })
+  }
 
   return {
     exerciseId,
+    userCanUpdate,
     objectives,
     subobjectives: state.referential.entities.subobjectives,
     audiences,
@@ -564,6 +617,9 @@ const select = (state, ownProps) => {
     incidents: state.referential.entities.incidents,
     incident_types: state.referential.entities.incident_types,
     injects: state.referential.entities.injects,
+    exercise: state.referential.entities.exercises,
+    exerciseStartDate,
+    exerciseEndDate
   }
 }
 
@@ -576,5 +632,7 @@ export default connect(select, {
   fetchIncidents,
   fetchIncidentTypes,
   fetchAllInjects,
+  fetchExercise,
+  fetchGroups,
   downloadFile
 })(injectIntl(IndexExercise))

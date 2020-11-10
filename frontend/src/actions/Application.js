@@ -6,13 +6,13 @@ import {postReferential, getReferential} from '../utils/Action'
 
 export const askToken = (username, password) => (dispatch) => {
     const data = {login: username, password: password};
-    return postReferential(schema.token, '/api/tokens', data)(dispatch).then(data => {
+    return postReferential(schema.token, '/api/auth', data)(dispatch).then(data => {
         dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data})
     })
 }
 
 export const checkKerberos = () => (dispatch) => {
-    return getReferential(schema.token, '/api/tokens/kerberos')(dispatch).then(data => {
+    return getReferential(schema.token, '/api/auth/kerberos')(dispatch).then(data => {
         dispatch({type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data})
     }).catch(function () {
         dispatch({type: Constants.IDENTITY_LOGIN_FAILED, payload: {status: 'ERROR'}})

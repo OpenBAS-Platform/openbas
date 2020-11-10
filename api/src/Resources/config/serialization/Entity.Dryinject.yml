@@ -1,0 +1,20 @@
+App\Entity\Dryinject:
+  attributes:
+    dryinject_id:
+      groups: [ 'dryinject', 'dryrun' ]
+    dryinject_title:
+      groups: [ 'dryinject' ]
+    dryinject_content:
+      groups: [ 'dryinject' ]
+    dryinject_date:
+      groups: [ 'dryinject' ]
+    dryinject_type:
+      groups: [ 'dryinject' ]
+    dryinject_status:
+      groups: [ 'dryinject' ]
+    dryinject_dryrun:
+      groups: [ 'dryinject' ]
+    user_can_update:
+      groups: [ 'dryinject' ]
+    user_can_delete:
+      groups: [ 'dryinject' ]
