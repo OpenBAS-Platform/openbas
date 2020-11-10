@@ -2,34 +2,32 @@
 
 namespace App\Controller\Exercise;
 
-use App\Entity\DryinjectStatus;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\ComcheckType;
 use App\Entity\Comcheck;
 use App\Entity\ComcheckStatus;
+use App\Entity\Exercise;
+use App\Form\Type\ComcheckType;
+use DateTime;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ComcheckController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List comchecks of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"comcheck"})
-     * @Rest\Get("/exercises/{exercise_id}/comchecks")
+     * @Rest\Get("/api/exercises/{exercise_id}/comchecks")
      */
     public function getExercisesComchecksAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -50,17 +48,22 @@ class ComcheckController extends BaseController
         return $comchecks;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read a comcheck"
      * )
      *
      * @Rest\View(serializerGroups={"comcheck"})
-     * @Rest\Get("/exercises/{exercise_id}/comchecks/{comcheck_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/comchecks/{comcheck_id}")
      */
     public function getExerciseComcheckAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -84,15 +87,20 @@ class ComcheckController extends BaseController
         return $comcheck;
     }
 
+    private function comcheckNotFound()
+    {
+        return View::create(['message' => 'Comcheck not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create a comcheck")
+     * @OA\Property(description="Create a comcheck")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"comcheck"})
-     * @Rest\Post("/exercises/{exercise_id}/comchecks")
+     * @Rest\Post("/api/exercises/{exercise_id}/comchecks")
      */
     public function postExercisesComchecksAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -108,7 +116,7 @@ class ComcheckController extends BaseController
 
         if ($form->isValid()) {
             $comcheck->setComcheckExercise($exercise);
-            $comcheck->setComcheckStartDate(new \DateTime());
+            $comcheck->setComcheckStartDate(new DateTime());
             $em->persist($comcheck);
             $em->flush();
 
@@ -134,7 +142,7 @@ class ComcheckController extends BaseController
                 $status = new ComcheckStatus();
                 $status->setStatusComcheck($comcheck);
                 $status->setStatusUser($user);
-                $status->setStatusLastUpdate(new \DateTime());
+                $status->setStatusLastUpdate(new DateTime());
                 $status->setStatusState(0);
                 $em->persist($status);
                 $em->flush();
@@ -149,7 +157,7 @@ class ComcheckController extends BaseController
                 $userData['user_phone2'] = $user->getUserPhone2();
                 $userData['user_phone3'] = $user->getUserPhone3();
                 $userData['user_organization'] = array();
-                $userData['user_organization']['organization_name']= $user->getUserOrganization()->getOrganizationName();
+                $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;
             }
 
@@ -163,16 +171,16 @@ class ComcheckController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a comcheck"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"comcheck"})
-     * @Rest\Delete("/exercises/{exercise_id}/comchecks/{comcheck_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/comchecks/{comcheck_id}")
      */
     public function removeExercisesComcheckAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -191,15 +199,5 @@ class ComcheckController extends BaseController
 
         $em->remove($comcheck);
         $em->flush();
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function comcheckNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Comcheck not found'], Response::HTTP_NOT_FOUND);
     }
 }

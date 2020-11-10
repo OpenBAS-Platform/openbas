@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,25 +12,16 @@ use App\Entity\Base\BaseEntity;
  */
 class Group extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->group_users = new ArrayCollection();
-        $this->group_grants = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $group_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $group_name;
-
     /**
      * @ORM\ManyToMany(targetEntity="User", inversedBy="user_groups")
      * @ORM\JoinTable(name="users_groups",
@@ -40,14 +31,19 @@ class Group extends BaseEntity
      * @var User[]
      */
     protected $group_users;
-
     /**
      * @ORM\OneToMany(targetEntity="Grant", mappedBy="grant_group")
      * @var Grant[]
      */
     protected $group_grants;
-
     protected $group_grant_in_exercise;
+
+    public function __construct()
+    {
+        $this->group_users = new ArrayCollection();
+        $this->group_grants = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getGroupId()
     {

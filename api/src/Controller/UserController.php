@@ -2,52 +2,46 @@
 
 namespace App\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Organization;
+use App\Entity\User;
+use App\Form\Type\UserType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Form\Type\UserType;
-use App\Entity\User;
-use App\Entity\Organization;
-use App\Service\OpenexMailerService;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class UserController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List users planificateurs"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Get("/planificateurs")
+     * @Rest\Get("/api/planificateurs")
      */
     public function getPlanificateursAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $planificateurs = $em->getRepository('App:User')->FindBy(array('user_planificateur' => true));
         return $planificateurs;
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List users"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Get("/users")
+     * @Rest\Get("/api/users")
      */
     public function getUsersAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
 
         $users = array();
         if (!$request->get('keyword')) {
@@ -77,16 +71,16 @@ class UserController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read a user"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Get("/users/{user_id}")
+     * @Rest\Get("/api/users/{user_id}")
      */
     public function getUserAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
         /* @var $user User */
 
@@ -101,17 +95,22 @@ class UserController extends BaseController
         return $user;
     }
 
+    private function userNotFound()
+    {
+        return View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Create a user"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
-     * @Rest\Post("/users")
+     * @Rest\Post("/api/users")
      */
     public function postUsersAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
 
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -133,12 +132,12 @@ class UserController extends BaseController
                 $user->setUserPassword($encoded);
             }
 
-            $em = $this->get('doctrine.orm.entity_manager');
+            $em = $this->getDoctrine()->getManager();
             if ($user->getUserAdmin() === null) {
                 $user->setUserAdmin(false);
             }
             if ($user->getUserAdmin() == true && !$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-                throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+                throw new AccessDeniedHttpException("Access Denied.");
             }
 
             $user->setUserLang('auto');
@@ -153,20 +152,20 @@ class UserController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a user"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"user"})
-     * @Rest\Delete("/users/{user_id}")
+     * @Rest\Delete("/api/users/{user_id}")
      */
     public function removeUserAction(Request $request)
     {
         if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+            throw new AccessDeniedHttpException("Access Denied.");
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
         /* @var $user User */
 
@@ -177,16 +176,16 @@ class UserController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Update a user"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Put("/users/{user_id}")
+     * @Rest\Put("/api/users/{user_id}")
      */
     public function updateUserAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
         /* @var $user User */
 
@@ -232,10 +231,5 @@ class UserController extends BaseController
         } else {
             return $form;
         }
-    }
-
-    private function userNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
     }
 }

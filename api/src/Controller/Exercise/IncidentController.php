@@ -3,32 +3,28 @@
 namespace App\Controller\Exercise;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\IncidentType;
 use App\Entity\Event;
-use App\Entity\Incident;
+use App\Entity\Exercise;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class IncidentController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List incidents of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"incident"})
-     * @Rest\Get("/exercises/{exercise_id}/incidents")
+     * @Rest\Get("/api/exercises/{exercise_id}/incidents")
      */
     public function getExercisesIncidentsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -57,6 +53,6 @@ class IncidentController extends BaseController
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 }

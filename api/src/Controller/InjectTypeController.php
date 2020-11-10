@@ -2,29 +2,24 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Exception;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\EventType;
-use App\Entity\Event;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class InjectTypeController extends Controller
+class InjectTypeController extends AbstractController
 {
     public static $INJECT_TYPE_MANUAL = 'openex_manual';
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List inject types"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Get("/inject_types")
+     * @Rest\Get("/api/inject_types")
      */
     public function getInjectTypesAction(Request $request)
     {
@@ -34,7 +29,7 @@ class InjectTypeController extends Controller
         try {
             $url = $this->getParameter('worker_url') . '/cxf/contracts';
             $contracts = json_decode(file_get_contents($url), true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $logger->error('Contracts can not be retrieved from worker: ' . $e->getMessage());
         }
 

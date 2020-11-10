@@ -2,22 +2,18 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\Tests\StringableObject;
-use App\Entity\Base\BaseEntity;
 
 
 /**
  * @ORM\Entity()
  * @ORM\Table(name="tags")
  */
-class Tag extends BaseEntity {
-
-    public function __construct() {
-        parent::__construct();
-        $this->tag_documents = new ArrayCollection();
-    }
+class Tag extends BaseEntity
+{
 
     /**
      * @ORM\Id
@@ -25,28 +21,35 @@ class Tag extends BaseEntity {
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $tag_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $tag_name;
-
-    public function getTagId(){
-        return $this->tag_id;
-    }
-
-    public function setTagName($name){
-        $this->tag_name = $name;
-        return $this;
-    }
-
-    public function getTagName(){
-        return $this->tag_name;
-    }
-
     /**
      * @ORM\ManyToMany(targetEntity="Document", mappedBy="document_tags")
      * @var Documents[]
      */
     protected $tag_documents;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->tag_documents = new ArrayCollection();
+    }
+
+    public function getTagId()
+    {
+        return $this->tag_id;
+    }
+
+    public function getTagName()
+    {
+        return $this->tag_name;
+    }
+
+    public function setTagName($name)
+    {
+        $this->tag_name = $name;
+        return $this;
+    }
 }

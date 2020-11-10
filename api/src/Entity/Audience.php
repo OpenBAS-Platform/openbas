@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,58 +12,42 @@ use App\Entity\Base\BaseEntity;
  */
 class Audience extends BaseEntity
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->audience_injects = new ArrayCollection();
-        $this->audience_subaudiences = new ArrayCollection();
-        $this->audience_planificateur_users = new ArrayCollection();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $audience_id;
-
     /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $audience_name;
-
     /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_audiences")
      * @ORM\JoinColumn(name="audience_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */
     protected $audience_exercise;
-
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     protected $audience_enabled = true;
-
     /**
      * @ORM\ManyToMany(targetEntity="Inject", mappedBy="inject_audiences")
      * @var Inject[]
      */
     protected $audience_injects;
-
     /**
      * @ORM\OneToMany(targetEntity="Comcheck", mappedBy="comcheck_audience")
      * @var Comcheck[]
      */
     protected $audience_comchecks;
-
     /**
      * @ORM\OneToMany(targetEntity="Subaudience", mappedBy="subaudience_audience")
      * @var Subaudience[]
      */
     protected $audience_subaudiences;
-
     protected $audience_users_number;
-
     /**
      * @ORM\ManyToMany(targetEntity="User", inversedBy="userPlanificateurAudiences")
      * @ORM\JoinTable(name="planificateurs_audiences",
@@ -73,6 +57,14 @@ class Audience extends BaseEntity
      * @var User[]
      */
     protected $audience_planificateur_users;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->audience_injects = new ArrayCollection();
+        $this->audience_subaudiences = new ArrayCollection();
+        $this->audience_planificateur_users = new ArrayCollection();
+    }
 
     /**
      * Add User planificateur to audience

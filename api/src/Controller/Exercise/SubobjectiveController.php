@@ -3,29 +3,27 @@
 namespace App\Controller\Exercise;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Exercise;
 use App\Entity\Objective;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SubobjectiveController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List subobjectives of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"subobjective"})
-     * @Rest\Get("/exercises/{exercise_id}/subobjectives")
+     * @Rest\Get("/api/exercises/{exercise_id}/subobjectives")
      */
     public function getExercisesSubobjectivesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -53,6 +51,6 @@ class SubobjectiveController extends BaseController
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 }

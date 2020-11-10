@@ -1,30 +1,27 @@
 <?php
+
 namespace App\Controller\Exercise\Tag;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Tag;
 use App\Form\Type\TagType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class TagController extends BaseController
 {
 
     /**
-     * @SWG\Property(description="Create a new tag")
+     * @OA\Property(description="Create a new tag")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"tag"})
-     * @Rest\Post("/tag")
+     * @Rest\Post("/api/tag")
      */
     public function postCreateTagAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
 
         $tag = new Tag();
         $form = $this->createForm(TagType::class, $tag);
@@ -39,26 +36,26 @@ class TagController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Edit a Tag")
+     * @OA\Property(description="Edit a Tag")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"tag"})
-     * @Rest\Post("/tag/{tag_id}")
+     * @Rest\Post("/api/tag/{tag_id}")
      */
     public function postEditTagAction(Request $request)
     {
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a tag"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"tag"})
-     * @Rest\Delete("/tag/{tag_id}")
+     * @Rest\Delete("/api/tag/{tag_id}")
      */
     public function deleteTagAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $tag = $em->getRepository('App:Tag')->find($request->get('tag_id'));
 
         if (empty($tag)) {
@@ -69,23 +66,23 @@ class TagController extends BaseController
         return array('result' => true);
     }
 
+    private function tagNotFound()
+    {
+        return View::create(['message' => 'Tag not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Get List of Tags"
      * )
      *
      * @Rest\View(serializerGroups={"tag"})
-     * @Rest\Get("/tag")
+     * @Rest\Get("/api/tag")
      */
     public function getTagAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $tags = $em->getRepository('App:Tag')->findAll();
         return $tags;
-    }
-
-    private function tagNotFound()
-    {
-        return View::create(['message' => 'Tag not found'], Response::HTTP_NOT_FOUND);
     }
 }

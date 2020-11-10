@@ -2,9 +2,8 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\BaseEntity;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
@@ -12,49 +11,43 @@ use App\Entity\Base\BaseEntity;
  */
 class Dryinject extends BaseEntity
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $dryinject_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $dryinject_title;
-
     /**
      * @ORM\Column(type="text", nullable=true)
      */
     protected $dryinject_content;
-
     /**
      * @ORM\Column(type="datetime")
      */
     protected $dryinject_date;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $dryinject_type;
-
     /**
      * @ORM\ManyToOne(targetEntity="Dryrun", inversedBy="dryrun_dryinjects")
      * @ORM\JoinColumn(name="dryinject_dryrun", referencedColumnName="dryrun_id", onDelete="CASCADE")
      * @var Dryrun
      */
     protected $dryinject_dryrun;
-
     /**
      * @ORM\OneToOne(targetEntity="DryinjectStatus", mappedBy="status_dryinject")
      */
     protected $dryinject_status;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     public function getDryinjectId()
     {

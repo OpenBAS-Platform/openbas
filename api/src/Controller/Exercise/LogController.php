@@ -2,31 +2,30 @@
 
 namespace App\Controller\Exercise;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Exercise;
-use App\Form\Type\LogType;
 use App\Entity\Log;
+use App\Form\Type\LogType;
+use DateTime;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class LogController extends Controller
+class LogController extends AbstractController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List logs"
      * )
      *
      * @Rest\View(serializerGroups={"log"})
-     * @Rest\Get("/exercises/{exercise_id}/logs")
+     * @Rest\Get("/api/exercises/{exercise_id}/logs")
      */
     public function getExercisesLogsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -46,17 +45,22 @@ class LogController extends Controller
         return $logs;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read a log"
      * )
      *
      * @Rest\View(serializerGroups={"log"})
-     * @Rest\Get("/exercises/{exercise_id}/logs/{log_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/logs/{log_id}")
      */
     public function getExercisesLogAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -77,15 +81,20 @@ class LogController extends Controller
         return $log;
     }
 
+    private function logNotFound()
+    {
+        return View::create(['message' => 'Log not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create a log")
+     * @OA\Property(description="Create a log")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"log"})
-     * @Rest\Post("/exercises/{exercise_id}/logs")
+     * @Rest\Post("/api/exercises/{exercise_id}/logs")
      */
     public function postExercisesLogsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -102,7 +111,7 @@ class LogController extends Controller
             $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
             $log->setLogUser($connectedUser);
             $log->setLogExercise($exercise);
-            $log->setLogDate(new \DateTime());
+            $log->setLogDate(new DateTime());
             $em->persist($log);
             $em->flush();
             $log->sanitizeUser();
@@ -113,16 +122,16 @@ class LogController extends Controller
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a log"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"log"})
-     * @Rest\Delete("/exercises/{exercise_id}/logs/{log_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/logs/{log_id}")
      */
     public function removeExercisesLogAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -144,14 +153,14 @@ class LogController extends Controller
     }
 
     /**
-     * @SWG\Property(description="Update a log")
+     * @OA\Property(description="Update a log")
      *
      * @Rest\View(serializerGroups={"log"})
-     * @Rest\Put("/exercises/{exercise_id}/logs/{log_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/logs/{log_id}")
      */
     public function updateExercisesLogAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -181,15 +190,5 @@ class LogController extends Controller
         } else {
             return $form;
         }
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function logNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Log not found'], Response::HTTP_NOT_FOUND);
     }
 }

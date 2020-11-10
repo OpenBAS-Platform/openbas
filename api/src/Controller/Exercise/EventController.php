@@ -2,39 +2,37 @@
 
 namespace App\Controller\Exercise;
 
-use App\Entity\InjectStatus;
-use App\Entity\Outcome;
-use FOS\RestBundle\View\View;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\EventType;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
+use App\Entity\InjectStatus;
+use App\Entity\Outcome;
+use App\Form\Type\EventType;
+use DateTime;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
 use PHPExcel_IOFactory;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List events of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"event"})
-     * @Rest\Get("/exercises/{exercise_id}/events")
+     * @Rest\Get("/api/exercises/{exercise_id}/events")
      */
     public function getExercisesEventsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -54,17 +52,22 @@ class EventController extends BaseController
         return $events;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read an event"
      * )
      *
      * @Rest\View(serializerGroups={"event"})
-     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/events/{event_id}")
      */
     public function getExerciseEventAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -86,15 +89,20 @@ class EventController extends BaseController
         return $event;
     }
 
+    private function eventNotFound()
+    {
+        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create an event")
+     * @OA\Property(description="Create an event")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"event"})
-     * @Rest\Post("/exercises/{exercise_id}/events")
+     * @Rest\Post("/api/exercises/{exercise_id}/events")
      */
     public function postExercisesEventsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -122,16 +130,16 @@ class EventController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete an event"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"event"})
-     * @Rest\Delete("/exercises/{exercise_id}/events/{event_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/events/{event_id}")
      */
     public function removeExercisesEventAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -153,14 +161,14 @@ class EventController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Update an event")
+     * @OA\Property(description="Update an event")
      *
      * @Rest\View(serializerGroups={"event"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}")
      */
     public function updateExercisesEventAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -191,16 +199,16 @@ class EventController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Import incidents and injects"
      * )
      *
      * @Rest\View(serializerGroups={"event"})
-     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/import")
+     * @Rest\Post("/api/exercises/{exercise_id}/events/{event_id}/import")
      */
     public function importExerciseEventAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -272,7 +280,7 @@ class EventController extends BaseController
                             break;
                         case 3:
                             $timestamp = strtotime($cell->getValue());
-                            $date = new \DateTime();
+                            $date = new DateTime();
                             $date->setTimestamp($timestamp);
                             $inject->setInjectDate($date);
                             break;
@@ -299,15 +307,5 @@ class EventController extends BaseController
         }
 
         return $event;
-    }
-
-    private function exerciseNotFound()
-    {
-        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function eventNotFound()
-    {
-        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 }

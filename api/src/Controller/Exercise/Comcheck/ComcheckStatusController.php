@@ -2,32 +2,28 @@
 
 namespace App\Controller\Exercise\Comcheck;
 
-use App\Entity\Dryinject;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
 use App\Entity\Comcheck;
-use App\Entity\ComcheckStatus;
+use App\Entity\Exercise;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class ComcheckStatusController extends Controller
+class ComcheckStatusController extends AbstractController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List statuses of a comcheck"
      * )
      *
      * @Rest\View(serializerGroups={"comcheckStatus"})
-     * @Rest\Get("/exercises/{exercise_id}/comchecks/{comcheck_id}/statuses")
+     * @Rest\Get("/api/exercises/{exercise_id}/comchecks/{comcheck_id}/statuses")
      */
     public function getExercisesComchecksStatusesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -51,11 +47,11 @@ class ComcheckStatusController extends Controller
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function comcheckNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Comcheck not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Comcheck not found'], Response::HTTP_NOT_FOUND);
     }
 }

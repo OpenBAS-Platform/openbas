@@ -1,10 +1,10 @@
 App\Entity\File:
-    attributes:
-        file_id:
-            groups: ['file', 'exercise', 'event', 'inject']
-        file_name:
-            groups: ['file', 'exercise', 'event', 'inject']
-        file_type:
-            groups: ['file', 'exercise', 'event', 'inject']
-        file_path:
-            groups: ['file', 'exercise', 'event', 'inject']
+  attributes:
+    file_id:
+      groups: [ 'file', 'exercise', 'event', 'inject' ]
+    file_name:
+      groups: [ 'file', 'exercise', 'event', 'inject' ]
+    file_type:
+      groups: [ 'file', 'exercise', 'event', 'inject' ]
+    file_path:
+      groups: [ 'file', 'exercise', 'event', 'inject' ]

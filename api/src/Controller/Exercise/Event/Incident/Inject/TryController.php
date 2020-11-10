@@ -2,34 +2,31 @@
 
 namespace App\Controller\Exercise\Event\Incident\Inject;
 
-use App\Entity\DryinjectStatus;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class TryController extends Controller
+class TryController extends AbstractController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Try an inject"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"injectStatus"})
-     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}/try")
+     * @Rest\Post("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}/try")
      */
     public function postExercisesEventsIncidentsInjectsTriesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -100,21 +97,21 @@ class TryController extends Controller
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function eventNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function incidentNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function injectNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Inject not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Inject not found'], Response::HTTP_NOT_FOUND);
     }
 }

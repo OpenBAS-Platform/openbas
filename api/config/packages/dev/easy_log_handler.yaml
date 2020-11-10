@@ -1,7 +1,7 @@
 services:
-    EasyCorp\EasyLog\EasyLogHandler:
-        public: false
-        arguments: ['%kernel.logs_dir%/%kernel.environment%.log']
+  EasyCorp\EasyLog\EasyLogHandler:
+    public: false
+    arguments: [ '%kernel.logs_dir%/%kernel.environment%.log' ]
 
 #// FIXME: How to add this configuration automatically without messing up with the monolog configuration?
 #monolog:

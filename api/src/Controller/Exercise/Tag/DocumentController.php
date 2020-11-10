@@ -1,38 +1,27 @@
 <?php
+
 namespace App\Controller\Exercise\Tag;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Document;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Form\Type\DocumentType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class DocumentController extends BaseController
 {
 
     /**
-    * Get Project File Path
-    **/
-    private function getProjectFilePath()
-    {
-        return $this->get('kernel')->getProjectDir() . '/var/files';
-    }
-
-    /**
-     * @SWG\Property(description="Download a file")
+     * @OA\Property(description="Download a file")
      *
-     * @Rest\Get("/document/download/{document_id}")
+     * @Rest\Get("/api/document/download/{document_id}")
      */
     public function downloadDocumentAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->find($request->get('document_id'));
         /* @var $file File */
 
@@ -41,21 +30,28 @@ class DocumentController extends BaseController
         }
 
         return $this->file(
-            $this->getProjectFilePath().'/'.$document->getDocumentPath(),
+            $this->getProjectFilePath() . '/' . $document->getDocumentPath(),
             $document->getDocumentName()
         );
     }
 
+    /**
+     * Get Project File Path
+     **/
+    private function getProjectFilePath()
+    {
+        return $this->get('kernel')->getProjectDir() . '/var/files';
+    }
 
     /**
-     * @SWG\Property(description="Get Document Tags by ID")
+     * @OA\Property(description="Get Document Tags by ID")
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"tag"})
-     * @Rest\Get("/document/{document_id}/tags")
+     * @Rest\Get("/api/document/{document_id}/tags")
      */
     public function getDocumentTagsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->findOneBy(array('document_id' => $request->get('document_id')));
         if (empty($document)) {
             return $this->documentNotFound();
@@ -63,15 +59,20 @@ class DocumentController extends BaseController
         return $document->getDocumentTags();
     }
 
+    private function documentNotFound()
+    {
+        return View::create(['message' => 'Document not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Get Document Tags 'exercise' by ID")
+     * @OA\Property(description="Get Document Tags 'exercise' by ID")
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"exercise"})
-     * @Rest\Get("/document/{document_id}/tags/exercise")
+     * @Rest\Get("/api/document/{document_id}/tags/exercise")
      */
     public function getDocumentTagsExerciseAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->findOneBy(array('document_id' => $request->get('document_id')));
         if (empty($document)) {
             return $this->documentNotFound();
@@ -79,16 +80,15 @@ class DocumentController extends BaseController
         return $document->getDocumentTagsExercise();
     }
 
-
     /**
-     * @SWG\Property(description="Get Document by ID")
+     * @OA\Property(description="Get Document by ID")
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"document"})
-     * @Rest\Get("/document/{document_id}")
+     * @Rest\Get("/api/document/{document_id}")
      */
     public function getDocumentAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->findOneBy(array('document_id' => $request->get('document_id')));
         if (empty($document)) {
             return $this->documentNotFound();
@@ -97,14 +97,14 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Edit Document Tags")
+     * @OA\Property(description="Edit Document Tags")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
-     * @Rest\Post("/document/{document_id}/save/tags")
+     * @Rest\Post("/api/document/{document_id}/save/tags")
      */
     public function postEditDocumentTagAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->findOneBy(array('document_id' => $request->get('document_id')));
         if (empty($document)) {
             return $this->documentNotFound();
@@ -125,14 +125,14 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Edit Document Tags Exercise")
+     * @OA\Property(description="Edit Document Tags Exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
-     * @Rest\Post("/document/{document_id}/save/tags/exercise")
+     * @Rest\Post("/api/document/{document_id}/save/tags/exercise")
      */
     public function postEditDocumentTagExerciseAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->findOneBy(array('document_id' => $request->get('document_id')));
         if (empty($document)) {
             return $this->documentNotFound();
@@ -152,16 +152,15 @@ class DocumentController extends BaseController
         return $document;
     }
 
-
     /**
-     * @SWG\Property(description="Create a new document")
+     * @OA\Property(description="Create a new document")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
-     * @Rest\Post("/document")
+     * @Rest\Post("/api/document")
      */
     public function postCreateDocumentAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         if (count($_FILES) == 0) {
             return View::create(['message' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         } else {
@@ -186,14 +185,14 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Edit a Document")
+     * @OA\Property(description="Edit a Document")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
-     * @Rest\Post("/document/save/{document_id}")
+     * @Rest\Post("/api/document/save/{document_id}")
      */
     public function postEditDocumentAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->find($request->get('document_id'));
 
         if (empty($document)) {
@@ -214,16 +213,16 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a document"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"document"})
-     * @Rest\Delete("/document/{document_id}")
+     * @Rest\Delete("/api/document/{document_id}")
      */
     public function deleteDocumentAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $document = $em->getRepository('App:Document')->find($request->get('document_id'));
 
         if (empty($document)) {
@@ -235,26 +234,21 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Get List of document"
      * )
      *
      * @Rest\View(serializerGroups={"document"})
-     * @Rest\Post("/document/search")
+     * @Rest\Post("/api/document/search")
      */
     public function searchDocumentAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $documents = $em->getRepository('App:Document')->findAll();
         foreach ($documents as &$document) {
             $document->computeDocumentListeTags();
             $document->computeDocumentListeTagsExercise();
         }
         return $documents;
-    }
-
-    private function documentNotFound()
-    {
-        return View::create(['message' => 'Document not found'], Response::HTTP_NOT_FOUND);
     }
 }

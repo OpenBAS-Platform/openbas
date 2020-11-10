@@ -2,37 +2,33 @@
 
 namespace App\Controller\Exercise\Audience;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Audience;
+use App\Entity\Exercise;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use PHPExcel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Entity\Audience;
-use PHPExcel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List users of an audience"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users")
+     * @Rest\Get("/api/exercises/{exercise_id}/audiences/{audience_id}/users")
      */
     public function getExercisesAudiencesUsersAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -63,16 +59,26 @@ class UserController extends BaseController
         return $users;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function audienceNotFound()
+    {
+        return View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List users of an audience (xls)"
      * )
      *
-     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}/users.xlsx")
+     * @Rest\Get("/api/exercises/{exercise_id}/audiences/{audience_id}/users.xlsx")
      */
     public function getExercisesAudiencesUsersXlsxAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -99,7 +105,7 @@ class UserController extends BaseController
             $users = array_merge($users, $subaudienceUsers);
         }
 
-        $xlsUsers = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $xlsUsers = new Spreadsheet();
         /* @var $xlsInjects PHPExcel */
 
         $xlsUsers->getProperties()
@@ -133,12 +139,12 @@ class UserController extends BaseController
             $sheet->setCellValue('G' . $i, $user->getUserPhone2());
             $sheet->setCellValue('H' . $i, $user->getUserPhone());
             $sheet->setCellValue('I' . $i, $user->getUserPhone3());
-            $sheet->setCellValue('J' . $i, (strlen($user->getUserPgpKey()) > 5? 'YES':'NO'));
+            $sheet->setCellValue('J' . $i, (strlen($user->getUserPgpKey()) > 5 ? 'YES' : 'NO'));
             $i++;
         }
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($xlsUsers);
-        $response =  new StreamedResponse(function () use ($writer) {
+        $writer = new Xlsx($xlsUsers);
+        $response = new StreamedResponse(function () use ($writer) {
             $writer->save('php://output');
         });
         $dispositionHeader = $response->headers->makeDisposition(
@@ -152,16 +158,6 @@ class UserController extends BaseController
         $response->headers->set('Content-Disposition', $dispositionHeader);
 
         return $response;
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function audienceNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function str_to_noaccent($str)

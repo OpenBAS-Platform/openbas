@@ -3,20 +3,18 @@
 namespace App\Controller;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class WorkerStatusController extends Controller
+class WorkerStatusController extends AbstractController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Get the worker status"
      * )
-     * @Rest\Get("/worker_status")
+     * @Rest\Get("/api/worker_status")
      */
     public function getWorkerStatusAction(Request $request)
     {

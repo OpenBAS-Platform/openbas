@@ -1,20 +1,20 @@
 App\Entity\Event:
-    attributes:
-        event_id:
-            groups: ['event', 'incident']
-        event_title:
-            groups: ['event']
-        event_description:
-            groups: ['event']
-        event_image:
-            groups: ['event']
-        event_exercise:
-            groups: ['event']
-        event_incidents:
-            groups: ['event']
-        event_order:
-            groups: ['event']
-        user_can_update:
-            groups: ['event']
-        user_can_delete:
-            groups: ['event']
+  attributes:
+    event_id:
+      groups: [ 'event', 'incident' ]
+    event_title:
+      groups: [ 'event' ]
+    event_description:
+      groups: [ 'event' ]
+    event_image:
+      groups: [ 'event' ]
+    event_exercise:
+      groups: [ 'event' ]
+    event_incidents:
+      groups: [ 'event' ]
+    event_order:
+      groups: [ 'event' ]
+    user_can_update:
+      groups: [ 'event' ]
+    user_can_delete:
+      groups: [ 'event' ]

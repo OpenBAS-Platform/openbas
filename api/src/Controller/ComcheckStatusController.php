@@ -1,30 +1,26 @@
 <?php
 
-namespace App\Controller\Anonymous;
-
-use App\Entity\Dryinject;
-use FOS\RestBundle\View\View;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+namespace App\Controller;
 
 use App\Entity\ComcheckStatus;
+use DateTime;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class ComcheckStatusController extends Controller
+class ComcheckStatusController extends AbstractFOSRestController
 {
     /**
-     * @SWG\Property(description="Update the status of a comcheck user")
+     * @OA\Property(description="Update the status of a comcheck user")
      * @Rest\View(serializerGroups={"comcheckStatus"})
-     * @Rest\Get("/comcheck/{comcheckstatus_id}")
+     * @Rest\Get("/api/comcheck/{comcheckstatus_id}")
      */
     public function updateComcheckStatusAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $status = $em->getRepository('App:ComcheckStatus')->find($request->get('comcheckstatus_id'));
         /* @var $status ComcheckStatus */
 
@@ -32,7 +28,7 @@ class ComcheckStatusController extends Controller
             return $this->statusNotFound();
         }
 
-        $status->setStatusLastUpdate(new \DateTime());
+        $status->setStatusLastUpdate(new DateTime());
         $status->setStatusState(1);
 
         $em->persist($status);

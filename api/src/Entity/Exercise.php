@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,6 +13,110 @@ use App\Entity\Base\BaseEntity;
  */
 class Exercise extends BaseEntity
 {
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="string")
+     * @ORM\GeneratedValue(strategy="UUID")
+     */
+    protected $exercise_id;
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $exercise_name;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $exercise_subtitle;
+    /**
+     * @ORM\Column(type="text")
+     */
+    protected $exercise_description;
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $exercise_start_date;
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    protected $exercise_end_date;
+    /**
+     * @ORM\Column(type="text", options={"default" : "animation@domaine.fr"})
+     */
+    protected $exercise_mail_expediteur;
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="exercise_owner", referencedColumnName="user_id")
+     */
+    protected $exercise_owner;
+    /**
+     * @ORM\OneToMany(targetEntity="Grant", mappedBy="grant_exercise")
+     * @var Grant[]
+     */
+    protected $exercise_grants;
+    /**
+     * @ORM\OneToMany(targetEntity="Audience", mappedBy="audience_exercise")
+     * @var Audience[]
+     */
+    protected $exercise_audiences;
+    /**
+     * @ORM\OneToMany(targetEntity="Objective", mappedBy="objective_exercise")
+     * @var Comcheck[]
+     */
+    protected $exercise_objectives;
+    /**
+     * @ORM\OneToMany(targetEntity="Log", mappedBy="log_exercise")
+     * @var Log[]
+     */
+    protected $exercise_logs;
+    /**
+     * @ORM\OneToMany(targetEntity="Event", mappedBy="event_exercise")
+     * @var Event[]
+     */
+    protected $exercise_events;
+    /**
+     * @ORM\OneToMany(targetEntity="Comcheck", mappedBy="comcheck_exercise")
+     * @var Comcheck[]
+     */
+    protected $exercise_comechecks;
+    /**
+     * @ORM\ManyToOne(targetEntity="File")
+     * @ORM\JoinColumn(name="exercise_image", referencedColumnName="file_id", onDelete="SET NULL", nullable=true)
+     */
+    protected $exercise_image;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $exercise_message_header;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $exercise_message_footer;
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $exercise_canceled = false;
+    /**
+     * @ORM\Column(type="string", options={"default" : "standard"})
+     */
+    protected $exercise_type = 'standard';
+    /**
+     * @ORM\ManyToOne(targetEntity="Group")
+     * @ORM\JoinColumn(name="exercise_animation_group", referencedColumnName="group_id", onDelete="SET NULL", nullable=true)
+     */
+    protected $exercise_animation_group;
+    /**
+     * @ORM\ManyToMany(targetEntity="Document", mappedBy="document_exercises")
+     * @var Documents[]
+     */
+    protected $exercise_documents;
+    /**
+     * @ORM\OneToMany(targetEntity="Dryrun", mappedBy="dryrun_exercise")
+     * @var Comcheck[]
+     */
+    protected $exercise_dryruns;
+    protected $exercise_status = 'SCHEDULED';
+    protected $exercise_owner_id;
+
     public function __construct()
     {
         $this->exercise_grants = new ArrayCollection();
@@ -21,142 +126,15 @@ class Exercise extends BaseEntity
         parent::__construct();
     }
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
-     */
-    protected $exercise_id;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    protected $exercise_name;
-
-    /**
-     * @ORM\Column(type="text")
-     */
-    protected $exercise_subtitle;
-
-    /**
-     * @ORM\Column(type="text")
-     */
-    protected $exercise_description;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $exercise_start_date;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    protected $exercise_end_date;
-
-    /**
-     * @ORM\Column(type="text", options={"default" : "animation@domaine.fr"})
-     */
-    protected $exercise_mail_expediteur;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="exercise_owner", referencedColumnName="user_id")
-     */
-    protected $exercise_owner;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Grant", mappedBy="grant_exercise")
-     * @var Grant[]
-     */
-    protected $exercise_grants;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Audience", mappedBy="audience_exercise")
-     * @var Audience[]
-     */
-    protected $exercise_audiences;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Objective", mappedBy="objective_exercise")
-     * @var Comcheck[]
-     */
-    protected $exercise_objectives;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Log", mappedBy="log_exercise")
-     * @var Log[]
-     */
-    protected $exercise_logs;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Event", mappedBy="event_exercise")
-     * @var Event[]
-     */
-    protected $exercise_events;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Comcheck", mappedBy="comcheck_exercise")
-     * @var Comcheck[]
-     */
-    protected $exercise_comechecks;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="File")
-     * @ORM\JoinColumn(name="exercise_image", referencedColumnName="file_id", onDelete="SET NULL", nullable=true)
-     */
-    protected $exercise_image;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $exercise_message_header;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $exercise_message_footer;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    protected $exercise_canceled = false;
-
-    /**
-     * @ORM\Column(type="string", options={"default" : "standard"})
-     */
-    protected $exercise_type = 'standard';
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Group")
-     * @ORM\JoinColumn(name="exercise_animation_group", referencedColumnName="group_id", onDelete="SET NULL", nullable=true)
-     */
-    protected $exercise_animation_group;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Document", mappedBy="document_exercises")
-     * @var Documents[]
-     */
-    protected $exercise_documents;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Dryrun", mappedBy="dryrun_exercise")
-     * @var Comcheck[]
-     */
-    protected $exercise_dryruns;
-
-    protected $exercise_status = 'SCHEDULED';
-
-    protected $exercise_owner_id;
+    public function getExerciseMailExpediteur()
+    {
+        return $this->exercise_mail_expediteur;
+    }
 
     public function setExerciseMailExpediteur($mail_expediteur)
     {
         $this->exercise_mail_expediteur = $mail_expediteur;
         return $this;
-    }
-
-    public function getExerciseMailExpediteur()
-    {
-        return $this->exercise_mail_expediteur;
     }
 
     public function getExerciseId()
@@ -222,17 +200,6 @@ class Exercise extends BaseEntity
     public function setExerciseEndDate($endDate)
     {
         $this->exercise_end_date = $endDate;
-        return $this;
-    }
-
-    public function getExerciseOwner()
-    {
-        return $this->exercise_owner;
-    }
-
-    public function setExerciseOwner($owner)
-    {
-        $this->exercise_owner = $owner;
         return $this;
     }
 
@@ -346,10 +313,20 @@ class Exercise extends BaseEntity
         return $this;
     }
 
-
     public function getExerciseOwnerId()
     {
         return $this->getExerciseOwner()->getUserId();
+    }
+
+    public function getExerciseOwner()
+    {
+        return $this->exercise_owner;
+    }
+
+    public function setExerciseOwner($owner)
+    {
+        $this->exercise_owner = $owner;
+        return $this;
     }
 
     public function computeExerciseOwner()
@@ -364,7 +341,7 @@ class Exercise extends BaseEntity
         } else {
             $all_injects_in_future = true;
             $all_injects_in_past = true;
-            $now = new \DateTime();
+            $now = new DateTime();
             foreach ($injects as $inject) {
                 if ($inject->getInjectDate() < $now) {
                     $all_injects_in_future = false;

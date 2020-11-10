@@ -2,35 +2,33 @@
 
 namespace App\Controller\Exercise\Event\Incident;
 
-use App\Entity\Audience;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\InjectType;
-use App\Entity\InjectStatus;
+use App\Entity\Audience;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
+use App\Entity\InjectStatus;
+use App\Form\Type\InjectType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class InjectController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List injects of an incident"
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
+     * @Rest\Get("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
      */
     public function getExercisesEventsIncidentsInjectsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -71,15 +69,30 @@ class InjectController extends BaseController
         return $injects;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function eventNotFound()
+    {
+        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function incidentNotFound()
+    {
+        return View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create an inject")
+     * @OA\Property(description="Create an inject")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"inject"})
      * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
      */
     public function postExercisesEventsIncidentsInjectsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -141,7 +154,43 @@ class InjectController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * Update exercise start and end dates
+     *
+     * @param Exercise $exercise
+     * @param Inject $inject
+     * @param String $removedInjectId
+     **/
+    private function updateExercise($exercise, $inject = null, $removedInjectId = null)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $injects = array();
+        if ($inject) {
+            $injects[] = $inject;
+        }
+
+        $events = $em->getRepository('App:Event')->findBy(['event_exercise' => $exercise]);
+        foreach ($events as $event) {
+            $incidents = $em->getRepository('App:Incident')->findBy(['incident_event' => $event]);
+            foreach ($incidents as $incident) {
+                $foundInjects = $em->getRepository('App:Inject')->findBy(['inject_incident' => $incident, 'inject_enabled' => true]);
+                foreach ($foundInjects as $inject) {
+                    if (!$removedInjectId || $removedInjectId !== $inject->getInjectId()) {
+                        $injects[] = $inject;
+                    }
+                }
+            }
+        }
+
+        $exercise->computeExerciseStatus($injects);
+        $exercise->computeStartEndDates($injects);
+        $exercise->computeExerciseOwner();
+        $em->persist($exercise);
+        $em->flush();
+    }
+
+    /**
+     * @OA\Property(
      *    description="Delete an inject"
      * )
      *
@@ -150,7 +199,7 @@ class InjectController extends BaseController
      */
     public function removeExercisesEventsIncidentsInjectAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -187,15 +236,20 @@ class InjectController extends BaseController
         $em->flush();
     }
 
+    private function injectNotFound()
+    {
+        return View::create(['message' => 'Inject not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Update an inject")
+     * @OA\Property(description="Update an inject")
      *
      * @Rest\View(serializerGroups={"inject"})
      * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
     public function updateExercisesEventsIncidentsInjectAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -251,61 +305,5 @@ class InjectController extends BaseController
         } else {
             return $form;
         }
-    }
-
-    /**
-     * Update exercise start and end dates
-     *
-     * @param Exercise $exercise
-     * @param Inject   $inject
-     * @param String   $removedInjectId
-     **/
-    private function updateExercise($exercise, $inject = null, $removedInjectId = null)
-    {
-        $em = $this->get('doctrine.orm.entity_manager');
-
-        $injects = array();
-        if ($inject) {
-            $injects[] = $inject;
-        }
-
-        $events = $em->getRepository('App:Event')->findBy(['event_exercise' => $exercise]);
-        foreach ($events as $event) {
-            $incidents = $em->getRepository('App:Incident')->findBy(['incident_event' => $event]);
-            foreach ($incidents as $incident) {
-                $foundInjects = $em->getRepository('App:Inject')->findBy(['inject_incident' => $incident, 'inject_enabled' => true]);
-                foreach ($foundInjects as $inject) {
-                    if (!$removedInjectId || $removedInjectId !== $inject->getInjectId()) {
-                        $injects[] = $inject;
-                    }
-                }
-            }
-        }
-
-        $exercise->computeExerciseStatus($injects);
-        $exercise->computeStartEndDates($injects);
-        $exercise->computeExerciseOwner();
-        $em->persist($exercise);
-        $em->flush();
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function eventNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function incidentNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function injectNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Inject not found'], Response::HTTP_NOT_FOUND);
     }
 }

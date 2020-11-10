@@ -2,40 +2,52 @@
 
 namespace App\Controller\Import;
 
+use App\Constant\ExerciseConstantClass;
+use App\Entity\Audience;
+use App\Entity\Event;
 use App\Entity\Exercise;
+use App\Entity\Incident;
+use App\Entity\Inject;
+use App\Entity\InjectStatus;
+use App\Entity\Objective;
+use App\Entity\Organization;
+use App\Entity\Outcome;
+use App\Entity\Subaudience;
+use App\Entity\Subobjective;
+use App\Entity\User;
+use DateTime;
+use Doctrine\DBAL\DBALException;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
+use PHPExcel;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use stdClass;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use PHPExcel;
-use App\Utils\Transform;
-use App\Constant\ExerciseConstantClass;
-use Doctrine\DBAL\DBALException;
+use function is_array;
+use function json_decode;
 
-class ImportExerciseController extends Controller
+class ImportExerciseController extends AbstractController
 {
 
     /**
-     * @SWG\Property(description="Import an exercise")
+     * @OA\Property(description="Import an exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Get("/exercises/import/check/exercise/{file_id}")
+     * @Rest\Get("/api/exercises/import/check/exercise/{file_id}")
      */
     public function checkIfExerciseNameExistAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        $em = $this->getDoctrine()->getManager();
+        $reader = new Xlsx();
         if ($request->get('file_id') !== null) {
             $file = $em->getRepository('App:File')->find($request->get('file_id'));
             if (empty($file)) {
                 return $this->fileNotFound();
             }
-            $fileAddress = $this->get('kernel')->getProjectDir()."/var/files/".$file->getFilePath();
+            $fileAddress = $this->get('kernel')->getProjectDir() . "/var/files/" . $file->getFilePath();
         } else {
             $fileAddress = $request->get('import_path');
         }
@@ -58,31 +70,151 @@ class ImportExerciseController extends Controller
         return array('exercise_exist' => false);
     }
 
+    /**
+     *
+     * @return type
+     */
+    private function fileNotFound()
+    {
+        return View::create(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+    }
 
     /**
-     * @SWG\Property(description="Import an exercise")
+     * Get Data for sheet by sheet name
+     * @param type $objPHPExcel Excel worksheet
+     * @param type $sheetName Excel sheetName
+     * @return type                 Return Array
+     */
+    private function getData(&$objPHPExcel, $sheetName)
+    {
+        $datas = array();
+        $sheet = $objPHPExcel->getSheetByName($sheetName);
+        switch ($sheetName) {
+            case ExerciseConstantClass::CST_EXERCISE:
+                $datas = [ExerciseConstantClass::CST_EXERCISE_IMAGE => $sheet->getCell('A2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_ANIMATION_GROUP => $sheet->getCell('B2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_NAME => $sheet->getCell('C2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_SUBTITLE => $sheet->getCell('D2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_DESCRIPTION => $sheet->getCell('E2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_START_DATE => $sheet->getCell('F2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_END_DATE => $sheet->getCell('G2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_MESSAGE_HEADER => $sheet->getCell('H2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_MESSAGE_FOOTER => $sheet->getCell('I2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_CANCELED => $sheet->getCell('J2')->getValue(),
+                    ExerciseConstantClass::CST_EXERCISE_MAIL_EXPEDITEUR => $sheet->getCell('K2')->getValue()];
+                break;
+            case ExerciseConstantClass::CST_AUDIENCE:
+                $i = 2;
+                do {
+                    $data = [ExerciseConstantClass::CST_AUDIENCE_NAME => $sheet->getCell('A' . $i)->getValue(),
+                        ExerciseConstantClass::CST_AUDIENCE_ENABLED => $sheet->getCell('B' . $i)->getValue(),
+                        ExerciseConstantClass::CST_SUBAUDIENCE_NAME => $sheet->getCell('C' . $i)->getValue(),
+                        ExerciseConstantClass::CST_SUBAUDIENCE_ENABLED => $sheet->getCell('D' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_ORGANIZATION => $sheet->getCell('E' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_LOGIN => $sheet->getCell('F' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_PASSWORD => $sheet->getCell('G' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_FIRSTNAME => $sheet->getCell('H' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_LASTNAME => $sheet->getCell('I' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_EMAIL => $sheet->getCell('J' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_EMAIL2 => $sheet->getCell('K' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_PHONE => $sheet->getCell('L' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_PHONE2 => $sheet->getCell('M' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_PHONE3 => $sheet->getCell('N' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_ADMIN => $sheet->getCell('O' . $i)->getValue(),
+                        ExerciseConstantClass::CST_USER_STATUS => $sheet->getCell('P' . $i)->getValue()];
+                    $datas[] = $data;
+                    $i++;
+                } while (trim($sheet->getCell('A' . $i)->getValue()) !== '');
+                break;
+            case ExerciseConstantClass::CST_OBJECTIVE:
+                $i = 2;
+                do {
+                    $data = [ExerciseConstantClass::CST_OBJECTIVE_TITLE => $sheet->getCell('A' . $i)->getValue(),
+                        ExerciseConstantClass::CST_OBJECTIVE_DESCRIPTION => $sheet->getCell('B' . $i)->getValue(),
+                        ExerciseConstantClass::CST_OBJECTIVE_PRIORITY => $sheet->getCell('C' . $i)->getValue(),
+                        ExerciseConstantClass::CST_SUBOBJECTIVE_TITLE => $sheet->getCell('D' . $i)->getValue(),
+                        ExerciseConstantClass::CST_SUBOBJECTIVE_DESCRIPTION => $sheet->getCell('E' . $i)->getValue(),
+                        ExerciseConstantClass::CST_SUBOBJECTIVE_PRIORITY => $sheet->getCell('F' . $i)->getValue()];
+                    $datas[] = $data;
+                    $i++;
+                } while (trim($sheet->getCell('A' . $i)->getValue()) !== '');
+                break;
+            case ExerciseConstantClass::CST_SCENARIOS:
+                $i = 2;
+                do {
+                    $data = [ExerciseConstantClass::CST_EVENT_IMAGE => $sheet->getCell('A' . $i)->getValue(),
+                        ExerciseConstantClass::CST_EVENT_TITLE => $sheet->getCell('B' . $i)->getValue(),
+                        ExerciseConstantClass::CST_EVENT_DESCRIPTION => $sheet->getCell('C' . $i)->getValue(),
+                        ExerciseConstantClass::CST_EVENT_ORDER => $sheet->getCell('D' . $i)->getValue()];
+                    $datas[] = $data;
+                    $i++;
+                } while (trim($sheet->getCell('B' . $i)->getValue()) !== '');
+                break;
+            case ExerciseConstantClass::CST_INCIDENTS:
+                $i = 2;
+                do {
+                    $data = [ExerciseConstantClass::CST_INCIDENT_TYPE => $sheet->getCell('A' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_EVENT => $sheet->getCell('B' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_TITLE => $sheet->getCell('C' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_STORY => $sheet->getCell('D' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_WEIGHT => $sheet->getCell('E' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_ORDER => $sheet->getCell('F' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_OUTCOME_COMMENT => $sheet->getCell('G' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INCIDENT_OUTCOME_RESULT => $sheet->getCell('H' . $i)->getValue()];
+                    $datas[] = $data;
+                    $i++;
+                } while (trim($sheet->getCell('A' . $i)->getValue()) !== '');
+                break;
+            case ExerciseConstantClass::CST_INJECTS:
+                $i = 2;
+                do {
+                    $data = [ExerciseConstantClass::CST_INJECT_INCIDENT_ID => $sheet->getCell('A' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_USER => $sheet->getCell('B' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_TITLE => $sheet->getCell('C' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_DESCRIPTION => $sheet->getCell('D' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_CONTENT => $sheet->getCell('E' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_DATE => $sheet->getCell('F' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_TYPE => $sheet->getCell('G' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_ALL_AUDIENCES => $sheet->getCell('H' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_ENABLED => $sheet->getCell('I' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_AUDIENCES => $sheet->getCell('J' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_SUBAUDIENCES => $sheet->getCell('K' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_STATUS_NAME => $sheet->getCell('L' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_STATUS_MESSAGE => $sheet->getCell('M' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_STATUS_DATE => $sheet->getCell('N' . $i)->getValue(),
+                        ExerciseConstantClass::CST_INJECT_STATUS_EXECUTION => $sheet->getCell('O' . $i)->getValue()];
+                    $datas[] = $data;
+                    $i++;
+                } while (trim($sheet->getCell('A' . $i)->getValue()) !== '');
+                break;
+        }
+        return $datas;
+    }
+
+    /**
+     * @OA\Property(description="Import an exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Post("/exercises/import")
+     * @Rest\Post("/api/exercises/import")
      */
     public function importExerciseAction(Request $request)
     {
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        $reader = new Xlsx();
         $listTypeSheet = [ExerciseConstantClass::CST_EXERCISE => 'import_exercise',
-                          ExerciseConstantClass::CST_AUDIENCE => 'import_audience',
-                          ExerciseConstantClass::CST_OBJECTIVE => 'import_objective',
-                          ExerciseConstantClass::CST_SCENARIOS => 'import_scenarios',
-                          ExerciseConstantClass::CST_INCIDENTS => 'import_incidents',
-                          ExerciseConstantClass::CST_INJECTS => 'import_injects'];
+            ExerciseConstantClass::CST_AUDIENCE => 'import_audience',
+            ExerciseConstantClass::CST_OBJECTIVE => 'import_objective',
+            ExerciseConstantClass::CST_SCENARIOS => 'import_scenarios',
+            ExerciseConstantClass::CST_INCIDENTS => 'import_incidents',
+            ExerciseConstantClass::CST_INJECTS => 'import_injects'];
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
 
         if ($request->get('file') !== null) {
             $file = $em->getRepository('App:File')->find($request->get('file'));
             if (empty($file)) {
                 return $this->fileNotFound();
             }
-            $fileAddress = $this->get('kernel')->getProjectDir()."/var/files/".$file->getFilePath();
+            $fileAddress = $this->get('kernel')->getProjectDir() . "/var/files/" . $file->getFilePath();
         } else {
             $fileAddress = $request->get('import_path');
         }
@@ -152,18 +284,135 @@ class ImportExerciseController extends Controller
     }
 
     /**
+     * Create Exercise
+     * @param type $em
+     * @param type $data
+     * @return Exercise
+     */
+    private function createOrUpdateExerciseSheet(&$em, $data, $forceCreate = false)
+    {
+        try {
+            $exercise = $em->getRepository('App:Exercise')->findOneBy(array('exercise_owner' => $this->getUser(), 'exercise_name' => $data[ExerciseConstantClass::CST_EXERCISE_NAME]));
+            if (!$exercise || $forceCreate) {
+                $exercise = new Exercise();
+            }
+
+            $exercise->setExerciseOwner($this->getUser());
+            $exercise->setExerciseName($data[ExerciseConstantClass::CST_EXERCISE_NAME]);
+            $exercise->setExerciseSubtitle($data[ExerciseConstantClass::CST_EXERCISE_SUBTITLE]);
+            $exercise->setExerciseDescription($data[ExerciseConstantClass::CST_EXERCISE_DESCRIPTION]);
+            $exercise->setExerciseMessageHeader($data[ExerciseConstantClass::CST_EXERCISE_MESSAGE_HEADER]);
+            $exercise->setExerciseMessageFooter($data[ExerciseConstantClass::CST_EXERCISE_MESSAGE_FOOTER]);
+            $exercise->setExerciseCanceled($data[ExerciseConstantClass::CST_EXERCISE_CANCELED]);
+            $exercise->setExerciseStartDate(new DateTime($data[ExerciseConstantClass::CST_EXERCISE_START_DATE]));
+            $exercise->setExerciseEndDate(new DateTime($data[ExerciseConstantClass::CST_EXERCISE_END_DATE]));
+            $exercise->setExerciseMailExpediteur($data[ExerciseConstantClass::CST_EXERCISE_MAIL_EXPEDITEUR]);
+            if ($data[ExerciseConstantClass::CST_EXERCISE_IMAGE] !== null) {
+                $file = $em->getRepository('App:File')->findOneBy(array('file_name' => $data[ExerciseConstantClass::CST_EXERCISE_IMAGE]));
+                if ($file) {
+                    $exercise->setExerciseImage($file);
+                }
+            }
+            if ($data[ExerciseConstantClass::CST_EXERCISE_ANIMATION_GROUP] !== null) {
+                $animationGroup = $em->getRepository('App:Group')->findOneBy(array('group_name' => $data[ExerciseConstantClass::CST_EXERCISE_ANIMATION_GROUP]));
+                if ($animationGroup) {
+                    $exercise->setExerciseAnimationGroup($animationGroup);
+                }
+            }
+            $em->persist($exercise);
+            $em->flush($exercise);
+            return $this->returnSuccess($exercise);
+        } catch (DBALException $ex) {
+            return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour de l\'exercice');
+        }
+    }
+
+    /**
+     * Return Success
+     * @param type $object
+     * @return stdClass
+     */
+    private function returnSuccess($object = null)
+    {
+        $returnObject = new stdClass();
+        $returnObject->success = true;
+        $returnObject->return = $object;
+        return $returnObject;
+    }
+
+    /**
+     * Return Error Message
+     * @param DBALException $ex
+     * @return stdClass
+     */
+    private function returnException(DBALException $ex, $errorMessage = null)
+    {
+        $returnObject = new stdClass();
+        $returnObject->success = false;
+        if ($errorMessage !== null) {
+            $returnObject->errorMessage = $errorMessage;
+            $returnObject->errorDetailMessage = $ex->getMessage();
+        } else {
+            $returnObject->errorMessage = $ex->getMessage();
+            $returnObject->errorDetailMessage = $ex->getMessage();
+        }
+        return $returnObject;
+    }
+
+    private function returnImportError($errorMessage, $errorDetailMessage = null)
+    {
+        return array('success' => false, 'errorMessage' => $errorMessage, 'errorDetailMessage' => $errorDetailMessage);
+    }
+
+    /**
+     * Create Or Update Audience, sub Audience and User
+     * @param type $em
+     * @param type $datas
+     * @param type $exercise
+     */
+    private function createOrUpdateAudienceSheet(&$em, $datas, $exercise, $forceCreate = false)
+    {
+        foreach ($datas as $data) {
+            $result = $this->createOrUpdateAudience($em, $data, $exercise, $forceCreate);
+            if ($result->success) {
+                $audience = $result->return;
+            } else {
+                return $this->returnErrorMessage($result->errorMessage, $result->errorDetailMessage);
+            }
+
+            if ($data[ExerciseConstantClass::CST_SUBAUDIENCE_NAME] !== null) {
+                $result = $this->createOrUpdateSubAudience($em, $data, $audience, $forceCreate);
+                if ($result->success) {
+                    $subAudience = $result->return;
+                } else {
+                    return $this->returnErrorMessage($return->errorMessage, $return->errorDetailMessage);
+                }
+                if ($data[ExerciseConstantClass::CST_USER_LOGIN] !== null) {
+                    $result = $this->createOrUpdateUser($em, $data, $subAudience, $forceCreate);
+                    if ($result->success) {
+                        $user = $result->return;
+                    } else {
+                        return $this->returnErrorMessage($result->errorMessage, $result->errorDetailMessage);
+                    }
+                }
+            }
+        }
+        return $this->returnSuccess();
+    }
+
+    /**
      *
      * @param type $em
      * @param type $data
      * @param type $exercise
-     * @return \App\Entity\Audience
+     * @return Audience
      */
     private function createOrUpdateAudience(&$em, $data, $exercise, $forceCreate = false)
     {
         try {
             $audience = $em->getRepository('App:Audience')->findOneBy(array('audience_exercise' => $exercise, 'audience_name' => $data[ExerciseConstantClass::CST_AUDIENCE_NAME]));
             if (!$audience || $forceCreate) {
-                $audience = new \App\Entity\Audience();
+                $audience = new Audience();
             }
             $audience->setAudienceName($data[ExerciseConstantClass::CST_AUDIENCE_NAME]);
             $audience->setAudienceEnabled($data[ExerciseConstantClass::CST_AUDIENCE_ENABLED]);
@@ -176,19 +425,28 @@ class ImportExerciseController extends Controller
         }
     }
 
+    private function returnErrorMessage($errorMessage, $errorDetailMessage = null)
+    {
+        $returnObject = new stdClass();
+        $returnObject->success = false;
+        $returnObject->errorMessage = $errorMessage;
+        $returnObject->errorDetailMessage = $errorDetailMessage;
+        return $returnObject;
+    }
+
     /**
      *
      * @param type $em
      * @param type $data
      * @param type $audience
-     * @return \App\Entity\Subaudience
+     * @return Subaudience
      */
     private function createOrUpdateSubAudience(&$em, $data, $audience, $forceCreate = false)
     {
         try {
             $subAudience = $em->getRepository('App:Subaudience')->findOneBy(array('subaudience_audience' => $audience, 'subaudience_name' => $data[ExerciseConstantClass::CST_SUBAUDIENCE_NAME]));
             if (!$subAudience || $forceCreate) {
-                $subAudience = new \App\Entity\Subaudience();
+                $subAudience = new Subaudience();
             }
             $subAudience->setSubaudienceAudience($audience);
             $subAudience->setSubaudienceName($data[ExerciseConstantClass::CST_SUBAUDIENCE_NAME]);
@@ -205,14 +463,14 @@ class ImportExerciseController extends Controller
      *
      * @param type $em
      * @param type $data
-     * @param \App\Entity\Subaudience $subAudience
+     * @param Subaudience $subAudience
      */
     private function createOrUpdateUser(&$em, $data, $subAudience = null, $forceCreate = false)
     {
         try {
             $user = $em->getRepository('App:User')->findOneBy(array('user_login' => $data[ExerciseConstantClass::CST_USER_LOGIN]));
             if (!$user) {
-                $user = new \App\Entity\User();
+                $user = new User();
             }
             $result = $this->createOrUpdateOrganization($em, $data, $forceCreate);
             if ($result->success) {
@@ -235,7 +493,7 @@ class ImportExerciseController extends Controller
             $user->setUserLang('auto');
             $em->persist($user);
             $em->flush($user);
-            if ($subAudience instanceof \App\Entity\Subaudience) {
+            if ($subAudience instanceof Subaudience) {
                 $subAudience->addSubaudienceUser($user);
                 $em->persist($subAudience);
                 $em->flush($subAudience);
@@ -250,14 +508,14 @@ class ImportExerciseController extends Controller
      *
      * @param type $em
      * @param type $data
-     * @return \App\Entity\Organization
+     * @return Organization
      */
     private function createOrUpdateOrganization(&$em, $data, $forceCreate = false)
     {
         try {
             $organization = $em->getRepository('App:Organization')->findOneBy(array('organization_name' => $data[ExerciseConstantClass::CST_USER_ORGANIZATION]));
             if (!$organization || $forceCreate) {
-                $organization = new \App\Entity\Organization();
+                $organization = new Organization();
             }
             $organization->setOrganizationName($data[ExerciseConstantClass::CST_USER_ORGANIZATION]);
             $em->persist($organization);
@@ -302,13 +560,63 @@ class ImportExerciseController extends Controller
      * @param type $datas
      * @param type $exercise
      */
+    private function createOrUpdateObjective(&$em, $data, $exercise, $forceCreate = false)
+    {
+        try {
+            $objective = $em->getRepository('App:Objective')->findOneBy(array('objective_title' => $data[ExerciseConstantClass::CST_OBJECTIVE_TITLE], 'objective_exercise' => $exercise));
+            if (!$objective || $forceCreate) {
+                $objective = new Objective();
+            }
+            $objective->setObjectiveTitle($data[ExerciseConstantClass::CST_OBJECTIVE_TITLE]);
+            $objective->setObjectiveDescription($data[ExerciseConstantClass::CST_OBJECTIVE_DESCRIPTION]);
+            $objective->setObjectivePriority($data[ExerciseConstantClass::CST_OBJECTIVE_PRIORITY]);
+            $objective->setObjectiveExercise($exercise);
+            $em->persist($objective);
+            $em->flush($objective);
+            return $this->returnSuccess($objective);
+        } catch (DBALException $ex) {
+            return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des objectifs');
+        }
+    }
+
+    /**
+     *
+     * @param type $em
+     * @param type $datas
+     * @param type $objective
+     */
+    private function createOrUpdateSubObjective(&$em, $data, $objective, $forceCreate = false)
+    {
+        try {
+            $subObjective = $em->getRepository('App:Subobjective')->findOneBy(array('subobjective_title' => $data[ExerciseConstantClass::CST_SUBOBJECTIVE_TITLE], 'subobjective_objective' => $objective));
+            if (!$subObjective || $forceCreate) {
+                $subObjective = new Subobjective();
+            }
+            $subObjective->setSubobjectiveTitle($data[ExerciseConstantClass::CST_SUBOBJECTIVE_TITLE]);
+            $subObjective->setSubobjectiveDescription($data[ExerciseConstantClass::CST_SUBOBJECTIVE_DESCRIPTION]);
+            $subObjective->setSubobjectivePriority($data[ExerciseConstantClass::CST_SUBOBJECTIVE_PRIORITY]);
+            $subObjective->setSubobjectiveObjective($objective);
+            $em->persist($subObjective);
+            $em->flush($subObjective);
+            return $this->returnSuccess($subObjective);
+        } catch (DBALException $ex) {
+            return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des sous objectifs');
+        }
+    }
+
+    /**
+     *
+     * @param type $em
+     * @param type $datas
+     * @param type $exercise
+     */
     private function createOrUpdateEventSheet(&$em, $datas, $exercise, $forceCreate = false)
     {
         try {
             foreach ($datas as $data) {
                 $event = $em->getRepository('App:Event')->findOneBy(array('event_title' => $data[ExerciseConstantClass::CST_EVENT_TITLE], 'event_exercise' => $exercise));
                 if (!$event || $forceCreate) {
-                    $event = new \App\Entity\Event();
+                    $event = new Event();
                     $event->setEventTitle($data[ExerciseConstantClass::CST_EVENT_TITLE]);
                     $event->setEventDescription($data[ExerciseConstantClass::CST_EVENT_DESCRIPTION]);
                     $event->setEventOrder($data[ExerciseConstantClass::CST_EVENT_ORDER]);
@@ -339,7 +647,7 @@ class ImportExerciseController extends Controller
                 if ($event && $incidentType) {
                     $incident = $em->getRepository('App:Incident')->findOneBy(array('incident_event' => $event, 'incident_title' => $data[ExerciseConstantClass::CST_INCIDENT_TITLE]));
                     if (!$incident || $forceCreate) {
-                        $incident = new \App\Entity\Incident();
+                        $incident = new Incident();
                     }
                     $incident->setIncidentType($incidentType);
                     $incident->setIncidentEvent($event);
@@ -352,7 +660,7 @@ class ImportExerciseController extends Controller
 
                     $incidentOutcome = $em->getRepository('App:Outcome')->findOneBy(array('outcome_incident' => $incident));
                     if (!$incidentOutcome) {
-                        $incidentOutcome = new \App\Entity\Outcome();
+                        $incidentOutcome = new Outcome();
                     }
                     $incidentOutcome->setOutcomeComment($data[ExerciseConstantClass::CST_INCIDENT_OUTCOME_COMMENT]);
                     $incidentOutcome->setOutComeResult($data[ExerciseConstantClass::CST_INCIDENT_OUTCOME_RESULT]);
@@ -390,19 +698,19 @@ class ImportExerciseController extends Controller
                 // Create/update inject
                 try {
                     $inject = $repositoryInject->findOneBy([
-                        'inject_incident'   => $incident,
-                        'inject_user'       => $user,
-                        'inject_title'      => $data[ExerciseConstantClass::CST_INJECT_TITLE]
+                        'inject_incident' => $incident,
+                        'inject_user' => $user,
+                        'inject_title' => $data[ExerciseConstantClass::CST_INJECT_TITLE]
                     ]);
                     if (!$inject || $forceCreate) {
-                        $inject = new \App\Entity\Inject();
+                        $inject = new Inject();
                     }
                     $inject->setInjectIncident($incident);
                     $inject->setInjectUser($user);
                     $inject->setInjectTitle($data[ExerciseConstantClass::CST_INJECT_TITLE]);
                     $inject->setInjectDescription($data[ExerciseConstantClass::CST_INJECT_DESCRIPTION]);
                     $inject->setInjectContent($data[ExerciseConstantClass::CST_INJECT_CONTENT]);
-                    $inject->setInjectDate(new \DateTime($data[ExerciseConstantClass::CST_INJECT_DATE]));
+                    $inject->setInjectDate(new DateTime($data[ExerciseConstantClass::CST_INJECT_DATE]));
                     $inject->setInjectType($data[ExerciseConstantClass::CST_INJECT_TYPE]);
                     $inject->setInjectAllAudiences($data[ExerciseConstantClass::CST_INJECT_ALL_AUDIENCES]);
                     $inject->setInjectEnabled($data[ExerciseConstantClass::CST_INJECT_ENABLED]);
@@ -416,12 +724,12 @@ class ImportExerciseController extends Controller
                 try {
                     $injectStatus = $repositoryInjectStatus->findOneBy(['status_inject' => $inject]);
                     if (!$injectStatus) {
-                        $injectStatus = new \App\Entity\InjectStatus();
+                        $injectStatus = new InjectStatus();
                     }
                     $injectStatus->setStatusName($data[ExerciseConstantClass::CST_INJECT_STATUS_NAME]);
                     $injectStatus->setStatusMessage($data[ExerciseConstantClass::CST_INJECT_STATUS_MESSAGE]);
                     $injectStatus->setStatusExecution($data[ExerciseConstantClass::CST_INJECT_STATUS_EXECUTION]);
-                    $injectStatus->setStatusDate(new \DateTime($data[ExerciseConstantClass::CST_INJECT_STATUS_DATE]));
+                    $injectStatus->setStatusDate(new DateTime($data[ExerciseConstantClass::CST_INJECT_STATUS_DATE]));
                     $injectStatus->setStatusInject($inject);
                     $em->persist($injectStatus);
                     $em->flush($injectStatus);
@@ -434,26 +742,26 @@ class ImportExerciseController extends Controller
 
                 $injectAudiencesRawData = $data[ExerciseConstantClass::CST_INJECT_AUDIENCES];
                 if ($injectAudiencesRawData) {
-                    $injectAudiences = \json_decode($injectAudiencesRawData, true);
-                    if (!\is_array($injectAudiences)) {
+                    $injectAudiences = json_decode($injectAudiencesRawData, true);
+                    if (!is_array($injectAudiences)) {
                         $injectAudiences = [$injectAudiencesRawData];
                     }
                 }
 
                 $injectSubAudiencesRawData = $data[ExerciseConstantClass::CST_INJECT_SUBAUDIENCES];
                 if ($injectSubAudiencesRawData) {
-                    $injectSubAudiences = \json_decode($injectSubAudiencesRawData, true);
-                    if (!\is_array($injectSubAudiences)) {
+                    $injectSubAudiences = json_decode($injectSubAudiencesRawData, true);
+                    if (!is_array($injectSubAudiences)) {
                         $injectSubAudiences = [$injectSubAudiencesRawData];
                     }
                 }
 
                 // Audiences
-                foreach($injectAudiences as $injectAudience) {
+                foreach ($injectAudiences as $injectAudience) {
                     try {
                         $audience = $repositoryAudience->findOneBy([
                             'audience_exercise' => $exercise,
-                            'audience_name'     => $injectAudience
+                            'audience_name' => $injectAudience
                         ]);
                         if ($audience) {
                             $inject->addInjectAudience($audience);
@@ -466,7 +774,7 @@ class ImportExerciseController extends Controller
                 }
 
                 // Subaudiences
-                foreach($injectSubAudiences as $injectSubAudience) {
+                foreach ($injectSubAudiences as $injectSubAudience) {
                     try {
                         $subAudience = $repositorySubAudience->findOneBy([
                             'subaudience_name' => $injectSubAudience
@@ -487,183 +795,6 @@ class ImportExerciseController extends Controller
         return $this->returnSuccess();
     }
 
-    /**
-     *
-     * @param type $em
-     * @param type $datas
-     * @param type $exercise
-     */
-    private function createOrUpdateObjective(&$em, $data, $exercise, $forceCreate = false)
-    {
-        try {
-            $objective = $em->getRepository('App:Objective')->findOneBy(array('objective_title' => $data[ExerciseConstantClass::CST_OBJECTIVE_TITLE], 'objective_exercise' => $exercise));
-            if (!$objective || $forceCreate) {
-                $objective = new \App\Entity\Objective();
-            }
-            $objective->setObjectiveTitle($data[ExerciseConstantClass::CST_OBJECTIVE_TITLE]);
-            $objective->setObjectiveDescription($data[ExerciseConstantClass::CST_OBJECTIVE_DESCRIPTION]);
-            $objective->setObjectivePriority($data[ExerciseConstantClass::CST_OBJECTIVE_PRIORITY]);
-            $objective->setObjectiveExercise($exercise);
-            $em->persist($objective);
-            $em->flush($objective);
-            return $this->returnSuccess($objective);
-        } catch (DBALException $ex) {
-            return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des objectifs');
-        }
-    }
-
-    /**
-     *
-     * @param type $em
-     * @param type $datas
-     * @param type $objective
-     */
-    private function createOrUpdateSubObjective(&$em, $data, $objective, $forceCreate = false)
-    {
-        try {
-            $subObjective = $em->getRepository('App:Subobjective')->findOneBy(array('subobjective_title' => $data[ExerciseConstantClass::CST_SUBOBJECTIVE_TITLE], 'subobjective_objective' => $objective));
-            if (!$subObjective || $forceCreate) {
-                $subObjective = new \App\Entity\Subobjective();
-            }
-            $subObjective->setSubobjectiveTitle($data[ExerciseConstantClass::CST_SUBOBJECTIVE_TITLE]);
-            $subObjective->setSubobjectiveDescription($data[ExerciseConstantClass::CST_SUBOBJECTIVE_DESCRIPTION]);
-            $subObjective->setSubobjectivePriority($data[ExerciseConstantClass::CST_SUBOBJECTIVE_PRIORITY]);
-            $subObjective->setSubobjectiveObjective($objective);
-            $em->persist($subObjective);
-            $em->flush($subObjective);
-            return $this->returnSuccess($subObjective);
-        } catch (DBALException $ex) {
-            return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des sous objectifs');
-        }
-    }
-
-    /**
-     * Create Or Update Audience, sub Audience and User
-     * @param type $em
-     * @param type $datas
-     * @param type $exercise
-     */
-    private function createOrUpdateAudienceSheet(&$em, $datas, $exercise, $forceCreate = false)
-    {
-        foreach ($datas as $data) {
-            $result = $this->createOrUpdateAudience($em, $data, $exercise, $forceCreate);
-            if ($result->success) {
-                $audience = $result->return;
-            } else {
-                return $this->returnErrorMessage($result->errorMessage, $result->errorDetailMessage);
-            }
-
-            if ($data[ExerciseConstantClass::CST_SUBAUDIENCE_NAME] !== null) {
-                $result = $this->createOrUpdateSubAudience($em, $data, $audience, $forceCreate);
-                if ($result->success) {
-                    $subAudience = $result->return;
-                } else {
-                    return $this->returnErrorMessage($return->errorMessage, $return->errorDetailMessage);
-                }
-                if ($data[ExerciseConstantClass::CST_USER_LOGIN] !== null) {
-                    $result = $this->createOrUpdateUser($em, $data, $subAudience, $forceCreate);
-                    if ($result->success) {
-                        $user = $result->return;
-                    } else {
-                        return $this->returnErrorMessage($result->errorMessage, $result->errorDetailMessage);
-                    }
-                }
-            }
-        }
-        return $this->returnSuccess();
-    }
-
-
-    /**
-     * Create Exercise
-     * @param type $em
-     * @param type $data
-     * @return Exercise
-     */
-    private function createOrUpdateExerciseSheet(&$em, $data, $forceCreate = false)
-    {
-        try {
-            $exercise = $em->getRepository('App:Exercise')->findOneBy(array('exercise_owner' => $this->getUser(), 'exercise_name' => $data[ExerciseConstantClass::CST_EXERCISE_NAME]));
-            if (!$exercise || $forceCreate) {
-                $exercise = new Exercise();
-            }
-
-            $exercise->setExerciseOwner($this->getUser());
-            $exercise->setExerciseName($data[ExerciseConstantClass::CST_EXERCISE_NAME]);
-            $exercise->setExerciseSubtitle($data[ExerciseConstantClass::CST_EXERCISE_SUBTITLE]);
-            $exercise->setExerciseDescription($data[ExerciseConstantClass::CST_EXERCISE_DESCRIPTION]);
-            $exercise->setExerciseMessageHeader($data[ExerciseConstantClass::CST_EXERCISE_MESSAGE_HEADER]);
-            $exercise->setExerciseMessageFooter($data[ExerciseConstantClass::CST_EXERCISE_MESSAGE_FOOTER]);
-            $exercise->setExerciseCanceled($data[ExerciseConstantClass::CST_EXERCISE_CANCELED]);
-            $exercise->setExerciseStartDate(new \DateTime($data[ExerciseConstantClass::CST_EXERCISE_START_DATE]));
-            $exercise->setExerciseEndDate(new \DateTime($data[ExerciseConstantClass::CST_EXERCISE_END_DATE]));
-            $exercise->setExerciseMailExpediteur($data[ExerciseConstantClass::CST_EXERCISE_MAIL_EXPEDITEUR]);
-            if ($data[ExerciseConstantClass::CST_EXERCISE_IMAGE] !== null) {
-                $file = $em->getRepository('App:File')->findOneBy(array('file_name' => $data[ExerciseConstantClass::CST_EXERCISE_IMAGE]));
-                if ($file) {
-                    $exercise->setExerciseImage($file);
-                }
-            }
-            if ($data[ExerciseConstantClass::CST_EXERCISE_ANIMATION_GROUP] !== null) {
-                $animationGroup = $em->getRepository('App:Group')->findOneBy(array('group_name' => $data[ExerciseConstantClass::CST_EXERCISE_ANIMATION_GROUP]));
-                if ($animationGroup) {
-                    $exercise->setExerciseAnimationGroup($animationGroup);
-                }
-            }
-            $em->persist($exercise);
-            $em->flush($exercise);
-            return $this->returnSuccess($exercise);
-        } catch (DBALException $ex) {
-            return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour de l\'exercice');
-        }
-    }
-
-    /**
-     * Return Success
-     * @param type $object
-     * @return \stdClass
-     */
-    private function returnSuccess($object = null)
-    {
-        $returnObject = new \stdClass();
-        $returnObject->success = true;
-        $returnObject->return = $object;
-        return $returnObject;
-    }
-
-    /**
-     * Return Error Message
-     * @param DBALException $ex
-     * @return \stdClass
-     */
-    private function returnException(DBALException $ex, $errorMessage = null)
-    {
-        $returnObject = new \stdClass();
-        $returnObject->success = false;
-        if ($errorMessage !== null) {
-            $returnObject->errorMessage = $errorMessage;
-            $returnObject->errorDetailMessage = $ex->getMessage();
-        } else {
-            $returnObject->errorMessage = $ex->getMessage();
-            $returnObject->errorDetailMessage = $ex->getMessage();
-        }
-        return $returnObject;
-    }
-
-    private function returnErrorMessage($errorMessage, $errorDetailMessage = null)
-    {
-        $returnObject = new \stdClass();
-        $returnObject->success = false;
-        $returnObject->errorMessage = $errorMessage;
-        $returnObject->errorDetailMessage = $errorDetailMessage;
-        return $returnObject;
-    }
-
-    private function returnImportError($errorMessage, $errorDetailMessage = null)
-    {
-        return array('success' => false, 'errorMessage' => $errorMessage, 'errorDetailMessage' => $errorDetailMessage);
-    }
-
     private function returnImportSuccess($exercise = null)
     {
         if ($exercise instanceof Exercise) {
@@ -671,126 +802,5 @@ class ImportExerciseController extends Controller
         } else {
             return array('success' => true);
         }
-    }
-
-    /**
-     * Get Data for sheet by sheet name
-     * @param type $objPHPExcel     Excel worksheet
-     * @param type $sheetName       Excel sheetName
-     * @return type                 Return Array
-     */
-    private function getData(&$objPHPExcel, $sheetName)
-    {
-        $datas = array();
-        $sheet = $objPHPExcel->getSheetByName($sheetName);
-        switch ($sheetName) {
-            case ExerciseConstantClass::CST_EXERCISE:
-                $datas = [ExerciseConstantClass::CST_EXERCISE_IMAGE => $sheet->getCell('A2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_ANIMATION_GROUP => $sheet->getCell('B2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_NAME => $sheet->getCell('C2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_SUBTITLE => $sheet->getCell('D2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_DESCRIPTION => $sheet->getCell('E2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_START_DATE => $sheet->getCell('F2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_END_DATE => $sheet->getCell('G2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_MESSAGE_HEADER => $sheet->getCell('H2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_MESSAGE_FOOTER => $sheet->getCell('I2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_CANCELED => $sheet->getCell('J2')->getValue(),
-                          ExerciseConstantClass::CST_EXERCISE_MAIL_EXPEDITEUR => $sheet->getCell('K2')->getValue()];
-                break;
-            case ExerciseConstantClass::CST_AUDIENCE:
-                $i = 2;
-                do {
-                    $data = [ExerciseConstantClass::CST_AUDIENCE_NAME => $sheet->getCell('A'.$i)->getValue(),
-                             ExerciseConstantClass::CST_AUDIENCE_ENABLED => $sheet->getCell('B'.$i)->getValue(),
-                             ExerciseConstantClass::CST_SUBAUDIENCE_NAME => $sheet->getCell('C'.$i)->getValue(),
-                             ExerciseConstantClass::CST_SUBAUDIENCE_ENABLED => $sheet->getCell('D'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_ORGANIZATION => $sheet->getCell('E'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_LOGIN => $sheet->getCell('F'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_PASSWORD => $sheet->getCell('G'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_FIRSTNAME => $sheet->getCell('H'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_LASTNAME => $sheet->getCell('I'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_EMAIL => $sheet->getCell('J'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_EMAIL2 => $sheet->getCell('K'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_PHONE => $sheet->getCell('L'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_PHONE2 => $sheet->getCell('M'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_PHONE3 => $sheet->getCell('N'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_ADMIN => $sheet->getCell('O'.$i)->getValue(),
-                             ExerciseConstantClass::CST_USER_STATUS => $sheet->getCell('P'.$i)->getValue()];
-                    $datas[] = $data;
-                    $i++;
-                } while (trim($sheet->getCell('A'.$i)->getValue()) !== '');
-                break;
-            case ExerciseConstantClass::CST_OBJECTIVE:
-                $i = 2;
-                do {
-                    $data = [ExerciseConstantClass::CST_OBJECTIVE_TITLE => $sheet->getCell('A'.$i)->getValue(),
-                             ExerciseConstantClass::CST_OBJECTIVE_DESCRIPTION => $sheet->getCell('B'.$i)->getValue(),
-                             ExerciseConstantClass::CST_OBJECTIVE_PRIORITY => $sheet->getCell('C'.$i)->getValue(),
-                             ExerciseConstantClass::CST_SUBOBJECTIVE_TITLE => $sheet->getCell('D'.$i)->getValue(),
-                             ExerciseConstantClass::CST_SUBOBJECTIVE_DESCRIPTION => $sheet->getCell('E'.$i)->getValue(),
-                             ExerciseConstantClass::CST_SUBOBJECTIVE_PRIORITY => $sheet->getCell('F'.$i)->getValue()];
-                    $datas[] = $data;
-                    $i++;
-                } while (trim($sheet->getCell('A'.$i)->getValue()) !== '');
-                break;
-            case ExerciseConstantClass::CST_SCENARIOS:
-                $i = 2;
-                do {
-                    $data = [ExerciseConstantClass::CST_EVENT_IMAGE => $sheet->getCell('A'.$i)->getValue(),
-                             ExerciseConstantClass::CST_EVENT_TITLE => $sheet->getCell('B'.$i)->getValue(),
-                             ExerciseConstantClass::CST_EVENT_DESCRIPTION => $sheet->getCell('C'.$i)->getValue(),
-                             ExerciseConstantClass::CST_EVENT_ORDER => $sheet->getCell('D'.$i)->getValue()];
-                    $datas[] = $data;
-                    $i++;
-                } while (trim($sheet->getCell('B'.$i)->getValue()) !== '');
-                break;
-            case ExerciseConstantClass::CST_INCIDENTS:
-                $i = 2;
-                do {
-                    $data = [ExerciseConstantClass::CST_INCIDENT_TYPE => $sheet->getCell('A'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_EVENT => $sheet->getCell('B'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_TITLE => $sheet->getCell('C'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_STORY => $sheet->getCell('D'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_WEIGHT => $sheet->getCell('E'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_ORDER => $sheet->getCell('F'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_OUTCOME_COMMENT => $sheet->getCell('G'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INCIDENT_OUTCOME_RESULT => $sheet->getCell('H'.$i)->getValue()];
-                    $datas[] = $data;
-                    $i++;
-                } while (trim($sheet->getCell('A'.$i)->getValue()) !== '');
-                        break;
-            case ExerciseConstantClass::CST_INJECTS:
-                $i = 2;
-                do {
-                    $data = [ExerciseConstantClass::CST_INJECT_INCIDENT_ID => $sheet->getCell('A'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_USER => $sheet->getCell('B'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_TITLE => $sheet->getCell('C'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_DESCRIPTION => $sheet->getCell('D'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_CONTENT => $sheet->getCell('E'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_DATE => $sheet->getCell('F'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_TYPE => $sheet->getCell('G'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_ALL_AUDIENCES => $sheet->getCell('H'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_ENABLED => $sheet->getCell('I'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_AUDIENCES => $sheet->getCell('J'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_SUBAUDIENCES => $sheet->getCell('K'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_STATUS_NAME => $sheet->getCell('L'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_STATUS_MESSAGE => $sheet->getCell('M'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_STATUS_DATE => $sheet->getCell('N'.$i)->getValue(),
-                             ExerciseConstantClass::CST_INJECT_STATUS_EXECUTION => $sheet->getCell('O'.$i)->getValue()];
-                    $datas[] = $data;
-                    $i++;
-                } while (trim($sheet->getCell('A'.$i)->getValue()) !== '');
-                break;
-        }
-        return $datas;
-    }
-
-    /**
-     *
-     * @return type
-     */
-    private function fileNotFound()
-    {
-        return View::create(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
     }
 }

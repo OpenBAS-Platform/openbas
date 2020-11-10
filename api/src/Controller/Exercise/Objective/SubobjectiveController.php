@@ -2,34 +2,31 @@
 
 namespace App\Controller\Exercise\Objective;
 
+use App\Controller\Base\BaseController;
+use App\Entity\Exercise;
+use App\Entity\Objective;
 use App\Entity\Subobjective;
 use App\Form\Type\SubobjectiveType;
-use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\ObjectiveType;
-use App\Entity\Objective;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SubobjectiveController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List subobjectives of an objective"
      * )
      *
      * @Rest\View(serializerGroups={"subobjective"})
-     * @Rest\Get("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
+     * @Rest\Get("/api/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
      */
     public function getExercisesObjectiveSubobjectivesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -58,15 +55,25 @@ class SubobjectiveController extends BaseController
         return $subobjectives;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function objectiveNotFound()
+    {
+        return View::create(['message' => 'Objective not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create a subobjective")
+     * @OA\Property(description="Create a subobjective")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"subobjective"})
-     * @Rest\Post("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
+     * @Rest\Post("/api/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
      */
     public function postExercisesObjectiveSubobjectivesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -98,16 +105,16 @@ class SubobjectiveController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a subobjective"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"subobjective"})
-     * @Rest\Delete("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")
      */
     public function removeExercisesObjectiveSubobjectiveAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -135,15 +142,20 @@ class SubobjectiveController extends BaseController
         $em->flush();
     }
 
+    private function subobjectiveNotFound()
+    {
+        return View::create(['message' => 'Subobjective not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Update a subobjective")
+     * @OA\Property(description="Update a subobjective")
      *
      * @Rest\View(serializerGroups={"subobjective"})
-     * @Rest\Put("/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")
      */
     public function updateExercisesObjectiveSubobjectiveAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -177,20 +189,5 @@ class SubobjectiveController extends BaseController
         } else {
             return $form;
         }
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function objectiveNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Objective not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function subobjectiveNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Subobjective not found'], Response::HTTP_NOT_FOUND);
     }
 }

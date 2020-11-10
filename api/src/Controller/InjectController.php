@@ -2,41 +2,41 @@
 
 namespace App\Controller;
 
-use App\Entity\DryinjectStatus;
-use App\Entity\Subaudience;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Audience;
-use App\Entity\Exercise;
-use App\Form\Type\InjectType;
-use App\Entity\InjectStatus;
+use App\Entity\Dryinject;
+use App\Entity\DryinjectStatus;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
-use App\Entity\Dryinject;
+use App\Entity\InjectStatus;
+use App\Entity\Subaudience;
+use DateTime;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use function json_encode;
 
 class InjectController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List injects for the worker"
      * )
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Get("/injects_all")
+     * @Rest\Get("/api/injects_all")
      */
     public function getAllInjectsAction(Request $request)
     {
         if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+            throw new AccessDeniedHttpException("Access Denied.");
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercises = $em->getRepository('App:Exercise')->findAll();
         /* @var $exercises Exercise[] */
 
@@ -71,24 +71,24 @@ class InjectController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List injects for the worker"
      * )
      *
-     * @Rest\Get("/injects")
+     * @Rest\Get("/api/injects")
      */
     public function getInjectsAction(Request $request)
     {
         if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+            throw new AccessDeniedHttpException("Access Denied.");
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
 
         $injects = array();
-        $dateStart = new \DateTime();
+        $dateStart = new DateTime();
         $dateStart->modify('-60 minutes');
-        $dateEnd = new \DateTime();
+        $dateEnd = new DateTime();
 
         $exercises = $em->getRepository('App:Exercise')->findBy(['exercise_canceled' => 0]);
         /* @var $exercises Exercise[] */
@@ -199,7 +199,7 @@ class InjectController extends BaseController
             }
         }
 
-        return new Response(\json_encode($output));
+        return new Response(json_encode($output));
     }
 
     /**
@@ -213,7 +213,7 @@ class InjectController extends BaseController
         $data = array();
         $data['context']['id'] = $inject->getInjectId();
         $data['context']['type'] = $inject->getInjectType();
-        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
+        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/injects/' . $inject->getInjectId() . '/status';
         $data['data'] = $this->getPersonalInjectContent(json_decode($inject->getInjectContent(), true), $user);
         $data['data']['content_header'] = $inject->getInjectHeader();
         $data['data']['content_footer'] = $inject->getInjectFooter();
@@ -245,28 +245,6 @@ class InjectController extends BaseController
     }
 
     /**
-     * Get DryInject Data
-     * @param type $request
-     * @param type $dryinject
-     * @param type $user
-     * @return type
-     */
-    public function getDryInjectData($request, $dryinject, $user)
-    {
-        $data = array();
-        $data['context']['id'] = $dryinject->getDryinjectId();
-        $data['context']['type'] = $dryinject->getDryinjectType();
-        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
-        $data['data'] = $this->getPersonalInjectContent(json_decode($dryinject->getDryinjectContent(), true), $user);
-        $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
-        $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
-        $data['data']['users'] = array();
-        $data['data']['users'][] = $this->getUserData($user);
-        $data['data']['replyto'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMailExpediteur();
-        return $data;
-    }
-
-    /**
      * Get User Data
      * @param type $user
      * @return type
@@ -288,19 +266,41 @@ class InjectController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * Get DryInject Data
+     * @param type $request
+     * @param type $dryinject
+     * @param type $user
+     * @return type
+     */
+    public function getDryInjectData($request, $dryinject, $user)
+    {
+        $data = array();
+        $data['context']['id'] = $dryinject->getDryinjectId();
+        $data['context']['type'] = $dryinject->getDryinjectType();
+        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
+        $data['data'] = $this->getPersonalInjectContent(json_decode($dryinject->getDryinjectContent(), true), $user);
+        $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
+        $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
+        $data['data']['users'] = array();
+        $data['data']['users'][] = $this->getUserData($user);
+        $data['data']['replyto'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMailExpediteur();
+        return $data;
+    }
+
+    /**
+     * @OA\Property(
      *    description="Update the status of an inject",
      * )
      * @Rest\View(serializerGroups={"injectStatus"})
-     * @Rest\Post("/injects/{inject_id}/status")
+     * @Rest\Post("/api/injects/{inject_id}/status")
      */
     public function updateInjectStatusAction(Request $request)
     {
         if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+            throw new AccessDeniedHttpException("Access Denied.");
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $inject = $em->getRepository('App:Inject')->find($request->get('inject_id'));
         /* @var $inject Inject */
 
@@ -313,7 +313,7 @@ class InjectController extends BaseController
         $status->setStatusName($request->request->get('status'));
         $status->setStatusMessage(json_encode($request->request->get('message')));
         $status->setStatusExecution($request->request->get('execution'));
-        $status->setStatusDate(new \DateTime());
+        $status->setStatusDate(new DateTime());
 
         $em->persist($status);
         $em->flush();
@@ -322,19 +322,19 @@ class InjectController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Update the status of an dryinject",
      * )
      * @Rest\View(serializerGroups={"dryinjectStatus"})
-     * @Rest\Post("/dryinjects/{dryinject_id}/status")
+     * @Rest\Post("/api/dryinjects/{dryinject_id}/status")
      */
     public function updateDryinjectStatusAction(Request $request)
     {
         if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException("Access Denied.");
+            throw new AccessDeniedHttpException("Access Denied.");
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $dryinject = $em->getRepository('App:Dryinject')->find($request->get('dryinject_id'));
         /* @var $dryinject Dryinject */
 
@@ -347,7 +347,7 @@ class InjectController extends BaseController
         $status->setStatusName($request->request->get('status'));
         $status->setStatusMessage(json_encode($request->request->get('message')));
         $status->setStatusExecution($request->request->get('execution'));
-        $status->setStatusDate(new \DateTime());
+        $status->setStatusDate(new DateTime());
 
         $em->persist($status);
         $em->flush();
@@ -357,6 +357,6 @@ class InjectController extends BaseController
 
     private function dryinjectNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Dryinject not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Dryinject not found'], Response::HTTP_NOT_FOUND);
     }
 }

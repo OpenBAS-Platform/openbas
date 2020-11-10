@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Base\BaseEntity;
+use DateTime;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
@@ -12,52 +12,46 @@ use App\Entity\Base\BaseEntity;
  */
 class Comcheck extends BaseEntity
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $comcheck_id;
-
     /**
      * @ORM\Column(type="datetime")
      */
     protected $comcheck_start_date;
-
     /**
      * @ORM\Column(type="datetime")
      */
     protected $comcheck_end_date;
-
     /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_comechecks")
      * @ORM\JoinColumn(name="comcheck_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */
     protected $comcheck_exercise;
-
     /**
      * @ORM\OneToMany(targetEntity="ComcheckStatus", mappedBy="status_comcheck")
      * @var Comcheck[]
      */
     protected $comcheck_comchecks_statuses;
-
     /**
      * @ORM\ManyToOne(targetEntity="Audience", inversedBy="audience_comchecks")
      * @ORM\JoinColumn(name="comcheck_audience", referencedColumnName="audience_id", onDelete="CASCADE")
      * @var Audience
      */
     protected $comcheck_audience;
-
     protected $comcheck_subject;
     protected $comcheck_message;
     protected $comcheck_footer;
     protected $comcheck_finished = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     public function getComcheckId()
     {
@@ -160,7 +154,7 @@ class Comcheck extends BaseEntity
 
     public function computeComcheckFinished()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         if ($this->comcheck_end_date < $now) {
             $this->comcheck_finished = true;
         } else {

@@ -4,52 +4,51 @@ namespace App\Controller;
 
 use App\Entity\File;
 use App\Entity\User;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use OpenApi\Annotations as OA;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use FOS\RestBundle\Controller\Annotations as Rest;
 
-class FileController extends Controller
+class FileController extends AbstractController
 {
-    /**
-    * Get Project File Path
-    **/
-    private function getProjectFilePath()
+    protected $parameterBag;
+
+    public function __construct(ParameterBagInterface $parameterBag)
     {
-        return $this->get('kernel')->getProjectDir() . '/var/files';
+        $this->parameterBag = $parameterBag;
+
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List files"
      * )
      *
      * @Rest\View(serializerGroups={"file"})
-     * @Rest\Get("/files")
+     * @Rest\Get("/api/files")
      */
     public function getFilesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         return $em->getRepository('App:File')->findBy(array(), array('file_id' => 'DESC'));
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Download a file"
      * )
      *
-     * @Rest\Get("/files/{file_id}")
+     * @Rest\Get("/api/files/{file_id}")
      */
     public function getFileAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $file = $em->getRepository('App:File')->find($request->get('file_id'));
         /* @var $file File */
 
@@ -59,7 +58,7 @@ class FileController extends Controller
                 return $this->fileNotFound();
             } else {
                 return $this->file(
-                    $this->getProjectFilePath().'/'.$document->getDocumentPath(),
+                    $this->getProjectFilePath() . '/' . $document->getDocumentPath(),
                     $document->getDocumentName()
                 );
             }
@@ -67,22 +66,35 @@ class FileController extends Controller
         }
 
         return $this->file(
-            $this->getProjectFilePath().'/'.$file->getFilePath(),
+            $this->getProjectFilePath() . '/' . $file->getFilePath(),
             $file->getFileName()
         );
     }
 
+    private function fileNotFound()
+    {
+        return View::create(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * Get Project File Path
+     **/
+    private function getProjectFilePath()
+    {
+        return $this->parameterBag->get('kernel.project_dir') . '/var/files';
+    }
+
+    /**
+     * @OA\Property(
      *    description="Upload a file"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"file"})
-     * @Rest\Post("/files")
+     * @Rest\Post("/api/files")
      */
     public function postFilesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         if (count($_FILES) == 0) {
             return View::create(['message' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         } else {
@@ -104,16 +116,16 @@ class FileController extends Controller
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a file"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"exercise"})
-     * @Rest\Delete("/files/{file_id}")
+     * @Rest\Delete("/api/files/{file_id}")
      */
     public function removeFileAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         /** @var User $user */
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
@@ -127,30 +139,30 @@ class FileController extends Controller
         if ($file) {
             $em->remove($file);
             $em->flush();
-            @unlink($this->getProjectFilePath().'/'.$file->getFilePath());
+            @unlink($this->getProjectFilePath() . '/' . $file->getFilePath());
         }
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Get all sheets name for an import file"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Get("/files/sheets/{file_id}")
+     * @Rest\Get("/api/files/sheets/{file_id}")
      */
     public function getImportFileSheetsNameAction(Request $request)
     {
-        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-        $listTypeSheet = ['exercise', 'audience', 'objective', 'scenarios','incidents', 'injects'];
-        $em = $this->get('doctrine.orm.entity_manager');
+        $reader = new Xlsx();
+        $listTypeSheet = ['exercise', 'audience', 'objective', 'scenarios', 'incidents', 'injects'];
+        $em = $this->getDoctrine()->getManager();
         $file = $em->getRepository('App:File')->find($request->get('file_id'));
 
         if (empty($file)) {
             return $this->fileNotFound();
         }
 
-        $fileAddress = $this->getProjectFilePath().'/'.$file->getFilePath();
+        $fileAddress = $this->getProjectFilePath() . '/' . $file->getFilePath();
 
         if (!file_exists($fileAddress)) {
             return $this->fileNotFound($fileAddress);
@@ -166,13 +178,8 @@ class FileController extends Controller
         return $oFileSheet;
     }
 
-    private function fileNotFound()
-    {
-        return View::create(['message' => 'File not found'], Response::HTTP_NOT_FOUND);
-    }
-
     private function fileNotExist($filePath)
     {
-        return View::create(['message' => 'File not exist :'.$filePath], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'File not exist :' . $filePath], Response::HTTP_NOT_FOUND);
     }
 }

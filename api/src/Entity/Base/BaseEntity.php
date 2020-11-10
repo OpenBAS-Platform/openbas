@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Entity\Base;
 
 class BaseEntity
@@ -23,6 +24,15 @@ class BaseEntity
     }
 
     /**
+     * Get User Can Update Object
+     * @return DateTime
+     */
+    public function getUserCanUpdate()
+    {
+        return $this->UserCanUpdate;
+    }
+
+    /**
      * Set User Can Update Object
      * @param type $boolean
      * @return $this
@@ -34,12 +44,12 @@ class BaseEntity
     }
 
     /**
-     * Get User Can Update Object
+     * Get User Can Delete Object
      * @return DateTime
      */
-    public function getUserCanUpdate()
+    public function getUserCanDelete()
     {
-        return $this->UserCanUpdate;
+        return $this->UserCanDelete;
     }
 
     /**
@@ -51,14 +61,5 @@ class BaseEntity
     {
         $this->UserCanDelete = $boolean;
         return $this;
-    }
-
-    /**
-     * Get User Can Delete Object
-     * @return DateTime
-     */
-    public function getUserCanDelete()
-    {
-        return $this->UserCanDelete;
     }
 }

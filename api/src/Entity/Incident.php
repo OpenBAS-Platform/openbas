@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,49 +12,36 @@ use App\Entity\Base\BaseEntity;
  */
 class Incident extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->incident_objectives = new ArrayCollection();
-        $this->incident_injects = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $incident_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $incident_title;
-
     /**
      * @ORM\Column(type="text")
      */
     protected $incident_story;
-
     /**
      * @ORM\Column(type="integer")
      */
     protected $incident_weight;
-
     /**
      * @ORM\ManyToOne(targetEntity="IncidentType", inversedBy="type_incidents")
      * @ORM\JoinColumn(name="incident_type", referencedColumnName="type_id", onDelete="CASCADE")
      * @var IncidentType
      */
     protected $incident_type;
-
     /**
      * @ORM\ManyToOne(targetEntity="Event", inversedBy="event_incidents")
      * @ORM\JoinColumn(name="incident_event", referencedColumnName="event_id", onDelete="CASCADE")
      * @var Event
      */
     protected $incident_event;
-
     /**
      * @ORM\ManyToMany(targetEntity="Subobjective", inversedBy="subobjective_incidents")
      * @ORM\JoinTable(name="incidents_subobjectives",
@@ -64,24 +51,27 @@ class Incident extends BaseEntity
      * @var Subobjective[]
      */
     protected $incident_subobjectives;
-
     /**
      * @ORM\OneToOne(targetEntity="Outcome", mappedBy="outcome_incident")
      */
     protected $incident_outcome;
-
     /**
      * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_incident")
      * @var Inject[]
      */
     protected $incident_injects;
-
     /**
      * @ORM\Column(type="smallint")
      */
     protected $incident_order = 0;
-
     protected $incident_exercise;
+
+    public function __construct()
+    {
+        $this->incident_objectives = new ArrayCollection();
+        $this->incident_injects = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getIncidentId()
     {

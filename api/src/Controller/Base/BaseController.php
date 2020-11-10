@@ -3,16 +3,17 @@
 namespace App\Controller\Base;
 
 use App\Entity\Event;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 
-class BaseController extends \Symfony\Bundle\FrameworkBundle\Controller\Controller
+class BaseController extends AbstractFOSRestController
 {
     const UPDATE = 'update';
     const DELETE = 'delete';
 
     /**
      * Check if user as grant to access to an object
-     * @param type $attributes  can be 'select'|'update'|'delete'
-     * @param type $object      The object
+     * @param type $attributes can be 'select'|'update'|'delete'
+     * @param type $object The object
      * @return boolean
      */
     protected function hasGranted($attributes, $object = null)
