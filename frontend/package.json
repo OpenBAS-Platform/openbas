@@ -1,6 +1,6 @@
 {
   "name": "openex-frontend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "devDependencies": {
     "react-scripts": "1.0.17",
@@ -41,7 +41,7 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://127.0.0.1:8001/",
+  "proxy": "http://127.0.0.1:8000/",
   "eslintConfig": {
     "plugins": [
       "react"

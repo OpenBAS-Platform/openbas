@@ -1,6 +1,6 @@
 {
     "type": "project",
-    "license": "proprietary",
+    "license": "Apache-2.0",
     "require": {
         "php": "^7.3",
         "ext-ctype": "*",
