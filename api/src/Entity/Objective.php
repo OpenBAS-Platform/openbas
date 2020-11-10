@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,46 +12,41 @@ use App\Entity\Base\BaseEntity;
  */
 class Objective extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->objective_subobjectives = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $objective_id;
-
     /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $objective_title;
-
     /**
      * @ORM\Column(type="text", nullable=true)
      */
     protected $objective_description;
-
     /**
      * @ORM\Column(type="smallint", nullable=true)
      */
     protected $objective_priority;
-
     /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_objectives")
      * @ORM\JoinColumn(name="objective_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */
     protected $objective_exercise;
-
     /**
      * @ORM\OneToMany(targetEntity="Subobjective", mappedBy="subobjective_objective")
      * @var Subobjective[]
      */
     protected $objective_subobjectives;
+
+    public function __construct()
+    {
+        $this->objective_subobjectives = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getObjectiveId()
     {

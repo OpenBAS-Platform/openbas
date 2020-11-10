@@ -3,34 +3,34 @@
 namespace App\Controller\Exercise;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use App\Entity\Audience;
 use App\Entity\Exercise;
 use App\Form\Type\AudienceType;
-use App\Entity\Audience;
-use PHPExcel;
 use App\Utils\Transform;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use PHPExcel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AudienceController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List audiences of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"audience"})
-     * @Rest\Get("/exercises/{exercise_id}/audiences")
+     * @Rest\Get("/api/exercises/{exercise_id}/audiences")
      */
     public function getExercisesAudiencesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -51,16 +51,21 @@ class AudienceController extends BaseController
         return $audiences;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List users of audiences (xls)"
      * )
      *
-     * @Rest\Get("/exercises/{exercise_id}/audiences.xlsx")
+     * @Rest\Get("/api/exercises/{exercise_id}/audiences.xlsx")
      */
     public function getExercisesUsersXlsxAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -74,7 +79,7 @@ class AudienceController extends BaseController
         $audiences = $em->getRepository('App:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
         /* @var $audiences Audience[] */
 
-        $xlsUsers = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $xlsUsers = new Spreadsheet();
         /* @var $xlsInjects PHPExcel */
 
         $xlsUsers->getProperties()
@@ -123,14 +128,14 @@ class AudienceController extends BaseController
                 $sheet->setCellValue('G' . $j, $user->getUserPhone2());
                 $sheet->setCellValue('H' . $j, $user->getUserPhone());
                 $sheet->setCellValue('I' . $j, $user->getUserPhone3());
-                $sheet->setCellValue('J' . $j, (strlen($user->getUserPgpKey()) > 5? 'YES':'NO'));
+                $sheet->setCellValue('J' . $j, (strlen($user->getUserPgpKey()) > 5 ? 'YES' : 'NO'));
                 $j++;
             }
             $i++;
         }
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($xlsUsers);
-        $response =  new StreamedResponse(function () use ($writer) {
+        $writer = new Xlsx($xlsUsers);
+        $response = new StreamedResponse(function () use ($writer) {
             $writer->save('php://output');
         });
         $dispositionHeader = $response->headers->makeDisposition(
@@ -147,16 +152,16 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read an audience"
      * )
      *
      * @Rest\View(serializerGroups={"audience"})
-     * @Rest\Get("/exercises/{exercise_id}/audiences/{audience_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function getExercisesAudienceAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -179,15 +184,20 @@ class AudienceController extends BaseController
         return $audience;
     }
 
+    private function audienceNotFound()
+    {
+        return View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create an audience")
+     * @OA\Property(description="Create an audience")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"audience"})
-     * @Rest\Post("/exercises/{exercise_id}/audiences")
+     * @Rest\Post("/api/exercises/{exercise_id}/audiences")
      */
     public function postExercisesAudiencesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -214,16 +224,16 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete an audience"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"audience"})
-     * @Rest\Delete("/exercises/{exercise_id}/audiences/{audience_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function removeExercisesAudienceAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -245,15 +255,15 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Update an audience")
+     * @OA\Property(description="Update an audience")
      *
      * @Rest\View(serializerGroups={"audience"})
-     * @Rest\Put("/exercises/{exercise_id}/audiences/{audience_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/audiences/{audience_id}")
      */
     public function updateExercisesAudienceAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $em2 = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
+        $em2 = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -282,15 +292,5 @@ class AudienceController extends BaseController
         } else {
             return $form;
         }
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function audienceNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
     }
 }

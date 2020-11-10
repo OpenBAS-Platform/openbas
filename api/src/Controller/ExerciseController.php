@@ -2,36 +2,35 @@
 
 namespace App\Controller;
 
+use App\Controller\Base\BaseController;
+use App\Entity\Audience;
 use App\Entity\Exercise;
 use App\Entity\Grant;
+use App\Entity\Subaudience;
 use App\Form\Type\ExerciseType;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Controller\Base\BaseController;
+use OpenApi\Annotations as OA;
+use PHPExcel;
+use Symfony\Bridge\Twig\TwigEngine;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use PHPExcel;
-use App\Utils\Transform;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Bridge\Twig\TwigEngine;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use ZipArchive;
 
 class ExerciseController extends BaseController
 {
-
     /**
-     * @SWG\Property(description="List exercises")
+     * @OA\Property(description="List exercises")
      *
      * @Rest\View(serializerGroups={"exercise"})
-     * @Rest\Get("/exercises")
+     * @Rest\Get("/api/exercises")
      */
     public function getExercisesAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -76,14 +75,14 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Read an exercise")
+     * @OA\Property(description="Read an exercise")
      *
      * @Rest\View(serializerGroups={"exercise"})
-     * @Rest\Get("/exercises/{exercise_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}")
      */
     public function getExerciseAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -120,22 +119,27 @@ class ExerciseController extends BaseController
         return $exercise;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create an exercise")
-     * @SWG\Parameter(in={"class"=ExerciseType::class, "name"=""})
+     * @OA\Property(description="Create an exercise")
+     * @OA\Parameter(in={"class"=ExerciseType::class, "name"=""})
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"exercise"})
-     * @Rest\Post("/exercises")
+     * @Rest\Post("/api/exercises")
      */
     public function postExercisesAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryFile = $entityManager->getRepository('App:File');
 
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
         if (!$user->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+            throw new AccessDeniedHttpException();
         }
 
         $exercise = new Exercise();
@@ -158,14 +162,14 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Delete an exercise")
+     * @OA\Property(description="Delete an exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"exercise"})
-     * @Rest\Delete("/exercises/{exercise_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}")
      */
     public function removeExerciseAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
 
         $exercise = $repositoryExercise->find($request->get('exercise_id'));
@@ -179,14 +183,14 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Copy one audience to an exercise")
+     * @OA\Property(description="Copy one audience to an exercise")
      *
      * @Rest\View(serializerGroups={"audience"})
-     * @Rest\Put("/exercises/{exercise_id}/copy-audience/{audience_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/copy-audience/{audience_id}")
      */
     public function copyAudienceToExerciseAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryAudience = $entityManager->getRepository('App:Audience');
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
 
@@ -195,14 +199,14 @@ class ExerciseController extends BaseController
 
         // copy audience
         if ($oAudience && $oExercice) {
-            $oNewAudience = new \App\Entity\Audience();
+            $oNewAudience = new Audience();
             $oNewAudience->setAudienceExercise($oExercice);
             $oNewAudience->setAudienceName($oAudience->getAudienceName());
             $oNewAudience->setAudienceEnabled($oAudience->getAudienceEnabled());
             $entityManager->persist($oNewAudience);
             // copy subaudiences list
             foreach ($oAudience->getAudienceSubaudiences() as $subAudience) {
-                $oNewSubAudience = new \App\Entity\Subaudience();
+                $oNewSubAudience = new Subaudience();
                 $oNewSubAudience->setSubaudienceName($subAudience->getSubaudienceName());
                 $oNewSubAudience->setSubaudienceEnabled($subAudience->getSubaudienceEnabled());
                 $oNewSubAudience->setSubaudienceAudience($oNewAudience);
@@ -219,17 +223,16 @@ class ExerciseController extends BaseController
         return $oNewAudience;
     }
 
-
     /**
-     * @SWG\Property(description="Update an exercise")
-     * @SWG\Parameter(in={"class"=ExerciseType::class, "name"=""})
+     * @OA\Property(description="Update an exercise")
+     * @OA\Parameter(in={"class"=ExerciseType::class, "name"=""})
      *
      * @Rest\View(serializerGroups={"exercise"})
-     * @Rest\Put("/exercises/{exercise_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}")
      */
     public function updateExerciseAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -275,15 +278,15 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Export inject to EML files")
-     * @SWG\Parameter(in={"class"=ExerciseType::class, "name"=""})
+     * @OA\Property(description="Export inject to EML files")
+     * @OA\Parameter(in={"class"=ExerciseType::class, "name"=""})
      *
      * @Rest\View(serializerGroups={"exercise"})
-     * @Rest\Get("/exercises/{exercise_id}/export/inject/eml")
+     * @Rest\Get("/api/exercises/{exercise_id}/export/inject/eml")
      */
     public function exportExerciseEMLAction(Request $request)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -295,8 +298,8 @@ class ExerciseController extends BaseController
         }
 
         $zipTempFile = 'openex_export_messages_eml_' . md5(uniqid() . date('Y-m-d H:i:s:u')) . '.zip';
-        $zipEngine = new \ZipArchive();
-        $zipEngine->open($zipTempFile, \ZipArchive::CREATE);
+        $zipEngine = new ZipArchive();
+        $zipEngine->open($zipTempFile, ZipArchive::CREATE);
 
         $scenarios = $repositoryEvent->findBy(['event_exercise' => $exercise]);
         foreach ($scenarios as $scenario) {
@@ -309,7 +312,7 @@ class ExerciseController extends BaseController
                         $injectContent = $this->getMailContent($inject, $user);
                         if ($injectContent) {
                             $zipEngine->addFromString(
-                                $this->sanitizeFilename($this->getInjectMailTitle($inject, $user).'.eml'),
+                                $this->sanitizeFilename($this->getInjectMailTitle($inject, $user) . '.eml'),
                                 $injectContent
                             );
                         }
@@ -344,20 +347,6 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * Get real base folder where files are stored
-     *
-     * @return string real base folder
-    **/
-    private function getProjectFilePath()
-    {
-        return join([
-            $this->get('kernel')->getProjectDir(),
-            'var',
-            'files'
-        ], DIRECTORY_SEPARATOR);
-    }
-
-    /**
      * Get Mail Content
      *
      * @param type $inject
@@ -366,7 +355,7 @@ class ExerciseController extends BaseController
      */
     private function getMailContent($inject, $user)
     {
-        $entityManager = $this->get('doctrine.orm.entity_manager');
+        $entityManager = $this->getDoctrine()->getManager();
         $repositoryDocument = $entityManager->getRepository('App:Document');
 
         $mailContent = [];
@@ -377,7 +366,7 @@ class ExerciseController extends BaseController
             $uniqueBoundaryString = '------------' . strtoupper(substr(md5($inject->getInjectId() . uniqid(rand(), true)), 0, 24));
 
             // To
-            $mailContent[] = "To: ".$user->getUserLogin();
+            $mailContent[] = "To: " . $user->getUserLogin();
 
             // From
             $exercise = $inject->getInjectIncident()->getIncidentEvent()->getEventExercise();
@@ -388,7 +377,7 @@ class ExerciseController extends BaseController
             }
 
             // Reply-to
-            $mailContent[] = "Reply-To: " .$exercise->getExerciseMailExpediteur();
+            $mailContent[] = "Reply-To: " . $exercise->getExerciseMailExpediteur();
 
             // Subject
             if (property_exists($injectContent, 'subject')) {
@@ -476,6 +465,31 @@ class ExerciseController extends BaseController
     }
 
     /**
+     * Get real base folder where files are stored
+     *
+     * @return string real base folder
+     **/
+    private function getProjectFilePath()
+    {
+        return join([
+            $this->get('kernel')->getProjectDir(),
+            'var',
+            'files'
+        ], DIRECTORY_SEPARATOR);
+    }
+
+    /**
+     * Sanitize text for filename
+     *
+     * @param string $filename
+     * @return string
+     */
+    private function sanitizeFilename(string $filename)
+    {
+        return mb_ereg_replace("([\.]{2,})", '', mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename));
+    }
+
+    /**
      * Generate Inject Mail Title
      *
      * @param type $inject
@@ -491,21 +505,5 @@ class ExerciseController extends BaseController
         ];
 
         return join(' - ', $titleParts);
-    }
-
-    /**
-     * Sanitize text for filename
-     *
-     * @param string $filename
-     * @return string
-     */
-    private function sanitizeFilename(string $filename)
-    {
-        return mb_ereg_replace("([\.]{2,})", '', mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '', $filename));
-    }
-
-    private function exerciseNotFound()
-    {
-        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 }

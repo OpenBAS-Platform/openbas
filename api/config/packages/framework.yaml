@@ -1,28 +1,27 @@
 framework:
-    translator: { fallbacks: [en] }
-    secret: '%env(APP_SECRET)%'
-    templating: { engines: ['twig'] }
-    default_locale: en
-    csrf_protection: true
-    http_method_override: true
-    validation:
-        enabled: true
-        enable_annotations: false
-        auto_mapping: []
-    serializer:
-        enabled: true
-        enable_annotations: true
-        mapping:
-            paths: ['%kernel.project_dir%/src/Resources/config/serialization']
+  translator: { fallbacks: [ en ] }
+  secret: '%env(APP_SECRET)%'
+  default_locale: en
+  csrf_protection: true
+  http_method_override: true
+  validation:
+    enabled: true
+    enable_annotations: false
+    auto_mapping: [ ]
+  serializer:
+    enabled: true
+    enable_annotations: true
+    mapping:
+      paths: [ '%kernel.project_dir%/src/Resources/config/serialization' ]
 
-    # Enables session support. Note that the session will ONLY be started if you read or write from it.
-    # Remove or comment this section to explicitly disable session support.
-    session:
-        handler_id: ~
-        cookie_secure: auto
-        cookie_samesite: lax
+  # Enables session support. Note that the session will ONLY be started if you read or write from it.
+  # Remove or comment this section to explicitly disable session support.
+  session:
+    handler_id: ~
+    cookie_secure: auto
+    cookie_samesite: lax
 
-    #esi: true
-    #fragments: true
-    php_errors:
-        log: true
+  #esi: true
+  #fragments: true
+  php_errors:
+    log: true

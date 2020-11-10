@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\Exercise;
 use App\Entity\User;
+use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -47,7 +48,7 @@ class ExerciseVoter extends Voter
                 return $this->canDelete($exercise, $user);
         }
 
-        throw new \LogicException('This code should not be reached!');
+        throw new LogicException('This code should not be reached!');
     }
 
     private function canSelect(Exercise $exercise, User $user)
@@ -57,6 +58,16 @@ class ExerciseVoter extends Voter
         }
 
         return false;
+    }
+
+    private function findGrant(Exercise $exercise, User $user)
+    {
+        $grants = $user->getGrants();
+        if (isset($grants[$exercise->getExerciseId()])) {
+            return $grants[$exercise->getExerciseId()];
+        } else {
+            return 'DENIED';
+        }
     }
 
     private function canUpdate(Exercise $exercise, User $user)
@@ -75,15 +86,5 @@ class ExerciseVoter extends Voter
         }
 
         return false;
-    }
-
-    private function findGrant(Exercise $exercise, User $user)
-    {
-        $grants = $user->getGrants();
-        if (isset($grants[$exercise->getExerciseId()])) {
-            return $grants[$exercise->getExerciseId()];
-        } else {
-            return 'DENIED';
-        }
     }
 }

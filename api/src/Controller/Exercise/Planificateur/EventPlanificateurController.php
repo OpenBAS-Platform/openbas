@@ -1,30 +1,27 @@
 <?php
+
 namespace App\Controller\Exercise\Planificateur;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventPlanificateurController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Update list user planificateur for an audience"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Post("/exercises/{exercise_id}/planificateurs/events/{event_id}")
+     * @Rest\Post("/api/exercises/{exercise_id}/planificateurs/events/{event_id}")
      */
     public function updatePlanificateurUserForEventAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $event = $em->getRepository('App:Event')->FindOneBy(array('event_id' => $request->get('event_id')));
         if ($event) {
             foreach ($request->get('planificateurs') as $planificateur) {
@@ -46,7 +43,7 @@ class EventPlanificateurController extends BaseController
 
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List user planificateur for an event"
      * )
      *
@@ -56,7 +53,7 @@ class EventPlanificateurController extends BaseController
     public function getPlanificateurUserForEventAction(Request $request)
     {
         $listPlanificateur = array();
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $planificateurs = $em->getRepository('App:User')->FindBy(array('user_planificateur' => true));
         $event = $em->getRepository('App:Event')->FindOneBy(array('event_id' => $request->get('event_id')));
         if ($event) {
@@ -67,7 +64,7 @@ class EventPlanificateurController extends BaseController
                     'user_lastname' => $planificateur->getUserLastname(),
                     'user_email' => $planificateur->getUserEmail(),
                     'is_planificateur_event' => $planificateur->isPlanificateurEvent($event)
-                    ];
+                ];
                 $listPlanificateur[] = $tabPlanificateur;
             }
         } else {

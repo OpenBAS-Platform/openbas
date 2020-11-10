@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,7 +25,7 @@ class Token
 
     /**
      * @ORM\Column(type="datetime")
-     * @var \DateTime
+     * @var DateTime
      */
     protected $token_created_at;
 
@@ -63,7 +63,7 @@ class Token
         return $this->token_created_at;
     }
 
-    public function setTokenCreatedAt(\DateTime $createdAt)
+    public function setTokenCreatedAt(DateTime $createdAt)
     {
         $this->token_created_at = $createdAt;
         return $this;

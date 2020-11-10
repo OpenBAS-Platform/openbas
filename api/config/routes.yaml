@@ -1,37 +1,23 @@
-app.swagger_ui:
-    path: /api/doc
-    methods: GET
-    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
 app.swagger:
-    path: /api/doc.json
-    methods: GET
-    defaults: { _controller: nelmio_api_doc.controller.swagger }
+  path: '/api/doc.json'
+  methods: GET
+  defaults: { _controller: nelmio_api_doc.controller.swagger }
 
-anonymous_api:
-    resource: "routes/routing_anonymous_api.yml"
-    prefix:   /api/anonymous
-    type:     rest
+app.swagger_ui:
+  path: '/api/doc'
+  methods: GET
+  defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
 
 api:
-    resource: "routes/routing_api.yml"
-    prefix:   /api
-    type:     rest
+  resource: 'routes/routing_api.yml'
+  type: annotation
 
 defaultReq:
-    path: /{req}
-    defaults: { _controller: App\Controller\DefaultController::indexAction }
-    requirements:
-      req: ".+"
+  path: '/{req}'
+  defaults: { _controller: App\Controller\DefaultController::indexAction }
+  requirements:
+    req: ".+"
 
 default:
-    path: /
-    defaults: { _controller: App\Controller\DefaultController::indexAction }
-
-frontend:
-    resource: App\Controller\DefaultController
-    prefix:   /
-    type:     annotation
-
-doc:
-    resource: "@NelmioApiDocBundle/Resources/config/routing/swaggerui.xml"
-    prefix:   /api/doc
+  path: '/'
+  defaults: { _controller: App\Controller\DefaultController::indexAction }

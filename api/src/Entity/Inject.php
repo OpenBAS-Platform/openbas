@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
+use function json_decode;
+use function json_encode;
 
 /**
  * @ORM\Entity()
@@ -13,45 +15,32 @@ use App\Entity\Base\BaseEntity;
  */
 class Inject extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->inject_audiences = new ArrayCollection();
-        $this->inject_subaudiences = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $inject_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $inject_title;
-
     /**
      * @ORM\Column(type="text")
      */
     protected $inject_description;
-
     /**
      * @ORM\Column(type="text", nullable=true)
      */
     protected $inject_content;
-
     /**
      * @ORM\Column(type="datetime")
      */
     protected $inject_date;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $inject_type;
-
     /**
      * @ORM\ManyToMany(targetEntity="Audience", inversedBy="audience_injects")
      * @ORM\JoinTable(name="injects_audiences",
@@ -61,7 +50,6 @@ class Inject extends BaseEntity
      * @var Audience[]
      */
     protected $inject_audiences;
-
     /**
      * @ORM\ManyToMany(targetEntity="Subaudience", inversedBy="subaudience_injects")
      * @ORM\JoinTable(name="injects_subaudiences",
@@ -71,43 +59,42 @@ class Inject extends BaseEntity
      * @var Subaudience[]
      */
     protected $inject_subaudiences;
-
     /**
      * @ORM\Column(type="boolean")
      */
     protected $inject_all_audiences = false;
-
     /**
      * @ORM\ManyToOne(targetEntity="Incident", inversedBy="incident_injects")
      * @ORM\JoinColumn(name="inject_incident", referencedColumnName="incident_id", onDelete="CASCADE")
      * @var Incident
      */
     protected $inject_incident;
-
     /**
      * @ORM\Column(type="boolean")
      */
     protected $inject_enabled = true;
-
     /**
      * @ORM\OneToOne(targetEntity="InjectStatus", mappedBy="status_inject")
      */
     protected $inject_status;
-
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="user_injects")
      * @ORM\JoinColumn(name="inject_user", referencedColumnName="user_id", onDelete="CASCADE")
      * @var User
      */
     protected $inject_user;
-
     protected $inject_event;
     protected $inject_exercise;
-
     protected $inject_header;
     protected $inject_footer;
-
     protected $inject_users_number;
+
+    public function __construct()
+    {
+        $this->inject_audiences = new ArrayCollection();
+        $this->inject_subaudiences = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getInjectId()
     {
@@ -146,7 +133,7 @@ class Inject extends BaseEntity
     {
         // Worker needs "file_*" properties -> duplicate "document_*" properties to "file_*"
         // quite ugly hack :'(
-        $injectContent = \json_decode($this->inject_content, true);
+        $injectContent = json_decode($this->inject_content, true);
         $attachments = [];
         if (is_array($injectContent) && array_key_exists('attachments', $injectContent) && is_array($injectContent['attachments'])) {
             foreach ($injectContent['attachments'] as $attachment) {
@@ -162,7 +149,7 @@ class Inject extends BaseEntity
             $injectContent['attachments'] = $attachments;
         }
 
-        return \json_encode($injectContent);
+        return json_encode($injectContent);
     }
 
     public function setInjectContent($content)
@@ -185,28 +172,6 @@ class Inject extends BaseEntity
         return $this;
     }
 
-    public function getInjectAudiences()
-    {
-        return $this->inject_audiences;
-    }
-
-    public function setInjectAudiences($audiences)
-    {
-        $this->inject_audiences = $audiences;
-        return $this;
-    }
-
-    public function getInjectSubaudiences()
-    {
-        return $this->inject_subaudiences;
-    }
-
-    public function setInjectSubaudiences($subaudiences)
-    {
-        $this->inject_subaudiences = $subaudiences;
-        return $this;
-    }
-
     public function addInjectSubaudience($subaudience)
     {
         if (!$this->inject_subaudiences->contains($subaudience)) {
@@ -223,17 +188,6 @@ class Inject extends BaseEntity
         return $this;
     }
 
-    public function getInjectAllAudiences()
-    {
-        return $this->inject_all_audiences;
-    }
-
-    public function setInjectAllAudiences($all_audiences)
-    {
-        $this->inject_all_audiences = $all_audiences;
-        return $this;
-    }
-
     public function getInjectType()
     {
         return $this->inject_type;
@@ -242,17 +196,6 @@ class Inject extends BaseEntity
     public function setInjectType($type)
     {
         $this->inject_type = $type;
-        return $this;
-    }
-
-    public function getInjectIncident()
-    {
-        return $this->inject_incident;
-    }
-
-    public function setInjectIncident($incident)
-    {
-        $this->inject_incident = $incident;
         return $this;
     }
 
@@ -398,6 +341,50 @@ class Inject extends BaseEntity
         }
 
         return $users;
+    }
+
+    public function getInjectAllAudiences()
+    {
+        return $this->inject_all_audiences;
+    }
+
+    public function setInjectAllAudiences($all_audiences)
+    {
+        $this->inject_all_audiences = $all_audiences;
+        return $this;
+    }
+
+    public function getInjectIncident()
+    {
+        return $this->inject_incident;
+    }
+
+    public function setInjectIncident($incident)
+    {
+        $this->inject_incident = $incident;
+        return $this;
+    }
+
+    public function getInjectAudiences()
+    {
+        return $this->inject_audiences;
+    }
+
+    public function setInjectAudiences($audiences)
+    {
+        $this->inject_audiences = $audiences;
+        return $this;
+    }
+
+    public function getInjectSubaudiences()
+    {
+        return $this->inject_subaudiences;
+    }
+
+    public function setInjectSubaudiences($subaudiences)
+    {
+        $this->inject_subaudiences = $subaudiences;
+        return $this;
     }
 
     public function computeUsersNumber($audiences = [])

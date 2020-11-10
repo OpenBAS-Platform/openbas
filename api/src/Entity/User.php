@@ -2,12 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Doctrine\Common\Collections\ArrayCollection;
-use App\Entity\Grant;
-use App\Entity\Subaudience;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -15,6 +13,113 @@ use App\Entity\Base\BaseEntity;
  */
 class User extends BaseEntity implements UserInterface
 {
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="string")
+     * @ORM\GeneratedValue(strategy="UUID")
+     */
+    protected $user_id;
+    /**
+     * @ORM\Column(type="string", unique=true)
+     */
+    protected $user_login;
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $user_firstname;
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $user_lastname;
+    /**
+     * @ORM\Column(type="string")
+     */
+    protected $user_email;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_email2;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone2;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_phone3;
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $user_pgp_key;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_password;
+    protected $user_plain_password;
+    /**
+     * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_user")
+     * @var Inject[]
+     */
+    protected $user_injects;
+    /**
+     * @ORM\OneToMany(targetEntity="ComcheckStatus", mappedBy="status_user")
+     * @var Comcheck[]
+     */
+    protected $user_comchecks_statuses;
+    /**
+     * @ORM\OneToMany(targetEntity="Log", mappedBy="log_user")
+     * @var Log[]
+     */
+    protected $user_logs;
+    /**
+     * @ORM\ManyToOne(targetEntity="Organization", inversedBy="organization_users")
+     * @ORM\JoinColumn(name="user_organization", referencedColumnName="organization_id", onDelete="RESTRICT")
+     * @var Organization
+     */
+    protected $user_organization;
+    /**
+     * @ORM\ManyToMany(targetEntity="Group", mappedBy="group_users")
+     * @var Group[]
+     */
+    protected $user_groups;
+    /**
+     * @ORM\ManyToMany(targetEntity="Subaudience", mappedBy="subaudienceUsers")
+     * @var Audience[]
+     */
+    protected $userSubaudiences;
+    /**
+     * @ORM\ManyToMany(targetEntity="Audience", mappedBy="audience_planificateur_users")
+     * @var Audience[]
+     */
+    protected $userPlanificateurAudiences;
+    /**
+     * @ORM\ManyToMany(targetEntity="Event", mappedBy="eventPlanificateurUsers")
+     * @var Event[]
+     */
+    protected $userPlanificateurEvents;
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    protected $user_admin = false;
+    /**
+     * @ORM\Column(type="boolean", options={"default" : false})
+     */
+    protected $user_planificateur = false;
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    protected $user_status = 1;
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $user_lang;
+    protected $user_gravatar;
+    protected $user_subaudience;
+
     public function __construct()
     {
         $this->user_groups = new ArrayCollection();
@@ -25,137 +130,6 @@ class User extends BaseEntity implements UserInterface
         $this->userPlanificateurEvents = new ArrayCollection();
         parent::__construct();
     }
-
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
-     */
-    protected $user_id;
-
-    /**
-     * @ORM\Column(type="string", unique=true)
-     */
-    protected $user_login;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    protected $user_firstname;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    protected $user_lastname;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    protected $user_email;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $user_email2;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $user_phone;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $user_phone2;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $user_phone3;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    protected $user_pgp_key;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $user_password;
-
-    protected $user_plain_password;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Inject", mappedBy="inject_user")
-     * @var Inject[]
-     */
-    protected $user_injects;
-
-    /**
-     * @ORM\OneToMany(targetEntity="ComcheckStatus", mappedBy="status_user")
-     * @var Comcheck[]
-     */
-    protected $user_comchecks_statuses;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Log", mappedBy="log_user")
-     * @var Log[]
-     */
-    protected $user_logs;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Organization", inversedBy="organization_users")
-     * @ORM\JoinColumn(name="user_organization", referencedColumnName="organization_id", onDelete="RESTRICT")
-     * @var Organization
-     */
-    protected $user_organization;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Group", mappedBy="group_users")
-     * @var Group[]
-     */
-    protected $user_groups;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Subaudience", mappedBy="subaudienceUsers")
-     * @var Audience[]
-     */
-    protected $userSubaudiences;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Audience", mappedBy="audience_planificateur_users")
-     * @var Audience[]
-     */
-    protected $userPlanificateurAudiences;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Event", mappedBy="eventPlanificateurUsers")
-     * @var Event[]
-     */
-    protected $userPlanificateurEvents;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    protected $user_admin = false;
-
-    /**
-     * @ORM\Column(type="boolean", options={"default" : false})
-     */
-    protected $user_planificateur = false;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    protected $user_status = 1;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    protected $user_lang;
-
-    protected $user_gravatar;
-    protected $user_subaudience;
 
     /**
      * Add Audience to planifications user
@@ -382,6 +356,12 @@ class User extends BaseEntity implements UserInterface
         return $this->userSubaudiences;
     }
 
+    public function setUserSubaudiences($subaudiences)
+    {
+        $this->userSubaudiences = $subaudiences;
+        return $this;
+    }
+
     public function addUserSubaudiences(Subaudience $oSubaudience)
     {
         if (!$this->userSubaudiences->contains($oSubaudience)) {
@@ -390,20 +370,26 @@ class User extends BaseEntity implements UserInterface
         return $this;
     }
 
-    public function setUserSubaudiences($subaudiences)
-    {
-        $this->userSubaudiences = $subaudiences;
-        return $this;
-    }
-
     public function getUserAdmin()
     {
         return $this->user_admin;
     }
 
+    public function setUserAdmin($admin)
+    {
+        $this->user_admin = $admin;
+        return $this;
+    }
+
     public function getUserPlanificateur()
     {
         return $this->user_planificateur;
+    }
+
+    public function setUserPlanificateur($planificateur)
+    {
+        $this->user_planificateur = $planificateur;
+        return $this;
     }
 
     /**
@@ -419,18 +405,6 @@ class User extends BaseEntity implements UserInterface
     public function isPlanificateurEvent($event)
     {
         return $this->userPlanificateurEvents->contains($event);
-    }
-
-    public function setUserAdmin($admin)
-    {
-        $this->user_admin = $admin;
-        return $this;
-    }
-
-    public function setUserPlanificateur($planificateur)
-    {
-        $this->user_planificateur = $planificateur;
-        return $this;
     }
 
     public function getUserStatus()
@@ -509,6 +483,11 @@ class User extends BaseEntity implements UserInterface
         return $roles;
     }
 
+    public function isAdmin()
+    {
+        return $this->user_admin;
+    }
+
     public function getGrants()
     {
         $grants = array();
@@ -538,10 +517,5 @@ class User extends BaseEntity implements UserInterface
     public function eraseCredentials()
     {
         $this->user_plain_password = null;
-    }
-
-    public function isAdmin()
-    {
-        return $this->user_admin;
     }
 }

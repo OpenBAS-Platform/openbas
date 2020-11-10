@@ -2,41 +2,40 @@
 
 namespace App\Controller\Exercise;
 
-use App\Controller\InjectTypeController;
-use App\Entity\DryinjectStatus;
-use Doctrine\ORM\EntityRepository;
-use FOS\RestBundle\View\View;
 use App\Controller\Base\BaseController;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\DryrunType;
+use App\Controller\InjectTypeController;
+use App\Entity\Dryinject;
+use App\Entity\DryinjectStatus;
 use App\Entity\Dryrun;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
-use App\Entity\Dryinject;
+use App\Form\Type\DryrunType;
+use DateInterval;
+use DateTime;
+use Doctrine\ORM\EntityRepository;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class DryrunController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List dryruns of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"dryrun"})
-     * @Rest\Get("/exercises/{exercise_id}/dryruns")
+     * @Rest\Get("/api/exercises/{exercise_id}/dryruns")
      */
     public function getExercisesDryrunsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -59,17 +58,22 @@ class DryrunController extends BaseController
         return $dryruns;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read a dryrun"
      * )
      *
      * @Rest\View(serializerGroups={"dryrun"})
-     * @Rest\Get("/exercises/{exercise_id}/dryruns/{dryrun_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/dryruns/{dryrun_id}")
      */
     public function getExerciseDryrunAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -93,15 +97,20 @@ class DryrunController extends BaseController
         return $dryrun;
     }
 
+    private function dryrunNotFound()
+    {
+        return View::create(['message' => 'Dryrun not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create a dryrun")
+     * @OA\Property(description="Create a dryrun")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"dryrun"})
-     * @Rest\Post("/exercises/{exercise_id}/dryruns")
+     * @Rest\Post("/api/exercises/{exercise_id}/dryruns")
      */
     public function postExercisesDryrunsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -117,7 +126,7 @@ class DryrunController extends BaseController
 
         if ($form->isValid()) {
             $dryrun->setDryrunExercise($exercise);
-            $dryrun->setDryrunDate(new \DateTime());
+            $dryrun->setDryrunDate(new DateTime());
             $em->persist($dryrun);
             $em->flush();
 
@@ -177,14 +186,14 @@ class DryrunController extends BaseController
 
                 // set the first inject to now
                 if ($previousInject === null) {
-                    $dryInject->setDryinjectDate(new \DateTime());
+                    $dryInject->setDryinjectDate(new DateTime());
                 } else {
                     // compute the interval in seconds from the previous inject
                     $previousDate = $previousInject->getInjectDate()->getTimestamp();
                     $currentDate = $inject->getInjectDate()->getTimestamp();
                     $intervalInSeconds = $currentDate - $previousDate;
                     // accelerate the interval and create the interval object
-                    $newInterval = new \DateInterval('PT' . round($intervalInSeconds / $dryrun->getDryrunSpeed()) . 'S');
+                    $newInterval = new DateInterval('PT' . round($intervalInSeconds / $dryrun->getDryrunSpeed()) . 'S');
                     // set the new datetime
                     $dryInject->setDryinjectDate($previousDryInject->getDryinjectDate()->add($newInterval));
                 }
@@ -213,16 +222,16 @@ class DryrunController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a dryrun"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"dryrun"})
-     * @Rest\Delete("/exercises/{exercise_id}/dryruns/{dryrun_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/dryruns/{dryrun_id}")
      */
     public function removeExercisesDryrunAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -241,15 +250,5 @@ class DryrunController extends BaseController
 
         $em->remove($dryrun);
         $em->flush();
-    }
-
-    private function exerciseNotFound()
-    {
-        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function dryrunNotFound()
-    {
-        return View::create(['message' => 'Dryrun not found'], Response::HTTP_NOT_FOUND);
     }
 }

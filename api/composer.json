@@ -1,46 +1,46 @@
 {
     "type": "project",
-    "license": "proprietary",
+    "license": "Apache-2.0",
     "require": {
-        "php": "^7.2.4",
+        "php": "^7.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/doctrine-bundle": "^1.11",
-        "friendsofsymfony/rest-bundle": "^2.5",
-        "nategood/httpful": "^0.2.20",
-        "nelmio/api-doc-bundle": "^3.4",
-        "phpoffice/phpspreadsheet": "^1.7",
-        "sensio/framework-extra-bundle": "^5.3",
-        "symfony/apache-pack": "^1.0",
-        "symfony/asset": "4.3.*",
-        "symfony/console": "4.3.*",
-        "symfony/doctrine-bridge": "4.3",
-        "symfony/dotenv": "4.3.*",
-        "symfony/expression-language": "4.3.*",
-        "symfony/flex": "^1.1",
-        "symfony/form": "4.3.*",
-        "symfony/framework-bundle": "4.3.*",
-        "symfony/http-client": "4.3.*",
-        "symfony/intl": "4.3.*",
-        "symfony/monolog-bundle": "^3.3",
-        "symfony/orm-pack": "^1.0",
-        "symfony/process": "4.3.*",
-        "symfony/security-bundle": "4.3.*",
-        "symfony/serializer": "4.3.*",
+        "doctrine/doctrine-bundle": "^2.1.2",
+        "friendsofsymfony/rest-bundle": "^3.0.3",
+        "nategood/httpful": "^0.3.2",
+        "nelmio/api-doc-bundle": "^4.0.1",
+        "phpoffice/phpspreadsheet": "^1.15.0",
+        "sensio/framework-extra-bundle": "^5.6.1",
+        "symfony/apache-pack": "^1.0.1",
+        "symfony/asset": "5.1.*",
+        "symfony/console": "5.1.*",
+        "symfony/doctrine-bridge": "5.1",
+        "symfony/dotenv": "5.1.*",
+        "symfony/expression-language": "5.1.*",
+        "symfony/flex": "^1.9",
+        "symfony/form": "5.1.*",
+        "symfony/framework-bundle": "5.1.*",
+        "symfony/http-client": "5.1.*",
+        "symfony/intl": "5.1.*",
+        "symfony/mime": "5.1.*",
+        "symfony/monolog-bundle": "^3.6.0",
+        "symfony/orm-pack": "^2.0.0",
+        "symfony/process": "5.1.*",
+        "symfony/security-bundle": "5.1.*",
+        "symfony/serializer": "5.1.*",
         "symfony/serializer-pack": "*",
-        "symfony/swiftmailer-bundle": "^3.1",
-        "symfony/translation": "4.3.*",
-        "symfony/twig-bundle": "4.3.*",
-        "symfony/validator": "4.3.*",
-        "symfony/web-link": "4.3.*",
-        "symfony/yaml": "4.3.*"
+        "symfony/swiftmailer-bundle": "^3.5.1",
+        "symfony/translation": "5.1.*",
+        "symfony/twig-bundle": "5.1.*",
+        "symfony/validator": "5.1.*",
+        "symfony/web-link": "5.1.*",
+        "symfony/yaml": "5.1.*"
     },
     "require-dev": {
         "symfony/debug-pack": "*",
-        "symfony/maker-bundle": "^1.11",
+        "symfony/maker-bundle": "^1.21.1",
         "symfony/profiler-pack": "*",
-        "symfony/test-pack": "*",
-        "symfony/web-server-bundle": "4.3.*"
+        "symfony/test-pack": "*"
     },
     "config": {
         "preferred-install": {
@@ -84,7 +84,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "4.3.*"
+            "require": "5.1.*"
         }
     }
 }

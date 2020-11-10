@@ -2,34 +2,30 @@
 
 namespace App\Controller\Exercise\Event;
 
-use App\Entity\Audience;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\InjectType;
+use App\Entity\Audience;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
-use App\Entity\Inject;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class InjectController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List injects of an event"
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Get("/exercises/{exercise_id}/events/{event_id}/injects")
+     * @Rest\Get("/api/exercises/{exercise_id}/events/{event_id}/injects")
      */
     public function getExercisesEventsInjectsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -73,11 +69,11 @@ class InjectController extends BaseController
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function eventNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 }

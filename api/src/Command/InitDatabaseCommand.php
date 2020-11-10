@@ -11,31 +11,30 @@ use App\Entity\Group;
 use App\Entity\Incident;
 use App\Entity\IncidentType;
 use App\Entity\Inject;
+use App\Entity\InjectStatus;
 use App\Entity\Objective;
+use App\Entity\Organization;
 use App\Entity\Outcome;
 use App\Entity\Result;
-use App\Entity\InjectStatus;
 use App\Entity\Subaudience;
 use App\Entity\Token;
 use App\Entity\User;
-use App\Entity\Organization;
+use DateTime;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class InitDatabaseCommand extends ContainerAwareCommand
+class InitDatabaseCommand extends Command
 {
+    protected static $defaultName = 'app:db-init';
     private $em;
-
 
     protected function configure()
     {
         $this
             ->setName('app:db-init')
             ->setDescription('Initialize the database with a primary set of data')
-            ->setHelp("Initialize the database with a primary set of data (users, tokens and samples).")
-        ;
+            ->setHelp("Initialize the database with a primary set of data (users, tokens and samples).");
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -58,7 +57,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $organizationAgency = $this->createOrganization('The agency', 'The national security agency');
         $output->writeln('Creating organization \'The agency\'');
 
-        $organizationPolice= $this->createOrganization('Police officer', 'Police Officier of Cynthiana');
+        $organizationPolice = $this->createOrganization('Police officer', 'Police Officier of Cynthiana');
         $output->writeln('Creating organization \'Police officer\'');
 
         $userAdmin = $this->createUser('admin@openex.io', 'admin', 'John', 'Doe', true, false, $organizationAgency);
@@ -101,8 +100,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Potatoes attack',
             'Major crisis exercise',
             'A massive potatoes attack, this is crisis.',
-            new \DateTime('2019-01-01 08:00:00'),
-            new \DateTime('2019-01-10 18:00:00'),
+            new DateTime('2019-01-01 08:00:00'),
+            new DateTime('2019-01-10 18:00:00'),
             $userAdmin,
             $fileExercise
         );
@@ -112,8 +111,8 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Cockroach invasion',
             'Minor crisis exercise',
             'A massive cockroach invasion, this is crisis.',
-            new \DateTime('2019-01-01 08:00:00'),
-            new \DateTime('2019-01-10 18:00:00'),
+            new DateTime('2019-01-01 08:00:00'),
+            new DateTime('2019-01-10 18:00:00'),
             $userAdmin,
             $fileExercise
         );
@@ -204,7 +203,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Potatoes headquarters conversation',
             'A potatoes headquarters conversation is intercepted',
             json_encode($content),
-            new \DateTime('2019-01-01 08:01:00'),
+            new DateTime('2019-01-01 08:01:00'),
             'openex_email',
             $incidentCapital,
             $userAdmin
@@ -217,7 +216,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'Potato arrival at the airport',
             'A potato is arriving at the airport ',
             json_encode($content),
-            new \DateTime('2019-01-02 08:15:00'),
+            new DateTime('2019-01-02 08:15:00'),
             'openex_email',
             $incidentCapital,
             $userAdmin
@@ -230,7 +229,7 @@ class InitDatabaseCommand extends ContainerAwareCommand
             'A potato has been detected',
             'A potato has been detected by CCTV',
             json_encode($content),
-            new \DateTime('2019-01-03 08:45:00'),
+            new DateTime('2019-01-03 08:45:00'),
             'openex_email',
             $incidentCapital,
             $userAdmin
@@ -249,14 +248,28 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $type;
     }
 
-    private function createResult($name)
+    private function createFile($name, $path, $type)
     {
-        $result = new Result();
-        $result->setResultName($name);
-        $this->em->persist($result);
+        $file = new File();
+        $file->setFileName($name);
+        $file->setFileTYpe($type);
+        $file->setFilePath($path);
+        $this->em->persist($file);
         $this->em->flush();
 
-        return $result;
+        return $file;
+    }
+
+    private function createOrganization($name, $description)
+    {
+        $organization = new Organization();
+        $organization->setOrganizationName($name);
+        $organization->setOrganizationDescription($description);
+
+        $this->em->persist($organization);
+        $this->em->flush();
+
+        return $organization;
     }
 
     private function createUser($login, $password, $firstname, $lastname, $admin, $planificateur, $organization)
@@ -280,23 +293,11 @@ class InitDatabaseCommand extends ContainerAwareCommand
         return $user;
     }
 
-    private function createOrganization($name, $description)
-    {
-        $organization = new Organization();
-        $organization->setOrganizationName($name);
-        $organization->setOrganizationDescription($description);
-
-        $this->em->persist($organization);
-        $this->em->flush();
-
-        return $organization;
-    }
-
     private function createToken($user)
     {
         $token = new Token();
         $token->setTokenValue(base64_encode(random_bytes(50)));
-        $token->setTokenCreatedAt(new \DateTime('now'));
+        $token->setTokenCreatedAt(new DateTime('now'));
         $token->setTokenUser($user);
         $this->em->persist($token);
         $this->em->flush();
@@ -353,18 +354,6 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $group->setGroupUsers($users);
         $this->em->persist($group);
         $this->em->flush();
-    }
-
-    private function createFile($name, $path, $type)
-    {
-        $file = new File();
-        $file->setFileName($name);
-        $file->setFileTYpe($type);
-        $file->setFilePath($path);
-        $this->em->persist($file);
-        $this->em->flush();
-
-        return $file;
     }
 
     private function createAudience($name, $exercise)
@@ -470,5 +459,15 @@ class InitDatabaseCommand extends ContainerAwareCommand
         $this->em->persist($status);
         $this->em->flush();
         return $status;
+    }
+
+    private function createResult($name)
+    {
+        $result = new Result();
+        $result->setResultName($name);
+        $this->em->persist($result);
+        $this->em->flush();
+
+        return $result;
     }
 }

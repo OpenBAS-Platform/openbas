@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Constant;
 
 class ExerciseConstantClass

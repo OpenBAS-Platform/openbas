@@ -3,30 +3,28 @@
 namespace App\Controller\Exercise;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Exercise;
-use App\Form\Type\ObjectiveType;
 use App\Entity\Objective;
+use App\Form\Type\ObjectiveType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ObjectiveController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List objectives"
      * )
      *
      * @Rest\View(serializerGroups={"objective"})
-     * @Rest\Get("/exercises/{exercise_id}/objectives")
+     * @Rest\Get("/api/exercises/{exercise_id}/objectives")
      */
     public function getExercisesObjectivesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -47,17 +45,22 @@ class ObjectiveController extends BaseController
         return $objectives;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read an objective"
      * )
      *
      * @Rest\View(serializerGroups={"objective"})
-     * @Rest\Get("/exercises/{exercise_id}/objectives/{objective_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/objectives/{objective_id}")
      */
     public function getExercisesObjectiveAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -80,15 +83,20 @@ class ObjectiveController extends BaseController
         return $objective;
     }
 
+    private function objectiveNotFound()
+    {
+        return View::create(['message' => 'Objective not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create an objective")
+     * @OA\Property(description="Create an objective")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"objective"})
-     * @Rest\Post("/exercises/{exercise_id}/objectives")
+     * @Rest\Post("/api/exercises/{exercise_id}/objectives")
      */
     public function postExercisesObjectivesAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -113,16 +121,16 @@ class ObjectiveController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete an objective"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"objective"})
-     * @Rest\Delete("/exercises/{exercise_id}/objectives/{objective_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/objectives/{objective_id}")
      */
     public function removeExercisesObjectiveAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -144,14 +152,14 @@ class ObjectiveController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Update an objective")
+     * @OA\Property(description="Update an objective")
      *
      * @Rest\View(serializerGroups={"objective"})
-     * @Rest\Put("/exercises/{exercise_id}/objectives/{objective_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/objectives/{objective_id}")
      */
     public function updateExercisesObjectiveAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -180,15 +188,5 @@ class ObjectiveController extends BaseController
         } else {
             return $form;
         }
-    }
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function objectiveNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Objective not found'], Response::HTTP_NOT_FOUND);
     }
 }

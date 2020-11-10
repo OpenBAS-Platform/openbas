@@ -4,50 +4,58 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    locale: 'en'
-    protocol:          '%env(APP_PROTOCOL)%'
-    worker_url:        '%env(WORKER_URL)%'
-    mail_sender:       no-reply@openex.io
+  locale: 'en'
+  protocol: '%env(APP_PROTOCOL)%'
+  worker_url: '%env(WORKER_URL)%'
+  mail_sender: no-reply@openex.io
 
 services:
-    mylogger.db:
-        alias: logger
-        public: true
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    openex_mailer:
-        class: App\Service\OpenexMailerService
-        arguments: ["@mailer", "@templating", "@translator.default"]
+  mylogger.db:
+    alias: logger
+    public: true
 
-    token_user_provider:
-        class: App\Security\TokenUserProvider
-        arguments: ["@token_repository", "@user_repository"]
-        public:    false
+  App\:
+    resource: '../src/*'
+    exclude: '../src/{DependencyInjection,Entity,Tests,Kernel.php}'
 
-    token_repository:
-        class:   Doctrine\ORM\EntityManager
-        factory: ["@doctrine.orm.entity_manager", "getRepository"]
-        arguments: ["App:Token"]
+  openex_mailer:
+    class: App\Service\OpenexMailerService
+    arguments: [ "@mailer", "@templating", "@translator.default" ]
 
-    user_repository:
-        class:   Doctrine\ORM\EntityManager
-        factory: ["@doctrine.orm.entity_manager", "getRepository"]
-        arguments: ["App:User"]
+  token_user_provider:
+    class: App\Security\TokenUserProvider
+    arguments: [ "@doctrine.orm.entity_manager" ]
+    public: false
 
-    token_authenticator:
-        class:     App\Security\TokenAuthenticator
-        arguments: ["@security.http_utils", "@doctrine.orm.entity_manager"]
-        public:    false
+  token_repository:
+    class: Doctrine\ORM\EntityManager
+    factory: [ "@doctrine.orm.entity_manager", "getRepository" ]
+    arguments: [ "App:Token" ]
 
-    exercise_voter:
-        class: App\Security\ExerciseVoter
-        arguments: ['@security.access.decision_manager']
-        public: false
-        tags:
-            - { name: security.voter }
+  user_repository:
+    class: Doctrine\ORM\EntityManager
+    factory: [ "@doctrine.orm.entity_manager", "getRepository" ]
+    arguments: [ "App:User" ]
 
-    group_voter:
-        class: App\Security\GroupVoter
-        arguments: ['@security.access.decision_manager']
-        public: false
-        tags:
-            - { name: security.voter }
+  token_authenticator:
+    class: App\Security\TokenAuthenticator
+    arguments: [ "@security.http_utils", "@doctrine.orm.entity_manager" ]
+    public: false
+
+  exercise_voter:
+    class: App\Security\ExerciseVoter
+    arguments: [ '@security.access.decision_manager' ]
+    public: false
+    tags:
+      - { name: security.voter }
+
+  group_voter:
+    class: App\Security\GroupVoter
+    arguments: [ '@security.access.decision_manager' ]
+    public: false
+    tags:
+      - { name: security.voter }

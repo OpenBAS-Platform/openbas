@@ -2,31 +2,29 @@
 
 namespace App\Controller\Exercise\Event\Incident;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\OutcomeType;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Outcome;
+use App\Form\Type\OutcomeType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class OutcomeController extends Controller
+class OutcomeController extends AbstractController
 {
     /**
-     * @SWG\Property(description="Update an outcome")
+     * @OA\Property(description="Update an outcome")
      *
      * @Rest\View(serializerGroups={"incident"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/outcome/{outcome_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/outcome/{outcome_id}")
      */
     public function updateExercisesEventsIncidentsOutcomeAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -72,21 +70,21 @@ class OutcomeController extends Controller
 
     private function exerciseNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function eventNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Event not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function incidentNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Incident not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function outcomeNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Outcome not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Outcome not found'], Response::HTTP_NOT_FOUND);
     }
 }

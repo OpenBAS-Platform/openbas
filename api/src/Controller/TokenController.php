@@ -2,31 +2,39 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Form\Type\CredentialsType;
-use App\Entity\Token;
 use App\Entity\Credentials;
+use App\Entity\Token;
+use App\Entity\User;
+use App\Form\Type\CredentialsType;
+use DateTime;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class TokenController extends Controller
+class TokenController extends AbstractController
 {
+    private $passwordEncoder;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Get a Kerberos token",
      * )
      * @Rest\View(serializerGroups={"token"})
-     * @Rest\Get("/tokens/kerberos")
+     * @Rest\Get("/api/tokens/kerberos")
      */
     public function getKerberosTokenAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $apacheAuthUser = $request->server->get('REMOTE_USER');
 
         if ($apacheAuthUser === null) {
@@ -52,7 +60,7 @@ class TokenController extends Controller
         if (!$token) {
             $token = new Token();
             $token->setTokenValue(base64_encode(random_bytes(50)));
-            $token->setTokenCreatedAt(new \DateTime('now'));
+            $token->setTokenCreatedAt(new DateTime('now'));
             $token->setTokenUser($user);
 
             $em->persist($token);
@@ -62,17 +70,22 @@ class TokenController extends Controller
         return $token;
     }
 
+    private function noKerberos()
+    {
+        return View::create(['message' => 'Kerberos is not detected'], Response::HTTP_BAD_REQUEST);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Create a token"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"token"})
-     * @Rest\Post("/tokens")
+     * @Rest\Post("/api/tokens")
      */
     public function postTokensAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $credentials = new Credentials();
         $form = $this->createForm(CredentialsType::class, $credentials);
 
@@ -89,8 +102,7 @@ class TokenController extends Controller
         }
         $user->setUserGravatar();
 
-        $encoder = $this->get('security.password_encoder');
-        $isPasswordValid = $encoder->isPasswordValid($user, $credentials->getPassword());
+        $isPasswordValid = $this->passwordEncoder->isPasswordValid($user, $credentials->getPassword());
 
         if (!$isPasswordValid) {
             return $this->invalidCredentials();
@@ -98,7 +110,7 @@ class TokenController extends Controller
 
         $token = new Token();
         $token->setTokenValue(base64_encode(random_bytes(50)));
-        $token->setTokenCreatedAt(new \DateTime('now'));
+        $token->setTokenCreatedAt(new DateTime('now'));
         $token->setTokenUser($user);
 
         $em->persist($token);
@@ -107,17 +119,22 @@ class TokenController extends Controller
         return $token;
     }
 
+    private function invalidCredentials()
+    {
+        return View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a token",
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"token"})
-     * @Rest\Delete("/tokens/{token_id}")
+     * @Rest\Delete("/api/tokens/{token_id}")
      */
     public function removeTokenAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $token = $em->getRepository('App:Token')->find($request->get('token_id'));
         /* @var $token Token */
 
@@ -127,21 +144,21 @@ class TokenController extends Controller
             $em->remove($token);
             $em->flush();
         } else {
-            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
+            throw new BadRequestHttpException();
         }
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read a token",
      * )
      *
      * @Rest\View(serializerGroups={"token"})
-     * @Rest\Get("/tokens/{token_id}")
+     * @Rest\Get("/api/tokens/{token_id}")
      */
     public function getTokenAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $token = $em->getRepository('App:Token')->find($request->get('token_id'));
         /* @var $token Token */
 
@@ -151,17 +168,7 @@ class TokenController extends Controller
             $token->setTokenUser($token->getTokenUser()->setUserGravatar());
             return $token;
         } else {
-            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException();
+            throw new BadRequestHttpException();
         }
-    }
-
-    private function invalidCredentials()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);
-    }
-
-    private function noKerberos()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Kerberos is not detected'], Response::HTTP_BAD_REQUEST);
     }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\User;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -13,25 +12,16 @@ use App\Entity\Base\BaseEntity;
  */
 class Subaudience extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->subaudienceUsers = new ArrayCollection();
-        $this->subaudience_injects = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $subaudience_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $subaudience_name;
-
     /**
      * @ORM\ManyToMany(targetEntity="User", inversedBy="userSubaudiences")
      * @ORM\JoinTable(name="users_subaudiences",
@@ -41,26 +31,29 @@ class Subaudience extends BaseEntity
      * @var User[]
      */
     protected $subaudienceUsers;
-
     /**
      * @ORM\ManyToOne(targetEntity="Audience", inversedBy="audience_subaudiences")
      * @ORM\JoinColumn(name="subaudience_audience", referencedColumnName="audience_id", onDelete="CASCADE")
      * @var Audience
      */
     protected $subaudience_audience;
-
     /**
      * @ORM\Column(type="boolean")
      */
     protected $subaudience_enabled = true;
-
     /**
      * @ORM\ManyToMany(targetEntity="Inject", mappedBy="inject_subaudiences")
      * @var Inject[]
      */
     protected $subaudience_injects;
-
     protected $subaudience_exercise;
+
+    public function __construct()
+    {
+        $this->subaudienceUsers = new ArrayCollection();
+        $this->subaudience_injects = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getSubaudienceId()
     {
@@ -89,6 +82,12 @@ class Subaudience extends BaseEntity
         return $this->subaudienceUsers;
     }
 
+    public function setSubaudienceUsers($users)
+    {
+        $this->subaudienceUsers = $users;
+        return $this;
+    }
+
     public function addSubaudienceUser(User $oUser)
     {
         if (!$this->subaudienceUsers->contains($oUser)) {
@@ -100,12 +99,6 @@ class Subaudience extends BaseEntity
     public function removeSubaudienceUser(User $oUser)
     {
         $this->subaudienceUsers->removeElement($oUser);
-        return $this;
-    }
-
-    public function setSubaudienceUsers($users)
-    {
-        $this->subaudienceUsers = $users;
         return $this;
     }
 

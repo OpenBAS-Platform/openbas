@@ -2,41 +2,41 @@
 
 namespace App\Controller\Export;
 
-use App\Entity\Exercise;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\View;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use PHPExcel;
-use App\Utils\Transform;
 use App\Constant\ExerciseConstantClass;
+use App\Entity\File;
+use App\Utils\Transform;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use OpenApi\Annotations as OA;
+use PHPExcel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use function json_encode;
 
-class ExportExerciseController extends Controller
+class ExportExerciseController extends AbstractController
 {
 
     /**
-     * @SWG\Property(description="Export an exercise")
+     * @OA\Property(description="Export an exercise")
      *
      * @Rest\View(serializerGroups={"exercise"})
-     * @Rest\Get("/exercises/{exercise_id}/export")
+     * @Rest\Get("/api/exercises/{exercise_id}/export")
      */
     public function exportExerciseAction(Request $request)
     {
         $activeSheetIndex = 0;
 
         $exportTypes = array(
-            'export_exercise'  => array('sheetName' => ExerciseConstantClass::CST_EXERCISE, 'export' => $request->get('export_exercise')),
-            'export_audience'  => array('sheetName' => ExerciseConstantClass::CST_AUDIENCE, 'export' => $request->get('export_audience')),
+            'export_exercise' => array('sheetName' => ExerciseConstantClass::CST_EXERCISE, 'export' => $request->get('export_exercise')),
+            'export_audience' => array('sheetName' => ExerciseConstantClass::CST_AUDIENCE, 'export' => $request->get('export_audience')),
             'export_objective' => array('sheetName' => ExerciseConstantClass::CST_OBJECTIVE, 'export' => $request->get('export_objective')),
             'export_scenarios' => array('sheetName' => ExerciseConstantClass::CST_SCENARIOS, 'export' => $request->get('export_scenarios')),
             'export_incidents' => array('sheetName' => ExerciseConstantClass::CST_INCIDENTS, 'export' => $request->get('export_incidents')),
-            'export_injects'   => array('sheetName' => ExerciseConstantClass::CST_INJECTS, 'export' => $request->get('export_injects'))
+            'export_injects' => array('sheetName' => ExerciseConstantClass::CST_INJECTS, 'export' => $request->get('export_injects'))
         );
 
         // L'export des audiences necessite l'export des exercises
@@ -63,9 +63,9 @@ class ExportExerciseController extends Controller
             $exportTypes['export_exercise']['export'] = '1';
         }
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
-        $xlsExport = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $xlsExport = new Spreadsheet();
 
         $xlsExport->getProperties()
             ->setCreator("OpenEx")
@@ -84,7 +84,7 @@ class ExportExerciseController extends Controller
                     case ExerciseConstantClass::CST_EXERCISE:
                         $activeSheet = $this->writeXlsColumnsHeader($activeSheet, ExerciseConstantClass::CST_EXERCISE);
                         $activeSheet = $this->setXlsValue($activeSheet, 'A2', $exercise->getExerciseImage()->getFileName());
-                        ($exercise->getExerciseAnimationGroup() !== null) ? $activeSheet = $this->setXlsValue($activeSheet, 'B2', $exercise->getExerciseAnimationGroup()->getGroupId()): "";
+                        ($exercise->getExerciseAnimationGroup() !== null) ? $activeSheet = $this->setXlsValue($activeSheet, 'B2', $exercise->getExerciseAnimationGroup()->getGroupId()) : "";
                         $activeSheet = $this->setXlsValue($activeSheet, 'C2', $exercise->getExerciseName());
                         $activeSheet = $this->setXlsValue($activeSheet, 'D2', $exercise->getExerciseSubtitle());
                         $activeSheet = $this->setXlsValue($activeSheet, 'E2', $exercise->getExerciseDescription());
@@ -237,8 +237,8 @@ class ExportExerciseController extends Controller
 
                                     // Export inject data
                                     $activeSheet = $this->exportXlsInjectData($activeSheet, $inject, $i);
-                                    $activeSheet = $this->setXlsValue($activeSheet, $xlsInjectAudienceColumn.$i, \json_encode($exportedInjectAudiences));
-                                    $activeSheet = $this->setXlsValue($activeSheet, $xlsInjectSubAudienceColumn.$i, \json_encode($exportedInjectSubAudiences));
+                                    $activeSheet = $this->setXlsValue($activeSheet, $xlsInjectAudienceColumn . $i, json_encode($exportedInjectAudiences));
+                                    $activeSheet = $this->setXlsValue($activeSheet, $xlsInjectSubAudienceColumn . $i, json_encode($exportedInjectSubAudiences));
                                     $activeSheet = $this->exportXlsInjectStatusData($activeSheet, $exportedInjectStatus, $i);
                                     $i++;
                                 }
@@ -250,13 +250,13 @@ class ExportExerciseController extends Controller
             }
         }
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($xlsExport);
+        $writer = new Xlsx($xlsExport);
         $exportFilePath = $request->get('export_path');
         if ($exportFilePath) {
             $writer->save($exportFilePath);
             $response = ['success' => true];
         } else {
-            $response =  new StreamedResponse(function () use ($writer) {
+            $response = new StreamedResponse(function () use ($writer) {
                 $writer->save('php://output');
             });
             $dispositionHeader = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "[" . Transform::strToNoAccent($exercise->getExerciseName()) . "] Export");
@@ -268,210 +268,6 @@ class ExportExerciseController extends Controller
         }
 
         return $response;
-    }
-
-    /**
-     * Set XLS Header Value
-     * @param type $activeSheet     Active Sheet
-     * @param type $columnName      Column name
-     * @param type $value           Value
-     * @return type                 ActiveSheet
-     */
-    private function setXlsHeaderValue($activeSheet, $columnName, $value)
-    {
-        $activeSheet->setCellValue($columnName.'1', $value)->getColumnDimension($columnName)->setAutoSize(true);
-        $activeSheet->getStyle($columnName.'1')->getFont()->setBold(true);
-        $activeSheet->getStyle($columnName.'1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER_CONTINUOUS);
-        return $activeSheet;
-    }
-
-    /**
-     * Set Xls cell Value
-     * @param type $activeSheet Active Sheet
-     * @param type $cellName    Cell Name
-     * @param type $value       Value
-     * @return type ActiveSheet
-     */
-    private function setXlsValue($activeSheet, $cellName, $value)
-    {
-        $activeSheet->setCellValue($cellName, $value);
-        return $activeSheet;
-    }
-
-    /**
-     * Export User Data to XLS
-     * @param type $activeSheet     Active Sheet
-     * @param type $user            Current User to export
-     * @param type $indexRow        Index Row
-     * @return type                 Return sheet
-     */
-    private function exportXlsUserData($activeSheet, $user, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'E'.$indexRow, $user->getUserOrganization()->getOrganizationName());
-        $activeSheet = $this->setXlsValue($activeSheet, 'F'.$indexRow, $user->getUserLogin());
-        $activeSheet = $this->setXlsValue($activeSheet, 'G'.$indexRow, $user->getUserPassword());
-        $activeSheet = $this->setXlsValue($activeSheet, 'H'.$indexRow, $user->getUserFirstname());
-        $activeSheet = $this->setXlsValue($activeSheet, 'I'.$indexRow, $user->getUserLastname());
-        $activeSheet = $this->setXlsValue($activeSheet, 'J'.$indexRow, $user->getUserEmail());
-        $activeSheet = $this->setXlsValue($activeSheet, 'K'.$indexRow, $user->getUserEmail2());
-        $activeSheet = $this->setXlsValue($activeSheet, 'L'.$indexRow, $user->getUserPhone());
-        $activeSheet = $this->setXlsValue($activeSheet, 'M'.$indexRow, $user->getUserPhone2());
-        $activeSheet = $this->setXlsValue($activeSheet, 'N'.$indexRow, $user->getUserPhone3());
-
-        if ($user->getUserAdmin() == false) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'O'.$indexRow, '0');
-        } else {
-            $activeSheet = $this->setXlsValue($activeSheet, 'O'.$indexRow, '1');
-        }
-        if ($user->getUserStatus() == false) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'P'.$indexRow, '0');
-        } else {
-            $activeSheet = $this->setXlsValue($activeSheet, 'P'.$indexRow, '1');
-        }
-        return $activeSheet;
-    }
-
-    /**
-     * Export Objective Data to XLS
-     * @param type $activeSheet     Active Sheet
-     * @param type $objective       Current Objective
-     * @param type $indexRow        Current index
-     * @return type                 Return sheet
-     */
-    private function exportXlsObjectiveData($activeSheet, $objective, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'A'.$indexRow, $objective->getObjectiveTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'B'.$indexRow, $objective->getObjectiveDescription());
-        $activeSheet = $this->setXlsValue($activeSheet, 'C'.$indexRow, $objective->getObjectivePriority());
-        return $activeSheet;
-    }
-
-    /**
-     * Export Subobjective Data to XLS
-     * @param type $activeSheet     Active sheet
-     * @param type $subObjective    Current SubObjective
-     * @param type $indexRow        Current index
-     * @return type
-     */
-    private function exportXlsSubObjectiveData($activeSheet, $subObjective, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'D'.$indexRow, $subObjective->getSubobjectiveTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'E'.$indexRow, $subObjective->getSubobjectiveDescription());
-        $activeSheet = $this->setXlsValue($activeSheet, 'F'.$indexRow, $subObjective->getSubobjectivePriority());
-        return $activeSheet;
-    }
-
-    /**
-     * Export events data to XLS
-     * @param type $activeSheet
-     * @param type $event
-     * @param type $indexRow
-     * @return type
-     */
-    private function exportXlsEventData($activeSheet, $event, $indexRow)
-    {
-        if ($event->getEventImage() instanceof \App\Entity\File) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'A'.$indexRow, $event->getEventImage()->getFilePath());
-        }
-        $activeSheet = $this->setXlsValue($activeSheet, 'B'.$indexRow, $event->getEventTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'C'.$indexRow, $event->getEventdescription());
-        $activeSheet = $this->setXlsValue($activeSheet, 'D'.$indexRow, $event->getEventOrder());
-        return $activeSheet;
-    }
-
-    /**
-     * Export incident data to XLS
-     * @param type $activeSheet     Active sheet
-     * @param type $incident        Incident object to extract
-     * @param type $indexRow        Index row
-     * @return type                 return sheet
-     */
-    private function exportXlsIncidentData($activeSheet, $incident, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'A'.$indexRow, $incident->getIncidentType()->getTypeName());
-        $activeSheet = $this->setXlsValue($activeSheet, 'B'.$indexRow, $incident->getIncidentEvent()->getEventTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'C'.$indexRow, $incident->getIncidentTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'D'.$indexRow, $incident->getIncidentStory());
-        $activeSheet = $this->setXlsValue($activeSheet, 'E'.$indexRow, $incident->getIncidentWeight());
-        $activeSheet = $this->setXlsValue($activeSheet, 'F'.$indexRow, $incident->getIncidentOrder());
-        return $activeSheet;
-    }
-
-    private function exportXlsIncidentOutcomeData($activeSheet, $incidentOutcome, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'G'.$indexRow, $incidentOutcome->getOutcomeComment());
-        $activeSheet = $this->setXlsValue($activeSheet, 'H'.$indexRow, $incidentOutcome->getOutcomeResult());
-        return $activeSheet;
-    }
-
-    private function exportXlsInjectStatusData($activeSheet, $injectStatus, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'L'.$indexRow, $injectStatus->getStatusName());
-        $activeSheet = $this->setXlsValue($activeSheet, 'M'.$indexRow, $injectStatus->getStatusMessage());
-        $activeSheet = $this->setXlsValue($activeSheet, 'N'.$indexRow, $injectStatus->getStatusDate());
-        $activeSheet = $this->setXlsValue($activeSheet, 'O'.$indexRow, $injectStatus->getStatusExecution());
-        return $activeSheet;
-    }
-
-    private function exportXlsInjectData($activeSheet, $inject, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'A'.$indexRow, $inject->getInjectIncident()->getIncidentTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'B'.$indexRow, $inject->getInjectUser()->getUserEmail());
-        $activeSheet = $this->setXlsValue($activeSheet, 'C'.$indexRow, $inject->getInjectTitle());
-        $activeSheet = $this->setXlsValue($activeSheet, 'D'.$indexRow, $inject->getInjectDescription());
-        $activeSheet = $this->setXlsValue($activeSheet, 'E'.$indexRow, $inject->getInjectContent());
-        $activeSheet = $this->setXlsValue($activeSheet, 'F'.$indexRow, $inject->getInjectDate());
-        $activeSheet = $this->setXlsValue($activeSheet, 'G'.$indexRow, $inject->getInjectType());
-
-        if ($inject->getInjectAllAudiences() == false) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'H'.$indexRow, '0');
-        } else {
-            $activeSheet = $this->setXlsValue($activeSheet, 'H'.$indexRow, '1');
-        }
-
-        if ($inject->getInjectEnabled() == false) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'I'.$indexRow, '0');
-        } else {
-            $activeSheet = $this->setXlsValue($activeSheet, 'I'.$indexRow, '1');
-        }
-
-        return $activeSheet;
-    }
-
-    /**
-     * Export SubAudience Data to xls
-     * @param type $activeSheet Active Sheet
-     * @param type $subAudience Sub Audience
-     * @param type $indexRow    Index row
-     * @return type             Return SubAudience
-     */
-    private function exportXlsSubAudienceData($activeSheet, $subAudience, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'C'.$indexRow, $subAudience->getSubaudienceName());
-        if ($subAudience->getSubaudienceEnabled() == false) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'D'.$indexRow, '0');
-        } else {
-            $activeSheet = $this->setXlsValue($activeSheet, 'D'.$indexRow, '1');
-        }
-        return $activeSheet;
-    }
-
-    /**
-     * Export Audience Data to XLS
-     * @param type $activeSheet     Active sheet
-     * @param type $audience        Current Audience
-     * @param type $indexRow        Current index
-     * @return type
-     */
-    private function exportXlsAudienceData($activeSheet, $audience, $indexRow)
-    {
-        $activeSheet = $this->setXlsValue($activeSheet, 'A'.$indexRow, $audience->getAudienceName());
-        if ($audience->getAudienceEnabled() == false) {
-            $activeSheet = $this->setXlsValue($activeSheet, 'B'.$indexRow, '0');
-        } else {
-            $activeSheet = $this->setXlsValue($activeSheet, 'B'.$indexRow, '1');
-        }
-        return $activeSheet;
     }
 
     /**
@@ -556,6 +352,210 @@ class ExportExerciseController extends Controller
                 $activeSheet = $this->setXlsHeaderValue($activeSheet, 'O', ExerciseConstantClass::CST_INJECT_STATUS_EXECUTION);
                 break;
         }
+        return $activeSheet;
+    }
+
+    /**
+     * Set XLS Header Value
+     * @param type $activeSheet Active Sheet
+     * @param type $columnName Column name
+     * @param type $value Value
+     * @return type                 ActiveSheet
+     */
+    private function setXlsHeaderValue($activeSheet, $columnName, $value)
+    {
+        $activeSheet->setCellValue($columnName . '1', $value)->getColumnDimension($columnName)->setAutoSize(true);
+        $activeSheet->getStyle($columnName . '1')->getFont()->setBold(true);
+        $activeSheet->getStyle($columnName . '1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER_CONTINUOUS);
+        return $activeSheet;
+    }
+
+    /**
+     * Set Xls cell Value
+     * @param type $activeSheet Active Sheet
+     * @param type $cellName Cell Name
+     * @param type $value Value
+     * @return type ActiveSheet
+     */
+    private function setXlsValue($activeSheet, $cellName, $value)
+    {
+        $activeSheet->setCellValue($cellName, $value);
+        return $activeSheet;
+    }
+
+    /**
+     * Export Audience Data to XLS
+     * @param type $activeSheet Active sheet
+     * @param type $audience Current Audience
+     * @param type $indexRow Current index
+     * @return type
+     */
+    private function exportXlsAudienceData($activeSheet, $audience, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'A' . $indexRow, $audience->getAudienceName());
+        if ($audience->getAudienceEnabled() == false) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'B' . $indexRow, '0');
+        } else {
+            $activeSheet = $this->setXlsValue($activeSheet, 'B' . $indexRow, '1');
+        }
+        return $activeSheet;
+    }
+
+    /**
+     * Export SubAudience Data to xls
+     * @param type $activeSheet Active Sheet
+     * @param type $subAudience Sub Audience
+     * @param type $indexRow Index row
+     * @return type             Return SubAudience
+     */
+    private function exportXlsSubAudienceData($activeSheet, $subAudience, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'C' . $indexRow, $subAudience->getSubaudienceName());
+        if ($subAudience->getSubaudienceEnabled() == false) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'D' . $indexRow, '0');
+        } else {
+            $activeSheet = $this->setXlsValue($activeSheet, 'D' . $indexRow, '1');
+        }
+        return $activeSheet;
+    }
+
+    /**
+     * Export User Data to XLS
+     * @param type $activeSheet Active Sheet
+     * @param type $user Current User to export
+     * @param type $indexRow Index Row
+     * @return type                 Return sheet
+     */
+    private function exportXlsUserData($activeSheet, $user, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'E' . $indexRow, $user->getUserOrganization()->getOrganizationName());
+        $activeSheet = $this->setXlsValue($activeSheet, 'F' . $indexRow, $user->getUserLogin());
+        $activeSheet = $this->setXlsValue($activeSheet, 'G' . $indexRow, $user->getUserPassword());
+        $activeSheet = $this->setXlsValue($activeSheet, 'H' . $indexRow, $user->getUserFirstname());
+        $activeSheet = $this->setXlsValue($activeSheet, 'I' . $indexRow, $user->getUserLastname());
+        $activeSheet = $this->setXlsValue($activeSheet, 'J' . $indexRow, $user->getUserEmail());
+        $activeSheet = $this->setXlsValue($activeSheet, 'K' . $indexRow, $user->getUserEmail2());
+        $activeSheet = $this->setXlsValue($activeSheet, 'L' . $indexRow, $user->getUserPhone());
+        $activeSheet = $this->setXlsValue($activeSheet, 'M' . $indexRow, $user->getUserPhone2());
+        $activeSheet = $this->setXlsValue($activeSheet, 'N' . $indexRow, $user->getUserPhone3());
+
+        if ($user->getUserAdmin() == false) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'O' . $indexRow, '0');
+        } else {
+            $activeSheet = $this->setXlsValue($activeSheet, 'O' . $indexRow, '1');
+        }
+        if ($user->getUserStatus() == false) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'P' . $indexRow, '0');
+        } else {
+            $activeSheet = $this->setXlsValue($activeSheet, 'P' . $indexRow, '1');
+        }
+        return $activeSheet;
+    }
+
+    /**
+     * Export Objective Data to XLS
+     * @param type $activeSheet Active Sheet
+     * @param type $objective Current Objective
+     * @param type $indexRow Current index
+     * @return type                 Return sheet
+     */
+    private function exportXlsObjectiveData($activeSheet, $objective, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'A' . $indexRow, $objective->getObjectiveTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'B' . $indexRow, $objective->getObjectiveDescription());
+        $activeSheet = $this->setXlsValue($activeSheet, 'C' . $indexRow, $objective->getObjectivePriority());
+        return $activeSheet;
+    }
+
+    /**
+     * Export Subobjective Data to XLS
+     * @param type $activeSheet Active sheet
+     * @param type $subObjective Current SubObjective
+     * @param type $indexRow Current index
+     * @return type
+     */
+    private function exportXlsSubObjectiveData($activeSheet, $subObjective, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'D' . $indexRow, $subObjective->getSubobjectiveTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'E' . $indexRow, $subObjective->getSubobjectiveDescription());
+        $activeSheet = $this->setXlsValue($activeSheet, 'F' . $indexRow, $subObjective->getSubobjectivePriority());
+        return $activeSheet;
+    }
+
+    /**
+     * Export events data to XLS
+     * @param type $activeSheet
+     * @param type $event
+     * @param type $indexRow
+     * @return type
+     */
+    private function exportXlsEventData($activeSheet, $event, $indexRow)
+    {
+        if ($event->getEventImage() instanceof File) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'A' . $indexRow, $event->getEventImage()->getFilePath());
+        }
+        $activeSheet = $this->setXlsValue($activeSheet, 'B' . $indexRow, $event->getEventTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'C' . $indexRow, $event->getEventdescription());
+        $activeSheet = $this->setXlsValue($activeSheet, 'D' . $indexRow, $event->getEventOrder());
+        return $activeSheet;
+    }
+
+    /**
+     * Export incident data to XLS
+     * @param type $activeSheet Active sheet
+     * @param type $incident Incident object to extract
+     * @param type $indexRow Index row
+     * @return type                 return sheet
+     */
+    private function exportXlsIncidentData($activeSheet, $incident, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'A' . $indexRow, $incident->getIncidentType()->getTypeName());
+        $activeSheet = $this->setXlsValue($activeSheet, 'B' . $indexRow, $incident->getIncidentEvent()->getEventTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'C' . $indexRow, $incident->getIncidentTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'D' . $indexRow, $incident->getIncidentStory());
+        $activeSheet = $this->setXlsValue($activeSheet, 'E' . $indexRow, $incident->getIncidentWeight());
+        $activeSheet = $this->setXlsValue($activeSheet, 'F' . $indexRow, $incident->getIncidentOrder());
+        return $activeSheet;
+    }
+
+    private function exportXlsIncidentOutcomeData($activeSheet, $incidentOutcome, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'G' . $indexRow, $incidentOutcome->getOutcomeComment());
+        $activeSheet = $this->setXlsValue($activeSheet, 'H' . $indexRow, $incidentOutcome->getOutcomeResult());
+        return $activeSheet;
+    }
+
+    private function exportXlsInjectData($activeSheet, $inject, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'A' . $indexRow, $inject->getInjectIncident()->getIncidentTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'B' . $indexRow, $inject->getInjectUser()->getUserEmail());
+        $activeSheet = $this->setXlsValue($activeSheet, 'C' . $indexRow, $inject->getInjectTitle());
+        $activeSheet = $this->setXlsValue($activeSheet, 'D' . $indexRow, $inject->getInjectDescription());
+        $activeSheet = $this->setXlsValue($activeSheet, 'E' . $indexRow, $inject->getInjectContent());
+        $activeSheet = $this->setXlsValue($activeSheet, 'F' . $indexRow, $inject->getInjectDate());
+        $activeSheet = $this->setXlsValue($activeSheet, 'G' . $indexRow, $inject->getInjectType());
+
+        if ($inject->getInjectAllAudiences() == false) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'H' . $indexRow, '0');
+        } else {
+            $activeSheet = $this->setXlsValue($activeSheet, 'H' . $indexRow, '1');
+        }
+
+        if ($inject->getInjectEnabled() == false) {
+            $activeSheet = $this->setXlsValue($activeSheet, 'I' . $indexRow, '0');
+        } else {
+            $activeSheet = $this->setXlsValue($activeSheet, 'I' . $indexRow, '1');
+        }
+
+        return $activeSheet;
+    }
+
+    private function exportXlsInjectStatusData($activeSheet, $injectStatus, $indexRow)
+    {
+        $activeSheet = $this->setXlsValue($activeSheet, 'L' . $indexRow, $injectStatus->getStatusName());
+        $activeSheet = $this->setXlsValue($activeSheet, 'M' . $indexRow, $injectStatus->getStatusMessage());
+        $activeSheet = $this->setXlsValue($activeSheet, 'N' . $indexRow, $injectStatus->getStatusDate());
+        $activeSheet = $this->setXlsValue($activeSheet, 'O' . $indexRow, $injectStatus->getStatusExecution());
         return $activeSheet;
     }
 }

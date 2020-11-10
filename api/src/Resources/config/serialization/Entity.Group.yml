@@ -1,16 +1,16 @@
 App\Entity\Group:
-    attributes:
-        group_id:
-            groups: ['group', 'user', 'grant', 'exercise']
-        group_name:
-            groups: ['group', 'user', 'grant']
-        group_users:
-            groups: ['group', 'grant']
-        group_grants:
-            groups: ['group']
-        group_grant_in_exercise:
-            groups: ['group']
-        user_can_update:
-            groups: ['group']
-        user_can_delete:
-            groups: ['group']
+  attributes:
+    group_id:
+      groups: [ 'group', 'user', 'grant', 'exercise' ]
+    group_name:
+      groups: [ 'group', 'user', 'grant' ]
+    group_users:
+      groups: [ 'group', 'grant' ]
+    group_grants:
+      groups: [ 'group' ]
+    group_grant_in_exercise:
+      groups: [ 'group' ]
+    user_can_update:
+      groups: [ 'group' ]
+    user_can_delete:
+      groups: [ 'group' ]

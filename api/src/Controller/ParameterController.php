@@ -2,33 +2,29 @@
 
 namespace App\Controller;
 
-use App\Entity\Exercise;
-use App\Entity\Grant;
-use App\Form\Type\ExerciseType;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ParameterController extends Controller
+class ParameterController extends AbstractController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List parameters"
      * )
      *
      * @Rest\View(serializerGroups={"parameter"})
-     * @Rest\Get("/parameters")
+     * @Rest\Get("/api/parameters")
      */
     public function getParametersAction(Request $request)
     {
     }
 
     /**
-     * @SWG\Property(description="Update a parameter")
+     * @OA\Property(description="Update a parameter")
      *
      * @Rest\View(serializerGroups={"parameter"})
      * @Rest\Put("/parameters/{parameter_id}")
@@ -39,6 +35,6 @@ class ParameterController extends Controller
 
     private function parameterNotFound()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'Parameter not found'], Response::HTTP_NOT_FOUND);
+        return View::create(['message' => 'Parameter not found'], Response::HTTP_NOT_FOUND);
     }
 }

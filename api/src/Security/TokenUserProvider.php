@@ -2,21 +2,20 @@
 
 namespace App\Security;
 
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\User;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class TokenUserProvider implements UserProviderInterface
 {
     protected $tokenRepository;
     protected $userRepository;
 
-    public function __construct(EntityRepository $tokenRepository, EntityRepository $userRepository)
+    public function __construct(EntityManager $em)
     {
-        $this->tokenRepository = $tokenRepository;
-        $this->userRepository = $userRepository;
+        $this->tokenRepository = $em->getRepository('App:Token');
+        $this->userRepository = $em->getRepository('App:User');
     }
 
     public function getToken($tokenHeader)

@@ -1,179 +1,183 @@
+comcheck_statuses:
+  type: annotation
+  resource: App\Controller\ComcheckStatusController
+
 parameters:
-    type:     rest
-    resource: App\Controller\ParameterController
+  type: annotation
+  resource: App\Controller\ParameterController
 
 users:
-    type:     rest
-    resource: App\Controller\UserController
+  type: annotation
+  resource: App\Controller\UserController
 
 groups:
-    type:     rest
-    resource: App\Controller\GroupController
+  type: annotation
+  resource: App\Controller\GroupController
 
 groups_grants:
-    type:     rest
-    resource: App\Controller\Group\GrantController
+  type: annotation
+  resource: App\Controller\Group\GrantController
 
 groups_users:
-    type:     rest
-    resource: App\Controller\Group\UserController
+  type: annotation
+  resource: App\Controller\Group\UserController
 
 tokens:
-    type:     rest
-    resource: App\Controller\TokenController
+  type: annotation
+  resource: App\Controller\TokenController
 
 organizations:
-    type:     rest
-    resource: App\Controller\OrganizationController
+  type: annotation
+  resource: App\Controller\OrganizationController
 
 files:
-    type:     rest
-    resource: App\Controller\FileController
+  type: annotation
+  resource: App\Controller\FileController
 
 incident_types:
-    type:     rest
-    resource: App\Controller\IncidentTypeController
+  type: annotation
+  resource: App\Controller\IncidentTypeController
 
 inject_types:
-    type:     rest
-    resource: App\Controller\InjectTypeController
+  type: annotation
+  resource: App\Controller\InjectTypeController
 
 inject_statuses:
-    type:     rest
-    resource: App\Controller\InjectStatusController
+  type: annotation
+  resource: App\Controller\InjectStatusController
 
 tests:
-    type:     rest
-    resource: App\Controller\TestsController
+  type: annotation
+  resource: App\Controller\TestsController
 
 exercises:
-    type:     rest
-    resource: App\Controller\ExerciseController
+  type: annotation
+  resource: App\Controller\ExerciseController
 
 exercises_export:
-    type:     rest
-    resource: App\Controller\Export\ExportExerciseController
+  type: annotation
+  resource: App\Controller\Export\ExportExerciseController
 
 exercises_tag:
-    type:     rest
-    resource: App\Controller\Exercise\Tag\TagController
+  type: annotation
+  resource: App\Controller\Exercise\Tag\TagController
 
 exercises_document:
-    type:     rest
-    resource: App\Controller\Exercise\Tag\DocumentController
+  type: annotation
+  resource: App\Controller\Exercise\Tag\DocumentController
 
 exercises_import:
-    type:     rest
-    resource: App\Controller\Import\ImportExerciseController
+  type: annotation
+  resource: App\Controller\Import\ImportExerciseController
 
 exercises_planificateur_audience:
-    type:     rest
-    resource: App\Controller\Exercise\Planificateur\AudiencePlanificateurController
+  type: annotation
+  resource: App\Controller\Exercise\Planificateur\AudiencePlanificateurController
 
 exercises_planificateur_event:
-    type:     rest
-    resource: App\Controller\Exercise\Planificateur\EventPlanificateurController
+  type: annotation
+  resource: App\Controller\Exercise\Planificateur\EventPlanificateurController
 
 exercises_statistics:
-    type:     rest
-    resource: App\Controller\Exercise\StatisticController
+  type: annotation
+  resource: App\Controller\Exercise\StatisticController
 
 exercises_comchecks:
-    type:     rest
-    resource: App\Controller\Exercise\ComcheckController
+  type: annotation
+  resource: App\Controller\Exercise\ComcheckController
 
 exercises_comchecks_statuses:
-    type:     rest
-    resource: App\Controller\Exercise\Comcheck\ComcheckStatusController
+  type: annotation
+  resource: App\Controller\Exercise\Comcheck\ComcheckStatusController
 
 exercises_dryruns:
-    type:     rest
-    resource: App\Controller\Exercise\DryrunController
+  type: annotation
+  resource: App\Controller\Exercise\DryrunController
 
 exercises_dryruns_injects:
-    type:     rest
-    resource: App\Controller\Exercise\Dryrun\DryinjectController
+  type: annotation
+  resource: App\Controller\Exercise\Dryrun\DryinjectController
 
 exercises_groups:
-    type:     rest
-    resource: App\Controller\Exercise\GroupController
+  type: annotation
+  resource: App\Controller\Exercise\GroupController
 
 exercises_objectives:
-    type:     rest
-    resource: App\Controller\Exercise\ObjectiveController
+  type: annotation
+  resource: App\Controller\Exercise\ObjectiveController
 
 exercises_subobjectives:
-    type:     rest
-    resource: App\Controller\Exercise\SubobjectiveController
+  type: annotation
+  resource: App\Controller\Exercise\SubobjectiveController
 
 exercises_objectives_subobjectives:
-    type:     rest
-    resource: App\Controller\Exercise\Objective\SubobjectiveController
+  type: annotation
+  resource: App\Controller\Exercise\Objective\SubobjectiveController
 
 exercises_audiences:
-    type:     rest
-    resource: App\Controller\Exercise\AudienceController
+  type: annotation
+  resource: App\Controller\Exercise\AudienceController
 
 exercises_audiences_users:
-    type:     rest
-    resource: App\Controller\Exercise\Audience\UserController
+  type: annotation
+  resource: App\Controller\Exercise\Audience\UserController
 
 exercises_audiences_subaudiences:
-    type:     rest
-    resource: App\Controller\Exercise\Audience\SubaudienceController
+  type: annotation
+  resource: App\Controller\Exercise\Audience\SubaudienceController
 
 exercises_audiences_subaudiences_users:
-    type:     rest
-    resource: App\Controller\Exercise\Audience\Subaudience\UserController
+  type: annotation
+  resource: App\Controller\Exercise\Audience\Subaudience\UserController
 
 exercises_subaudiences:
-    type:     rest
-    resource: App\Controller\Exercise\SubaudienceController
+  type: annotation
+  resource: App\Controller\Exercise\SubaudienceController
 
 exercises_events:
-    type:     rest
-    resource: App\Controller\Exercise\EventController
+  type: annotation
+  resource: App\Controller\Exercise\EventController
 
 exercises_incidents:
-    type:     rest
-    resource: App\Controller\Exercise\IncidentController
+  type: annotation
+  resource: App\Controller\Exercise\IncidentController
 
 exercises_injects:
-    type:     rest
-    resource: App\Controller\Exercise\InjectController
+  type: annotation
+  resource: App\Controller\Exercise\InjectController
 
 exercises_change_duration:
-    type:     rest
-    resource: App\Controller\Exercise\ChangeDuration\ChangeDurationController
+  type: annotation
+  resource: App\Controller\Exercise\ChangeDuration\ChangeDurationController
 
 exercises_events_incidents:
-    type:     rest
-    resource: App\Controller\Exercise\Event\IncidentController
+  type: annotation
+  resource: App\Controller\Exercise\Event\IncidentController
 
 exercises_events_injects:
-    type:     rest
-    resource: App\Controller\Exercise\Event\InjectController
+  type: annotation
+  resource: App\Controller\Exercise\Event\InjectController
 
 exercises_event_incidents_injects:
-    type:     rest
-    resource: App\Controller\Exercise\Event\Incident\InjectController
+  type: annotation
+  resource: App\Controller\Exercise\Event\Incident\InjectController
 
 exercises_event_incidents_injects_try:
-    type:     rest
-    resource: App\Controller\Exercise\Event\Incident\Inject\TryController
+  type: annotation
+  resource: App\Controller\Exercise\Event\Incident\Inject\TryController
 
 exercises_event_incidents_outcomes:
-    type:     rest
-    resource: App\Controller\Exercise\Event\Incident\OutcomeController
+  type: annotation
+  resource: App\Controller\Exercise\Event\Incident\OutcomeController
 
 exercises_logs:
-    type:     rest
-    resource: App\Controller\Exercise\LogController
+  type: annotation
+  resource: App\Controller\Exercise\LogController
 
 injects:
-    type:     rest
-    resource: App\Controller\InjectController
+  type: annotation
+  resource: App\Controller\InjectController
 
 worker_status:
-    type:     rest
-    resource: App\Controller\WorkerStatusController
+  type: annotation
+  resource: App\Controller\WorkerStatusController

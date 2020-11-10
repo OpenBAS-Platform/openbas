@@ -3,36 +3,36 @@
 namespace App\Controller\Exercise;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\InjectType;
+use App\Entity\Audience;
 use App\Entity\Event;
+use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
-use App\Entity\Audience;
+use DateTime;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
 use PHPExcel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InjectController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List injects of an exercise"
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Get("/exercises/{exercise_id}/injects")
+     * @Rest\Get("/api/exercises/{exercise_id}/injects")
      */
     public function getExercisesInjectsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -72,16 +72,21 @@ class InjectController extends BaseController
         return $injects;
     }
 
+    private function exerciseNotFound()
+    {
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List injects of an exercise (xls)"
      * )
      *
-     * @Rest\Get("/exercises/{exercise_id}/injects.xlsx")
+     * @Rest\Get("/api/exercises/{exercise_id}/injects.xlsx")
      */
     public function getExercisesInjectsXlsxAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -108,7 +113,7 @@ class InjectController extends BaseController
             }
         }
 
-        $xlsInjects = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $xlsInjects = new Spreadsheet();
         /* @var $xlsInjects PHPExcel */
 
         $xlsInjects->getProperties()
@@ -141,8 +146,8 @@ class InjectController extends BaseController
             $i++;
         }
 
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($xlsInjects);
-        $response =  new StreamedResponse(function () use ($writer) {
+        $writer = new Xlsx($xlsInjects);
+        $response = new StreamedResponse(function () use ($writer) {
             $writer->save('php://output');
         });
         $dispositionHeader = $response->headers->makeDisposition(
@@ -158,22 +163,43 @@ class InjectController extends BaseController
         return $response;
     }
 
+    private function str_to_noaccent($str)
+    {
+        $url = $str;
+        $url = preg_replace('#Ç#', 'C', $url);
+        $url = preg_replace('#ç#', 'c', $url);
+        $url = preg_replace('#è|é|ê|ë#', 'e', $url);
+        $url = preg_replace('#È|É|Ê|Ë#', 'E', $url);
+        $url = preg_replace('#à|á|â|ã|ä|å#', 'a', $url);
+        $url = preg_replace('#@|À|Á|Â|Ã|Ä|Å#', 'A', $url);
+        $url = preg_replace('#ì|í|î|ï#', 'i', $url);
+        $url = preg_replace('#Ì|Í|Î|Ï#', 'I', $url);
+        $url = preg_replace('#ð|ò|ó|ô|õ|ö#', 'o', $url);
+        $url = preg_replace('#Ò|Ó|Ô|Õ|Ö#', 'O', $url);
+        $url = preg_replace('#ù|ú|û|ü#', 'u', $url);
+        $url = preg_replace('#Ù|Ú|Û|Ü#', 'U', $url);
+        $url = preg_replace('#ý|ÿ#', 'y', $url);
+        $url = preg_replace('#Ý#', 'Y', $url);
+
+        return ($url);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Shift injects of an exercise",
      * )
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Put("/exercises/{exercise_id}/injects")
+     * @Rest\Put("/api/exercises/{exercise_id}/injects")
      */
     public function shiftExercisesInjectsAction(Request $request)
     {
         if (!$request->request->get('shift_day') && !$request->request->get('shift_hour') && !$request->request->get('shift_minute')) {
-            return \FOS\RestBundle\View\View::create(['message' => 'Missing day/hour/minute value'], Response::HTTP_BAD_REQUEST);
+            return View::create(['message' => 'Missing day/hour/minute value'], Response::HTTP_BAD_REQUEST);
         }
 
         /* Shift inject with interval */
-        $old_date = new \DateTime($request->request->get('old_date'));
+        $old_date = new DateTime($request->request->get('old_date'));
 
 
         $value_days = intval($request->request->get('shift_day'));
@@ -191,12 +217,12 @@ class InjectController extends BaseController
             $string_modify .= sprintf("%+d", $value_minutes) . 'minutes';
         }
 
-        $new_date_with_shift = new \DateTime($request->request->get('old_date'));
+        $new_date_with_shift = new DateTime($request->request->get('old_date'));
         $new_date_with_shift->modify($string_modify);
 
         $interval = $old_date->diff($new_date_with_shift);
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -207,8 +233,8 @@ class InjectController extends BaseController
         $this->denyAccessUnlessGranted('select', $exercise);
 
         /* New date for exercise */
-        $newStartDateExercise = new \DateTime($exercise->getExerciseStartDate()->add($interval)->format('Y-m-d H:i:s'));
-        $newEndDateExercise = new \DateTime($exercise->getExerciseEndDate()->add($interval)->format('Y-m-d H:i:s'));
+        $newStartDateExercise = new DateTime($exercise->getExerciseStartDate()->add($interval)->format('Y-m-d H:i:s'));
+        $newEndDateExercise = new DateTime($exercise->getExerciseEndDate()->add($interval)->format('Y-m-d H:i:s'));
         $exercise->setExerciseStartDate($newStartDateExercise);
         $exercise->setExerciseEndDate($newEndDateExercise);
         $em->persist($exercise);
@@ -234,7 +260,7 @@ class InjectController extends BaseController
         }
 
         foreach ($injects as &$inject) {
-            $newDate = new \DateTime($inject->getInjectDate()->add($interval)->format('Y-m-d H:i:s'));
+            $newDate = new DateTime($inject->getInjectDate()->add($interval)->format('Y-m-d H:i:s'));
             $inject->setInjectDate($newDate);
             $em->persist($inject);
             $em->flush();
@@ -256,33 +282,5 @@ class InjectController extends BaseController
         }
 
         return $injects;
-    }
-
-
-
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function str_to_noaccent($str)
-    {
-        $url = $str;
-        $url = preg_replace('#Ç#', 'C', $url);
-        $url = preg_replace('#ç#', 'c', $url);
-        $url = preg_replace('#è|é|ê|ë#', 'e', $url);
-        $url = preg_replace('#È|É|Ê|Ë#', 'E', $url);
-        $url = preg_replace('#à|á|â|ã|ä|å#', 'a', $url);
-        $url = preg_replace('#@|À|Á|Â|Ã|Ä|Å#', 'A', $url);
-        $url = preg_replace('#ì|í|î|ï#', 'i', $url);
-        $url = preg_replace('#Ì|Í|Î|Ï#', 'I', $url);
-        $url = preg_replace('#ð|ò|ó|ô|õ|ö#', 'o', $url);
-        $url = preg_replace('#Ò|Ó|Ô|Õ|Ö#', 'O', $url);
-        $url = preg_replace('#ù|ú|û|ü#', 'u', $url);
-        $url = preg_replace('#Ù|Ú|Û|Ü#', 'U', $url);
-        $url = preg_replace('#ý|ÿ#', 'y', $url);
-        $url = preg_replace('#Ý#', 'Y', $url);
-
-        return ($url);
     }
 }

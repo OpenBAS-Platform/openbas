@@ -2,31 +2,28 @@
 
 namespace App\Controller\Group;
 
-use App\Entity\User;
-use App\Form\Type\UserType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
 use App\Entity\Group;
+use App\Entity\User;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class UserController extends Controller
+class UserController extends AbstractController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List users of a group"
      * )
      *
      * @Rest\View(serializerGroups={"user"})
-     * @Rest\Get("/groups/{group_id}/users")
+     * @Rest\Get("/api/groups/{group_id}/users")
      */
     public function getGroupsUsersAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -39,15 +36,20 @@ class UserController extends Controller
         return $group->getGroupUsers();
     }
 
+    private function groupNotFound()
+    {
+        return View::create(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Add a user to a group")
+     * @OA\Property(description="Add a user to a group")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
-     * @Rest\Post("/groups/{group_id}/users")
+     * @Rest\Post("/api/groups/{group_id}/users")
      */
     public function postGroupsUsersAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -71,17 +73,22 @@ class UserController extends Controller
         return $user;
     }
 
+    private function userNotFound()
+    {
+        return View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Remove a user from a group",
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"role"})
-     * @Rest\Delete("/groups/{group_id}/users/{user_id}")
+     * @Rest\Delete("/api/groups/{group_id}/users/{user_id}")
      */
     public function removeGroupsUserAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -103,15 +110,5 @@ class UserController extends Controller
         $em->flush();
 
         return $user;
-    }
-
-    private function groupNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
-    }
-
-    private function userNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
     }
 }

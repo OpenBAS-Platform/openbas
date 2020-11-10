@@ -3,30 +3,29 @@
 namespace App\Controller\Group;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Group;
 use App\Entity\Grant;
+use App\Entity\Group;
 use App\Form\Type\GrantType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class GrantController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List grants of a group"
      * )
      *
      * @Rest\View(serializerGroups={"grant"})
-     * @Rest\Get("/groups/{group_id}/grants")
+     * @Rest\Get("/api/groups/{group_id}/grants")
      */
     public function getGroupsGrantsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -44,19 +43,24 @@ class GrantController extends BaseController
         return $groups;
     }
 
+    private function groupNotFound()
+    {
+        return View::create(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Add a grant to a group")
+     * @OA\Property(description="Add a grant to a group")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"grant"})
-     * @Rest\Post("/groups/{group_id}/grants")
+     * @Rest\Post("/api/groups/{group_id}/grants")
      */
     public function postGroupsGrantsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
         if (!$user->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+            throw new AccessDeniedHttpException();
         }
 
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
@@ -82,15 +86,15 @@ class GrantController extends BaseController
 
     /**
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"grant"})
-     * @Rest\Delete("/groups/{group_id}/grants/{grant_id}")
+     * @Rest\Delete("/api/groups/{group_id}/grants/{grant_id}")
      */
     public function removeGroupsGrantAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $user = $this->get('security.token_storage')->getToken()->getUser();
 
         if (!$user->isAdmin()) {
-            throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
+            throw new AccessDeniedHttpException();
         }
 
         $grant = $em->getRepository('App:Grant')->find($request->get('grant_id'));
@@ -100,10 +104,5 @@ class GrantController extends BaseController
             $em->remove($grant);
             $em->flush();
         }
-    }
-
-    private function groupNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
     }
 }

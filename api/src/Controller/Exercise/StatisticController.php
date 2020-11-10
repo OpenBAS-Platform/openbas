@@ -3,40 +3,35 @@
 namespace App\Controller\Exercise;
 
 use App\Controller\Base\BaseController;
-use App\Controller\OrganizationController;
-use App\Entity\Organization;
-use phpDocumentor\Reflection\Types\Array_;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Exercise;
-use App\Form\Type\InjectType;
-use App\Entity\Event;
-use App\Entity\Incident;
-use App\Entity\Inject;
 use App\Entity\Audience;
+use App\Entity\Event;
+use App\Entity\Exercise;
+use App\Entity\Incident;
+use DateTime;
+use Exception;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
 use PHPExcel;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use function is_array;
 
 class StatisticController extends BaseController
 {
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Get all statistics for an exercise"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Get("/exercises/{exercise_id}/statistics")
+     * @Rest\Get("/api/exercises/{exercise_id}/statistics")
      */
     public function getStatisticsForExerciseAction(Request $request)
     {
         $exerciseId = $request->get('exercise_id');
 
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $oExercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $oExercise Exercise */
 
@@ -47,78 +42,21 @@ class StatisticController extends BaseController
         $interval = $request->get('interval');
 
         return [
-            'allInjectsCount'           => $this->getAllInjectsCount($exerciseId),
-            'avgInjectPerPlayerCount'   => $this->getAverageInjectsNumberPerPlayer($exerciseId),
-            'allPlayersCount'           => $this->getAllPlayersCount($exerciseId),
-            'organizationsCount'        => $this->getOrganizationsCount($exerciseId),
-            'frequencyOfInjectsCount'   => $this->getInjectsFrequency($exerciseId),
-            'injectPerPlayer'           => $this->getInjectsCountsPerPlayer($exerciseId),
-            'injectPerIncident'         => $this->getInjectsCountsPerIncident($exerciseId),
-            'injectPerInterval'         => $this->getInjectsCountsPerInterval($exerciseId, $interval),
-            'value'                     => strval($this->getDefaultInteval($exerciseId, $interval))
+            'allInjectsCount' => $this->getAllInjectsCount($exerciseId),
+            'avgInjectPerPlayerCount' => $this->getAverageInjectsNumberPerPlayer($exerciseId),
+            'allPlayersCount' => $this->getAllPlayersCount($exerciseId),
+            'organizationsCount' => $this->getOrganizationsCount($exerciseId),
+            'frequencyOfInjectsCount' => $this->getInjectsFrequency($exerciseId),
+            'injectPerPlayer' => $this->getInjectsCountsPerPlayer($exerciseId),
+            'injectPerIncident' => $this->getInjectsCountsPerIncident($exerciseId),
+            'injectPerInterval' => $this->getInjectsCountsPerInterval($exerciseId, $interval),
+            'value' => strval($this->getDefaultInteval($exerciseId, $interval))
         ];
     }
 
-    /**
-     * Return an array of users from audiences and subaudiences
-     *
-     * @param $exerciseId
-     * @return array
-     */
-    private function getAllPlayersFromExercise($exerciseId)
+    private function exerciseNotFound()
     {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
-        /* @var $exercise Exercise */
-
-        if (empty($exercise)) {
-            return $this->exerciseNotFound();
-        }
-
-        $this->denyAccessUnlessGranted('select', $exercise);
-
-        $audiences = $em->getRepository('App:Audience')->findBy(['audience_exercise' => $exercise]);
-        /* @var $audiences Audience[] */
-
-        $users = [];
-        foreach ($audiences as $audience) {
-            foreach ($audience->getAudienceSubaudiences() as $subaudience) {
-                foreach ($subaudience->getSubaudienceUsers() as $user) {
-                    $user->setUserSubaudience($subaudience->getSubaudienceName());
-
-                    // Check if user is already picked
-                    $isUserAlreadyPicked = false;
-                    foreach ($users as $tmpUser) {
-                        if ($user->getUserId() === $tmpUser->getUserId()) {
-                            $isUserAlreadyPicked = true;
-                            break;
-                        }
-                    }
-                    if (!$isUserAlreadyPicked) {
-                        $users[] = $user;
-                    }
-                }
-            }
-        }
-
-        return $users;
-    }
-
-    /**
-     * Returns the number of players for an exercise
-     *
-     * @param $exerciseId
-     * @return int
-     */
-    private function getAllPlayersCount($exerciseId)
-    {
-        $users = $this->getAllPlayersFromExercise($exerciseId);
-
-        if (!\is_array($users)) {
-            return 0;
-        }
-
-        return count($users);
+        return View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -129,7 +67,7 @@ class StatisticController extends BaseController
      */
     private function getAllInjectsCount($exerciseId)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -184,6 +122,68 @@ class StatisticController extends BaseController
     }
 
     /**
+     * Returns the number of players for an exercise
+     *
+     * @param $exerciseId
+     * @return int
+     */
+    private function getAllPlayersCount($exerciseId)
+    {
+        $users = $this->getAllPlayersFromExercise($exerciseId);
+
+        if (!is_array($users)) {
+            return 0;
+        }
+
+        return count($users);
+    }
+
+    /**
+     * Return an array of users from audiences and subaudiences
+     *
+     * @param $exerciseId
+     * @return array
+     */
+    private function getAllPlayersFromExercise($exerciseId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        $this->denyAccessUnlessGranted('select', $exercise);
+
+        $audiences = $em->getRepository('App:Audience')->findBy(['audience_exercise' => $exercise]);
+        /* @var $audiences Audience[] */
+
+        $users = [];
+        foreach ($audiences as $audience) {
+            foreach ($audience->getAudienceSubaudiences() as $subaudience) {
+                foreach ($subaudience->getSubaudienceUsers() as $user) {
+                    $user->setUserSubaudience($subaudience->getSubaudienceName());
+
+                    // Check if user is already picked
+                    $isUserAlreadyPicked = false;
+                    foreach ($users as $tmpUser) {
+                        if ($user->getUserId() === $tmpUser->getUserId()) {
+                            $isUserAlreadyPicked = true;
+                            break;
+                        }
+                    }
+                    if (!$isUserAlreadyPicked) {
+                        $users[] = $user;
+                    }
+                }
+            }
+        }
+
+        return $users;
+    }
+
+    /**
      * Returns the number of organizations for an exercise
      *
      * @param $exerciseId
@@ -191,7 +191,7 @@ class StatisticController extends BaseController
      */
     private function getOrganizationsCount($exerciseId)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
 
         $users = $this->getAllPlayersFromExercise($exerciseId);
         $organizations = [];
@@ -211,7 +211,7 @@ class StatisticController extends BaseController
      */
     private function getInjectsFrequency($exerciseId)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -230,6 +230,40 @@ class StatisticController extends BaseController
     }
 
     /**
+     * Return the datatime boundaries of an exercise and its duration (in hours)
+     * from min(first inject, exercise start) to max(last inject, exercise end)
+     *
+     * @param $exerciseId
+     * return array
+     */
+    private function getExerciseDateTimeBoundaries($exerciseId)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
+        /* @var $exercise Exercise */
+
+        if (empty($exercise)) {
+            return $this->exerciseNotFound();
+        }
+
+        // Force compute exercise dates
+        $allInjects = $this->getAllInjects($exerciseId);
+        $exercise->computeStartEndDates($allInjects);
+
+        $startDateExercise = new DateTime($exercise->getExerciseStartDate()->format('Y-m-d H:i:s'));
+        $endDateExercise = new DateTime($exercise->getExerciseEndDate()->format('Y-m-d H:i:s'));
+
+        $diff = $startDateExercise->diff($endDateExercise);
+        $durationInHours = $diff->h + ($diff->days * 24);
+
+        return [
+            'start' => $startDateExercise,
+            'end' => $endDateExercise,
+            'duration' => $durationInHours
+        ];
+    }
+
+    /**
      * Return an array of all injects from an exercise
      *
      * @param $exerciseId
@@ -237,7 +271,7 @@ class StatisticController extends BaseController
      */
     private function getAllInjects($exerciseId)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -340,7 +374,7 @@ class StatisticController extends BaseController
      */
     private function getInjectsCountsPerIncident($exerciseId)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $oExercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $oExercise Exercise */
 
@@ -377,48 +411,14 @@ class StatisticController extends BaseController
     }
 
     /**
-     * Return the datatime boundaries of an exercise and its duration (in hours)
-     * from min(first inject, exercise start) to max(last inject, exercise end)
-     *
-     * @param $exerciseId
-     * return array
-     */
-    private function getExerciseDateTimeBoundaries($exerciseId)
-    {
-        $em = $this->get('doctrine.orm.entity_manager');
-        $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
-        /* @var $exercise Exercise */
-
-        if (empty($exercise)) {
-            return $this->exerciseNotFound();
-        }
-
-        // Force compute exercise dates
-        $allInjects = $this->getAllInjects($exerciseId);
-        $exercise->computeStartEndDates($allInjects);
-
-        $startDateExercise = new \DateTime($exercise->getExerciseStartDate()->format('Y-m-d H:i:s'));
-        $endDateExercise = new \DateTime($exercise->getExerciseEndDate()->format('Y-m-d H:i:s'));
-
-        $diff = $startDateExercise->diff($endDateExercise);
-        $durationInHours = $diff->h + ($diff->days * 24);
-
-        return [
-             'start'    => $startDateExercise,
-             'end'      => $endDateExercise,
-             'duration' => $durationInHours
-         ];
-    }
-
-    /**
      * Return the number of inject per interval for an exercise
      * @param $exerciseId
      * @return json for chartJS
-     * @throws \Exception
+     * @throws Exception
      */
     private function getInjectsCountsPerInterval($exerciseId, $interval)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -450,9 +450,9 @@ class StatisticController extends BaseController
 
         //Format json for chartJS
         $output = [
-            'labels'    => [],
-            'datasets'  => [
-                'data'      => []
+            'labels' => [],
+            'datasets' => [
+                'data' => []
             ]
         ];
 
@@ -526,13 +526,8 @@ class StatisticController extends BaseController
         return $interval;
     }
 
-    private function exerciseNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Exercise not found'], Response::HTTP_NOT_FOUND);
-    }
-
     private function intervalNull()
     {
-        return \FOS\RestBundle\View\View::create(['message' => 'No interval'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        return View::create(['message' => 'No interval'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

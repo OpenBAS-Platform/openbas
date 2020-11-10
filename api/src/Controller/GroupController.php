@@ -2,37 +2,30 @@
 
 namespace App\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Entity\Grant;
+use App\Entity\Group;
+use App\Form\Type\GroupType;
+use FOS\RestBundle\Controller\Annotations as Rest;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\View\ViewHandler;
-use FOS\RestBundle\View\View;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
-use App\Entity\Group;
-use App\Entity\User;
-use App\Form\Type\GroupType;
-use App\Entity\Grant;
 
 class GroupController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List groups"
      * )
      *
      * @Rest\View(serializerGroups={"group"})
-     * @Rest\Get("/groups")
+     * @Rest\Get("/api/groups")
      */
     public function getGroupsAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         if ($this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
             $groups = $em->getRepository('App:Group')->findAll();
         } else {
@@ -48,16 +41,16 @@ class GroupController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Read a group"
      * )
      *
      * @Rest\View(serializerGroups={"group"})
-     * @Rest\Get("/groups/{group_id}")
+     * @Rest\Get("/api/groups/{group_id}")
      */
     public function getGroupAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -71,11 +64,16 @@ class GroupController extends BaseController
         return $group;
     }
 
+    private function groupNotFound()
+    {
+        return View::create(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
+    }
+
     /**
-     * @SWG\Property(description="Create a group")
+     * @OA\Property(description="Create a group")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"group"})
-     * @Rest\Post("/groups")
+     * @Rest\Post("/api/groups")
      */
     public function postGroupsAction(Request $request)
     {
@@ -84,7 +82,7 @@ class GroupController extends BaseController
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
+            $em = $this->getDoctrine()->getManager();
             $em->persist($group);
             $em->flush();
             return $group;
@@ -94,7 +92,7 @@ class GroupController extends BaseController
     }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Delete a group"
      * )
      *
@@ -103,7 +101,7 @@ class GroupController extends BaseController
      */
     public function removeGroupAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -115,14 +113,14 @@ class GroupController extends BaseController
     }
 
     /**
-     * @SWG\Property(description="Update a group")
+     * @OA\Property(description="Update a group")
      *
      * @Rest\View(serializerGroups={"group"})
-     * @Rest\Put("/groups/{group_id}")
+     * @Rest\Put("/api/groups/{group_id}")
      */
     public function updateGroupAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -144,10 +142,5 @@ class GroupController extends BaseController
         } else {
             return $form;
         }
-    }
-
-    private function groupNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Group not found'], Response::HTTP_NOT_FOUND);
     }
 }

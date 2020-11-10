@@ -1,30 +1,28 @@
 <?php
+
 namespace App\Controller\Exercise\Planificateur;
 
 use App\Controller\Base\BaseController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Nelmio\ApiDocBundle\Annotation\Security;
-use Swagger\Annotations as SWG;
+use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AudiencePlanificateurController extends BaseController
 {
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="Update list user planificateur for an audience"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Post("/exercises/{exercise_id}/planificateurs/audiences/{audience_id}")
+     * @Rest\Post("/api/exercises/{exercise_id}/planificateurs/audiences/{audience_id}")
      */
     public function updatePlanificateurUserForAudienceAction(Request $request)
     {
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $audience = $em->getRepository('App:Audience')->FindOneBy(array('audience_id' => $request->get('audience_id')));
         if ($audience) {
             foreach ($request->get('planificateurs') as $planificateur) {
@@ -44,20 +42,23 @@ class AudiencePlanificateurController extends BaseController
         }
     }
 
-
+    private function audienceNotFound()
+    {
+        return View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
+    }
 
     /**
-     * @SWG\Property(
+     * @OA\Property(
      *    description="List user planificateur for an audience"
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
-     * @Rest\Get("/exercises/{exercise_id}/planificateurs/audiences/{audience_id}")
+     * @Rest\Get("/api/exercises/{exercise_id}/planificateurs/audiences/{audience_id}")
      */
     public function getPlanificateurUserForAudienceAction(Request $request)
     {
         $listPlanificateur = array();
-        $em = $this->get('doctrine.orm.entity_manager');
+        $em = $this->getDoctrine()->getManager();
         $planificateurs = $em->getRepository('App:User')->FindBy(array('user_planificateur' => true));
         $audience = $em->getRepository('App:Audience')->FindOneBy(array('audience_id' => $request->get('audience_id')));
         if ($audience) {
@@ -75,10 +76,5 @@ class AudiencePlanificateurController extends BaseController
             return $this->audienceNotFound();
         }
         return $listPlanificateur;
-    }
-
-    private function audienceNotFound()
-    {
-        return \FOS\RestBundle\View\View::create(['message' => 'Audience not found'], Response::HTTP_NOT_FOUND);
     }
 }

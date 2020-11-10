@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,54 +12,40 @@ use App\Entity\Base\BaseEntity;
  */
 class Event extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->event_incidents = new ArrayCollection();
-        $this->eventPlanificateurUsers = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $event_id;
-
     /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $event_title;
-
     /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $event_description;
-
     /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_events")
      * @ORM\JoinColumn(name="event_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */
     protected $event_exercise;
-
     /**
      * @ORM\OneToMany(targetEntity="Incident", mappedBy="incident_event")
      * @var Incident[]
      */
     protected $event_incidents;
-
     /**
      * @ORM\ManyToOne(targetEntity="File")
      * @ORM\JoinColumn(name="event_image", referencedColumnName="file_id", onDelete="SET NULL", nullable=true)
      */
     protected $event_image;
-
     /**
      * @ORM\Column(type="smallint", nullable=true)
      */
     protected $event_order = 0;
-
     /**
      * @ORM\ManyToMany(targetEntity="User", inversedBy="userPlanificateurEvents")
      * @ORM\JoinTable(name="planificateurs_events",
@@ -69,6 +55,13 @@ class Event extends BaseEntity
      * @var User[]
      */
     protected $eventPlanificateurUsers;
+
+    public function __construct()
+    {
+        $this->event_incidents = new ArrayCollection();
+        $this->eventPlanificateurUsers = new ArrayCollection();
+        parent::__construct();
+    }
 
     /**
      * Add User planificateur to event

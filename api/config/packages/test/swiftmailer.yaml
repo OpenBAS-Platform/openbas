@@ -1,2 +1,2 @@
 swiftmailer:
-    disable_delivery: true
+  disable_delivery: true

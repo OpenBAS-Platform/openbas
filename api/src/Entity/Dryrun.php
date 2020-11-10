@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,48 +12,42 @@ use App\Entity\Base\BaseEntity;
  */
 class Dryrun extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->dryrun_dryinjects = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $dryrun_id;
-
     /**
      * @ORM\Column(type="datetime")
      */
     protected $dryrun_date;
-
     /**
      * @ORM\Column(type="integer")
      */
     protected $dryrun_speed;
-
     /**
      * @ORM\ManyToOne(targetEntity="Exercise", inversedBy="exercise_dryruns")
      * @ORM\JoinColumn(name="dryrun_exercise", referencedColumnName="exercise_id", onDelete="CASCADE")
      * @var Exercise
      */
     protected $dryrun_exercise;
-
     /**
      * @ORM\OneToMany(targetEntity="Dryinject", mappedBy="dryinject_dryrun")
      * @var Incident[]
      */
     protected $dryrun_dryinjects;
-
     /**
      * @ORM\Column(type="boolean")
      */
     protected $dryrun_status = true;
-
     protected $dryrun_finished = false;
+
+    public function __construct()
+    {
+        $this->dryrun_dryinjects = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getDryrunId()
     {

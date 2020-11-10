@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Base\BaseEntity;
 
 /**
  * @ORM\Entity()
@@ -12,48 +12,42 @@ use App\Entity\Base\BaseEntity;
  */
 class Subobjective extends BaseEntity
 {
-    public function __construct()
-    {
-        $this->subobjective_incidents = new ArrayCollection();
-        parent::__construct();
-    }
-
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
      * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $subobjective_id;
-
     /**
      * @ORM\Column(type="string")
      */
     protected $subobjective_title;
-
     /**
      * @ORM\Column(type="text")
      */
     protected $subobjective_description;
-
     /**
      * @ORM\Column(type="smallint")
      */
     protected $subobjective_priority;
-
     /**
      * @ORM\ManyToOne(targetEntity="Objective", inversedBy="objective_subobjectives")
      * @ORM\JoinColumn(name="subobjective_objective", referencedColumnName="objective_id", onDelete="CASCADE")
      * @var Objective
      */
     protected $subobjective_objective;
-
     /**
      * @ORM\ManyToMany(targetEntity="Incident", mappedBy="incident_subobjectives")
      * @var Incident[]
      */
     protected $subobjective_incidents;
-
     protected $subobjective_exercise;
+
+    public function __construct()
+    {
+        $this->subobjective_incidents = new ArrayCollection();
+        parent::__construct();
+    }
 
     public function getSubobjectiveId()
     {
