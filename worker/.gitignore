@@ -1,5 +1,0 @@
-.idea
-*.iml
-target
-distribution/src/main/filtered-resources/openex/*.properties
-
