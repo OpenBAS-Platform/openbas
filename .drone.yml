@@ -1,0 +1,61 @@
+kind: pipeline
+name: openex-tests
+
+steps:
+- name: api-tests
+  image: php:7
+  environment:
+    APP_ENV: test
+    APP_SECRET: bfa014e0-e02e-4aa6-a42b-603b19dcf159
+    DATABASE_URL: pgsql://openex:openex@pgsql:5432/openex
+    MAILER_URL: null://localhost
+    PLAYER_URL: http://player:8080
+  commands:
+  - apk add build-base git
+  - cd openex-platform/openex-api
+  - php composer.phar install
+  - php bin/console doctrine:schema:create --env=test
+  - php bin/console app:db-init --env=test
+  - vendor/bin/phpunit
+
+- name: frontend-tests
+  image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
+  commands: 
+  - cd openex-platform/openex-front
+  - yarn install
+  - yarn build
+  - yarn test
+
+- name: build-circleci
+  image: curlimages/curl
+  commands:
+  - curl -X POST --data "branch=master" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
+  environment:
+    CIRCLECI_TOKEN:
+      from_secret: circleci_token
+  when:
+    branch:
+    - master
+    event:
+      exclude:
+      - pull_request
+      - tag
+
+- name: build-circleci-release
+  image: curlimages/curl
+  commands:
+  - curl -X POST --data "tag=$DRONE_TAG" https://circleci.com/api/v1.1/project/github/OpenEx-Platform/openex/build?circle-token=$CIRCLECI_TOKEN
+  environment:
+    CIRCLECI_TOKEN:
+      from_secret: circleci_token
+  when:
+    event:
+      - tag
+
+services:
+- name: database
+  image: postgres:9-alpine
+  environment:
+    POSTGRES_USER: openex
+    POSTGRES_PASSWORD: openex
+    POSTGRES_DB: openex
