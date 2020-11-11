@@ -1,11 +1,6 @@
 kind: pipeline
 name: openex-tests
 
-volumes:
-- name: initdb
-  host:
-    path: ./openex-platform/openex-api/initdb
-
 steps:
 - name: api-tests
   image: php:7-alpine
@@ -64,6 +59,5 @@ services:
     POSTGRES_USER: openex
     POSTGRES_PASSWORD: openex
     POSTGRES_DB: openex
-  volumes:
-  - name: initdb
-    path: /docker-entrypoint-initdb.d
+  commands:
+  - PGPASSWORD=openex psql --host=localhost --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
