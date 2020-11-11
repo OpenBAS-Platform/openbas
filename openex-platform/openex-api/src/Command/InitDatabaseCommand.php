@@ -243,6 +243,8 @@ class InitDatabaseCommand extends Command
         );
         $this->createInjectStatus($injectCamera);
         $output->writeln('Creating inject \'A potato has been detected\'');
+
+        return Command::SUCCESS;
     }
 
     private function createIncidentType($name)
