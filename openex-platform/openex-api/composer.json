@@ -5,7 +5,7 @@
         "php": "^7.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/doctrine-bundle": "^2.1.2",
+        "doctrine/doctrine-bundle": "^2.2.1",
         "friendsofsymfony/rest-bundle": "^3.0.3",
         "nategood/httpful": "^0.3.2",
         "nelmio/api-doc-bundle": "^4.0.1",

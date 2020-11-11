@@ -17,7 +17,7 @@ Please replace every line in curly brackets { like this } with an appropriate an
 
 1. OS (where OpenEx server runs): { e.g. Mac OS 10, Windows 10, Ubuntu 16.4, etc. }
 2. OpenEx version: { e.g. OpenEx 1.0.2 }
-3. OpenEx component: { e.g. api, frontend or worker }
+3. OpenEx client: { e.g. frontend or python }
 4. Other environment details:
 
 ## Reproducible Steps

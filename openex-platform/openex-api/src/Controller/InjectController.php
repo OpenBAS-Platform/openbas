@@ -288,28 +288,6 @@ class InjectController extends BaseController
     }
 
     /**
-     * Get DryInject Data
-     * @param type $request
-     * @param type $dryinject
-     * @param type $user
-     * @return type
-     */
-    public function getDryInjectData($request, $dryinject, $user)
-    {
-        $data = array();
-        $data['context']['id'] = $dryinject->getDryinjectId();
-        $data['context']['type'] = $dryinject->getDryinjectType();
-        $data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
-        $data['data'] = $this->getPersonalInjectContent(json_decode($dryinject->getDryinjectContent(), true), $user);
-        $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
-        $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
-        $data['data']['users'] = array();
-        $data['data']['users'][] = $this->getUserData($user);
-        $data['data']['replyto'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMailExpediteur();
-        return $data;
-    }
-
-    /**
      * @OA\Property(
      *    description="Update the status of an inject",
      * )
