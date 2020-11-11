@@ -2,6 +2,11 @@ kind: pipeline
 name: openex-tests
 
 steps:
+- name: init-service
+  image: postgres:13-alpine
+  commands:
+  - PGPASSWORD=openex psql --host=postgres --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
+
 - name: api-tests
   image: chialab/php:7.4
   environment:
@@ -11,7 +16,6 @@ steps:
     MAILER_URL: null://localhost
     PLAYER_URL: http://player:8080
   commands:
-  - apk add build-base git
   - cd openex-platform/openex-api
   - php composer.phar install
   - php bin/console doctrine:schema:create --env=test
@@ -53,11 +57,9 @@ steps:
       - tag
 
 services:
-- name: database
+- name: postgres
   image: postgres:13-alpine
   environment:
     POSTGRES_USER: openex
     POSTGRES_PASSWORD: openex
     POSTGRES_DB: openex
-  commands:
-  - PGPASSWORD=openex psql --host=localhost --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
