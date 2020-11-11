@@ -6,7 +6,7 @@ steps:
   image: postgres:13-alpine
   commands:
   - sleep 30
-  - PGPASSWORD=openex psql --host=postgres --port=5432 --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
+  - PGPASSWORD=openex psql --host=pgsql --port=5432 --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
 
 - name: api-tests
   image: chialab/php:7.4
@@ -58,7 +58,7 @@ steps:
       - tag
 
 services:
-- name: postgres
+- name: pgsql
   image: postgres:13-alpine
   environment:
     POSTGRES_USER: openex
