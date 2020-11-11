@@ -1,6 +1,11 @@
 kind: pipeline
 name: openex-tests
 
+volumes:
+- name: initdb
+  host:
+    path: ./openex-platform/openex-api/initdb
+
 steps:
 - name: api-tests
   image: php:7-alpine
@@ -60,4 +65,5 @@ services:
     POSTGRES_PASSWORD: openex
     POSTGRES_DB: openex
   volumes:
-    - "./openex-platform/openex-api/initdb:/docker-entrypoint-initdb.d:ro"
+  - name: initdb
+    path: /docker-entrypoint-initdb.d

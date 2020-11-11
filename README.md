@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://www.openex.io"><img src="https://www.openex.io/wp-content/uploads/2020/11/logo_github.png" alt="OpenEx"></a>
+  <a href="https://www.openex.io"><img src="https://www.openex.io/wp-content/uploads/2020/11/logo_github2.png" alt="OpenEx"></a>
 </h1>
 <p align="center">
   <a href="https://www.openex.io" alt="Website"><img src="https://img.shields.io/badge/website-openex.io-blue.svg" /></a>
