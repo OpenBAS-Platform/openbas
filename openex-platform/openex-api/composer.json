@@ -58,11 +58,6 @@
             "App\\Tests\\": "tests/"
         }
     },
-    "replace": {
-        "paragonie/random_compat": "2.*",
-        "symfony/polyfill-ctype": "*",
-        "symfony/polyfill-iconv": "*"
-    },
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",

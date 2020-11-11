@@ -3,7 +3,7 @@ name: openex-tests
 
 steps:
 - name: api-tests
-  image: php:7-alpine
+  image: chialab/php:7.4
   environment:
     APP_ENV: test
     APP_SECRET: bfa014e0-e02e-4aa6-a42b-603b19dcf159
