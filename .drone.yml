@@ -3,7 +3,7 @@ name: openex-tests
 
 steps:
 - name: api-tests
-  image: php:7
+  image: php:7-alpine
   environment:
     APP_ENV: test
     APP_SECRET: bfa014e0-e02e-4aa6-a42b-603b19dcf159
@@ -54,8 +54,10 @@ steps:
 
 services:
 - name: database
-  image: postgres:9-alpine
+  image: postgres:13-alpine
   environment:
     POSTGRES_USER: openex
     POSTGRES_PASSWORD: openex
     POSTGRES_DB: openex
+  volumes:
+    - "./openex-platform/openex-api/initdb:/docker-entrypoint-initdb.d:ro"
