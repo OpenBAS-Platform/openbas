@@ -40,6 +40,7 @@
     "require-dev": {
         "symfony/debug-pack": "*",
         "symfony/maker-bundle": "^1.21.1",
+        "symfony/phpunit-bridge": "^5.1",
         "symfony/profiler-pack": "*",
         "symfony/test-pack": "*"
     },
