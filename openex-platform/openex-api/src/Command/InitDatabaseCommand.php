@@ -15,19 +15,28 @@ use App\Entity\InjectStatus;
 use App\Entity\Objective;
 use App\Entity\Organization;
 use App\Entity\Outcome;
-use App\Entity\Result;
 use App\Entity\Subaudience;
 use App\Entity\Token;
 use App\Entity\User;
 use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class InitDatabaseCommand extends Command
 {
     protected static $defaultName = 'app:db-init';
     private $em;
+    private $encoder;
+
+    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
+    {
+        parent::__construct();
+        $this->em = $em;
+        $this->encoder = $encoder;
+    }
 
     protected function configure()
     {
@@ -39,8 +48,6 @@ class InitDatabaseCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->em = $this->getContainer()->get('doctrine.orm.entity_manager');
-
         $output->writeln('Initializing database');
         $output->writeln('============');
         $output->writeln('');
@@ -284,8 +291,7 @@ class InitDatabaseCommand extends Command
         $user->setUserStatus(1);
         $user->setUserLang('auto');
         $user->setUserOrganization($organization);
-        $encoder = $this->getContainer()->get('security.password_encoder');
-        $encoded = $encoder->encodePassword($user, $password);
+        $encoded = $this->encoder->encodePassword($user, $password);
         $user->setUserPassword($encoded);
         $this->em->persist($user);
         $this->em->flush();

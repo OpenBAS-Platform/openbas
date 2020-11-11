@@ -4,15 +4,16 @@ namespace App\Controller;
 
 use App\Controller\Base\BaseController;
 use App\Entity\Audience;
+use App\Entity\Event;
 use App\Entity\Exercise;
 use App\Entity\Grant;
+use App\Entity\Incident;
 use App\Entity\Subaudience;
 use App\Form\Type\ExerciseType;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
 use PHPExcel;
-use Symfony\Bridge\Twig\TwigEngine;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

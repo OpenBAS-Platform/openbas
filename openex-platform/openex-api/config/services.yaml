@@ -20,7 +20,7 @@ services:
 
   App\:
     resource: '../src/*'
-    exclude: '../src/{DependencyInjection,Entity,Tests,Kernel.php}'
+    exclude: '../src/{Entity,Form,Migrations,Resources,Kernel.php}'
 
   openex_mailer:
     class: App\Service\OpenexMailerService
