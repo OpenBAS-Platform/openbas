@@ -106,16 +106,18 @@ jobs:
       - setup_remote_docker
 
 workflows:
-  opencti:
+  openex:
     jobs:
       - build_platform:
           filters:
             tags:
               only: /.*/     
       - build_player:
+          requires:
+            - build_platform        
           filters:
             tags:
-              only: /.*/            
+              only: /.*/                          
       - package_rolling:
           requires:
             - build_platform
