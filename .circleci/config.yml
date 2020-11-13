@@ -19,112 +19,62 @@ jobs:
           root: ~/
           paths:
             - openex
-  build_platform_musl:
-    working_directory: ~/opencti_musl
+
+  build_player:
+    working_directory: ~/openex
     docker:
-      - image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
+      - image: maven:3.6.3-openjdk-15
     steps:
-      - run:
-          command: apk update && apk upgrade && apk --no-cache add git build-base libmagic
-      - checkout
+      - attach_workspace:
+          at: ~/
       - run: 
-          working_directory: ~/opencti_musl/opencti-platform/opencti-front
-          command: yarn install
-      - run:
-          working_directory: ~/opencti_musl/opencti-platform/opencti-front
-          command: yarn build
-      - run:
-          working_directory: ~/opencti_musl/opencti-platform/opencti-graphql
-          command: yarn install
-      - run:
-          working_directory: ~/opencti_musl/opencti-platform/opencti-graphql
-          command: yarn build
+          working_directory: ~/openex/openex-player
+          command: mvn install
       - persist_to_workspace:
           root: ~/
           paths:
-            - opencti_musl         
-  package_rolling:
-    working_directory: ~/opencti
-    docker:
-      - image: circleci/node:12.13.1-stretch
-    steps:
-      - attach_workspace:
-          at: ~/
-      - add_ssh_keys
-      - run: ssh-keyscan -H opencti.io >> ~/.ssh/known_hosts
-      - run: git config --global user.email "ci@opencti.io" && git config --global user.name "OpenCTI CircleCI"
-      - run: git remote add opencti ssh://git-OLOszi5F@opencti.io:/~/git-OLOszi5F.git && git push --force opencti master
-      - run: mkdir release
-      - run: cp -a ./opencti-platform/opencti-graphql release/opencti
-      - run: cp -a ./opencti-worker/src release/opencti/worker
-      - run: cd release/opencti && git clone https://github.com/OpenCTI-Platform/docker
-      - run: cd release/opencti && git clone https://github.com/OpenCTI-Platform/connectors
-      - run:
-          working_directory: ~/opencti/release
-          command: tar -zcvf "opencti-$(date '+%Y%m%d').tar.gz" opencti
-      - run: 
-          working_directory: ~/opencti/release
-          command: scp "opencti-$(date '+%Y%m%d').tar.gz" git-OLOszi5F@opencti.io:/dns/io/opencti/releases/
+            - openex
 
-  package_rolling_musl:
-    working_directory: ~/opencti_musl
+  package_rolling:
+    working_directory: ~/openex
     docker:
-      - image: circleci/node:12.13.1-stretch
+      - image: chialab/php:7.4
     steps:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
-      - run: ssh-keyscan -H opencti.io >> ~/.ssh/known_hosts
-      - run: git config --global user.email "ci@opencti.io" && git config --global user.name "OpenCTI CircleCI"
-      - run: git remote add opencti ssh://git-OLOszi5F@opencti.io:/~/git-OLOszi5F.git && git push --force opencti master
-      - run: mkdir release
-      - run: cp -a ./opencti-platform/opencti-graphql release/opencti
-      - run: cp -a ./opencti-worker/src release/opencti/worker
-      - run: cd release/opencti && git clone https://github.com/OpenCTI-Platform/docker
-      - run: cd release/opencti && git clone https://github.com/OpenCTI-Platform/connectors
+      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run:
-          working_directory: ~/opencti_musl/release
-          command: tar -zcvf "opencti-$(date '+%Y%m%d')_musl.tar.gz" opencti
+          working_directory: ~/openex/openex-platform/openex-api
+          command: php composer.phar install --no-progress --no-interaction
+      - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
+      - run: git remote add openex ssh://git-9qdBths0@openex.io:/~/git-9qdBths0.git && git push --force openex master
+      - run: mkdir release
+      - run: cp -a ./openex-platform/openex-api release/openex
+      - run: cp -a ./openex-platform/openex-front/build/index.html release/openex/templates/views/Default/index.html.twig
+      - run: cp -a ./openex-platform/openex-front/build/static release/openex/public/
+      - run: cp -a ./openex-platform/openex-front/build/images release/openex/public/
+      - run: cp -a ./openex-platform/openex-front/build/ckeditor release/openex/public/
+      - run: mkdir release/openex/player && cp -a ./openex-platform/openex-player/target/player-2.0.0.jar release/openex/player
+      - run:
+          working_directory: ~/openex/release
+          command: tar -zcvf "openex-$(date '+%Y%m%d').tar.gz" openex
       - run: 
-          working_directory: ~/opencti_musl/release
-          command: scp "opencti-$(date '+%Y%m%d')_musl.tar.gz" git-OLOszi5F@opencti.io:/dns/io/opencti/releases/
+          working_directory: ~/openex/release
+          command: scp "openex-$(date '+%Y%m%d').tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
 
   deploy_demo:
-    working_directory: ~/opencti
+    working_directory: ~/openex
     docker:
-      - image: circleci/node:12.13.1-stretch
+      - image: chialab/php:7.4
     steps:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
-      - run: ssh-keyscan -H opencti.io >> ~/.ssh/known_hosts
+      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run: sudo apt-get update -qq && sudo apt install rsync
       - run: mkdir deploy
-      - run: git config --global user.email "ci@opencti.io" && git config --global user.name "OpenCTI CircleCI"
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git clone ssh://opencti-fiqid45E@opencti.io:/~/opencti-fiqid45E.git .
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git submodule init && git submodule update --remote          
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git remote add ci ~/opencti && git pull --no-edit -s recursive -X theirs ci master
-      - run:
-          working_directory: ~/opencti/deploy
-          command: rsync -av --delete ~/opencti/opencti-platform/opencti-graphql/public/ ./opencti-platform/opencti-graphql/public/
-      - run:
-          working_directory: ~/opencti/deploy
-          command: rsync -av --delete ~/opencti/opencti-platform/opencti-graphql/build/ ./opencti-platform/opencti-graphql/build/
-      - run:  
-          working_directory: ~/opencti/deploy 
-          command: rsync -av ./opencti-connectors/ ./opencti-connectors-enabled/          
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git add -A
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
 
   deploy_reference:
     working_directory: ~/opencti
@@ -137,31 +87,7 @@ jobs:
       - run: ssh-keyscan -H opencti.io >> ~/.ssh/known_hosts    
       - run: sudo apt-get update -qq && sudo apt install rsync
       - run: mkdir -p deploy
-      - run: git config --global user.email "ci@opencti.io" && git config --global user.name "OpenCTI CircleCI"
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git clone ssh://opencti-b0gY5UHe@opencti.io:/~/opencti-b0gY5UHe.git .
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git submodule init && git submodule update --remote          
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git remote add ci ~/opencti && git pull --no-edit -s recursive -X theirs ci master          
-      - run:
-          working_directory: ~/opencti/deploy
-          command: rsync -av --delete ~/opencti/opencti-platform/opencti-graphql/public/ ./opencti-platform/opencti-graphql/public/
-      - run:
-          working_directory: ~/opencti/deploy
-          command: rsync -av --delete ~/opencti/opencti-platform/opencti-graphql/build/ ./opencti-platform/opencti-graphql/build/
-      - run:  
-          working_directory: ~/opencti/deploy 
-          command: rsync -av ./opencti-connectors/ ./opencti-connectors-enabled/          
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git add -A
-      - run:
-          working_directory: ~/opencti/deploy
-          command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
 
   docker_build:
     working_directory: ~/opencti
@@ -170,22 +96,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          working_directory: ~/opencti/opencti-platform
-          name: Build Docker image opencti/platform
-          command: docker build -t opencti/platform:latest . && docker tag opencti/platform:latest opencti/platform:${CIRCLE_TAG}
-      - run:
-          working_directory: ~/opencti/opencti-worker
-          name: Build Docker image opencti/worker
-          command: docker build -t opencti/worker:latest . && docker tag opencti/worker:latest opencti/worker:${CIRCLE_TAG}
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push opencti/platform:latest
-            docker push opencti/platform:${CIRCLE_TAG}
-            docker push opencti/worker:latest
-            docker push opencti/worker:${CIRCLE_TAG}
 
   docker_build_rolling:
     working_directory: ~/opencti
@@ -194,20 +104,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run:
-          working_directory: ~/opencti/opencti-platform
-          name: Build Docker image opencti/platform
-          command: docker build -t opencti/platform:rolling .
-      - run:
-          working_directory: ~/opencti/opencti-worker
-          name: Build Docker image opencti/worker
-          command: docker build -t opencti/worker:rolling .
-      - run:
-          name: Publish Docker Image to Docker Hub
-          command: |
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            docker push opencti/platform:rolling
-            docker push opencti/worker:rolling
 
 workflows:
   opencti:
@@ -215,28 +111,23 @@ workflows:
       - build_platform:
           filters:
             tags:
-              only: /.*/
-      - build_platform_musl:
+              only: /.*/     
+      - build_player:
           filters:
             tags:
-              only: /.*/           
+              only: /.*/            
       - package_rolling:
           requires:
             - build_platform
+            - build_player
           filters:
             branches:
               only:
-                - master
-      - package_rolling_musl:
-          requires:
-            - build_platform_musl
-          filters:
-            branches:
-              only:
-                - master                
+                - master           
       - deploy_demo:
           requires:
             - build_platform
+            - build_player
           filters:
             branches:
               only:
@@ -244,20 +135,23 @@ workflows:
       - deploy_reference:
           requires:
             - build_platform
+            - build_player
           filters:
             branches:
               only:
                 - master
       - docker_build_rolling:
           requires:
-            - build_platform  
+            - build_platform
+            - build_player
           filters:
             branches:
               only:
                 - master
       - docker_build:
           requires:
-            - build_platform   
+            - build_platform
+            - build_player
           filters:
             tags:
               only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/

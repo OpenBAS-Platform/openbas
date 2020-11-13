@@ -18,7 +18,7 @@ steps:
     PLAYER_URL: http://player:8080
   commands:
   - cd openex-platform/openex-api
-  - php composer.phar install
+  - php composer.phar install --no-progress --no-interaction
   - php bin/console doctrine:schema:create --env=test
   - php bin/console app:db-init --env=test
   - php bin/phpunit

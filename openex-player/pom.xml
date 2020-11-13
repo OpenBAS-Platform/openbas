@@ -10,12 +10,12 @@
     </parent>
     <groupId>io.openex</groupId>
     <artifactId>player</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2.0.0</version>
     <name>player</name>
     <description>Openex player</description>
 
     <properties>
-        <java.version>15</java.version>
+        <java.version>14</java.version>
     </properties>
 
     <dependencies>
