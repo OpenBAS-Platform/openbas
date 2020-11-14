@@ -77,20 +77,20 @@ jobs:
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
 
   deploy_reference:
-    working_directory: ~/opencti
+    working_directory: ~/openex
     docker:
-      - image: circleci/node:12.13.1-stretch
+      - image: chialab/php:7.4
     steps:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
-      - run: ssh-keyscan -H opencti.io >> ~/.ssh/known_hosts    
+      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts    
       - run: sudo apt-get update -qq && sudo apt install rsync
       - run: mkdir -p deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
 
   docker_build:
-    working_directory: ~/opencti
+    working_directory: ~/openex
     docker:
       - image: circleci/buildpack-deps:stretch
     steps:
@@ -98,7 +98,7 @@ jobs:
       - setup_remote_docker
 
   docker_build_rolling:
-    working_directory: ~/opencti
+    working_directory: ~/openex
     docker:
       - image: circleci/buildpack-deps:stretch
     steps:
