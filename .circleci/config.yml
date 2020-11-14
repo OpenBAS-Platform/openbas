@@ -55,7 +55,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/static release/openex/public/
       - run: cp -a ./openex-platform/openex-front/build/images release/openex/public/
       - run: cp -a ./openex-platform/openex-front/build/ckeditor release/openex/public/
-      - run: mkdir release/openex/player && cp -a ./openex-platform/openex-player/target/player-2.0.0.jar release/openex/player
+      - run: mkdir release/openex/player && cp -a ./openex-player/target/player-2.0.0.jar release/openex/player
       - run:
           working_directory: ~/openex/release
           command: tar -zcvf "openex-$(date '+%Y%m%d').tar.gz" openex
