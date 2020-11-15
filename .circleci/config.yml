@@ -72,7 +72,7 @@ jobs:
           at: ~/
       - add_ssh_keys
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: sudo apt-get update -qq && sudo apt install rsync
+      - run: apt-get update -qq && apt install rsync
       - run: mkdir deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run:
@@ -100,7 +100,7 @@ jobs:
           at: ~/
       - add_ssh_keys
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts    
-      - run: sudo apt-get update -qq && sudo apt install rsync
+      - run: apt-get update -qq && apt install rsync
       - run: mkdir -p deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
 
