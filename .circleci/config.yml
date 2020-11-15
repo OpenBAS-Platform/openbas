@@ -88,6 +88,7 @@ jobs:
       - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-player/target ./deploy/openex-player/
       - run:
           working_directory: ~/openex/deploy
           command: git add --force -A
@@ -103,10 +104,30 @@ jobs:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
-      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts    
+      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
-      - run: mkdir -p deploy
+      - run: mkdir deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
+      - run:
+          working_directory: ~/openex/deploy
+          command: git clone ssh://openex-Ak5byxnE@openex.io:/~/openex-Ak5byxnE.git .
+      - run:
+          working_directory: ~/openex/deploy
+          command: git submodule init && git submodule update --remote          
+      - run:
+          working_directory: ~/openex/deploy
+          command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master         
+      - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
+      - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-player/target ./deploy/openex-player/
+      - run:
+          working_directory: ~/openex/deploy
+          command: git add --force -A
+      - run:
+          working_directory: ~/openex/deploy
+          command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
 
   docker_build:
     working_directory: ~/openex
