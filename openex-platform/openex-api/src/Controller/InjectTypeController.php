@@ -27,7 +27,7 @@ class InjectTypeController extends AbstractController
 
         $contracts = array();
         try {
-            $url = $this->getParameter('worker_url') . '/contracts';
+            $url = $this->getParameter('player_url') . '/contracts';
             $contracts = json_decode(file_get_contents($url), true);
         } catch (Exception $e) {
             $logger->error('Contracts can not be retrieved from worker: ' . $e->getMessage());

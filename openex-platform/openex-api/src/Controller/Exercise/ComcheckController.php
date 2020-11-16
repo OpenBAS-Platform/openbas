@@ -161,7 +161,7 @@ class ComcheckController extends BaseController
                 $data['data']['users'][] = $userData;
             }
 
-            $url = $this->getParameter('worker_url') . '/cxf/worker/openex_email';
+            $url = $this->getParameter('player_url') . '/cxf/worker/openex_email';
             $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
 
             return $comcheck;

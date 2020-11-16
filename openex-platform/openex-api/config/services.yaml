@@ -6,7 +6,7 @@
 parameters:
   locale: 'en'
   protocol: '%env(APP_PROTOCOL)%'
-  worker_url: '%env(WORKER_URL)%'
+  player_url: '%env(PLAYER_URL)%'
   mail_sender: no-reply@openex.io
 
 services:

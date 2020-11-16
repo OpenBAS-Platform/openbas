@@ -18,7 +18,7 @@ class WorkerStatusController extends AbstractController
      */
     public function getWorkerStatusAction(Request $request)
     {
-        $url = $this->getParameter('worker_url') . '/cxf/heartbeat';
+        $url = $this->getParameter('player_url') . '/cxf/heartbeat';
         /** @var \Httpful\Response $response */
         $response = \Httpful\Request::get($url)->send();
         return new Response(json_encode($response->body), $response->code, $response->headers->toArray());
