@@ -9,7 +9,6 @@ use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,14 +16,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FileController extends AbstractController
 {
-    protected $parameterBag;
-
-    public function __construct(ParameterBagInterface $parameterBag)
-    {
-        $this->parameterBag = $parameterBag;
-
-    }
-
     /**
      * @OA\Property(
      *    description="List files"
@@ -81,7 +72,7 @@ class FileController extends AbstractController
      **/
     private function getProjectFilePath()
     {
-        return $this->parameterBag->get('kernel.project_dir') . '/var/files';
+        return $this->getParameter('kernel.project_dir') . '/var/files';
     }
 
     /**

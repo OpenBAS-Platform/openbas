@@ -40,7 +40,7 @@ class DocumentController extends BaseController
      **/
     private function getProjectFilePath()
     {
-        return $this->get('kernel')->getProjectDir() . '/var/files';
+        return $this->getParameter('kernel.project_dir') . '/var/files';
     }
 
     /**
