@@ -12,6 +12,7 @@ use App\Entity\Incident;
 use App\Entity\Inject;
 use App\Entity\InjectStatus;
 use App\Entity\Subaudience;
+use App\Entity\User;
 use DateTime;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -104,7 +105,7 @@ class InjectController extends BaseController
                         ->where('s.status_inject = i.inject_id')
                         ->andWhere('s.status_name is NULL')
                         ->andWhere('i.inject_enabled = true')
-                        ->andWhere('i.inject_type != \'other\'')
+                        ->andWhere('i.inject_type != \'manual\'')
                         ->andWhere('i.inject_incident = :incident')
                         ->andWhere('i.inject_date BETWEEN :start AND :end')
                         ->orderBy('i.inject_date', 'ASC')
@@ -204,16 +205,16 @@ class InjectController extends BaseController
 
     /**
      * Get Inject Data
-     * @param type $request
-     * @param type $inject
-     * @param type $user
+     * @param Request $request
+     * @param Inject $inject
+     * @param User $user
      */
     public function getInjectData($request, $inject, $user)
     {
         $data = array();
         $data['id'] = $inject->getInjectId();
         $data['type'] = $inject->getInjectType();
-        $data['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/injects/' . $inject->getInjectId() . '/status';
+        $data['callback_url'] = $request->getSchemeAndHttpHost() . '/api/injects/' . $inject->getInjectId() . '/status';
         $data['data'] = $this->getPersonalInjectContent(json_decode($inject->getInjectContent(), true), $user);
         $data['data']['content_header'] = $inject->getInjectHeader();
         $data['data']['content_footer'] = $inject->getInjectFooter();
@@ -225,9 +226,9 @@ class InjectController extends BaseController
 
     /**
      * Personnalisation du contenu de l'inject
-     * @param type $content
-     * @param type $user
-     * @return type
+     * @param mixed $content
+     * @param User $user
+     * @return mixed
      */
     public function getPersonalInjectContent($content, $user)
     {
@@ -246,17 +247,17 @@ class InjectController extends BaseController
 
     /**
      * Get DryInject Data
-     * @param type $request
-     * @param type $dryinject
-     * @param type $user
-     * @return type
+     * @param Request $request
+     * @param Dryinject $dryinject
+     * @param User $user
+     * @return mixed
      */
     public function getDryInjectData($request, $dryinject, $user)
     {
         $data = array();
         $data['id'] = $dryinject->getDryinjectId();
         $data['type'] = $dryinject->getDryinjectType();
-        $data['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHttpHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
+        $data['callback_url'] = $request->getSchemeAndHttpHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
         $data['data'] = $this->getPersonalInjectContent(json_decode($dryinject->getDryinjectContent(), true), $user);
         $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
         $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
@@ -268,8 +269,8 @@ class InjectController extends BaseController
 
     /**
      * Get User Data
-     * @param type $user
-     * @return type
+     * @param User $user
+     * @return mixed
      */
     public function getUserData($user)
     {

@@ -5,7 +5,6 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
   locale: 'en'
-  protocol: '%env(APP_PROTOCOL)%'
   player_url: '%env(PLAYER_URL)%'
   mail_sender: no-reply@openex.io
 

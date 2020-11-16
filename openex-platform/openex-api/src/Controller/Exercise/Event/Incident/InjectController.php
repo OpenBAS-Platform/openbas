@@ -88,7 +88,7 @@ class InjectController extends BaseController
      * @OA\Property(description="Create an inject")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"inject"})
-     * @Rest\Post("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
+     * @Rest\Post("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
      */
     public function postExercisesEventsIncidentsInjectsAction(Request $request)
     {
@@ -195,7 +195,7 @@ class InjectController extends BaseController
      * )
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"inject"})
-     * @Rest\Delete("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
+     * @Rest\Delete("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
     public function removeExercisesEventsIncidentsInjectAction(Request $request)
     {
@@ -245,7 +245,7 @@ class InjectController extends BaseController
      * @OA\Property(description="Update an inject")
      *
      * @Rest\View(serializerGroups={"inject"})
-     * @Rest\Put("/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
+     * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
      */
     public function updateExercisesEventsIncidentsInjectAction(Request $request)
     {

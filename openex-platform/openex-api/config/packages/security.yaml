@@ -13,19 +13,23 @@ security:
 
     doc:
       pattern: ^/api/doc
+      stateless: true
       security: false
 
     auth:
       pattern: ^/api/auth
+      stateless: true
       security: false
 
     comcheck:
       pattern: ^/api/comcheck
+      stateless: true
       security: false
 
     api:
       pattern: ^/api
       stateless: true
+      security: true
       guard:
         authenticators:
           - token_authenticator
@@ -35,3 +39,9 @@ security:
     frontend:
       pattern: ^/
       security: false
+
+  access_control:
+    - { path: '^/api/doc', roles: [] }
+    - { path: '^/api/auth', roles: [] }
+    - { path: '^/api/comcheck', roles: [] }
+    - { path: '^/api', roles: [IS_AUTHENTICATED_FULLY] }

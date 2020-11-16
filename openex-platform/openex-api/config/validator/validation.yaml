@@ -157,7 +157,7 @@ App\Entity\Inject:
       - Type: string
     inject_date:
       - NotBlank: ~
-      - DateTime: ~
+      - Type: datetime
 
 App\Entity\Log:
   properties:

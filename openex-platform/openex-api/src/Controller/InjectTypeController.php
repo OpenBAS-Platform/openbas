@@ -5,6 +5,7 @@ namespace App\Controller;
 use Exception;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use OpenApi\Annotations as OA;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,10 +22,8 @@ class InjectTypeController extends AbstractController
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Get("/api/inject_types")
      */
-    public function getInjectTypesAction(Request $request)
+    public function getInjectTypesAction(LoggerInterface $logger)
     {
-        $logger = $this->get('mylogger.db');
-
         $contracts = array();
         try {
             $url = $this->getParameter('player_url') . '/contracts';
