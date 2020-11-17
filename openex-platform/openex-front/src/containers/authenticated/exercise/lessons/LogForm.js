@@ -1,35 +1,46 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import {FormField} from '../../../../components/Field'
-import {i18nRegister} from '../../../../utils/Messages'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { reduxForm, change } from 'redux-form';
+import { FormField } from '../../../../components/Field';
+import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
   fr: {
-    'Title': 'Titre',
-    'Content': 'Contenu'
-  }
-})
+    Title: 'Titre',
+    Content: 'Contenu',
+  },
+});
 
-const validate = values => {
-  const errors = {}
-  const requiredFields = []
-  requiredFields.forEach(field => {
+const validate = (values) => {
+  const errors = {};
+  const requiredFields = [];
+  requiredFields.forEach((field) => {
     if (!values[field]) {
-      errors[field] = 'Required'
+      errors[field] = 'Required';
     }
-  })
-  return errors
-}
+  });
+  return errors;
+};
 
 class LogForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField name="log_title" fullWidth={true} type="text" label="Title"/>
-        <FormField name="log_content" fullWidth={true} multiLine={true} rows={4} label="Content"/>
+        <FormField
+          name="log_title"
+          fullWidth={true}
+          type="text"
+          label="Title"
+        />
+        <FormField
+          name="log_content"
+          fullWidth={true}
+          multiLine={true}
+          rows={4}
+          label="Content"
+        />
       </form>
-    )
+    );
   }
 }
 
@@ -40,7 +51,9 @@ LogForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  audiences: PropTypes.array
-}
+  audiences: PropTypes.array,
+};
 
-export default reduxForm({form: 'LogForm', validate}, null, {change})(LogForm)
+export default reduxForm({ form: 'LogForm', validate }, null, { change })(
+  LogForm,
+);

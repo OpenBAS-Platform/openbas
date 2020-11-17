@@ -1,183 +1,279 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
-import * as Constants from '../../../../constants/ComponentTypes'
-import {List} from '../../../../components/List'
-import {Dialog} from '../../../../components/Dialog'
-import {MainListItem, SecondaryListItem} from '../../../../components/list/ListItem'
-import {Icon} from '../../../../components/Icon'
-import {FlatButton} from '../../../../components/Button'
-import {fetchObjectives} from '../../../../actions/Objective'
-import {fetchSubobjectives} from '../../../../actions/Subobjective'
-import {fetchGroups} from '../../../../actions/Group'
-import ObjectivePopover from './ObjectivePopover'
-import SubobjectivePopover from './SubobjectivePopover'
-import CreateObjective from './CreateObjective'
-import ObjectiveView from './ObjectiveView'
-import SubobjectiveView from './SubobjectiveView'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import * as Constants from '../../../../constants/ComponentTypes';
+import { List } from '../../../../components/List';
+import { Dialog } from '../../../../components/Dialog';
+import {
+  MainListItem,
+  SecondaryListItem,
+} from '../../../../components/list/ListItem';
+import { Icon } from '../../../../components/Icon';
+import { FlatButton } from '../../../../components/Button';
+import { fetchObjectives } from '../../../../actions/Objective';
+import { fetchSubobjectives } from '../../../../actions/Subobjective';
+import { fetchGroups } from '../../../../actions/Group';
+import ObjectivePopover from './ObjectivePopover';
+import SubobjectivePopover from './SubobjectivePopover';
+import CreateObjective from './CreateObjective';
+import ObjectiveView from './ObjectiveView';
+import SubobjectiveView from './SubobjectiveView';
 
 i18nRegister({
   fr: {
-    'Objectives': 'Objectifs',
-    'You do not have any objectives in this exercise.': 'Vous n\'avez aucun objectif dans cet exercice.',
-    'Objective view': 'Vue de l\'objectif',
-    'Subobjective view': 'Vue du sous-objectif'
-  }
-})
+    Objectives: 'Objectifs',
+    'You do not have any objectives in this exercise.':
+      "Vous n'avez aucun objectif dans cet exercice.",
+    'Objective view': "Vue de l'objectif",
+    'Subobjective view': 'Vue du sous-objectif',
+  },
+});
 
 const styles = {
-  'container': {
-    paddingBottom: '50px'
+  container: {
+    paddingBottom: '50px',
   },
-  'empty': {
+  empty: {
     marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  'priority': {
+  priority: {
     fontSize: '18px',
     fontWeight: 500,
-    marginRight: '10px'
+    marginRight: '10px',
   },
-  'title': {
+  title: {
     float: 'left',
     fontSize: '13px',
-    textTransform: 'uppercase'
-  }
-}
+    textTransform: 'uppercase',
+  },
+};
 
 class IndexObjective extends Component {
   constructor(props) {
-    super(props)
-    this.state = {openObjective: false, currentObjective: {}, openSubobjective: false, currentSubobjective: {}}
+    super(props);
+    this.state = {
+      openObjective: false,
+      currentObjective: {},
+      openSubobjective: false,
+      currentSubobjective: {},
+    };
   }
 
   componentDidMount() {
-    this.props.fetchObjectives(this.props.exerciseId)
-    this.props.fetchSubobjectives(this.props.exerciseId)
-    this.props.fetchGroups()
+    this.props.fetchObjectives(this.props.exerciseId);
+    this.props.fetchSubobjectives(this.props.exerciseId);
+    this.props.fetchGroups();
   }
 
   handleOpenObjective(objective) {
-    this.setState({currentObjective: objective, openObjective: true})
+    this.setState({ currentObjective: objective, openObjective: true });
   }
 
   handleCloseObjective() {
-    this.setState({openObjective: false})
+    this.setState({ openObjective: false });
   }
 
   handleOpenSubobjective(subobjective) {
-    this.setState({currentSubobjective: subobjective, openSubobjective: true})
+    this.setState({
+      currentSubobjective: subobjective,
+      openSubobjective: true,
+    });
   }
 
   handleCloseSubobjective() {
-    this.setState({openSubobjective: false})
+    this.setState({ openSubobjective: false });
   }
 
   render() {
     const objectiveActions = [
-      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseObjective.bind(this)}/>,
-    ]
+      <FlatButton
+        key="close"
+        label="Close"
+        primary={true}
+        onClick={this.handleCloseObjective.bind(this)}
+      />,
+    ];
     const subobjectiveActions = [
-      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseSubobjective.bind(this)}/>,
-    ]
+      <FlatButton
+        key="close"
+        label="Close"
+        primary={true}
+        onClick={this.handleCloseSubobjective.bind(this)}
+      />,
+    ];
 
-    let {exerciseId, objectives} = this.props
+    const { exerciseId, objectives } = this.props;
     if (objectives.length > 0) {
-      return <div style={styles.container}>
-        <div style={styles.title}><T>Objectives</T></div>
-        <div className="clearfix"></div>
-        <List>
-          {objectives.map(objective => {
-            let nestedItems = objective.objective_subobjectives.map(data => {
-                let subobjective = R.propOr({}, data.subobjective_id, this.props.subobjectives)
-                let subobjective_id = R.propOr(data.subobjective_id, 'subobjective_id', subobjective)
-                let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
-                let subobjective_description = R.propOr('-', 'subobjective_description', subobjective)
-                let subobjective_priority = R.propOr('-', 'subobjective_priority', subobjective)
+      return (
+        <div style={styles.container}>
+          <div style={styles.title}>
+            <T>Objectives</T>
+          </div>
+          <div className="clearfix"></div>
+          <List>
+            {objectives.map((objective) => {
+              const nestedItems = objective.objective_subobjectives.map(
+                (data) => {
+                  const subobjective = R.propOr(
+                    {},
+                    data.subobjective_id,
+                    this.props.subobjectives,
+                  );
+                  const subobjective_id = R.propOr(
+                    data.subobjective_id,
+                    'subobjective_id',
+                    subobjective,
+                  );
+                  const subobjective_title = R.propOr(
+                    '-',
+                    'subobjective_title',
+                    subobjective,
+                  );
+                  const subobjective_description = R.propOr(
+                    '-',
+                    'subobjective_description',
+                    subobjective,
+                  );
+                  const subobjective_priority = R.propOr(
+                    '-',
+                    'subobjective_priority',
+                    subobjective,
+                  );
 
-                return <SecondaryListItem
-                  key={subobjective_id}
-                  onClick={this.handleOpenSubobjective.bind(this, subobjective)}
-                  rightIconButton={
-                    this.props.userCanUpdate ?
-                      <SubobjectivePopover
-                        exerciseId={exerciseId}
-                        objectiveId={objective.objective_id}
-                        subobjective={subobjective}
-                      />
-                      : ""
+                  return (
+                    <SecondaryListItem
+                      key={subobjective_id}
+                      onClick={this.handleOpenSubobjective.bind(
+                        this,
+                        subobjective,
+                      )}
+                      rightIconButton={
+                        this.props.userCanUpdate ? (
+                          <SubobjectivePopover
+                            exerciseId={exerciseId}
+                            objectiveId={objective.objective_id}
+                            subobjective={subobjective}
+                          />
+                        ) : (
+                          ''
+                        )
+                      }
+                      leftIcon={
+                        <Icon
+                          name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}
+                        />
+                      }
+                      primaryText={
+                        <div>
+                          <span style={styles.priority}>
+                            {objective.objective_priority}.
+                            {subobjective_priority}
+                          </span>
+                          {subobjective_title}
+                        </div>
+                      }
+                      secondaryText={subobjective_description}
+                    />
+                  );
+                },
+              );
+
+              return (
+                <MainListItem
+                  initiallyOpen={true}
+                  key={objective.objective_id}
+                  onClick={this.handleOpenObjective.bind(this, objective)}
+                  leftIcon={
+                    <Icon
+                      name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}
+                    />
                   }
-                  leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>}
+                  rightIconButton={
+                    this.props.userCanUpdate ? (
+                      <ObjectivePopover
+                        exerciseId={exerciseId}
+                        objective={objective}
+                      />
+                    ) : (
+                      ''
+                    )
+                  }
                   primaryText={
                     <div>
-                      <span style={styles.priority}>{objective.objective_priority}.{subobjective_priority}</span>
-                      {subobjective_title}
+                      <span style={styles.priority}>
+                        {objective.objective_priority}
+                      </span>
+                      {objective.objective_title}
                     </div>
                   }
-                  secondaryText={subobjective_description}/>
-              }
-            )
+                  secondaryText={objective.objective_description}
+                  nestedItems={nestedItems}
+                />
+              );
+            })}
+          </List>
 
-            return (
-              <MainListItem
-                initiallyOpen={true}
-                key={objective.objective_id}
-                onClick={this.handleOpenObjective.bind(this, objective)}
-                leftIcon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}/>}
-                rightIconButton={
-                  this.props.userCanUpdate ?
-                    <ObjectivePopover exerciseId={exerciseId} objective={objective}/>
-                    : ""
-                }
-                primaryText={
-                  <div>
-                    <span style={styles.priority}>{objective.objective_priority}</span>
-                    {objective.objective_title}
-                  </div>
-                }
-                secondaryText={objective.objective_description}
-                nestedItems={nestedItems}
-              />
-            )
-          })}
-        </List>
+          <Dialog
+            title={R.propOr(
+              '-',
+              'objective_title',
+              this.state.currentObjective,
+            )}
+            modal={false}
+            open={this.state.openObjective}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseObjective.bind(this)}
+            actions={objectiveActions}
+          >
+            <ObjectiveView objective={this.state.currentObjective} />
+          </Dialog>
 
-        <Dialog
-          title={R.propOr('-', 'objective_title', this.state.currentObjective)}
-          modal={false}
-          open={this.state.openObjective}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseObjective.bind(this)}
-          actions={objectiveActions}>
-          <ObjectiveView objective={this.state.currentObjective} />
-        </Dialog>
+          <Dialog
+            title={R.propOr(
+              '-',
+              'subobjective_title',
+              this.state.currentSubobjective,
+            )}
+            modal={false}
+            open={this.state.openSubobjective}
+            autoScrollBodyContent={true}
+            onRequestClose={this.handleCloseSubobjective.bind(this)}
+            actions={subobjectiveActions}
+          >
+            <SubobjectiveView subobjective={this.state.currentSubobjective} />
+          </Dialog>
 
-        <Dialog
-          title={R.propOr('-', 'subobjective_title', this.state.currentSubobjective)}
-          modal={false}
-          open={this.state.openSubobjective}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseSubobjective.bind(this)}
-          actions={subobjectiveActions}>
-          <SubobjectiveView subobjective={this.state.currentSubobjective} />
-        </Dialog>
-
-        {this.props.userCanUpdate ? <CreateObjective exerciseId={exerciseId}/> : "" }
-      </div>
-    } else {
-      return <div style={styles.container}>
-        <div style={styles.title}><T>Objectives</T></div>
-        <div className="clearfix"></div>
-        <div style={styles.empty}><T>You do not have any objectives in this exercise.</T></div>
-
-        {this.props.userCanUpdate ? <CreateObjective exerciseId={exerciseId}/> : "" }
-      </div>
+          {this.props.userCanUpdate ? (
+            <CreateObjective exerciseId={exerciseId} />
+          ) : (
+            ''
+          )}
+        </div>
+      );
     }
+    return (
+        <div style={styles.container}>
+          <div style={styles.title}>
+            <T>Objectives</T>
+          </div>
+          <div className="clearfix"></div>
+          <div style={styles.empty}>
+            <T>You do not have any objectives in this exercise.</T>
+          </div>
+
+          {this.props.userCanUpdate ? (
+            <CreateObjective exerciseId={exerciseId} />
+          ) : (
+            ''
+          )}
+        </div>
+    );
   }
 }
 
@@ -187,72 +283,80 @@ IndexObjective.propTypes = {
   subobjectives: PropTypes.object,
   fetchObjectives: PropTypes.func.isRequired,
   fetchSubobjectives: PropTypes.func.isRequired,
-  userCanUpdate: PropTypes.bool
-}
+  userCanUpdate: PropTypes.bool,
+};
 
 const filterObjectives = (objectives, exerciseId) => {
-  let objectivesFilterAndSorting = R.pipe(
+  const objectivesFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.objective_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.objective_priority > b.objective_priority)
-  )
-  return objectivesFilterAndSorting(objectives)
-}
+    R.filter((n) => n.objective_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.objective_priority > b.objective_priority),
+  );
+  return objectivesFilterAndSorting(objectives);
+};
 
 const filterSubobjectives = (subobjectives) => {
-  let subobjectivesSorting = R.pipe(
+  const subobjectivesSorting = R.pipe(
     R.values,
-    R.sort((a, b) => { return a.subobjective_priority > b.subobjective_priority }),
-    R.indexBy(R.prop('subobjective_id'))
-  )
-  return subobjectivesSorting(subobjectives)
-}
+    R.sort((a, b) => a.subobjective_priority > b.subobjective_priority),
+    R.indexBy(R.prop('subobjective_id')),
+  );
+  return subobjectivesSorting(subobjectives);
+};
 
 const checkUserCanUpdate = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let userId = R.path(['logged', 'user'], state.app)
-  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
+  const { exerciseId } = ownProps.params;
+  const userId = R.path(['logged', 'user'], state.app);
+  const isAdmin = R.path(
+    [userId, 'user_admin'],
+    state.referential.entities.users,
+  );
 
-  let userCanUpdate = isAdmin
+  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
-    let groupValues = R.values(state.referential.entities.groups)
+    const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
       group.group_grants.forEach((grant) => {
         if (
           grant
           && grant.grant_exercise
-          && (grant.grant_exercise.exercise_id === exerciseId)
-          && (grant.grant_name === 'PLANNER')
+          && grant.grant_exercise.exercise_id === exerciseId
+          && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && (user.user_id === userId)) {
-              userCanUpdate = true
+            if (user && user.user_id === userId) {
+              userCanUpdate = true;
             }
-          })
+          });
         }
-      })
-    })
+      });
+    });
   }
 
-  return userCanUpdate
-}
+  return userCanUpdate;
+};
 
 const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let objectives = filterObjectives(state.referential.entities.objectives, exerciseId)
-  let subobjectives = filterSubobjectives(state.referential.entities.subobjectives)
-  let userCanUpdate = checkUserCanUpdate(state, ownProps)
+  const { exerciseId } = ownProps.params;
+  const objectives = filterObjectives(
+    state.referential.entities.objectives,
+    exerciseId,
+  );
+  const subobjectives = filterSubobjectives(
+    state.referential.entities.subobjectives,
+  );
+  const userCanUpdate = checkUserCanUpdate(state, ownProps);
 
   return {
     exerciseId,
     objectives,
     subobjectives,
-    userCanUpdate
-  }
-}
+    userCanUpdate,
+  };
+};
 
 export default connect(select, {
   fetchObjectives,
   fetchSubobjectives,
-  fetchGroups
+  fetchGroups,
 })(IndexObjective);

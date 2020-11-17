@@ -1,5 +1,5 @@
 html {
-  overflow-y:scroll;
+  overflow-y: scroll;
   height: 100%;
 }
 
@@ -24,8 +24,8 @@ hr {
   padding: 0;
   border: none;
   height: 1px;
-  color: #E0E0E0;
-  background-color: #E0E0E0;
+  color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 
 h2 {
@@ -84,8 +84,8 @@ div.line li:last-child {
   margin-right: 0;
 }
 
-div.line li::before{
-  content: '';
+div.line li::before {
+  content: "";
   position: absolute;
   top: 4px;
   left: -200px;

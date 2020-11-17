@@ -1,8 +1,8 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import * as Constants from "../constants/ComponentTypes";
-import {Paper} from './Paper'
-import {BackgroundImage} from './Image'
+import React from 'react';
+import PropTypes from 'prop-types';
+import * as Constants from '../constants/ComponentTypes';
+import { Paper } from './Paper';
+import { BackgroundImage } from './Image';
 
 const styles = {
   header: {
@@ -16,7 +16,7 @@ const styles = {
     width: '100%',
     fontWeight: 400,
     color: '#616161',
-    height: '30px'
+    height: '30px',
   },
   title: {
     margin: '5px 0 5px 0',
@@ -27,25 +27,25 @@ const styles = {
   subtitle: {
     fontSize: '14px',
     fontWeight: 300,
-    color: '#808080'
+    color: '#808080',
   },
   backgroundImage: {
     height: '150px',
-    position: 'relative'
+    position: 'relative',
   },
   hover: {
     position: 'absolute',
     bottom: 0,
     padding: '10px',
     backgroundColor: 'rgba(0, 0, 0, .7)',
-    width: '380px'
+    width: '380px',
   },
   description: {
     padding: 0,
     margin: 0,
     color: '#ffffff',
     fontWeight: 400,
-    fontSize: '13px'
+    fontSize: '13px',
   },
   line: {
     position: 'relative',
@@ -54,15 +54,15 @@ const styles = {
     fontSize: '13px',
     position: 'absolute',
     top: '8px',
-    left: '8px'
+    left: '8px',
   },
   dateRight: {
     fontSize: '13px',
     position: 'absolute',
     top: '8px',
-    right: '8px'
-  }
-}
+    right: '8px',
+  },
+};
 
 export const Exercise = (props) => (
   <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE} zDepth={4}>
@@ -89,7 +89,7 @@ export const Exercise = (props) => (
       </div>
     </BackgroundImage>
   </Paper>
-)
+);
 
 Exercise.propTypes = {
   name: PropTypes.string,
@@ -100,5 +100,5 @@ Exercise.propTypes = {
   startDate: PropTypes.string,
   endDate: PropTypes.string,
   status: PropTypes.string,
-  image_id: PropTypes.string
-}
+  image_id: PropTypes.string,
+};

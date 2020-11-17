@@ -1,33 +1,33 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUIAppBar from 'material-ui/AppBar'
-import * as Constants from '../constants/ComponentTypes'
+import React from 'react';
+import PropTypes from 'prop-types';
+import MUIAppBar from 'material-ui/AppBar';
+import * as Constants from '../constants/ComponentTypes';
 
 const appBarStyle = {
-  [ Constants.APPBAR_TYPE_TOPBAR ]: {
-    position: 'fixed'
+  [Constants.APPBAR_TYPE_TOPBAR]: {
+    position: 'fixed',
   },
-  [ Constants.APPBAR_TYPE_TOPBAR_NOICON ]: {
+  [Constants.APPBAR_TYPE_TOPBAR_NOICON]: {
     marginBottom: '20px',
-    position: 'fixed'
+    position: 'fixed',
   },
-}
+};
 
 const appBarTitleStyle = {
-  [ Constants.APPBAR_TYPE_TOPBAR ]: {
+  [Constants.APPBAR_TYPE_TOPBAR]: {
     textAlign: 'left',
     marginLeft: '60px',
     cursor: 'pointer',
   },
-  [ Constants.APPBAR_TYPE_TOPBAR_NOICON ]: {
+  [Constants.APPBAR_TYPE_TOPBAR_NOICON]: {
     textAlign: 'left',
     marginLeft: '10px',
-    cursor: 'pointer'
+    cursor: 'pointer',
   },
-  [ Constants.APPBAR_TYPE_LEFTBAR ]: {
-    cursor: 'pointer'
+  [Constants.APPBAR_TYPE_LEFTBAR]: {
+    cursor: 'pointer',
   },
-}
+};
 
 export const AppBar = (props) => (
   <MUIAppBar
@@ -40,7 +40,7 @@ export const AppBar = (props) => (
     titleStyle={appBarTitleStyle[props.type]}
     style={appBarStyle[props.type]}
   />
-)
+);
 
 AppBar.propTypes = {
   title: PropTypes.node,
@@ -49,5 +49,5 @@ AppBar.propTypes = {
   onLeftIconButtonTouchTap: PropTypes.func,
   iconElementRight: PropTypes.element,
   iconElementLeft: PropTypes.element,
-  showMenuIconButton: PropTypes.bool
-}
+  showMenuIconButton: PropTypes.bool,
+};

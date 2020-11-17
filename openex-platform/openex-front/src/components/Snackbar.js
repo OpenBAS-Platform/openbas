@@ -1,6 +1,6 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUISnackbar from 'material-ui/Snackbar'
+import React from 'react';
+import PropTypes from 'prop-types';
+import MUISnackbar from 'material-ui/Snackbar';
 
 export const Snackbar = (props) => (
   <MUISnackbar
@@ -9,11 +9,11 @@ export const Snackbar = (props) => (
     onRequestClose={props.onRequestClose}
     autoHideDuration={props.autoHideDuration}
   />
-)
+);
 
 Snackbar.propTypes = {
   open: PropTypes.bool,
   message: PropTypes.node,
   onRequestClose: PropTypes.func,
-  autoHideDuration: PropTypes.number
-}
+  autoHideDuration: PropTypes.number,
+};

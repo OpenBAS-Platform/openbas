@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
  * @usage
  * <TimlineItem time={time} text={text} />
  */
-function TimlineItem({time, text}) {
+function TimlineItem({ time, text }) {
   return (
     <li>
       <i className="fa" />
@@ -13,9 +13,7 @@ function TimlineItem({time, text}) {
         <span className="time">
           <i className="fa fa-clock-o" /> {time}
         </span>
-        <div className="time-line-header">
-          {text}
-        </div>
+        <div className="time-line-header">{text}</div>
       </div>
     </li>
   );

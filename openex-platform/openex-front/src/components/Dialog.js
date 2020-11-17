@@ -1,23 +1,25 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUIDialog from 'material-ui/Dialog'
-import {injectIntl} from 'react-intl'
+import React from 'react';
+import PropTypes from 'prop-types';
+import MUIDialog from 'material-ui/Dialog';
+import { injectIntl } from 'react-intl';
 
 export const DialogIntl = (props) => (
   <MUIDialog
-    title={props.title ? props.intl.formatMessage({id: props.title}) : undefined}
+    title={
+      props.title ? props.intl.formatMessage({ id: props.title }) : undefined
+    }
     modal={props.modal}
     open={props.open}
     contentStyle={props.contentStyle}
-    style={{zIndex: 2000}}
+    style={{ zIndex: 2000 }}
     onRequestClose={props.onRequestClose}
     autoScrollBodyContent={props.autoScrollBodyContent}
     actions={props.actions}
   >
     {props.children}
   </MUIDialog>
-)
-export const Dialog = injectIntl(DialogIntl)
+);
+export const Dialog = injectIntl(DialogIntl);
 
 DialogIntl.propTypes = {
   title: PropTypes.string,
@@ -29,7 +31,7 @@ DialogIntl.propTypes = {
   actions: PropTypes.node,
   children: PropTypes.node,
   contentStyle: PropTypes.object,
-}
+};
 
 export const DialogTitleElementIntl = (props) => (
   <MUIDialog
@@ -38,7 +40,7 @@ export const DialogTitleElementIntl = (props) => (
     open={props.open}
     contentStyle={props.contentStyle}
     bodyStyle={props.bodyStyle}
-    style={{zIndex: 2000}}
+    style={{ zIndex: 2000 }}
     autoDetectWindowHeight={props.autoDetectWindowHeight}
     onRequestClose={props.onRequestClose}
     autoScrollBodyContent={props.autoScrollBodyContent}
@@ -46,8 +48,8 @@ export const DialogTitleElementIntl = (props) => (
   >
     {props.children}
   </MUIDialog>
-)
-export const DialogTitleElement = injectIntl(DialogTitleElementIntl)
+);
+export const DialogTitleElement = injectIntl(DialogTitleElementIntl);
 
 DialogTitleElementIntl.propTypes = {
   title: PropTypes.node,
@@ -61,5 +63,5 @@ DialogTitleElementIntl.propTypes = {
   children: PropTypes.node,
   contentStyle: PropTypes.object,
   bodyStyle: PropTypes.object,
-  style: PropTypes.object
-}
+  style: PropTypes.object,
+};

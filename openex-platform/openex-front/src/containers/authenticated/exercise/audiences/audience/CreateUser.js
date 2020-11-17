@@ -1,47 +1,57 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {addUser} from '../../../../../actions/User'
-import {Dialog} from '../../../../../components/Dialog'
-import {FlatButton} from '../../../../../components/Button'
-import UserForm from './UserForm'
-import * as Constants from '../../../../../constants/ComponentTypes'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { addUser } from '../../../../../actions/User';
+import { Dialog } from '../../../../../components/Dialog';
+import { FlatButton } from '../../../../../components/Button';
+import UserForm from './UserForm';
+import * as Constants from '../../../../../constants/ComponentTypes';
 
 i18nRegister({
   fr: {
     'Create user': 'Créer un utilisateur',
-    'Create a new user': 'Créer un nouvel utilisateur'
-  }
-})
+    'Create a new user': 'Créer un nouvel utilisateur',
+  },
+});
 
 class CreateUser extends Component {
   constructor(props) {
     super(props);
-    this.state = {openCreate: false}
+    this.state = { openCreate: false };
   }
 
   handleOpenCreate() {
-    this.setState({openCreate: true})
+    this.setState({ openCreate: true });
   }
 
   handleCloseCreate() {
-    this.setState({openCreate: false})
+    this.setState({ openCreate: false });
   }
 
   onSubmitCreate(data) {
-    return this.props.addUser(data)
+    return this.props.addUser(data);
   }
 
   submitFormCreate() {
-    this.refs.userForm.submit()
+    this.refs.userForm.submit();
   }
 
   render() {
     const actionsCreateUser = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton key="create" label="Create user" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
-    ]
+      <FlatButton
+        key="cancel"
+        label="Cancel"
+        primary={true}
+        onClick={this.handleCloseCreate.bind(this)}
+      />,
+      <FlatButton
+        key="create"
+        label="Create user"
+        primary={true}
+        onClick={this.submitFormCreate.bind(this)}
+      />,
+    ];
 
     return (
       <div>
@@ -67,7 +77,7 @@ class CreateUser extends Component {
           />
         </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -75,14 +85,12 @@ CreateUser.propTypes = {
   exerciseId: PropTypes.string,
   organizations: PropTypes.object,
   addUser: PropTypes.func,
-}
+};
 
-const select = (state) => {
-  return {
-    organizations: state.referential.entities.organizations,
-  }
-}
+const select = (state) => ({
+  organizations: state.referential.entities.organizations,
+});
 
 export default connect(select, {
-  addUser
+  addUser,
 })(CreateUser);

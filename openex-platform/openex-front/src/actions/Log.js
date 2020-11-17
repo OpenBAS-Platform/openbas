@@ -1,27 +1,32 @@
-import * as schema from './Schema'
-import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
+import * as schema from './Schema';
+import {
+  getReferential,
+  putReferential,
+  postReferential,
+  delReferential,
+} from '../utils/Action';
 
 export const fetchLogs = (exerciseId, noloading) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/logs'
-    return getReferential(schema.arrayOfLogs, uri, noloading)(dispatch)
-}
+  const uri = `/api/exercises/${exerciseId}/logs`;
+  return getReferential(schema.arrayOfLogs, uri, noloading)(dispatch);
+};
 
 export const fetchLog = (exerciseId, logId) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/logs/' + logId
-    return getReferential(schema.log, uri)(dispatch)
-}
+  const uri = `/api/exercises/${exerciseId}/logs/${logId}`;
+  return getReferential(schema.log, uri)(dispatch);
+};
 
 export const updateLog = (exerciseId, logId, data) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/logs/' + logId
-    return putReferential(schema.log, uri, data)(dispatch)
-}
+  const uri = `/api/exercises/${exerciseId}/logs/${logId}`;
+  return putReferential(schema.log, uri, data)(dispatch);
+};
 
 export const addLog = (exerciseId, data) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/logs'
-    return postReferential(schema.log, uri, data)(dispatch)
-}
+  const uri = `/api/exercises/${exerciseId}/logs`;
+  return postReferential(schema.log, uri, data)(dispatch);
+};
 
 export const deleteLog = (exerciseId, logId) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/logs/' + logId
-    return delReferential(uri, 'logs', logId)(dispatch)
-}
+  const uri = `/api/exercises/${exerciseId}/logs/${logId}`;
+  return delReferential(uri, 'logs', logId)(dispatch);
+};

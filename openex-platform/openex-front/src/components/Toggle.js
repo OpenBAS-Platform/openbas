@@ -1,6 +1,6 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUIToggle from 'material-ui/Toggle'
+import React from 'react';
+import PropTypes from 'prop-types';
+import MUIToggle from 'material-ui/Toggle';
 
 export const Toggle = (props) => (
   <MUIToggle
@@ -9,11 +9,11 @@ export const Toggle = (props) => (
     defaultToggled={props.defaultToggled}
     toggled={props.toggled}
   />
-)
+);
 
 Toggle.propTypes = {
   label: PropTypes.node,
   defaultToggled: PropTypes.bool,
   toggled: PropTypes.bool,
   onToggle: PropTypes.func,
-}
+};

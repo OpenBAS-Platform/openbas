@@ -1,141 +1,218 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {T} from '../../../../../components/I18n'
-import {i18nRegister} from '../../../../../utils/Messages'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {Popover} from '../../../../../components/Popover'
-import {Menu} from '../../../../../components/Menu'
-import {Dialog} from '../../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../../components/Button'
-import {Icon} from '../../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from '../../../../../components/menu/MenuItem'
-import Theme from '../../../../../components/Theme'
-import {updateUser} from '../../../../../actions/User'
-import {updateSubaudience} from '../../../../../actions/Subaudience'
-import UserForm from './UserForm'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import { Popover } from '../../../../../components/Popover';
+import { Menu } from '../../../../../components/Menu';
+import { Dialog } from '../../../../../components/Dialog';
+import { IconButton, FlatButton } from '../../../../../components/Button';
+import { Icon } from '../../../../../components/Icon';
+import {
+  MenuItemLink,
+  MenuItemButton,
+} from '../../../../../components/menu/MenuItem';
+import Theme from '../../../../../components/Theme';
+import { updateUser } from '../../../../../actions/User';
+import { updateSubaudience } from '../../../../../actions/Subaudience';
+import UserForm from './UserForm';
 
 const style = {
   position: 'absolute',
   top: '7px',
   right: 0,
-}
+};
 
 i18nRegister({
   fr: {
-    'Do you want to remove the user from this sub-audience?': 'Souhaitez-vous supprimer l\'utilisateur de cette sous-audience ?',
-    'Update the user': 'Modifier l\'utilisateur',
-    'Update the profile': 'Modifier le profil de l\'utilisateur',
-    'Profile': 'Profil'
-  }
-})
+    'Do you want to remove the user from this sub-audience?':
+      "Souhaitez-vous supprimer l'utilisateur de cette sous-audience ?",
+    'Update the user': "Modifier l'utilisateur",
+    'Update the profile': "Modifier le profil de l'utilisateur",
+    Profile: 'Profil',
+  },
+});
 
 class UserPopover extends Component {
   constructor(props) {
-    super(props)
-    this.state = {openDelete: false, openEdit: false, openPopover: false}
+    super(props);
+    this.state = { openDelete: false, openEdit: false, openPopover: false };
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation()
-    this.setState({openPopover: true, anchorEl: event.currentTarget})
+    event.stopPropagation();
+    this.setState({ openPopover: true, anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
+    this.setState({ openPopover: false });
   }
 
   handleOpenEdit() {
-    this.setState({openEdit: true})
-    this.handlePopoverClose()
+    this.setState({ openEdit: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false})
+    this.setState({ openEdit: false });
   }
 
   onSubmitEdit(data) {
-    return this.props.updateUser(this.props.user.user_id, data)
+    return this.props.updateUser(this.props.user.user_id, data);
   }
 
   submitFormEdit() {
-    this.refs.userForm.submit()
+    this.refs.userForm.submit();
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
-    this.handlePopoverClose()
+    this.setState({ openDelete: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({ openDelete: false });
   }
 
   submitDelete() {
     const user_ids = R.pipe(
       R.values,
-      R.filter(a => a.user_id !== this.props.user.user_id),
-      R.map(u => u.user_id)
-    )(this.props.subaudience.subaudience_users)
-    this.props.updateSubaudience(this.props.exerciseId, this.props.audience.audience_id, this.props.subaudience.subaudience_id, {subaudience_users: user_ids})
-    this.handleCloseDelete()
+      R.filter((a) => a.user_id !== this.props.user.user_id),
+      R.map((u) => u.user_id),
+    )(this.props.subaudience.subaudience_users);
+    this.props.updateSubaudience(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      this.props.subaudience.subaudience_id,
+      { subaudience_users: user_ids },
+    );
+    this.handleCloseDelete();
   }
 
   switchColor(disabled) {
     if (disabled) {
-      return Theme.palette.disabledColor
-    } else {
-      return Theme.palette.textColor
+      return Theme.palette.disabledColor;
     }
+    return Theme.palette.textColor;
   }
 
   render() {
-    let subaudience_is_updatable = R.propOr(true, 'user_can_update', this.props.subaudience)
-    let subaudience_is_deletable = R.propOr(true, 'user_can_delete', this.props.subaudience)
-    let user_is_updatable = R.propOr(true, 'user_can_update', this.props.user)
-    let user_is_deletable = R.propOr(true, 'user_can_delete', this.props.user)
+    const subaudience_is_updatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.subaudience,
+    );
+    const subaudience_is_deletable = R.propOr(
+      true,
+      'user_can_delete',
+      this.props.subaudience,
+    );
+    const user_is_updatable = R.propOr(true, 'user_can_update', this.props.user);
+    const user_is_deletable = R.propOr(true, 'user_can_delete', this.props.user);
 
     const editActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      subaudience_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/> : ""
-    ]
+      <FlatButton
+        key="cancel"
+        label="Cancel"
+        primary={true}
+        onClick={this.handleCloseEdit.bind(this)}
+      />,
+      subaudience_is_updatable ? (
+        <FlatButton
+          key="update"
+          label="Update"
+          primary={true}
+          onClick={this.submitFormEdit.bind(this)}
+        />
+      ) : (
+        ''
+      ),
+    ];
     const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      subaudience_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
-    ]
+      <FlatButton
+        key="cancel"
+        label="Cancel"
+        primary={true}
+        onClick={this.handleCloseDelete.bind(this)}
+      />,
+      subaudience_is_deletable ? (
+        <FlatButton
+          key="delete"
+          label="Delete"
+          primary={true}
+          onClick={this.submitDelete.bind(this)}
+        />
+      ) : (
+        ''
+      ),
+    ];
 
-    var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
-    let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
-    let initialValues = R.pipe(
+    const organizationPath = [
+      R.prop('user_organization', this.props.user),
+      'organization_name',
+    ];
+    const organization_name = R.pathOr(
+      '-',
+      organizationPath,
+      this.props.organizations,
+    );
+    const initialValues = R.pipe(
       R.assoc('user_organization', organization_name),
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_email2', 'user_organization', 'user_phone', 'user_phone2', 'user_phone3', 'user_pgp_key'])
-    )(this.props.user)
+      R.pick([
+        'user_firstname',
+        'user_lastname',
+        'user_email',
+        'user_email2',
+        'user_organization',
+        'user_phone',
+        'user_phone2',
+        'user_phone3',
+        'user_pgp_key',
+      ]),
+    )(this.props.user);
 
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon
             name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(!this.props.audience.audience_enabled || !this.props.subaudience.subaudience_enabled)}
+            color={this.switchColor(
+              !this.props.audience.audience_enabled
+                || !this.props.subaudience.subaudience_enabled,
+            )}
           />
         </IconButton>
 
-        {
-          (user_is_updatable || user_is_deletable) ?
-            <Popover
-              open={this.state.openPopover}
-              anchorEl={this.state.anchorEl}
-              onRequestClose={this.handlePopoverClose.bind(this)}
-            >
-              <Menu multiple={false}>
-                {user_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ""}
-                {user_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/> : ""}
-              </Menu>
-            </Popover>
-          :
-            ""
-        }
+        {user_is_updatable || user_is_deletable ? (
+          <Popover
+            open={this.state.openPopover}
+            anchorEl={this.state.anchorEl}
+            onRequestClose={this.handlePopoverClose.bind(this)}
+          >
+            <Menu multiple={false}>
+              {user_is_updatable ? (
+                <MenuItemLink
+                  label="Edit"
+                  onClick={this.handleOpenEdit.bind(this)}
+                />
+              ) : (
+                ''
+              )}
+              {user_is_deletable ? (
+                <MenuItemButton
+                  label="Delete"
+                  onClick={this.handleOpenDelete.bind(this)}
+                />
+              ) : (
+                ''
+              )}
+            </Menu>
+          </Popover>
+        ) : (
+          ''
+        )}
 
         <Dialog
           title="Confirmation"
@@ -163,15 +240,13 @@ class UserPopover extends Component {
           />
         </Dialog>
       </div>
-    )
+    );
   }
 }
 
-const select = (state) => {
-  return {
-    organizations: state.referential.entities.organizations
-  }
-}
+const select = (state) => ({
+  organizations: state.referential.entities.organizations,
+});
 
 UserPopover.propTypes = {
   exerciseId: PropTypes.string,
@@ -181,10 +256,10 @@ UserPopover.propTypes = {
   audience: PropTypes.object,
   subaudience: PropTypes.object,
   organizations: PropTypes.object,
-  children: PropTypes.node
-}
+  children: PropTypes.node,
+};
 
 export default connect(select, {
   updateUser,
-  updateSubaudience
-})(UserPopover)
+  updateSubaudience,
+})(UserPopover);

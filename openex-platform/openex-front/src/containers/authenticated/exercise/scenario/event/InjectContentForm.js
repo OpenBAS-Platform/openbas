@@ -1,73 +1,74 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import * as R from 'ramda'
-import {FormField, CKEditorField} from '../../../../../components/Field'
-import {T} from '../../../../../components/I18n'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {FlatButton} from '../../../../../components/Button'
-import DocumentGallery from '../../../DocumentGallery'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {Button} from '../../../../../components/Button'
-import {Dialog} from '../../../../../components/Dialog'
-import {ToggleField} from '../../../../../components/ToggleField'
-import {Icon} from '../../../../../components/Icon'
-import {Chip} from '../../../../../components/Chip'
-import {Avatar} from '../../../../../components/Avatar'
-import {injectIntl} from 'react-intl'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { reduxForm, change } from 'redux-form';
+import * as R from 'ramda';
+import { injectIntl } from 'react-intl';
+import { FormField, CKEditorField } from '../../../../../components/Field';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { FlatButton, Button } from '../../../../../components/Button';
+import DocumentGallery from '../../../DocumentGallery';
+import * as Constants from '../../../../../constants/ComponentTypes';
+
+import { Dialog } from '../../../../../components/Dialog';
+import { ToggleField } from '../../../../../components/ToggleField';
+import { Icon } from '../../../../../components/Icon';
+import { Chip } from '../../../../../components/Chip';
+import { Avatar } from '../../../../../components/Avatar';
 
 const styles = {
   attachment: {
     margin: '10px 0px 0px -4px',
   },
   variables: {
-    fontSize: '14px'
-  }
-}
+    fontSize: '14px',
+  },
+};
 
 i18nRegister({
   fr: {
-    'sender': 'Expéditeur',
-    'subject': 'Sujet',
-    'body': 'Message',
-    'message': 'Message',
-    'encrypted': 'Chiffrement',
-    'content': 'Contenu',
+    sender: 'Expéditeur',
+    subject: 'Sujet',
+    body: 'Message',
+    message: 'Message',
+    encrypted: 'Chiffrement',
+    content: 'Contenu',
     'Add an attachment': 'Ajouter une pièce jointe',
-    'No content available for this inject type.': 'Aucun contenu disponible pour ce type d\'injection'
+    'No content available for this inject type.':
+      "Aucun contenu disponible pour ce type d'injection",
   },
   en: {
-    'sender': 'Sender',
-    'subject': 'Subject',
-    'body': 'Message',
-    'message': 'Message',
-    'content': 'Content'
-  }
-})
+    sender: 'Sender',
+    subject: 'Subject',
+    body: 'Message',
+    message: 'Message',
+    content: 'Content',
+  },
+});
 
 const validate = (values, props) => {
-  const errors = {}
-  let current_type = undefined
+  const errors = {};
+  let current_type;
 
   if (Array.isArray(props.types)) {
-    props.types.forEach(type => {
+    props.types.forEach((type) => {
       if (type.type === props.type) {
-        current_type = type
+        current_type = type;
       }
-    })
+    });
   }
 
   if (current_type && Array.isArray(current_type.fields)) {
-    current_type.fields.forEach(field => {
-      const value = values[field.name]
+    current_type.fields.forEach((field) => {
+      const value = values[field.name];
       if (field.mandatory && !value) {
-        errors[field.name] = props.intl.formatMessage({id: 'Required'})
+        errors[field.name] = props.intl.formatMessage({ id: 'Required' });
       }
-    })
+    });
   }
 
-  return errors
-}
+  return errors;
+};
 
 class InjectContentForm extends Component {
   constructor(props) {
@@ -75,49 +76,50 @@ class InjectContentForm extends Component {
 
     this.state = {
       openGallery: false,
-      current_type: null
-    }
+      current_type: null,
+    };
 
     // dirty hack to get types
     // when editing inject
     if (Array.isArray(this.props.types)) {
-      this.props.types.forEach(type => {
+      this.props.types.forEach((type) => {
         if (type.type === this.props.type) {
           // eslint-disable-next-line
-          this.state.current_type = type
+          this.state.current_type = type;
         }
-      })
-    // when creating inject
-    } else {
-      if (this.props.types[this.props.type]) {
-        // eslint-disable-next-line
-        this.state.current_type = this.props.types[this.props.type]
-      }
+      });
+      // when creating inject
+    } else if (this.props.types[this.props.type]) {
+      // eslint-disable-next-line
+        this.state.current_type = this.props.types[this.props.type];
     }
-
   }
 
   handleOpenGallery() {
-    this.setState({openGallery: true})
+    this.setState({ openGallery: true });
   }
 
   handleCloseGallery() {
-    this.setState({openGallery: false})
+    this.setState({ openGallery: false });
   }
 
   handleFileSelection(file) {
-    this.props.onContentAttachmentAdd(file)
-    this.handleCloseGallery()
+    this.props.onContentAttachmentAdd(file);
+    this.handleCloseGallery();
   }
 
   handleDocumentSelection(selectedDocument) {
-    this.props.onContentAttachmentAdd(selectedDocument)
-    this.handleCloseGallery()
+    this.props.onContentAttachmentAdd(selectedDocument);
+    this.handleCloseGallery();
   }
 
   render() {
     if (this.props.type === null) {
-      return (<div><T>No content available for this inject type.</T></div>)
+      return (
+        <div>
+          <T>No content available for this inject type.</T>
+        </div>
+      );
     }
 
     const documentGalleryActions = [
@@ -125,27 +127,33 @@ class InjectContentForm extends Component {
         label="Cancel"
         primary={true}
         onClick={this.handleCloseGallery.bind(this)}
-      />
-    ]
+      />,
+    ];
 
     if (!this.state.current_type || !this.state.current_type.fields) {
-      return (<div><T>No type available for this inject.</T></div>)
+      return (
+        <div>
+          <T>No type available for this inject.</T>
+        </div>
+      );
     }
 
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.state.current_type.fields.map(field => {
+        {this.state.current_type.fields.map((field) => {
           switch (field.type) {
             case 'textarea':
-              return <FormField
-                key={field.name}
-                name={field.name}
-                fullWidth={true}
-                multiLine={true}
-                rows={3}
-                type="text"
-                label={field.name}
-              />
+              return (
+                <FormField
+                  key={field.name}
+                  name={field.name}
+                  fullWidth={true}
+                  multiLine={true}
+                  rows={3}
+                  type="text"
+                  label={field.name}
+                />
+              );
             case 'richtextarea':
               return (
                 <div key={field.name}>
@@ -159,29 +167,37 @@ class InjectContentForm extends Component {
                   </label>
                   <div style={styles.variables}>
                     Les variables disponibles sont :
-                    <kbd>{'{{'}NOM{'}}'}</kbd>, <kbd>{'{{'}PRENOM{'}}'}</kbd> et <kbd>{'{{'}ORGANISATION{'}}'}</kbd>.
+                    <kbd>
+                      {'{{'}NOM{'}}'}
+                    </kbd>
+                    ,{' '}
+                    <kbd>
+                      {'{{'}PRENOM{'}}'}
+                    </kbd>{' '}
+                    et{' '}
+                    <kbd>
+                      {'{{'}ORGANISATION{'}}'}
+                    </kbd>
+                    .
                   </div>
                 </div>
-              )
+              );
             case 'checkbox':
               return (
                 <div key={field.name}>
-                  <br/>
+                  <br />
                   <ToggleField
                     key={field.name}
                     name={field.name}
                     label={<T>{field.name}</T>}
                   />
                 </div>
-              )
+              );
             case 'attachment':
               return (
-                <div
-                  key={field.name}
-                  style={styles.attachment}
-                >
+                <div key={field.name} style={styles.attachment}>
                   <Button
-                    label='Add an attachment'
+                    label="Add an attachment"
                     onClick={this.handleOpenGallery.bind(this)}
                   />
                   <Dialog
@@ -190,34 +206,55 @@ class InjectContentForm extends Component {
                     title="Selection d'un document"
                     open={this.state.openGallery}
                     onRequestClose={this.handleCloseGallery.bind(this)}
-                    contentStyle={{'width': '600px;', 'maxWidth': '70%'}}
+                    contentStyle={{ width: '600px;', maxWidth: '70%' }}
                   >
-                    <DocumentGallery fileSelector={this.handleDocumentSelection.bind(this)}/>
+                    <DocumentGallery
+                      fileSelector={this.handleDocumentSelection.bind(this)}
+                    />
                   </Dialog>
                   <div>
-                    {this.props.attachments.map(attachment => {
-                      let document_name = R.propOr('-', 'document_name', attachment)
-                      let document_id = R.propOr('-', 'document_id', attachment)
+                    {this.props.attachments.map((attachment) => {
+                      const document_name = R.propOr(
+                        '-',
+                        'document_name',
+                        attachment,
+                      );
+                      const document_id = R.propOr(
+                        '-',
+                        'document_id',
+                        attachment,
+                      );
                       return (
                         <Chip
                           key={document_name}
-                          onRequestDelete={this.props.onContentAttachmentDelete.bind(this, document_name)}
+                          onRequestDelete={this.props.onContentAttachmentDelete.bind(
+                            this,
+                            document_name,
+                          )}
                           type={Constants.CHIP_TYPE_LIST}
-                          onClick={this.props.downloadAttachment.bind(this, document_id, document_name)}
+                          onClick={this.props.downloadAttachment.bind(
+                            this,
+                            document_id,
+                            document_name,
+                          )}
                         >
                           <Avatar
-                            icon={<Icon name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}/>}
+                            icon={
+                              <Icon
+                                name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}
+                              />
+                            }
                             size={32}
                             type={Constants.AVATAR_TYPE_CHIP}
                           />
                           {document_name}
                         </Chip>
-                      )
+                      );
                     })}
                     <div className="clearfix"></div>
                   </div>
                 </div>
-              )
+              );
             default:
               return (
                 <FormField
@@ -227,11 +264,11 @@ class InjectContentForm extends Component {
                   type="text"
                   label={field.name}
                 />
-              )
+              );
           }
         })}
       </form>
-    )
+    );
   }
 }
 
@@ -248,8 +285,10 @@ InjectContentForm.propTypes = {
   onContentAttachmentAdd: PropTypes.func,
   onContentAttachmentDelete: PropTypes.func,
   attachments: PropTypes.array,
-  downloadAttachment: PropTypes.func
-}
+  downloadAttachment: PropTypes.func,
+};
 
-let formComponent = reduxForm({form: 'InjectContentForm', validate}, null, {change})(InjectContentForm)
-export default injectIntl(formComponent, {withRef: true})
+const formComponent = reduxForm({ form: 'InjectContentForm', validate }, null, {
+  change,
+})(InjectContentForm);
+export default injectIntl(formComponent, { withRef: true });

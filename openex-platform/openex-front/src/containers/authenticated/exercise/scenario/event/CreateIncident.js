@@ -1,68 +1,88 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {addIncident, selectIncident} from '../../../../../actions/Incident'
-import {DialogTitleElement} from '../../../../../components/Dialog'
-import {FlatButton} from '../../../../../components/Button'
-import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
-import {ActionButtonCreate} from '../../../../../components/Button'
-import {AppBar} from '../../../../../components/AppBar'
-import IncidentForm from './IncidentForm'
-import IncidentSubobjectives from './IncidentSubobjectives'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import { addIncident, selectIncident } from '../../../../../actions/Incident';
+import { DialogTitleElement } from '../../../../../components/Dialog';
+import { FlatButton, ActionButtonCreate } from '../../../../../components/Button';
+import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
+
+import { AppBar } from '../../../../../components/AppBar';
+import IncidentForm from './IncidentForm';
+import IncidentSubobjectives from './IncidentSubobjectives';
 
 i18nRegister({
   fr: {
     '1. Parameters': '1. Paramètres',
     '2. Subobjectives': '2. Sous-objectifs',
-    'Incidents': 'Incidents',
-    'Create a new incident': 'Créer un nouvel incident'
-  }
-})
+    Incidents: 'Incidents',
+    'Create a new incident': 'Créer un nouvel incident',
+  },
+});
 
 class CreateIncident extends Component {
   constructor(props) {
     super(props);
-    this.state = {openCreate: false, stepIndex: 0, finished: false, incidentData: null}
+    this.state = {
+      openCreate: false,
+      stepIndex: 0,
+      finished: false,
+      incidentData: null,
+    };
   }
 
   handleOpenCreate() {
-    this.setState({openCreate: true})
+    this.setState({ openCreate: true });
   }
 
   handleCloseCreate() {
-    this.setState({openCreate: false, stepIndex: 0, finished: false, incidentData: null})
+    this.setState({
+      openCreate: false,
+      stepIndex: 0,
+      finished: false,
+      incidentData: null,
+    });
   }
 
   onGlobalSubmit(data) {
-    this.setState({incidentData: data})
+    this.setState({ incidentData: data });
   }
 
   onSubobjectivesChange(data) {
-    let incidentData = this.state.incidentData
-    incidentData.incident_subobjectives = data
-    this.setState({incidentData: incidentData})
+    const { incidentData } = this.state;
+    incidentData.incident_subobjectives = data;
+    this.setState({ incidentData });
   }
 
   handleNext() {
     if (this.state.stepIndex === 0) {
-      this.refs.incidentForm.submit()
+      this.refs.incidentForm.submit();
     } else if (this.state.stepIndex === 1) {
-      this.createIncident()
+      this.createIncident();
     }
   }
 
   selectSubobjectives() {
-    this.setState({stepIndex: 1, finished: true})
+    this.setState({ stepIndex: 1, finished: true });
   }
 
   createIncident() {
-    this.props.addIncident(this.props.exerciseId, this.props.eventId, this.state.incidentData).then((payload) => {
-      this.props.selectIncident(this.props.exerciseId, this.props.eventId, payload.result)
-    })
-    this.handleCloseCreate()
+    this.props
+      .addIncident(
+        this.props.exerciseId,
+        this.props.eventId,
+        this.state.incidentData,
+      )
+      .then((payload) => {
+        this.props.selectIncident(
+          this.props.exerciseId,
+          this.props.eventId,
+          payload.result,
+        );
+      });
+    this.handleCloseCreate();
   }
 
   getStepContent(stepIndex) {
@@ -73,8 +93,9 @@ class CreateIncident extends Component {
             ref="incidentForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectSubobjectives.bind(this)}
-            types={this.props.incident_types}/>
-        )
+            types={this.props.incident_types}
+          />
+        );
       case 1:
         return (
           <IncidentSubobjectives
@@ -85,30 +106,44 @@ class CreateIncident extends Component {
             subobjectives={this.props.subobjectives}
             incidentSubobjectivesIds={[]}
           />
-        )
+        );
       default:
-        return 'Go away!'
+        return 'Go away!';
     }
   }
 
   render() {
     const actions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton key="create" label={this.state.stepIndex === 1 ? "Create" : "Next"} primary={true}
-                  onClick={this.handleNext.bind(this)}/>,
-    ]
+      <FlatButton
+        key="cancel"
+        label="Cancel"
+        primary={true}
+        onClick={this.handleCloseCreate.bind(this)}
+      />,
+      <FlatButton
+        key="create"
+        label={this.state.stepIndex === 1 ? 'Create' : 'Next'}
+        primary={true}
+        onClick={this.handleNext.bind(this)}
+      />,
+    ];
 
     return (
       <div>
-        {(this.props.can_create) ?
-            <AppBar title={<T>Incidents</T>}
-                showMenuIconButton={false}
-                iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                onClick={this.handleOpenCreate.bind(this)}/>}/>
-        :
-           <AppBar title={<T>Incidents</T>}
-                showMenuIconButton={false}/>
-        }
+        {this.props.can_create ? (
+          <AppBar
+            title={<T>Incidents</T>}
+            showMenuIconButton={false}
+            iconElementRight={
+              <ActionButtonCreate
+                type={Constants.BUTTON_TYPE_CREATE_RIGHT}
+                onClick={this.handleOpenCreate.bind(this)}
+              />
+            }
+          />
+        ) : (
+          <AppBar title={<T>Incidents</T>} showMenuIconButton={false} />
+        )}
 
         <DialogTitleElement
           title={
@@ -129,11 +164,12 @@ class CreateIncident extends Component {
           open={this.state.openCreate}
           onRequestClose={this.handleCloseCreate.bind(this)}
           autoScrollBodyContent={true}
-          actions={actions}>
+          actions={actions}
+        >
           <div>{this.getStepContent(this.state.stepIndex)}</div>
         </DialogTitleElement>
       </div>
-    )
+    );
   }
 }
 
@@ -144,7 +180,7 @@ CreateIncident.propTypes = {
   subobjectives: PropTypes.array,
   addIncident: PropTypes.func,
   selectIncident: PropTypes.func,
-  can_create: PropTypes.bool
-}
+  can_create: PropTypes.bool,
+};
 
-export default connect(null, {addIncident, selectIncident})(CreateIncident);
+export default connect(null, { addIncident, selectIncident })(CreateIncident);

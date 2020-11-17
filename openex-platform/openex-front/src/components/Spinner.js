@@ -1,29 +1,31 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import CircularProgress from 'material-ui/CircularProgress'
-import * as Constants from '../constants/ComponentTypes'
+import React from 'react';
+import PropTypes from 'prop-types';
+import CircularProgress from 'material-ui/CircularProgress';
+import * as Constants from '../constants/ComponentTypes';
 
 const styles = {
-  [ Constants.SPINNER_TYPE_NAV ]: {
+  [Constants.SPINNER_TYPE_NAV]: {
     margin: '10px 0 0 8px',
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  [ Constants.SPINNER_TYPE_INJECT]: {
+  [Constants.SPINNER_TYPE_INJECT]: {
     top: 8,
     margin: 12,
     left: 4,
     padding: 0,
-    position: 'absolute'
-  }
-}
+    position: 'absolute',
+  },
+};
 
 export const CircularSpinner = (props) => (
-    <div style={styles[props.type]}><CircularProgress color={props.color} size={props.size}/></div>
-)
+  <div style={styles[props.type]}>
+    <CircularProgress color={props.color} size={props.size} />
+  </div>
+);
 
 CircularSpinner.propTypes = {
   show: PropTypes.bool,
   size: PropTypes.number,
   type: PropTypes.string,
-  color: PropTypes.string
-}
+  color: PropTypes.string,
+};

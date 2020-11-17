@@ -1,46 +1,80 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import * as R from 'ramda'
-import {FormField} from '../../../../components/Field'
-import {T} from '../../../../components/I18n'
-import {SelectField} from '../../../../components/SelectField'
-import {i18nRegister} from '../../../../utils/Messages'
-import MenuItem from 'material-ui/MenuItem'
-import {AutoCompleteField} from '../../../../components/AutoComplete'
-import AutoComplete from 'material-ui/AutoComplete'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { reduxForm, change } from 'redux-form';
+import * as R from 'ramda';
+import MenuItem from 'material-ui/MenuItem';
+import AutoComplete from 'material-ui/AutoComplete';
+import { FormField } from '../../../../components/Field';
+import { T } from '../../../../components/I18n';
+import { SelectField } from '../../../../components/SelectField';
+import { i18nRegister } from '../../../../utils/Messages';
+import { AutoCompleteField } from '../../../../components/AutoComplete';
 
 i18nRegister({
   fr: {
     'Email address': 'Adresse email',
     'Email address (secondary)': 'Adresse email (secondaire)',
-    'Firstname': 'Prénom',
-    'Lastname': 'Nom',
-    'Organization': 'Organisation',
-    'Language': 'Langue',
-    'Automatic': 'Automatique'
-  }
-})
+    Firstname: 'Prénom',
+    Lastname: 'Nom',
+    Organization: 'Organisation',
+    Language: 'Langue',
+    Automatic: 'Automatique',
+  },
+});
 
 class UserForm extends Component {
   render() {
-    let dataSource = R.map(val => val.organization_name, R.values(this.props.organizations))
+    const dataSource = R.map(
+      (val) => val.organization_name,
+      R.values(this.props.organizations),
+    );
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && <div><strong>{this.props.error}</strong><br/></div>}
-        <FormField name="user_email" fullWidth={true} type="text" label="Email address"/>
-        <FormField name="user_email2" fullWidth={true} type="text" label="Email address (secondary)"/>
-        <FormField name="user_firstname" fullWidth={true} type="text" label="Firstname"/>
-        <FormField name="user_lastname" fullWidth={true} type="text" label="Lastname"/>
-        <AutoCompleteField filter={AutoComplete.caseInsensitiveFilter} name="user_organization" fullWidth={true}
-                           type="text" label="Organization" dataSource={dataSource}/>
+        {this.props.error && (
+          <div>
+            <strong>{this.props.error}</strong>
+            <br />
+          </div>
+        )}
+        <FormField
+          name="user_email"
+          fullWidth={true}
+          type="text"
+          label="Email address"
+        />
+        <FormField
+          name="user_email2"
+          fullWidth={true}
+          type="text"
+          label="Email address (secondary)"
+        />
+        <FormField
+          name="user_firstname"
+          fullWidth={true}
+          type="text"
+          label="Firstname"
+        />
+        <FormField
+          name="user_lastname"
+          fullWidth={true}
+          type="text"
+          label="Lastname"
+        />
+        <AutoCompleteField
+          filter={AutoComplete.caseInsensitiveFilter}
+          name="user_organization"
+          fullWidth={true}
+          type="text"
+          label="Organization"
+          dataSource={dataSource}
+        />
         <SelectField label={<T>Language</T>} name="user_lang" fullWidth={true}>
-          <MenuItem key="auto" value="auto" primaryText={<T>Automatic</T>}/>
-          <MenuItem key="en" value="en" primaryText="English"/>
-          <MenuItem key="fr" value="fr" primaryText="Français"/>
+          <MenuItem key="auto" value="auto" primaryText={<T>Automatic</T>} />
+          <MenuItem key="en" value="en" primaryText="English" />
+          <MenuItem key="fr" value="fr" primaryText="Français" />
         </SelectField>
       </form>
-    )
+    );
   }
 }
 
@@ -51,7 +85,7 @@ UserForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  organizations: PropTypes.object
-}
+  organizations: PropTypes.object,
+};
 
-export default reduxForm({form: 'UserForm'}, null, {change})(UserForm)
+export default reduxForm({ form: 'UserForm' }, null, { change })(UserForm);

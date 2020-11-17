@@ -1,9 +1,9 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import DatePicker from 'material-ui/DatePicker'
-import TimePicker from 'material-ui/TimePicker'
-import {dayFormat, timeFormat, parse} from '../utils/Time'
-import {injectIntl} from 'react-intl'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import DatePicker from 'material-ui/DatePicker';
+import TimePicker from 'material-ui/TimePicker';
+import { injectIntl } from 'react-intl';
+import { dayFormat, timeFormat, parse } from '../utils/Time';
 
 const styles = {
   global: {
@@ -12,24 +12,24 @@ const styles = {
   picker: {
     position: 'absolute',
     top: '40px',
-  }
-}
+  },
+};
 
 class DateTimePicker extends Component {
   constructor(props) {
     super(props);
-    this.state = {datetime: parse(this.props.defaultDate).toDate()}
+    this.state = { datetime: parse(this.props.defaultDate).toDate() };
   }
 
   handleDateChange(event, date) {
-    var buildDateStr = dayFormat(date)
-    this.setState({datetime: parse(buildDateStr).toDate()})
-    this.props.handleResult(buildDateStr)
+    const buildDateStr = dayFormat(date);
+    this.setState({ datetime: parse(buildDateStr).toDate() });
+    this.props.handleResult(buildDateStr);
   }
 
   handleTimeChange(event, time) {
-    var buildDateStr = timeFormat(time)
-    this.props.handleResult(buildDateStr)
+    const buildDateStr = timeFormat(time);
+    this.props.handleResult(buildDateStr);
   }
 
   render() {
@@ -45,9 +45,9 @@ class DateTimePicker extends Component {
           onChange={this.handleDateChange.bind(this)}
           floatingLabelText="Date"
           locale={this.props.intl.locale}
-          cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
+          cancelLabel={this.props.intl.formatMessage({ id: 'Cancel' })}
           style={styles.global}
-          dialogContainerStyle={{zIndex: 2100}}
+          dialogContainerStyle={{ zIndex: 2100 }}
         />
 
         <TimePicker
@@ -57,21 +57,21 @@ class DateTimePicker extends Component {
           ref="timePicker"
           value={this.state.datetime}
           onChange={this.handleTimeChange.bind(this)}
-          cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
+          cancelLabel={this.props.intl.formatMessage({ id: 'Cancel' })}
           floatingLabelText="Time"
-          okLabel={<div style={{display: 'none'}}></div>}
+          okLabel={<div style={{ display: 'none' }}></div>}
           style={styles.global}
-          dialogStyle={{zIndex: 2100}}
+          dialogStyle={{ zIndex: 2100 }}
         />
       </div>
-    )
+    );
   }
 }
 
 DateTimePicker.propTypes = {
   handleResult: PropTypes.func,
   defaultDate: PropTypes.string,
-  intl: PropTypes.object
-}
+  intl: PropTypes.object,
+};
 
-export default injectIntl(DateTimePicker, {withRef: true})
+export default injectIntl(DateTimePicker, { withRef: true });

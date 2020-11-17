@@ -1,35 +1,48 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUISelectField from 'material-ui/SelectField'
-import {Field} from 'redux-form'
+import React from 'react';
+import PropTypes from 'prop-types';
+import MUISelectField from 'material-ui/SelectField';
+import { Field } from 'redux-form';
 
 const styles = {
   global: {
     marginBottom: '10px',
   },
   input: {
-    borderRadius: '5px'
-  }
-}
+    borderRadius: '5px',
+  },
+};
 
-const renderSelectField = ({input, onSelectChange, label, fullWidth, multiLine, rows, type, hint, children, meta: {touched, error}}) => (
-  <MUISelectField hintText={hint}
-                  floatingLabelText={label}
-                  floatingLabelFixed={false}
-                  errorText={touched && error}
-                  style={styles.global}
-                  inputStyle={styles.input}
-                  fullWidth={fullWidth}
-                  multiLine={multiLine}
-                  rows={rows}
-                  type={type}
-                  {...input}
-                  onChange={(event, index, value) => {
-                    onSelectChange && onSelectChange(event, index, value)
-                    input.onChange(value)
-                  }}
-                  children={children}
-  />)
+const renderSelectField = ({
+  input,
+  onSelectChange,
+  label,
+  fullWidth,
+  multiLine,
+  rows,
+  type,
+  hint,
+  children,
+  meta: { touched, error },
+}) => (
+  <MUISelectField
+    hintText={hint}
+    floatingLabelText={label}
+    floatingLabelFixed={false}
+    errorText={touched && error}
+    style={styles.global}
+    inputStyle={styles.input}
+    fullWidth={fullWidth}
+    multiLine={multiLine}
+    rows={rows}
+    type={type}
+    {...input}
+    onChange={(event, index, value) => {
+      onSelectChange && onSelectChange(event, index, value);
+      input.onChange(value);
+    }}
+    children={children}
+  />
+);
 
 renderSelectField.propTypes = {
   input: PropTypes.object,
@@ -42,9 +55,9 @@ renderSelectField.propTypes = {
   name: PropTypes.string,
   meta: PropTypes.object,
   onSelectChange: PropTypes.func,
-  children: PropTypes.node
-}
+  children: PropTypes.node,
+};
 
 export const SelectField = (props) => (
-  <Field component={renderSelectField} {...props}/>
-)
+  <Field component={renderSelectField} {...props} />
+);

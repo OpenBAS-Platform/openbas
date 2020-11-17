@@ -47,7 +47,9 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     {
         if ($credentials && strlen($credentials) > 0) {
             $token = $this->em->getRepository('App:Token')->findOneBy(['token_value' => $credentials]);
-            return $token->getTokenUser();
+            if( $token ) {
+                return $token->getTokenUser();
+            }
         }
         return null;
     }

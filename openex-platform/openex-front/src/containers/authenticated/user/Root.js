@@ -1,31 +1,31 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as Constants from '../../../constants/ComponentTypes'
-import {AppBar} from '../../../components/AppBar'
-import UserPopover from '../UserPopover'
-import {redirectToHome} from '../../../actions/Application'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as Constants from '../../../constants/ComponentTypes';
+import { AppBar } from '../../../components/AppBar';
+import UserPopover from '../UserPopover';
+import { redirectToHome } from '../../../actions/Application';
 
 const styles = {
   container: {
-    padding: '90px 20px 0 85px'
+    padding: '90px 20px 0 85px',
   },
   empty: {
     marginTop: 40,
     fontSize: '18px',
     fontWeight: 500,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   logo: {
     width: '40px',
     marginTop: '4px',
-    cursor: 'pointer'
-  }
-}
+    cursor: 'pointer',
+  },
+};
 
 class RootUser extends Component {
   redirectToHome() {
-    this.props.redirectToHome()
+    this.props.redirectToHome();
   }
 
   render() {
@@ -36,14 +36,18 @@ class RootUser extends Component {
           type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
           onTitleTouchTap={this.redirectToHome.bind(this)}
           onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
-          iconElementRight={<UserPopover/>}
-          iconElementLeft={<img src="../../images/logo_white.png" alt="logo" style={styles.logo}/>}
+          iconElementRight={<UserPopover />}
+          iconElementLeft={
+            <img
+              src="../../images/logo_white.png"
+              alt="logo"
+              style={styles.logo}
+            />
+          }
         />
-        <div style={styles.container}>
-          {this.props.children}
-        </div>
+        <div style={styles.container}>{this.props.children}</div>
       </div>
-    )
+    );
   }
 }
 
@@ -51,7 +55,7 @@ RootUser.propTypes = {
   toggleLeftBar: PropTypes.func,
   logout: PropTypes.func,
   redirectToHome: PropTypes.func,
-  children: PropTypes.node
-}
+  children: PropTypes.node,
+};
 
-export default connect(null, {redirectToHome})(RootUser);
+export default connect(null, { redirectToHome })(RootUser);

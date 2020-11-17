@@ -1,93 +1,101 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import * as Constants from '../../../constants/ComponentTypes'
-import Theme from '../../../components/Theme'
-import {T} from '../../../components/I18n'
-import {Icon} from '../../../components/Icon'
-import {i18nRegister} from '../../../utils/Messages'
-import {fetchExercises} from '../../../actions/Exercise'
-import {fetchUsers} from '../../../actions/User'
-import {fetchGlobalInjects} from '../../../actions/Inject'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import * as Constants from '../../../constants/ComponentTypes';
+import Theme from '../../../components/Theme';
+import { T } from '../../../components/I18n';
+import { Icon } from '../../../components/Icon';
+import { i18nRegister } from '../../../utils/Messages';
+import { fetchExercises } from '../../../actions/Exercise';
+import { fetchUsers } from '../../../actions/User';
+import { fetchGlobalInjects } from '../../../actions/Inject';
 
 i18nRegister({
   fr: {
-    'Exercises': 'Exercices',
-    'Users': 'Utilisateurs',
-    'Injects': 'Injects'
-  }
-})
+    Exercises: 'Exercices',
+    Users: 'Utilisateurs',
+    Injects: 'Injects',
+  },
+});
 
 const styles = {
-  'container': {
+  container: {
     padding: '50px 0px 0px 0px',
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  'stat': {
+  stat: {
     display: 'inline-block',
-    width: "300px",
+    width: '300px',
   },
-  'number': {
+  number: {
     color: Theme.palette.primary1Color,
     fontSize: '60px',
-    fontWeight: '400'
+    fontWeight: '400',
   },
-  'icon': {
+  icon: {
     color: Theme.palette.primary1Color,
     margin: '35px 0px 0px 0px',
-    fontWeight: '400'
+    fontWeight: '400',
   },
-  'name': {
+  name: {
     color: Theme.palette.disabledColor,
     fontSize: '12px',
     textTransform: 'uppercase',
-  }
-}
+  },
+};
 
 class Index extends Component {
   componentDidMount() {
-    this.props.fetchExercises()
-    this.props.fetchUsers()
-    this.props.fetchGlobalInjects()
+    this.props.fetchExercises();
+    this.props.fetchUsers();
+    this.props.fetchGlobalInjects();
   }
 
   render() {
-    return <div style={styles.container}>
-      <div style={styles.stat}>
-        <div style={styles.number}>
-          {this.props.exercises.length}
+    return (
+      <div style={styles.container}>
+        <div style={styles.stat}>
+          <div style={styles.number}>{this.props.exercises.length}</div>
+          <div style={styles.icon}>
+            <Icon
+              name={Constants.ICON_NAME_ACTION_ROWING}
+              style={{ width: '40px', height: '40px' }}
+              color={Theme.palette.disabledColor}
+            />
+          </div>
+          <div style={styles.name}>
+            <T>Exercises</T>
+          </div>
         </div>
-        <div style={styles.icon}>
-          <Icon name={Constants.ICON_NAME_ACTION_ROWING} style={{width: '40px', height: '40px'}} color={Theme.palette.disabledColor} />
+        <div style={styles.stat}>
+          <div style={styles.number}>{this.props.users.length}</div>
+          <div style={styles.icon}>
+            <Icon
+              name={Constants.ICON_NAME_SOCIAL_GROUP}
+              style={{ width: '40px', height: '40px' }}
+              color={Theme.palette.disabledColor}
+            />
+          </div>
+          <div style={styles.name}>
+            <T>Users</T>
+          </div>
         </div>
-        <div style={styles.name}>
-          <T>Exercises</T>
+        <div style={styles.stat}>
+          <div style={styles.number}>{this.props.injects.length}</div>
+          <div style={styles.icon}>
+            <Icon
+              name={Constants.ICON_NAME_AV_CALL_TO_ACTION}
+              style={{ width: '40px', height: '40px' }}
+              color={Theme.palette.disabledColor}
+            />
+          </div>
+          <div style={styles.name}>
+            <T>Injects</T>
+          </div>
         </div>
       </div>
-      <div style={styles.stat}>
-        <div style={styles.number}>
-          {this.props.users.length}
-        </div>
-        <div style={styles.icon}>
-          <Icon name={Constants.ICON_NAME_SOCIAL_GROUP} style={{width: '40px', height: '40px'}} color={Theme.palette.disabledColor} />
-        </div>
-        <div style={styles.name}>
-          <T>Users</T>
-        </div>
-      </div>
-      <div style={styles.stat}>
-        <div style={styles.number}>
-          {this.props.injects.length}
-        </div>
-        <div style={styles.icon}>
-          <Icon name={Constants.ICON_NAME_AV_CALL_TO_ACTION} style={{width: '40px', height: '40px'}} color={Theme.palette.disabledColor} />
-        </div>
-        <div style={styles.name}>
-          <T>Injects</T>
-        </div>
-      </div>
-    </div>
+    );
   }
 }
 
@@ -97,15 +105,17 @@ Index.propTypes = {
   injects: PropTypes.array,
   fetchExercises: PropTypes.func,
   fetchUsers: PropTypes.func,
-  fetchGlobalInjects: PropTypes.func
-}
+  fetchGlobalInjects: PropTypes.func,
+};
 
-const select = (state) => {
-  return {
-    exercises: R.values(state.referential.entities.exercises),
-    users: R.values(state.referential.entities.users),
-    injects: R.values(state.referential.entities.injects)
-  }
-}
+const select = (state) => ({
+  exercises: R.values(state.referential.entities.exercises),
+  users: R.values(state.referential.entities.users),
+  injects: R.values(state.referential.entities.injects),
+});
 
-export default connect(select, {fetchExercises, fetchUsers, fetchGlobalInjects})(Index)
+export default connect(select, {
+  fetchExercises,
+  fetchUsers,
+  fetchGlobalInjects,
+})(Index);

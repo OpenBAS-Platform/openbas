@@ -1,74 +1,88 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {addSubaudience, selectSubaudience} from '../../../../../actions/Subaudience'
-import {Dialog} from '../../../../../components/Dialog'
-import {FlatButton} from '../../../../../components/Button'
-import SubaudienceForm from './SubaudienceForm'
-import {ActionButtonCreate} from '../../../../../components/Button'
-import {AppBar} from '../../../../../components/AppBar'
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import {
+  addSubaudience,
+  selectSubaudience,
+} from '../../../../../actions/Subaudience';
+import { Dialog } from '../../../../../components/Dialog';
+import { FlatButton, ActionButtonCreate } from '../../../../../components/Button';
+import SubaudienceForm from './SubaudienceForm';
+
+import { AppBar } from '../../../../../components/AppBar';
 
 i18nRegister({
   fr: {
     'Sub-audiences': 'Sous-audiences',
-    'Create a new sub-audience': 'Créer une nouvelle sous-audience'
-  }
-})
+    'Create a new sub-audience': 'Créer une nouvelle sous-audience',
+  },
+});
 
 class CreateSubaudience extends Component {
   constructor(props) {
     super(props);
-    this.state = {openCreate: false}
+    this.state = { openCreate: false };
   }
 
   handleOpenCreate() {
-    this.setState({openCreate: true})
+    this.setState({ openCreate: true });
   }
 
   handleCloseCreate() {
-    this.setState({openCreate: false})
+    this.setState({ openCreate: false });
   }
 
   onSubmitCreate(data) {
-    return this.props.addSubaudience(this.props.exerciseId, this.props.audienceId, data)
+    return this.props
+      .addSubaudience(this.props.exerciseId, this.props.audienceId, data)
       .then((payload) => {
-        this.props.selectSubaudience(this.props.exerciseId, this.props.audienceId, payload.result)
-      })
+        this.props.selectSubaudience(
+          this.props.exerciseId,
+          this.props.audienceId,
+          payload.result,
+        );
+      });
   }
 
   submitFormCreate() {
-    this.refs.subaudienceForm.submit()
+    this.refs.subaudienceForm.submit();
   }
 
   render() {
     const actions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton key="create" label="Create" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
-    ]
+      <FlatButton
+        key="cancel"
+        label="Cancel"
+        primary={true}
+        onClick={this.handleCloseCreate.bind(this)}
+      />,
+      <FlatButton
+        key="create"
+        label="Create"
+        primary={true}
+        onClick={this.submitFormCreate.bind(this)}
+      />,
+    ];
 
     return (
       <div>
-        {
-          (this.props.can_create) ?
-            <AppBar
-              title={<T>Sub-audiences</T>}
-              showMenuIconButton={false}
-              iconElementRight={
-                <ActionButtonCreate
-                  type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                  onClick={this.handleOpenCreate.bind(this)}
-                />
-              }
-            />
-          :
-            <AppBar
-              title={<T>Sub-audiences</T>}
-              showMenuIconButton={false}
-            />
-        }
+        {this.props.can_create ? (
+          <AppBar
+            title={<T>Sub-audiences</T>}
+            showMenuIconButton={false}
+            iconElementRight={
+              <ActionButtonCreate
+                type={Constants.BUTTON_TYPE_CREATE_RIGHT}
+                onClick={this.handleOpenCreate.bind(this)}
+              />
+            }
+          />
+        ) : (
+          <AppBar title={<T>Sub-audiences</T>} showMenuIconButton={false} />
+        )}
         <Dialog
           title="Create a new sub-audience"
           modal={false}
@@ -92,10 +106,10 @@ CreateSubaudience.propTypes = {
   audienceId: PropTypes.string,
   addSubaudience: PropTypes.func,
   selectSubaudience: PropTypes.func,
-  can_create: PropTypes.bool
-}
+  can_create: PropTypes.bool,
+};
 
 export default connect(null, {
   addSubaudience,
-  selectSubaudience
+  selectSubaudience,
 })(CreateSubaudience);
