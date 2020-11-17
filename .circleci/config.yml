@@ -154,7 +154,7 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openexhq/platform:${CIRCLE_TAG}
-            docker push openexhq/worker:${CIRCLE_TAG}
+            docker push openexhq/player:${CIRCLE_TAG}
 
   docker_build_rolling:
     working_directory: ~/openex
@@ -181,7 +181,7 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push openexhq/platform:rolling
-            docker push openexhq/worker:rolling
+            docker push openexhq/player:rolling
 
 workflows:
   openex:
