@@ -88,7 +88,7 @@ jobs:
       - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-player/target ./deploy/openex-player/
+      - run: mv ./deploy/openex-player/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/
       - run:
           working_directory: ~/openex/deploy
           command: git add --force -A
@@ -121,7 +121,7 @@ jobs:
       - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-player/target ./deploy/openex-player/
+      - run: mv ./deploy/openex-player/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/
       - run:
           working_directory: ~/openex/deploy
           command: git add --force -A

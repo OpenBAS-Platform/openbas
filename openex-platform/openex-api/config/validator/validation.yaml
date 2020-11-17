@@ -55,11 +55,11 @@ App\Entity\Exercise:
       - NotBlank: ~
       - Type: string
     exercise_start_date:
-      - DateTime: ~
       - NotBlank: ~
+      - Type: datetime
     exercise_end_date:
-      - DateTime: ~
       - NotBlank: ~
+      - Type: datetime
 
 App\Entity\Objective:
   properties:
@@ -103,7 +103,7 @@ App\Entity\Comcheck:
       - NotBlank: ~
     comcheck_end_date:
       - NotBlank: ~
-      - DateTime: ~
+      - Type: datetime
     comcheck_subject:
       - NotBlank: ~
       - Type: string
