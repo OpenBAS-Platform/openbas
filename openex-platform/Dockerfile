@@ -8,3 +8,10 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Copy work files
 COPY openex-api /opt/openex
 RUN cd /opt/openex && php composer.phar install --no-progress --no-interaction
+
+# Expose and entrypoint
+COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh 
+
+EXPOSE 80/tcp
+ENTRYPOINT ["/entrypoint.sh"]
