@@ -9,6 +9,7 @@ use App\Entity\Token;
 use App\Entity\User;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,6 +53,16 @@ class InitDatabaseCommand extends Command
         $output->writeln('Initializing database');
         $output->writeln('============');
         $output->writeln('');
+
+        $conn = $this->em->getConnection();
+        $sql = 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"';
+        $stmt = $conn->prepare($sql);
+        try {
+            $stmt->execute();
+            $output->writeln('Creating extensions');
+        } catch (Exception $exception) {
+            $output->writeln('Error creating extension');
+        }
 
         $this->createIncidentType('TECHNICAL');
         $this->createIncidentType('OPERATIONAL');
