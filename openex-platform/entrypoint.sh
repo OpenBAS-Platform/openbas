@@ -4,7 +4,7 @@
 cd /opt/openex
 
 # Initialize schema
-bin/console doctrine:schema:update
+bin/console doctrine:schema:update --force
 
 # Initialize data
 bin/console app:db-init
