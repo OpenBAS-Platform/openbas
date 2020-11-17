@@ -143,12 +143,12 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/ckeditor ./openex-platform/openex-api/public/
       - run:
           working_directory: ~/openex/openex-platform
-          name: Build Docker image openex/platform
-          command: docker build -t openex/platform:${CIRCLE_TAG} .
+          name: Build Docker image openexhq/platform
+          command: docker build -t openexhq/platform:${CIRCLE_TAG} .
       - run:
           working_directory: ~/openex/openex-player
-          name: Build Docker image openex/player
-          command: docker build -t openex/player:${CIRCLE_TAG} .
+          name: Build Docker image openexhq/player
+          command: docker build -t openexhq/player:${CIRCLE_TAG} .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
@@ -170,12 +170,12 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/ckeditor ./openex-platform/openex-api/public/
       - run:
           working_directory: ~/openex/openex-platform
-          name: Build Docker image openex/platform
-          command: docker build -t openex/platform:rolling .
+          name: Build Docker image openexhq/platform
+          command: docker build -t openexhq/platform:rolling .
       - run:
           working_directory: ~/openex/openex-player
-          name: Build Docker image openex/player
-          command: docker build -t openex/player:rolling .
+          name: Build Docker image openexhq/player
+          command: docker build -t openexhq/player:rolling .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |

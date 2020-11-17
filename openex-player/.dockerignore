@@ -1,0 +1,7 @@
+# Files
+src/main/resources/application-dev.properties
+
+# Cache
+.mvn
+.idea
+target
