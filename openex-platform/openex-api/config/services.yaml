@@ -6,6 +6,7 @@
 parameters:
   locale: 'en'
   player_url: '%env(PLAYER_URL)%'
+  admin_token: '%env(ADMIN_TOKEN)%'
   mail_sender: no-reply@openex.io
 
 services:
