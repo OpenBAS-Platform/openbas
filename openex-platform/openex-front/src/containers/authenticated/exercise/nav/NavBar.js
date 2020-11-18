@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Drawer } from '../../../../components/Drawer';
 import { List } from '../../../../components/List';

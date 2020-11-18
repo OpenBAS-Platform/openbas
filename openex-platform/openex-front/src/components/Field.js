@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import MUITextField from 'material-ui/TextField';
+import MUITextField from '@material-ui/core/TextField';
 import { Field } from 'redux-form';
 import { injectIntl } from 'react-intl';
 import CKEditor4 from 'ckeditor4-react';

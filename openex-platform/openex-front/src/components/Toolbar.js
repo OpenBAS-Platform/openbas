@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Toolbar as MUIToolbar,
-  ToolbarGroup as MUIToolbarGroup,
-  ToolbarSeparator as MUIToolbarSeparator,
-  ToolbarTitle as MUIToolbarTitle,
-} from 'material-ui/Toolbar';
+import MUIToolbar from '@material-ui/core/Toolbar';
 import Theme from './Theme';
 import * as Constants from '../constants/ComponentTypes';
 

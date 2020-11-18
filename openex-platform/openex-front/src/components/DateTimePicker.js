@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import DatePicker from 'material-ui/DatePicker';
-import TimePicker from 'material-ui/TimePicker';
+import DatePicker from '@material-ui/pickers/DatePicker';
+import TimePicker from '@material-ui/pickers/TimePicker';
 import { injectIntl } from 'react-intl';
 import { dayFormat, timeFormat, parse } from '../utils/Time';
 

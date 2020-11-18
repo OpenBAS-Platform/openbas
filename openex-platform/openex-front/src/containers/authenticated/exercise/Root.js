@@ -14,6 +14,22 @@ import NavBar from './nav/NavBar';
 import LeftBar from './nav/LeftBar';
 import UserPopover from '../UserPopover';
 import { fetchExercise } from '../../../actions/Exercise';
+import {Route, Switch} from "react-router";
+import IndexExercise from "./Index";
+import IndexExerciseExecution from "./execution/Index";
+import IndexExerciseLessons from "./lessons/Index";
+import IndexExerciseChecks from "./check/Index";
+import IndexExerciseDryrun from "./check/Dryrun";
+import IndexExerciseComcheck from "./check/Comcheck";
+import IndexExerciseObjectives from "./objective/Index";
+import IndexExerciseScenario from "./scenario/Index";
+import IndexExerciseScenarioEvent from "./scenario/event/Index";
+import IndexExerciseAudiences from "./audiences/Index";
+import IndexExerciseAudiencesAudience from "./audiences/audience/Index";
+import IndexExerciseDocuments from "./documents/Index";
+import IndexExerciseStatistics from "./statistics/Index";
+import IndexExerciseSettings from "./settings/Index";
+import IndexUserProfile from "../user/profile/Index";
 
 const styles = {
   root: {
@@ -79,7 +95,38 @@ class RootAuthenticated extends Component {
             this.props.exercise,
           )}
         />
-        <div style={styles.root}>{this.props.children}</div>
+        <div style={styles.root}>
+          <Switch>
+            <Route exact path="/private/exercise/:exerciseId" component={IndexExercise} />
+            <Route path="execution" component={IndexExerciseExecution} />
+            <Route path="lessons" component={IndexExerciseLessons} />
+            <Route path="checks" component={IndexExerciseChecks} />
+            <Route
+                path="checks/dryrun/:dryrunId"
+                component={IndexExerciseDryrun}
+            />
+            <Route
+                path="checks/comcheck/:comcheckId"
+                component={IndexExerciseComcheck}
+            />
+            <Route path="objectives" component={IndexExerciseObjectives} />
+            <Route path="scenario" component={IndexExerciseScenario} />
+            <Route
+                path="scenario/:eventId"
+                component={IndexExerciseScenarioEvent}
+            />
+            <Route path="audiences" component={IndexExerciseAudiences} />
+            <Route
+                path="audiences/:audienceId"
+                component={IndexExerciseAudiencesAudience}
+            />
+            <Route path="calendar" component={IndexExercise} />
+            <Route path="documents" component={IndexExerciseDocuments} />
+            <Route path="statistics" component={IndexExerciseStatistics} />
+            <Route path="settings" component={IndexExerciseSettings} />
+            <Route path="profile" component={IndexUserProfile} />
+          </Switch>
+        </div>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIChip from 'material-ui/Chip';
+import MUIChip from '@material-ui/core/Chip';
 
 /* TAG LISTE AVAILABLE */
 const chipTagListe = {

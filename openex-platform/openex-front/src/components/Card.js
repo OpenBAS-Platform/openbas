@@ -1,13 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import {
-  Card as MUICard,
-  CardHeader as MUICardHeader,
-  CardMedia as MUICardMedia,
-  CardTitle as MUICardTitle,
-  CardText as MUICardText,
-} from 'material-ui/Card';
+import MUICard from '@material-ui/core/Card';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import MUICardMedia from '@material-ui/core/CardMedia';
+import MUICardContent from '@material-ui/core/CardContent';
 
 export const Card = (props) => <MUICard>{props.children}</MUICard>;
 
@@ -39,7 +35,7 @@ CardMedia.propTypes = {
 };
 
 export const CardTitle = (props) => (
-  <MUICardTitle
+  <MUICardHeader
     title={props.title}
     titleColor={props.titleColor}
     subtitle={props.subtitle}
@@ -54,7 +50,7 @@ CardTitle.propTypes = {
   subtitleColor: PropTypes.string,
 };
 
-export const CardText = (props) => <MUICardText>{props.children}</MUICardText>;
+export const CardText = (props) => <MUICardContent>{props.children}</MUICardContent>;
 
 CardText.propTypes = {
   children: PropTypes.node,

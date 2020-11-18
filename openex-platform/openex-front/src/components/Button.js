@@ -1,12 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router';
-import MUIRaisedButton from 'material-ui/RaisedButton';
-import MUIFloatingActionButton from 'material-ui/FloatingActionButton';
-import MUIFlatButton from 'material-ui/FlatButton';
-import MUIIconButton from 'material-ui/IconButton';
-import ContentAdd from 'material-ui/svg-icons/content/add';
-import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow';
+import { Link } from 'react-router-dom';
+import MUIButton from '@material-ui/core/Button';
+import MUIIconButton from '@material-ui/core/IconButton';
+import { Add, PlayArrow } from '@material-ui/icons';
 import { injectIntl } from 'react-intl';
 import * as Constants from '../constants/ComponentTypes';
 
@@ -46,7 +43,7 @@ const buttonStyle = {
 };
 
 const ButtonIntl = (props) => (
-  <MUIRaisedButton
+  <MUIButton
     secondary={true}
     label={props.intl.formatMessage({ id: props.label })}
     type={props.type}
@@ -68,7 +65,7 @@ ButtonIntl.propTypes = {
 };
 
 const FlatButtonIntl = (props) => (
-  <MUIFlatButton
+  <MUIButton
     secondary={props.secondary}
     primary={props.primary}
     label={props.intl.formatMessage({ id: props.label })}
@@ -90,7 +87,7 @@ FlatButtonIntl.propTypes = {
 };
 
 export const LinkFlatButtonIntl = (props) => (
-  <MUIFlatButton
+  <MUIButton
     secondary={props.secondary}
     primary={props.primary}
     containerElement={<Link to={props.to} />}
@@ -112,7 +109,7 @@ LinkFlatButtonIntl.propTypes = {
 };
 
 export const LinkButtonIntl = (props) => (
-  <MUIRaisedButton
+  <MUIButton
     primary={true}
     containerElement={<Link to={props.to} />}
     disabled={props.disabled}
@@ -136,7 +133,7 @@ export const FloatingActionsButtonCreate = (props) => (
     onClick={props.onClick}
     style={buttonStyle[props.type]}
   >
-    <ContentAdd />
+    <Add />
   </MUIFloatingActionButton>
 );
 
@@ -148,14 +145,14 @@ FloatingActionsButtonCreate.propTypes = {
 };
 
 export const FloatingActionsButtonPlay = (props) => (
-  <MUIFloatingActionButton
+  <MUIButton
     secondary={true}
     disabled={props.disabled}
     onClick={props.onClick}
     style={buttonStyle[props.type]}
   >
-    <AVPlayArrow />
-  </MUIFloatingActionButton>
+    <PlayArrow />
+  </MUIButton>
 );
 
 FloatingActionsButtonPlay.propTypes = {
@@ -166,7 +163,7 @@ FloatingActionsButtonPlay.propTypes = {
 };
 
 export const ActionButtonCreate = (props) => (
-  <MUIFloatingActionButton
+  <MUIButton
     mini={true}
     disabled={props.disabled}
     onClick={props.onClick}
@@ -174,8 +171,8 @@ export const ActionButtonCreate = (props) => (
     zDepth={0}
     style={buttonStyle[props.type]}
   >
-    <ContentAdd />
-  </MUIFloatingActionButton>
+    <Add />
+  </MUIButton>
 );
 
 ActionButtonCreate.propTypes = {

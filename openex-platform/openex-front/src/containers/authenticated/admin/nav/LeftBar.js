@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { List } from 'material-ui/List';
+import List from '@material-ui/core/List';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Drawer } from '../../../../components/Drawer';
 import { ListItemLink } from '../../../../components/list/ListItem';

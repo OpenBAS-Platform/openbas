@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import * as R from 'ramda';
-import MenuItem from 'material-ui/MenuItem';
-import AutoComplete from 'material-ui/AutoComplete';
+import MenuItem from '@material-ui/core/MenuItem';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { FormField } from '../../../../components/Field';
 import { T } from '../../../../components/I18n';
 import { SelectField } from '../../../../components/SelectField';
@@ -61,7 +61,7 @@ class UserForm extends Component {
           label="Lastname"
         />
         <AutoCompleteField
-          filter={AutoComplete.caseInsensitiveFilter}
+          filter={Autocomplete.caseInsensitiveFilter}
           name="user_organization"
           fullWidth={true}
           type="text"

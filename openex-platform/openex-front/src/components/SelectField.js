@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUISelectField from 'material-ui/SelectField';
+import MUISelect from '@material-ui/core/Select';
 import { Field } from 'redux-form';
 
 const styles = {
@@ -24,7 +24,7 @@ const renderSelectField = ({
   children,
   meta: { touched, error },
 }) => (
-  <MUISelectField
+  <MUISelect
     hintText={hint}
     floatingLabelText={label}
     floatingLabelFixed={false}

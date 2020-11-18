@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import DocumentTitle from '../../components/DocumentTitle';
+import { Route, Switch } from 'react-router';
+import Login from './login/Login';
+import IndexComcheck from './comcheck/Index';
+import { UserIsNotAuthenticated } from '../../App';
 
 class RootAnonymous extends Component {
   render() {
     return (
-      <DocumentTitle title="OpenEx - Crisis management exercises platform">
-        <div>{this.props.children}</div>
-      </DocumentTitle>
+      <div>
+        <Switch>
+          <Route
+            exact
+            path="/login"
+            component={UserIsNotAuthenticated(Login)}
+          />
+          <Route exact path="/comcheck/:statusId" component={IndexComcheck} />
+        </Switch>
+      </div>
     );
   }
 }

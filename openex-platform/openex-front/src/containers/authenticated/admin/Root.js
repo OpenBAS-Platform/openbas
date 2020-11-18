@@ -9,6 +9,11 @@ import { AppBar } from '../../../components/AppBar';
 import NavBar from './nav/NavBar';
 import LeftBar from './nav/LeftBar';
 import UserPopover from '../UserPopover';
+import {Route, Switch} from "react-router";
+import IndexAdmin from "./Index";
+import IndexAdminUsers from "./user/Index";
+import IndexAdminGroups from "./group/Index";
+import IndexAdminTests from "./tests/Index";
 
 i18nRegister({
   fr: {
@@ -55,7 +60,13 @@ class RootAuthenticated extends Component {
         />
         <NavBar pathname={this.props.pathname} />
         <LeftBar pathname={this.props.pathname} />
-        <div style={styles.root}>{this.props.children}</div>
+
+        <Switch>
+          <Route path="index" component={IndexAdmin} />
+          <Route path="users" component={IndexAdminUsers} />
+          <Route path="groups" component={IndexAdminGroups} />
+          <Route path="tests" component={IndexAdminTests} />
+        </Switch>
       </div>
     );
   }

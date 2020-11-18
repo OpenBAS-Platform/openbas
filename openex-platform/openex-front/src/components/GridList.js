@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  GridList as MUIGridList,
-  GridTile as MUIGridTile,
-} from 'material-ui/GridList';
+import MUIGridList from '@material-ui/core/GridList';
+import MUIGridListTile from '@material-ui/core/GridListTile';
 import * as Constants from '../constants/ComponentTypes';
 
 const GridListStyle = {
@@ -35,13 +33,13 @@ GridList.propTypes = {
 };
 
 export const GridTile = (props) => (
-  <MUIGridTile
+  <MUIGridListTile
     title={props.title}
     subtitle={props.subtitle}
     actionIcon={props.actionIcon}
   >
     {props.children}
-  </MUIGridTile>
+  </MUIGridListTile>
 );
 
 GridTile.propTypes = {

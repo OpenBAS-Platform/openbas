@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -112,8 +112,8 @@ class IndexExerciseLessons extends Component {
 
   componentDidMount() {
     this.props.fetchGroups();
-    const initialStream = Rx.Observable.of(1); // Fetch on loading
-    const intervalStream = Rx.Observable.interval(FIVE_SECONDS); // Fetch every five seconds
+    const initialStream = Observable.of(1); // Fetch on loading
+    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
     this.subscription = initialStream
       .merge(intervalStream)
       .exhaustMap(() => Promise.all([

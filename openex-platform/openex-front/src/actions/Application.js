@@ -1,4 +1,3 @@
-import { push } from 'react-router-redux';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
 import { api } from '../App';

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUISlider from 'material-ui/Slider';
+import MUISlider from '@material-ui/core/Slider';
 import { Field } from 'redux-form';
 
 const renderSliderField = ({

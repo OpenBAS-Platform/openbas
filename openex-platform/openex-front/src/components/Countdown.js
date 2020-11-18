@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { injectIntl } from 'react-intl';
 import countdown from 'countdown';
 import { T } from './I18n';
@@ -38,8 +38,8 @@ class Countdown extends Component {
   }
 
   componentDidMount() {
-    const initialStream = Rx.Observable.of(1);
-    const intervalStream = Rx.Observable.interval(ONE_SECOND);
+    const initialStream = Observable.of(1);
+    const intervalStream = Observable.interval(ONE_SECOND);
     this.subscription = initialStream
       .merge(intervalStream)
       .do(() => this.setState({ startDate: now() }))

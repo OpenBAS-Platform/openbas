@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIToggle from 'material-ui/Toggle';
+import MUISwitch from '@material-ui/core/Switch';
 
 export const Toggle = (props) => (
-  <MUIToggle
+  <MUISwitch
     label={props.label}
     onToggle={props.onToggle}
     defaultToggled={props.defaultToggled}

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Route, Switch } from 'react-router';
 import * as Constants from '../../../constants/ComponentTypes';
 import { AppBar } from '../../../components/AppBar';
 import UserPopover from '../UserPopover';
 import { redirectToHome } from '../../../actions/Application';
+import IndexUserProfile from './profile/Index';
 
 const styles = {
   container: {
@@ -45,7 +47,11 @@ class RootUser extends Component {
             />
           }
         />
-        <div style={styles.container}>{this.props.children}</div>
+        <div style={styles.container}>
+          <Switch>
+          <Route path="profile" component={IndexUserProfile} />
+          </Switch>
+        </div>
       </div>
     );
   }

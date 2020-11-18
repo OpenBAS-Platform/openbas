@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIPopover from 'material-ui/Popover';
+import MUIPopover from '@material-ui/core/Popover';
 
 export const Popover = (props) => (
   <MUIPopover

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIAutoComplete from 'material-ui/AutoComplete';
+import MUIAutocomplete from '@material-ui/lab/Autocomplete';
 import { Field } from 'redux-form';
 import { injectIntl } from 'react-intl';
 
@@ -26,7 +26,7 @@ const renderAutoCompleteField = ({
   filter,
   meta: { touched, error },
 }) => (
-  <MUIAutoComplete
+  <MUIAutocomplete
     hintText={hint}
     floatingLabelText={label}
     floatingLabelFixed={false}

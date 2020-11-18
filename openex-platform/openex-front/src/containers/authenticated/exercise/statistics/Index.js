@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Bar, HorizontalBar, Line } from 'react-chartjs-2';
 
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import { getStatisticsForExercise } from '../../../../actions/Exercise';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
@@ -298,7 +298,7 @@ class Index extends Component {
           <p>
             <T>Interval:</T>
             <br />
-            <SelectField
+            <Select
               labelId="interval-select-label"
               name="interval"
               id="interval-select"
@@ -312,7 +312,7 @@ class Index extends Component {
               <MenuItem key={'6'} value={'6'} primaryText="6h" />
               <MenuItem key={'12'} value={'12'} primaryText="12h" />
               <MenuItem key={'24'} value={'24'} primaryText="24h" />
-            </SelectField>
+            </Select>
           </p>
 
           <Line

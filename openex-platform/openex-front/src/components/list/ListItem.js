@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIListItem from 'material-ui/List/ListItem';
+import MUIListItem from '@material-ui/core/ListItem';
 import { injectIntl } from 'react-intl';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import Theme from '../Theme';
 import * as Constants from '../../constants/ComponentTypes';
 

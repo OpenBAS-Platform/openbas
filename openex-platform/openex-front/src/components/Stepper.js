@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  Step as MUIStep,
-  Stepper as MUIStepper,
-  StepButton as MUIStepButton,
-  StepLabel as MUIStepLabel,
-} from 'material-ui/Stepper';
+import MUIStep from '@material-ui/core/Stepper';
+import MUIStepButton from '@material-ui/core/StepButton';
+import MUIStepLabel from '@material-ui/core/StepLabel';
 
 export const Step = (props) => (
   <MUIStep

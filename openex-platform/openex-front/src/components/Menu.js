@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIMenu from 'material-ui/Menu';
+import MUIMenu from '@material-ui/core/Menu';
 
 export const Menu = (props) => (
   <MUIMenu multiple={props.multiple}>{props.children}</MUIMenu>

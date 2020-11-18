@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
 import Theme from '../../../../components/Theme';
 import { T } from '../../../../components/I18n';
@@ -150,9 +150,9 @@ class Comcheck extends Component {
     this.props.fetchUsers();
     this.props.fetchOrganizations();
     // Scheduler listener
-    const initialStream = Rx.Observable.of(1); // Fetch on loading
-    const intervalStream = Rx.Observable.interval(FIVE_SECONDS); // Fetch every five seconds
-    const cancelStream = Rx.Observable.create((obs) => {
+    const initialStream = Observable.of(1); // Fetch on loading
+    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
+    const cancelStream = Observable.create((obs) => {
       this.cancelStreamEvent = () => {
         obs.next(1);
       };

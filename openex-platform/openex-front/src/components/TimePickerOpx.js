@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import TimePicker from "material-ui/TimePicker";
+import TimePicker from "@material-ui/pickers/TimePicker";
 import { injectIntl } from "react-intl";
 import PropTypes from "prop-types";
 import { timeFormat } from "../utils/Time";

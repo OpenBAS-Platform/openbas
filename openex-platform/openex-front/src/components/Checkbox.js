@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUICheckbox from 'material-ui/Checkbox';
+import MUICheckbox from '@material-ui/core/Checkbox';
 
 export const Checkbox = (props) => (
   <MUICheckbox

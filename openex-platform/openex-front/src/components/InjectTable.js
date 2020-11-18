@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import { injectIntl } from 'react-intl';
 import * as R from 'ramda';
-import {
-  Table,
-  TableBody,
-  TableHeader,
-  TableHeaderColumn,
-  TableRow,
-  TableRowColumn,
-} from 'material-ui/Table';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 import PropTypes from 'prop-types';
 import { timeDiff } from '../utils/Time';
 
@@ -80,9 +76,9 @@ class InjectTable extends Component {
               <TableRowColumn>{row.inject_title}</TableRowColumn>
               <TableRowColumn>{row.inject_type}</TableRowColumn>
               <TableRowColumn>
-                {`${new Date(row.inject_date).toLocaleDateString('fr-FR')
-                } ${
-                  new Date(row.inject_date).toLocaleTimeString('fr-FR')}`}
+                {`${new Date(row.inject_date).toLocaleDateString(
+                  'fr-FR',
+                )} ${new Date(row.inject_date).toLocaleTimeString('fr-FR')}`}
               </TableRowColumn>
             </TableRow>
           ))}

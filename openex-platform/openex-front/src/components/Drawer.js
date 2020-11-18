@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIDrawer from 'material-ui/Drawer';
-import { zIndex } from 'material-ui/styles';
+import MUIDrawer from '@material-ui/core/Drawer';
 
 export const Drawer = (props) => (
   <MUIDrawer
@@ -9,7 +8,7 @@ export const Drawer = (props) => (
     docked={props.docked}
     open={props.open}
     openSecondary={props.openSecondary}
-    style={{ zIndex: zIndex.drawer - props.zindex }}
+    style={{ zIndex: 2000 - props.zindex }}
     onRequestChange={props.onRequestChange}
   >
     {props.children}

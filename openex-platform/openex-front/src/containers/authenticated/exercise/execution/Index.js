@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import * as R from 'ramda';
 import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -115,8 +115,8 @@ class IndexExecution extends Component {
     this.props.fetchAudiences(this.props.exerciseId);
     this.props.fetchSubaudiences(this.props.exerciseId);
     this.props.fetchInjectTypes();
-    const initialStream = Rx.Observable.of(1); // Fetch on loading
-    const intervalStream = Rx.Observable.interval(FIVE_SECONDS); // Fetch every five seconds
+    const initialStream = Observable.of(1); // Fetch on loading
+    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
     this.subscription = initialStream
       .merge(intervalStream)
       .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId, true)) // Fetch only if previous call finished

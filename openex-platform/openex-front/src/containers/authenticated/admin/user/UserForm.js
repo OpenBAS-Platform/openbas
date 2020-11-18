@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import * as R from 'ramda';
-import AutoComplete from 'material-ui/AutoComplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 import { ToggleField } from '../../../../components/ToggleField';
@@ -59,7 +59,7 @@ class UserForm extends Component {
           label="Lastname"
         />
         <AutoCompleteField
-          filter={AutoComplete.caseInsensitiveFilter}
+          filter={Autocomplete.caseInsensitiveFilter}
           name="user_organization"
           fullWidth={true}
           type="text"

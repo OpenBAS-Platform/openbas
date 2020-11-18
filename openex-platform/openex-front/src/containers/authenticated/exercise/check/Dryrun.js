@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Rx from 'rxjs/Rx';
+import { Observable } from 'rxjs';
 import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
@@ -105,9 +105,9 @@ class IndexExerciseDryrun extends Component {
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId);
     // Scheduler listener
-    const initialStream = Rx.Observable.of(1); // Fetch on loading
-    const intervalStream = Rx.Observable.interval(FIVE_SECONDS); // Fetch every five seconds
-    const cancelStream = Rx.Observable.create((obs) => {
+    const initialStream = Observable.of(1); // Fetch on loading
+    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
+    const cancelStream = Observable.create((obs) => {
       this.cancelStreamEvent = () => {
         obs.next(1);
       };

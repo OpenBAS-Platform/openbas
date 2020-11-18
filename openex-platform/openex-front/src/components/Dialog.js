@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import MUIDialog from 'material-ui/Dialog';
+import MUIDialog from '@material-ui/core/Dialog';
 import { injectIntl } from 'react-intl';
 
 export const DialogIntl = (props) => (
