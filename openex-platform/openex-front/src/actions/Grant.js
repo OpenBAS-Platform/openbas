@@ -1,4 +1,5 @@
 import * as schema from './Schema';
+// eslint-disable-next-line import/no-cycle
 import { postReferential, delReferential } from '../utils/Action';
 
 export const addGrant = (groupId, data) => (dispatch) => postReferential(

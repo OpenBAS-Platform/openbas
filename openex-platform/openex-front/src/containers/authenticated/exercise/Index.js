@@ -18,24 +18,27 @@ import {
 } from '../../../components/list/ListItem';
 import { Icon } from '../../../components/Icon';
 import { FlatButton } from '../../../components/Button';
-import { fetchObjectives } from '../../../actions/Objective';
-import { fetchSubobjectives } from '../../../actions/Subobjective';
-import { fetchAudiences } from '../../../actions/Audience';
-import { fetchSubaudiences } from '../../../actions/Subaudience';
-import { fetchEvents } from '../../../actions/Event';
-import { fetchIncidents, fetchIncidentTypes } from '../../../actions/Incident';
-import { downloadFile } from '../../../actions/File';
-import { fetchAllInjects } from '../../../actions/Inject';
-import { fetchExercise } from '../../../actions/Exercise';
-import { fetchGroups } from '../../../actions/Group';
-import EventView from './scenario/event/EventView';
-import IncidentView from './scenario/event/IncidentView';
-import InjectView from './scenario/event/InjectView';
-import AudienceView from './audiences/audience/AudienceView';
-import ObjectiveView from './objective/ObjectiveView';
-import AudiencePopover from './AudiencePopover';
-import AudiencesPopover from './AudiencesPopover';
-import ScenarioPopover from './ScenarioPopover';
+// TODO @Sam fix dependency cycle
+/* eslint-disable */
+import { fetchObjectives } from "../../../actions/Objective";
+import { fetchSubobjectives } from "../../../actions/Subobjective";
+import { fetchAudiences } from "../../../actions/Audience";
+import { fetchSubaudiences } from "../../../actions/Subaudience";
+import { fetchEvents } from "../../../actions/Event";
+import { fetchIncidents, fetchIncidentTypes } from "../../../actions/Incident";
+import { downloadFile } from "../../../actions/File";
+import { fetchAllInjects } from "../../../actions/Inject";
+import { fetchExercise } from "../../../actions/Exercise";
+import { fetchGroups } from "../../../actions/Group";
+import EventView from "./scenario/event/EventView";
+import IncidentView from "./scenario/event/IncidentView";
+import InjectView from "./scenario/event/InjectView";
+import AudienceView from "./audiences/audience/AudienceView";
+import ObjectiveView from "./objective/ObjectiveView";
+import AudiencePopover from "./AudiencePopover";
+import AudiencesPopover from "./AudiencesPopover";
+import ScenarioPopover from "./ScenarioPopover";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -158,6 +161,7 @@ class IndexExercise extends Component {
     this.props.fetchExercise(this.props.exerciseId);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   selectIcon(type) {
     switch (type) {
       case 'email':
@@ -184,6 +188,7 @@ class IndexExercise extends Component {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -259,13 +264,14 @@ class IndexExercise extends Component {
     this.setState({ openInjectAudiences: false });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   render() {
     const viewEventActions = [
       <FlatButton
+        key="closeEvent"
         label="Close"
         primary={true}
         onClick={this.handleCloseViewEvent.bind(this)}
@@ -273,6 +279,7 @@ class IndexExercise extends Component {
     ];
     const viewIncidentActions = [
       <FlatButton
+        key="closeIncident"
         label="Close"
         primary={true}
         onClick={this.handleCloseViewIncident.bind(this)}
@@ -280,6 +287,7 @@ class IndexExercise extends Component {
     ];
     const viewInjectActions = [
       <FlatButton
+        key="closeInject"
         label="Close"
         primary={true}
         onClick={this.handleCloseViewInject.bind(this)}
@@ -287,6 +295,7 @@ class IndexExercise extends Component {
     ];
     const viewAudienceActions = [
       <FlatButton
+        key="CloseAudience"
         label="Close"
         primary={true}
         onClick={this.handleCloseViewAudience.bind(this)}
@@ -294,6 +303,7 @@ class IndexExercise extends Component {
     ];
     const viewObjectiveActions = [
       <FlatButton
+        key="closeObjective"
         label="Close"
         primary={true}
         onClick={this.handleCloseViewObjective.bind(this)}
@@ -301,6 +311,7 @@ class IndexExercise extends Component {
     ];
     const audiencesActions = [
       <FlatButton
+        key="closeAudiences"
         label="Close"
         primary={true}
         onClick={this.handleCloseAudiences.bind(this)}
@@ -308,6 +319,7 @@ class IndexExercise extends Component {
     ];
     const objectivesActions = [
       <FlatButton
+        key="closeObjectives"
         label="Close"
         primary={true}
         onClick={this.handleCloseObjectives.bind(this)}
@@ -315,6 +327,7 @@ class IndexExercise extends Component {
     ];
     const injectAudiencesActions = [
       <FlatButton
+        key="closeAudiences"
         label="Close"
         primary={true}
         onClick={this.handleCloseInjectAudiences.bind(this)}
@@ -337,17 +350,15 @@ class IndexExercise extends Component {
           )}
           <List>
             {R.take(3, this.props.objectives).map((objective) => (
-                <MainListItem
-                  key={objective.objective_id}
-                  onClick={this.handleOpenViewObjective.bind(this, objective)}
-                  primaryText={objective.objective_title}
-                  secondaryText={objective.objective_description}
-                  leftIcon={
-                    <Icon
-                      name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}
-                    />
-                  }
-                />
+              <MainListItem
+                key={objective.objective_id}
+                onClick={this.handleOpenViewObjective.bind(this, objective)}
+                primaryText={objective.objective_title}
+                secondaryText={objective.objective_description}
+                leftIcon={
+                  <Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG} />
+                }
+              />
             ))}
           </List>
           {this.props.objectives.length > 3 ? (
@@ -370,17 +381,17 @@ class IndexExercise extends Component {
           >
             <List>
               {this.props.objectives.map((objective) => (
-                  <MainSmallListItem
-                    key={objective.objective_id}
-                    onClick={this.handleOpenViewObjective.bind(this, objective)}
-                    primaryText={objective.objective_title}
-                    secondaryText={objective.objective_description}
-                    leftIcon={
-                      <Icon
-                        name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}
-                      />
-                    }
-                  />
+                <MainSmallListItem
+                  key={objective.objective_id}
+                  onClick={this.handleOpenViewObjective.bind(this, objective)}
+                  primaryText={objective.objective_title}
+                  secondaryText={objective.objective_description}
+                  leftIcon={
+                    <Icon
+                      name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}
+                    />
+                  }
+                />
               ))}
             </List>
           </Dialog>
@@ -412,9 +423,9 @@ class IndexExercise extends Component {
           )}
           <List>
             {R.take(3, this.props.audiences).map((audience) => {
-              const playersText = `${audience.audience_users_number
-              } ${
-                this.props.intl.formatMessage({ id: 'players' })}`;
+              const playersText = `${
+                audience.audience_users_number
+              } ${this.props.intl.formatMessage({ id: 'players' })}`;
               return (
                 <MainListItem
                   rightIconButton={
@@ -473,9 +484,9 @@ class IndexExercise extends Component {
           >
             <List>
               {this.props.audiences.map((audience) => {
-                const playersText = `${audience.audience_users_number
-                } ${
-                  this.props.intl.formatMessage({ id: 'players' })}`;
+                const playersText = `${
+                  audience.audience_users_number
+                } ${this.props.intl.formatMessage({ id: 'players' })}`;
                 return (
                   <MainSmallListItem
                     rightIconButton={
@@ -563,44 +574,48 @@ class IndexExercise extends Component {
             )(event.event_incidents);
 
             const nestedItems = incidents.map((incident) => {
-              const incident_id = R.propOr(
+              const incidentId = R.propOr(
                 Math.random(),
                 'incident_id',
                 incident,
               );
-              const incident_title = R.propOr('-', 'incident_title', incident);
-              const incident_story = R.propOr('-', 'incident_story', incident);
-              const incident_injects = R.propOr([], 'incident_injects', incident);
+              const incidentTitle = R.propOr('-', 'incident_title', incident);
+              const incidentStory = R.propOr('-', 'incident_story', incident);
+              const incidentInjects = R.propOr(
+                [],
+                'incident_injects',
+                incident,
+              );
 
               const injects = R.pipe(
                 R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
                 R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
-              )(incident_injects);
+              )(incidentInjects);
 
               const nestedItems2 = injects.map((inject) => {
-                const inject_id = R.propOr(Math.random(), 'inject_id', inject);
-                const inject_title = R.propOr('-', 'inject_title', inject);
-                const inject_type = R.propOr('-', 'inject_type', inject);
-                const inject_date = R.propOr(undefined, 'inject_date', inject);
+                const injectId = R.propOr(Math.random(), 'inject_id', inject);
+                const injectTitle = R.propOr('-', 'inject_title', inject);
+                const injectType = R.propOr('-', 'inject_type', inject);
+                const injectDate = R.propOr(undefined, 'inject_date', inject);
 
                 return (
                   <TertiaryListItem
-                    key={inject_id}
+                    key={injectId}
                     onClick={this.handleOpenViewInject.bind(this, inject)}
-                    leftIcon={this.selectIcon(inject_type)}
-                    primaryText={inject_title}
-                    secondaryText={dateFormat(inject_date)}
+                    leftIcon={this.selectIcon(injectType)}
+                    primaryText={injectTitle}
+                    secondaryText={dateFormat(injectDate)}
                   />
                 );
               });
               return (
                 <SecondaryListItem
                   initiallyOpen={false}
-                  key={incident_id}
+                  key={incidentId}
                   onClick={this.handleOpenViewIncident.bind(this, incident)}
                   leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS} />}
-                  primaryText={incident_title}
-                  secondaryText={incident_story}
+                  primaryText={incidentTitle}
+                  secondaryText={incidentStory}
                   nestedItems={nestedItems2}
                 />
               );
@@ -667,23 +682,23 @@ class IndexExercise extends Component {
         >
           <List>
             {this.state.currentInjectAudiences.map((data) => {
-              const audience = R.find((a) => a.audience_id === data.audience_id)(
-                this.props.audiences,
-              );
-              const audience_id = R.propOr(
+              const audience = R.find(
+                (a) => a.audience_id === data.audience_id,
+              )(this.props.audiences);
+              const audienceId = R.propOr(
                 data.audience_id,
                 'audience_id',
                 audience,
               );
-              const audience_name = R.propOr('-', 'audience_name', audience);
-              const audience_users = R.propOr([], 'audience_users', audience);
-              const playersText = `${audience_users.length
-              } ${
-                this.props.intl.formatMessage({ id: 'players' })}`;
+              const audienceName = R.propOr('-', 'audience_name', audience);
+              const audienceUsers = R.propOr([], 'audience_users', audience);
+              const playersText = `${
+                audienceUsers.length
+              } ${this.props.intl.formatMessage({ id: 'players' })}`;
 
               return (
                 <MainSmallListItem
-                  key={audience_id}
+                  key={audienceId}
                   onClick={this.handleOpenViewAudience.bind(this, audience)}
                   primaryText={
                     <div
@@ -694,7 +709,7 @@ class IndexExercise extends Component {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {audience_name}
+                      {audienceName}
                     </div>
                   }
                   secondaryText={
@@ -779,6 +794,7 @@ const getExerciseStartDate = (exercises) => {
   if (exercise.length > 0) {
     return exercise[0].exercise_start_date;
   }
+  return null;
 };
 
 const getExerciseEndDate = (exercises) => {
@@ -786,6 +802,7 @@ const getExerciseEndDate = (exercises) => {
   if (exercise.length > 0) {
     return exercise[0].exercise_end_date;
   }
+  return null;
 };
 
 const select = (state, ownProps) => {

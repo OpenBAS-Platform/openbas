@@ -1,19 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import * as R from 'ramda';
 import { dateFormat, timeDiff } from '../../utils/Time';
-import { fetchExercises } from '../../actions/Exercise';
-import { dataFile } from '../../actions/File';
-import * as Constants from '../../constants/ComponentTypes';
-import { AppBar } from '../../components/AppBar';
-import { Exercise } from '../../components/Exercise';
-import UserPopover from './UserPopover';
-import { redirectToHome } from '../../actions/Application';
-import { T } from '../../components/I18n';
-import { i18nRegister } from '../../utils/Messages';
-import CreateExercise from './exercise/CreateExercise';
+// TODO @Sam fix dependency cycle
+/* eslint-disable */
+import { fetchExercises } from "../../actions/Exercise";
+import { dataFile } from "../../actions/File";
+import * as Constants from "../../constants/ComponentTypes";
+import AppBar from "../../components/AppBar";
+import { Exercise } from "../../components/Exercise";
+import UserPopover from "./UserPopover";
+import { T } from "../../components/I18n";
+import { i18nRegister } from "../../utils/Messages";
+import CreateExercise from "./exercise/CreateExercise";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -46,7 +48,7 @@ class IndexAuthenticated extends Component {
   }
 
   redirectToHome() {
-    this.props.redirectToHome();
+    this.props.history.push('/private');
   }
 
   render() {
@@ -70,15 +72,15 @@ class IndexAuthenticated extends Component {
             ''
           )}
           {this.props.exercises.map((exercise) => {
-            const start_date = dateFormat(
+            const startDate = dateFormat(
               exercise.exercise_start_date,
               'MMM D, YYYY',
             );
-            const end_date = dateFormat(
+            const endDate = dateFormat(
               exercise.exercise_end_date,
               'MMM D, YYYY',
             );
-            const file_id = R.pathOr(
+            const fileId = R.pathOr(
               null,
               ['exercise_image', 'file_id'],
               exercise,
@@ -92,11 +94,11 @@ class IndexAuthenticated extends Component {
                   name={exercise.exercise_name}
                   subtitle={exercise.exercise_subtitle}
                   description={exercise.exercise_description}
-                  startDate={start_date}
-                  endDate={end_date}
+                  startDate={startDate}
+                  endDate={endDate}
                   status={exercise.exercise_status}
                   organizer={exercise.exercise_organizer}
-                  image_id={file_id}
+                  image_id={fileId}
                 />
               </Link>
             );
@@ -141,6 +143,6 @@ const select = (state) => {
   };
 };
 
-export default connect(select, { redirectToHome, fetchExercises, dataFile })(
-  IndexAuthenticated,
+export default withRouter(
+  connect(select, { fetchExercises, dataFile })(IndexAuthenticated),
 );

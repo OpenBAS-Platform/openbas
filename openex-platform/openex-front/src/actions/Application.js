@@ -1,6 +1,8 @@
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-import { api } from '../App';
+// eslint-disable-next-line import/no-cycle
+import { api, history } from '../App';
+// eslint-disable-next-line import/no-cycle
 import { postReferential, getReferential } from '../utils/Action';
 
 export const askToken = (username, password) => (dispatch) => {
@@ -9,8 +11,8 @@ export const askToken = (username, password) => (dispatch) => {
     schema.token,
     '/api/auth',
     data,
-  )(dispatch).then((data) => {
-    dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data });
+  )(dispatch).then((finalData) => {
+    dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: finalData });
   });
 };
 
@@ -61,39 +63,43 @@ export const savedDismiss = () => (dispatch) => {
 };
 
 export const redirectToHome = () => (dispatch) => {
-  dispatch(push('/'));
+  dispatch(history.push('/'));
 };
 
 export const redirectToAdmin = () => (dispatch) => {
-  dispatch(push('/private/admin/index'));
+  dispatch(history.push('/private/admin/index'));
 };
 
 export const redirectToExercise = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}`));
+  dispatch(history.push(`/private/exercise/${exerciseId}`));
 };
 
 export const redirectToScenario = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/scenario`));
+  dispatch(history.push(`/private/exercise/${exerciseId}/scenario`));
 };
 
 export const redirectToAudiences = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/audiences`));
+  dispatch(history.push(`/private/exercise/${exerciseId}/audiences`));
 };
 
 export const redirectToEvent = (exerciseId, eventId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/scenario/${eventId}`));
+  dispatch(history.push(`/private/exercise/${exerciseId}/scenario/${eventId}`));
 };
 
 export const redirectToChecks = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/checks`));
+  dispatch(history.push(`/private/exercise/${exerciseId}/checks`));
 };
 
 export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
   dispatch(
-    push(`/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`),
+    history.push(
+      `/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`,
+    ),
   );
 };
 
 export const redirectToDryrun = (exerciseId, dryrunId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/checks/dryrun/${dryrunId}`));
+  dispatch(
+    history.push(`/private/exercise/${exerciseId}/checks/dryrun/${dryrunId}`),
+  );
 };

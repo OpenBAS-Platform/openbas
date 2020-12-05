@@ -5,8 +5,9 @@ import List from '@material-ui/core/List';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Drawer } from '../../../../components/Drawer';
 import { ListItemLink } from '../../../../components/list/ListItem';
-import { AppBar } from '../../../../components/AppBar';
+import AppBar from '../../../../components/AppBar';
 import { Icon } from '../../../../components/Icon';
+// eslint-disable-next-line import/no-cycle
 import {
   redirectToExercise,
   toggleLeftBar,

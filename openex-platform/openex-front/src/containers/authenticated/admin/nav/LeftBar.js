@@ -5,13 +5,14 @@ import List from '@material-ui/core/List';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Drawer } from '../../../../components/Drawer';
 import { ListItemLink } from '../../../../components/list/ListItem';
-import { AppBar } from '../../../../components/AppBar';
+import AppBar from '../../../../components/AppBar';
 import { Icon } from '../../../../components/Icon';
+import { i18nRegister } from '../../../../utils/Messages';
+// eslint-disable-next-line import/no-cycle
 import {
   redirectToAdmin,
   toggleLeftBar,
 } from '../../../../actions/Application';
-import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
   fr: {

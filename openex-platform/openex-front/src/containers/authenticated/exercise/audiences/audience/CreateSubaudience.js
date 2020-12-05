@@ -4,15 +4,18 @@ import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import * as Constants from '../../../../../constants/ComponentTypes';
+import AppBar from '../../../../../components/AppBar';
+import { Dialog } from '../../../../../components/Dialog';
+import {
+  FlatButton,
+  ActionButtonCreate,
+} from '../../../../../components/Button';
+import SubaudienceForm from './SubaudienceForm';
+// eslint-disable-next-line import/no-cycle
 import {
   addSubaudience,
   selectSubaudience,
 } from '../../../../../actions/Subaudience';
-import { Dialog } from '../../../../../components/Dialog';
-import { FlatButton, ActionButtonCreate } from '../../../../../components/Button';
-import SubaudienceForm from './SubaudienceForm';
-
-import { AppBar } from '../../../../../components/AppBar';
 
 i18nRegister({
   fr: {

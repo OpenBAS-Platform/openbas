@@ -26,8 +26,11 @@ import { locale } from './utils/BrowserLanguage';
 import { i18n, debug } from './utils/Messages';
 import referential, { entitiesInitializer } from './reducers/Referential';
 import * as Constants from './constants/ActionTypes';
+// TODO @Sam fix dependency cycle
+/* eslint-disable */
 import RootAnonymous from './containers/anonymous/Root';
 import RootAuthenticated from './containers/authenticated/Root';
+/* eslint-enable */
 import app from './reducers/App';
 import screen from './reducers/Screen';
 
@@ -43,8 +46,11 @@ const initialState = {
 
 // Console patch in dev temporary disable react intl failure
 if (process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line no-console
   const originalConsoleError = console.error;
+  // eslint-disable-next-line no-console
   if (console.error === originalConsoleError) {
+    // eslint-disable-next-line no-console
     console.error = (...args) => {
       if (args && args[0].indexOf('[React Intl]') === 0) return;
       originalConsoleError.call(console, ...args);
@@ -53,25 +59,25 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 let store;
-const baseHistory = createBrowserHistory();
+export const history = createBrowserHistory();
 const logger = createLogger({
   predicate: (getState, action) => !action.type.startsWith('DATA_FETCH')
     && !action.type.startsWith('@@redux-form'),
 });
 // Only compose the store if devTools are available
 const rootReducer = combineReducers({
+  router: connectRouter(history),
+  form: formReducer,
   app,
   referential,
   screen,
-  router: connectRouter(baseHistory),
-  form: formReducer,
 });
 if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
   store = createStore(
     rootReducer,
     initialState,
     compose(
-      applyMiddleware(routerMiddleware(baseHistory), thunk, logger),
+      applyMiddleware(routerMiddleware(history), thunk, logger),
       window.devToolsExtension && window.devToolsExtension(),
     ),
   );
@@ -79,7 +85,7 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
   store = createStore(
     rootReducer,
     initialState,
-    applyMiddleware(routerMiddleware(baseHistory), thunk),
+    applyMiddleware(routerMiddleware(history), thunk),
   );
 }
 
@@ -113,7 +119,9 @@ export const api = (schema) => {
         store.dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS });
         return Promise.reject(res.data);
       }
+      // eslint-disable-next-line no-underscore-dangle
       if (res.status === 503 && err.config && !err.config.__isRetryRequest) {
+        // eslint-disable-next-line no-param-reassign,no-underscore-dangle
         err.config.__isRetryRequest = true;
         return axios(err.config);
       }
@@ -173,12 +181,13 @@ const select = (state) => {
 const ConnectedIntl = connect(select)(IntlWrapper);
 
 class App extends Component {
+  // eslint-disable-next-line class-methods-use-this
   render() {
     return (
       <ThemeProvider theme={createMuiTheme(theme)}>
         <ConnectedIntl store={store}>
           <Provider store={store}>
-            <ConnectedRouter history={baseHistory}>
+            <ConnectedRouter history={history}>
               <Switch>
                 <Redirect exact from="/" to="/private" />
                 <Route

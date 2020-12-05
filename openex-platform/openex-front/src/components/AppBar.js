@@ -29,7 +29,7 @@ const appBarTitleStyle = {
   },
 };
 
-export const AppBar = (props) => (
+const AppBar = (props) => (
   <MUIAppBar
     title={props.title}
     onTitleClick={props.onTitleTouchTap}
@@ -51,3 +51,5 @@ AppBar.propTypes = {
   iconElementLeft: PropTypes.element,
   showMenuIconButton: PropTypes.bool,
 };
+
+export default AppBar;

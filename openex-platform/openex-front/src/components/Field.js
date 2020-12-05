@@ -7,10 +7,10 @@ import CKEditor4 from 'ckeditor4-react';
 
 const styles = {
   global: {
-    marginBottom: '10px',
+    marginBottom: 20,
   },
   input: {
-    borderRadius: '5px',
+    borderRadius: 5,
   },
   richText: {
     header: {
@@ -35,14 +35,14 @@ const renderTextField = ({
   multiLine,
   rows,
   type,
-  hint,
+  placeholder,
   onFocus,
   onClick,
   meta: { touched, error },
 }) => (
   <MUITextField
-    hintText={hint}
-    floatingLabelText={label}
+    placeholder={placeholder}
+    label={label}
     floatingLabelFixed={false}
     errorText={touched && error}
     style={styles.global}
@@ -63,7 +63,7 @@ renderTextField.propTypes = {
   multiLine: PropTypes.bool,
   rows: PropTypes.number,
   type: PropTypes.string,
-  hint: PropTypes.string,
+  placeholder: PropTypes.string,
   label: PropTypes.string,
   name: PropTypes.string,
   meta: PropTypes.object,
@@ -78,7 +78,11 @@ export const FormFieldIntl = (props) => (
     label={
       props.label ? props.intl.formatMessage({ id: props.label }) : undefined
     }
-    hint={props.hint ? props.intl.formatMessage({ id: props.hint }) : undefined}
+    placeholder={
+      props.placeholder
+        ? props.intl.formatMessage({ id: props.placeholder })
+        : undefined
+    }
     fullWidth={props.fullWidth}
     multiLine={props.multiLine}
     rows={props.rows}
@@ -94,7 +98,7 @@ export const FormFieldIntl = (props) => (
 export const FormField = injectIntl(FormFieldIntl);
 
 FormFieldIntl.propTypes = {
-  hint: PropTypes.string,
+  placeholder: PropTypes.string,
   label: PropTypes.string,
   intl: PropTypes.object,
   name: PropTypes.string,

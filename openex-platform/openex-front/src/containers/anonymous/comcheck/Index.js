@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+// eslint-disable-next-line import/no-cycle
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
-import {
-  Toolbar,
-  ToolbarGroup,
-  ToolbarTitle,
-} from '../../../components/Toolbar';
+import { Toolbar } from '../../../components/Toolbar';
 import { i18nRegister } from '../../../utils/Messages';
 import * as Constants from '../../../constants/ComponentTypes';
 import { dateFormat } from '../../../utils/Time';
@@ -37,8 +34,8 @@ class IndexComcheck extends Component {
   }
 
   render() {
-    const status_state = R.propOr(0, 'status_state', this.props.comcheck_status);
-    const status_last_update = R.propOr(
+    const statusState = R.propOr(0, 'status_state', this.props.comcheck_status);
+    const statusLastUpdate = R.propOr(
       undefined,
       'status_last_update',
       this.props.comcheck_status,
@@ -47,18 +44,13 @@ class IndexComcheck extends Component {
     return (
       <div style={styles.comcheck}>
         <Toolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
-          <ToolbarGroup>
-            <ToolbarTitle
-              text="Communication check"
-              type={Constants.TOOLBAR_TYPE_LOGIN}
-            />
-          </ToolbarGroup>
+          Communication check
         </Toolbar>
         <br />
         Your communication check is{' '}
-        <strong>{status_state ? 'successfull' : 'failed'}</strong>.<br />
-        {status_last_update !== undefined
-          ? `Verification done at ${dateFormat(status_last_update)}`
+        <strong>{statusState ? 'successfull' : 'failed'}</strong>.<br />
+        {statusLastUpdate !== undefined
+          ? `Verification done at ${dateFormat(statusLastUpdate)}`
           : ''}
       </div>
     );

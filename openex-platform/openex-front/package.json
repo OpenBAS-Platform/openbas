@@ -35,7 +35,8 @@
     "redux-logger": "^3.0.6",
     "reselect": "^4.0.0",
     "rxjs": "^6.6.3",
-    "seamless-immutable": "^7.1.4"
+    "seamless-immutable": "^7.1.4",
+    "typeface-roboto": "^1.1.13"
   },
   "devDependencies": {
     "react-scripts": "4.0.0",

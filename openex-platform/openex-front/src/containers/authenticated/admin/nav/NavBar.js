@@ -8,7 +8,8 @@ import { List } from '../../../../components/List';
 import { CircularSpinner } from '../../../../components/Spinner';
 import { IconListItemLink } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
-import { AppBar } from '../../../../components/AppBar';
+import AppBar from '../../../../components/AppBar';
+// eslint-disable-next-line import/no-cycle
 import { toggleLeftBar } from '../../../../actions/Application';
 
 const styles = {

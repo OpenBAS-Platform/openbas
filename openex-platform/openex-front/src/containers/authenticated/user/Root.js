@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router';
 import * as Constants from '../../../constants/ComponentTypes';
-import { AppBar } from '../../../components/AppBar';
+import AppBar from '../../../components/AppBar';
 import UserPopover from '../UserPopover';
 import { redirectToHome } from '../../../actions/Application';
 import IndexUserProfile from './profile/Index';

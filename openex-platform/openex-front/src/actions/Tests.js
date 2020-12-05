@@ -1,4 +1,5 @@
 import * as schema from './Schema';
+// eslint-disable-next-line import/no-cycle
 import { postReferential, getReferential } from '../utils/Action';
 
 export const createExerciseTest = (data) => (dispatch) => postReferential(

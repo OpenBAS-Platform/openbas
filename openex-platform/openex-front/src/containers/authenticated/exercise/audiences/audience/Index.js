@@ -13,7 +13,7 @@ import { fetchAudiences } from '../../../../../actions/Audience';
 import { fetchSubaudiences } from '../../../../../actions/Subaudience';
 import { fetchComchecks } from '../../../../../actions/Comcheck';
 import { FlatButton } from '../../../../../components/Button';
-import { Toolbar, ToolbarTitle } from '../../../../../components/Toolbar';
+import { Toolbar } from '../../../../../components/Toolbar';
 import { Dialog } from '../../../../../components/Dialog';
 import Theme from '../../../../../components/Theme';
 import { List } from '../../../../../components/List';

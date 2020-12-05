@@ -4,14 +4,14 @@ import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { addIncident, selectIncident } from '../../../../../actions/Incident';
 import { DialogTitleElement } from '../../../../../components/Dialog';
 import { FlatButton, ActionButtonCreate } from '../../../../../components/Button';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
-
-import { AppBar } from '../../../../../components/AppBar';
+import AppBar from '../../../../../components/AppBar';
 import IncidentForm from './IncidentForm';
 import IncidentSubobjectives from './IncidentSubobjectives';
+// eslint-disable-next-line import/no-cycle
+import { addIncident, selectIncident } from '../../../../../actions/Incident';
 
 i18nRegister({
   fr: {

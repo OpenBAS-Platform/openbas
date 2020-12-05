@@ -43,16 +43,22 @@ const LoginForm = (props) => {
       <FormField
         name="username"
         type="text"
-        hint="Email address"
+        label="Email address"
         fullWidth={true}
       />
       <FormField
         name="password"
         type="password"
-        hint="Password"
+        label="Password"
         fullWidth={true}
       />
-      <Button type="submit" disabled={pristine || submitting} label="Sign in" />
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={pristine || submitting}
+        label="Sign in"
+        onClick={handleSubmit(onSubmit)}
+      />
     </form>
   );
 };

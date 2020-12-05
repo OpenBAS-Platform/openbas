@@ -6,7 +6,7 @@ import { dateFormat } from '../../../../../utils/Time';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import Theme from '../../../../../components/Theme';
-import { Toolbar, ToolbarTitle } from '../../../../../components/Toolbar';
+import { Toolbar } from '../../../../../components/Toolbar';
 import { Dialog } from '../../../../../components/Dialog';
 import { List } from '../../../../../components/List';
 import {

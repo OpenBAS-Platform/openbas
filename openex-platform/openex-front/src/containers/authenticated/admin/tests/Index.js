@@ -6,6 +6,8 @@ import { Paper } from '../../../../components/Paper';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Button } from '../../../../components/Button';
 import { i18nRegister } from '../../../../utils/Messages';
+// TODO @Sam fix dependency cycle
+/* eslint-disable */
 import { createExerciseTest, deleteUsersTest } from '../../../../actions/Tests';
 import {
   deleteExercise,
@@ -13,6 +15,7 @@ import {
   importExerciseFromPath,
 } from '../../../../actions/Exercise';
 import { addDryrun } from '../../../../actions/Dryrun';
+/* eslint-enable */
 
 i18nRegister({
   fr: {

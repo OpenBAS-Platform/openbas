@@ -114,13 +114,13 @@ class ShiftForm extends Component {
   }
 
   getAllInject() {
-    const allInject = R.pipe(
+    return R.pipe(
       R.values,
       R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
     )(this.props.injects);
-    return allInject;
   }
 
+  /* eslint-disable react/no-string-refs */
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>

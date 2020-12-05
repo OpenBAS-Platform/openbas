@@ -3,17 +3,20 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { i18nRegister } from '../../../utils/Messages';
 import { T } from '../../../components/I18n';
-import { redirectToAdmin, toggleLeftBar } from '../../../actions/Application';
-import * as Constants from '../../../constants/ComponentTypes';
-import { AppBar } from '../../../components/AppBar';
-import NavBar from './nav/NavBar';
-import LeftBar from './nav/LeftBar';
-import UserPopover from '../UserPopover';
-import {Route, Switch} from "react-router";
+// TODO @Sam fix dependency cycle
+/* eslint-disable */
+import { redirectToAdmin, toggleLeftBar } from "../../../actions/Application";
+import * as Constants from "../../../constants/ComponentTypes";
+import AppBar from "../../../components/AppBar";
+import NavBar from "./nav/NavBar";
+import LeftBar from "./nav/LeftBar";
+import UserPopover from "../UserPopover";
+import { Route, Switch } from "react-router";
 import IndexAdmin from "./Index";
 import IndexAdminUsers from "./user/Index";
 import IndexAdminGroups from "./group/Index";
 import IndexAdminTests from "./tests/Index";
+/* eslint-enable */
 
 i18nRegister({
   fr: {

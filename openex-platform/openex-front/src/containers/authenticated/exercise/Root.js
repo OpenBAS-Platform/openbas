@@ -7,7 +7,7 @@ import {
   toggleLeftBar,
 } from '../../../actions/Application';
 import * as Constants from '../../../constants/ComponentTypes';
-import { AppBar } from '../../../components/AppBar';
+import AppBar from '../../../components/AppBar';
 import { Chip } from '../../../components/Chip';
 import { T } from '../../../components/I18n';
 import NavBar from './nav/NavBar';

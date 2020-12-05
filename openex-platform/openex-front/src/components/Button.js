@@ -44,14 +44,16 @@ const buttonStyle = {
 
 const ButtonIntl = (props) => (
   <MUIButton
-    secondary={true}
-    label={props.intl.formatMessage({ id: props.label })}
     type={props.type}
+    color="secondary"
+    variant={props.variant}
     disabled={props.disabled}
     onClick={props.onClick}
     style={styles.RaisedButton}
     containerElement={props.containerElement}
-  />
+  >
+    {props.intl.formatMessage({ id: props.label })}
+  </MUIButton>
 );
 export const Button = injectIntl(ButtonIntl);
 
@@ -127,14 +129,15 @@ LinkButtonIntl.propTypes = {
 };
 
 export const FloatingActionsButtonCreate = (props) => (
-  <MUIFloatingActionButton
+  <MUIButton
+    variant="floating"
     secondary={true}
     disabled={props.disabled}
     onClick={props.onClick}
     style={buttonStyle[props.type]}
   >
     <Add />
-  </MUIFloatingActionButton>
+  </MUIButton>
 );
 
 FloatingActionsButtonCreate.propTypes = {
