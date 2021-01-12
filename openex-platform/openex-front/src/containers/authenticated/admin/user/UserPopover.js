@@ -14,7 +14,6 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../components/menu/MenuItem';
-// eslint-disable-next-line import/no-cycle
 import { updateUser, deleteUser } from '../../../../actions/User';
 import UserForm from './UserForm';
 import UserPasswordForm from './UserPasswordForm';

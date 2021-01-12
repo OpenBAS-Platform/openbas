@@ -1,5 +1,4 @@
 import * as schema from './Schema';
-// eslint-disable-next-line import/no-cycle
 import {
   getReferential,
   putReferential,

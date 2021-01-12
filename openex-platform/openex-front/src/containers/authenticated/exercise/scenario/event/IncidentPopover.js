@@ -15,7 +15,6 @@ import {
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
-// eslint-disable-next-line import/no-cycle
 import {
   updateIncident,
   deleteIncident,

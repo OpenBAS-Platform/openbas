@@ -7,7 +7,6 @@ import { FormField, CKEditorField } from '../../../../../components/Field';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { FlatButton, Button } from '../../../../../components/Button';
-// eslint-disable-next-line import/no-cycle
 import DocumentGallery from '../../../DocumentGallery';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { Dialog } from '../../../../../components/Dialog';

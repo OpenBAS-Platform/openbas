@@ -11,7 +11,6 @@ import { Dialog } from '../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemButton } from '../../../components/menu/MenuItem';
-// eslint-disable-next-line import/no-cycle
 import { updateAudience } from '../../../actions/Audience';
 
 const style = {

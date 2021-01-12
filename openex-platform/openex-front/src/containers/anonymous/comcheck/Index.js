@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-// eslint-disable-next-line import/no-cycle
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
 import { Toolbar } from '../../../components/Toolbar';
 import { i18nRegister } from '../../../utils/Messages';

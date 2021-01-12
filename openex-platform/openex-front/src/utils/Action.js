@@ -2,9 +2,8 @@ import { SubmissionError } from 'redux-form';
 import Immutable from 'seamless-immutable';
 import * as R from 'ramda';
 import FileSaver from 'file-saver';
-// eslint-disable-next-line import/no-cycle
-import { api } from '../App';
 import * as Constants from '../constants/ActionTypes';
+import { api } from '../Network';
 
 const submitErrors = (data) => {
   const errorsExtractor = R.pipe(

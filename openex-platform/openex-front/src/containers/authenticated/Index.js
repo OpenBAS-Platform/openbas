@@ -4,18 +4,15 @@ import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import * as R from 'ramda';
 import { dateFormat, timeDiff } from '../../utils/Time';
-// TODO @Sam fix dependency cycle
-/* eslint-disable */
-import { fetchExercises } from "../../actions/Exercise";
-import { dataFile } from "../../actions/File";
-import * as Constants from "../../constants/ComponentTypes";
-import AppBar from "../../components/AppBar";
-import { Exercise } from "../../components/Exercise";
-import UserPopover from "./UserPopover";
-import { T } from "../../components/I18n";
-import { i18nRegister } from "../../utils/Messages";
-import CreateExercise from "./exercise/CreateExercise";
-/* eslint-enable */
+import { fetchExercises } from '../../actions/Exercise';
+import { dataFile } from '../../actions/File';
+import * as Constants from '../../constants/ComponentTypes';
+import AppBar from '../../components/AppBar';
+import { Exercise } from '../../components/Exercise';
+import UserPopover from './UserPopover';
+import { T } from '../../components/I18n';
+import { i18nRegister } from '../../utils/Messages';
+import CreateExercise from './exercise/CreateExercise';
 
 i18nRegister({
   fr: {

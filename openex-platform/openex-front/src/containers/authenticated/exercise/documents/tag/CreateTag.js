@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { Dialog } from '../../../../../components/Dialog';
 import { FlatButton } from '../../../../../components/Button';
-// eslint-disable-next-line import/no-cycle
 import { addTag } from '../../../../../actions/Tag';
 import TagForm from './TagForm';
 

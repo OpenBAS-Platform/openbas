@@ -9,7 +9,6 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
-// eslint-disable-next-line import/no-cycle
 import { addLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 

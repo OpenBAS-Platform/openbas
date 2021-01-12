@@ -8,7 +8,6 @@ import { Menu } from '../../../components/Menu';
 import { IconButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemLink } from '../../../components/menu/MenuItem';
-// eslint-disable-next-line import/no-cycle
 import { downloadExportAudiences } from '../../../actions/Audience';
 
 const style = {

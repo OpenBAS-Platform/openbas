@@ -12,26 +12,23 @@ import { i18nRegister } from '../../utils/Messages';
 import { timeDiff } from '../../utils/Time';
 import * as Constants from '../../constants/ComponentTypes';
 import { SearchField } from '../../components/SimpleTextField';
-// TODO @Sam fix dependency cycle
-/* eslint-disable */
-import { fetchTags } from "../../actions/Tag";
+import { fetchTags } from '../../actions/Tag';
 import {
   addDocument,
   searchDocument,
   getDocument,
   getDocumentTags,
   getDocumentTagsExercise,
-} from "../../actions/Document";
-import { fetchExercises } from "../../actions/Exercise";
+} from '../../actions/Document';
+import { fetchExercises } from '../../actions/Exercise';
 import {
   TagListe,
   TagExerciseListe,
   TagAddToFilter,
   TagSmallListe,
   TagSmallExerciseListe,
-} from "./exercise/documents/component/Tag";
-import { FlatButton } from "../../components/Button";
-/* eslint-enable */
+} from './exercise/documents/component/Tag';
+import { FlatButton } from '../../components/Button';
 
 const styles = {
   container: {

@@ -1,6 +1,5 @@
 import * as schema from './Schema';
 import * as Constants from '../constants/ActionTypes';
-// eslint-disable-next-line import/no-cycle
 import {
   getReferential,
   postReferential,

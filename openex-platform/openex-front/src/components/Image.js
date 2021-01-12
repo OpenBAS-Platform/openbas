@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// eslint-disable-next-line import/no-cycle
 import { dataFile } from '../actions/File';
 
 // Region background Image
