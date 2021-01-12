@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 import { askToken, checkKerberos } from '../../../actions/Application';
 import { T } from '../../../components/I18n';
 import { Toolbar } from '../../../components/Toolbar';
@@ -13,8 +12,6 @@ import * as Constants from '../../../constants/ComponentTypes';
 i18nRegister({
   fr: {
     Login: 'Identification',
-    'Login: demo@openex.io / Password: demo':
-      "Nom d'utilisateur : demo@openex.io / Mot de passe : demo",
   },
 });
 
@@ -36,6 +33,12 @@ const styles = () => ({
     width: 150,
     margin: '0px 0px 20px 0px',
   },
+  subtitle: {
+    color: '#ffffff',
+    fontWeight: 400,
+    fontSize: 18,
+    marginTop: 10,
+  },
 });
 
 class Login extends Component {
@@ -55,9 +58,7 @@ class Login extends Component {
         <img src="images/logo_openex.png" alt="logo" className={classes.logo} />
         <div className={classes.login}>
           <Toolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
-            <Typography variant="h6" gutterBottom={true}>
-              {<T>Login</T>}
-            </Typography>
+            <div className={classes.subtitle}>{<T>Login</T>}</div>
           </Toolbar>
           <LoginForm onSubmit={this.onSubmit.bind(this)} />
         </div>

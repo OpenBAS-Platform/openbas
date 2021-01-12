@@ -11,6 +11,7 @@ i18nRegister({
     'Email address': 'Adresse email',
     Password: 'Mot de passe',
     'Sign in': 'Se connecter',
+    'Authentication failed': "Echec de l'authentification",
   },
 });
 
@@ -35,12 +36,6 @@ const LoginForm = (props) => {
   } = props;
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={style}>
-      {error && (
-        <div>
-          <strong>{error}</strong>
-          <br />
-        </div>
-      )}
       <TextField
         name="username"
         type="text"
@@ -53,6 +48,8 @@ const LoginForm = (props) => {
         label="Password"
         fullWidth={true}
         style={{ marginTop: 20 }}
+        error={!!error}
+        helperText={error ? <T>Authentication failed</T> : ''}
       />
       <Button
         type="submit"
@@ -77,4 +74,5 @@ LoginForm.propTypes = {
 
 export default reduxForm({
   form: 'LoginForm',
+  validate,
 })(LoginForm);
