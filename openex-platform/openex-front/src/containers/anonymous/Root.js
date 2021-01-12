@@ -1,13 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router';
+import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
 import NotFound from './NotFound';
-// TODO @Sam fix dependency cycle
-/* eslint-disable */
-import Login from "./login/Login";
-import IndexComcheck from "./comcheck/Index";
-import { UserIsNotAuthenticated } from "../../App";
-/* eslint-enable */
+import Login from './login/Login';
+import IndexComcheck from './comcheck/Index';
+
+const UserIsNotAuthenticated = connectedRouterRedirect({
+  redirectPath: '/private',
+  authenticatedSelector: (state) => state.app.logged === null || state.app.logged === undefined,
+  wrapperDisplayName: 'UserIsNotAuthenticated',
+  allowRedirectBack: false,
+});
 
 class RootAnonymous extends Component {
   // eslint-disable-next-line class-methods-use-this

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../utils/Messages';
-// eslint-disable-next-line import/no-cycle
 import { addUser } from '../../../../actions/User';
 import { Dialog } from '../../../../components/Dialog';
 import {

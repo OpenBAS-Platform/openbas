@@ -1,8 +1,6 @@
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-// eslint-disable-next-line import/no-cycle
-import { api, history } from '../App';
-// eslint-disable-next-line import/no-cycle
+import { history } from '../Store';
 import { postReferential, getReferential } from '../utils/Action';
 
 export const askToken = (username, password) => (dispatch) => {
@@ -34,21 +32,6 @@ export const fetchToken = () => (dispatch, getState) => getReferential(
   schema.token,
   `/api/tokens/${getState().app.logged.token}`,
 )(dispatch);
-
-export const fetchWorkerStatus = () => (dispatch) => api()
-  .get('/api/worker_status')
-  .then((response) => {
-    dispatch({
-      type: Constants.DATA_FETCH_WORKER_STATUS,
-      payload: response.data,
-    });
-  })
-  .catch(() => {
-    dispatch({
-      type: Constants.DATA_FETCH_WORKER_STATUS,
-      payload: { status: 'ERROR' },
-    });
-  });
 
 export const logout = () => (dispatch) => {
   dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS });

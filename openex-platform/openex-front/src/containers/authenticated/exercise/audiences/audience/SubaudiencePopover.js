@@ -16,7 +16,6 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
-// eslint-disable-next-line import/no-cycle
 import {
   updateSubaudience,
   selectSubaudience,

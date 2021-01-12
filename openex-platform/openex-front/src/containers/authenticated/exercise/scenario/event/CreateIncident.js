@@ -13,7 +13,6 @@ import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
 import AppBar from '../../../../../components/AppBar';
 import IncidentForm from './IncidentForm';
 import IncidentSubobjectives from './IncidentSubobjectives';
-// eslint-disable-next-line import/no-cycle
 import { addIncident, selectIncident } from '../../../../../actions/Incident';
 
 i18nRegister({

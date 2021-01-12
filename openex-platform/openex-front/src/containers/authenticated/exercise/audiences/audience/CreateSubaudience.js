@@ -11,7 +11,6 @@ import {
   ActionButtonCreate,
 } from '../../../../../components/Button';
 import SubaudienceForm from './SubaudienceForm';
-// eslint-disable-next-line import/no-cycle
 import {
   addSubaudience,
   selectSubaudience,

@@ -18,27 +18,24 @@ import {
 } from '../../../components/list/ListItem';
 import { Icon } from '../../../components/Icon';
 import { FlatButton } from '../../../components/Button';
-// TODO @Sam fix dependency cycle
-/* eslint-disable */
-import { fetchObjectives } from "../../../actions/Objective";
-import { fetchSubobjectives } from "../../../actions/Subobjective";
-import { fetchAudiences } from "../../../actions/Audience";
-import { fetchSubaudiences } from "../../../actions/Subaudience";
-import { fetchEvents } from "../../../actions/Event";
-import { fetchIncidents, fetchIncidentTypes } from "../../../actions/Incident";
-import { downloadFile } from "../../../actions/File";
-import { fetchAllInjects } from "../../../actions/Inject";
-import { fetchExercise } from "../../../actions/Exercise";
-import { fetchGroups } from "../../../actions/Group";
-import EventView from "./scenario/event/EventView";
-import IncidentView from "./scenario/event/IncidentView";
-import InjectView from "./scenario/event/InjectView";
-import AudienceView from "./audiences/audience/AudienceView";
-import ObjectiveView from "./objective/ObjectiveView";
-import AudiencePopover from "./AudiencePopover";
-import AudiencesPopover from "./AudiencesPopover";
-import ScenarioPopover from "./ScenarioPopover";
-/* eslint-enable */
+import { fetchObjectives } from '../../../actions/Objective';
+import { fetchSubobjectives } from '../../../actions/Subobjective';
+import { fetchAudiences } from '../../../actions/Audience';
+import { fetchSubaudiences } from '../../../actions/Subaudience';
+import { fetchEvents } from '../../../actions/Event';
+import { fetchIncidents, fetchIncidentTypes } from '../../../actions/Incident';
+import { downloadFile } from '../../../actions/File';
+import { fetchAllInjects } from '../../../actions/Inject';
+import { fetchExercise } from '../../../actions/Exercise';
+import { fetchGroups } from '../../../actions/Group';
+import EventView from './scenario/event/EventView';
+import IncidentView from './scenario/event/IncidentView';
+import InjectView from './scenario/event/InjectView';
+import AudienceView from './audiences/audience/AudienceView';
+import ObjectiveView from './objective/ObjectiveView';
+import AudiencePopover from './AudiencePopover';
+import AudiencesPopover from './AudiencesPopover';
+import ScenarioPopover from './ScenarioPopover';
 
 i18nRegister({
   fr: {

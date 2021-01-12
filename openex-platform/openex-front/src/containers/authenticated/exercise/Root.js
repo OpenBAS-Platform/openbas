@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Route, Switch } from 'react-router';
-// eslint-disable-next-line import/no-cycle
 import {
   redirectToExercise,
   toggleLeftBar,
@@ -12,8 +11,6 @@ import * as Constants from '../../../constants/ComponentTypes';
 import AppBar from '../../../components/AppBar';
 import { Chip } from '../../../components/Chip';
 import { T } from '../../../components/I18n';
-// TODO @Sam fix dependency cycle
-/* eslint-disable */
 import NavBar from './nav/NavBar';
 import LeftBar from './nav/LeftBar';
 import UserPopover from '../UserPopover';
@@ -33,7 +30,6 @@ import IndexExerciseDocuments from './documents/Index';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
 import IndexUserProfile from '../user/profile/Index';
-/* eslint-enable */
 
 const styles = {
   root: {

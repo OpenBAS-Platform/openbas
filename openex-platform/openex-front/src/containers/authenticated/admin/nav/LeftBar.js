@@ -8,7 +8,6 @@ import { ListItemLink } from '../../../../components/list/ListItem';
 import AppBar from '../../../../components/AppBar';
 import { Icon } from '../../../../components/Icon';
 import { i18nRegister } from '../../../../utils/Messages';
-// eslint-disable-next-line import/no-cycle
 import {
   redirectToAdmin,
   toggleLeftBar,

@@ -5,18 +5,15 @@ import { Link, withRouter } from 'react-router-dom';
 import * as R from 'ramda';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import { withStyles } from '@material-ui/core/styles';
 import { dateFormat, timeDiff } from '../../utils/Time';
-// TODO @Sam fix dependency cycle
-/* eslint-disable */
-import { fetchExercises } from "../../actions/Exercise";
-import { dataFile } from "../../actions/File";
-import { Exercise } from "../../components/Exercise";
-import UserPopover from "./UserPopover";
-import { T } from "../../components/I18n";
-import { i18nRegister } from "../../utils/Messages";
-import CreateExercise from "./exercise/CreateExercise";
-import { withStyles } from "@material-ui/core/styles";
-/* eslint-enable */
+import { fetchExercises } from '../../actions/Exercise';
+import { dataFile } from '../../actions/File';
+import { Exercise } from '../../components/Exercise';
+import UserPopover from './UserPopover';
+import { T } from '../../components/I18n';
+import { i18nRegister } from '../../utils/Messages';
+import CreateExercise from './exercise/CreateExercise';
 
 i18nRegister({
   fr: {
@@ -109,9 +106,7 @@ class IndexAuthenticated extends Component {
             );
           })}
         </div>
-        {this.props.userAdmin && (
-          <CreateExercise />
-        )}
+        {this.props.userAdmin && <CreateExercise />}
       </div>
     );
   }

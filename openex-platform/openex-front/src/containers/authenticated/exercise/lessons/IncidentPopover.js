@@ -10,7 +10,6 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
-// eslint-disable-next-line import/no-cycle
 import { updateOutcome } from '../../../../actions/Outcome';
 import OutcomeForm from './OutcomeForm';
 

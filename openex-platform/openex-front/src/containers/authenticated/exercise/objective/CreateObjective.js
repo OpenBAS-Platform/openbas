@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
-// eslint-disable-next-line import/no-cycle
 import { addObjective } from '../../../../actions/Objective';
 import { Dialog } from '../../../../components/Dialog';
 import {
