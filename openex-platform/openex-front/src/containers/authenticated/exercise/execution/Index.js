@@ -277,7 +277,7 @@ class IndexExecution extends Component {
         <div style={styles.status}>
           <T>{exerciseStatus}</T>
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix"/>
         <div style={styles.subtitle}>
           {dateFormat(
             R.propOr(undefined, 'exercise_start_date', this.props.exercise),
@@ -288,7 +288,7 @@ class IndexExecution extends Component {
           )}
         </div>
         <div style={styles.state}>{this.selectStatus(exerciseStatus)}</div>
-        <div className="clearfix"></div>
+        <div className="clearfix"/>
         <br />
         <LinearProgress
           mode={
@@ -309,7 +309,7 @@ class IndexExecution extends Component {
           <div style={styles.title}>
             <T>Pending injects</T> {countdown}
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix"/>
           <List>
             {this.props.injectsPending.length === 0 ? (
               <div style={styles.empty}>
@@ -384,7 +384,7 @@ class IndexExecution extends Component {
                           {dateFormat(injectDate)}
                         </span>
                       </div>
-                      <div className="clearfix"></div>
+                      <div className="clearfix"/>
                     </div>
                   }
                   leftIcon={injectIcon}
@@ -461,7 +461,7 @@ class IndexExecution extends Component {
                       <div style={styles.inject_date}>
                         {dateFormat(inject.inject_date)}
                       </div>
-                      <div className="clearfix"></div>
+                      <div className="clearfix"/>
                     </div>
                   }
                   leftIcon={this.selectIcon(inject.inject_type, color)}

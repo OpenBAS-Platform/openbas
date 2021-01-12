@@ -81,6 +81,12 @@
     "egulias/email-validator": {
         "version": "2.1.23"
     },
+    "ezyang/htmlpurifier": {
+        "version": "v4.13.0"
+    },
+    "friendsofphp/proxy-manager-lts": {
+        "version": "v1.0.2"
+    },
     "friendsofsymfony/rest-bundle": {
         "version": "2.2",
         "recipe": {
@@ -92,6 +98,15 @@
         "files": [
             "config/packages/fos_rest.yaml"
         ]
+    },
+    "laminas/laminas-code": {
+        "version": "4.0.0"
+    },
+    "laminas/laminas-eventmanager": {
+        "version": "3.3.0"
+    },
+    "laminas/laminas-zendframework-bridge": {
+        "version": "1.1.1"
     },
     "maennchen/zipstream-php": {
         "version": "2.1.0"
@@ -413,6 +428,9 @@
     },
     "symfony/property-info": {
         "version": "v5.1.8"
+    },
+    "symfony/proxy-manager-bridge": {
+        "version": "v5.1.10"
     },
     "symfony/routing": {
         "version": "5.1",
