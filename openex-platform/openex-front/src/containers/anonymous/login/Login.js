@@ -19,7 +19,7 @@ i18nRegister({
   },
 });
 
-const loginHeight = 250;
+const loginHeight = 280;
 
 const styles = () => ({
   container: {
@@ -56,18 +56,11 @@ class Login extends Component {
         <img src="images/logo_openex.png" alt="logo" className={classes.logo} />
         <div className={classes.login}>
           <Toolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
-            <Typography variant="h2" gutterBottom={true}>
+            <Typography variant="h6" gutterBottom={true}>
               {<T>Login</T>}
             </Typography>
           </Toolbar>
           <LoginForm onSubmit={this.onSubmit.bind(this)} />
-          {this.props.demo === '1' ? (
-            <i>
-              <T>Login: demo@openex.io / Password: demo</T>
-            </i>
-          ) : (
-            ''
-          )}
         </div>
       </div>
     );

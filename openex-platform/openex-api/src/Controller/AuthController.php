@@ -123,6 +123,6 @@ class AuthController extends AbstractController
 
     private function invalidCredentials()
     {
-        return View::create(['message' => 'Invalid credentials'], Response::HTTP_BAD_REQUEST);
+        return View::create(['errors' => ['children' => ['login' => ['errors' => ['Invalid credentials']]]]], Response::HTTP_BAD_REQUEST);
     }
 }

@@ -3,18 +3,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link, withRouter } from 'react-router-dom';
 import * as R from 'ramda';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import { dateFormat, timeDiff } from '../../utils/Time';
 // TODO @Sam fix dependency cycle
 /* eslint-disable */
 import { fetchExercises } from "../../actions/Exercise";
 import { dataFile } from "../../actions/File";
-import * as Constants from "../../constants/ComponentTypes";
-import AppBar from "../../components/AppBar";
 import { Exercise } from "../../components/Exercise";
 import UserPopover from "./UserPopover";
 import { T } from "../../components/I18n";
 import { i18nRegister } from "../../utils/Messages";
 import CreateExercise from "./exercise/CreateExercise";
+import { withStyles } from "@material-ui/core/styles";
 /* eslint-enable */
 
 i18nRegister({
@@ -24,10 +25,17 @@ i18nRegister({
   },
 });
 
-const styles = {
-  container: {
-    padding: '90px 20px 0 85px',
-    textAlign: 'center',
+const styles = () => ({
+  root: {
+    flexGrow: 1,
+  },
+  logo: {
+    width: '40px',
+    cursor: 'pointer',
+  },
+  title: {
+    fontSize: 25,
+    marginLeft: 20,
   },
   empty: {
     marginTop: 40,
@@ -35,12 +43,7 @@ const styles = {
     fontWeight: 500,
     textAlign: 'center',
   },
-  logo: {
-    width: '40px',
-    marginTop: '4px',
-    cursor: 'pointer',
-  },
-};
+});
 
 class IndexAuthenticated extends Component {
   componentDidMount() {
@@ -52,24 +55,26 @@ class IndexAuthenticated extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div>
-        <AppBar
-          title="OpenEx"
-          type={Constants.APPBAR_TYPE_TOPBAR_NOICON}
-          onLeftIconButtonTouchTap={this.redirectToHome.bind(this)}
-          iconElementRight={<UserPopover />}
-          iconElementLeft={
-            <img src="/images/logo_white.png" alt="logo" style={styles.logo} />
-          }
-        />
-        <div style={styles.container}>
-          {this.props.exercises.length === 0 ? (
-            <div style={styles.empty}>
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Toolbar>
+            <img
+              src="/images/logo_white.png"
+              alt="logo"
+              className={classes.logo}
+              onClick={this.redirectToHome.bind(this)}
+            />
+            <div className={classes.title}>OpenEx</div>
+            <UserPopover />
+          </Toolbar>
+        </AppBar>
+        <div className={classes.container}>
+          {this.props.exercises.length === 0 && (
+            <div className={classes.empty}>
               <T>You do not have any available exercise on this platform.</T>
             </div>
-          ) : (
-            ''
           )}
           {this.props.exercises.map((exercise) => {
             const startDate = dateFormat(
@@ -104,15 +109,8 @@ class IndexAuthenticated extends Component {
             );
           })}
         </div>
-
-        {this.props.userAdmin ? (
-          <CreateExercise
-            exerciseId={this.props.exerciseId}
-            injects={this.props.injects}
-            exercise={this.props.exercise}
-          />
-        ) : (
-          ''
+        {this.props.userAdmin && (
+          <CreateExercise />
         )}
       </div>
     );
@@ -143,6 +141,8 @@ const select = (state) => {
   };
 };
 
-export default withRouter(
-  connect(select, { fetchExercises, dataFile })(IndexAuthenticated),
-);
+export default R.compose(
+  withRouter,
+  connect(select, { fetchExercises, dataFile }),
+  withStyles(styles),
+)(IndexAuthenticated);

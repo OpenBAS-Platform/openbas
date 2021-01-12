@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm } from 'redux-form';
-import { FormField } from '../../../components/Field';
-import { Button } from '../../../components/Button';
+import Button from '@material-ui/core/Button';
 import { i18nRegister } from '../../../utils/Messages';
+import { T } from '../../../components/I18n';
+import { TextField } from '../../../components/TextField';
 
 i18nRegister({
   fr: {
@@ -19,7 +20,7 @@ const style = {
 
 const validate = (values) => {
   const errors = {};
-  const requiredFields = [];
+  const requiredFields = ['username', 'password'];
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
@@ -40,25 +41,28 @@ const LoginForm = (props) => {
           <br />
         </div>
       )}
-      <FormField
+      <TextField
         name="username"
         type="text"
         label="Email address"
         fullWidth={true}
       />
-      <FormField
+      <TextField
         name="password"
         type="password"
         label="Password"
         fullWidth={true}
+        style={{ marginTop: 20 }}
       />
       <Button
         type="submit"
         variant="contained"
         disabled={pristine || submitting}
-        label="Sign in"
         onClick={handleSubmit(onSubmit)}
-      />
+        style={{ marginTop: 20 }}
+      >
+        <T>Sign in</T>
+      </Button>
     </form>
   );
 };
@@ -73,5 +77,4 @@ LoginForm.propTypes = {
 
 export default reduxForm({
   form: 'LoginForm',
-  validate,
 })(LoginForm);

@@ -14,7 +14,7 @@
     "connected-react-router": "^6.8.0",
     "countdown": "^2.6.0",
     "file-saver": "^2.0.2",
-    "history": "^5.0.0",
+    "history": "^4.10.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
     "normalizr": "^3.6.1",
