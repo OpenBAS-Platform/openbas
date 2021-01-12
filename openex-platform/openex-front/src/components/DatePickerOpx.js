@@ -1,23 +1,23 @@
-import React, { Component } from "react";
-import DatePicker from "@material-ui/pickers/DatePicker";
-import { injectIntl } from "react-intl";
-import PropTypes from "prop-types";
-import { dayFormat } from "../utils/Time";
+import React, { Component } from 'react';
+import DatePicker from '@material-ui/pickers/DatePicker';
+import { injectIntl } from 'react-intl';
+import PropTypes from 'prop-types';
+import { dayFormat } from '../utils/Time';
 
 const styles = {
   global: {
-    display: "none",
+    display: 'none',
   },
   picker: {
-    position: "absolute",
-    top: "40px",
+    position: 'absolute',
+    top: '40px',
   },
 };
 
 class DatePickerOpx extends Component {
-  handleChange = (event, date) => {
+  handleChange(event, date) {
     this.props.handleResult(dayFormat(date));
-  };
+  }
 
   render() {
     return (
@@ -31,7 +31,7 @@ class DatePickerOpx extends Component {
         onChange={this.handleChange}
         floatingLabelText="Date"
         locale={this.props.intl.locale}
-        cancelLabel={this.props.intl.formatMessage({ id: "Cancel" })}
+        cancelLabel={this.props.intl.formatMessage({ id: 'Cancel' })}
         style={styles.global}
         dialogContainerStyle={{ zIndex: 2100 }}
       />

@@ -14,9 +14,11 @@ import {
   MenuItemButton,
   MenuItemLink,
 } from '../../../../components/menu/MenuItem';
-import { updateExercise } from '../../../../actions/Exercise';
-import { addDryrun } from '../../../../actions/Dryrun';
-import { redirectToDryrun } from '../../../../actions/Application';
+/* eslint-disable */
+import { updateExercise } from "../../../../actions/Exercise";
+import { addDryrun } from "../../../../actions/Dryrun";
+import { redirectToDryrun } from "../../../../actions/Application";
+/* eslint-enable */
 import DryrunForm from '../check/DryrunForm';
 
 const style = {
@@ -108,12 +110,12 @@ class ExercisePopover extends Component {
   }
 
   render() {
-    const exercise_disabled = R.propOr(
+    const exerciseDisabled = R.propOr(
       false,
       'exercise_canceled',
       this.props.exercise,
     );
-    const exercise_is_updatable = R.propOr(
+    const exerciseIsUpdatable = R.propOr(
       false,
       'user_can_update',
       this.props.exercise,
@@ -126,7 +128,7 @@ class ExercisePopover extends Component {
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
-      exercise_is_updatable ? (
+      exerciseIsUpdatable ? (
         <FlatButton
           key="disable"
           label="Disable"
@@ -144,7 +146,7 @@ class ExercisePopover extends Component {
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
-      exercise_is_updatable ? (
+      exerciseIsUpdatable ? (
         <FlatButton
           key="enable"
           label="Enable"
@@ -185,8 +187,8 @@ class ExercisePopover extends Component {
               label="Launch a dryrun"
               onClick={this.handleOpenDryrun.bind(this)}
             />
-            {exercise_is_updatable ? (
-              exercise_disabled ? (
+            {exerciseIsUpdatable ? (
+              exerciseDisabled ? (
                 <MenuItemButton
                   label="Enable"
                   onClick={this.handleOpenEnable.bind(this)}
@@ -227,10 +229,12 @@ class ExercisePopover extends Component {
           onRequestClose={this.handleCloseDryrun.bind(this)}
           actions={dryrunActions}
         >
+          {/* eslint-disable */}
           <DryrunForm
             ref="dryrunForm"
             onSubmit={this.onSubmitDryrun.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

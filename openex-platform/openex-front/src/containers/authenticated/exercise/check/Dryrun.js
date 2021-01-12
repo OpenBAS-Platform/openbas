@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
-
 import * as Constants from '../../../../constants/ComponentTypes';
 import { List } from '../../../../components/List';
 import Theme from '../../../../components/Theme';
@@ -17,11 +16,13 @@ import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
 import { CircularSpinner } from '../../../../components/Spinner';
 import Countdown from '../../../../components/Countdown';
-import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchDryrun } from '../../../../actions/Dryrun';
-import { fetchDryinjects } from '../../../../actions/Dryinject';
-import { downloadFile } from '../../../../actions/File';
-import DryrunPopover from './DryrunPopover';
+/* eslint-disable */
+import { fetchAudiences } from "../../../../actions/Audience";
+import { fetchDryrun } from "../../../../actions/Dryrun";
+import { fetchDryinjects } from "../../../../actions/Dryinject";
+import { downloadFile } from "../../../../actions/File";
+import DryrunPopover from "./DryrunPopover";
+/* eslint-enable */
 import DryinjectView from './DryinjectView';
 import DryinjectStatusView from './DryinjectStatusView';
 
@@ -131,14 +132,15 @@ class IndexExerciseDryrun extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const dryrun_finished = R.propOr(false, 'dryrun_finished', nextProps.dryrun);
-    if (dryrun_finished) this.cancelStreamEvent();
+    const dryrunFinished = R.propOr(false, 'dryrun_finished', nextProps.dryrun);
+    if (dryrunFinished) this.cancelStreamEvent();
   }
 
   componentWillUnmount() {
     this.subscription.unsubscribe();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   selectIcon(type, color) {
     switch (type) {
       case 'openex_email':
@@ -192,8 +194,8 @@ class IndexExerciseDryrun extends Component {
     this.setState({ openStatus: false });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   render() {
@@ -214,9 +216,13 @@ class IndexExerciseDryrun extends Component {
       />,
     ];
 
-    const dryrun_id = R.propOr('', 'dryrun_id', this.props.dryrun);
-    const dryrun_date = R.propOr('', 'dryrun_date', this.props.dryrun);
-    const dryrun_finished = R.propOr(false, 'dryrun_finished', this.props.dryrun);
+    const dryrunId = R.propOr('', 'dryrun_id', this.props.dryrun);
+    const dryrunDate = R.propOr('', 'dryrun_date', this.props.dryrun);
+    const dryrunFinished = R.propOr(
+      false,
+      'dryrun_finished',
+      this.props.dryrun,
+    );
     const nextDryinject = R.propOr(
       undefined,
       'dryinject_date',
@@ -238,11 +244,11 @@ class IndexExerciseDryrun extends Component {
           dryrun={this.props.dryrun}
           listenDeletionCall={this.cancelStreamEvent}
         />
-        <div style={styles.audience}>{dryrun_id}</div>
+        <div style={styles.audience}>{dryrunId}</div>
         <div className="clearfix"></div>
-        <div style={styles.subtitle}>{dateFormat(dryrun_date)}</div>
+        <div style={styles.subtitle}>{dateFormat(dryrunDate)}</div>
         <div style={styles.state}>
-          {dryrun_finished ? (
+          {dryrunFinished ? (
             <Icon
               name={Constants.ICON_NAME_ACTION_DONE_ALL}
               color={Theme.palette.primary1Color}
@@ -251,7 +257,7 @@ class IndexExerciseDryrun extends Component {
             <CircularSpinner size={20} color={Theme.palette.primary1Color} />
           )}
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix" />
         <br />
         <LinearProgress
           mode={
@@ -271,7 +277,7 @@ class IndexExerciseDryrun extends Component {
           <div style={styles.title}>
             <T>Pending injects</T> {countdown}
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix" />
           <List>
             {this.props.dryinjectsPending.length === 0 ? (
               <div style={styles.empty}>
@@ -281,9 +287,9 @@ class IndexExerciseDryrun extends Component {
               ''
             )}
             {R.take(30, this.props.dryinjectsPending).map((dryinject) => {
-              const inject_in_progress = R.path(['inject_status', 'status_name'], dryinject)
+              const injectInProgress = R.path(['inject_status', 'status_name'], dryinject)
                 === 'PENDING';
-              const injectIcon = inject_in_progress ? (
+              const injectIcon = injectInProgress ? (
                 <CircularSpinner
                   size={20}
                   type={Constants.SPINNER_TYPE_INJECT}
@@ -304,7 +310,7 @@ class IndexExerciseDryrun extends Component {
                       <div style={styles.dryinject_date}>
                         {dateFormat(dryinject.dryinject_date)}
                       </div>
-                      <div className="clearfix"></div>
+                      <div className="clearfix" />
                     </div>
                   }
                   leftIcon={injectIcon}

@@ -5,15 +5,17 @@ import * as R from 'ramda';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
-import { fetchGroups } from '../../../../actions/Group';
-import { fetchUsers } from '../../../../actions/User';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import { fetchExercises } from '../../../../actions/Exercise';
-import { List } from '../../../../components/List';
-import { MainListItem, HeaderItem } from '../../../../components/list/ListItem';
-import { Icon } from '../../../../components/Icon';
-import CreateGroup from './CreateGroup';
-import GroupPopover from './GroupPopover';
+/* eslint-disable */
+import { fetchGroups } from "../../../../actions/Group";
+import { fetchUsers } from "../../../../actions/User";
+import { fetchOrganizations } from "../../../../actions/Organization";
+import { fetchExercises } from "../../../../actions/Exercise";
+import { List } from "../../../../components/List";
+import { MainListItem, HeaderItem } from "../../../../components/list/ListItem";
+import { Icon } from "../../../../components/Icon";
+import CreateGroup from "./CreateGroup";
+import GroupPopover from "./GroupPopover";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -115,11 +117,15 @@ class Index extends Component {
   }
 
   // TODO replace with sortWith after Ramdajs new release
+  // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   descend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
@@ -161,13 +167,13 @@ class Index extends Component {
             />
           )}
           {groups.map((group) => {
-            const group_id = R.propOr(Math.random(), 'group_id', group);
-            const group_name = R.propOr('-', 'group_name', group);
-            const group_users = R.propOr([], 'group_users', group);
+            const groupId = R.propOr(Math.random(), 'group_id', group);
+            const groupName = R.propOr('-', 'group_name', group);
+            const groupUsers = R.propOr([], 'group_users', group);
 
             return (
               <MainListItem
-                key={group_id}
+                key={groupId}
                 leftIcon={
                   <Icon
                     name={Constants.ICON_NAME_SOCIAL_PUBLIC}
@@ -185,9 +191,9 @@ class Index extends Component {
                 }
                 primaryText={
                   <div>
-                    <div style={styles.name}>{group_name}</div>
-                    <div style={styles.users}>{group_users.length}</div>
-                    <div className="clearfix"></div>
+                    <div style={styles.name}>{groupName}</div>
+                    <div style={styles.users}>{groupUsers.length}</div>
+                    <div className="clearfix" />
                   </div>
                 }
               />

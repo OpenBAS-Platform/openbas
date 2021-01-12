@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+// eslint-disable-next-line import/no-cycle
 import { addGroup } from '../../../../actions/Group';
 import { Dialog } from '../../../../components/Dialog';
 import {
@@ -37,6 +38,7 @@ class CreateGroup extends Component {
   }
 
   submitFormCreate() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.groupForm.submit();
   }
 
@@ -69,11 +71,13 @@ class CreateGroup extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={actionsCreateGroup}
         >
+          {/* eslint-disable */}
           <UserForm
             ref="groupForm"
             onSubmit={this.onSubmitCreate.bind(this)}
             onSubmitSuccess={this.handleCloseCreate.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

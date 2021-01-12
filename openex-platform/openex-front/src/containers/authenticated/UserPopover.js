@@ -7,14 +7,16 @@ import { Popover } from '../../components/Popover';
 import { Avatar } from '../../components/Avatar';
 import { Menu } from '../../components/Menu';
 import { MenuItemLink, MenuItemButton } from '../../components/menu/MenuItem';
-import { logout, fetchToken } from '../../actions/Application';
-import { i18nRegister } from '../../utils/Messages';
+/* eslint-disable */
+import { logout, fetchToken } from "../../actions/Application";
+/* eslint-disable */
+import { i18nRegister } from "../../utils/Messages";
 
 i18nRegister({
   fr: {
-    'Sign out': 'Se déconnecter',
-    Profile: 'Profil',
-    Admin: 'Admin',
+    "Sign out": "Se déconnecter",
+    Profile: "Profil",
+    Admin: "Admin",
   },
 });
 
@@ -65,13 +67,13 @@ class UserPopover extends Component {
               to={
                 this.props.exerciseId
                   ? `/private/exercise/${this.props.exerciseId}/profile`
-                  : '/private/user/profile'
+                  : "/private/user/profile"
               }
             />
             {this.props.userAdmin ? (
               <MenuItemLink label="Admin" to="/private/admin/index" />
             ) : (
-              ''
+              ""
             )}
             <MenuItemButton
               label="Sign out"
@@ -94,13 +96,13 @@ UserPopover.propTypes = {
 };
 
 const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
+  const userId = R.path(["logged", "user"], state.app);
   return {
     userGravatar: R.path(
-      [userId, 'user_gravatar'],
-      state.referential.entities.users,
+      [userId, "user_gravatar"],
+      state.referential.entities.users
     ),
-    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
+    userAdmin: R.path([userId, "user_admin"], state.referential.entities.users),
   };
 };
 

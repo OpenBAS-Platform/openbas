@@ -10,8 +10,10 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
+/* eslint-disable */
 import { addComcheck } from '../../../../actions/Comcheck';
 import { redirectToComcheck } from '../../../../actions/Application';
+/* eslint-enable */
 import ComcheckForm from './ComcheckForm';
 
 const style = {
@@ -64,6 +66,7 @@ class DryrunsPopover extends Component {
   }
 
   submitFormLaunch() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.comcheckForm.submit();
   }
 
@@ -126,12 +129,14 @@ class DryrunsPopover extends Component {
           autoScrollBodyContent={true}
           actions={launchActions}
         >
+          {/* eslint-disable */}
           <ComcheckForm
             initialValues={initialComcheckValues}
             ref="comcheckForm"
             audiences={this.props.audiences}
             onSubmit={this.onSubmitLaunch.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

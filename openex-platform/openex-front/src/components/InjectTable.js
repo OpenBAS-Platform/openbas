@@ -5,6 +5,7 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
 import PropTypes from 'prop-types';
 import { timeDiff } from '../utils/Time';
 
@@ -54,17 +55,17 @@ class InjectTable extends Component {
         selectable={this.state.selectable}
         multiSelectable={this.state.multiSelectable}
       >
-        <TableHeader
+        <TableHead
           displaySelectAll={this.state.showCheckboxes}
           adjustForCheckbox={this.state.showCheckboxes}
           enableSelectAll={this.state.enableSelectAll}
         >
           <TableRow>
-            <TableHeaderColumn tooltip="title">Titre</TableHeaderColumn>
-            <TableHeaderColumn tooltip="type">Type</TableHeaderColumn>
-            <TableHeaderColumn tooltip="date">Date et Heure</TableHeaderColumn>
+            <TableCell tooltip="title">Titre</TableCell>
+            <TableCell tooltip="type">Type</TableCell>
+            <TableCell tooltip="date">Date et Heure</TableCell>
           </TableRow>
-        </TableHeader>
+        </TableHead>
         <TableBody
           displayRowCheckbox={this.state.showCheckboxes}
           deselectOnClickaway={this.state.deselectOnClickaway}
@@ -73,13 +74,13 @@ class InjectTable extends Component {
         >
           {this.getAllInject().map((row, index) => (
             <TableRow key={index}>
-              <TableRowColumn>{row.inject_title}</TableRowColumn>
-              <TableRowColumn>{row.inject_type}</TableRowColumn>
-              <TableRowColumn>
+              <TableCell>{row.inject_title}</TableCell>
+              <TableCell>{row.inject_type}</TableCell>
+              <TableCell>
                 {`${new Date(row.inject_date).toLocaleDateString(
                   'fr-FR',
                 )} ${new Date(row.inject_date).toLocaleTimeString('fr-FR')}`}
-              </TableRowColumn>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -12,6 +12,7 @@ const customComparator = (previousState, state) => {
   return equals;
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const equalsSelector = (s) => createStructuredSelector(
   s,
   createSelectorCreator(defaultMemoize, customComparator),

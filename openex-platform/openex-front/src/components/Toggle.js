@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MUISwitch from '@material-ui/core/Switch';
 
+// eslint-disable-next-line import/prefer-default-export
 export const Toggle = (props) => (
   <MUISwitch
     label={props.label}

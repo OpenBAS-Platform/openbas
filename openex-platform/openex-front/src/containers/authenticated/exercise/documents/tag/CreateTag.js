@@ -32,6 +32,7 @@ class CreateTag extends Component {
   }
 
   submitForm() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.tagForm.submit();
   }
 
@@ -65,11 +66,13 @@ class CreateTag extends Component {
           actions={actions}
           onRequestClose={this.handleClose.bind(this)}
         >
+          {/* eslint-disable */}
           <TagForm
             ref="tagForm"
             onSubmit={this.onSubmit.bind(this)}
             onSubmitSuccess={this.handleClose.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

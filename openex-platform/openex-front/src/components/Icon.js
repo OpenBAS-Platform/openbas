@@ -53,6 +53,7 @@ import {
   DateRange,
   AccessTime,
   Edit,
+  RemoveRedEye,
 } from '@material-ui/icons';
 import * as Constants from '../constants/ComponentTypes';
 
@@ -94,15 +95,16 @@ const iconStyle = {
   },
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const Icon = (props) => {
   const mergeStyle = { ...props.style, ...iconStyle[props.type] };
   switch (props.name) {
     case Constants.ICON_NAME_DOCUMENT_ACTION_DELETE:
       return <Delete style={mergeStyle} color={props.color} />;
     case Constants.ICON_NAME_DOCUMENT_ACTION_EXPORT:
-      return <Export style={mergeStyle} color={props.color} />;
+      return <CloudDownload style={mergeStyle} color={props.color} />;
     case Constants.ICON_NAME_DOCUMENT_ACTION_VIEW:
-      return <View style={mergeStyle} color={props.color} />;
+      return <RemoveRedEye style={mergeStyle} color={props.color} />;
     case Constants.ICON_NAME_DOCUMENT_ACTION_EDIT:
       return <Edit style={mergeStyle} color={props.color} />;
     case Constants.ICON_NAME_LOCAL_MOVIES:

@@ -12,23 +12,26 @@ import { i18nRegister } from '../../utils/Messages';
 import { timeDiff } from '../../utils/Time';
 import * as Constants from '../../constants/ComponentTypes';
 import { SearchField } from '../../components/SimpleTextField';
-import { fetchTags } from '../../actions/Tag';
+// TODO @Sam fix dependency cycle
+/* eslint-disable */
+import { fetchTags } from "../../actions/Tag";
 import {
   addDocument,
   searchDocument,
   getDocument,
   getDocumentTags,
   getDocumentTagsExercise,
-} from '../../actions/Document';
-import { fetchExercises } from '../../actions/Exercise';
+} from "../../actions/Document";
+import { fetchExercises } from "../../actions/Exercise";
 import {
   TagListe,
   TagExerciseListe,
   TagAddToFilter,
   TagSmallListe,
   TagSmallExerciseListe,
-} from './exercise/documents/component/Tag';
-import { FlatButton } from '../../components/Button';
+} from "./exercise/documents/component/Tag";
+import { FlatButton } from "../../components/Button";
+/* eslint-enable */
 
 const styles = {
   container: {
@@ -173,16 +176,18 @@ class DocumentGallery extends Component {
   }
 
   openFileDialog() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
+    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
-    this.props.addDocument(data).then((document_id) => {
-      this.props.getDocument(document_id.result).then((document) => {
+    this.props.addDocument(data).then((document) => {
+      this.props.getDocument(document.result).then((finalDocument) => {
         this.handleEditDocument(
-          R.prop(document.result, document.entities.document),
+          R.prop(finalDocument.result, finalDocument.entities.document),
         );
       });
     });
@@ -268,6 +273,7 @@ class DocumentGallery extends Component {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   checkIfDocumentIsDisplay(
     document,
     listeTagAddToFilter,
@@ -312,11 +318,13 @@ class DocumentGallery extends Component {
         });
       });
 
+      // eslint-disable-next-line no-plusplus
       for (let i = 0; i < listeTagCritere.length; i++) {
         if (listeTagCritere[i].exist === false) {
           toDisplay = false;
         }
       }
+      // eslint-disable-next-line no-plusplus
       for (let i = 0; i < listeTagExerciseCritere.length; i++) {
         if (listeTagExerciseCritere[i].exist === false) {
           toDisplay = false;
@@ -363,22 +371,24 @@ class DocumentGallery extends Component {
               )}
             {R.values(this.state.listeTagExerciseAddToFilter).map(
               (exercise) => (
-                  <TagAddToFilter
-                    value={exercise.exercise_name}
-                    onRequestDelete={this.removeTagExerciseToFilter.bind(
-                      this,
-                      exercise,
-                    )}
-                  />
+                <TagAddToFilter
+                  key={exercise.exercise_id}
+                  value={exercise.exercise_name}
+                  onRequestDelete={this.removeTagExerciseToFilter.bind(
+                    this,
+                    exercise,
+                  )}
+                />
               ),
             )}
             {R.values(this.state.listeTagAddToFilter).map((tag) => (
-                <TagAddToFilter
-                  value={tag.tag_name}
-                  onRequestDelete={this.removeTagToFilter.bind(this, tag)}
-                />
+              <TagAddToFilter
+                key={tag.tag_id}
+                value={tag.tag_name}
+                onRequestDelete={this.removeTagToFilter.bind(this, tag)}
+              />
             ))}
-            <div className="clearfix"></div>
+            <div className="clearfix" />
             {this.state.listeTagAddToFilter.length !== 0
             || this.state.listeTagExerciseAddToFilter.length !== 0 ? (
               <div style={styles.searchDivTagLibelle}>
@@ -386,7 +396,9 @@ class DocumentGallery extends Component {
                 {R.values(this.state.listeTagExerciseAddToFilter).map(
                   (exercise) => `${exercise.exercise_name}, `,
                 )}
-                {R.values(this.state.listeTagAddToFilter).map((tag) => `${tag.tag_name}, `)}
+                {R.values(this.state.listeTagAddToFilter).map(
+                  (tag) => `${tag.tag_name}, `,
+                )}
               </div>
               ) : (
                 ''
@@ -408,22 +420,20 @@ class DocumentGallery extends Component {
                 ''
               )}
               <Table selectable={false} style={{ marginTop: '5px' }}>
-                <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableHeaderColumn
-                      style={{ width: '100px' }}
-                    ></TableHeaderColumn>
-                    <TableHeaderColumn>
+                    <TableCell style={{ width: '100px' }}></TableCell>
+                    <TableCell>
                       <T>Name</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Description</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Tags</T>
-                    </TableHeaderColumn>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
+                </TableHead>
                 <TableBody displayRowCheckbox={false}>
                   {this.props.documents.map((document, index) => {
                     const listeTagAddToFilter = [
@@ -440,7 +450,7 @@ class DocumentGallery extends Component {
                     );
                     return toDisplay === true ? (
                       <TableRow>
-                        <TableRowColumn style={{ width: '100px' }}>
+                        <TableCell style={{ width: '100px' }}>
                           <input
                             type="radio"
                             name="radio_select_document"
@@ -449,28 +459,32 @@ class DocumentGallery extends Component {
                               document,
                             )}
                           />
-                        </TableRowColumn>
-                        <TableRowColumn>
-                          {document.document_name}
-                        </TableRowColumn>
-                        <TableRowColumn
+                        </TableCell>
+                        <TableCell>{document.document_name}</TableCell>
+                        <TableCell
                           style={{
                             wordWrap: 'break-word',
                             whiteSpace: 'normal',
                           }}
                         >
                           {document.document_description}
-                        </TableRowColumn>
-                        <TableRowColumn>
-                          {document.document_liste_tags.map((tag) => <TagSmallListe value={tag.tag_name} />)}
+                        </TableCell>
+                        <TableCell>
+                          {document.document_liste_tags.map((tag) => (
+                            <TagSmallListe
+                              key={tag.tag_id}
+                              value={tag.tag_name}
+                            />
+                          ))}
                           {document.document_liste_tags_exercise.map(
                             (exercise) => (
-                                <TagSmallExerciseListe
-                                  value={exercise.exercise_name}
-                                />
+                              <TagSmallExerciseListe
+                                key={exercise.exercise_id}
+                                value={exercise.exercise_name}
+                              />
                             ),
                           )}
-                        </TableRowColumn>
+                        </TableCell>
                       </TableRow>
                     ) : (
                       ''
@@ -498,29 +512,33 @@ class DocumentGallery extends Component {
                 ''
               )}
               {this.props.tags.map((tag) => (
-                  <TagListe
-                    value={tag.tag_name}
-                    onClick={this.addAvailableTagToFilter.bind(this, tag)}
-                  />
+                <TagListe
+                  key={tag.tag_id}
+                  value={tag.tag_name}
+                  onClick={this.addAvailableTagToFilter.bind(this, tag)}
+                />
               ))}
               {this.props.exercises.map((exercise) => (
-                  <TagExerciseListe
-                    value={exercise.exercise_name}
-                    onClick={this.addAvailableTagExerciseToFilter.bind(
-                      this,
-                      exercise,
-                    )}
-                  />
+                <TagExerciseListe
+                  key={exercise.exercise_id}
+                  value={exercise.exercise_name}
+                  onClick={this.addAvailableTagExerciseToFilter.bind(
+                    this,
+                    exercise,
+                  )}
+                />
               ))}
             </div>
           </div>
         </div>
+        {/* eslint-disable */}
         <input
           type="file"
           ref="fileUpload"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           onChange={this.handleFileChange.bind(this)}
         />
+        {/* eslint-enable */}
       </div>
     );
   }

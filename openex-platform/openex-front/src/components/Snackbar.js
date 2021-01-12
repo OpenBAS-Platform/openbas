@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MUISnackbar from '@material-ui/core/Snackbar';
 
+// eslint-disable-next-line import/prefer-default-export
 export const Snackbar = (props) => (
   <MUISnackbar
     open={props.open}

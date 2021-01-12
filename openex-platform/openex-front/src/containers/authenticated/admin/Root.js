@@ -15,7 +15,6 @@ import { Route, Switch } from "react-router";
 import IndexAdmin from "./Index";
 import IndexAdminUsers from "./user/Index";
 import IndexAdminGroups from "./group/Index";
-import IndexAdminTests from "./tests/Index";
 /* eslint-enable */
 
 i18nRegister({
@@ -68,7 +67,6 @@ class RootAuthenticated extends Component {
           <Route path="index" component={IndexAdmin} />
           <Route path="users" component={IndexAdminUsers} />
           <Route path="groups" component={IndexAdminGroups} />
-          <Route path="tests" component={IndexAdminTests} />
         </Switch>
       </div>
     );

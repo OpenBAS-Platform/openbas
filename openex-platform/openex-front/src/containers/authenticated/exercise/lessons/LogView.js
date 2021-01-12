@@ -17,13 +17,12 @@ const styles = {
 
 class LogView extends Component {
   render() {
-    const log_title = R.propOr('-', 'log_title', this.props.log);
-    const log_content = R.propOr('-', 'log_content', this.props.log);
-
+    const logTitle = R.propOr('-', 'log_title', this.props.log);
+    const logContent = R.propOr('-', 'log_content', this.props.log);
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{log_title}</div>
-        <div style={styles.story}>{log_content}</div>
+        <div style={styles.title}>{logTitle}</div>
+        <div style={styles.story}>{logContent}</div>
       </div>
     );
   }

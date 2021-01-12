@@ -25,12 +25,14 @@ import { Chip } from '../../../../components/Chip';
 import { Avatar } from '../../../../components/Avatar';
 import { List } from '../../../../components/List';
 import { MainSmallListItem } from '../../../../components/list/ListItem';
+/* eslint-disable */
 import {
   fetchGroup,
   updateGroup,
   deleteGroup,
-} from '../../../../actions/Group';
-import { addGrant, deleteGrant } from '../../../../actions/Grant';
+} from "../../../../actions/Group";
+import { addGrant, deleteGrant } from "../../../../actions/Grant";
+/* eslint-enable */
 import GroupForm from './GroupForm';
 
 i18nRegister({
@@ -112,6 +114,7 @@ class GroupPopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.groupForm.submit();
   }
 
@@ -159,16 +162,14 @@ class GroupPopover extends Component {
     if (grantId !== null && isChecked) {
       return;
       // the grant does not exist yet
-    } if (isChecked) {
+    }
+    if (isChecked) {
       const { grantsToAdd } = this.state;
       grantsToAdd.push({ exercise_id: exerciseId, grant_name: grantName });
       this.setState({ grantsToAdd });
     }
-
     // the grand does not exist
-    if (grantId === null && !isChecked) {
-
-    } else if (!isChecked) {
+    if (!isChecked && grantId !== null) {
       const { grantsToRemove } = this.state;
       grantsToRemove.push({ exercise_id: exerciseId, grant_id: grantId });
       this.setState({ grantsToRemove });
@@ -177,7 +178,7 @@ class GroupPopover extends Component {
 
   submitGrants() {
     const { grantsToAdd } = this.state;
-    const addGrant = (n) => this.props
+    const internalAddGrant = (n) => this.props
       .addGrant(this.props.group.group_id, {
         grant_name: n.grant_name,
         grant_exercise: n.exercise_id,
@@ -185,14 +186,15 @@ class GroupPopover extends Component {
       .then(() => {
         this.props.fetchGroup(this.props.group.group_id);
       });
-    R.forEach(addGrant, grantsToAdd);
+    R.forEach(internalAddGrant, grantsToAdd);
     this.setState({ grantsToAdd: [] });
 
     const { grantsToRemove } = this.state;
-    const deleteGrant = (n) => this.props.deleteGrant(this.props.group.group_id, n.grant_id).then(() => {
+    // eslint-disable-next-line max-len
+    const internalDeleteGrant = (n) => this.props.deleteGrant(this.props.group.group_id, n.grant_id).then(() => {
       this.props.fetchGroup(this.props.group.group_id);
     });
-    R.forEach(deleteGrant, grantsToRemove);
+    R.forEach(internalDeleteGrant, grantsToRemove);
     this.setState({ grantsToRemove: [] });
 
     this.handleCloseGrants();
@@ -326,12 +328,14 @@ class GroupPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <GroupForm
             ref="groupForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
         <DialogTitleElement
           title={
@@ -353,9 +357,9 @@ class GroupPopover extends Component {
           <div>
             {this.state.usersIds.map((userId) => {
               const user = R.propOr({}, userId, this.props.users);
-              const user_firstname = R.propOr('-', 'user_firstname', user);
-              const user_lastname = R.propOr('-', 'user_lastname', user);
-              const user_gravatar = R.propOr('-', 'user_gravatar', user);
+              const userFirstname = R.propOr('-', 'user_firstname', user);
+              const userLastname = R.propOr('-', 'user_lastname', user);
+              const userGravatar = R.propOr('-', 'user_gravatar', user);
               return (
                 <Chip
                   key={userId}
@@ -363,11 +367,11 @@ class GroupPopover extends Component {
                   type={Constants.CHIP_TYPE_LIST}
                 >
                   <Avatar
-                    src={user_gravatar}
+                    src={userGravatar}
                     size={32}
                     type={Constants.AVATAR_TYPE_CHIP}
                   />
-                  {user_firstname} {user_lastname}
+                  {userFirstname} {userLastname}
                 </Chip>
               );
             })}
@@ -377,10 +381,10 @@ class GroupPopover extends Component {
             <List>
               {filteredUsers.map((user) => {
                 const disabled = R.find(
-                  (user_id) => user_id === user.user_id,
+                  (userId) => userId === user.user_id,
                   this.state.usersIds,
                 ) !== undefined;
-                const user_organization = R.propOr(
+                const userOrganization = R.propOr(
                   {},
                   user.user_organization,
                   this.props.organizations,
@@ -388,7 +392,7 @@ class GroupPopover extends Component {
                 const organizationName = R.propOr(
                   '-',
                   'organization_name',
-                  user_organization,
+                  userOrganization,
                 );
                 return (
                   <MainSmallListItem
@@ -425,19 +429,19 @@ class GroupPopover extends Component {
           actions={grantsActions}
         >
           <Table selectable={false} style={{ marginTop: '5px' }}>
-            <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+            <TableHead adjustForCheckbox={false} displaySelectAll={false}>
               <TableRow>
-                <TableHeaderColumn>
+                <TableCell>
                   <T>Exercise</T>
-                </TableHeaderColumn>
-                <TableHeaderColumn>
+                </TableCell>
+                <TableCell>
                   <T>Read/Write</T>
-                </TableHeaderColumn>
-                <TableHeaderColumn>
+                </TableCell>
+                <TableCell>
                   <T>Read only</T>
-                </TableHeaderColumn>
+                </TableCell>
               </TableRow>
-            </TableHeader>
+            </TableHead>
             <TableBody displayRowCheckbox={false}>
               {R.values(this.props.exercises).map((exercise) => {
                 const grantPlanner = R.find(
@@ -449,12 +453,16 @@ class GroupPopover extends Component {
                     && g.grant_name === 'OBSERVER',
                 )(this.props.group.group_grants);
                 const grantPlannerId = R.propOr(null, 'grant_id', grantPlanner);
-                const grantObserverId = R.propOr(null, 'grant_id', grantObserver);
+                const grantObserverId = R.propOr(
+                  null,
+                  'grant_id',
+                  grantObserver,
+                );
 
                 return (
                   <TableRow key={exercise.exercise_id}>
-                    <TableRowColumn>{exercise.exercise_name}</TableRowColumn>
-                    <TableRowColumn>
+                    <TableCell>{exercise.exercise_name}</TableCell>
+                    <TableCell>
                       <Checkbox
                         defaultChecked={grantPlannerId !== null}
                         onCheck={this.handleGrantCheck.bind(
@@ -464,8 +472,8 @@ class GroupPopover extends Component {
                           'PLANNER',
                         )}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <Checkbox
                         defaultChecked={grantObserverId !== null}
                         onCheck={this.handleGrantCheck.bind(
@@ -475,7 +483,7 @@ class GroupPopover extends Component {
                           'OBSERVER',
                         )}
                       />
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                 );
               })}

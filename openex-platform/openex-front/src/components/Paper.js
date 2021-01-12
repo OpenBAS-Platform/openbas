@@ -28,6 +28,7 @@ const paperStyle = {
   },
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const Paper = (props) => (
   <MUIPaper
     rounded={true}

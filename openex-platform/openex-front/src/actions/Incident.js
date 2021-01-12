@@ -54,12 +54,12 @@ export const deleteIncident = (exerciseId, eventId, incidentId) => (
   return delReferential(uri, 'incidents', incidentId)(dispatch);
 };
 
-export const selectIncident = (exercise_id, event_id, incident_id) => (
+export const selectIncident = (exercieId, eventId, incidentId) => (
   dispatch,
 ) => {
   dispatch({
     type: Constants.APPLICATION_SELECT_INCIDENT,
-    payload: { exercise_id, event_id, incident_id },
+    payload: { exercieId, eventId, incidentId },
   });
 };
 

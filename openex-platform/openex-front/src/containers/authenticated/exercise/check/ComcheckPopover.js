@@ -11,8 +11,10 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemButton } from '../../../../components/menu/MenuItem';
-import { redirectToChecks } from '../../../../actions/Application';
-import { deleteComcheck } from '../../../../actions/Comcheck';
+/* eslint-disable */
+import { redirectToChecks } from "../../../../actions/Application";
+import { deleteComcheck } from "../../../../actions/Comcheck";
+/* eslint-enable */
 
 const style = {
   float: 'left',
@@ -61,7 +63,7 @@ class ComcheckPopover extends Component {
   }
 
   render() {
-    const comcheck_is_deletable = R.propOr(
+    const comcheckIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.comcheck,
@@ -74,7 +76,7 @@ class ComcheckPopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      comcheck_is_deletable ? (
+      comcheckIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -96,7 +98,7 @@ class ComcheckPopover extends Component {
           anchorEl={this.state.anchorEl}
           onRequestClose={this.handlePopoverClose.bind(this)}
         >
-          {comcheck_is_deletable ? (
+          {comcheckIsDeletable ? (
             <Menu multiple={false}>
               <MenuItemButton
                 label="Delete"

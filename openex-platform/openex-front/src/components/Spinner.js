@@ -17,6 +17,7 @@ const styles = {
   },
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const CircularSpinner = (props) => (
   <div style={styles[props.type]}>
     <CircularProgress color={props.color} size={props.size} />

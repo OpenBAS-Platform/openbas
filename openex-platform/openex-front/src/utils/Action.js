@@ -2,6 +2,7 @@ import { SubmissionError } from 'redux-form';
 import Immutable from 'seamless-immutable';
 import * as R from 'ramda';
 import FileSaver from 'file-saver';
+// eslint-disable-next-line import/no-cycle
 import { api } from '../App';
 import * as Constants from '../constants/ActionTypes';
 
@@ -53,9 +54,9 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
       dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
       return response.data;
     })
-    .catch((data) => {
+    .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR });
-      throw submitErrors(data);
+      throw submitErrors(error);
     });
 };
 
@@ -68,9 +69,9 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
       dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
       return response.data;
     })
-    .catch((data) => {
+    .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR });
-      throw submitErrors(data);
+      throw submitErrors(error);
     });
 };
 
@@ -84,8 +85,8 @@ export const delReferential = (uri, type, id) => (dispatch) => {
         payload: Immutable({ type, id }),
       });
     })
-    .catch((data) => {
+    .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR });
-      throw submitErrors(data);
+      throw submitErrors(error);
     });
 };

@@ -1,36 +1,39 @@
-import React, { Component } from "react";
-import { Icon } from "./Icon";
-import * as Constants from "../constants/ComponentTypes";
-import { FormField } from "./Field";
-import DatePickerOpx from "./DatePickerOpx";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Icon } from './Icon';
+import * as Constants from '../constants/ComponentTypes';
+import { FormField } from './Field';
+import DatePickerOpx from './DatePickerOpx';
 
 const styles = {
   newInputDate: {
     iconCalendar: {
-      cursor: "pointer",
+      cursor: 'pointer',
     },
     inputOnlyDateField: {
-      display: "inline-block",
-      width: "90%",
-      marginLeft: "4%",
-      verticalAlign: "middle",
+      display: 'inline-block',
+      width: '90%',
+      marginLeft: '4%',
+      verticalAlign: 'middle',
     },
     inputOnlyDateIcon: {
-      display: "inline-block",
-      width: "5%",
-      verticalAlign: "middle",
+      display: 'inline-block',
+      width: '5%',
+      verticalAlign: 'middle',
     },
     inputDateColumn: {
-      display: "inline-block",
-      width: "48%",
-      verticalAlign: "middle",
+      display: 'inline-block',
+      width: '48%',
+      verticalAlign: 'middle',
     },
   },
 };
 
 class DatePickerIconOpx extends Component {
-  refDatePicker = React.createRef();
+  constructor(props) {
+    super(props);
+    this.refDatePicker = React.createRef();
+  }
 
   raiseDatePicker() {
     this.refDatePicker.current.openDialog();

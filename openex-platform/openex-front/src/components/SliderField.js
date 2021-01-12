@@ -15,6 +15,7 @@ const renderSliderField = ({
       /* disable the dragging propagation */
     }}
     onChange={(event, newValue) => {
+      // eslint-disable-next-line no-unused-expressions
       onSliderChange && onSliderChange(event, newValue);
       input.onChange(newValue);
     }}
@@ -31,6 +32,7 @@ renderSliderField.propTypes = {
   onSliderChange: PropTypes.func,
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const SliderField = (props) => (
   <Field component={renderSliderField} {...props} />
 );

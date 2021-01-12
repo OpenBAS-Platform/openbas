@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../utils/Messages';
+// eslint-disable-next-line import/no-cycle
 import { addUser } from '../../../../actions/User';
 import { Dialog } from '../../../../components/Dialog';
 import {
@@ -37,6 +38,7 @@ class CreateUser extends Component {
   }
 
   submitFormCreate() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.userForm.submit();
   }
 
@@ -70,6 +72,7 @@ class CreateUser extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={actionsCreateUser}
         >
+          {/* eslint-disable */}
           <UserForm
             ref="userForm"
             editing={false}
@@ -77,6 +80,7 @@ class CreateUser extends Component {
             organizations={this.props.organizations}
             onSubmitSuccess={this.handleCloseCreate.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

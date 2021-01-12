@@ -10,6 +10,7 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
+// eslint-disable-next-line import/no-cycle
 import { updateOutcome } from '../../../../actions/Outcome';
 import OutcomeForm from './OutcomeForm';
 
@@ -66,6 +67,7 @@ class IncidentPopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.outcomeForm.submit();
   }
 
@@ -89,7 +91,7 @@ class IncidentPopover extends Component {
       ['outcome_result', 'outcome_comment'],
       this.props.incident.incident_outcome,
     );
-    const incident_is_updatable = R.propOr(
+    const incidentIsUpdatable = R.propOr(
       false,
       'user_can_update',
       this.props.incident,
@@ -103,7 +105,7 @@ class IncidentPopover extends Component {
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
         </IconButton>
 
-        {incident_is_updatable ? (
+        {incidentIsUpdatable ? (
           <Popover
             open={this.state.openPopover}
             anchorEl={this.state.anchorEl}
@@ -127,12 +129,14 @@ class IncidentPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <OutcomeForm
             ref="outcomeForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

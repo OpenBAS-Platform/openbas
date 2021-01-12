@@ -43,5 +43,6 @@ export const i18nRegister = (data) => {
 };
 
 export const debug = (...msg) => {
+  // eslint-disable-next-line no-console
   if (process.env.NODE_ENV === 'development') Function.prototype.apply.call(console.log, console, [logDate(), msg]);
 };

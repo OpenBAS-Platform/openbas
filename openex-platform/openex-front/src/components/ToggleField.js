@@ -20,6 +20,7 @@ renderToggleField.propTypes = {
   onToggle: PropTypes.func,
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const ToggleField = (props) => (
   <Field label={props.label} component={renderToggleField} {...props} />
 );

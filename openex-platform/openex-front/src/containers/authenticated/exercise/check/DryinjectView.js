@@ -30,6 +30,7 @@ const styles = {
 };
 
 class DryinjectView extends Component {
+  // eslint-disable-next-line class-methods-use-this
   readJSON(str) {
     try {
       return JSON.parse(str);
@@ -39,19 +40,19 @@ class DryinjectView extends Component {
   }
 
   render() {
-    const dryinject_content = this.readJSON(
+    const dryinjectContent = this.readJSON(
       R.propOr(null, 'dryinject_content', this.props.dryinject),
     );
-    const dryinject_description = R.propOr(
+    const dryinjectDescription = R.propOr(
       '',
       'dryinject_description',
       this.props.dryinject,
     );
 
-    const dryinject_fields = R.pipe(
+    const dryinjectFields = R.pipe(
       R.toPairs(),
       R.map((d) => ({ key: R.head(d), value: R.last(d) })),
-    )(dryinject_content);
+    )(dryinjectContent);
 
     const displayedAsText = ['sender', 'subject', 'body', 'message', 'content'];
     const displayedAsList = ['attachments'];
@@ -63,10 +64,10 @@ class DryinjectView extends Component {
             <T>Description</T>
           </strong>
           <br />
-          <div>{dryinject_description}</div>
+          <div>{dryinjectDescription}</div>
         </div>
         <br />
-        {dryinject_fields.map((field) => {
+        {dryinjectFields.map((field) => {
           if (R.indexOf(field.key, displayedAsText) !== -1) {
             return (
               <div key={field.key}>
@@ -74,11 +75,12 @@ class DryinjectView extends Component {
                   <T>{field.key}</T>
                 </strong>
                 <br />
-                <div dangerouslySetInnerHTML={{ __html: field.value }}></div>
+                <div dangerouslySetInnerHTML={{ __html: field.value }} />
                 <br />
               </div>
             );
-          } if (R.indexOf(field.key, displayedAsList) !== -1) {
+          }
+          if (R.indexOf(field.key, displayedAsList) !== -1) {
             return (
               <div key={field.key}>
                 <strong>
@@ -86,19 +88,19 @@ class DryinjectView extends Component {
                 </strong>
                 <br />
                 {field.value.map((v) => {
-                  const document_name = R.propOr('-', 'document_name', v);
-                  const document_id = R.propOr('-', 'document_id', v);
+                  const documentName = R.propOr('-', 'document_name', v);
+                  const documentId = R.propOr('-', 'document_id', v);
                   return (
                     <div
                       key={v.document_name}
                       style={styles.link}
-                      dangerouslySetInnerHTML={{ __html: document_name }}
+                      dangerouslySetInnerHTML={{ __html: documentName }}
                       onClick={this.props.downloadAttachment.bind(
                         this,
-                        document_id,
-                        document_name,
+                        documentId,
+                        documentName,
                       )}
-                    ></div>
+                    />
                   );
                 })}
                 <br />

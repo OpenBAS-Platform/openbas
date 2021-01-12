@@ -9,6 +9,7 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
+// eslint-disable-next-line import/no-cycle
 import { addLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 
@@ -58,6 +59,7 @@ class LogsPopover extends Component {
   }
 
   submitFormCreate() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.logForm.submit();
   }
 
@@ -101,11 +103,13 @@ class LogsPopover extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={createActions}
         >
+          {/* eslint-disable */}
           <LogForm
             ref="logForm"
             onSubmit={this.onSubmitCreate.bind(this)}
             onSubmitSuccess={this.handleCloseCreate.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

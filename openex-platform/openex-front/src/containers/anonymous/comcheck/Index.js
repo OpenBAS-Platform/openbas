@@ -65,14 +65,14 @@ IndexComcheck.propTypes = {
 
 const select = (state, ownProps) => {
   const { statusId } = ownProps.params;
-  const comcheck_status = R.propOr(
+  const comcheckStatus = R.propOr(
     {},
     statusId,
     state.referential.entities.comchecks_statuses,
   );
   return {
     statusId,
-    comcheck_status,
+    comcheckStatus,
   };
 };
 

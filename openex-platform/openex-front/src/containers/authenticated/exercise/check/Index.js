@@ -9,12 +9,14 @@ import * as Constants from '../../../../constants/ComponentTypes';
 import { List } from '../../../../components/List';
 import { MainListItemLink } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
-import { fetchGroups } from '../../../../actions/Group';
-import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchDryruns } from '../../../../actions/Dryrun';
-import { fetchComchecks } from '../../../../actions/Comcheck';
-import DryrunsPopover from './DryrunsPopover';
-import ComchecksPopover from './ComchecksPopover';
+/* eslint-disable */
+import { fetchGroups } from "../../../../actions/Group";
+import { fetchAudiences } from "../../../../actions/Audience";
+import { fetchDryruns } from "../../../../actions/Dryrun";
+import { fetchComchecks } from "../../../../actions/Comcheck";
+import DryrunsPopover from "./DryrunsPopover";
+import ComchecksPopover from "./ComchecksPopover";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -108,33 +110,28 @@ class IndexExcerciseDryrun extends Component {
           )}
           <List>
             {this.props.dryruns.map((dryrun) => (
-                <MainListItemLink
-                  to={
-                    `/private/exercise/${
-                      this.props.exerciseId
-                    }/checks/dryrun/${
-                      dryrun.dryrun_id}`
-                  }
-                  key={dryrun.dryrun_id}
-                  primaryText={
-                    <div>
-                      <div style={styles.dryrun_audience}>
-                        <T>Dryrun</T>
-                      </div>
-                      <div style={styles.dryrun_date}>
-                        {dateFormat(dryrun.dryrun_date)}
-                      </div>
-                      <div className="clearfix"></div>
+              <MainListItemLink
+                to={`/private/exercise/${this.props.exerciseId}/checks/dryrun/${dryrun.dryrun_id}`}
+                key={dryrun.dryrun_id}
+                primaryText={
+                  <div>
+                    <div style={styles.dryrun_audience}>
+                      <T>Dryrun</T>
                     </div>
-                  }
-                  leftIcon={
-                    <Icon
-                      name={Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO}
-                      type={Constants.ICON_TYPE_MAINLIST}
-                      color={dryrun.dryrun_finished ? '#666666' : '#E91E63'}
-                    />
-                  }
-                />
+                    <div style={styles.dryrun_date}>
+                      {dateFormat(dryrun.dryrun_date)}
+                    </div>
+                    <div className="clearfix"></div>
+                  </div>
+                }
+                leftIcon={
+                  <Icon
+                    name={Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO}
+                    type={Constants.ICON_TYPE_MAINLIST}
+                    color={dryrun.dryrun_finished ? '#666666' : '#E91E63'}
+                  />
+                }
+              />
             ))}
           </List>
         </div>
@@ -160,23 +157,18 @@ class IndexExcerciseDryrun extends Component {
           )}
           <List>
             {this.props.comchecks.map((comcheck) => {
-              const comcheck_audience = R.find(
+              const comcheckAudience = R.find(
                 (a) => a.audience_id === comcheck.comcheck_audience.audience_id,
                 this.props.audiences,
               );
               const audienceName = R.propOr(
                 '-',
                 'audience_name',
-                comcheck_audience,
+                comcheckAudience,
               );
               return (
                 <MainListItemLink
-                  to={
-                    `/private/exercise/${
-                      this.props.exerciseId
-                    }/checks/comcheck/${
-                      comcheck.comcheck_id}`
-                  }
+                  to={`/private/exercise/${this.props.exerciseId}/checks/comcheck/${comcheck.comcheck_id}`}
                   key={comcheck.comcheck_id}
                   primaryText={
                     <div>
@@ -184,7 +176,7 @@ class IndexExcerciseDryrun extends Component {
                       <div style={styles.dryrun_date}>
                         {dateFormat(comcheck.comcheck_start_date)}
                       </div>
-                      <div className="clearfix"></div>
+                      <div className="clearfix"/>
                     </div>
                   }
                   leftIcon={

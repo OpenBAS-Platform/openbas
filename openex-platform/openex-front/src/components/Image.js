@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+// eslint-disable-next-line import/no-cycle
 import { dataFile } from '../actions/File';
 
 // Region background Image
@@ -10,11 +11,12 @@ class ReactBackgroundImage extends Component {
     this.state = { imgData: null };
   }
 
-  fetchImageData(image_id) {
+  fetchImageData(imageId) {
+    // eslint-disable-next-line no-underscore-dangle
     const _this = this;
     const urlCreator = window.URL || window.webkitURL;
     this.props
-      .dataFile(image_id)
+      .dataFile(imageId)
       .then((response) => _this.setState({ imgData: urlCreator.createObjectURL(response.data) }));
   }
 
@@ -65,11 +67,12 @@ class ReactImage extends Component {
     this.state = { imgData: null };
   }
 
-  fetchImageData(image_id) {
+  fetchImageData(imageId) {
+    // eslint-disable-next-line no-underscore-dangle
     const _this = this;
     const urlCreator = window.URL || window.webkitURL;
     this.props
-      .dataFile(image_id)
+      .dataFile(imageId)
       .then((response) => _this.setState({ imgData: urlCreator.createObjectURL(response.data) }));
   }
 

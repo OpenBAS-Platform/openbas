@@ -4,16 +4,21 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { i18nRegister } from '../../utils/Messages';
 import * as Constants from '../../constants/ComponentTypes';
+/* eslint-disable */
 import {
   fetchFiles,
   addFile,
   deleteFile,
   downloadFile,
-} from '../../actions/File';
-import { IconButton, FloatingActionsButtonCreate } from '../../components/Button';
-import { Image } from '../../components/Image';
-import { GridList, GridTile } from '../../components/GridList';
-import { Icon } from '../../components/Icon';
+} from "../../actions/File";
+import {
+  IconButton,
+  FloatingActionsButtonCreate,
+} from "../../components/Button";
+import { Image } from "../../components/Image";
+import { GridList, GridTile } from "../../components/GridList";
+import { Icon } from "../../components/Icon";
+/* eslint-enable */
 
 import { SimpleTextField } from '../../components/SimpleTextField';
 
@@ -49,11 +54,13 @@ class FileGallery extends Component {
   }
 
   openFileDialog() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
+    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props.addFile(data);
   }
@@ -62,12 +69,12 @@ class FileGallery extends Component {
     this.props.fileSelector(file);
   }
 
-  handleFileDelete(file_id) {
-    return this.props.deleteFile(file_id);
+  handleFileDelete(fileId) {
+    return this.props.deleteFile(fileId);
   }
 
-  handleFileDownload(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  handleFileDownload(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   render() {
@@ -149,12 +156,14 @@ class FileGallery extends Component {
           onClick={this.openFileDialog.bind(this)}
           type={Constants.BUTTON_TYPE_FLOATING}
         />
+        {/* eslint-disable */}
         <input
           type="file"
           ref="fileUpload"
           style={{ display: 'none' }}
           onChange={this.handleFileChange.bind(this)}
         />
+        {/* eslint-enable */}
       </div>
     );
   }

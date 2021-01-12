@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Constants from '../constants/ComponentTypes';
 import { Paper } from './Paper';
+// eslint-disable-next-line import/no-cycle
 import { BackgroundImage } from './Image';
 
 const styles = {
@@ -64,6 +65,7 @@ const styles = {
   },
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const Exercise = (props) => (
   <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE} zDepth={4}>
     <div style={styles.header}>

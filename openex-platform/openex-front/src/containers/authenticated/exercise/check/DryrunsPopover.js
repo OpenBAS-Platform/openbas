@@ -9,8 +9,10 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
-import { addDryrun } from '../../../../actions/Dryrun';
-import { redirectToDryrun } from '../../../../actions/Application';
+/* eslint-disable */
+import { addDryrun } from "../../../../actions/Dryrun";
+import { redirectToDryrun } from "../../../../actions/Application";
+/* eslint-enable */
 import DryrunForm from './DryrunForm';
 
 const style = {
@@ -61,6 +63,7 @@ class DryrunsPopover extends Component {
   }
 
   submitFormLaunch() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.dryrunForm.submit();
   }
 
@@ -104,10 +107,12 @@ class DryrunsPopover extends Component {
           onRequestClose={this.handleCloseLaunch.bind(this)}
           actions={launchActions}
         >
+          {/* eslint-disable */}
           <DryrunForm
             ref="dryrunForm"
             onSubmit={this.onSubmitLaunch.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

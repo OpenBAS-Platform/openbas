@@ -17,12 +17,12 @@ const styles = {
 
 class OutcomeView extends Component {
   render() {
-    const outcome_result = R.pathOr(
+    const outcomeResult = R.pathOr(
       '-',
       ['incident_outcome', 'outcome_result'],
       this.props.incident,
     );
-    const outcome_comment = R.pathOr(
+    const outcomeComment = R.pathOr(
       '-',
       ['incident_outcome', 'outcome_comment'],
       this.props.incident,
@@ -30,8 +30,8 @@ class OutcomeView extends Component {
 
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{outcome_result}</div>
-        <div style={styles.story}>{outcome_comment}</div>
+        <div style={styles.title}>{outcomeResult}</div>
+        <div style={styles.story}>{outcomeComment}</div>
       </div>
     );
   }

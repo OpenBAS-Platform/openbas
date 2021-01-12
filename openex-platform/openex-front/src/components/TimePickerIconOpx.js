@@ -1,37 +1,40 @@
-import React, { Component } from "react";
-import { Icon } from "./Icon";
-import * as Constants from "../constants/ComponentTypes";
-import { FormField } from "./Field";
-import TimePickerOpx from "./TimePickerOpx";
-import PropTypes from "prop-types";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Icon } from './Icon';
+import * as Constants from '../constants/ComponentTypes';
+import { FormField } from './Field';
+import TimePickerOpx from './TimePickerOpx';
 
 const styles = {
   newInputDate: {
     iconCalendar: {
-      cursor: "pointer",
+      cursor: 'pointer',
     },
     inputOnlyTimeField: {
-      display: "inline-block",
-      width: "90%",
-      verticalAlign: "middle",
-      marginLeft: "4%",
+      display: 'inline-block',
+      width: '90%',
+      verticalAlign: 'middle',
+      marginLeft: '4%',
     },
     inputOnlyTimeIcon: {
-      display: "inline-block",
-      width: "5%",
-      verticalAlign: "middle",
+      display: 'inline-block',
+      width: '5%',
+      verticalAlign: 'middle',
     },
     inputTimeColumn: {
-      display: "inline-block",
-      width: "48%",
-      marginLeft: "4%",
-      verticalAlign: "middle",
+      display: 'inline-block',
+      width: '48%',
+      marginLeft: '4%',
+      verticalAlign: 'middle',
     },
   },
 };
 
 class TimePickerIconOpx extends Component {
-  refTimePicker = React.createRef();
+  constructor(props) {
+    super(props);
+    this.refTimePicker = React.createRef();
+  }
 
   raiseDatePicker() {
     this.refTimePicker.current.openDialog();

@@ -80,8 +80,8 @@ class DocumentTags extends Component {
           <div style={styles.ssDivGauche}>
             {this.props.availables_tags.map((tag) => {
               let exist = false;
-              this.props.document_tags.forEach((document_tags) => {
-                if (document_tags === tag.tag_id) {
+              this.props.document_tags.forEach((documentTags) => {
+                if (documentTags === tag.tag_id) {
                   exist = true;
                 }
               });
@@ -98,10 +98,8 @@ class DocumentTags extends Component {
             })}
             {this.props.availables_exercises_tags.map((exercise) => {
               let exist = false;
-              this.props.document_tags_exercise.forEach((
-                document_tags,
-              ) => {
-                if (document_tags === exercise.exercise_id) {
+              this.props.document_tags_exercise.forEach((documentTags) => {
+                if (documentTags === exercise.exercise_id) {
                   exist = true;
                 }
               });
@@ -134,8 +132,8 @@ class DocumentTags extends Component {
               )}
             {this.props.availables_tags.map((tag) => {
               let exist = false;
-              this.props.document_tags.forEach((document_tags) => {
-                if (document_tags === tag.tag_id) {
+              this.props.document_tags.forEach((documentTags) => {
+                if (documentTags === tag.tag_id) {
                   exist = true;
                 }
               });
@@ -152,10 +150,8 @@ class DocumentTags extends Component {
             })}
             {this.props.availables_exercises_tags.map((exercise) => {
               let exist = false;
-              this.props.document_tags_exercise.forEach((
-                document_tags,
-              ) => {
-                if (document_tags === exercise.exercise_id) {
+              this.props.document_tags_exercise.forEach((documentTags) => {
+                if (documentTags === exercise.exercise_id) {
                   exist = true;
                 }
               });

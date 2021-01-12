@@ -14,6 +14,7 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../components/menu/MenuItem';
+// eslint-disable-next-line import/no-cycle
 import { updateLog, deleteLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 
@@ -64,6 +65,7 @@ class LogPopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.logForm.submit();
   }
 
@@ -152,12 +154,14 @@ class LogPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <LogForm
             ref="logForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

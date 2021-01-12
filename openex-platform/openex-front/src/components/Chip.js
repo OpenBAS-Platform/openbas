@@ -22,6 +22,7 @@ const chipLabelStyle = {
   },
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const Chip = (props) => (
   <MUIChip
     backgroundColor={props.backgroundColor}

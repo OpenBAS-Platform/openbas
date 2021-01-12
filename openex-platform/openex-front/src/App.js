@@ -1,18 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import {
-  createStore, applyMiddleware, compose, combineReducers,
-} from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { Provider, connect } from 'react-redux';
 import { createBrowserHistory } from 'history';
 import { Redirect, Route, Switch } from 'react-router';
-import {
-  connectRouter,
-  ConnectedRouter,
-  routerMiddleware,
-} from 'connected-react-router';
+import { ConnectedRouter, routerMiddleware } from 'connected-react-router';
 import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { normalize } from 'normalizr';
@@ -20,19 +14,17 @@ import { IntlProvider } from 'react-intl';
 import * as R from 'ramda';
 import Immutable from 'seamless-immutable';
 import { createLogger } from 'redux-logger';
-import { reducer as formReducer } from 'redux-form';
 import theme from './components/Theme';
 import { locale } from './utils/BrowserLanguage';
 import { i18n, debug } from './utils/Messages';
-import referential, { entitiesInitializer } from './reducers/Referential';
+import { entitiesInitializer } from './reducers/Referential';
 import * as Constants from './constants/ActionTypes';
 // TODO @Sam fix dependency cycle
 /* eslint-disable */
-import RootAnonymous from './containers/anonymous/Root';
-import RootAuthenticated from './containers/authenticated/Root';
+import RootAnonymous from "./containers/anonymous/Root";
+import RootAuthenticated from "./containers/authenticated/Root";
 /* eslint-enable */
-import app from './reducers/App';
-import screen from './reducers/Screen';
+import createRootReducer from './reducers/Root';
 
 // Default application state
 const initialState = {
@@ -64,17 +56,10 @@ const logger = createLogger({
   predicate: (getState, action) => !action.type.startsWith('DATA_FETCH')
     && !action.type.startsWith('@@redux-form'),
 });
-// Only compose the store if devTools are available
-const rootReducer = combineReducers({
-  router: connectRouter(history),
-  form: formReducer,
-  app,
-  referential,
-  screen,
-});
+
 if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
   store = createStore(
-    rootReducer,
+    createRootReducer(history),
     initialState,
     compose(
       applyMiddleware(routerMiddleware(history), thunk, logger),
@@ -83,7 +68,7 @@ if (process.env.NODE_ENV === 'development' && window.devToolsExtension) {
   );
 } else {
   store = createStore(
-    rootReducer,
+    createRootReducer(history),
     initialState,
     applyMiddleware(routerMiddleware(history), thunk),
   );

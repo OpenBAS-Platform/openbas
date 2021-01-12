@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-
 import * as Constants from '../../../../constants/ComponentTypes';
 import { List } from '../../../../components/List';
 import { MainListItem } from '../../../../components/list/ListItem';
@@ -14,15 +13,17 @@ import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
 import { Dialog } from '../../../../components/Dialog';
 import { FlatButton } from '../../../../components/Button';
-import { fetchIncidents } from '../../../../actions/Incident';
-import { fetchLogs } from '../../../../actions/Log';
-import { fetchGroups } from '../../../../actions/Group';
-import { equalsSelector } from '../../../../utils/Selectors';
-import LogsPopover from './LogsPopover';
-import LogPopover from './LogPopover';
-import IncidentPopover from './IncidentPopover';
-import OutcomeView from './OutcomeView';
-import LogView from './LogView';
+/* eslint-disable */
+import { fetchIncidents } from "../../../../actions/Incident";
+import { fetchLogs } from "../../../../actions/Log";
+import { fetchGroups } from "../../../../actions/Group";
+import { equalsSelector } from "../../../../utils/Selectors";
+import LogsPopover from "./LogsPopover";
+import LogPopover from "./LogPopover";
+import IncidentPopover from "./IncidentPopover";
+import OutcomeView from "./OutcomeView";
+import LogView from "./LogView";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -177,49 +178,49 @@ class IndexExerciseLessons extends Component {
           )}
           <List>
             {this.props.incidents.map((incident) => (
-                <MainListItem
-                  key={incident.incident_id}
-                  onClick={this.handleOpenOutcome.bind(this, incident)}
-                  rightIconButton={
-                    <IncidentPopover
-                      exerciseId={this.props.exerciseId}
-                      incident={incident}
-                    />
-                  }
-                  primaryText={
-                    <div>
-                      <div style={styles.log_title}>
-                        {incident.incident_title}
-                      </div>
-                      <div style={styles.incident_result}>
-                        <LinearProgress
-                          mode="determinate"
-                          min={0}
-                          max={100}
-                          value={incident.incident_outcome.outcome_result}
-                        />
-                      </div>
-                      <div className="clearfix"></div>
+              <MainListItem
+                key={incident.incident_id}
+                onClick={this.handleOpenOutcome.bind(this, incident)}
+                rightIconButton={
+                  <IncidentPopover
+                    exerciseId={this.props.exerciseId}
+                    incident={incident}
+                  />
+                }
+                primaryText={
+                  <div>
+                    <div style={styles.log_title}>
+                      {incident.incident_title}
                     </div>
-                  }
-                  secondaryText={
-                    <div style={styles.log_content}>
-                      {incident.incident_outcome.outcome_comment === null ? (
-                        <i>
-                          <T>No comment for this incident.</T>
-                        </i>
-                      ) : (
-                        <i>{incident.incident_outcome.outcome_comment}</i>
-                      )}
+                    <div style={styles.incident_result}>
+                      <LinearProgress
+                        mode="determinate"
+                        min={0}
+                        max={100}
+                        value={incident.incident_outcome.outcome_result}
+                      />
                     </div>
-                  }
-                  leftIcon={
-                    <Icon
-                      name={Constants.ICON_NAME_MAPS_LAYERS}
-                      type={Constants.ICON_TYPE_MAINLIST2}
-                    />
-                  }
-                />
+                    <div className="clearfix"></div>
+                  </div>
+                }
+                secondaryText={
+                  <div style={styles.log_content}>
+                    {incident.incident_outcome.outcome_comment === null ? (
+                      <i>
+                        <T>No comment for this incident.</T>
+                      </i>
+                    ) : (
+                      <i>{incident.incident_outcome.outcome_comment}</i>
+                    )}
+                  </div>
+                }
+                leftIcon={
+                  <Icon
+                    name={Constants.ICON_NAME_MAPS_LAYERS}
+                    type={Constants.ICON_TYPE_MAINLIST2}
+                  />
+                }
+              />
             ))}
           </List>
           <Dialog
@@ -242,7 +243,7 @@ class IndexExerciseLessons extends Component {
           ) : (
             ''
           )}
-          <div className="clearfix"></div>
+          <div className="clearfix"/>
           {this.props.logs.length === 0 ? (
             <div style={styles.empty}>
               <T>You do not have any entries in the exercise log.</T>
@@ -252,31 +253,31 @@ class IndexExerciseLessons extends Component {
           )}
           <List>
             {this.props.logs.map((log) => (
-                <MainListItem
-                  key={log.log_id}
-                  onClick={this.handleOpenLog.bind(this, log)}
-                  rightIconButton={
-                    <LogPopover exerciseId={this.props.exerciseId} log={log} />
-                  }
-                  primaryText={
-                    <div>
-                      <div style={styles.log_title}>{log.log_title}</div>
-                      <div style={styles.log_date}>
-                        {dateFormat(log.log_date)}
-                      </div>
-                      <div className="clearfix"></div>
+              <MainListItem
+                key={log.log_id}
+                onClick={this.handleOpenLog.bind(this, log)}
+                rightIconButton={
+                  <LogPopover exerciseId={this.props.exerciseId} log={log} />
+                }
+                primaryText={
+                  <div>
+                    <div style={styles.log_title}>{log.log_title}</div>
+                    <div style={styles.log_date}>
+                      {dateFormat(log.log_date)}
                     </div>
-                  }
-                  secondaryText={
-                    <div style={styles.log_content}>{log.log_content}</div>
-                  }
-                  leftIcon={
-                    <Icon
-                      name={Constants.ICON_NAME_ACTION_DESCRIPTION}
-                      type={Constants.ICON_TYPE_MAINLIST2}
-                    />
-                  }
-                />
+                    <div className="clearfix"/>
+                  </div>
+                }
+                secondaryText={
+                  <div style={styles.log_content}>{log.log_content}</div>
+                }
+                leftIcon={
+                  <Icon
+                    name={Constants.ICON_NAME_ACTION_DESCRIPTION}
+                    type={Constants.ICON_TYPE_MAINLIST2}
+                  />
+                }
+              />
             ))}
           </List>
           <Dialog

@@ -5,7 +5,6 @@ import { Observable } from 'rxjs';
 import * as R from 'ramda';
 import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
-
 import { equalsSelector } from '../../../../utils/Selectors';
 import Theme from '../../../../components/Theme';
 import { T } from '../../../../components/I18n';
@@ -18,13 +17,15 @@ import { Dialog } from '../../../../components/Dialog';
 import { FlatButton } from '../../../../components/Button';
 import { CircularSpinner } from '../../../../components/Spinner';
 import Countdown from '../../../../components/Countdown';
-import { fetchGroups } from '../../../../actions/Group';
-import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchSubaudiences } from '../../../../actions/Subaudience';
-import { fetchAllInjects, fetchInjectTypes } from '../../../../actions/Inject';
-import { downloadFile } from '../../../../actions/File';
-import ExercisePopover from './ExercisePopover';
-import InjectPopover from '../scenario/event/InjectPopover';
+/* eslint-disable */
+import { fetchGroups } from "../../../../actions/Group";
+import { fetchAudiences } from "../../../../actions/Audience";
+import { fetchSubaudiences } from "../../../../actions/Subaudience";
+import { fetchAllInjects, fetchInjectTypes } from "../../../../actions/Inject";
+import { downloadFile } from "../../../../actions/File";
+import ExercisePopover from "./ExercisePopover";
+import InjectPopover from "../scenario/event/InjectPopover";
+/* eslint-enable */
 import InjectView from '../scenario/event/InjectView';
 import InjectStatusView from './InjectStatusView';
 
@@ -119,6 +120,7 @@ class IndexExecution extends Component {
     const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
     this.subscription = initialStream
       .merge(intervalStream)
+      // eslint-disable-next-line max-len
       .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId, true)) // Fetch only if previous call finished
       .subscribe();
   }
@@ -127,6 +129,7 @@ class IndexExecution extends Component {
     this.subscription.unsubscribe();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   selectIcon(type, color) {
     switch (type) {
       case 'openex_email':
@@ -164,6 +167,7 @@ class IndexExecution extends Component {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   selectStatus(status) {
     switch (status) {
       case 'SCHEDULED':
@@ -201,6 +205,7 @@ class IndexExecution extends Component {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -224,8 +229,8 @@ class IndexExecution extends Component {
     this.setState({ openStatus: false });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   render() {
@@ -315,23 +320,23 @@ class IndexExecution extends Component {
             )}
             {R.take(30, this.props.injectsPending).map((inject) => {
               const injectId = R.propOr(Math.random(), 'inject_id', inject);
-              const inject_title = R.propOr('-', 'inject_title', inject);
-              const inject_date = R.prop('inject_date', inject);
-              const inject_type = R.propOr('-', 'inject_type', inject);
-              const inject_audiences = R.propOr([], 'inject_audiences', inject);
-              const inject_subaudiences = R.propOr(
+              const injectTitle = R.propOr('-', 'inject_title', inject);
+              const injectDate = R.prop('inject_date', inject);
+              const injectType = R.propOr('-', 'inject_type', inject);
+              const injectAudiences = R.propOr([], 'inject_audiences', inject);
+              const injectSubaudiences = R.propOr(
                 [],
                 'inject_subaudiences',
                 inject,
               );
-              const inject_enabled = R.propOr(true, 'inject_enabled', inject);
+              const injectEnabled = R.propOr(true, 'inject_enabled', inject);
               const injectNotSupported = !R.propOr(
                 false,
-                inject_type,
+                injectType,
                 this.props.inject_types,
               );
-              const inject_in_progress = R.path(['inject_status', 'status_name'], inject) === 'PENDING';
-              const injectIcon = inject_in_progress ? (
+              const injectInProgress = R.path(['inject_status', 'status_name'], inject) === 'PENDING';
+              const injectIcon = injectInProgress ? (
                 <CircularSpinner
                   size={20}
                   type={Constants.SPINNER_TYPE_INJECT}
@@ -339,9 +344,9 @@ class IndexExecution extends Component {
                 />
               ) : (
                 this.selectIcon(
-                  inject_type,
+                  injectType,
                   this.switchColor(
-                    !inject_enabled
+                    !injectEnabled
                       || injectNotSupported
                       || exerciseStatus === 'CANCELED',
                   ),
@@ -357,26 +362,26 @@ class IndexExecution extends Component {
                         <span
                           style={{
                             color: this.switchColor(
-                              !inject_enabled
+                              !injectEnabled
                                 || injectNotSupported
                                 || exerciseStatus === 'CANCELED',
                             ),
                           }}
                         >
-                          {inject_title}
+                          {injectTitle}
                         </span>
                       </div>
                       <div style={styles.inject_date}>
                         <span
                           style={{
                             color: this.switchColor(
-                              !inject_enabled
+                              !injectEnabled
                                 || injectNotSupported
                                 || exerciseStatus === 'CANCELED',
                             ),
                           }}
                         >
-                          {dateFormat(inject_date)}
+                          {dateFormat(injectDate)}
                         </span>
                       </div>
                       <div className="clearfix"></div>
@@ -384,17 +389,17 @@ class IndexExecution extends Component {
                   }
                   leftIcon={injectIcon}
                   rightIconButton={
-                    !inject_in_progress && this.props.userCanUpdate ? (
+                    !injectInProgress && this.props.userCanUpdate ? (
                       <InjectPopover
                         type={Constants.INJECT_EXEC}
                         exerciseId={this.props.exerciseId}
                         eventId={inject.inject_event}
                         incidentId={inject.inject_incident.incident_id}
                         inject={inject}
-                        injectAudiencesIds={inject_audiences.map(
+                        injectAudiencesIds={injectAudiences.map(
                           (a) => a.audience_id,
                         )}
-                        injectSubaudiencesIds={inject_subaudiences.map(
+                        injectSubaudiencesIds={injectSubaudiences.map(
                           (a) => a.subaudience_id,
                         )}
                         audiences={this.props.audiences}

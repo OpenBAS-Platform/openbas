@@ -13,8 +13,9 @@ import { timeDiff } from '../../../../utils/Time';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { SearchField } from '../../../../components/SimpleTextField';
 import { Dialog } from '../../../../components/Dialog';
-import { fetchGroups } from '../../../../actions/Group';
-import { fetchTags, deleteTag } from '../../../../actions/Tag';
+/* eslint-disable */
+import { fetchGroups } from "../../../../actions/Group";
+import { fetchTags, deleteTag } from "../../../../actions/Tag";
 import {
   addDocument,
   searchDocument,
@@ -26,10 +27,11 @@ import {
   editDocumentTagsExercise,
   deleteDocument,
   downloadDocument,
-} from '../../../../actions/Document';
-import { fetchExercises } from '../../../../actions/Exercise';
-import { FlatButton } from '../../../../components/Button';
-import CreateTag from './tag/CreateTag';
+} from "../../../../actions/Document";
+import { fetchExercises } from "../../../../actions/Exercise";
+import { FlatButton } from "../../../../components/Button";
+import CreateTag from "./tag/CreateTag";
+/* eslint-enable */
 import DocumentForm from './document/DocumentForm';
 import DocumentActionPopover from './tag/DocumentActionPopover';
 import DocumentTags from './document/DocumentTags';
@@ -302,14 +304,16 @@ class Index extends Component {
   }
 
   openFileDialog() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
+    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
-    this.props.addDocument(data).then((document_id) => {
-      this.props.getDocument(document_id.result).then((document) => {
+    this.props.addDocument(data).then((documentId) => {
+      this.props.getDocument(documentId.result).then((document) => {
         this.handleEditDocument(
           R.prop(document.result, document.entities.document),
         );
@@ -335,22 +339,23 @@ class Index extends Component {
   }
 
   handleEditDocumentEditTag() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.documentForm.submit();
     this.handleCloseEditDocument();
     this.handleEditDocumentTag(this.state.selectedDocument.document_id);
   }
 
-  handleEditDocumentTag(document_id) {
+  handleEditDocumentTag(documentId) {
     this.setState({
-      selectedDocument: document_id,
+      selectedDocument: documentId,
     });
     // recherche des tags du document
-    this.props.getDocumentTags(document_id).then((tags) => {
+    this.props.getDocumentTags(documentId).then((tags) => {
       this.setState({
         documentsTags: tags.result,
       });
       // recherche des tags 'exercices' du document
-      this.props.getDocumentTagsExercise(document_id).then((tagsExercise) => {
+      this.props.getDocumentTagsExercise(documentId).then((tagsExercise) => {
         this.setState({
           documentsTagsExercise: tagsExercise.result,
           openEditDocumentTag: true,
@@ -378,6 +383,7 @@ class Index extends Component {
   }
 
   submitEditDocument() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.documentForm.submit();
   }
 
@@ -399,7 +405,7 @@ class Index extends Component {
   }
 
   onSubmitDocument(data) {
-    this.props.saveDocument(data.document_id, data).then((document) => {
+    this.props.saveDocument(data.document_id, data).then(() => {
       window.location.reload();
     });
   }
@@ -438,6 +444,7 @@ class Index extends Component {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   checkIfDocumentIsDisplay(
     document,
     listeTagAddToFilter,
@@ -483,11 +490,13 @@ class Index extends Component {
         });
       });
 
+      // eslint-disable-next-line no-plusplus
       for (let i = 0; i < listeTagCritere.length; i++) {
         if (listeTagCritere[i].exist === false) {
           toDisplay = false;
         }
       }
+      // eslint-disable-next-line no-plusplus
       for (let i = 0; i < listeTagExerciseCritere.length; i++) {
         if (listeTagExerciseCritere[i].exist === false) {
           toDisplay = false;
@@ -555,7 +564,7 @@ class Index extends Component {
           <div style={styles.title}>
             <T>Document Gallery</T>
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix" />
         </div>
 
         <div style={styles.columnRight}>
@@ -569,11 +578,9 @@ class Index extends Component {
               styletype={Constants.FIELD_TYPE_RIGHT}
             />
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix" />
         </div>
-
-        <div className="clearfix"></div>
-
+        <div className="clearfix" />
         <div style={styles.searchDivTitle}>
           <T>Search by :</T>
         </div>
@@ -593,22 +600,22 @@ class Index extends Component {
               )}
             {R.values(this.state.listeTagExerciseAddToFilter).map(
               (exercise) => (
-                  <TagAddToFilter
-                    key={exercise.exercise_id}
-                    value={exercise.exercise_name}
-                    onRequestDelete={this.removeTagExerciseToFilter.bind(
-                      this,
-                      exercise,
-                    )}
-                  />
+                <TagAddToFilter
+                  key={exercise.exercise_id}
+                  value={exercise.exercise_name}
+                  onRequestDelete={this.removeTagExerciseToFilter.bind(
+                    this,
+                    exercise,
+                  )}
+                />
               ),
             )}
             {R.values(this.state.listeTagAddToFilter).map((tag) => (
-                <TagAddToFilter
-                  key={tag.tag_id}
-                  value={tag.tag_name}
-                  onRequestDelete={this.removeTagToFilter.bind(this, tag)}
-                />
+              <TagAddToFilter
+                key={tag.tag_id}
+                value={tag.tag_name}
+                onRequestDelete={this.removeTagToFilter.bind(this, tag)}
+              />
             ))}
 
             <div className="clearfix"></div>
@@ -619,7 +626,9 @@ class Index extends Component {
                 {R.values(this.state.listeTagExerciseAddToFilter).map(
                   (exercise) => `${exercise.exercise_name}, `,
                 )}
-                {R.values(this.state.listeTagAddToFilter).map((tag) => `${tag.tag_name}, `)}
+                {R.values(this.state.listeTagAddToFilter).map(
+                  (tag) => `${tag.tag_name}, `,
+                )}
               </div>
               ) : (
                 ''
@@ -641,23 +650,23 @@ class Index extends Component {
                 ''
               )}
               <Table selectable={true} style={{ marginTop: '5px' }}>
-                <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableHeaderColumn>
+                    <TableCell>
                       <T>Name</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Description</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Type</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Tags</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn width="20">&nbsp;</TableHeaderColumn>
+                    </TableCell>
+                    <TableCell width="20">&nbsp;</TableCell>
                   </TableRow>
-                </TableHeader>
+                </TableHead>
                 <TableBody displayRowCheckbox={false}>
                   {this.props.documents.map((document) => {
                     const listeTagAddToFilter = [
@@ -674,37 +683,33 @@ class Index extends Component {
                     );
                     return toDisplay === true ? (
                       <TableRow key={document.document_id}>
-                        <TableRowColumn>
-                          {document.document_name}
-                        </TableRowColumn>
-                        <TableRowColumn
+                        <TableCell>{document.document_name}</TableCell>
+                        <TableCell
                           style={{
                             wordWrap: 'break-word',
                             whiteSpace: 'normal',
                           }}
                         >
                           {document.document_description}
-                        </TableRowColumn>
-                        <TableRowColumn>
-                          {document.document_type}
-                        </TableRowColumn>
-                        <TableRowColumn>
+                        </TableCell>
+                        <TableCell>{document.document_type}</TableCell>
+                        <TableCell>
                           {document.document_liste_tags.map((tag) => (
-                              <TagSmallListe
-                                key={tag.tag_id}
-                                value={tag.tag_name}
-                              />
+                            <TagSmallListe
+                              key={tag.tag_id}
+                              value={tag.tag_name}
+                            />
                           ))}
                           {document.document_liste_tags_exercise.map(
                             (exercise) => (
-                                <TagSmallExerciseListe
-                                  key={exercise.exercise_id}
-                                  value={exercise.exercise_name}
-                                />
+                              <TagSmallExerciseListe
+                                key={exercise.exercise_id}
+                                value={exercise.exercise_name}
+                              />
                             ),
                           )}
-                        </TableRowColumn>
-                        <TableRowColumn width="20">
+                        </TableCell>
+                        <TableCell width="20">
                           <div>
                             {this.props.userCanUpdate ? (
                               <DocumentActionPopover
@@ -727,7 +732,7 @@ class Index extends Component {
                               ''
                             )}
                           </div>
-                        </TableRowColumn>
+                        </TableCell>
                       </TableRow>
                     ) : (
                       ''
@@ -759,37 +764,38 @@ class Index extends Component {
                 ''
               )}
               {this.props.tags.map((tag) => (
-                  <TagListe
-                    key={tag.tag_id}
-                    value={tag.tag_name}
-                    onClick={this.addAvailableTagToFilter.bind(this, tag)}
-                    onRequestDelete={this.handleOpenConfirmDeleteTag.bind(
-                      this,
-                      tag,
-                    )}
-                  />
+                <TagListe
+                  key={tag.tag_id}
+                  value={tag.tag_name}
+                  onClick={this.addAvailableTagToFilter.bind(this, tag)}
+                  onRequestDelete={this.handleOpenConfirmDeleteTag.bind(
+                    this,
+                    tag,
+                  )}
+                />
               ))}
               {this.props.exercises.map((exercise) => (
-                  <TagExerciseListe
-                    key={exercise.exercise_id}
-                    value={exercise.exercise_name}
-                    onClick={this.addAvailableTagExerciseToFilter.bind(
-                      this,
-                      exercise,
-                    )}
-                  />
+                <TagExerciseListe
+                  key={exercise.exercise_id}
+                  value={exercise.exercise_name}
+                  onClick={this.addAvailableTagExerciseToFilter.bind(
+                    this,
+                    exercise,
+                  )}
+                />
               ))}
             </div>
             {this.props.userCanUpdate ? <CreateTag /> : ''}
           </div>
         </div>
+        {/* eslint-disable */}
         <input
           type="file"
           ref="fileUpload"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           onChange={this.handleFileChange.bind(this)}
         />
-
+        {/* eslint-enable */}
         {this.props.userCanUpdate ? (
           <Dialog
             title="Edit document"
@@ -798,17 +804,18 @@ class Index extends Component {
             onRequestClose={this.handleCloseEditDocument.bind(this)}
             actions={actionsEditDocument}
           >
+            {/* eslint-disable */}
             <DocumentForm
               ref="documentForm"
               initialValues={this.state.selectedDocument}
               onSubmit={this.onSubmitDocument.bind(this)}
               onSubmitSuccess={this.handleCloseEditDocument.bind(this)}
             />
+            {/* eslint-enable */}
           </Dialog>
         ) : (
           ''
         )}
-
         {this.props.userCanUpdate ? (
           <Dialog
             title="Delete Tag"

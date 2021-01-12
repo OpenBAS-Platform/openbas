@@ -17,39 +17,36 @@ export const searchDocument = (data) => (dispatch) => {
   return postReferential(schema.arrayOfDocument, uri, data)(dispatch);
 };
 
-export const saveDocument = (document_id, data) => (dispatch) => {
-  const uri = `/api/document/save/${document_id}`;
+export const saveDocument = (documentId, data) => (dispatch) => {
+  const uri = `/api/document/save/${documentId}`;
   return postReferential(schema.document, uri, data)(dispatch);
 };
 
-export const getDocument = (document_id) => (dispatch) => getReferential(
-  schema.document,
-  `/api/document/${document_id}`,
-)(dispatch);
+export const getDocument = (documentId) => (dispatch) => getReferential(schema.document, `/api/document/${documentId}`)(dispatch);
 
-export const getDocumentTags = (document_id) => (dispatch) => getReferential(
+export const getDocumentTags = (documentId) => (dispatch) => getReferential(
   schema.arrayOfTags,
-  `/api/document/${document_id}/tags`,
+  `/api/document/${documentId}/tags`,
 )(dispatch);
 
-export const getDocumentTagsExercise = (document_id) => (dispatch) => getReferential(
+export const getDocumentTagsExercise = (documentId) => (dispatch) => getReferential(
   schema.arrayOfExercises,
-  `/api/document/${document_id}/tags/exercise`,
+  `/api/document/${documentId}/tags/exercise`,
 )(dispatch);
 
-export const editDocumentTags = (document_id, data) => (dispatch) => {
-  const uri = `/api/document/${document_id}/save/tags`;
+export const editDocumentTags = (documentId, data) => (dispatch) => {
+  const uri = `/api/document/${documentId}/save/tags`;
   return postReferential(schema.document, uri, data)(dispatch);
 };
 
-export const editDocumentTagsExercise = (document_id, data) => (dispatch) => {
-  const uri = `/api/document/${document_id}/save/tags/exercise`;
+export const editDocumentTagsExercise = (documentId, data) => (dispatch) => {
+  const uri = `/api/document/${documentId}/save/tags/exercise`;
   return postReferential(schema.document, uri, data)(dispatch);
 };
 
-export const deleteDocument = (document_id) => (dispatch) => {
-  const uri = `/api/document/${document_id}`;
-  return delReferential(uri, 'document', document_id)(dispatch);
+export const deleteDocument = (documentId) => (dispatch) => {
+  const uri = `/api/document/${documentId}`;
+  return delReferential(uri, 'document', documentId)(dispatch);
 };
 
-export const downloadDocument = (document_id, document_name) => (dispatch) => fileSave(`/api/files/${document_id}`, document_name)(dispatch);
+export const downloadDocument = (documentId, documentName) => (dispatch) => fileSave(`/api/files/${documentId}`, documentName)(dispatch);

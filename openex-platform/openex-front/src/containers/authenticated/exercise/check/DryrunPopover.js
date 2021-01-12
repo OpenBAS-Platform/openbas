@@ -11,8 +11,10 @@ import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemButton } from '../../../../components/menu/MenuItem';
-import { redirectToChecks } from '../../../../actions/Application';
-import { deleteDryrun } from '../../../../actions/Dryrun';
+/* eslint-disable */
+import { redirectToChecks } from "../../../../actions/Application";
+import { deleteDryrun } from "../../../../actions/Dryrun";
+/* eslint-enable */
 
 const style = {
   float: 'left',
@@ -58,7 +60,7 @@ class DryrunPopover extends Component {
   }
 
   render() {
-    const dryrun_is_deletable = R.propOr(
+    const dryrunIsDeletable = R.propOr(
       true,
       'user_can_update',
       this.props.dryrun,
@@ -71,7 +73,7 @@ class DryrunPopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      dryrun_is_deletable ? (
+      dryrunIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -93,7 +95,7 @@ class DryrunPopover extends Component {
           anchorEl={this.state.anchorEl}
           onRequestClose={this.handlePopoverClose.bind(this)}
         >
-          {dryrun_is_deletable ? (
+          {dryrunIsDeletable ? (
             <Menu multiple={false}>
               <MenuItemButton
                 label="Delete"

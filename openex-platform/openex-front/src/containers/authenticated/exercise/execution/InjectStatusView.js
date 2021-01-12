@@ -41,6 +41,7 @@ const styles = {
 };
 
 class InjectStatusView extends Component {
+  // eslint-disable-next-line class-methods-use-this
   readJSON(str) {
     try {
       return JSON.parse(str);
@@ -50,22 +51,24 @@ class InjectStatusView extends Component {
   }
 
   render() {
-    const inject_status = R.propOr('-', 'inject_status', this.props.inject);
-    const inject_message_lines = this.readJSON(
-      R.propOr(null, 'status_message', inject_status),
+    const injectStatus = R.propOr('-', 'inject_status', this.props.inject);
+    const injectMessageLines = this.readJSON(
+      R.propOr(null, 'status_message', injectStatus),
     );
-    const time = convertToCountdown(inject_status.status_execution);
+    const time = convertToCountdown(injectStatus.status_execution);
 
     return (
       <div style={styles.container}>
         <div style={styles.title}>
-          <T>{inject_status.status_name}</T> ({time})
+          <T>{injectStatus.status_name}</T> ({time})
         </div>
-        <div style={styles.date}>{dateFormat(inject_status.status_date)}</div>
-        <div style={{ clear: 'both' }}></div>
+        <div style={styles.date}>{dateFormat(injectStatus.status_date)}</div>
+        <div className="clearfix" />
         <br />
         <div style={styles.message}>
-          {inject_message_lines.map((line) => <div key={Math.random()}>{line}</div>)}
+          {injectMessageLines.map((line) => (
+            <div key={Math.random()}>{line}</div>
+          ))}
         </div>
       </div>
     );

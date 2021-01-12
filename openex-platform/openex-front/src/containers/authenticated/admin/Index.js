@@ -7,9 +7,11 @@ import Theme from '../../../components/Theme';
 import { T } from '../../../components/I18n';
 import { Icon } from '../../../components/Icon';
 import { i18nRegister } from '../../../utils/Messages';
-import { fetchExercises } from '../../../actions/Exercise';
-import { fetchUsers } from '../../../actions/User';
-import { fetchGlobalInjects } from '../../../actions/Inject';
+/* eslint-disable */
+import { fetchExercises } from "../../../actions/Exercise";
+import { fetchUsers } from "../../../actions/User";
+import { fetchGlobalInjects } from "../../../actions/Inject";
+/* eslint-enable */
 
 i18nRegister({
   fr: {

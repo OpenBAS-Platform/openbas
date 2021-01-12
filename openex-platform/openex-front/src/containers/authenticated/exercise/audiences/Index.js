@@ -6,13 +6,15 @@ import Theme from '../../../../components/Theme';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
-import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchGroups } from '../../../../actions/Group';
-import { SearchField } from '../../../../components/SimpleTextField';
-import { Icon } from '../../../../components/Icon';
-import { List } from '../../../../components/List';
-import { MainListItemLink } from '../../../../components/list/ListItem';
-import CreateAudience from './audience/CreateAudience';
+/* eslint-disable */
+import { fetchAudiences } from "../../../../actions/Audience";
+import { fetchGroups } from "../../../../actions/Group";
+import { SearchField } from "../../../../components/SimpleTextField";
+import { Icon } from "../../../../components/Icon";
+import { List } from "../../../../components/List";
+import { MainListItemLink } from "../../../../components/list/ListItem";
+import CreateAudience from "./audience/CreateAudience";
+/* eslint-enable */
 
 const styles = {
   container: {
@@ -58,6 +60,7 @@ class IndexAudiences extends Component {
     this.setState({ searchTerm: value });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -86,7 +89,7 @@ class IndexAudiences extends Component {
             styletype={Constants.FIELD_TYPE_RIGHT}
           />
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix"/>
         {this.props.audiences.length === 0 ? (
           <div style={styles.empty}>
             <T>You do not have any audiences in this exercise.</T>
@@ -96,46 +99,41 @@ class IndexAudiences extends Component {
         )}
         <List>
           {filteredAudiences.map((audience) => (
-              <MainListItemLink
-                to={
-                  `/private/exercise/${
-                    this.props.exerciseId
-                  }/audiences/${
-                    audience.audience_id}`
-                }
-                key={audience.audience_id}
-                leftIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_SOCIAL_GROUP}
-                    color={this.switchColor(!audience.audience_enabled)}
-                  />
-                }
-                primaryText={
-                  <div
-                    style={{
-                      color: this.switchColor(!audience.audience_enabled),
-                    }}
-                  >
-                    {audience.audience_name}
-                  </div>
-                }
-                secondaryText={
-                  <div
-                    style={{
-                      color: this.switchColor(!audience.audience_enabled),
-                    }}
-                  >
-                    {audience.audience_users_number}&nbsp;
-                    <T>players</T>
-                  </div>
-                }
-                rightIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
-                    color={this.switchColor(!audience.audience_enabled)}
-                  />
-                }
-              />
+            <MainListItemLink
+              to={`/private/exercise/${this.props.exerciseId}/audiences/${audience.audience_id}`}
+              key={audience.audience_id}
+              leftIcon={
+                <Icon
+                  name={Constants.ICON_NAME_SOCIAL_GROUP}
+                  color={this.switchColor(!audience.audience_enabled)}
+                />
+              }
+              primaryText={
+                <div
+                  style={{
+                    color: this.switchColor(!audience.audience_enabled),
+                  }}
+                >
+                  {audience.audience_name}
+                </div>
+              }
+              secondaryText={
+                <div
+                  style={{
+                    color: this.switchColor(!audience.audience_enabled),
+                  }}
+                >
+                  {audience.audience_users_number}&nbsp;
+                  <T>players</T>
+                </div>
+              }
+              rightIcon={
+                <Icon
+                  name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
+                  color={this.switchColor(!audience.audience_enabled)}
+                />
+              }
+            />
           ))}
         </List>
 

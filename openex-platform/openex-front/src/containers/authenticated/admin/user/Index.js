@@ -5,18 +5,20 @@ import * as R from 'ramda';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
-import { fetchUsers } from '../../../../actions/User';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import { List } from '../../../../components/List';
+/* eslint-disable */
+import { fetchUsers } from "../../../../actions/User";
+import { fetchOrganizations } from "../../../../actions/Organization";
+import { List } from "../../../../components/List";
 import {
   AvatarListItem,
   AvatarHeaderItem,
-} from '../../../../components/list/ListItem';
-import { Avatar } from '../../../../components/Avatar';
-import { Icon } from '../../../../components/Icon';
-import { SearchField } from '../../../../components/SimpleTextField';
-import CreateUser from './CreateUser';
-import UserPopover from './UserPopover';
+} from "../../../../components/list/ListItem";
+import { Avatar } from "../../../../components/Avatar";
+import { Icon } from "../../../../components/Icon";
+import { SearchField } from "../../../../components/SimpleTextField";
+import CreateUser from "./CreateUser";
+import UserPopover from "./UserPopover";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -171,11 +173,15 @@ class Index extends Component {
   }
 
   // TODO replace with sortWith after Ramdajs new release
+  // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   descend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
@@ -232,14 +238,14 @@ class Index extends Component {
           />
 
           {R.take(20, users).map((user) => {
-            const user_id = R.propOr(Math.random(), 'user_id', user);
-            const user_firstname = R.propOr('-', 'user_firstname', user);
-            const user_lastname = R.propOr('-', 'user_lastname', user);
-            const user_email = R.propOr('-', 'user_email', user);
-            const user_gravatar = R.propOr('', 'user_gravatar', user);
-            const user_admin = R.propOr('-', 'user_admin', user);
-            const user_planificateur = R.propOr('-', 'user_planificateur', user);
-            const user_organization = R.propOr(
+            const userId = R.propOr(Math.random(), 'user_id', user);
+            const userFirstname = R.propOr('-', 'user_firstname', user);
+            const userLastname = R.propOr('-', 'user_lastname', user);
+            const userEmail = R.propOr('-', 'user_email', user);
+            const userGravatar = R.propOr('', 'user_gravatar', user);
+            const userAdmin = R.propOr('-', 'user_admin', user);
+            const userPlanificateur = R.propOr('-', 'user_planificateur', user);
+            const userOrganization = R.propOr(
               {},
               user.user_organization,
               this.props.organizations,
@@ -247,28 +253,28 @@ class Index extends Component {
             const organizationName = R.propOr(
               '-',
               'organization_name',
-              user_organization,
+              userOrganization,
             );
 
             return (
               <AvatarListItem
-                key={user_id}
+                key={userId}
                 leftAvatar={
                   <Avatar
                     type={Constants.AVATAR_TYPE_MAINLIST}
-                    src={user_gravatar}
+                    src={userGravatar}
                   />
                 }
                 rightIconButton={<UserPopover user={user} />}
                 primaryText={
                   <div>
                     <div style={styles.name}>
-                      {user_firstname} {user_lastname}
+                      {userFirstname} {userLastname}
                     </div>
-                    <div style={styles.mail}>{user_email}</div>
+                    <div style={styles.mail}>{userEmail}</div>
                     <div style={styles.org}>{organizationName}</div>
                     <div style={styles.admin}>
-                      {user_admin ? (
+                      {userAdmin ? (
                         <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE} />
                       ) : (
                         <Icon
@@ -277,7 +283,7 @@ class Index extends Component {
                       )}
                     </div>
                     <div style={styles.planificateur}>
-                      {user_planificateur ? (
+                      {userPlanificateur ? (
                         <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE} />
                       ) : (
                         <Icon
@@ -285,7 +291,7 @@ class Index extends Component {
                         />
                       )}
                     </div>
-                    <div className="clearfix"></div>
+                    <div className="clearfix" />
                   </div>
                 }
               />

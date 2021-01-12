@@ -8,23 +8,24 @@ import Theme from '../../../../components/Theme';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
-import { fetchUsers } from '../../../../actions/User';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import { fetchAudiences } from '../../../../actions/Audience';
+/* eslint-disable */
+import { fetchUsers } from "../../../../actions/User";
+import { fetchOrganizations } from "../../../../actions/Organization";
+import { fetchAudiences } from "../../../../actions/Audience";
 import {
   fetchComcheck,
   fetchComcheckStatuses,
-} from '../../../../actions/Comcheck';
-import { List } from '../../../../components/List';
+} from "../../../../actions/Comcheck";
+import { List } from "../../../../components/List";
 import {
   AvatarListItem,
   AvatarHeaderItem,
-} from '../../../../components/list/ListItem';
-import { Avatar } from '../../../../components/Avatar';
-import { CircularSpinner } from '../../../../components/Spinner';
-import { Icon } from '../../../../components/Icon';
-
-import ComcheckPopover from './ComcheckPopover';
+} from "../../../../components/list/ListItem";
+import { Avatar } from "../../../../components/Avatar";
+import { CircularSpinner } from "../../../../components/Spinner";
+import { Icon } from "../../../../components/Icon";
+import ComcheckPopover from "./ComcheckPopover";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -176,12 +177,12 @@ class Comcheck extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const comcheck_finished = R.propOr(
+    const comcheckFinished = R.propOr(
       false,
       'comcheck_finished',
       nextProps.comcheck,
     );
-    if (comcheck_finished) this.cancelStreamEvent();
+    if (comcheckFinished) this.cancelStreamEvent();
   }
 
   componentWillUnmount() {
@@ -211,14 +212,17 @@ class Comcheck extends Component {
     );
   }
 
-  // TODO MOVE THAT TO UTILS
+  // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
     // replace with sortWith after Ramdajs new release
+    // eslint-disable-next-line no-nested-ternary
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   descend(a, b) {
     // replace with sortWith after Ramdajs new release
+    // eslint-disable-next-line no-nested-ternary
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
@@ -234,9 +238,9 @@ class Comcheck extends Component {
   // TODO MOVE THAT TO UTILS
 
   buildUserModel(status) {
-    const user_id = R.pathOr(Math.random(), ['status_user', 'user_id'], status);
-    const user = R.propOr({}, user_id, this.props.users);
-    const user_organization = R.propOr(
+    const userId = R.pathOr(Math.random(), ['status_user', 'user_id'], status);
+    const user = R.propOr({}, userId, this.props.users);
+    const userOrganization = R.propOr(
       {},
       user.user_organization,
       this.props.organizations,
@@ -246,7 +250,7 @@ class Comcheck extends Component {
       user_lastname: R.propOr('-', 'user_lastname', user),
       user_email: R.propOr('-', 'user_email', user),
       user_gravatar: R.propOr('', 'user_gravatar', user),
-      user_organization: R.propOr('-', 'organization_name', user_organization),
+      user_organization: R.propOr('-', 'organization_name', userOrganization),
       status_id: R.propOr(Math.random(), 'status_id', status),
       status_state: R.propOr(false, 'status_state', status),
       status_last_update: R.propOr('', 'status_last_update', status),
@@ -259,7 +263,7 @@ class Comcheck extends Component {
       R.sort((a, b) => this.modelSorting(this.state.sortBy, this.state.orderAsc, a, b)),
     )(this.props.comcheck_statuses);
 
-    const comcheck_finished = R.propOr(
+    const comcheckFinished = R.propOr(
       false,
       'comcheck_finished',
       this.props.comcheck,
@@ -279,7 +283,7 @@ class Comcheck extends Component {
           <div style={styles.audience}>
             {R.propOr('-', 'audience_name', this.props.audience)}
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix" />
           <div style={styles.subtitle}>
             {dateFormat(
               R.propOr(undefined, 'comcheck_start_date', this.props.comcheck),
@@ -290,7 +294,7 @@ class Comcheck extends Component {
             )}
           </div>
           <div style={styles.comcheck_state}>
-            {comcheck_finished ? (
+            {comcheckFinished ? (
               <Icon
                 name={Constants.ICON_NAME_ACTION_DONE_ALL}
                 color={Theme.palette.primary1Color}
@@ -299,7 +303,7 @@ class Comcheck extends Component {
               <CircularSpinner size={20} color={Theme.palette.primary1Color} />
             )}
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix" />
           <List>
             <AvatarHeaderItem
               leftAvatar={<span style={styles.header.avatar}>#</span>}
@@ -310,43 +314,42 @@ class Comcheck extends Component {
                   {this.SortHeader('user_organization', 'Organization')}
                   {this.SortHeader('status_last_update', 'Last update')}
                   {this.SortHeader('status_state', 'State')}
-                  <div className="clearfix"></div>
+                  <div className="clearfix" />
                 </div>
               }
             />
 
-            {data.map((item) =>
+            {data.map((item) => (
               // Return the dom
-              (
-                <AvatarListItem
-                  key={item.status_id}
-                  leftAvatar={
-                    <Avatar
-                      type={Constants.AVATAR_TYPE_MAINLIST}
-                      src={item.user_gravatar}
-                    />
-                  }
-                  primaryText={
-                    <div>
-                      <div style={styles.name}>
-                        {item.user_firstname} {item.user_lastname}
-                      </div>
-                      <div style={styles.mail}>{item.user_email}</div>
-                      <div style={styles.org}>{item.user_organization}</div>
-                      <div style={styles.update}>
-                        {dateFormat(item.status_last_update)}
-                      </div>
-                      <div style={styles.state}>
-                        <Icon
-                          name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}
-                          color={item.status_state ? '#4CAF50' : '#F44336'}
-                        />
-                      </div>
-                      <div className="clearfix"></div>
+              <AvatarListItem
+                key={item.status_id}
+                leftAvatar={
+                  <Avatar
+                    type={Constants.AVATAR_TYPE_MAINLIST}
+                    src={item.user_gravatar}
+                  />
+                }
+                primaryText={
+                  <div>
+                    <div style={styles.name}>
+                      {item.user_firstname} {item.user_lastname}
                     </div>
-                  }
-                />
-              ))}
+                    <div style={styles.mail}>{item.user_email}</div>
+                    <div style={styles.org}>{item.user_organization}</div>
+                    <div style={styles.update}>
+                      {dateFormat(item.status_last_update)}
+                    </div>
+                    <div style={styles.state}>
+                      <Icon
+                        name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}
+                        color={item.status_state ? '#4CAF50' : '#F44336'}
+                      />
+                    </div>
+                    <div className="clearfix" />
+                  </div>
+                }
+              />
+            ))}
           </List>
         </div>
       </div>
@@ -380,7 +383,11 @@ const filterComcheckStatuses = (statuses, comcheckId) => {
 const select = (state, ownProps) => {
   const { exerciseId } = ownProps.params;
   const { comcheckId } = ownProps.params;
-  const comcheck = R.propOr({}, comcheckId, state.referential.entities.comchecks);
+  const comcheck = R.propOr(
+    {},
+    comcheckId,
+    state.referential.entities.comchecks,
+  );
   const audience = comcheck.comcheck_audience
     ? R.propOr(
       {},
@@ -388,7 +395,7 @@ const select = (state, ownProps) => {
       state.referential.entities.audiences,
     )
     : {};
-  const comcheck_statuses = filterComcheckStatuses(
+  const comcheckStatuses = filterComcheckStatuses(
     state.referential.entities.comchecks_statuses,
     comcheckId,
   );
@@ -398,7 +405,7 @@ const select = (state, ownProps) => {
     comcheckId,
     audience,
     comcheck,
-    comcheck_statuses,
+    comcheckStatuses,
     users: state.referential.entities.users,
     organizations: state.referential.entities.organizations,
   };

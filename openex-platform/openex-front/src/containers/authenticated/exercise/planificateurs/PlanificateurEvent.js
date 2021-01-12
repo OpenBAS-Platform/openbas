@@ -46,8 +46,11 @@ const PlanificateurEvent = ({
     />,
   ];
 
-  const handleCheck = (planificateurUserId, eventId) => (event, isChecked) => {
-    handleCheckPlanificateur(planificateurUserId, eventId, isChecked);
+  const handleCheck = (planificateurUserId, checkedEventId) => (
+    event,
+    isChecked,
+  ) => {
+    handleCheckPlanificateur(planificateurUserId, checkedEventId, isChecked);
   };
 
   return (
@@ -61,37 +64,35 @@ const PlanificateurEvent = ({
     >
       <form onSubmit={submitFormPlanificateur}>
         <Table selectable={false} style={{ marginTop: '5px' }}>
-          <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+          <TableHead adjustForCheckbox={false} displaySelectAll={false}>
             <TableRow>
-              <TableHeaderColumn>
+              <TableCell>
                 <T>FirstName</T>
-              </TableHeaderColumn>
-              <TableHeaderColumn>
+              </TableCell>
+              <TableCell>
                 <T>LastName</T>
-              </TableHeaderColumn>
-              <TableHeaderColumn>
+              </TableCell>
+              <TableCell>
                 <T>Email</T>
-              </TableHeaderColumn>
-              <TableHeaderColumn>
+              </TableCell>
+              <TableCell>
                 <T>Planner</T>
-              </TableHeaderColumn>
+              </TableCell>
             </TableRow>
-          </TableHeader>
+          </TableHead>
           <TableBody displayRowCheckbox={false}>
             {R.values(planificateursEvent).map((planificateur) => (
-                <TableRow key={planificateur.user_id}>
-                  <TableRowColumn>
-                    {planificateur.user_firstname}
-                  </TableRowColumn>
-                  <TableRowColumn>{planificateur.user_lastname}</TableRowColumn>
-                  <TableRowColumn>{planificateur.user_email}</TableRowColumn>
-                  <TableRowColumn>
-                    <Checkbox
-                      defaultChecked={planificateur.is_planificateur_event}
-                      onCheck={handleCheck(planificateur.user_id, eventId)}
-                    />
-                  </TableRowColumn>
-                </TableRow>
+              <TableRow key={planificateur.user_id}>
+                <TableCell>{planificateur.user_firstname}</TableCell>
+                <TableCell>{planificateur.user_lastname}</TableCell>
+                <TableCell>{planificateur.user_email}</TableCell>
+                <TableCell>
+                  <Checkbox
+                    defaultChecked={planificateur.is_planificateur_event}
+                    onCheck={handleCheck(planificateur.user_id, eventId)}
+                  />
+                </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>

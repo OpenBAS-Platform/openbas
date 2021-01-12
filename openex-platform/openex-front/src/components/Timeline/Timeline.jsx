@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import PropTypes from 'prop-types';
-import TimlineItem from './TimlineItem';
+import TimlineItem from './TimlineItem.jsx';
 
 /**
  * Converts array of events in to object having date as the key and list of

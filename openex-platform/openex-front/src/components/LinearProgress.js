@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MUILinearProgress from '@material-ui/core/LinearProgress';
 
+// eslint-disable-next-line import/prefer-default-export
 export const LinearProgress = (props) => (
   <MUILinearProgress
     mode={props.mode}

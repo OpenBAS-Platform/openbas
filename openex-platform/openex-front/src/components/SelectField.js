@@ -37,11 +37,13 @@ const renderSelectField = ({
     type={type}
     {...input}
     onChange={(event, index, value) => {
+      // eslint-disable-next-line no-unused-expressions
       onSelectChange && onSelectChange(event, index, value);
       input.onChange(value);
     }}
-    children={children}
-  />
+  >
+    {children}
+  </MUISelect>
 );
 
 renderSelectField.propTypes = {
@@ -58,6 +60,7 @@ renderSelectField.propTypes = {
   children: PropTypes.node,
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const SelectField = (props) => (
   <Field component={renderSelectField} {...props} />
 );
