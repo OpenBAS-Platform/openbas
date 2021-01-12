@@ -231,7 +231,7 @@ class Index extends Component {
   }
 
   deleteTag(tag) {
-    this.handleOpenConfirmDeleteTag();
+    this.handleOpenConfirmDeleteTag(tag);
   }
 
   addAvailableTagToFilter(tag) {

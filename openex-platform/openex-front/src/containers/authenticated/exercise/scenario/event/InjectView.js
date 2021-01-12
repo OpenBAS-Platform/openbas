@@ -41,6 +41,7 @@ const styles = {
 };
 
 class InjectView extends Component {
+  // eslint-disable-next-line class-methods-use-this
   readJSON(str) {
     try {
       return JSON.parse(str);
@@ -50,18 +51,18 @@ class InjectView extends Component {
   }
 
   render() {
-    const inject_content = this.readJSON(
+    const injectContent = this.readJSON(
       R.propOr(null, 'inject_content', this.props.inject),
     );
-    const inject_description = R.propOr(
+    const injectDescription = R.propOr(
       '',
       'inject_description',
       this.props.inject,
     );
-    const inject_fields = R.pipe(
+    const injectFields = R.pipe(
       R.toPairs(),
       R.map((d) => ({ key: R.head(d), value: R.last(d) })),
-    )(inject_content);
+    )(injectContent);
 
     const displayedAsText = ['sender', 'subject', 'body', 'message', 'content'];
     const displayedAsList = ['attachments'];
@@ -73,10 +74,10 @@ class InjectView extends Component {
             <T>Description</T>
           </strong>
           <br />
-          <div>{inject_description}</div>
+          <div>{injectDescription}</div>
         </div>
         <br />
-        {inject_fields.map((field) => {
+        {injectFields.map((field) => {
           if (R.indexOf(field.key, displayedAsText) !== -1) {
             return (
               <div key={field.key}>
@@ -88,7 +89,8 @@ class InjectView extends Component {
                 <br />
               </div>
             );
-          } if (R.indexOf(field.key, displayedAsList) !== -1) {
+          }
+          if (R.indexOf(field.key, displayedAsList) !== -1) {
             return (
               <div key={field.key}>
                 <strong>
@@ -96,17 +98,17 @@ class InjectView extends Component {
                 </strong>
                 <br />
                 {field.value.map((v) => {
-                  const document_name = R.propOr('-', 'document_name', v);
-                  const document_id = R.propOr('-', 'document_id', v);
+                  const documentName = R.propOr('-', 'document_name', v);
+                  const documentId = R.propOr('-', 'document_id', v);
                   return (
                     <div
                       key={v.document_name}
                       style={styles.link}
-                      dangerouslySetInnerHTML={{ __html: document_name }}
+                      dangerouslySetInnerHTML={{ __html: documentName }}
                       onClick={this.props.downloadAttachment.bind(
                         this,
-                        document_id,
-                        document_name,
+                        documentId,
+                        documentName,
                       )}
                     ></div>
                   );
@@ -131,14 +133,14 @@ class InjectView extends Component {
                 const audience = R.find(
                   (a) => a.audience_id === data.audience_id,
                 )(this.props.audiences);
-                const audience_id = R.propOr('-', 'audience_id', audience);
-                const audience_name = R.propOr('-', 'audience_name', audience);
+                const audienceId = R.propOr('-', 'audience_id', audience);
+                const audienceName = R.propOr('-', 'audience_name', audience);
 
                 return (
                   <MainSmallListItem
-                    key={audience_id}
+                    key={audienceId}
                     leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />}
-                    primaryText={audience_name}
+                    primaryText={audienceName}
                   />
                 );
               })}
@@ -147,7 +149,7 @@ class InjectView extends Component {
                 const subaudience = R.find(
                   (a) => a.subaudience_id === data.subaudience_id,
                 )(this.props.subaudiences);
-                const subaudience_id = R.propOr(
+                const subaudienceId = R.propOr(
                   data.subaudience_id,
                   'subaudience_id',
                   subaudience,
@@ -156,19 +158,18 @@ class InjectView extends Component {
                   (a) => a.audience_id
                     === subaudience.subaudience_audience.audience_id,
                 )(this.props.audiences);
-                const audience_name = R.propOr('-', 'audience_name', audience);
-                const subaudience_name = R.propOr(
+                const audienceName = R.propOr('-', 'audience_name', audience);
+                const subaudienceName = R.propOr(
                   '-',
                   'subaudience_name',
                   subaudience,
                 );
-                const subaudienceName = `[${audience_name}] ${subaudience_name}`;
-
+                const finalSubaudienceName = `[${audienceName}] ${subaudienceName}`;
                 return (
                   <MainSmallListItem
-                    key={subaudience_id}
+                    key={subaudienceId}
                     leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />}
-                    primaryText={subaudienceName}
+                    primaryText={finalSubaudienceName}
                   />
                 );
               })}

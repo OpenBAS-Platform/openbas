@@ -15,8 +15,10 @@ import {
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
 import Theme from '../../../../../components/Theme';
-import { updateUser } from '../../../../../actions/User';
-import { updateSubaudience } from '../../../../../actions/Subaudience';
+/* eslint-disable */
+import { updateUser } from "../../../../../actions/User";
+import { updateSubaudience } from "../../../../../actions/Subaudience";
+/* eslint-enable */
 import UserForm from './UserForm';
 
 const style = {
@@ -64,6 +66,7 @@ class UserPopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.userForm.submit();
   }
 
@@ -77,7 +80,7 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    const user_ids = R.pipe(
+    const userIds = R.pipe(
       R.values,
       R.filter((a) => a.user_id !== this.props.user.user_id),
       R.map((u) => u.user_id),
@@ -86,11 +89,12 @@ class UserPopover extends Component {
       this.props.exerciseId,
       this.props.audience.audience_id,
       this.props.subaudience.subaudience_id,
-      { subaudience_users: user_ids },
+      userIds,
     );
     this.handleCloseDelete();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -99,18 +103,18 @@ class UserPopover extends Component {
   }
 
   render() {
-    const subaudience_is_updatable = R.propOr(
+    const subaudienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.subaudience,
     );
-    const subaudience_is_deletable = R.propOr(
+    const subaudienceIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.subaudience,
     );
-    const user_is_updatable = R.propOr(true, 'user_can_update', this.props.user);
-    const user_is_deletable = R.propOr(true, 'user_can_delete', this.props.user);
+    const userIsUpdatable = R.propOr(true, 'user_can_update', this.props.user);
+    const userIsDeletable = R.propOr(true, 'user_can_delete', this.props.user);
 
     const editActions = [
       <FlatButton
@@ -119,7 +123,7 @@ class UserPopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      subaudience_is_updatable ? (
+      subaudienceIsUpdatable ? (
         <FlatButton
           key="update"
           label="Update"
@@ -137,7 +141,7 @@ class UserPopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      subaudience_is_deletable ? (
+      subaudienceIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -153,13 +157,13 @@ class UserPopover extends Component {
       R.prop('user_organization', this.props.user),
       'organization_name',
     ];
-    const organization_name = R.pathOr(
+    const organizationName = R.pathOr(
       '-',
       organizationPath,
       this.props.organizations,
     );
     const initialValues = R.pipe(
-      R.assoc('user_organization', organization_name),
+      R.assoc('user_organization', organizationName),
       R.pick([
         'user_firstname',
         'user_lastname',
@@ -185,14 +189,14 @@ class UserPopover extends Component {
           />
         </IconButton>
 
-        {user_is_updatable || user_is_deletable ? (
+        {userIsUpdatable || userIsDeletable ? (
           <Popover
             open={this.state.openPopover}
             anchorEl={this.state.anchorEl}
             onRequestClose={this.handlePopoverClose.bind(this)}
           >
             <Menu multiple={false}>
-              {user_is_updatable ? (
+              {userIsUpdatable ? (
                 <MenuItemLink
                   label="Edit"
                   onClick={this.handleOpenEdit.bind(this)}
@@ -200,7 +204,7 @@ class UserPopover extends Component {
               ) : (
                 ''
               )}
-              {user_is_deletable ? (
+              {userIsDeletable ? (
                 <MenuItemButton
                   label="Delete"
                   onClick={this.handleOpenDelete.bind(this)}
@@ -231,6 +235,7 @@ class UserPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <UserForm
             ref="userForm"
             initialValues={initialValues}
@@ -238,6 +243,7 @@ class UserPopover extends Component {
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

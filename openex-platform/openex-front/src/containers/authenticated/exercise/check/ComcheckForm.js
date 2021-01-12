@@ -126,11 +126,11 @@ class ComcheckForm extends Component {
           fullWidth={true}
         >
           {this.props.audiences.map((audience) => (
-              <MenuItem
-                key={audience.audience_id}
-                value={audience.audience_id}
-                primaryText={<T>{audience.audience_name}</T>}
-              />
+            <MenuItem
+              key={audience.audience_id}
+              value={audience.audience_id}
+              primaryText={<T>{audience.audience_name}</T>}
+            />
           ))}
         </SelectField>
 
@@ -147,11 +147,13 @@ class ComcheckForm extends Component {
           />
 
           <div style={styles.fullDate}>
+            {/* eslint-disable */}
             <FormField
               ref="comcheck_end_date"
               name="comcheck_end_date"
               type="hidden"
             />
+            {/* eslint-enable */}
           </div>
         </div>
 

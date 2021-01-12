@@ -168,22 +168,22 @@ class ExerciseForm extends Component {
   }
 
   render() {
-    const exercise_start_date_only = R.pathOr(
+    const exerciseStartDateOnly = R.pathOr(
       undefined,
       ['initialDateValues', 'exercise_start_date_only'],
       this.props,
     );
-    const exercise_start_time = R.pathOr(
+    const exerciseStartTime = R.pathOr(
       undefined,
       ['initialTimeValues', 'exercise_start_time'],
       this.props,
     );
-    const exercise_end_date_only = R.pathOr(
+    const exerciseEndDateOnly = R.pathOr(
       undefined,
       ['initialDateValues', 'exercise_end_date_only'],
       this.props,
     );
-    const exercise_end_time = R.pathOr(
+    const exerciseEndTime = R.pathOr(
       undefined,
       ['initialTimeValues', 'exercise_end_time'],
       this.props,
@@ -227,21 +227,22 @@ class ExerciseForm extends Component {
               nameField="exercise_start_date_only"
               labelField="StartDay"
               onChange={this.replaceStartDateValue.bind(this)}
-              defaultDate={exercise_start_date_only}
+              defaultDate={exerciseStartDateOnly}
             />
             <TimePickerIconOpx
               nameField="exercise_start_time"
               labelField="StartTime"
               onChange={this.replaceStartTimeValue.bind(this)}
-              defaultTime={exercise_start_time}
+              defaultTime={exerciseStartTime}
             />
-
             <div style={styles.fullDate}>
+              {/* eslint-disable */}
               <FormField
                 ref="exercise_start_date"
                 name="exercise_start_date"
                 type="hidden"
               />
+              {/* eslint-enable */}
             </div>
           </div>
 
@@ -250,21 +251,22 @@ class ExerciseForm extends Component {
               nameField="exercise_end_date_only"
               labelField="EndDay"
               onChange={this.replaceEndDateValue.bind(this)}
-              defaultDate={exercise_end_date_only}
+              defaultDate={exerciseEndDateOnly}
             />
             <TimePickerIconOpx
               nameField="exercise_end_time"
               labelField="EndTime"
               onChange={this.replaceEndTimeValue.bind(this)}
-              defaultTime={exercise_end_time}
+              defaultTime={exerciseEndTime}
             />
-
             <div style={styles.fullDate}>
+              {/* eslint-disable */}
               <FormField
                 ref="exercise_end_date"
                 name="exercise_end_date"
                 type="hidden"
               />
+              {/* eslint-enable */}
             </div>
           </div>
         </div>

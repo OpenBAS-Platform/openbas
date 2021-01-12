@@ -10,6 +10,7 @@ import * as R from 'ramda';
 import { T } from '../../../components/I18n';
 import * as Constants from '../../../constants/ComponentTypes';
 import { i18nRegister } from '../../../utils/Messages';
+/* eslint-disable */
 import {
   addExercise,
   updateExercise,
@@ -19,42 +20,43 @@ import {
   exportInjectEml,
   fetchExercise,
   checkIfExerciseNameExist,
-} from '../../../actions/Exercise';
-import { addFile, getImportFileSheetsName } from '../../../actions/File';
-import { downloadDocument } from '../../../actions/Document';
-import { Dialog, DialogTitleElement } from '../../../components/Dialog';
-import { Checkbox } from '../../../components/Checkbox';
+} from "../../../actions/Exercise";
+import { addFile, getImportFileSheetsName } from "../../../actions/File";
+import { downloadDocument } from "../../../actions/Document";
+import { Dialog, DialogTitleElement } from "../../../components/Dialog";
+import { Checkbox } from "../../../components/Checkbox";
 import {
   FlatButton,
   FloatingActionsButtonCreate,
-} from '../../../components/Button';
-import SelectExercise from './SelectExercise';
-import AudienceForm from './audiences/audience/AudienceForm';
-import ExerciseForm from './ExerciseForm';
-import { SimpleTextField } from '../../../components/SimpleTextField';
-import { Chip } from '../../../components/Chip';
-import { Avatar } from '../../../components/Avatar';
-import { List } from '../../../components/List';
-import { MainSmallListItem } from '../../../components/list/ListItem';
+} from "../../../components/Button";
+import SelectExercise from "./SelectExercise";
+import AudienceForm from "./audiences/audience/AudienceForm";
+import ExerciseForm from "./ExerciseForm";
+import { SimpleTextField } from "../../../components/SimpleTextField";
+import { Chip } from "../../../components/Chip";
+import { Avatar } from "../../../components/Avatar";
+import { List } from "../../../components/List";
+import { MainSmallListItem } from "../../../components/list/ListItem";
 import {
   addAudience,
   fetchAudiences,
   fetchAudience,
-} from '../../../actions/Audience';
+} from "../../../actions/Audience";
 import {
   addSubaudience,
   updateSubaudience,
   fetchSubaudiences,
-} from '../../../actions/Subaudience';
+} from "../../../actions/Subaudience";
 import {
   addInject,
   fetchInjectTypesExerciseSimple,
-} from '../../../actions/Inject';
-import { addEvent } from '../../../actions/Event';
-import { addIncident, fetchIncidentTypes } from '../../../actions/Incident';
-import InjectForm from './scenario/event/InjectForm';
-import InjectContentForm from './scenario/event/InjectContentForm';
-import { dateToISO } from '../../../utils/Time';
+} from "../../../actions/Inject";
+import { addEvent } from "../../../actions/Event";
+import { addIncident, fetchIncidentTypes } from "../../../actions/Incident";
+import InjectForm from "./scenario/event/InjectForm";
+import InjectContentForm from "./scenario/event/InjectContentForm";
+import { dateToISO } from "../../../utils/Time";
+/* eslint-enable */
 import { Step, StepLabel, Stepper } from '../../../components/Stepper';
 
 i18nRegister({
@@ -160,12 +162,12 @@ class CreateExercise extends Component {
     };
   }
 
-  handleOpenImport(data, exercise_exist) {
+  handleOpenImport(data, exerciseExist) {
     data.map((value) => {
       const { dataToImport } = this.state;
       dataToImport[value] = '1';
       this.setState({
-        exerciseNameExist: exercise_exist,
+        exerciseNameExist: exerciseExist,
         dataToImport,
       });
       return value;
@@ -197,40 +199,51 @@ class CreateExercise extends Component {
   }
 
   onSubmit(data) {
+    // eslint-disable-next-line no-param-reassign
     data.exercise_start_date = this.convertDate(
       `${data.exercise_start_date_only} ${data.exercise_start_time}`,
     );
+    // eslint-disable-next-line no-param-reassign
     data.exercise_end_date = this.convertDate(
       `${data.exercise_end_date_only} ${data.exercise_end_time}`,
     );
+    // eslint-disable-next-line no-param-reassign
     data.exercise_type = 'simple';
-
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_start_date_only;
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_start_time;
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_end_date_only;
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_end_time;
-
     this.setState({ exerciseData: data });
   }
 
   onSubmitStandardExercise(data) {
+    // eslint-disable-next-line no-param-reassign
     data.exercise_start_date = this.convertDate(
       `${data.exercise_start_date_only} ${data.exercise_start_time}`,
     );
+    // eslint-disable-next-line no-param-reassign
     data.exercise_end_date = this.convertDate(
       `${data.exercise_end_date_only} ${data.exercise_end_time}`,
     );
+    // eslint-disable-next-line no-param-reassign
     data.exercise_type = 'standard';
-
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_start_date_only;
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_start_time;
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_end_date_only;
+    // eslint-disable-next-line no-param-reassign
     delete data.exercise_end_time;
-
     return this.props.addExercise(data);
   }
 
   submitForm() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.exerciseForm.submit();
   }
 
@@ -311,6 +324,7 @@ class CreateExercise extends Component {
     }
   }
 
+  // eslint-disable-next-line consistent-return,class-methods-use-this
   convertDate(dateToConvert) {
     const regexDateFr = RegExp(
       '^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
@@ -318,27 +332,25 @@ class CreateExercise extends Component {
     const regexDateEn = RegExp(
       '^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
     );
-    let timeSplitted; let dateSplitted; let split; let
-      newDate;
-
+    let timeSplitted;
+    let dateSplitted;
+    let split;
+    let newDate;
     if (regexDateFr.test(dateToConvert)) {
       split = dateToConvert.split(' ');
       dateSplitted = split[0].split('/');
+      // eslint-disable-next-line prefer-destructuring
       timeSplitted = split[1];
-      newDate = `${dateSplitted[2]
-      }-${
-        dateSplitted[1]
-      }-${
-        dateSplitted[0]
-      } ${
-        timeSplitted}`;
+      newDate = `${dateSplitted[2]}-${dateSplitted[1]}-${dateSplitted[0]} ${timeSplitted}`;
       return newDate;
-    } if (regexDateEn.test(dateToConvert)) {
+    }
+    if (regexDateEn.test(dateToConvert)) {
       return dateToConvert;
     }
   }
 
   openFileDialog() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
@@ -351,6 +363,7 @@ class CreateExercise extends Component {
 
   handleFileChange() {
     const data = new FormData();
+    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props.addFile(data).then((file) => {
       const fileData = {
@@ -417,6 +430,7 @@ class CreateExercise extends Component {
   }
 
   submitFormAudience() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.audienceForm.submit();
   }
 
@@ -496,16 +510,18 @@ class CreateExercise extends Component {
   }
 
   onGlobalSubmit(data) {
+    // eslint-disable-next-line no-param-reassign
     data.inject_date = this.convertDateInject(
       `${data.inject_date_only} ${data.inject_time}`,
     );
-
+    // eslint-disable-next-line no-param-reassign
     delete data.inject_date_only;
+    // eslint-disable-next-line no-param-reassign
     delete data.inject_time;
-
     this.setState({ injectData: data });
   }
 
+  // eslint-disable-next-line consistent-return,class-methods-use-this
   convertDateInject(dateToConvert) {
     const regexDateFr = RegExp(
       '^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
@@ -513,22 +529,19 @@ class CreateExercise extends Component {
     const regexDateEn = RegExp(
       '^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
     );
-    let timeSplitted; let dateSplitted; let split; let
-      newDate;
-
+    let timeSplitted;
+    let dateSplitted;
+    let split;
+    let newDate;
     if (regexDateFr.test(dateToConvert)) {
       split = dateToConvert.split(' ');
       dateSplitted = split[0].split('/');
+      // eslint-disable-next-line prefer-destructuring
       timeSplitted = split[1];
-      newDate = `${dateSplitted[2]
-      }-${
-        dateSplitted[1]
-      }-${
-        dateSplitted[0]
-      } ${
-        timeSplitted}`;
+      newDate = `${dateSplitted[2]}-${dateSplitted[1]}-${dateSplitted[0]} ${timeSplitted}`;
       return newDate;
-    } if (regexDateEn.test(dateToConvert)) {
+    }
+    if (regexDateEn.test(dateToConvert)) {
       return dateToConvert;
     }
   }
@@ -551,6 +564,7 @@ class CreateExercise extends Component {
 
   onContentSubmit(data) {
     const { injectData } = this.state;
+    // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
     injectData.inject_content = JSON.stringify(data);
     this.setState({ injectData });
@@ -570,8 +584,10 @@ class CreateExercise extends Component {
 
   handleNext() {
     if (this.state.stepIndex === 0) {
+      // eslint-disable-next-line react/no-string-refs
       this.refs.injectForm.submit();
     } else if (this.state.stepIndex === 1) {
+      // eslint-disable-next-line react/no-string-refs
       this.refs.contentForm.getWrappedInstance().submit();
     }
   }
@@ -584,14 +600,13 @@ class CreateExercise extends Component {
       // creation de l'audience correspondante et recuperation de son Id
       this.props
         .addAudience(exerciseId, this.state.audienceData)
-        .then((value) => {
-          const audienceId = value.result;
-
+        .then((subValue) => {
+          const audienceId = subValue.result;
           // creation de la sous-audience correspondante et recuperation de son Id
           this.props
             .addSubaudience(exerciseId, audienceId, this.state.subaudienceData)
-            .then((value) => {
-              const subaudienceId = value.result;
+            .then((subSubValue) => {
+              const subaudienceId = subSubValue.result;
               this.props.updateSubaudience(
                 exerciseId,
                 audienceId,
@@ -604,14 +619,13 @@ class CreateExercise extends Component {
               // creation de l'evenement correspondant et recuperation de son Id
               this.props
                 .addEvent(exerciseId, this.state.eventData)
-                .then((value) => {
-                  const eventId = value.result;
-
+                .then((subSubSubValue) => {
+                  const eventId = subSubSubValue.result;
                   // creation de l'incident correspondant et recuperation de son Id
                   this.props
                     .addIncident(exerciseId, eventId, this.state.incidentData)
-                    .then((value) => {
-                      const incidentId = value.result;
+                    .then((subSubSubSubValue) => {
+                      const incidentId = subSubSubSubValue.result;
                       // ajout de l'audience et de la sous-audience
                       this.onAudiencesChange([audienceId]);
                       this.onSubaudiencesChange([]);
@@ -644,24 +658,27 @@ class CreateExercise extends Component {
     this.setState({ stepIndex: 1 });
   }
 
-  downloadAttachment(document_id, document_name) {
-    return this.props.downloadDocument(document_id, document_name);
+  downloadAttachment(documentId, documentName) {
+    return this.props.downloadDocument(documentId, documentName);
   }
 
   getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
+        /* eslint-disable */
         return (
           <InjectForm
             ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
-            initialValues={{ inject_type: 'openex_manual' }}
+            initialValues={{ inject_type: "openex_manual" }}
             types={this.state.inject_types}
           />
         );
+      /* eslint-enable */
       case 1:
+        /* eslint-disable */
         return (
           <InjectContentForm
             ref="contentForm"
@@ -671,12 +688,13 @@ class CreateExercise extends Component {
             onSubmitSuccess={this.createInject.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(
-              this,
+              this
             )}
             downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}
           />
         );
+      /* eslint-enable */
       default:
         return 'Go away!';
     }
@@ -685,11 +703,13 @@ class CreateExercise extends Component {
   render() {
     const exerciseSimpleActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleClose.bind(this)}
       />,
       <FlatButton
+        key="create"
         label="Create"
         primary={true}
         onClick={this.submitForm.bind(this)}
@@ -698,11 +718,13 @@ class CreateExercise extends Component {
 
     const exerciseStandardActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseStandardExercise.bind(this)}
       />,
       <FlatButton
+        key="create"
         label="Create"
         primary={true}
         onClick={this.submitForm.bind(this)}
@@ -726,11 +748,13 @@ class CreateExercise extends Component {
 
     const audienceActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseAudience.bind(this)}
       />,
       <FlatButton
+        key="next"
         label="Next"
         primary={true}
         onClick={this.submitFormAudience.bind(this)}
@@ -782,12 +806,14 @@ class CreateExercise extends Component {
 
     return (
       <div>
+        {/* eslint-disable */}
         <input
           type="file"
           ref="fileUpload"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           onChange={this.handleFileChange.bind(this)}
         />
+        {/* eslint-enable */}
         <FloatingActionsButtonCreate
           type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpenSelect.bind(this)}
@@ -815,12 +841,14 @@ class CreateExercise extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={exerciseSimpleActions}
         >
+          {/* eslint-disable */}
           <ExerciseForm
             ref="exerciseForm"
             onSubmit={this.onSubmit.bind(this)}
             onSubmitSuccess={this.handleCreate.bind(this)}
             initialValues={informationValues}
           />
+          {/* eslint-enable */}
         </Dialog>
         <Dialog
           title="Create a new standard exercise"
@@ -829,12 +857,14 @@ class CreateExercise extends Component {
           onRequestClose={this.handleCloseStandardExercise.bind(this)}
           actions={exerciseStandardActions}
         >
+          {/* eslint-disable */}
           <ExerciseForm
             ref="exerciseForm"
             onSubmit={this.onSubmitStandardExercise.bind(this)}
             onSubmitSuccess={this.handleCloseStandardExercise.bind(this)}
             initialValues={informationValues}
           />
+          {/* eslint-enable */}
         </Dialog>
         <Dialog
           title="Importer un exercice"
@@ -845,9 +875,11 @@ class CreateExercise extends Component {
         >
           {this.state.exerciseNameExist === true ? (
             <div style={styles.divWarning}>
+              {/* eslint-disable-next-line react/no-unescaped-entities */}
               Attention, vous êtes déja le propriétaire d'un exercice portant le
               même nom.
               <br />
+              {/* eslint-disable-next-line react/no-unescaped-entities */}
               En cas d'import votre exercice sera mis à jour.
             </div>
           ) : (
@@ -855,116 +887,106 @@ class CreateExercise extends Component {
           )}
           <T>Please, chose data to import</T>
           <Table selectable={true} style={{ marginTop: '5px' }}>
-            <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+            <TableHead adjustForCheckbox={false} displaySelectAll={false}>
               <TableRow>
-                <TableHeaderColumn width="30">
+                <TableCell width="30">
                   <T>Import</T>
-                </TableHeaderColumn>
-                <TableHeaderColumn width="130">
+                </TableCell>
+                <TableCell width="130">
                   <T>Items</T>
-                </TableHeaderColumn>
-                <TableHeaderColumn>
+                </TableCell>
+                <TableCell>
                   <T>Description</T>
-                </TableHeaderColumn>
+                </TableCell>
               </TableRow>
-            </TableHeader>
+            </TableHead>
             <TableBody displayRowCheckbox={false}>
               {this.state.dataToImport.exercise === '1' ? (
                 <TableRow key="tab-exercise">
-                  <TableRowColumn width="30">
+                  <TableCell width="30">
                     <Checkbox
                       defaultChecked={true}
                       name="chk-import-exercise"
                       onCheck={this.handleImportCheck.bind(this, 'exercise')}
                     />
-                  </TableRowColumn>
-                  <TableRowColumn width="130">Exercise</TableRowColumn>
-                  <TableRowColumn>
-                    Import data from exercise sheet
-                  </TableRowColumn>
+                  </TableCell>
+                  <TableCell width="130">Exercise</TableCell>
+                  <TableCell>Import data from exercise sheet</TableCell>
                 </TableRow>
               ) : (
                 ''
               )}
               {this.state.dataToImport.audience === '1' ? (
                 <TableRow key="tab-audiences">
-                  <TableRowColumn width="30">
+                  <TableCell width="30">
                     <Checkbox
                       defaultChecked={true}
                       name="chk-import-audience"
                       onCheck={this.handleImportCheck.bind(this, 'audience')}
                     />
-                  </TableRowColumn>
-                  <TableRowColumn width="130">Audiences</TableRowColumn>
-                  <TableRowColumn>
-                    Import data from audience sheet
-                  </TableRowColumn>
+                  </TableCell>
+                  <TableCell width="130">Audiences</TableCell>
+                  <TableCell>Import data from audience sheet</TableCell>
                 </TableRow>
               ) : (
                 ''
               )}
               {this.state.dataToImport.objective === '1' ? (
                 <TableRow key="tab-objective">
-                  <TableRowColumn width="30">
+                  <TableCell width="30">
                     <Checkbox
                       defaultChecked={true}
                       name="chk-import-objective"
                       onCheck={this.handleImportCheck.bind(this, 'objective')}
                     />
-                  </TableRowColumn>
-                  <TableRowColumn width="130">Objective</TableRowColumn>
-                  <TableRowColumn>
-                    Import data from objective sheet
-                  </TableRowColumn>
+                  </TableCell>
+                  <TableCell width="130">Objective</TableCell>
+                  <TableCell>Import data from objective sheet</TableCell>
                 </TableRow>
               ) : (
                 ''
               )}
               {this.state.dataToImport.scenarios === '1' ? (
                 <TableRow key="tab-scenarios">
-                  <TableRowColumn width="30">
+                  <TableCell width="30">
                     <Checkbox
                       defaultChecked={true}
                       name="chk-import-scenarios"
                       onCheck={this.handleImportCheck.bind(this, 'scenarios')}
                     />
-                  </TableRowColumn>
-                  <TableRowColumn width="130">Events</TableRowColumn>
-                  <TableRowColumn>Import data from events sheet</TableRowColumn>
+                  </TableCell>
+                  <TableCell width="130">Events</TableCell>
+                  <TableCell>Import data from events sheet</TableCell>
                 </TableRow>
               ) : (
                 ''
               )}
               {this.state.dataToImport.incidents === '1' ? (
                 <TableRow key="tab-incidents">
-                  <TableRowColumn width="30">
+                  <TableCell width="30">
                     <Checkbox
                       defaultChecked={true}
                       name="chk-import-incidents"
                       onCheck={this.handleImportCheck.bind(this, 'incidents')}
                     />
-                  </TableRowColumn>
-                  <TableRowColumn width="130">Incidents</TableRowColumn>
-                  <TableRowColumn>
-                    Import data from incident sheet
-                  </TableRowColumn>
+                  </TableCell>
+                  <TableCell width="130">Incidents</TableCell>
+                  <TableCell>Import data from incident sheet</TableCell>
                 </TableRow>
               ) : (
                 ''
               )}
               {this.state.dataToImport.injects === '1' ? (
                 <TableRow key="tab-injects">
-                  <TableRowColumn width="30">
+                  <TableCell width="30">
                     <Checkbox
                       defaultChecked={true}
                       name="chk-import-injects"
                       onCheck={this.handleImportCheck.bind(this, 'injects')}
                     />
-                  </TableRowColumn>
-                  <TableRowColumn width="130">Injects</TableRowColumn>
-                  <TableRowColumn>
-                    Import data from injects sheet
-                  </TableRowColumn>
+                  </TableCell>
+                  <TableCell width="130">Injects</TableCell>
+                  <TableCell>Import data from injects sheet</TableCell>
                 </TableRow>
               ) : (
                 ''
@@ -979,12 +1001,14 @@ class CreateExercise extends Component {
           onRequestClose={this.handleCloseAudience.bind(this)}
           actions={audienceActions}
         >
+          {/* eslint-disable */}
           <AudienceForm
             ref="audienceForm"
             onSubmit={this.onSubmitAudience.bind(this)}
             onSubmitSuccess={this.handleCreateAudience.bind(this)}
             initialValues={informationValues}
           />
+          {/* eslint-enable */}
         </Dialog>
         <DialogTitleElement
           title={
@@ -1005,18 +1029,18 @@ class CreateExercise extends Component {
         >
           <div>
             {this.state.users.map((user) => (
-                <Chip
-                  key={user.user_id}
-                  onRequestDelete={this.removeUser.bind(this, user)}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
-                  <Avatar
-                    src={user.user_gravatar}
-                    size={32}
-                    type={Constants.AVATAR_TYPE_CHIP}
-                  />
-                  {user.user_firstname} {user.user_lastname}
-                </Chip>
+              <Chip
+                key={user.user_id}
+                onRequestDelete={this.removeUser.bind(this, user)}
+                type={Constants.CHIP_TYPE_LIST}
+              >
+                <Avatar
+                  src={user.user_gravatar}
+                  size={32}
+                  type={Constants.AVATAR_TYPE_CHIP}
+                />
+                {user.user_firstname} {user.user_lastname}
+              </Chip>
             ))}
             <div className="clearfix"></div>
           </div>
@@ -1028,7 +1052,7 @@ class CreateExercise extends Component {
                   this.state.users,
                 ) !== undefined
                   || this.state.subaudienceUsersIds.includes(user.user_id);
-                const user_organization = R.propOr(
+                const userOrganization = R.propOr(
                   {},
                   user.user_organization,
                   this.props.organizations,
@@ -1036,7 +1060,7 @@ class CreateExercise extends Component {
                 const organizationName = R.propOr(
                   '-',
                   'organization_name',
-                  user_organization,
+                  userOrganization,
                 );
                 return (
                   <MainSmallListItem
@@ -1050,7 +1074,7 @@ class CreateExercise extends Component {
                         </div>
                         <div style={styles.mail}>{user.user_email}</div>
                         <div style={styles.org}>{organizationName}</div>
-                        <div className="clearfix"></div>
+                        <div className="clearfix" />
                       </div>
                     }
                     leftAvatar={

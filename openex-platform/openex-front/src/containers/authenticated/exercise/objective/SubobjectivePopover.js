@@ -14,11 +14,13 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../components/menu/MenuItem';
-import { fetchObjective } from '../../../../actions/Objective';
+/* eslint-disable */
+import { fetchObjective } from "../../../../actions/Objective";
 import {
   updateSubobjective,
   deleteSubobjective,
-} from '../../../../actions/Subobjective';
+} from "../../../../actions/Subobjective";
+/* eslint-enable */
 import SubobjectiveForm from './SubobjectiveForm';
 
 const style = {
@@ -80,6 +82,7 @@ class SubobjectivePopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.subobjectiveForm.submit();
   }
 
@@ -113,12 +116,12 @@ class SubobjectivePopover extends Component {
   }
 
   render() {
-    const subobjective_is_updatable = R.propOr(
+    const subobjectiveIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.subobjective,
     );
-    const subobjective_is_deletable = R.propOr(
+    const subobjectiveIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.subobjective,
@@ -131,7 +134,7 @@ class SubobjectivePopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      subobjective_is_updatable ? (
+      subobjectiveIsUpdatable ? (
         <FlatButton
           key="update"
           label="Update"
@@ -149,7 +152,7 @@ class SubobjectivePopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      subobjective_is_deletable ? (
+      subobjectiveIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -175,14 +178,14 @@ class SubobjectivePopover extends Component {
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
         </IconButton>
 
-        {subobjective_is_updatable || subobjective_is_deletable ? (
+        {subobjectiveIsUpdatable || subobjectiveIsDeletable ? (
           <Popover
             open={this.state.openPopover}
             anchorEl={this.state.anchorEl}
             onRequestClose={this.handlePopoverClose.bind(this)}
           >
             <Menu multiple={false}>
-              {subobjective_is_updatable ? (
+              {subobjectiveIsUpdatable ? (
                 <MenuItemLink
                   label="Edit"
                   onClick={this.handleOpenEdit.bind(this)}
@@ -190,7 +193,7 @@ class SubobjectivePopover extends Component {
               ) : (
                 ''
               )}
-              {subobjective_is_deletable ? (
+              {subobjectiveIsDeletable ? (
                 <MenuItemButton
                   label="Delete"
                   onClick={this.handleOpenDelete.bind(this)}
@@ -220,12 +223,14 @@ class SubobjectivePopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <SubobjectiveForm
             ref="subobjectiveForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

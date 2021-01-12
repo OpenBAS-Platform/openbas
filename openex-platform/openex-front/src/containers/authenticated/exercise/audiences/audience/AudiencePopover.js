@@ -10,35 +10,37 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
+/* eslint-disable */
 import {
   redirectToAudiences,
   redirectToComcheck,
-} from '../../../../../actions/Application';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
-import { Dialog } from '../../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../../components/Button';
-import { Checkbox } from '../../../../../components/Checkbox';
-import { Icon } from '../../../../../components/Icon';
+} from "../../../../../actions/Application";
+import * as Constants from "../../../../../constants/ComponentTypes";
+import { Popover } from "../../../../../components/Popover";
+import { Menu } from "../../../../../components/Menu";
+import { Dialog } from "../../../../../components/Dialog";
+import { IconButton, FlatButton } from "../../../../../components/Button";
+import { Checkbox } from "../../../../../components/Checkbox";
+import { Icon } from "../../../../../components/Icon";
 import {
   MenuItemLink,
   MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
-import { addComcheck } from '../../../../../actions/Comcheck';
+} from "../../../../../components/menu/MenuItem";
+import { addComcheck } from "../../../../../actions/Comcheck";
 import {
   updateAudience,
   downloadExportAudience,
   deleteAudience,
   copyAudienceToExercise,
-} from '../../../../../actions/Audience';
+} from "../../../../../actions/Audience";
 import {
   getPlanificateurUserForAudience,
   updatePlanificateurUserForAudience,
-} from '../../../../../actions/Planificateurs';
-import AudienceForm from './AudienceForm';
-import ComcheckForm from '../../check/ComcheckForm';
-import { fetchExercises } from '../../../../../actions/Exercise';
+} from "../../../../../actions/Planificateurs";
+import AudienceForm from "./AudienceForm";
+import ComcheckForm from "../../check/ComcheckForm";
+import { fetchExercises } from "../../../../../actions/Exercise";
+/* eslint-enable */
 import { dateFormat, timeDiff } from '../../../../../utils/Time';
 import PlanificateurAudience from '../../planificateurs/PlanificateurAudience';
 
@@ -178,21 +180,23 @@ class AudiencePopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.audienceForm.submit();
   }
 
-  onSubmitCopyAudience(event) {
+  onSubmitCopyAudience() {
     this.setState({ openCopyAudience: false });
     const exercicesToAdd = [...this.state.exercicesToAdd];
     const audienceId = this.props.audience.audience_id;
-    const { copyAudienceToExercise } = this.props;
+    const { copyAudienceToExerciseAction } = this.props;
     exercicesToAdd.forEach((exerciseId) => {
       const data = { audience_id: audienceId, exercise_id: exerciseId };
-      copyAudienceToExercise(exerciseId, audienceId, data);
+      copyAudienceToExerciseAction(exerciseId, audienceId, data);
     });
   }
 
   submitFormComcheck() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.comCheck.submit();
   }
 
@@ -260,13 +264,14 @@ class AudiencePopover extends Component {
   }
 
   handleCheckPlanificateur(userId, audienceId, isChecked) {
-    const liste_planificateurs = [...this.state.planificateursAudience];
-    liste_planificateurs.forEach((user) => {
+    const listePlanificateurs = [...this.state.planificateursAudience];
+    listePlanificateurs.forEach((user) => {
       if (user.user_id === userId) {
+        // eslint-disable-next-line no-param-reassign
         user.is_planificateur_audience = isChecked;
       }
     });
-    this.setState({ planificateursAudience: liste_planificateurs });
+    this.setState({ planificateursAudience: listePlanificateurs });
   }
 
   submitEnable() {
@@ -291,17 +296,17 @@ class AudiencePopover extends Component {
   }
 
   render() {
-    const audience_enabled = R.propOr(
+    const audienceEnabled = R.propOr(
       true,
       'audience_enabled',
       this.props.audience,
     );
-    const audience_is_updatable = R.propOr(
+    const audienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.audience,
     );
-    const audience_is_deletable = R.propOr(
+    const audienceIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.audience,
@@ -312,16 +317,12 @@ class AudiencePopover extends Component {
     const initialComcheckValues = {
       comcheck_audience: R.propOr(0, 'audience_id', this.props.audience),
       comcheck_subject: this.t('Communication check'),
-      comcheck_message:
-        `${this.t('Hello')
-        },<br /><br />${
-          this.t(
-            'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
-          )}`,
-      comcheck_footer:
-        `${this.t('Best regards')
-        },<br />${
-          this.t('The exercise control Team')}`,
+      comcheck_message: `${this.t('Hello')},<br /><br />${this.t(
+        'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
+      )}`,
+      comcheck_footer: `${this.t('Best regards')},<br />${this.t(
+        'The exercise control Team',
+      )}`,
     };
 
     const comCopyAudienceToOtherExercise = [
@@ -361,7 +362,7 @@ class AudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      audience_is_updatable ? (
+      audienceIsUpdatable ? (
         <FlatButton
           key="update"
           label="Update"
@@ -379,7 +380,7 @@ class AudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      audience_is_deletable ? (
+      audienceIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -397,7 +398,7 @@ class AudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
-      audience_is_updatable ? (
+      audienceIsUpdatable ? (
         <FlatButton
           key="disable"
           label="Disable"
@@ -415,7 +416,7 @@ class AudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
-      audience_is_updatable ? (
+      audienceIsUpdatable ? (
         <FlatButton
           key="enable"
           label="Enable"
@@ -457,7 +458,7 @@ class AudiencePopover extends Component {
               label="Copy Audience to Exercise"
               onClick={this.handleOpenCopyAudienceToOtherExercise.bind(this)}
             />
-            {audience_is_updatable ? (
+            {audienceIsUpdatable ? (
               <MenuItemLink
                 label="Edit"
                 onClick={this.handleOpenEdit.bind(this)}
@@ -465,8 +466,9 @@ class AudiencePopover extends Component {
             ) : (
               ''
             )}
-            {audience_is_updatable ? (
-              audience_enabled ? (
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {audienceIsUpdatable ? (
+              audienceEnabled ? (
                 <MenuItemButton
                   label="Disable"
                   onClick={this.handleOpenDisable.bind(this)}
@@ -484,7 +486,7 @@ class AudiencePopover extends Component {
               label="Export to XLS"
               onClick={this.handleDownloadAudience.bind(this)}
             />
-            {audience_is_deletable ? (
+            {audienceIsDeletable ? (
               <MenuItemButton
                 label="Delete"
                 onClick={this.handleOpenDelete.bind(this)}
@@ -510,12 +512,14 @@ class AudiencePopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <AudienceForm
             ref="audienceForm"
-            initialValues={R.pick(['audience_name'], this.props.audience)}
+            initialValues={R.pick(["audience_name"], this.props.audience)}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
 
         <Dialog
@@ -540,38 +544,38 @@ class AudiencePopover extends Component {
             id="copyExerciceForm"
           >
             <Table selectable={false} style={{ marginTop: '5px' }}>
-              <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+              <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                 <TableRow>
-                  <TableHeaderColumn>
+                  <TableCell>
                     <T>Exercise</T>
-                  </TableHeaderColumn>
-                  <TableHeaderColumn>
+                  </TableCell>
+                  <TableCell>
                     <T>Start Date</T>
-                  </TableHeaderColumn>
-                  <TableHeaderColumn>
+                  </TableCell>
+                  <TableCell>
                     <T>End Date</T>
-                  </TableHeaderColumn>
-                  <TableHeaderColumn>
+                  </TableCell>
+                  <TableCell>
                     <T>Copy</T>
-                  </TableHeaderColumn>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
+              </TableHead>
               <TableBody displayRowCheckbox={false}>
                 {R.values(this.props.exercises).map((exercise) => {
-                  const start_date = dateFormat(
+                  const startDate = dateFormat(
                     exercise.exercise_start_date,
                     'MMM D, YYYY',
                   );
-                  const end_date = dateFormat(
+                  const endDate = dateFormat(
                     exercise.exercise_end_date,
                     'MMM D, YYYY',
                   );
                   return (
                     <TableRow key={exercise.exercise_id}>
-                      <TableRowColumn>{exercise.exercise_name}</TableRowColumn>
-                      <TableRowColumn>{start_date}</TableRowColumn>
-                      <TableRowColumn>{end_date}</TableRowColumn>
-                      <TableRowColumn>
+                      <TableCell>{exercise.exercise_name}</TableCell>
+                      <TableCell>{startDate}</TableCell>
+                      <TableCell>{endDate}</TableCell>
+                      <TableCell>
                         <Checkbox
                           defaultChecked={false}
                           onCheck={this.handleCopyCheck.bind(
@@ -579,7 +583,7 @@ class AudiencePopover extends Component {
                             exercise.exercise_id,
                           )}
                         />
-                      </TableRowColumn>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -595,6 +599,7 @@ class AudiencePopover extends Component {
           onRequestClose={this.handleCloseComcheck.bind(this)}
           actions={comcheckActions}
         >
+          {/* eslint-disable */}
           <ComcheckForm
             ref="comcheckForm"
             audiences={this.props.audiences}
@@ -602,6 +607,7 @@ class AudiencePopover extends Component {
             onSubmit={this.onSubmitComcheck.bind(this)}
             onSubmitSuccess={this.handleCloseComcheck.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
 
         <PlanificateurAudience
@@ -636,6 +642,15 @@ class AudiencePopover extends Component {
   }
 }
 
+const sortExercises = (exercises, exerciseId) => {
+  const exercisesSorting = R.pipe(
+    R.filter((n) => n.exercise_id !== exerciseId),
+    R.sort((a, b) => timeDiff(a.exercise_start_date, b.exercise_start_date)),
+  );
+
+  return exercisesSorting(exercises);
+};
+
 const select = (state, ownProps) => {
   const userId = R.path(['logged', 'user'], state.app);
   const exercise = R.prop(
@@ -652,15 +667,6 @@ const select = (state, ownProps) => {
     exerciseOwnerId,
     userId,
   };
-};
-
-const sortExercises = (exercises, exercise_id) => {
-  const exercisesSorting = R.pipe(
-    R.filter((n) => n.exercise_id !== exercise_id),
-    R.sort((a, b) => timeDiff(a.exercise_start_date, b.exercise_start_date)),
-  );
-
-  return exercisesSorting(exercises);
 };
 
 AudiencePopover.propTypes = {

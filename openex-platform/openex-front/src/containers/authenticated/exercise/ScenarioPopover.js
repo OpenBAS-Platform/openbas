@@ -14,24 +14,25 @@ import { Menu } from '../../../components/Menu';
 import { IconButton, FlatButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemLink } from '../../../components/menu/MenuItem';
+/* eslint-disable */
 import {
   downloadExportInjects,
   shiftAllInjects,
-
   simulateChangeDurationExercise,
   changeDurationExercise,
-} from '../../../actions/Inject';
+} from "../../../actions/Inject";
 
-import ShiftForm from './ShiftForm';
-import InjectTable from '../../../components/InjectTable';
-import { T } from '../../../components/I18n';
-import { fetchExercise } from '../../../actions/Exercise';
+import ShiftForm from "./ShiftForm";
+import InjectTable from "../../../components/InjectTable";
+import { T } from "../../../components/I18n";
+import { fetchExercise } from "../../../actions/Exercise";
 import {
   START_TIME_OF_DAY,
   END_TIME_OF_DAY,
-} from '../../../constants/ComponentTypes';
-import Theme from '../../../components/Theme';
-import { redirectToHome } from '../../../actions/Application';
+} from "../../../constants/ComponentTypes";
+import Theme from "../../../components/Theme";
+import { redirectToHome } from "../../../actions/Application";
+/* eslint-enable */
 
 const style = {
   float: 'left',
@@ -309,11 +310,13 @@ class ScenarioPopover extends Component {
       R.head,
       R.prop('inject_date'),
     )(this.props.injects);
+    // eslint-disable-next-line no-param-reassign
     data.old_date = firstInjectDate;
     return this.props.shiftAllInjects(this.props.exerciseId, data);
   }
 
   submitFormShift() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.shiftForm.submit();
   }
 
@@ -340,7 +343,7 @@ class ScenarioPopover extends Component {
         alert('Please, choose valid number');
       } else if (
         parseInt(this.state.start_time_of_day, 10)
-          >= parseInt(this.state.end_time_of_day, 10)
+        >= parseInt(this.state.end_time_of_day, 10)
       ) {
         alert('Please check start and end day hours');
       } else {
@@ -354,7 +357,7 @@ class ScenarioPopover extends Component {
         this.props
           .simulateChangeDurationExercise(this.props.exerciseId, data)
           .then((returnInjects) => {
-            const new_injects = [];
+            const newInjects = [];
             let index = 0;
             let exerciseEndDateSimulate;
             let exerciseDurationSimulate;
@@ -363,17 +366,13 @@ class ScenarioPopover extends Component {
                 exerciseEndDateSimulate = element.exercise_end_date;
                 exerciseDurationSimulate = element.exercise_duration;
               }
+              // eslint-disable-next-line no-plusplus
               index++;
-              new_injects.push({
+              newInjects.push({
                 ts: element.ts,
-                text:
-                    `${element.event
-                    } - ${
-                      element.incident
-                    } - ${
-                      element.inject}`,
+                text: `${element.event} - ${element.incident} - ${element.inject}`,
               });
-              new_injects.sort((injectA, injectB) => {
+              newInjects.sort((injectA, injectB) => {
                 if (injectA.ts === injectB.ts) {
                   return 0;
                 }
@@ -387,7 +386,7 @@ class ScenarioPopover extends Component {
             });
             this.setState({
               openChangeDuration: false,
-              new_injects,
+              newInjects,
             });
             this.setState({
               openResumeChangeDuration: true,
@@ -490,12 +489,14 @@ class ScenarioPopover extends Component {
           onRequestClose={this.handleCancelShift.bind(this)}
           actions={shiftActions}
         >
+          {/* eslint-disable */}
           <ShiftForm
             ref="shiftForm"
             onSubmitSuccess={this.handleCloseShift.bind(this)}
             onSubmit={this.onSubmitShift.bind(this)}
             injects={this.props.injects}
           />
+          {/* eslint-enable */}
         </Dialog>
 
         <Dialog
@@ -519,7 +520,9 @@ class ScenarioPopover extends Component {
           <div>
             {this.state.checkContinuousDays === false ? (
               <div style={styles.showWarningSimulate}>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 Attention, dans le cadre d'une journée discontinue toute
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 modification d'exercice est irréversible.
               </div>
             ) : (
@@ -527,13 +530,11 @@ class ScenarioPopover extends Component {
             )}
             <div style={styles.divSimulateExerciseResume}>
               <T>Exercise estimated end: </T>
-              {`${new Date(this.state.exerciseEndDateSimulate).toLocaleDateString(
-                'fr-FR',
-              )
-              } ${
-                new Date(this.state.exerciseEndDateSimulate).toLocaleTimeString(
-                  'fr-FR',
-                )}`}
+              {`${new Date(
+                this.state.exerciseEndDateSimulate,
+              ).toLocaleDateString('fr-FR')} ${new Date(
+                this.state.exerciseEndDateSimulate,
+              ).toLocaleTimeString('fr-FR')}`}
             </div>
 
             <div style={styles.divSimulateExerciseResume}>
@@ -571,11 +572,9 @@ class ScenarioPopover extends Component {
               <div style={styles.changeDuration.input}>
                 {`${new Date(this.getFirstInjectDate()).toLocaleDateString(
                   'fr-FR',
-                )
-                } ${
-                  new Date(this.getFirstInjectDate()).toLocaleTimeString(
-                    'fr-FR',
-                  )}`}
+                )} ${new Date(this.getFirstInjectDate()).toLocaleTimeString(
+                  'fr-FR',
+                )}`}
               </div>
             </div>
 
@@ -588,11 +587,9 @@ class ScenarioPopover extends Component {
               <div style={styles.changeDuration.input}>
                 {`${new Date(this.getLastInjectDate()).toLocaleDateString(
                   'fr-FR',
-                )
-                } ${
-                  new Date(this.getLastInjectDate()).toLocaleTimeString(
-                    'fr-FR',
-                  )}`}
+                )} ${new Date(this.getLastInjectDate()).toLocaleTimeString(
+                  'fr-FR',
+                )}`}
               </div>
             </div>
 
@@ -603,6 +600,7 @@ class ScenarioPopover extends Component {
                 </p>
               </div>
               <div style={styles.changeDuration.inputHour}>
+                {/* eslint-disable */}
                 <TextField
                   id="duration"
                   ref="duration"
@@ -612,6 +610,7 @@ class ScenarioPopover extends Component {
                   type="text"
                   disabled={true}
                 />
+                {/* eslint-enable */}
               </div>
               <div style={styles.changeDuration.unitHour}>
                 <p>
@@ -627,6 +626,7 @@ class ScenarioPopover extends Component {
                 </p>
               </div>
               <div style={styles.changeDuration.inputHour}>
+                {/* eslint-disable */}
                 <TextField
                   id="duration_desired"
                   ref="duration_desired"
@@ -637,6 +637,7 @@ class ScenarioPopover extends Component {
                   type="number"
                   disabled={false}
                 />
+                {/* eslint-enable */}
               </div>
               <div style={styles.changeDuration.unitHour}>
                 <p>
@@ -646,6 +647,7 @@ class ScenarioPopover extends Component {
             </div>
 
             <div style={styles.checkbox}>
+              {/* eslint-disable */}
               <Checkbox
                 ref="checkContinuousDays"
                 name="checkContinuousDays"
@@ -654,6 +656,7 @@ class ScenarioPopover extends Component {
                 label={<T>Allow move inject outside of working hours.</T>}
                 labelPosition="right"
               />
+              {/* eslint-enable */}
             </div>
 
             <div style={{ display: this.state.showDiscontinue }}>
@@ -665,6 +668,7 @@ class ScenarioPopover extends Component {
                     </p>
                   </div>
                   <div style={styles.changeDuration.inputHour}>
+                    {/* eslint-disable */}
                     <TextField
                       id="start_time_day"
                       ref="start_time_day"
@@ -675,6 +679,7 @@ class ScenarioPopover extends Component {
                       disabled={false}
                       onChange={this.handleChangeStartTimeDay}
                     />
+                    {/* eslint-disable */}
                   </div>
                   <div style={styles.changeDuration.unitHour}>
                     <p>

@@ -62,8 +62,8 @@ class IncidentSubobjectives extends Component {
     this.submitSubobjectives(subobjectivesIds);
   }
 
-  submitSubobjectives(subobjectives_ids) {
-    this.props.onChange(subobjectives_ids);
+  submitSubobjectives(subobjectivesIds) {
+    this.props.onChange(subobjectivesIds);
   }
 
   render() {
@@ -96,7 +96,7 @@ class IncidentSubobjectives extends Component {
             const subobjective = R.find(
               (a) => a.subobjective_id === subobjectiveId,
             )(this.props.subobjectives);
-            const subobjective_title = R.propOr(
+            const subobjectiveTitle = R.propOr(
               '-',
               'subobjective_title',
               subobjective,
@@ -117,7 +117,7 @@ class IncidentSubobjectives extends Component {
                   size={32}
                   type={Constants.AVATAR_TYPE_CHIP}
                 />
-                {subobjective_title}
+                {subobjectiveTitle}
               </Chip>
             );
           })}
@@ -134,7 +134,7 @@ class IncidentSubobjectives extends Component {
           <List>
             {filteredSubobjectives.map((subobjective) => {
               const disabled = R.find(
-                (subobjective_id) => subobjective_id === subobjective.subobjective_id,
+                (subobjectiveId) => subobjectiveId === subobjective.subobjective_id,
                 this.state.subobjectivesIds,
               ) !== undefined;
               return (

@@ -25,12 +25,12 @@ const styles = {
 
 class UserView extends Component {
   render() {
-    const user_email = R.propOr('-', 'user_email', this.props.user);
-    const user_gravatar = R.propOr('', 'user_gravatar', this.props.user);
-    const user_phone = R.propOr('', 'user_phone', this.props.user);
-    const user_phone2 = R.propOr('', 'user_phone2', this.props.user);
-    const user_pgp_key = R.propOr(false, 'user_pgp_key', this.props.user);
-    const user_organization = R.propOr(
+    const userEmail = R.propOr('-', 'user_email', this.props.user);
+    const userGravatar = R.propOr('', 'user_gravatar', this.props.user);
+    const userPhone = R.propOr('', 'user_phone', this.props.user);
+    const userPhone2 = R.propOr('', 'user_phone2', this.props.user);
+    const userPgpKey = R.propOr(false, 'user_pgp_key', this.props.user);
+    const userOrganization = R.propOr(
       {},
       this.props.user.user_organization,
       this.props.organizations,
@@ -38,22 +38,22 @@ class UserView extends Component {
     const organizationName = R.propOr(
       '-',
       'organization_name',
-      user_organization,
+      userOrganization,
     );
 
     return (
       <div style={styles.container}>
         <div style={styles.image}>
-          <img src={user_gravatar} alt="Avatar" />
+          <img src={userGravatar} alt="Avatar" />
         </div>
         <div style={styles.info}>
           <div>
-            <strong>{user_email}</strong>
+            <strong>{userEmail}</strong>
           </div>
           <div>{organizationName}</div>
-          <div>{user_phone2}</div>
-          <div>{user_phone}</div>
-          <div>{user_pgp_key ? <T>PGP Key is set</T> : ''}</div>
+          <div>{userPhone2}</div>
+          <div>{userPhone}</div>
+          <div>{userPgpKey ? <T>PGP Key is set</T> : ''}</div>
         </div>
       </div>
     );

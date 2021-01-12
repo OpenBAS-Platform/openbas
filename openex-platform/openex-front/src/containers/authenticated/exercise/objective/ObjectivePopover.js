@@ -14,12 +14,14 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../components/menu/MenuItem';
+/* eslint-disable */
 import {
   fetchObjective,
   updateObjective,
   deleteObjective,
-} from '../../../../actions/Objective';
-import { addSubobjective } from '../../../../actions/Subobjective';
+} from "../../../../actions/Objective";
+import { addSubobjective } from "../../../../actions/Subobjective";
+/* eslint-enable */
 import ObjectiveForm from './ObjectiveForm';
 import SubobjectiveForm from './SubobjectiveForm';
 
@@ -80,6 +82,7 @@ class ObjectivePopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.objectiveForm.submit();
   }
 
@@ -125,16 +128,17 @@ class ObjectivePopover extends Component {
   }
 
   submitFormCreateSubobjective() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.subobjectiveForm.submit();
   }
 
   render() {
-    const objective_is_updatable = R.propOr(
+    const objectiveIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.objective,
     );
-    const objective_is_deletable = R.propOr(
+    const objectiveIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.objective,
@@ -147,7 +151,7 @@ class ObjectivePopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      objective_is_updatable ? (
+      objectiveIsUpdatable ? (
         <FlatButton
           key="update"
           label="Update"
@@ -165,7 +169,7 @@ class ObjectivePopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      objective_is_deletable ? (
+      objectiveIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -210,7 +214,7 @@ class ObjectivePopover extends Component {
               label="Add a subobjective"
               onClick={this.handleOpenCreateSubobjective.bind(this)}
             />
-            {objective_is_updatable ? (
+            {objectiveIsUpdatable ? (
               <MenuItemLink
                 label="Edit"
                 onClick={this.handleOpenEdit.bind(this)}
@@ -218,7 +222,7 @@ class ObjectivePopover extends Component {
             ) : (
               ''
             )}
-            {objective_is_deletable ? (
+            {objectiveIsDeletable ? (
               <MenuItemButton
                 label="Delete"
                 onClick={this.handleOpenDelete.bind(this)}
@@ -244,12 +248,14 @@ class ObjectivePopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <ObjectiveForm
             ref="objectiveForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
         <Dialog
           title="Create a new subobjective"
@@ -258,11 +264,13 @@ class ObjectivePopover extends Component {
           onRequestClose={this.handleCloseCreateSubobjective.bind(this)}
           actions={createSubobjectiveActions}
         >
+          {/* eslint-disable */}
           <SubobjectiveForm
             ref="subobjectiveForm"
             onSubmit={this.onSubmitCreateSubobjective.bind(this)}
             onSubmitSuccess={this.handleCloseCreateSubobjective.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

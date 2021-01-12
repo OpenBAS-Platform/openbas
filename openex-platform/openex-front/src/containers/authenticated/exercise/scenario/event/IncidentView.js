@@ -23,19 +23,19 @@ const styles = {
 
 class IncidentView extends Component {
   render() {
-    const incident_type = R.propOr('-', 'incident_type', this.props.incident);
-    const incident_type_name = R.pathOr(
+    const incidentType = R.propOr('-', 'incident_type', this.props.incident);
+    const incidentTypeName = R.pathOr(
       '-',
-      [incident_type, 'type_name'],
+      [incidentType, 'type_name'],
       this.props.incident_types,
     );
-    const incident_story = R.propOr('-', 'incident_story', this.props.incident);
+    const incidentStory = R.propOr('-', 'incident_story', this.props.incident);
     return (
       <div style={styles.container}>
         <div style={styles.type}>
-          <T>{incident_type_name}</T>
+          <T>{incidentTypeName}</T>
         </div>
-        <div style={styles.story}>{incident_story}</div>
+        <div style={styles.story}>{incidentStory}</div>
       </div>
     );
   }

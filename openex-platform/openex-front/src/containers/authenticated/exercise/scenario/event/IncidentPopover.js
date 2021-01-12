@@ -15,6 +15,7 @@ import {
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
+// eslint-disable-next-line import/no-cycle
 import {
   updateIncident,
   deleteIncident,
@@ -101,6 +102,7 @@ class IncidentPopover extends Component {
 
   handleNext() {
     if (this.state.stepIndex === 0) {
+      // eslint-disable-next-line react/no-string-refs
       this.refs.incidentForm.submit();
     } else if (this.state.stepIndex === 1) {
       this.updateIncident();
@@ -150,6 +152,7 @@ class IncidentPopover extends Component {
   getStepContent(stepIndex, initialValues) {
     switch (stepIndex) {
       case 0:
+        /* eslint-disable */
         return (
           <IncidentForm
             ref="incidentForm"
@@ -159,7 +162,9 @@ class IncidentPopover extends Component {
             types={this.props.incident_types}
           />
         );
+      /* eslint-enable */
       case 1:
+        /* eslint-disable */
         return (
           <IncidentSubobjectives
             ref="incidentSubobjectives"
@@ -170,18 +175,19 @@ class IncidentPopover extends Component {
             incidentSubobjectivesIds={this.props.incidentSubobjectivesIds}
           />
         );
+      /* eslint-enable */
       default:
         return 'Go away!';
     }
   }
 
   render() {
-    const incident_is_updatable = R.propOr(
+    const incidentIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.incident,
     );
-    const incident_is_deletable = R.propOr(
+    const incidentIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.incident,
@@ -194,7 +200,7 @@ class IncidentPopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      incident_is_updatable ? (
+      incidentIsUpdatable ? (
         <FlatButton
           key="update"
           label={this.state.stepIndex === 1 ? 'Update' : 'Next'}
@@ -212,7 +218,7 @@ class IncidentPopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      incident_is_deletable ? (
+      incidentIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -241,14 +247,14 @@ class IncidentPopover extends Component {
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
         </IconButton>
 
-        {incident_is_updatable || incident_is_deletable ? (
+        {incidentIsUpdatable || incidentIsDeletable ? (
           <Popover
             open={this.state.openPopover}
             anchorEl={this.state.anchorEl}
             onRequestClose={this.handlePopoverClose.bind(this)}
           >
             <Menu multiple={false}>
-              {incident_is_updatable ? (
+              {incidentIsUpdatable ? (
                 <MenuItemLink
                   label="Edit"
                   onClick={this.handleOpenEdit.bind(this)}
@@ -256,7 +262,7 @@ class IncidentPopover extends Component {
               ) : (
                 ''
               )}
-              {incident_is_deletable ? (
+              {incidentIsDeletable ? (
                 <MenuItemButton
                   label="Delete"
                   onClick={this.handleOpenDelete.bind(this)}

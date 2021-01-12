@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { fetchOrganizations } from '../../../../actions/Organization';
-import { updateUser } from '../../../../actions/User';
+/* eslint-disable */
+import { fetchOrganizations } from "../../../../actions/Organization";
+import { updateUser } from "../../../../actions/User";
+/* eslint-enable */
 import { Paper } from '../../../../components/Paper';
 import { Button } from '../../../../components/Button';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -49,14 +51,17 @@ class Index extends Component {
   }
 
   submitUser() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.userForm.submit();
   }
 
   submitProfile() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.profileForm.submit();
   }
 
   submitPassword() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.passwordForm.submit();
   }
 
@@ -65,13 +70,13 @@ class Index extends Component {
       R.propOr('-', 'user_organization', this.props.user),
       'organization_name',
     ];
-    const organization_name = R.pathOr(
+    const organizationName = R.pathOr(
       '-',
       organizationPath,
       this.props.organizations,
     );
     const initPipe = R.pipe(
-      R.assoc('user_organization', organization_name), // Reformat organization
+      R.assoc('user_organization', organizationName), // Reformat organization
       R.pick([
         'user_firstname',
         'user_lastname',
@@ -94,12 +99,14 @@ class Index extends Component {
             <h2>
               <T>Profile</T>
             </h2>
+            {/* eslint-disable */}
             <UserForm
               ref="userForm"
               organizations={this.props.organizations}
               onSubmit={this.onUpdate.bind(this)}
               initialValues={informationValues}
             />
+            {/* eslint-enable */}
             <br />
             <Button
               type="submit"
@@ -113,11 +120,13 @@ class Index extends Component {
             <h2>
               <T>Information</T>
             </h2>
+            {/* eslint-disable */}
             <ProfileForm
               ref="profileForm"
               onSubmit={this.onUpdate.bind(this)}
               initialValues={informationValues}
             />
+            {/* eslint-enable */}
             <br />
             <Button
               type="submit"
@@ -131,10 +140,12 @@ class Index extends Component {
             <h2>
               <T>Password</T>
             </h2>
+            {/* eslint-disable */}
             <PasswordForm
               ref="passwordForm"
               onSubmit={this.onUpdatePassword.bind(this)}
             />
+            {/* eslint-enable */}
             <br />
             <Button
               type="submit"

@@ -4,9 +4,11 @@ import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router';
 import * as Constants from '../../../constants/ComponentTypes';
 import AppBar from '../../../components/AppBar';
-import UserPopover from '../UserPopover';
-import { redirectToHome } from '../../../actions/Application';
-import IndexUserProfile from './profile/Index';
+/* eslint-disable */
+import UserPopover from "../UserPopover";
+import { redirectToHome } from "../../../actions/Application";
+import IndexUserProfile from "./profile/Index";
+/* eslint-enable */
 
 const styles = {
   container: {
@@ -49,7 +51,7 @@ class RootUser extends Component {
         />
         <div style={styles.container}>
           <Switch>
-          <Route path="profile" component={IndexUserProfile} />
+            <Route path="profile" component={IndexUserProfile} />
           </Switch>
         </div>
       </div>

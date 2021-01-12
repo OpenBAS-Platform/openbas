@@ -20,14 +20,14 @@ const styles = {
 
 class ObjectiveView extends Component {
   render() {
-    const objective_description = R.propOr(
+    const objectiveDescription = R.propOr(
       '-',
       'objective_description',
       this.props.objective,
     );
     return (
       <div style={styles.container}>
-        <div style={styles.story}>{objective_description}</div>
+        <div style={styles.story}>{objectiveDescription}</div>
       </div>
     );
   }

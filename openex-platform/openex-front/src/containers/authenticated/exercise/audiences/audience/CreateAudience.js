@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
+// eslint-disable-next-line import/no-cycle
 import { addAudience } from '../../../../../actions/Audience';
 import { Dialog } from '../../../../../components/Dialog';
 import {
@@ -36,6 +37,7 @@ class CreateAudience extends Component {
   }
 
   submitForm() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.audienceForm.submit();
   }
 
@@ -68,11 +70,13 @@ class CreateAudience extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
+          {/* eslint-disable */}
           <AudienceForm
             ref="audienceForm"
             onSubmit={this.onSubmit.bind(this)}
             onSubmitSuccess={this.handleClose.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

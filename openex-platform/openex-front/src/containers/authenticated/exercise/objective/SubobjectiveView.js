@@ -20,14 +20,14 @@ const styles = {
 
 class SubobjectiveView extends Component {
   render() {
-    const subobjective_description = R.propOr(
+    const subobjectiveDescription = R.propOr(
       '-',
       'subobjective_description',
       this.props.subobjective,
     );
     return (
       <div style={styles.container}>
-        <div style={styles.story}>{subobjective_description}</div>
+        <div style={styles.story}>{subobjectiveDescription}</div>
       </div>
     );
   }

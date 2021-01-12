@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
+// eslint-disable-next-line import/no-cycle
 import { addEvent } from '../../../../../actions/Event';
 import { Dialog } from '../../../../../components/Dialog';
 import {
@@ -36,6 +37,7 @@ class CreateEvent extends Component {
   }
 
   submitForm() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.eventForm.submit();
   }
 
@@ -68,11 +70,13 @@ class CreateEvent extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
+          {/* eslint-disable */}
           <EventForm
             ref="eventForm"
             onSubmit={this.onSubmit.bind(this)}
             onSubmitSuccess={this.handleClose.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

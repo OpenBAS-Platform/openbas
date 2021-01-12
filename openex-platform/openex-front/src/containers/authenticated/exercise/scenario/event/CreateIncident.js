@@ -5,7 +5,10 @@ import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { DialogTitleElement } from '../../../../../components/Dialog';
-import { FlatButton, ActionButtonCreate } from '../../../../../components/Button';
+import {
+  FlatButton,
+  ActionButtonCreate,
+} from '../../../../../components/Button';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
 import AppBar from '../../../../../components/AppBar';
 import IncidentForm from './IncidentForm';
@@ -58,6 +61,7 @@ class CreateIncident extends Component {
 
   handleNext() {
     if (this.state.stepIndex === 0) {
+      // eslint-disable-next-line react/no-string-refs
       this.refs.incidentForm.submit();
     } else if (this.state.stepIndex === 1) {
       this.createIncident();
@@ -88,6 +92,7 @@ class CreateIncident extends Component {
   getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
+        /* eslint-disable */
         return (
           <IncidentForm
             ref="incidentForm"
@@ -96,7 +101,9 @@ class CreateIncident extends Component {
             types={this.props.incident_types}
           />
         );
+      /* eslint-enable */
       case 1:
+        /* eslint-disable */
         return (
           <IncidentSubobjectives
             ref="incidentSubobjectives"
@@ -107,6 +114,7 @@ class CreateIncident extends Component {
             incidentSubobjectivesIds={[]}
           />
         );
+      /* eslint-enable */
       default:
         return 'Go away!';
     }

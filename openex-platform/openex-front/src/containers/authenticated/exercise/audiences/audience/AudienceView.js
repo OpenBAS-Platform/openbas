@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { fetchUsers } from '../../../../../actions/User';
-import { fetchOrganizations } from '../../../../../actions/Organization';
+/* eslint-disable */
+import { fetchUsers } from "../../../../../actions/User";
+import { fetchOrganizations } from "../../../../../actions/Organization";
+/* eslint-enable */
 import {
   MainSmallListItem,
   SecondarySmallListItem,
@@ -52,11 +54,11 @@ class AudienceView extends Component {
           {subaudiences.map((subaudience) => {
             const nestedItems = subaudience.subaudience_users.map((data) => {
               const user = R.propOr({}, data.user_id, this.props.users);
-              const user_id = R.propOr(data.user_id, 'user_id', user);
-              const user_firstname = R.propOr('-', 'user_firstname', user);
-              const user_lastname = R.propOr('-', 'user_lastname', user);
-              const user_gravatar = R.propOr('', 'user_gravatar', user);
-              const user_organization = R.propOr(
+              const userId = R.propOr(data.user_id, 'user_id', user);
+              const userFirstname = R.propOr('-', 'user_firstname', user);
+              const userLastname = R.propOr('-', 'user_lastname', user);
+              const userGravatar = R.propOr('', 'user_gravatar', user);
+              const userOrganization = R.propOr(
                 {},
                 user.user_organization,
                 this.props.organizations,
@@ -64,21 +66,20 @@ class AudienceView extends Component {
               const organizationName = R.propOr(
                 '-',
                 'organization_name',
-                user_organization,
+                userOrganization,
               );
-
               return (
                 <SecondarySmallListItem
-                  key={user_id}
+                  key={userId}
                   leftAvatar={
                     <Avatar
                       type={Constants.AVATAR_TYPE_MAINLIST}
-                      src={user_gravatar}
+                      src={userGravatar}
                     />
                   }
                   primaryText={
                     <div>
-                      {user_firstname} {user_lastname}
+                      {userFirstname} {userLastname}
                     </div>
                   }
                   secondaryText={organizationName}

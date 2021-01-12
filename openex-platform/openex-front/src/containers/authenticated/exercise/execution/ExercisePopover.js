@@ -106,6 +106,7 @@ class ExercisePopover extends Component {
   }
 
   submitFormDryrun() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.dryrunForm.submit();
   }
 
@@ -187,6 +188,7 @@ class ExercisePopover extends Component {
               label="Launch a dryrun"
               onClick={this.handleOpenDryrun.bind(this)}
             />
+            {/* eslint-disable-next-line no-nested-ternary */}
             {exerciseIsUpdatable ? (
               exerciseDisabled ? (
                 <MenuItemButton

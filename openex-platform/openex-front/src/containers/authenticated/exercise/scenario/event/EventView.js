@@ -17,14 +17,14 @@ const styles = {
 
 class EventView extends Component {
   render() {
-    const event_description = R.propOr(
+    const eventDescription = R.propOr(
       '-',
       'event_description',
       this.props.event,
     );
     return (
       <div style={styles.container}>
-        <div style={styles.story}>{event_description}</div>
+        <div style={styles.story}>{eventDescription}</div>
       </div>
     );
   }

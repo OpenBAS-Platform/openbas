@@ -6,21 +6,23 @@ import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { dateToISO } from '../../../../../utils/Time';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { fetchIncident } from '../../../../../actions/Incident';
-import { downloadFile } from '../../../../../actions/File';
+/* eslint-disable */
+import { fetchIncident } from "../../../../../actions/Incident";
+import { downloadFile } from "../../../../../actions/File";
 import {
   addInject,
   updateInject,
   deleteInject,
-} from '../../../../../actions/Inject';
-import { DialogTitleElement } from '../../../../../components/Dialog';
-import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
+} from "../../../../../actions/Inject";
+import { DialogTitleElement } from "../../../../../components/Dialog";
+import { Step, Stepper, StepLabel } from "../../../../../components/Stepper";
 import {
   FlatButton,
   FloatingActionsButtonCreate,
-} from '../../../../../components/Button';
-import InjectForm from './InjectForm';
-import InjectContentForm from './InjectContentForm';
+} from "../../../../../components/Button";
+import InjectForm from "./InjectForm";
+import InjectContentForm from "./InjectContentForm";
+/* eslint-enable */
 import InjectAudiences from './InjectAudiences';
 
 i18nRegister({
@@ -60,16 +62,18 @@ class CreateInject extends Component {
   }
 
   onGlobalSubmit(data) {
+    // eslint-disable-next-line no-param-reassign
     data.inject_date = this.convertDate(
       `${data.inject_date_only} ${data.inject_time}`,
     );
-
+    // eslint-disable-next-line no-param-reassign
     delete data.inject_date_only;
+    // eslint-disable-next-line no-param-reassign
     delete data.inject_time;
-
     this.setState({ injectData: data });
   }
 
+  // eslint-disable-next-line consistent-return,class-methods-use-this
   convertDate(dateToConvert) {
     const regexDateFr = RegExp(
       '^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
@@ -77,22 +81,20 @@ class CreateInject extends Component {
     const regexDateEn = RegExp(
       '^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
     );
-    let timeSplitted; let dateSplitted; let split; let
-      newDate;
+    let timeSplitted;
+    let dateSplitted;
+    let split;
+    let newDate;
 
     if (regexDateFr.test(dateToConvert)) {
       split = dateToConvert.split(' ');
       dateSplitted = split[0].split('/');
+      // eslint-disable-next-line prefer-destructuring
       timeSplitted = split[1];
-      newDate = `${dateSplitted[2]
-      }-${
-        dateSplitted[1]
-      }-${
-        dateSplitted[0]
-      } ${
-        timeSplitted}`;
+      newDate = `${dateSplitted[2]}-${dateSplitted[1]}-${dateSplitted[0]} ${timeSplitted}`;
       return newDate;
-    } if (regexDateEn.test(dateToConvert)) {
+    }
+    if (regexDateEn.test(dateToConvert)) {
       return dateToConvert;
     }
   }
@@ -115,6 +117,7 @@ class CreateInject extends Component {
 
   onContentSubmit(data) {
     const { injectData } = this.state;
+    // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
     injectData.inject_content = JSON.stringify(data);
     this.setState({ injectData });
@@ -141,9 +144,11 @@ class CreateInject extends Component {
   handleNext() {
     switch (this.state.stepIndex) {
       case 0:
+        // eslint-disable-next-line react/no-string-refs
         this.refs.injectForm.submit();
         break;
       case 1:
+        // eslint-disable-next-line react/no-string-refs
         this.refs.contentForm.getWrappedInstance().submit();
         break;
       case 2:
@@ -189,24 +194,27 @@ class CreateInject extends Component {
     this.setState({ stepIndex: 2, finished: true });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
+        /* eslint-disable */
         return (
           <InjectForm
             ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
             onSubmitSuccess={this.selectContent.bind(this)}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
-            initialValues={{ inject_type: 'openex_manual' }}
+            initialValues={{ inject_type: "openex_manual" }}
             types={this.props.inject_types}
           />
         );
+      /* eslint-enable */
       case 1:
+        /* eslint-disable */
         return (
           <InjectContentForm
             ref="contentForm"
@@ -216,13 +224,15 @@ class CreateInject extends Component {
             onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(
-              this,
+              this
             )}
             downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}
           />
         );
+      /* eslint-enable */
       case 2:
+        /* eslint-disable */
         return (
           <InjectAudiences
             ref="injectAudiences"
@@ -239,6 +249,7 @@ class CreateInject extends Component {
             selectAll={false}
           />
         );
+      /* eslint-enable */
       default:
         return 'Go away!';
     }

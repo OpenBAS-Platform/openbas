@@ -10,34 +10,36 @@ import { Toolbar } from '../../../../../components/Toolbar';
 import { Dialog } from '../../../../../components/Dialog';
 import { List } from '../../../../../components/List';
 import {
-  MainListItem,
   HeaderItem,
+  MainListItem,
 } from '../../../../../components/list/ListItem';
 import { Icon } from '../../../../../components/Icon';
 import { FlatButton } from '../../../../../components/Button';
 import { SearchField } from '../../../../../components/SimpleTextField';
-import { fetchAudiences } from '../../../../../actions/Audience';
-import { fetchSubaudiences } from '../../../../../actions/Subaudience';
-import { fetchSubobjectives } from '../../../../../actions/Subobjective';
-import { downloadFile } from '../../../../../actions/File';
-import { fetchEvents } from '../../../../../actions/Event';
+/* eslint-disable */
+import { fetchAudiences } from "../../../../../actions/Audience";
+import { fetchSubaudiences } from "../../../../../actions/Subaudience";
+import { fetchSubobjectives } from "../../../../../actions/Subobjective";
+import { downloadFile } from "../../../../../actions/File";
+import { fetchEvents } from "../../../../../actions/Event";
 import {
-  fetchIncidentTypes,
   fetchIncidents,
-} from '../../../../../actions/Incident';
+  fetchIncidentTypes,
+} from "../../../../../actions/Incident";
 import {
+  fetchInjects,
   fetchInjectTypes,
   fetchInjectTypesExerciseSimple,
-  fetchInjects,
-} from '../../../../../actions/Inject';
-import { fetchGroups } from '../../../../../actions/Group';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import IncidentNav from './IncidentNav';
-import EventPopover from './EventPopover';
-import IncidentPopover from './IncidentPopover';
-import CreateInject from './CreateInject';
-import InjectPopover from './InjectPopover';
-import InjectView from './InjectView';
+} from "../../../../../actions/Inject";
+import { fetchGroups } from "../../../../../actions/Group";
+import * as Constants from "../../../../../constants/ComponentTypes";
+import IncidentNav from "./IncidentNav";
+import EventPopover from "./EventPopover";
+import IncidentPopover from "./IncidentPopover";
+import CreateInject from "./CreateInject";
+import InjectPopover from "./InjectPopover";
+import InjectView from "./InjectView";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -152,6 +154,7 @@ class Index extends Component {
     this.props.fetchEvents(this.props.exerciseId);
     this.props.fetchIncidentTypes();
     this.props.fetchIncidents(this.props.exerciseId);
+    // eslint-disable-next-line consistent-return
     this.props.fetchInjectTypes().then((value) => {
       if (value.result.length !== 0) {
         // Build object from array
@@ -230,14 +233,19 @@ class Index extends Component {
   }
 
   // TODO replace with sortWith after Ramdajs new release
+  // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   descend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   selectIcon(type, color) {
     switch (type) {
       case 'openex_email':
@@ -275,6 +283,7 @@ class Index extends Component {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -290,8 +299,8 @@ class Index extends Component {
     this.setState({ openView: false });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   render() {
@@ -307,8 +316,7 @@ class Index extends Component {
     const {
       exerciseId, eventId, event, incident, incidents,
     } = this.props;
-    const event_title = R.propOr('-', 'event_title', event);
-    const event_is_updatable = R.propOr(
+    const eventIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.event,
@@ -327,8 +335,12 @@ class Index extends Component {
         R.filter(filterByKeyword),
         R.sort((a, b) => {
           // TODO replace with sortWith after Ramdajs new release
-          const fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString());
-          const fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString());
+          const fieldA = R.toLower(
+            R.propOr('', this.state.sortBy, a).toString(),
+          );
+          const fieldB = R.toLower(
+            R.propOr('', this.state.sortBy, b).toString(),
+          );
           return this.state.orderAsc
             ? this.ascend(fieldA, fieldB)
             : this.descend(fieldA, fieldB);
@@ -345,7 +357,7 @@ class Index extends Component {
             incidents={incidents}
             incident_types={this.props.incident_types}
             subobjectives={this.props.subobjectives}
-            can_create={event_is_updatable && this.props.userCanUpdate}
+            can_create={eventIsUpdatable && this.props.userCanUpdate}
           />
           <div>
             <div style={styles.title}>
@@ -384,7 +396,7 @@ class Index extends Component {
               />
             </div>
 
-            <div className="clearfix"></div>
+            <div className="clearfix" />
 
             <List>
               {incident.incident_injects.length === 0 ? (
@@ -404,7 +416,7 @@ class Index extends Component {
                         'inject_users_number',
                         <Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />,
                       )}
-                      <div className="clearfix"></div>
+                      <div className="clearfix" />
                     </div>
                   }
                 />
@@ -413,35 +425,39 @@ class Index extends Component {
               {injects.map((inject) => {
                 // Setup variables
                 const injectId = R.propOr(Math.random(), 'inject_id', inject);
-                const inject_title = R.propOr('-', 'inject_title', inject);
-                const inject_user = R.propOr('-', 'inject_user', inject);
-                const inject_date = R.prop('inject_date', inject);
-                const inject_type = R.propOr('-', 'inject_type', inject);
-                const inject_audiences = R.propOr([], 'inject_audiences', inject);
-                const inject_subaudiences = R.propOr(
+                const injectTitle = R.propOr('-', 'inject_title', inject);
+                const injectUser = R.propOr('-', 'inject_user', inject);
+                const injectDate = R.prop('inject_date', inject);
+                const injectType = R.propOr('-', 'inject_type', inject);
+                const injectAudiences = R.propOr(
+                  [],
+                  'inject_audiences',
+                  inject,
+                );
+                const injectSubaudiences = R.propOr(
                   [],
                   'inject_subaudiences',
                   inject,
                 );
-                const inject_users_number = R.propOr(
+                const injectUsersNumber = R.propOr(
                   '-',
                   'inject_users_number',
                   inject,
                 );
-                const inject_enabled = R.propOr(true, 'inject_enabled', inject);
-                const injectType = R.propOr(
+                const injectEnabled = R.propOr(true, 'inject_enabled', inject);
+                const injectTypeInHere = R.propOr(
                   false,
-                  inject_type,
+                  injectType,
                   this.props.inject_types,
                 );
-                const injectDisabled = !injectType;
+                const injectDisabled = !injectTypeInHere;
                 // Return the dom
                 return (
                   <MainListItem
                     key={injectId}
                     leftIcon={this.selectIcon(
-                      inject_type,
-                      this.switchColor(!inject_enabled || injectDisabled),
+                      injectType,
+                      this.switchColor(!injectEnabled || injectDisabled),
                     )}
                     onClick={this.handleOpenView.bind(this, inject)}
                     rightIconButton={
@@ -451,10 +467,10 @@ class Index extends Component {
                         eventId={eventId}
                         incidentId={incident.incident_id}
                         inject={inject}
-                        injectAudiencesIds={inject_audiences.map(
+                        injectAudiencesIds={injectAudiences.map(
                           (a) => a.audience_id,
                         )}
-                        injectSubaudiencesIds={inject_subaudiences.map(
+                        injectSubaudiencesIds={injectSubaudiences.map(
                           (a) => a.subaudience_id,
                         )}
                         audiences={this.props.audiences}
@@ -470,47 +486,47 @@ class Index extends Component {
                           <span
                             style={{
                               color: this.switchColor(
-                                !inject_enabled || injectDisabled,
+                                !injectEnabled || injectDisabled,
                               ),
                             }}
                           >
-                            {inject_title}
+                            {injectTitle}
                           </span>
                         </div>
                         <div style={styles.inject_date}>
                           <span
                             style={{
                               color: this.switchColor(
-                                !inject_enabled || injectDisabled,
+                                !injectEnabled || injectDisabled,
                               ),
                             }}
                           >
-                            {dateFormat(inject_date)}
+                            {dateFormat(injectDate)}
                           </span>
                         </div>
                         <div style={styles.inject_user}>
                           <span
                             style={{
                               color: this.switchColor(
-                                !inject_enabled || injectDisabled,
+                                !injectEnabled || injectDisabled,
                               ),
                             }}
                           >
-                            {inject_user}
+                            {injectUser}
                           </span>
                         </div>
                         <div style={styles.inject_audiences}>
                           <span
                             style={{
                               color: this.switchColor(
-                                !inject_enabled || injectDisabled,
+                                !injectEnabled || injectDisabled,
                               ),
                             }}
                           >
-                            {inject_users_number.toString()}
+                            {injectUsersNumber.toString()}
                           </span>
                         </div>
-                        <div className="clearfix"></div>
+                        <div className="clearfix" />
                       </div>
                     }
                   />
@@ -518,7 +534,7 @@ class Index extends Component {
               })}
             </List>
 
-            {event_is_updatable && this.props.userCanUpdate ? (
+            {eventIsUpdatable && this.props.userCanUpdate ? (
               <CreateInject
                 exerciseId={exerciseId}
                 eventId={eventId}
@@ -531,10 +547,6 @@ class Index extends Component {
               ''
             )}
             <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-              <ToolbarTitle
-                type={Constants.TOOLBAR_TYPE_EVENT}
-                text={event_title}
-              />
               <EventPopover
                 exerciseId={exerciseId}
                 eventId={eventId}
@@ -561,7 +573,8 @@ class Index extends Component {
           </div>
         </div>
       );
-    } if (event) {
+    }
+    if (event) {
       return (
         <div style={styles.container}>
           <IncidentNav
@@ -569,16 +582,12 @@ class Index extends Component {
             eventId={eventId}
             incidents={incidents}
             incident_types={this.props.incident_types}
-            can_create={event_is_updatable && this.props.userCanUpdate}
+            can_create={eventIsUpdatable && this.props.userCanUpdate}
           />
           <div style={styles.empty}>
             <T>This event is empty.</T>
           </div>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-            <ToolbarTitle
-              type={Constants.TOOLBAR_TYPE_EVENT}
-              text={event_title}
-            />
             <EventPopover
               exerciseId={exerciseId}
               eventId={eventId}
@@ -590,7 +599,7 @@ class Index extends Component {
         </div>
       );
     }
-    return <div style={styles.container}></div>;
+    return <div style={styles.container}> &nbsp; </div>;
   }
 }
 
@@ -660,12 +669,10 @@ const filterIncidents = (incidents, eventId) => {
 const checkUserCanUpdate = (state, ownProps) => {
   const { exerciseId } = ownProps.params;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {

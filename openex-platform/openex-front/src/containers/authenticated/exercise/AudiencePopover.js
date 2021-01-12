@@ -11,6 +11,7 @@ import { Dialog } from '../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemButton } from '../../../components/menu/MenuItem';
+// eslint-disable-next-line import/no-cycle
 import { updateAudience } from '../../../actions/Audience';
 
 const style = {
@@ -86,12 +87,12 @@ class AudiencePopover extends Component {
   }
 
   render() {
-    const audience_enabled = R.propOr(
+    const audienceEnabled = R.propOr(
       true,
       'audience_enabled',
       this.props.audience,
     );
-    const audience_is_updatable = R.propOr(
+    const audienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.audience,
@@ -99,11 +100,12 @@ class AudiencePopover extends Component {
 
     const disableActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
-      audience_is_updatable ? (
+      audienceIsUpdatable ? (
         <FlatButton
           label="Disable"
           primary={true}
@@ -115,11 +117,12 @@ class AudiencePopover extends Component {
     ];
     const enableActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
-      audience_is_updatable ? (
+      audienceIsUpdatable ? (
         <FlatButton
           label="Enable"
           primary={true}
@@ -143,10 +146,11 @@ class AudiencePopover extends Component {
           anchorEl={this.state.anchorEl}
           onRequestClose={this.handlePopoverClose.bind(this)}
         >
-          {audience_is_updatable ? (
+          {audienceIsUpdatable ? (
             <Menu multiple={false}>
-              {audience_is_updatable ? (
-                audience_enabled ? (
+              {/* eslint-disable-next-line no-nested-ternary */}
+              {audienceIsUpdatable ? (
+                audienceEnabled ? (
                   <MenuItemButton
                     label="Disable"
                     onClick={this.handleOpenDisable.bind(this)}

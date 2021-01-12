@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as Constants from '../../../../../constants/ComponentTypes';
+/* eslint-disable */
 import { selectIncident } from '../../../../../actions/Incident';
 import { Drawer } from '../../../../../components/Drawer';
 import { List } from '../../../../../components/List';
 import { ListItemLink } from '../../../../../components/list/ListItem';
 import { Icon } from '../../../../../components/Icon';
 import CreateIncident from './CreateIncident';
+/* eslint-enable */
 
 class IncidentNav extends Component {
   handleChangeIncident(incidentId) {

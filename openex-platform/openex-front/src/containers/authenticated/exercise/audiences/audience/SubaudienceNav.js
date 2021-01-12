@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { selectSubaudience } from '../../../../../actions/Subaudience';
-import { Drawer } from '../../../../../components/Drawer';
-import { List } from '../../../../../components/List';
-import { ListItemLink } from '../../../../../components/list/ListItem';
-import { Icon } from '../../../../../components/Icon';
-import Theme from '../../../../../components/Theme';
-import CreateSubaudience from './CreateSubaudience';
+/* eslint-disable */
+import { selectSubaudience } from "../../../../../actions/Subaudience";
+import { Drawer } from "../../../../../components/Drawer";
+import { List } from "../../../../../components/List";
+import { ListItemLink } from "../../../../../components/list/ListItem";
+import { Icon } from "../../../../../components/Icon";
+import Theme from "../../../../../components/Theme";
+import CreateSubaudience from "./CreateSubaudience";
+/* eslint-enable */
 
 class SubaudienceNav extends Component {
   handleChangeAudience(subaudienceId) {
@@ -20,6 +22,7 @@ class SubaudienceNav extends Component {
     );
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -28,7 +31,7 @@ class SubaudienceNav extends Component {
   }
 
   render() {
-    const subaudience_is_updatable = R.propOr(
+    const subaudienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.audience,
@@ -44,35 +47,35 @@ class SubaudienceNav extends Component {
         <CreateSubaudience
           exerciseId={this.props.exerciseId}
           audienceId={this.props.audienceId}
-          can_create={subaudience_is_updatable}
+          can_create={subaudienceIsUpdatable}
         />
         <List>
           {this.props.subaudiences.map((subaudience) => (
-              <ListItemLink
-                grey={
-                  !subaudience.subaudience_enabled
-                  || !this.props.audience.audience_enabled
-                }
-                type={Constants.LIST_ITEM_NOSPACE}
-                key={subaudience.subaudience_id}
-                active={
-                  this.props.selectedSubaudience === subaudience.subaudience_id
-                }
-                onClick={this.handleChangeAudience.bind(
-                  this,
-                  subaudience.subaudience_id,
-                )}
-                label={subaudience.subaudience_name}
-                leftIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_SOCIAL_GROUP}
-                    color={this.switchColor(
-                      !subaudience.subaudience_enabled
-                        || !this.props.audience.audience_enabled,
-                    )}
-                  />
-                }
-              />
+            <ListItemLink
+              grey={
+                !subaudience.subaudience_enabled
+                || !this.props.audience.audience_enabled
+              }
+              type={Constants.LIST_ITEM_NOSPACE}
+              key={subaudience.subaudience_id}
+              active={
+                this.props.selectedSubaudience === subaudience.subaudience_id
+              }
+              onClick={this.handleChangeAudience.bind(
+                this,
+                subaudience.subaudience_id,
+              )}
+              label={subaudience.subaudience_name}
+              leftIcon={
+                <Icon
+                  name={Constants.ICON_NAME_SOCIAL_GROUP}
+                  color={this.switchColor(
+                    !subaudience.subaudience_enabled
+                      || !this.props.audience.audience_enabled,
+                  )}
+                />
+              }
+            />
           ))}
         </List>
       </Drawer>

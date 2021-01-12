@@ -4,8 +4,11 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { updateSubaudience } from '../../../../../actions/Subaudience';
-import { fetchUsers } from '../../../../../actions/User';
+/* eslint-disable */
+import { updateSubaudience } from "../../../../../actions/Subaudience";
+import { fetchUsers } from "../../../../../actions/User";
+import CreateUser from "./CreateUser";
+/* eslint-enable */
 import { DialogTitleElement } from '../../../../../components/Dialog';
 import { Chip } from '../../../../../components/Chip';
 import { Avatar } from '../../../../../components/Avatar';
@@ -16,7 +19,6 @@ import {
   FloatingActionsButtonCreate,
 } from '../../../../../components/Button';
 import { SimpleTextField } from '../../../../../components/SimpleTextField';
-import CreateUser from './CreateUser';
 
 const styles = {
   name: {
@@ -164,20 +166,20 @@ class AddUsers extends Component {
         >
           <div>
             {this.state.users.map((user) => (
-                <Chip
-                  key={user.user_id}
-                  onRequestDelete={this.removeUser.bind(this, user)}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
-                  <Avatar
-                    src={user.user_gravatar}
-                    size={32}
-                    type={Constants.AVATAR_TYPE_CHIP}
-                  />
-                  {user.user_firstname} {user.user_lastname}
-                </Chip>
+              <Chip
+                key={user.user_id}
+                onRequestDelete={this.removeUser.bind(this, user)}
+                type={Constants.CHIP_TYPE_LIST}
+              >
+                <Avatar
+                  src={user.user_gravatar}
+                  size={32}
+                  type={Constants.AVATAR_TYPE_CHIP}
+                />
+                {user.user_firstname} {user.user_lastname}
+              </Chip>
             ))}
-            <div className="clearfix"></div>
+            <div className="clearfix"/>
           </div>
           <div>
             <List>
@@ -187,7 +189,7 @@ class AddUsers extends Component {
                   this.state.users,
                 ) !== undefined
                   || this.props.subaudienceUsersIds.includes(user.user_id);
-                const user_organization = R.propOr(
+                const userOrganization = R.propOr(
                   {},
                   user.user_organization,
                   this.props.organizations,
@@ -195,7 +197,7 @@ class AddUsers extends Component {
                 const organizationName = R.propOr(
                   '-',
                   'organization_name',
-                  user_organization,
+                  userOrganization,
                 );
                 return (
                   <MainSmallListItem
@@ -209,7 +211,7 @@ class AddUsers extends Component {
                         </div>
                         <div style={styles.mail}>{user.user_email}</div>
                         <div style={styles.org}>{organizationName}</div>
-                        <div className="clearfix"></div>
+                        <div className="clearfix" />
                       </div>
                     }
                     leftAvatar={

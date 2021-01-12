@@ -7,9 +7,9 @@ import { FormField, CKEditorField } from '../../../../../components/Field';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { FlatButton, Button } from '../../../../../components/Button';
+// eslint-disable-next-line import/no-cycle
 import DocumentGallery from '../../../DocumentGallery';
 import * as Constants from '../../../../../constants/ComponentTypes';
-
 import { Dialog } from '../../../../../components/Dialog';
 import { ToggleField } from '../../../../../components/ToggleField';
 import { Icon } from '../../../../../components/Icon';
@@ -48,25 +48,22 @@ i18nRegister({
 
 const validate = (values, props) => {
   const errors = {};
-  let current_type;
-
+  let currentType;
   if (Array.isArray(props.types)) {
     props.types.forEach((type) => {
       if (type.type === props.type) {
-        current_type = type;
+        currentType = type;
       }
     });
   }
-
-  if (current_type && Array.isArray(current_type.fields)) {
-    current_type.fields.forEach((field) => {
+  if (currentType && Array.isArray(currentType.fields)) {
+    currentType.fields.forEach((field) => {
       const value = values[field.name];
       if (field.mandatory && !value) {
         errors[field.name] = props.intl.formatMessage({ id: 'Required' });
       }
     });
   }
-
   return errors;
 };
 
@@ -91,7 +88,7 @@ class InjectContentForm extends Component {
       // when creating inject
     } else if (this.props.types[this.props.type]) {
       // eslint-disable-next-line
-        this.state.current_type = this.props.types[this.props.type];
+      this.state.current_type = this.props.types[this.props.type];
     }
   }
 
@@ -121,9 +118,9 @@ class InjectContentForm extends Component {
         </div>
       );
     }
-
     const documentGalleryActions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseGallery.bind(this)}
@@ -214,28 +211,28 @@ class InjectContentForm extends Component {
                   </Dialog>
                   <div>
                     {this.props.attachments.map((attachment) => {
-                      const document_name = R.propOr(
+                      const documentName = R.propOr(
                         '-',
                         'document_name',
                         attachment,
                       );
-                      const document_id = R.propOr(
+                      const documentId = R.propOr(
                         '-',
                         'document_id',
                         attachment,
                       );
                       return (
                         <Chip
-                          key={document_name}
+                          key={documentName}
                           onRequestDelete={this.props.onContentAttachmentDelete.bind(
                             this,
-                            document_name,
+                            documentName,
                           )}
                           type={Constants.CHIP_TYPE_LIST}
                           onClick={this.props.downloadAttachment.bind(
                             this,
-                            document_id,
-                            document_name,
+                            documentId,
+                            documentName,
                           )}
                         >
                           <Avatar
@@ -247,7 +244,7 @@ class InjectContentForm extends Component {
                             size={32}
                             type={Constants.AVATAR_TYPE_CHIP}
                           />
-                          {document_name}
+                          {documentName}
                         </Chip>
                       );
                     })}

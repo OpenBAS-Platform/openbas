@@ -76,7 +76,10 @@ class InjectAudiences extends Component {
 
   addSubaudience(subaudienceId) {
     if (!this.state.subaudiencesIds.includes(subaudienceId)) {
-      const subaudiencesIds = R.append(subaudienceId, this.state.subaudiencesIds);
+      const subaudiencesIds = R.append(
+        subaudienceId,
+        this.state.subaudiencesIds,
+      );
       this.setState({ subaudiencesIds });
       this.submitSubaudiences(subaudiencesIds);
     }
@@ -96,12 +99,12 @@ class InjectAudiences extends Component {
     this.submitSelectAll(value);
   }
 
-  submitAudiences(audiences_ids) {
-    this.props.onChangeAudiences(audiences_ids);
+  submitAudiences(audiencesIds) {
+    this.props.onChangeAudiences(audiencesIds);
   }
 
-  submitSubaudiences(subaudiences_ids) {
-    this.props.onChangeSubaudiences(subaudiences_ids);
+  submitSubaudiences(subaudiencesIds) {
+    this.props.onChangeSubaudiences(subaudiencesIds);
   }
 
   submitSelectAll(selectAll) {
@@ -151,7 +154,7 @@ class InjectAudiences extends Component {
               const audience = R.find((a) => a.audience_id === audienceId)(
                 this.props.audiences,
               );
-              const audience_name = R.propOr('-', 'audience_name', audience);
+              const audienceName = R.propOr('-', 'audience_name', audience);
               return (
                   <Chip
                     key={audienceId}
@@ -163,7 +166,7 @@ class InjectAudiences extends Component {
                       size={32}
                       type={Constants.AVATAR_TYPE_CHIP}
                     />
-                    {audience_name}
+                    {audienceName}
                   </Chip>
               );
             })}
@@ -177,14 +180,14 @@ class InjectAudiences extends Component {
                 (a) => a.audience_id
                     === subaudience.subaudience_audience.audience_id,
               )(this.props.audiences);
-              const audience_name = R.propOr('-', 'audience_name', audience);
-              const subaudience_name = R.propOr(
+              const audienceName = R.propOr('-', 'audience_name', audience);
+              const subaudienceName = R.propOr(
                 '-',
                 'subaudience_name',
                 subaudience,
               );
               const disabled = R.find(
-                (audience_id) => audience_id
+                (audienceId) => audienceId
                       === subaudience.subaudience_audience.audience_id,
                 this.state.audiencesIds,
               ) !== undefined;
@@ -204,13 +207,13 @@ class InjectAudiences extends Component {
                         size={32}
                         type={Constants.AVATAR_TYPE_CHIP}
                       />
-                      [{audience_name}] {subaudience_name}
+                      [{audienceName}] {subaudienceName}
                     </Chip>
                 );
               }
-              return <div></div>;
+              return <div key={subaudienceId}> &nbsp; </div>;
             })}
-          <div className="clearfix"></div>
+          <div className="clearfix" />
         </div>
         <div>
           {filteredAudiences.length === 0 ? (
@@ -225,24 +228,24 @@ class InjectAudiences extends Component {
               ? ''
               : filteredAudiences.map((audience) => {
                 const disabled = R.find(
-                  (audience_id) => audience_id === audience.audience_id,
+                  (audienceId) => audienceId === audience.audience_id,
                   this.state.audiencesIds,
                 ) !== undefined;
                 const nestedItems = !disabled
                   ? audience.audience_subaudiences.map((data) => {
                     const subaaudienceDisabled = R.find(
-                      (subaudience_id) => subaudience_id === data.subaudience_id,
+                      (subaudienceId) => subaudienceId === data.subaudience_id,
                       this.state.subaudiencesIds,
                     ) !== undefined;
                     const subaudience = R.find(
                       (a) => a.subaudience_id === data.subaudience_id,
                     )(this.props.subaudiences);
-                    const subaudience_id = R.propOr(
+                    const subaudienceId = R.propOr(
                       data.subaudience_id,
                       'subaudience_id',
                       subaudience,
                     );
-                    const subaudience_name = R.propOr(
+                    const subaudienceName = R.propOr(
                       '-',
                       'subaudience_name',
                       subaudience,
@@ -250,7 +253,7 @@ class InjectAudiences extends Component {
 
                     return (
                           <SecondarySmallListItem
-                            key={subaudience_id}
+                            key={subaudienceId}
                             disabled={subaaudienceDisabled}
                             onClick={this.addSubaudience.bind(
                               this,
@@ -258,9 +261,7 @@ class InjectAudiences extends Component {
                             )}
                             primaryText={
                               <div>
-                                <div style={styles.name}>
-                                  {subaudience_name}
-                                </div>
+                                <div style={styles.name}>{subaudienceName}</div>
                                 <div className="clearfix"></div>
                               </div>
                             }
@@ -288,7 +289,7 @@ class InjectAudiences extends Component {
                           <div style={styles.name}>
                             {audience.audience_name}
                           </div>
-                          <div className="clearfix"></div>
+                          <div className="clearfix" />
                         </div>
                       }
                       leftAvatar={

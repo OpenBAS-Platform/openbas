@@ -102,8 +102,10 @@ class InjectForm extends Component {
   }
 
   computeDateTime(valueDate, valueTime) {
+    // eslint-disable-next-line no-param-reassign
     valueDate = valueDate
       || R.pathOr(undefined, ['initialValues', 'inject_date_only'], this.props);
+    // eslint-disable-next-line no-param-reassign
     valueTime = valueTime
       || R.pathOr(undefined, ['initialValues', 'inject_time'], this.props);
     const valueFullDate = `${valueDate} ${valueTime}`;
@@ -111,12 +113,12 @@ class InjectForm extends Component {
   }
 
   render() {
-    const inject_date_only = R.pathOr(
+    const injectDateOnly = R.pathOr(
       undefined,
       ['initialValues', 'inject_date_only'],
       this.props,
     );
-    const inject_time = R.pathOr(
+    const injectTime = R.pathOr(
       undefined,
       ['initialValues', 'inject_time'],
       this.props,
@@ -136,16 +138,17 @@ class InjectForm extends Component {
             nameField="inject_date_only"
             labelField="Day"
             onChange={this.replaceDateValue.bind(this)}
-            defaultDate={inject_date_only}
+            defaultDate={injectDateOnly}
           />
           <TimePickerIconOpx
             nameField="inject_time"
             labelField="Time"
             onChange={this.replaceTimeValue.bind(this)}
-            defaultTime={inject_time}
+            defaultTime={injectTime}
           />
 
           <div style={styles.fullDate}>
+            {/* eslint-disable-next-line react/no-string-refs */}
             <FormField ref="inject_date" name="inject_date" type="hidden" />
           </div>
         </div>
@@ -166,11 +169,11 @@ class InjectForm extends Component {
           onSelectChange={this.props.onInjectTypeChange}
         >
           {R.values(this.props.types).map((data) => (
-              <MenuItem
-                key={data.type}
-                value={data.type}
-                primaryText={<T>{data.type}</T>}
-              />
+            <MenuItem
+              key={data.type}
+              value={data.type}
+              primaryText={<T>{data.type}</T>}
+            />
           ))}
         </SelectField>
       </form>

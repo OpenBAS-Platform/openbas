@@ -13,14 +13,16 @@ import {
 } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
 import { FlatButton } from '../../../../components/Button';
-import { fetchObjectives } from '../../../../actions/Objective';
-import { fetchSubobjectives } from '../../../../actions/Subobjective';
-import { fetchGroups } from '../../../../actions/Group';
-import ObjectivePopover from './ObjectivePopover';
-import SubobjectivePopover from './SubobjectivePopover';
-import CreateObjective from './CreateObjective';
-import ObjectiveView from './ObjectiveView';
-import SubobjectiveView from './SubobjectiveView';
+/* eslint-disable */
+import { fetchObjectives } from "../../../../actions/Objective";
+import { fetchSubobjectives } from "../../../../actions/Subobjective";
+import { fetchGroups } from "../../../../actions/Group";
+import ObjectivePopover from "./ObjectivePopover";
+import SubobjectivePopover from "./SubobjectivePopover";
+import CreateObjective from "./CreateObjective";
+import ObjectiveView from "./ObjectiveView";
+import SubobjectiveView from "./SubobjectiveView";
+/* eslint-enable */
 
 i18nRegister({
   fr: {
@@ -115,7 +117,7 @@ class IndexObjective extends Component {
           <div style={styles.title}>
             <T>Objectives</T>
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix" />
           <List>
             {objectives.map((objective) => {
               const nestedItems = objective.objective_subobjectives.map(
@@ -125,22 +127,22 @@ class IndexObjective extends Component {
                     data.subobjective_id,
                     this.props.subobjectives,
                   );
-                  const subobjective_id = R.propOr(
+                  const subobjectiveId = R.propOr(
                     data.subobjective_id,
                     'subobjective_id',
                     subobjective,
                   );
-                  const subobjective_title = R.propOr(
+                  const subobjectiveTitle = R.propOr(
                     '-',
                     'subobjective_title',
                     subobjective,
                   );
-                  const subobjective_description = R.propOr(
+                  const subobjectiveDescription = R.propOr(
                     '-',
                     'subobjective_description',
                     subobjective,
                   );
-                  const subobjective_priority = R.propOr(
+                  const subobjectivePriority = R.propOr(
                     '-',
                     'subobjective_priority',
                     subobjective,
@@ -148,7 +150,7 @@ class IndexObjective extends Component {
 
                   return (
                     <SecondaryListItem
-                      key={subobjective_id}
+                      key={subobjectiveId}
                       onClick={this.handleOpenSubobjective.bind(
                         this,
                         subobjective,
@@ -173,12 +175,12 @@ class IndexObjective extends Component {
                         <div>
                           <span style={styles.priority}>
                             {objective.objective_priority}.
-                            {subobjective_priority}
+                            {subobjectivePriority}
                           </span>
-                          {subobjective_title}
+                          {subobjectiveTitle}
                         </div>
                       }
-                      secondaryText={subobjective_description}
+                      secondaryText={subobjectiveDescription}
                     />
                   );
                 },
@@ -258,21 +260,21 @@ class IndexObjective extends Component {
       );
     }
     return (
-        <div style={styles.container}>
-          <div style={styles.title}>
-            <T>Objectives</T>
-          </div>
-          <div className="clearfix"></div>
-          <div style={styles.empty}>
-            <T>You do not have any objectives in this exercise.</T>
-          </div>
-
-          {this.props.userCanUpdate ? (
-            <CreateObjective exerciseId={exerciseId} />
-          ) : (
-            ''
-          )}
+      <div style={styles.container}>
+        <div style={styles.title}>
+          <T>Objectives</T>
         </div>
+        <div className="clearfix"></div>
+        <div style={styles.empty}>
+          <T>You do not have any objectives in this exercise.</T>
+        </div>
+
+        {this.props.userCanUpdate ? (
+          <CreateObjective exerciseId={exerciseId} />
+        ) : (
+          ''
+        )}
+      </div>
     );
   }
 }

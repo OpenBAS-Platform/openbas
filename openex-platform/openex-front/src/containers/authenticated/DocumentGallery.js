@@ -337,7 +337,7 @@ class DocumentGallery extends Component {
   render() {
     return (
       <div style={styles.container}>
-        <div style={styles.columnLeft}></div>
+        <div style={styles.columnLeft}> &nbsp; </div>
         <div style={styles.columnRight}>
           <div style={styles.search}>
             <SearchField
@@ -349,9 +349,9 @@ class DocumentGallery extends Component {
               styletype={Constants.FIELD_TYPE_RIGHT}
             />
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix"/>
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix"/>
         <div style={styles.searchDivTitle}>
           <T>Search by</T>
         </div>
@@ -405,7 +405,7 @@ class DocumentGallery extends Component {
               )}
           </div>
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix"/>
         <div style={styles.divDocuments}>
           <div style={styles.divDocumentsListe}>
             <div style={styles.divDocumentsTitle}>
@@ -422,7 +422,7 @@ class DocumentGallery extends Component {
               <Table selectable={false} style={{ marginTop: '5px' }}>
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableCell style={{ width: '100px' }}></TableCell>
+                    <TableCell style={{ width: '100px' }}> &nbsp; </TableCell>
                     <TableCell>
                       <T>Name</T>
                     </TableCell>
@@ -435,7 +435,7 @@ class DocumentGallery extends Component {
                   </TableRow>
                 </TableHead>
                 <TableBody displayRowCheckbox={false}>
-                  {this.props.documents.map((document, index) => {
+                  {this.props.documents.map((document) => {
                     const listeTagAddToFilter = [
                       ...this.state.listeTagAddToFilter,
                     ];
@@ -577,7 +577,7 @@ DocumentGallery.propTypes = {
   addDocument: PropTypes.func,
 };
 
-const select = (state, ownProps) => ({
+const select = (state) => ({
   exercises: sortExercises(R.values(state.referential.entities.exercises)),
   documents: sortDocuments(R.values(state.referential.entities.document)),
   tags: sortTags(R.values(state.referential.entities.tag)),

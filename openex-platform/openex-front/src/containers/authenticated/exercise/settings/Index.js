@@ -7,28 +7,30 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import * as R from 'ramda';
+/* eslint-disable */
 import {
-  updateExercise,
   deleteExercise,
   exportExercise,
   exportInjectEml,
-} from '../../../../actions/Exercise';
-import { shiftAllInjects } from '../../../../actions/Inject';
-import { fetchGroups } from '../../../../actions/Group';
-import { redirectToHome } from '../../../../actions/Application';
-import { Paper } from '../../../../components/Paper';
-import { Button, FlatButton } from '../../../../components/Button';
-import { Image } from '../../../../components/Image';
-import { Checkbox } from '../../../../components/Checkbox';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
-import { Dialog } from '../../../../components/Dialog';
-import * as Constants from '../../../../constants/ComponentTypes';
-import TemplateForm from './TemplateForm';
-import ExerciseForm from '../ExerciseForm';
-import FileGallery from '../../FileGallery';
-import { dateFormat, dateToISO } from '../../../../utils/Time';
-import { addFile, getImportFileSheetsName } from '../../../../actions/File';
+  updateExercise,
+} from "../../../../actions/Exercise";
+import { shiftAllInjects } from "../../../../actions/Inject";
+import { fetchGroups } from "../../../../actions/Group";
+import { redirectToHome } from "../../../../actions/Application";
+import { Paper } from "../../../../components/Paper";
+import { Button, FlatButton } from "../../../../components/Button";
+import { Image } from "../../../../components/Image";
+import { Checkbox } from "../../../../components/Checkbox";
+import { T } from "../../../../components/I18n";
+import { i18nRegister } from "../../../../utils/Messages";
+import { Dialog } from "../../../../components/Dialog";
+import * as Constants from "../../../../constants/ComponentTypes";
+import TemplateForm from "./TemplateForm";
+import ExerciseForm from "../ExerciseForm";
+import FileGallery from "../../FileGallery";
+import { dateFormat, dateToISO } from "../../../../utils/Time";
+import { addFile, getImportFileSheetsName } from "../../../../actions/File";
+/* eslint-enable */
 
 const styles = {
   PaperContent: {
@@ -120,6 +122,7 @@ class Index extends Component {
     this.props.fetchGroups();
   }
 
+  // eslint-disable-next-line consistent-return
   onUpdate(data) {
     const newData = R.pipe(
       // Need to convert date to ISO format with timezone
@@ -139,6 +142,7 @@ class Index extends Component {
   }
 
   submitInformation() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.informationForm.submit();
   }
 
@@ -147,6 +151,7 @@ class Index extends Component {
   }
 
   submitTemplate() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.templateForm.submit();
   }
 
@@ -190,6 +195,7 @@ class Index extends Component {
       .then(() => this.props.redirectToHome());
   }
 
+  // eslint-disable-next-line consistent-return
   submitExport() {
     const dataToExport = this.state.typesToExport;
     if (dataToExport.audience === '1' && dataToExport.exercise === '0') {
@@ -242,14 +248,14 @@ class Index extends Component {
     this.setState({ openConfirmMailExpediteur: false });
   }
 
-  submitConfirmEmail(data) {
+  submitConfirmEmail() {
     const { newData } = this.state;
     this.props.updateExercise(this.props.id, newData);
     this.handleCloseConfirmMailExpediteur();
   }
 
   render() {
-    const exercise_is_deletable = R.propOr(
+    const exerciseIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.exercise,
@@ -262,7 +268,7 @@ class Index extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      exercise_is_deletable ? (
+      exerciseIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -338,19 +344,21 @@ class Index extends Component {
     );
 
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
-    const image_id = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
+    const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
     return (
       <div>
         {this.props.userCanUpdate ? (
           <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
             <div style={styles.PaperContent}>
               <h2>Information</h2>
+              {/* eslint-disable */}
               <ExerciseForm
                 ref="informationForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
                 hideDates={true}
               />
+              {/* eslint-enable */}
               <br />
               <Button
                 type="submit"
@@ -378,12 +386,14 @@ class Index extends Component {
               <h2>
                 <T>Messages template</T>
               </h2>
+              {/* eslint-disable */}
               <TemplateForm
                 ref="templateForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
                 groups={this.props.groups}
               />
+              {/* eslint-enable */}
               <br />
               <Button
                 type="submit"
@@ -400,9 +410,9 @@ class Index extends Component {
           <div style={styles.PaperContent}>
             <h2>Image</h2>
             <br />
-            {image_id ? (
+            {imageId ? (
               <Image
-                image_id={image_id}
+                image_id={imageId}
                 alt="Exercise logo"
                 style={styles.image}
               />
@@ -446,7 +456,7 @@ class Index extends Component {
                   We do not recommend you do this.
                 </T>
               </p>
-              {exercise_is_deletable ? (
+              {exerciseIsDeletable ? (
                 <Button
                   label="Delete"
                   onClick={this.handleOpenDelete.bind(this)}
@@ -479,7 +489,9 @@ class Index extends Component {
             </p>
             <p>
               <T>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 Note: You can import a previously exported exercise on "create
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 exercise" form.
               </T>
             </p>
@@ -493,109 +505,109 @@ class Index extends Component {
             >
               <T>Please, chose data to export</T>
               <Table selectable={true} style={{ marginTop: '5px' }}>
-                <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableHeaderColumn width="30">
+                    <TableCell width="30">
                       <T>Export</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Item</T>
-                    </TableHeaderColumn>
-                    <TableHeaderColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Description</T>
-                    </TableHeaderColumn>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
+                </TableHead>
                 <TableBody displayRowCheckbox={false}>
                   <TableRow key="tab-exercise">
-                    <TableRowColumn width="30">
+                    <TableCell width="30">
                       <Checkbox
                         defaultChecked={true}
                         name="chk-export-exercise"
                         onCheck={this.handleExportCheck.bind(this, 'exercise')}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Exercise</T>
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Export data of current exercise</T>
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-audiences">
-                    <TableRowColumn width="30">
+                    <TableCell width="30">
                       <Checkbox
                         defaultChecked={true}
                         name="chk-export-audiences"
                         onCheck={this.handleExportCheck.bind(this, 'audience')}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Audiences</T>
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Export audiences data</T>
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-objective">
-                    <TableRowColumn width="30">
+                    <TableCell width="30">
                       <Checkbox
                         defaultChecked={true}
                         name="chk-export-objective"
                         onCheck={this.handleExportCheck.bind(this, 'objective')}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Objective</T>
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Export objectives data</T>
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-scenarios">
-                    <TableRowColumn width="30">
+                    <TableCell width="30">
                       <Checkbox
                         defaultChecked={true}
                         name="chk-export-scenarios"
                         onCheck={this.handleExportCheck.bind(this, 'scenarios')}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Events</T>
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Export events data</T>
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-incidents">
-                    <TableRowColumn width="30">
+                    <TableCell width="30">
                       <Checkbox
                         defaultChecked={true}
                         name="chk-export-incidents"
                         onCheck={this.handleExportCheck.bind(this, 'incidents')}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Incidents</T>
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Export incidents data</T>
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-injects">
-                    <TableRowColumn width="30">
+                    <TableCell width="30">
                       <Checkbox
                         defaultChecked={true}
                         name="chk-export-injects"
                         onCheck={this.handleExportCheck.bind(this, 'injects')}
                       />
-                    </TableRowColumn>
-                    <TableRowColumn width="130">
+                    </TableCell>
+                    <TableCell width="130">
                       <T>Injects</T>
-                    </TableRowColumn>
-                    <TableRowColumn>
+                    </TableCell>
+                    <TableCell>
                       <T>Export injects data</T>
-                    </TableRowColumn>
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -610,6 +622,7 @@ class Index extends Component {
             </h2>
             <p>
               <T>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 Exporter de tous les injects de l'exercice au format EML dans
                 une archive.
               </T>
@@ -648,12 +661,10 @@ Index.propTypes = {
 const checkUserCanUpdate = (state, ownProps) => {
   const { exerciseId } = ownProps.params;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {

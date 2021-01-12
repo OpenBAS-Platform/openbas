@@ -51,6 +51,7 @@ class CreateSubaudience extends Component {
   }
 
   submitFormCreate() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.subaudienceForm.submit();
   }
 
@@ -93,11 +94,13 @@ class CreateSubaudience extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={actions}
         >
+          {/* eslint-disable */}
           <SubaudienceForm
             ref="subaudienceForm"
             onSubmit={this.onSubmitCreate.bind(this)}
             onSubmitSuccess={this.handleCloseCreate.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

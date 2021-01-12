@@ -6,29 +6,31 @@ import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { timeDiff } from '../../../../../utils/Time';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { fetchGroups } from '../../../../../actions/Group';
-import { fetchUsers } from '../../../../../actions/User';
-import { fetchOrganizations } from '../../../../../actions/Organization';
-import { fetchAudiences } from '../../../../../actions/Audience';
-import { fetchSubaudiences } from '../../../../../actions/Subaudience';
-import { fetchComchecks } from '../../../../../actions/Comcheck';
-import { FlatButton } from '../../../../../components/Button';
-import { Toolbar } from '../../../../../components/Toolbar';
-import { Dialog } from '../../../../../components/Dialog';
-import Theme from '../../../../../components/Theme';
-import { List } from '../../../../../components/List';
+/* eslint-disable */
+import { fetchGroups } from "../../../../../actions/Group";
+import { fetchUsers } from "../../../../../actions/User";
+import { fetchOrganizations } from "../../../../../actions/Organization";
+import { fetchAudiences } from "../../../../../actions/Audience";
+import { fetchSubaudiences } from "../../../../../actions/Subaudience";
+import { fetchComchecks } from "../../../../../actions/Comcheck";
+import { FlatButton } from "../../../../../components/Button";
+import { Toolbar } from "../../../../../components/Toolbar";
+import { Dialog } from "../../../../../components/Dialog";
+import Theme from "../../../../../components/Theme";
+import { List } from "../../../../../components/List";
 import {
-  AvatarListItem,
   AvatarHeaderItem,
-} from '../../../../../components/list/ListItem';
-import { Avatar } from '../../../../../components/Avatar';
-import { Icon } from '../../../../../components/Icon';
-import { SearchField } from '../../../../../components/SimpleTextField';
-import SubaudienceNav from './SubaudienceNav';
-import AudiencePopover from './AudiencePopover';
-import SubaudiencePopover from './SubaudiencePopover';
-import AddUsers from './AddUsers';
-import UserPopover from './UserPopover';
+  AvatarListItem,
+} from "../../../../../components/list/ListItem";
+import { Avatar } from "../../../../../components/Avatar";
+import { Icon } from "../../../../../components/Icon";
+import { SearchField } from "../../../../../components/SimpleTextField";
+import SubaudienceNav from "./SubaudienceNav";
+import AudiencePopover from "./AudiencePopover";
+import SubaudiencePopover from "./SubaudiencePopover";
+import AddUsers from "./AddUsers";
+import UserPopover from "./UserPopover";
+/* eslint-enable */
 import UserView from './UserView';
 
 i18nRegister({
@@ -177,14 +179,19 @@ class IndexAudience extends Component {
   }
 
   // TODO replace with sortWith after Ramdajs new release
+  // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   descend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -222,8 +229,7 @@ class IndexAudience extends Component {
       subaudience,
       subaudiences,
     } = this.props;
-    const audience_name = R.propOr('-', 'audience_name', audience);
-    const subaudience_is_updatable = R.propOr(
+    const subaudienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
       subaudience,
@@ -295,7 +301,7 @@ class IndexAudience extends Component {
                 styletype={Constants.FIELD_TYPE_RIGHT}
               />
             </div>
-            <div className="clearfix"></div>
+            <div className="clearfix" />
             <List>
               {subaudience.subaudience_users.length === 0 ? (
                 <div style={styles.empty}>
@@ -350,7 +356,7 @@ class IndexAudience extends Component {
                       >
                         {this.SortHeader('user_organization', 'Organization')}
                       </span>
-                      <div className="clearfix"></div>
+                      <div className="clearfix" />
                     </div>
                   }
                 />
@@ -359,11 +365,11 @@ class IndexAudience extends Component {
               {users.map((user) => {
                 // Setup variables
                 const userId = R.propOr(Math.random(), 'user_id', user);
-                const user_firstname = R.propOr('-', 'user_firstname', user);
-                const user_lastname = R.propOr('-', 'user_lastname', user);
-                const user_email = R.propOr('-', 'user_email', user);
-                const user_gravatar = R.propOr('', 'user_gravatar', user);
-                const user_organization = R.propOr(
+                const userFirstname = R.propOr('-', 'user_firstname', user);
+                const userLastname = R.propOr('-', 'user_lastname', user);
+                const userEmail = R.propOr('-', 'user_email', user);
+                const userGravatar = R.propOr('', 'user_gravatar', user);
+                const userOrganization = R.propOr(
                   {},
                   user.user_organization,
                   this.props.organizations,
@@ -371,7 +377,7 @@ class IndexAudience extends Component {
                 const organizationName = R.propOr(
                   '-',
                   'organization_name',
-                  user_organization,
+                  userOrganization,
                 );
                 // Return the dom
                 return (
@@ -381,7 +387,7 @@ class IndexAudience extends Component {
                     leftAvatar={
                       <Avatar
                         type={Constants.AVATAR_TYPE_MAINLIST}
-                        src={user_gravatar}
+                        src={userGravatar}
                       />
                     }
                     rightIconButton={
@@ -403,7 +409,7 @@ class IndexAudience extends Component {
                               ),
                             }}
                           >
-                            {user_firstname} {user_lastname}
+                            {userFirstname} {userLastname}
                           </span>
                         </div>
                         <div style={styles.mail}>
@@ -415,7 +421,7 @@ class IndexAudience extends Component {
                               ),
                             }}
                           >
-                            {user_email}
+                            {userEmail}
                           </span>
                         </div>
                         <div style={styles.org}>
@@ -430,7 +436,7 @@ class IndexAudience extends Component {
                             {organizationName}
                           </span>
                         </div>
-                        <div className="clearfix"></div>
+                        <div className="clearfix" />
                       </div>
                     }
                   />
@@ -438,10 +444,6 @@ class IndexAudience extends Component {
               })}
             </List>
             <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-              <ToolbarTitle
-                type={Constants.TOOLBAR_TYPE_EVENT}
-                text={audience_name}
-              />
               <AudiencePopover
                 exerciseId={exerciseId}
                 audienceId={audienceId}
@@ -450,11 +452,7 @@ class IndexAudience extends Component {
               />
             </Toolbar>
             <Dialog
-              title={
-                `${this.state.currentUser.user_firstname
-                } ${
-                  this.state.currentUser.user_lastname}`
-              }
+              title={`${this.state.currentUser.user_firstname} ${this.state.currentUser.user_lastname}`}
               modal={false}
               open={this.state.openView}
               autoScrollBodyContent={true}
@@ -466,7 +464,7 @@ class IndexAudience extends Component {
                 organizations={this.props.organizations}
               />
             </Dialog>
-            {subaudience_is_updatable ? (
+            {subaudienceIsUpdatable ? (
               <AddUsers
                 exerciseId={exerciseId}
                 audienceId={audienceId}
@@ -481,7 +479,8 @@ class IndexAudience extends Component {
           </div>
         </div>
       );
-    } if (audience) {
+    }
+    if (audience) {
       return (
         <div style={styles.container}>
           <SubaudienceNav
@@ -494,10 +493,6 @@ class IndexAudience extends Component {
             <T>This audience is empty.</T>
           </div>
           <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-            <ToolbarTitle
-              type={Constants.TOOLBAR_TYPE_EVENT}
-              text={audience_name}
-            />
             <AudiencePopover
               exerciseId={exerciseId}
               audienceId={audienceId}
@@ -508,7 +503,7 @@ class IndexAudience extends Component {
         </div>
       );
     }
-    return <div style={styles.container}></div>;
+    return <div style={styles.container}> &nbsp; </div>;
   }
 }
 
@@ -563,12 +558,10 @@ const filterComchecks = (comchecks, audienceId) => {
 const checkUserCanUpdate = (state, ownProps) => {
   const { exerciseId } = ownProps.params;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {

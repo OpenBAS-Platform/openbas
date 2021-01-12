@@ -5,12 +5,14 @@ import * as R from 'ramda';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
-import { fetchEvents } from '../../../../actions/Event';
-import { fetchGroups } from '../../../../actions/Group';
-import { Icon } from '../../../../components/Icon';
-import { List } from '../../../../components/List';
-import { MainListItemLink } from '../../../../components/list/ListItem';
-import CreateEvent from './event/CreateEvent';
+/* eslint-disable */
+import { fetchEvents } from "../../../../actions/Event";
+import { fetchGroups } from "../../../../actions/Group";
+import { Icon } from "../../../../components/Icon";
+import { List } from "../../../../components/List";
+import { MainListItemLink } from "../../../../components/list/ListItem";
+import CreateEvent from "./event/CreateEvent";
+/* eslint-enable */
 
 const styles = {
   container: {
@@ -49,7 +51,7 @@ class IndexScenario extends Component {
         <div style={styles.title}>
           <T>Events</T>
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix" />
         {this.props.events.length === 0 ? (
           <div style={styles.empty}>
             <T>You do not have any events in this exercise.</T>
@@ -59,23 +61,18 @@ class IndexScenario extends Component {
         )}
         <List>
           {this.props.events.map((event) => (
-              <MainListItemLink
-                to={
-                  `/private/exercise/${
-                    this.props.exerciseId
-                  }/scenario/${
-                    event.event_id}`
-                }
-                key={event.event_id}
-                leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT} />}
-                primaryText={<div>{event.event_title}</div>}
-                secondaryText={event.event_description}
-                rightIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
-                  />
-                }
-              />
+            <MainListItemLink
+              to={`/private/exercise/${this.props.exerciseId}/scenario/${event.event_id}`}
+              key={event.event_id}
+              leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT} />}
+              primaryText={<div>{event.event_title}</div>}
+              secondaryText={event.event_description}
+              rightIcon={
+                <Icon
+                  name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
+                />
+              }
+            />
           ))}
         </List>
 

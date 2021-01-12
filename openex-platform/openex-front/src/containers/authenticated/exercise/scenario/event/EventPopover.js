@@ -4,26 +4,28 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
-import { redirectToScenario } from '../../../../../actions/Application';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
-import { Dialog } from '../../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../../components/Button';
-import { Icon } from '../../../../../components/Icon';
+/* eslint-disable */
+import { redirectToScenario } from "../../../../../actions/Application";
+import * as Constants from "../../../../../constants/ComponentTypes";
+import { Popover } from "../../../../../components/Popover";
+import { Menu } from "../../../../../components/Menu";
+import { Dialog } from "../../../../../components/Dialog";
+import { IconButton, FlatButton } from "../../../../../components/Button";
+import { Icon } from "../../../../../components/Icon";
 import {
   MenuItemLink,
   MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
+} from "../../../../../components/menu/MenuItem";
 import {
   updateEvent,
   deleteEvent,
   importEvent,
-} from '../../../../../actions/Event';
+} from "../../../../../actions/Event";
 import {
   getPlanificateurUserForEvent,
   updatePlanificateurUserForEvent,
-} from '../../../../../actions/Planificateurs';
+} from "../../../../../actions/Planificateurs";
+/* eslint-enable */
 import EventForm from './EventForm';
 import PlanificateurEvent from '../../planificateurs/PlanificateurEvent';
 
@@ -114,13 +116,14 @@ class EventPopover extends Component {
   }
 
   handleCheckPlanificateur(userId, eventId, isChecked) {
-    const liste_planificateurs = [...this.state.planificateursEvent];
-    liste_planificateurs.forEach((user) => {
+    const listePlanificateurs = [...this.state.planificateursEvent];
+    listePlanificateurs.forEach((user) => {
       if (user.user_id === userId) {
+        // eslint-disable-next-line no-param-reassign
         user.is_planificateur_event = isChecked;
       }
     });
-    this.setState({ planificateursEvent: liste_planificateurs });
+    this.setState({ planificateursEvent: listePlanificateurs });
   }
 
   onSubmitEdit(data) {
@@ -132,6 +135,7 @@ class EventPopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.eventForm.submit();
   }
 
@@ -152,11 +156,13 @@ class EventPopover extends Component {
   }
 
   openFileDialog() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
+    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props
       .importEvent(this.props.exerciseId, this.props.eventId, data)
@@ -165,12 +171,12 @@ class EventPopover extends Component {
   }
 
   render() {
-    const event_is_updatable = R.propOr(
+    const eventIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.event,
     );
-    const event_is_deletable = R.propOr(
+    const eventIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.event,
@@ -184,7 +190,7 @@ class EventPopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      event_is_updatable ? (
+      eventIsUpdatable ? (
         <FlatButton
           key="update"
           label="Update"
@@ -202,7 +208,7 @@ class EventPopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      event_is_deletable ? (
+      eventIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -234,7 +240,7 @@ class EventPopover extends Component {
           anchorEl={this.state.anchorEl}
           onRequestClose={this.handlePopoverClose.bind(this)}
         >
-          {(event_is_updatable || event_is_deletable) && userCanUpdate ? (
+          {(eventIsUpdatable || eventIsDeletable) && userCanUpdate ? (
             <Menu multiple={false}>
               <MenuItemLink
                 label="Import"
@@ -248,7 +254,7 @@ class EventPopover extends Component {
               ) : (
                 ''
               )}
-              {event_is_updatable ? (
+              {eventIsUpdatable ? (
                 <MenuItemLink
                   label="Edit"
                   onClick={this.handleOpenEdit.bind(this)}
@@ -256,7 +262,7 @@ class EventPopover extends Component {
               ) : (
                 ''
               )}
-              {event_is_deletable ? (
+              {eventIsDeletable ? (
                 <MenuItemButton
                   label="Delete"
                   onClick={this.handleOpenDelete.bind(this)}
@@ -268,12 +274,14 @@ class EventPopover extends Component {
           ) : (
             ''
           )}
+          {/* eslint-disable */}
           <input
             type="file"
             ref="fileUpload"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             onChange={this.handleFileChange.bind(this)}
           />
+          {/* eslint-enable */}
         </Popover>
 
         <PlanificateurEvent
@@ -301,12 +309,14 @@ class EventPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <EventForm
             ref="eventForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
       </div>
     );

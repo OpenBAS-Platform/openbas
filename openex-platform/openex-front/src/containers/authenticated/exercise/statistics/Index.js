@@ -5,6 +5,7 @@ import { Bar, HorizontalBar, Line } from 'react-chartjs-2';
 
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+// eslint-disable-next-line import/no-cycle
 import { getStatisticsForExercise } from '../../../../actions/Exercise';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
@@ -105,8 +106,8 @@ class Index extends Component {
 
     const dataArrayInjectPerPlayer = [];
     if (oInjectPerPlayer.datasets && oInjectPerPlayer.datasets.data) {
-      oInjectPerPlayer.datasets.data.forEach((data) => {
-        dataArrayInjectPerPlayer.push(data);
+      oInjectPerPlayer.datasets.data.forEach((finalData) => {
+        dataArrayInjectPerPlayer.push(finalData);
       });
     }
 
@@ -132,12 +133,9 @@ class Index extends Component {
     }
 
     const dataArrayInjectPerIncident = [];
-    if (
-      oInjectPerIncident.datasets
-      && oInjectPerIncident.datasets.data
-    ) {
-      oInjectPerIncident.datasets.data.forEach((data) => {
-        dataArrayInjectPerIncident.push(data);
+    if (oInjectPerIncident.datasets && oInjectPerIncident.datasets.data) {
+      oInjectPerIncident.datasets.data.forEach((finalData) => {
+        dataArrayInjectPerIncident.push(finalData);
       });
     }
 
@@ -163,12 +161,9 @@ class Index extends Component {
     }
 
     const dataArrayInjectPerInterval = [];
-    if (
-      oInjectPerInterval.datasets
-      && oInjectPerInterval.datasets.data
-    ) {
-      oInjectPerInterval.datasets.data.forEach((data) => {
-        dataArrayInjectPerInterval.push(data);
+    if (oInjectPerInterval.datasets && oInjectPerInterval.datasets.data) {
+      oInjectPerInterval.datasets.data.forEach((finalData) => {
+        dataArrayInjectPerInterval.push(finalData);
       });
     }
 
@@ -201,6 +196,7 @@ class Index extends Component {
         <div style={styles.lineStatistic}>
           <div style={styles.columnStatistic}>
             <p>
+              {/* eslint-disable-next-line react/no-unescaped-entities */}
               Nombre total d'impressions pour cet exercice&nbsp;:{' '}
               {this.state.allInjectsCount}
               &nbsp;
@@ -213,12 +209,14 @@ class Index extends Component {
               </span>
             </p>
             <p>
+              {/* eslint-disable-next-line react/no-unescaped-entities */}
               Nombre moyen d'injects par joueur&nbsp;:{' '}
               {this.state.avgInjectPerPlayerCount}
             </p>
             <p>Nombre total de joueurs&nbsp;: {this.state.allPlayersCount}</p>
           </div>
           <div style={styles.columnStatistic}>
+            {/* eslint-disable-next-line react/no-unescaped-entities */}
             <p>Nombre d'organisations&nbsp;: {this.state.organizationsCount}</p>
             <p>
               Fréquence des impressions&nbsp;:{' '}
@@ -228,6 +226,7 @@ class Index extends Component {
         </div>
 
         <div>
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
           <h3>Répartition du nombre d'impressions par joueur :</h3>
           <Bar
             data={this.state.injectPerPlayer}
@@ -240,6 +239,7 @@ class Index extends Component {
                   {
                     ticks: {
                       beginAtZero: true,
+                      // eslint-disable-next-line consistent-return
                       callback(value) {
                         if (value % 1 === 0) {
                           return value;
@@ -261,6 +261,7 @@ class Index extends Component {
         </div>
 
         <div>
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
           <h3>Répartition du nombre d'injects par incident :</h3>
           <HorizontalBar
             data={this.state.injectPerIncident}
@@ -280,6 +281,7 @@ class Index extends Component {
                   {
                     ticks: {
                       beginAtZero: true,
+                      // eslint-disable-next-line consistent-return
                       callback(value) {
                         if (value % 1 === 0) {
                           return value;
@@ -294,6 +296,7 @@ class Index extends Component {
         </div>
 
         <div>
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
           <h3>Répartition du nombre d'injects par pas de temps :</h3>
           <p>
             <T>Interval:</T>
@@ -326,6 +329,7 @@ class Index extends Component {
                   {
                     ticks: {
                       beginAtZero: true,
+                      // eslint-disable-next-line consistent-return
                       callback(value) {
                         if (value % 1 === 0) {
                           return value;

@@ -17,9 +17,10 @@ import {
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
-import { fetchIncident, selectIncident } from '../../../../../actions/Incident';
-import { downloadFile } from '../../../../../actions/File';
-import { redirectToEvent } from '../../../../../actions/Application';
+/* eslint-disable */
+import { fetchIncident, selectIncident } from "../../../../../actions/Incident";
+import { downloadFile } from "../../../../../actions/File";
+import { redirectToEvent } from "../../../../../actions/Application";
 import {
   addInject,
   updateInject,
@@ -27,9 +28,10 @@ import {
   tryInject,
   injectDone,
   fetchInjectTypesExerciseSimple,
-} from '../../../../../actions/Inject';
-import InjectForm from './InjectForm';
-import InjectContentForm from './InjectContentForm';
+} from "../../../../../actions/Inject";
+import InjectForm from "./InjectForm";
+import InjectContentForm from "./InjectContentForm";
+/* eslint-enable */
 import InjectAudiences from './InjectAudiences';
 import CopyForm from './CopyForm';
 
@@ -98,6 +100,7 @@ class InjectPopover extends Component {
     };
   }
 
+  // eslint-disable-next-line class-methods-use-this
   readJSON(str) {
     try {
       return JSON.parse(str);
@@ -155,6 +158,7 @@ class InjectPopover extends Component {
 
   onContentSubmit(data) {
     const { injectData } = this.state;
+    // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
     injectData.inject_content = JSON.stringify(data);
     this.setState({
@@ -205,9 +209,11 @@ class InjectPopover extends Component {
   submitFormEdit() {
     switch (this.state.stepIndex) {
       case 0:
+        // eslint-disable-next-line react/no-string-refs
         this.refs.injectForm.submit();
         break;
       case 1:
+        // eslint-disable-next-line react/no-string-refs
         this.refs.contentForm.getWrappedInstance().submit();
         break;
       case 2:
@@ -345,6 +351,7 @@ class InjectPopover extends Component {
   }
 
   submitFormCopy() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.copyForm.submit();
   }
 
@@ -378,7 +385,7 @@ class InjectPopover extends Component {
       (a) => a.audience_id,
       this.props.inject.inject_subaudiences,
     );
-    const new_inject = R.pipe(
+    const newInject = R.pipe(
       R.dissoc('inject_id'),
       R.dissoc('inject_event'),
       R.dissoc('inject_exercise'),
@@ -396,7 +403,7 @@ class InjectPopover extends Component {
         this.props.exerciseId,
         incident.incident_event.event_id,
         data.incident_id,
-        new_inject,
+        newInject,
       )
       .then(() => {
         this.props
@@ -454,13 +461,14 @@ class InjectPopover extends Component {
     });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name);
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   getStepContent(stepIndex, initialValues) {
     switch (stepIndex) {
       case 0:
+        /* eslint-disable */
         return (
           <InjectForm
             ref="injectForm"
@@ -471,7 +479,9 @@ class InjectPopover extends Component {
             types={this.state.inject_types}
           />
         );
+      /* eslint-enable */
       case 1:
+        /* eslint-disable */
         return (
           <InjectContentForm
             ref="contentForm"
@@ -484,13 +494,15 @@ class InjectPopover extends Component {
             onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(
-              this,
+              this
             )}
             downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}
           />
         );
+      /* eslint-enable */
       case 2:
+        /* eslint-disable */
         return (
           <InjectAudiences
             ref="injectAudiences"
@@ -508,11 +520,13 @@ class InjectPopover extends Component {
             selectAll={this.props.inject.inject_all_audiences}
           />
         );
+      /* eslint-enable */
       default:
         return 'Go away!';
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -521,12 +535,12 @@ class InjectPopover extends Component {
   }
 
   render() {
-    const inject_is_updatable = R.propOr(
+    const injectIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.inject,
     );
-    const inject_is_deletable = R.propOr(
+    const injectIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.inject,
@@ -540,7 +554,7 @@ class InjectPopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      inject_is_updatable && userCanUpdate ? (
+      injectIsUpdatable && userCanUpdate ? (
         <FlatButton
           key="update"
           label={this.state.stepIndex === 2 ? 'Update' : 'Next'}
@@ -558,7 +572,7 @@ class InjectPopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      inject_is_deletable && userCanUpdate ? (
+      injectIsDeletable && userCanUpdate ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -576,7 +590,7 @@ class InjectPopover extends Component {
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
-      inject_is_updatable && userCanUpdate ? (
+      injectIsUpdatable && userCanUpdate ? (
         <FlatButton
           key="disable"
           label="Disable"
@@ -594,7 +608,7 @@ class InjectPopover extends Component {
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
-      inject_is_updatable && userCanUpdate ? (
+      injectIsUpdatable && userCanUpdate ? (
         <FlatButton
           key="enable"
           label="Enable"
@@ -676,11 +690,11 @@ class InjectPopover extends Component {
       ]),
     );
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined;
-    const inject_enabled = R.propOr(true, 'inject_enabled', this.props.inject);
-    const inject_type = R.propOr(true, 'inject_type', this.props.inject);
+    const injectEnabled = R.propOr(true, 'inject_enabled', this.props.inject);
+    const injectType = R.propOr(true, 'inject_type', this.props.inject);
     const injectNotSupported = !R.propOr(
       false,
-      inject_type,
+      injectType,
       this.props.inject_types,
     );
 
@@ -693,7 +707,7 @@ class InjectPopover extends Component {
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
           <Icon
             name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(!inject_enabled || injectNotSupported)}
+            color={this.switchColor(!injectEnabled || injectNotSupported)}
           />
         </IconButton>
 
@@ -720,7 +734,7 @@ class InjectPopover extends Component {
               ) : (
                 ''
               )}
-              {inject_enabled && !injectNotSupported ? (
+              {injectEnabled && !injectNotSupported ? (
                 <MenuItemButton
                   label="Disable"
                   onClick={this.handleOpenDisable.bind(this)}
@@ -728,7 +742,7 @@ class InjectPopover extends Component {
               ) : (
                 ''
               )}
-              {!inject_enabled && !injectNotSupported ? (
+              {!injectEnabled && !injectNotSupported ? (
                 <MenuItemButton
                   label="Enable"
                   onClick={this.handleOpenEnable.bind(this)}
@@ -736,7 +750,7 @@ class InjectPopover extends Component {
               ) : (
                 ''
               )}
-              {inject_type === 'openex_manual'
+              {injectType === 'openex_manual'
               && this.props.location === 'run' ? (
                 <MenuItemButton
                   label="Mark as done"
@@ -753,7 +767,7 @@ class InjectPopover extends Component {
               ) : (
                 ''
               )}
-              {inject_is_deletable ? (
+              {injectIsDeletable ? (
                 <MenuItemButton
                   label="Delete"
                   onClick={this.handleOpenDelete.bind(this)}
@@ -840,12 +854,14 @@ class InjectPopover extends Component {
           onRequestClose={this.handleCloseCopy.bind(this)}
           actions={copyActions}
         >
+          {/* eslint-disable */}
           <CopyForm
             ref="copyForm"
             incidents={this.props.incidents}
             onSubmit={this.onCopySubmit.bind(this)}
             onSubmitSuccess={this.handleCloseCopy.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
         <Dialog
           title="Test"
@@ -871,7 +887,9 @@ class InjectPopover extends Component {
             </div>
             <br />
             {this.state.injectResult && this.state.injectResult.message
-              ? this.state.injectResult.message.map((line) => <div key={Math.random()}>{line}</div>)
+              ? this.state.injectResult.message.map((line) => (
+                  <div key={Math.random()}>{line}</div>
+              ))
               : ''}
           </div>
         </Dialog>

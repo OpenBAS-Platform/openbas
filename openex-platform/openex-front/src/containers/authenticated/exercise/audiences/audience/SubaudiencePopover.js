@@ -16,6 +16,7 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
+// eslint-disable-next-line import/no-cycle
 import {
   updateSubaudience,
   selectSubaudience,
@@ -83,6 +84,7 @@ class SubaudiencePopover extends Component {
   }
 
   submitFormEdit() {
+    // eslint-disable-next-line react/no-string-refs
     this.refs.subaudienceForm.submit();
   }
 
@@ -163,6 +165,7 @@ class SubaudiencePopover extends Component {
     this.handlePopoverClose();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   switchColor(disabled) {
     if (disabled) {
       return Theme.palette.disabledColor;
@@ -171,17 +174,17 @@ class SubaudiencePopover extends Component {
   }
 
   render() {
-    const subaudience_enabled = R.propOr(
+    const subaudienceEnabled = R.propOr(
       true,
       'subaudience_enabled',
       this.props.subaudience,
     );
-    const subaudience_is_updatable = R.propOr(
+    const subaudienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.subaudience,
     );
-    const subaudience_is_deletable = R.propOr(
+    const subaudienceIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.subaudience,
@@ -194,7 +197,7 @@ class SubaudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      subaudience_is_updatable ? (
+      subaudienceIsUpdatable ? (
         <FlatButton
           key="update"
           label="Update"
@@ -212,7 +215,7 @@ class SubaudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      subaudience_is_deletable ? (
+      subaudienceIsDeletable ? (
         <FlatButton
           key="delete"
           label="Delete"
@@ -230,7 +233,7 @@ class SubaudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
-      subaudience_is_updatable ? (
+      subaudienceIsUpdatable ? (
         <FlatButton
           key="disable"
           label="Disable"
@@ -248,7 +251,7 @@ class SubaudiencePopover extends Component {
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
-      subaudience_is_updatable ? (
+      subaudienceIsUpdatable ? (
         <FlatButton
           key="enable"
           label="Enable"
@@ -277,7 +280,7 @@ class SubaudiencePopover extends Component {
           onRequestClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
-            {subaudience_is_updatable ? (
+            {subaudienceIsUpdatable ? (
               <MenuItemLink
                 label="Edit"
                 onClick={this.handleOpenEdit.bind(this)}
@@ -285,8 +288,9 @@ class SubaudiencePopover extends Component {
             ) : (
               ''
             )}
-            {subaudience_is_updatable ? (
-              subaudience_enabled ? (
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {subaudienceIsUpdatable ? (
+              subaudienceEnabled ? (
                 <MenuItemButton
                   label="Disable"
                   onClick={this.handleOpenDisable.bind(this)}
@@ -304,7 +308,7 @@ class SubaudiencePopover extends Component {
               label="Export to XLS"
               onClick={this.handleDownloadAudience.bind(this)}
             />
-            {subaudience_is_deletable ? (
+            {subaudienceIsDeletable ? (
               <MenuItemButton
                 label="Delete"
                 onClick={this.handleOpenDelete.bind(this)}
@@ -330,12 +334,14 @@ class SubaudiencePopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
+          {/* eslint-disable */}
           <SubaudienceForm
             ref="subaudienceForm"
-            initialValues={R.pick(['subaudience_name'], this.props.subaudience)}
+            initialValues={R.pick(["subaudience_name"], this.props.subaudience)}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
+          {/* eslint-enable */}
         </Dialog>
         <Dialog
           title="Confirmation"
