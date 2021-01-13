@@ -5,6 +5,8 @@ import * as R from 'ramda';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { updateUser } from '../../../actions/User';
 import { i18nRegister } from '../../../utils/Messages';
@@ -12,6 +14,7 @@ import { T } from '../../../components/I18n';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
+import UserPopover from '../UserPopover';
 
 i18nRegister({
   fr: {
@@ -24,11 +27,27 @@ i18nRegister({
   },
 });
 
-const styles = () => ({
+const styles = (theme) => ({
   paper: {
     padding: 20,
     marginBottom: 40,
   },
+  appBar: {
+    width: '100%',
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  container: {
+    padding: 20,
+  },
+  logo: {
+    width: '40px',
+    cursor: 'pointer',
+  },
+  title: {
+    fontSize: 25,
+    marginLeft: 20,
+  },
+  toolbar: theme.mixins.toolbar,
 });
 
 class Index extends Component {
@@ -56,6 +75,10 @@ class Index extends Component {
 
   submitPassword() {
     this.refs.passwordForm.submit();
+  }
+
+  redirectToHome() {
+    this.props.history.push('/private');
   }
 
   render() {
@@ -86,61 +109,78 @@ class Index extends Component {
     );
     const informationValues = this.props.user !== undefined ? initPipe(this.props.user) : undefined;
     return (
-      <div style={{ width: 800, margin: '0 auto' }}>
-        <Paper elevation={4} className={classes.paper}>
-          <h2>
-            <T>Profile</T>
-          </h2>
-          <UserForm
-            ref="userForm"
-            organizations={this.props.organizations}
-            onSubmit={this.onUpdate.bind(this)}
-            initialValues={informationValues}
-          />
-          <br />
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={this.submitUser.bind(this)}
-          >
-            <T>Update</T>
-          </Button>
-        </Paper>
-        <Paper elevation={4} className={classes.paper}>
-          <h2>
-            <T>Information</T>
-          </h2>
-          <ProfileForm
-            ref="profileForm"
-            onSubmit={this.onUpdate.bind(this)}
-            initialValues={informationValues}
-          />
-          <br />
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={this.submitProfile.bind(this)}
-          >
-            <T>Update</T>
-          </Button>
-        </Paper>
-        <Paper elevation={4} className={classes.paper}>
-          <h2>
-            <T>Password</T>
-          </h2>
-          <PasswordForm
-            ref="passwordForm"
-            onSubmit={this.onUpdatePassword.bind(this)}
-          />
-          <br />
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={this.submitPassword.bind(this)}
-          >
-            <T>Update</T>
-          </Button>
-        </Paper>
+      <div>
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <img
+              src="/images/logo_white.png"
+              alt="logo"
+              className={classes.logo}
+              onClick={this.redirectToHome.bind(this)}
+            />
+            <div className={classes.title}>OpenEx</div>
+            <UserPopover />
+          </Toolbar>
+        </AppBar>
+        <div className={classes.toolbar} />
+        <div className={classes.container}>
+          <div style={{ width: 800, margin: '0 auto' }}>
+            <Paper elevation={4} className={classes.paper}>
+              <h2>
+                <T>Profile</T>
+              </h2>
+              <UserForm
+                ref="userForm"
+                organizations={this.props.organizations}
+                onSubmit={this.onUpdate.bind(this)}
+                initialValues={informationValues}
+              />
+              <br />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitUser.bind(this)}
+              >
+                <T>Update</T>
+              </Button>
+            </Paper>
+            <Paper elevation={4} className={classes.paper}>
+              <h2>
+                <T>Information</T>
+              </h2>
+              <ProfileForm
+                ref="profileForm"
+                onSubmit={this.onUpdate.bind(this)}
+                initialValues={informationValues}
+              />
+              <br />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitProfile.bind(this)}
+              >
+                <T>Update</T>
+              </Button>
+            </Paper>
+            <Paper elevation={4} className={classes.paper}>
+              <h2>
+                <T>Password</T>
+              </h2>
+              <PasswordForm
+                ref="passwordForm"
+                onSubmit={this.onUpdatePassword.bind(this)}
+              />
+              <br />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitPassword.bind(this)}
+              >
+                <T>Update</T>
+              </Button>
+            </Paper>
+          </div>
+        </div>
       </div>
     );
   }

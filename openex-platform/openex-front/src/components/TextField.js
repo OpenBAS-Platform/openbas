@@ -8,13 +8,13 @@ const renderTextField = ({
   meta: { touched, invalid, error },
   ...others
 }) => (
-  <MuiTextField
-    label={label}
-    error={touched && invalid}
-    helperText={touched && error}
-    {...input}
-    {...others}
-  />
+    <MuiTextField
+      label={label}
+      error={touched && invalid}
+      helperText={touched && error}
+      {...input}
+      {...others}
+    />
 );
 
 // eslint-disable-next-line import/prefer-default-export

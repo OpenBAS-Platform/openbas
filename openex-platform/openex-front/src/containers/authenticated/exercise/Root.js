@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Route, Switch, withRouter } from 'react-router';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import { withStyles } from '@material-ui/core/styles';
 import { redirectToExercise } from '../../../actions/Application';
 import LeftBar from './nav/LeftBar';
 import { fetchExercise } from '../../../actions/Exercise';
@@ -20,8 +23,28 @@ import IndexExerciseAudiencesAudience from './audiences/audience/Index';
 import IndexExerciseDocuments from './documents/Index';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
+import UserPopover from '../UserPopover';
 
-class RootAuthenticated extends Component {
+const styles = (theme) => ({
+  appBar: {
+    width: '100%',
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  container: {
+    padding: 20,
+  },
+  logo: {
+    width: '40px',
+    cursor: 'pointer',
+  },
+  title: {
+    fontSize: 25,
+    marginLeft: 20,
+  },
+  toolbar: theme.mixins.toolbar,
+});
+
+class RootExercise extends Component {
   componentDidMount() {
     this.props.fetchExercise(this.props.id);
   }
@@ -30,7 +53,12 @@ class RootAuthenticated extends Component {
     this.props.redirectToExercise(this.props.id);
   }
 
+  redirectToHome() {
+    this.props.history.push('/private');
+  }
+
   render() {
+    const { classes } = this.props;
     return (
       <div style={{ paddingLeft: 180 }}>
         <LeftBar
@@ -42,91 +70,108 @@ class RootAuthenticated extends Component {
             this.props.exercise,
           )}
         />
-        <Switch>
-          <Route
-            exact
-            path="/private/exercise/:exerciseId"
-            component={() => <IndexExercise id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/execution"
-            component={() => <IndexExerciseExecution id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/lessons"
-            component={() => <IndexExerciseLessons id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/checks"
-            component={() => <IndexExerciseChecks id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/checks/dryrun/:dryrunId"
-            component={() => <IndexExerciseDryrun id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/checks/comcheck/:comcheckId"
-            component={() => <IndexExerciseComcheck id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/objectives"
-            component={() => <IndexExerciseObjectives id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/scenario"
-            component={() => <IndexExerciseScenario id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/scenario/:eventId"
-            component={() => <IndexExerciseScenarioEvent id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/audiences"
-            component={() => <IndexExerciseAudiences id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/audiences/:audienceId"
-            component={() => (
-              <IndexExerciseAudiencesAudience id={this.props.id} />
-            )}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/calendar"
-            component={() => <IndexExercise id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/documents"
-            component={() => <IndexExerciseDocuments id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/statistics"
-            component={() => <IndexExerciseStatistics id={this.props.id} />}
-          />
-          <Route
-            exact
-            path="/private/exercise/:exerciseId/settings"
-            component={() => <IndexExerciseSettings id={this.props.id} />}
-          />
-        </Switch>
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <img
+              src="/images/logo_white.png"
+              alt="logo"
+              className={classes.logo}
+              onClick={this.redirectToHome.bind(this)}
+            />
+            <div className={classes.title}>OpenEx</div>
+            <UserPopover />
+          </Toolbar>
+        </AppBar>
+        <div className={classes.toolbar} />
+        <div className={classes.container}>
+          <Switch>
+            <Route
+              exact
+              path="/private/exercise/:exerciseId"
+              component={() => <IndexExercise id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/execution"
+              component={() => <IndexExerciseExecution id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/lessons"
+              component={() => <IndexExerciseLessons id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/checks"
+              component={() => <IndexExerciseChecks id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/checks/dryrun/:dryrunId"
+              component={() => <IndexExerciseDryrun id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/checks/comcheck/:comcheckId"
+              component={() => <IndexExerciseComcheck id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/objectives"
+              component={() => <IndexExerciseObjectives id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/scenario"
+              component={() => <IndexExerciseScenario id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/scenario/:eventId"
+              component={() => (
+                <IndexExerciseScenarioEvent id={this.props.id} />
+              )}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/audiences"
+              component={() => <IndexExerciseAudiences id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/audiences/:audienceId"
+              component={() => (
+                <IndexExerciseAudiencesAudience id={this.props.id} />
+              )}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/calendar"
+              component={() => <IndexExercise id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/documents"
+              component={() => <IndexExerciseDocuments id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/statistics"
+              component={() => <IndexExerciseStatistics id={this.props.id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/settings"
+              component={() => <IndexExerciseSettings id={this.props.id} />}
+            />
+          </Switch>
+        </div>
       </div>
     );
   }
 }
 
-RootAuthenticated.propTypes = {
+RootExercise.propTypes = {
   id: PropTypes.string,
   pathname: PropTypes.string,
   leftBarOpen: PropTypes.bool,
@@ -150,9 +195,10 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
+  withRouter,
   connect(select, {
     redirectToExercise,
     fetchExercise,
   }),
-  withRouter,
-)(RootAuthenticated);
+  withStyles(styles),
+)(RootExercise);

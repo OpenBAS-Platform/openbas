@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Observable } from 'rxjs';
+import Dialog from '@material-ui/core/Dialog';
 import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -11,7 +12,6 @@ import { List } from '../../../../components/List';
 import { MainListItem } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
-import { Dialog } from '../../../../components/Dialog';
 import { FlatButton } from '../../../../components/Button';
 /* eslint-disable */
 import { fetchIncidents } from "../../../../actions/Incident";

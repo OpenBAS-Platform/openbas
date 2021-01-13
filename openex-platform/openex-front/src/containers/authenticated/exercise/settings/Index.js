@@ -11,8 +11,9 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import * as R from 'ramda';
 import { withStyles } from '@material-ui/core/styles';
 import {
@@ -28,7 +29,6 @@ import { Image } from '../../../../components/Image';
 import { Checkbox } from '../../../../components/Checkbox';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
 import TemplateForm from './TemplateForm';
 import ExerciseForm from '../ExerciseForm';
 import FileGallery from '../../FileGallery';
@@ -61,10 +61,10 @@ i18nRegister({
     'Export incidents data': 'Exporter les données concernant les incidents',
     Inject: 'Injections',
     'Export injects data': 'Exporter les données concernant les injections',
-    'Export an exercise': 'Exporter un exercice',
+    'Export of the exercise': "Export de l'exercice",
     'Full export for an excercise.': 'Exporter un exercice complet.',
-    'Note: You can import a previously exported exercise on "create exercise" form.':
-      "Note : Vous pouvez importer un exercice préalablement exporté à partir du formulaire de création d'un nouvel exercice.",
+    'Note: you can import a previously exported exercise from the home page.':
+      "Note : vous pouvez importer un exercice préalablement exporté depuis la page d'accueil.",
     'Import data to an exercise.': 'Importer un exercice complet.',
     search: 'Parcourir',
     Export: 'Exporter',
@@ -73,13 +73,11 @@ i18nRegister({
     'Please, chose data to import':
       'Veuillez sélectionner les données à importer :',
     'Export of Exercise': "Export de l'exercice",
-    'Export all email injects to files (.eml)':
-      'Exporter tous les injects emails vers des fichiers (.eml)',
+    'Export all email injects to files (.eml) so you can use it into your mail client.':
+      'Exporter tous les injects emails vers des fichiers (.eml) pour les utiliser dans votre client mail.',
     'Do you want to change the sender email address?':
       "Souhaitez-vous changer l'adresse email de l'expéditeur ?",
-    'Note: You can import a previously exported exercise from the home page.':
-      'Note: vous ',
-    'Emails export': 'Export des emails',
+    'Export of the emails': 'Export des emails',
   },
 });
 
@@ -96,11 +94,9 @@ class Index extends Component {
     this.state = {
       openDelete: false,
       openGallery: false,
-      openConfirmMailExpediteur: false,
       openExport: false,
       openImport: false,
       initialStartDate: '',
-      initialEmailExpediteur: '',
       newStartDate: '',
       newData: '',
       exerciseNameExist: false,
@@ -125,15 +121,7 @@ class Index extends Component {
       // Need to convert date to ISO format with timezone
       R.assoc('exercise_start_date', dateToISO(data.exercise_start_date)),
       R.assoc('exercise_end_date', dateToISO(data.exercise_end_date)),
-      R.assoc('exercise_mail_expediteur', data.exercise_mail_expediteur),
     )(data);
-    if (
-      newData.exercise_mail_expediteur !== this.props.initialEmailExpediteur
-    ) {
-      this.setState({ newData });
-      this.setState({ openConfirmMailExpediteur: true });
-      return true;
-    }
     return this.props.updateExercise(this.props.id, newData);
   }
 
@@ -238,10 +226,6 @@ class Index extends Component {
     this.handleCloseGallery();
   }
 
-  handleCloseConfirmMailExpediteur() {
-    this.setState({ openConfirmMailExpediteur: false });
-  }
-
   submitConfirmEmail() {
     const { newData } = this.state;
     this.props.updateExercise(this.props.id, newData);
@@ -254,40 +238,6 @@ class Index extends Component {
       'user_can_delete',
       this.props.exercise,
     );
-
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      exerciseIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-
-    const exportActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseExport.bind(this)}
-      />,
-      <Button
-        key="export"
-        label="Export"
-        primary={true}
-        onClick={this.submitExport.bind(this)}
-      />,
-    ];
     const { classes, exercise } = this.props;
     const splittedStartDate = R.split(
       ' ',
@@ -298,10 +248,6 @@ class Index extends Component {
       dateFormat(R.path(['exercise', 'exercise_end_date'], this.props)),
     );
     const initPipe = R.pipe(
-      R.assoc('exercise_start_date_only', splittedStartDate[0]),
-      R.assoc('exercise_start_time', splittedStartDate[1]),
-      R.assoc('exercise_end_date_only', splittedEndDate[0]),
-      R.assoc('exercise_end_time', splittedStartDate[1]),
       R.assoc(
         'exercise_animation_group',
         R.path(['exercise', 'exercise_animation_group', 'group_id'], this.props),
@@ -310,90 +256,57 @@ class Index extends Component {
         'exercise_name',
         'exercise_description',
         'exercise_subtitle',
-        'exercise_start_date_only',
-        'exercise_start_time',
-        'exercise_end_date_only',
-        'exercise_end_time',
+        'exercise_start_date',
+        'exercise_end_date',
         'exercise_message_header',
         'exercise_message_footer',
         'exercise_mail_expediteur',
-        'exercise_animation_group',
       ]),
     );
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
-    const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
     console.log(informationValues);
+    const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
     return (
       <div style={{ width: 800, margin: '0 auto' }}>
         {this.props.userCanUpdate && (
           <Paper elevation={4} className={classes.paper}>
-            <div style={styles.PaperContent}>
-              <Typography variant="h5" style={{ marginBottom: 20 }}>
-                Information
-              </Typography>
-              <ExerciseForm
-                ref="informationForm"
-                onSubmit={this.onUpdate.bind(this)}
-                initialValues={informationValues}
-              />
-              <br />
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={this.submitInformation.bind(this)}
-              >
-                <T>Update</T>
-              </Button>
-            </div>
-            <Dialog
-              open={this.state.openConfirmMailExpediteur}
-              onClose={this.handleCloseConfirmMailExpediteur.bind(this)}
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              Information
+            </Typography>
+            <ExerciseForm
+              ref="informationForm"
+              onSubmit={this.onUpdate.bind(this)}
+              initialValues={informationValues}
+            />
+            <br />
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitInformation.bind(this)}
             >
-              <DialogContent>
-                <DialogContentText>
-                  <T>Do you want to change the sender email address?</T>
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleCloseConfirmMailExpediteur.bind(this)}
-                >
-                  <T>Cancel</T>
-                </Button>
-                ,
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={this.submitConfirmEmail.bind(this)}
-                >
-                  <T>Confirm</T>
-                </Button>
-              </DialogActions>
-            </Dialog>
+              <T>Update</T>
+            </Button>
           </Paper>
         )}
         {this.props.userCanUpdate && (
           <Paper elevation={4} className={classes.paper}>
-            <div style={styles.PaperContent}>
-              <Typography variant="h5" style={{ marginBottom: 20 }}>
-                <T>Messages template</T>
-              </Typography>
-              <TemplateForm
-                ref="templateForm"
-                onSubmit={this.onUpdate.bind(this)}
-                initialValues={informationValues}
-                groups={this.props.groups}
-              />
-              <br />
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={this.submitTemplate.bind(this)}
-              >
-                <T>Update</T>
-              </Button>
-            </div>
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              <T>Messages template</T>
+            </Typography>
+            <TemplateForm
+              ref="templateForm"
+              onSubmit={this.onUpdate.bind(this)}
+              initialValues={informationValues}
+              groups={this.props.groups}
+            />
+            <br />
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitTemplate.bind(this)}
+            >
+              <T>Update</T>
+            </Button>
           </Paper>
         )}
         <Paper elevation={4} className={classes.paper}>
@@ -431,59 +344,51 @@ class Index extends Component {
             )}
           </div>
         </Paper>
-        {this.props.userCanUpdate && (
-          <Paper elevation={4} className={classes.paper}>
-            <div style={styles.PaperContent}>
-              <Typography variant="h2">
-                <T>Delete</T>
-              </Typography>
-              <Typography variant="body1">
-                <T>
-                  Deleting an exercise will result in deleting all its content,
-                  including objectives, events, incidents, injects and audience.
-                  We do not recommend you do this.
-                </T>
-              </Typography>
-              {exerciseIsDeletable && (
-                <Button onClick={this.handleOpenDelete.bind(this)}>
-                  <T>Delete</T>
-                </Button>
-              )}
-              <Dialog
-                open={this.state.openDelete}
-                onClose={this.handleCloseDelete.bind(this)}
-              >
-                <DialogContent>
-                  <DialogContentText>
-                    <T>Do you want to delete this exercise?</T>
-                  </DialogContentText>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </Paper>
-        )}
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2>
-              <T>Export an exercise</T>
-            </h2>
-            <p>
-              <T>Full export for an excercise.</T>
-            </p>
-            <p>
-              <T>
-                Note: You can import a previously exported exercise from the
-                home page.
-              </T>
-            </p>
-            <Button label="Export" onClick={this.handleOpenExport.bind(this)} />
-            <Dialog
-              title="Export of Exercise"
-              modal={true}
-              open={this.state.openExport}
-              onRequestClose={this.handleCloseExport.bind(this)}
-              actions={exportActions}
-            >
+        <Paper elevation={4} className={classes.paper}>
+          <Typography variant="h5" style={{ marginBottom: 20 }}>
+            <T>Export of the emails</T>
+          </Typography>
+          <Typography variant="body1" style={{ marginBottom: 20 }}>
+            <T>
+              Export all email injects to files (.eml) so you can use it into
+              your mail client.
+            </T>
+          </Typography>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.submitExportEml.bind(this)}
+          >
+            <T>Export</T>
+          </Button>
+        </Paper>
+        <Paper elevation={4} className={classes.paper}>
+          <Typography variant="h5" style={{ marginBottom: 20 }}>
+            <T>Export of the exercise</T>
+          </Typography>
+          <Typography variant="body1" style={{ marginBottom: 20 }}>
+            <T>
+              Note: you can import a previously exported exercise from the home
+              page.
+            </T>
+          </Typography>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.handleOpenExport.bind(this)}
+          >
+            <T>Export</T>
+          </Button>
+          <Dialog
+            title=""
+            modal={true}
+            open={this.state.openExport}
+            onRequestClose={this.handleCloseExport.bind(this)}
+          >
+            <DialogTitle>
+              <T>Export of Exercise</T>
+            </DialogTitle>
+            <DialogContent>
               <T>Please, chose data to export</T>
               <Table selectable={true} style={{ marginTop: '5px' }}>
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
@@ -592,23 +497,74 @@ class Index extends Component {
                   </TableRow>
                 </TableBody>
               </Table>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseExport.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitExport.bind(this)}
+              >
+                <T>Export</T>
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Paper>
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              <T>Delete</T>
+            </Typography>
+            <Typography variant="body1" style={{ marginBottom: 20 }}>
+              <T>
+                Deleting an exercise will result in deleting all its content,
+                including objectives, events, incidents, injects and audience.
+                We do not recommend you do this.
+              </T>
+            </Typography>
+            {exerciseIsDeletable && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={this.handleOpenDelete.bind(this)}
+              >
+                <T>Delete</T>
+              </Button>
+            )}
+            <Dialog
+              open={this.state.openDelete}
+              onClose={this.handleCloseDelete.bind(this)}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  <T>Do you want to delete this exercise?</T>
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseDelete.bind(this)}
+                >
+                  <T>Cancel</T>
+                </Button>
+                {exerciseIsDeletable && (
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={this.submitDelete.bind(this)}
+                  >
+                    <T>Delete</T>
+                  </Button>
+                )}
+              </DialogActions>
             </Dialog>
-          </div>
-        </Paper>
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2>
-              <T>Emails export</T>
-            </h2>
-            <p>
-              <T>Export all email injects to files (.eml)</T>
-            </p>
-            <Button
-              label="Exporter"
-              onClick={this.submitExportEml.bind(this)}
-            />
-          </div>
-        </Paper>
+          </Paper>
+        )}
       </div>
     );
   }

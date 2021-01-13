@@ -7,12 +7,12 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Dialog from '@material-ui/core/Dialog';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import { timeDiff } from '../../../../utils/Time';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { SearchField } from '../../../../components/SimpleTextField';
-import { Dialog } from '../../../../components/Dialog';
 /* eslint-disable */
 import { fetchGroups } from "../../../../actions/Group";
 import { fetchTags, deleteTag } from "../../../../actions/Tag";

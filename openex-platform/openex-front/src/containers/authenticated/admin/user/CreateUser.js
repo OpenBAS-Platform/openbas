@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../utils/Messages';
 import { addUser } from '../../../../actions/User';
-import { Dialog } from '../../../../components/Dialog';
 import {
   FlatButton,
   FloatingActionsButtonCreate,

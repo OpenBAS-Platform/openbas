@@ -38,13 +38,11 @@ class TemplateForm extends Component {
           fullWidth={true}
           style={{ marginTop: 20 }}
         >
-          <MenuItem value={null} primaryText="" />
+          <MenuItem value={null}> &nbsp; </MenuItem>
           {this.props.groups.map((data) => (
-            <MenuItem
-              key={data.group_id}
-              value={data.group_id}
-              primaryText={data.group_name}
-            />
+            <MenuItem key={data.group_id} value={data.group_id}>
+              {data.group_name}
+            </MenuItem>
           ))}
         </Select>
       </form>

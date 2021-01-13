@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Dialog from '@material-ui/core/Dialog';
 import { addGroup } from '../../../../actions/Group';
-import { Dialog } from '../../../../components/Dialog';
 import {
   FlatButton,
   FloatingActionsButtonCreate,

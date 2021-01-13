@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Dialog from '@material-ui/core/Dialog';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { List } from '../../../../components/List';
-import { Dialog } from '../../../../components/Dialog';
 import {
   MainListItem,
   SecondaryListItem,

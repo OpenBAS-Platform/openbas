@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Popover } from '../../../../components/Popover';
 import { Menu } from '../../../../components/Menu';
-import { Dialog } from '../../../../components/Dialog';
 import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
@@ -101,13 +101,11 @@ class LogsPopover extends Component {
           onRequestClose={this.handleCloseCreate.bind(this)}
           actions={createActions}
         >
-          {/* eslint-disable */}
           <LogForm
             ref="logForm"
             onSubmit={this.onSubmitCreate.bind(this)}
             onSubmitSuccess={this.handleCloseCreate.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
       </div>
     );
