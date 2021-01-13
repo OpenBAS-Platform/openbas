@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { updateUser } from '../../../actions/User';
 import { i18nRegister } from '../../../utils/Messages';
@@ -126,9 +127,9 @@ class Index extends Component {
         <div className={classes.container}>
           <div style={{ width: 800, margin: '0 auto' }}>
             <Paper elevation={4} className={classes.paper}>
-              <h2>
+              <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Profile</T>
-              </h2>
+              </Typography>
               <UserForm
                 ref="userForm"
                 organizations={this.props.organizations}
@@ -145,9 +146,9 @@ class Index extends Component {
               </Button>
             </Paper>
             <Paper elevation={4} className={classes.paper}>
-              <h2>
+              <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Information</T>
-              </h2>
+              </Typography>
               <ProfileForm
                 ref="profileForm"
                 onSubmit={this.onUpdate.bind(this)}
@@ -163,9 +164,9 @@ class Index extends Component {
               </Button>
             </Paper>
             <Paper elevation={4} className={classes.paper}>
-              <h2>
+              <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Password</T>
-              </h2>
+              </Typography>
               <PasswordForm
                 ref="passwordForm"
                 onSubmit={this.onUpdatePassword.bind(this)}

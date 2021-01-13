@@ -239,14 +239,6 @@ class Index extends Component {
       this.props.exercise,
     );
     const { classes, exercise } = this.props;
-    const splittedStartDate = R.split(
-      ' ',
-      dateFormat(R.path(['exercise', 'exercise_start_date'], this.props)),
-    );
-    const splittedEndDate = R.split(
-      ' ',
-      dateFormat(R.path(['exercise', 'exercise_end_date'], this.props)),
-    );
     const initPipe = R.pipe(
       R.assoc(
         'exercise_animation_group',
@@ -264,7 +256,6 @@ class Index extends Component {
       ]),
     );
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
-    console.log(informationValues);
     const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
     return (
       <div style={{ width: 800, margin: '0 auto' }}>
