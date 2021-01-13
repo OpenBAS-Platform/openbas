@@ -6,7 +6,7 @@ import { Route, Switch, withRouter } from 'react-router';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { withStyles } from '@material-ui/core/styles';
-import { redirectToExercise } from '../../../actions/Application';
+import { redirectToExercise, redirectToHome } from '../../../actions/Application';
 import LeftBar from './nav/LeftBar';
 import { fetchExercise } from '../../../actions/Exercise';
 import IndexExercise from './Index';
@@ -54,7 +54,7 @@ class RootExercise extends Component {
   }
 
   redirectToHome() {
-    this.props.history.push('/private');
+    this.props.redirectToHome();
   }
 
   render() {
@@ -198,6 +198,7 @@ export default R.compose(
   withRouter,
   connect(select, {
     redirectToExercise,
+    redirectToHome,
     fetchExercise,
   }),
   withStyles(styles),

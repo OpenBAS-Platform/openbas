@@ -1,6 +1,6 @@
+import { push } from 'connected-react-router';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-import { history } from '../Store';
 import { postReferential, getReferential } from '../utils/Action';
 
 export const askToken = (username, password) => (dispatch) => {
@@ -50,43 +50,37 @@ export const savedDismiss = () => (dispatch) => {
 };
 
 export const redirectToHome = () => (dispatch) => {
-  dispatch(history.push('/'));
+  dispatch(push('/'));
 };
 
 export const redirectToAdmin = () => (dispatch) => {
-  dispatch(history.push('/private/admin/index'));
+  dispatch(push('/private/admin/index'));
 };
 
 export const redirectToExercise = (exerciseId) => (dispatch) => {
-  dispatch(history.push(`/private/exercise/${exerciseId}`));
+  dispatch(push(`/private/exercise/${exerciseId}`));
 };
 
 export const redirectToScenario = (exerciseId) => (dispatch) => {
-  dispatch(history.push(`/private/exercise/${exerciseId}/scenario`));
+  dispatch(push(`/private/exercise/${exerciseId}/scenario`));
 };
 
 export const redirectToAudiences = (exerciseId) => (dispatch) => {
-  dispatch(history.push(`/private/exercise/${exerciseId}/audiences`));
+  dispatch(push(`/private/exercise/${exerciseId}/audiences`));
 };
 
 export const redirectToEvent = (exerciseId, eventId) => (dispatch) => {
-  dispatch(history.push(`/private/exercise/${exerciseId}/scenario/${eventId}`));
+  dispatch(push(`/private/exercise/${exerciseId}/scenario/${eventId}`));
 };
 
 export const redirectToChecks = (exerciseId) => (dispatch) => {
-  dispatch(history.push(`/private/exercise/${exerciseId}/checks`));
+  dispatch(push(`/private/exercise/${exerciseId}/checks`));
 };
 
 export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
-  dispatch(
-    history.push(
-      `/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`,
-    ),
-  );
+  dispatch(push(`/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`));
 };
 
 export const redirectToDryrun = (exerciseId, dryrunId) => (dispatch) => {
-  dispatch(
-    history.push(`/private/exercise/${exerciseId}/checks/dryrun/${dryrunId}`),
-  );
+  dispatch(push(`/private/exercise/${exerciseId}/checks/dryrun/${dryrunId}`));
 };
