@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { FormField } from '../../../../components/Field';
-import { T } from '../../../../components/I18n';
-import { SelectField } from '../../../../components/SelectField';
-import { i18nRegister } from '../../../../utils/Messages';
-import { AutoCompleteField } from '../../../../components/AutoComplete';
+import { T } from '../../../components/I18n';
+import { Select } from '../../../components/Select';
+import { TextField } from '../../../components/TextField';
+import { i18nRegister } from '../../../utils/Messages';
+import { Autocomplete } from '../../../components/Autocomplete';
 
 i18nRegister({
   fr: {
@@ -24,55 +23,58 @@ i18nRegister({
 
 class UserForm extends Component {
   render() {
-    const dataSource = R.map(
+    const options = R.map(
       (val) => val.organization_name,
       R.values(this.props.organizations),
     );
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.props.error && (
-          <div>
-            <strong>{this.props.error}</strong>
-            <br />
-          </div>
-        )}
-        <FormField
+        <TextField
           name="user_email"
           fullWidth={true}
-          type="text"
-          label="Email address"
+          label={<T>Email address</T>}
         />
-        <FormField
+        <TextField
           name="user_email2"
           fullWidth={true}
-          type="text"
-          label="Email address (secondary)"
+          label={<T>Email address (secondary)</T>}
+          style={{ marginTop: 20 }}
         />
-        <FormField
+        <TextField
           name="user_firstname"
           fullWidth={true}
-          type="text"
-          label="Firstname"
+          label={<T>Firstname</T>}
+          style={{ marginTop: 20 }}
         />
-        <FormField
+        <TextField
           name="user_lastname"
           fullWidth={true}
-          type="text"
           label="Lastname"
+          style={{ marginTop: 20 }}
         />
-        <AutoCompleteField
-          filter={Autocomplete.caseInsensitiveFilter}
+        <Autocomplete
           name="user_organization"
           fullWidth={true}
-          type="text"
           label="Organization"
-          dataSource={dataSource}
+          options={options}
+          style={{ marginTop: 20 }}
         />
-        <SelectField label={<T>Language</T>} name="user_lang" fullWidth={true}>
-          <MenuItem key="auto" value="auto" primaryText={<T>Automatic</T>} />
-          <MenuItem key="en" value="en" primaryText="English" />
-          <MenuItem key="fr" value="fr" primaryText="Français" />
-        </SelectField>
+        <Select
+          label={<T>Language</T>}
+          name="user_lang"
+          fullWidth={true}
+          style={{ marginTop: 20 }}
+        >
+          <MenuItem key="auto" value="auto">
+            <T>Automatic</T>
+          </MenuItem>
+          <MenuItem key="en" value="en">
+            English
+          </MenuItem>
+          <MenuItem key="fr" value="fr">
+            Français
+          </MenuItem>
+        </Select>
       </form>
     );
   }

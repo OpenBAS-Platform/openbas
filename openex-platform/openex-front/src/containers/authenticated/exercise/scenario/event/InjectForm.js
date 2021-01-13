@@ -4,7 +4,7 @@ import { reduxForm, change } from 'redux-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
 import { FormField } from '../../../../../components/Field';
-import { SelectField } from '../../../../../components/SelectField';
+import { Select } from '../../../../../components/Select';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import DatePickerIconOpx from '../../../../../components/DatePickerIconOpx';
@@ -162,7 +162,7 @@ class InjectForm extends Component {
           label="Description"
         />
 
-        <SelectField
+        <Select
           label="Type"
           name="inject_type"
           fullWidth={true}
@@ -175,7 +175,7 @@ class InjectForm extends Component {
               primaryText={<T>{data.type}</T>}
             />
           ))}
-        </SelectField>
+        </Select>
       </form>
     );
   }

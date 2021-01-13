@@ -78,7 +78,7 @@ class UserPopover extends Component {
             to={
               this.props.exerciseId
                 ? `/private/exercise/${this.props.exerciseId}/profile`
-                : '/private/user/profile'
+                : '/private/profile'
             }
           >
             <T>Profile</T>

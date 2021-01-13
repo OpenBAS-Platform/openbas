@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../components/Field';
+import { FormField } from '../../../components/Field';
 
 const validate = (values) => {
   const errors = {};

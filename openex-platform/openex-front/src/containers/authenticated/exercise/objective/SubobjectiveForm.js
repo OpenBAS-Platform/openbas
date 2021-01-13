@@ -5,7 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { FormField } from '../../../../components/Field';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
-import { SelectField } from '../../../../components/SelectField';
+import { Select } from '../../../../components/Select';
 
 i18nRegister({
   fr: {
@@ -42,7 +42,7 @@ class SubobjectiveForm extends Component {
           type="text"
           label="Description"
         />
-        <SelectField
+        <Select
           label={<T>Priority</T>}
           name="subobjective_priority"
           fullWidth={true}
@@ -57,7 +57,7 @@ class SubobjectiveForm extends Component {
           <MenuItem key="8" value={8} primaryText="8" />
           <MenuItem key="9" value={9} primaryText="9" />
           <MenuItem key="10" value={10} primaryText="10" />
-        </SelectField>
+        </Select>
       </form>
     );
   }

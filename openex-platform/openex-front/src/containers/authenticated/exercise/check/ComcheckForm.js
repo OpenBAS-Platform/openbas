@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import MenuItem from '@material-ui/core/MenuItem';
 import { FormField, CKEditorField } from '../../../../components/Field';
-import { SelectField } from '../../../../components/SelectField';
+import { Select } from '../../../../components/Select';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 import DatePickerIconOpx from '../../../../components/DatePickerIconOpx';
@@ -120,7 +120,7 @@ class ComcheckForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <SelectField
+        <Select
           label={<T>Target audience</T>}
           name="comcheck_audience"
           fullWidth={true}
@@ -132,7 +132,7 @@ class ComcheckForm extends Component {
               primaryText={<T>{audience.audience_name}</T>}
             />
           ))}
-        </SelectField>
+        </Select>
 
         <div style={styles.newInputDate.inputDateTimeLine}>
           <DatePickerIconOpx

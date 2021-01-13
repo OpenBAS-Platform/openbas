@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
-import { SelectField } from '../../../../../components/SelectField';
+import { Select } from '../../../../../components/Select';
 import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
@@ -27,7 +27,7 @@ class CopyForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <SelectField label="Incident" name="incident_id" fullWidth={true}>
+        <Select label="Incident" name="incident_id" fullWidth={true}>
           {R.values(this.props.incidents).map((data) => (
               <MenuItem
                 key={data.incident_id}
@@ -35,7 +35,7 @@ class CopyForm extends Component {
                 primaryText={data.incident_title}
               />
           ))}
-        </SelectField>
+        </Select>
       </form>
     );
   }

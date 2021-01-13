@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import * as R from 'ramda';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 import { ToggleField } from '../../../../components/ToggleField';
 import { FormField } from '../../../../components/Field';
-import { AutoCompleteField } from '../../../../components/AutoComplete';
+import { Autocomplete } from '../../../../components/Autocomplete';
 
 i18nRegister({
   fr: {
@@ -58,8 +57,7 @@ class UserForm extends Component {
           type="text"
           label="Lastname"
         />
-        <AutoCompleteField
-          filter={Autocomplete.caseInsensitiveFilter}
+        <Autocomplete
           name="user_organization"
           fullWidth={true}
           type="text"

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import MenuItem from '@material-ui/core/MenuItem';
 import { FormField } from '../../../../components/Field';
-import { SelectField } from '../../../../components/SelectField';
+import { Select } from '../../../../components/Select';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 
@@ -31,7 +31,7 @@ class TemplateForm extends Component {
           type="text"
           label="Messages footer"
         />
-        <SelectField
+        <Select
           label={<T>Exercise control (animation)</T>}
           name="exercise_animation_group"
           fullWidth={true}
@@ -44,7 +44,7 @@ class TemplateForm extends Component {
                 primaryText={data.group_name}
               />
           ))}
-        </SelectField>
+        </Select>
       </form>
     );
   }

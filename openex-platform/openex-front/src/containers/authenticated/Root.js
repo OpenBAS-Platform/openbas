@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import * as R from 'ramda';
 import { Route, Switch } from 'react-router';
 import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
-import { Snackbar } from '../../components/Snackbar';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import { withStyles } from '@material-ui/core/styles';
+import { withRouter } from 'react-router-dom';
 import { T } from '../../components/I18n';
 import { i18nRegister } from '../../utils/Messages';
-import * as Constants from '../../constants/ComponentTypes';
-import { Icon } from '../../components/Icon';
 import { savedDismiss } from '../../actions/Application';
 import IndexAuthenticated from './Index';
+import IndexProfile from './profile/Index';
 import RootAdmin from './admin/Root';
-import RootUser from './user/Root';
 import RootExercise from './exercise/Root';
+import UserPopover from './UserPopover';
 
 const UserIsAdmin = connectedRouterRedirect({
   authenticatedSelector: (state) => state.app.logged.admin === true,
@@ -27,34 +32,66 @@ i18nRegister({
   },
 });
 
+const styles = () => ({
+  container: {
+    padding: 20,
+  },
+  logo: {
+    width: '40px',
+    cursor: 'pointer',
+  },
+  title: {
+    fontSize: 25,
+    marginLeft: 20,
+  },
+});
+
 class RootAuthenticated extends Component {
+  redirectToHome() {
+    this.props.history.push('/private');
+  }
+
   render() {
+    const { classes } = this.props;
     return (
       <div>
         <Snackbar
           open={this.props.savedPopupOpen}
-          autoHideDuration={1500}
-          onRequestClose={this.props.savedDismiss.bind(this)}
-          message={
-            <div>
-              <Icon
-                name={Constants.ICON_NAME_ACTION_DONE}
-                color="#ffffff"
-                type={Constants.ICON_TYPE_LEFT}
-              />
-              <T>Action done.</T>
-            </div>
-          }
-        />
-        <Switch>
-          <Route path="/admin" component={UserIsAdmin(RootAdmin)} />
-          <Route exact path="/private" component={IndexAuthenticated} />
-          <Route path="/private/user" component={RootUser} />
-          <Route
-            path="/private/exercise/:exerciseId"
-            component={RootExercise}
-          />
-        </Switch>
+          autoHideDuration={4000}
+          onClose={this.props.savedDismiss.bind(this)}
+        >
+          <Alert
+            severity="info"
+            onClose={this.props.savedDismiss.bind(this)}
+            elevation={6}
+            variant="outlined"
+          >
+            <T>Action done.</T>
+          </Alert>
+        </Snackbar>
+        <AppBar position="static">
+          <Toolbar>
+            <img
+              src="/images/logo_white.png"
+              alt="logo"
+              className={classes.logo}
+              onClick={this.redirectToHome.bind(this)}
+            />
+            <div className={classes.title}>OpenEx</div>
+            <UserPopover />
+          </Toolbar>
+        </AppBar>
+        <div className={classes.container}>
+          <Switch>
+            <Route path="/admin" component={UserIsAdmin(RootAdmin)} />
+            <Route exact path="/private" component={IndexAuthenticated} />
+            <Route exact path="/private/profile" component={IndexProfile} />
+            <Route
+              path="/private/exercise/:exerciseId"
+              component={RootExercise}
+            />
+          </Switch>
+        </div>
       </div>
     );
   }
@@ -70,4 +107,8 @@ const select = (state) => ({
   savedPopupOpen: state.screen.saved || false,
 });
 
-export default connect(select, { savedDismiss })(RootAuthenticated);
+export default R.compose(
+  withRouter,
+  connect(select, { savedDismiss }),
+  withStyles(styles),
+)(RootAuthenticated);

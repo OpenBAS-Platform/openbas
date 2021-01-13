@@ -29,7 +29,7 @@ import IndexExerciseAudiencesAudience from './audiences/audience/Index';
 import IndexExerciseDocuments from './documents/Index';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
-import IndexUserProfile from '../user/profile/Index';
+import IndexUserProfile from '../profile/Index';
 
 const styles = {
   root: {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { reduxForm, change } from 'redux-form';
 import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../components/I18n';
-import { SelectField } from '../../../../components/SelectField';
+import { Select } from '../../../../components/Select';
 import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
@@ -30,7 +30,7 @@ class DryrunForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <SelectField label={<T>Speed</T>} name="dryrun_speed" fullWidth={true}>
+        <Select label={<T>Speed</T>} name="dryrun_speed" fullWidth={true}>
           <MenuItem key="24x" value="24" primaryText="24x (1 day = 1 hour)" />
           <MenuItem
             key="48x"
@@ -42,7 +42,7 @@ class DryrunForm extends Component {
             value="72"
             primaryText="72x (1 day = 15 minutes)"
           />
-        </SelectField>
+        </Select>
       </form>
     );
   }

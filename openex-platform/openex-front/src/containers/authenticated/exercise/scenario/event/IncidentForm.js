@@ -5,7 +5,7 @@ import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
 import { FormField } from '../../../../../components/Field';
 import { T } from '../../../../../components/I18n';
-import { SelectField } from '../../../../../components/SelectField';
+import { Select } from '../../../../../components/Select';
 import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
@@ -54,7 +54,7 @@ class IncidentForm extends Component {
           type="text"
           label="Title"
         />
-        <SelectField label={<T>Type</T>} name="incident_type" fullWidth={true}>
+        <Select label={<T>Type</T>} name="incident_type" fullWidth={true}>
           {R.values(this.props.types).map((type) => (
               <MenuItem
                 key={type.type_id}
@@ -62,8 +62,8 @@ class IncidentForm extends Component {
                 primaryText={<T>{type.type_name}</T>}
               />
           ))}
-        </SelectField>
-        <SelectField
+        </Select>
+        <Select
           label={<T>Significance</T>}
           name="incident_weight"
           fullWidth={true}
@@ -75,7 +75,7 @@ class IncidentForm extends Component {
                 primaryText={<T>{weight.weight_name}</T>}
               />
           ))}
-        </SelectField>
+        </Select>
         <FormField
           name="incident_story"
           fullWidth={true}
