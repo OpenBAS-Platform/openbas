@@ -6,50 +6,34 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
 import * as R from 'ramda';
-/* eslint-disable */
+import { withStyles } from '@material-ui/core/styles';
 import {
   deleteExercise,
   exportExercise,
   exportInjectEml,
   updateExercise,
-} from "../../../../actions/Exercise";
-import { shiftAllInjects } from "../../../../actions/Inject";
-import { fetchGroups } from "../../../../actions/Group";
-import { redirectToHome } from "../../../../actions/Application";
-import { Paper } from "../../../../components/Paper";
-import { Button, FlatButton } from "../../../../components/Button";
-import { Image } from "../../../../components/Image";
-import { Checkbox } from "../../../../components/Checkbox";
-import { T } from "../../../../components/I18n";
-import { i18nRegister } from "../../../../utils/Messages";
-import { Dialog } from "../../../../components/Dialog";
-import * as Constants from "../../../../constants/ComponentTypes";
-import TemplateForm from "./TemplateForm";
-import ExerciseForm from "../ExerciseForm";
-import FileGallery from "../../FileGallery";
-import { dateFormat, dateToISO } from "../../../../utils/Time";
-import { addFile, getImportFileSheetsName } from "../../../../actions/File";
-/* eslint-enable */
-
-const styles = {
-  PaperContent: {
-    padding: '20px',
-  },
-  image: {
-    width: '90%',
-  },
-  divWarning: {
-    border: '2px #FFBF00 solid',
-    padding: '10px',
-    borderRadius: '5px',
-    marginTop: '10px',
-    marginBottom: '10px',
-    fontWeight: '400',
-    backgroundColor: '#F5DA81',
-    textAlign: 'center',
-  },
-};
+} from '../../../../actions/Exercise';
+import { shiftAllInjects } from '../../../../actions/Inject';
+import { fetchGroups } from '../../../../actions/Group';
+import { redirectToHome } from '../../../../actions/Application';
+import { Image } from '../../../../components/Image';
+import { Checkbox } from '../../../../components/Checkbox';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import * as Constants from '../../../../constants/ComponentTypes';
+import TemplateForm from './TemplateForm';
+import ExerciseForm from '../ExerciseForm';
+import FileGallery from '../../FileGallery';
+import { dateFormat, dateToISO } from '../../../../utils/Time';
+import { addFile, getImportFileSheetsName } from '../../../../actions/File';
 
 i18nRegister({
   fr: {
@@ -89,6 +73,20 @@ i18nRegister({
     'Please, chose data to import':
       'Veuillez sélectionner les données à importer :',
     'Export of Exercise': "Export de l'exercice",
+    'Export all email injects to files (.eml)':
+      'Exporter tous les injects emails vers des fichiers (.eml)',
+    'Do you want to change the sender email address?':
+      "Souhaitez-vous changer l'adresse email de l'expéditeur ?",
+    'Note: You can import a previously exported exercise from the home page.':
+      'Note: vous ',
+    'Emails export': 'Export des emails',
+  },
+});
+
+const styles = () => ({
+  paper: {
+    padding: 20,
+    marginBottom: 40,
   },
 });
 
@@ -122,7 +120,6 @@ class Index extends Component {
     this.props.fetchGroups();
   }
 
-  // eslint-disable-next-line consistent-return
   onUpdate(data) {
     const newData = R.pipe(
       // Need to convert date to ISO format with timezone
@@ -130,19 +127,17 @@ class Index extends Component {
       R.assoc('exercise_end_date', dateToISO(data.exercise_end_date)),
       R.assoc('exercise_mail_expediteur', data.exercise_mail_expediteur),
     )(data);
-
     if (
       newData.exercise_mail_expediteur !== this.props.initialEmailExpediteur
     ) {
       this.setState({ newData });
       this.setState({ openConfirmMailExpediteur: true });
-    } else {
-      return this.props.updateExercise(this.props.id, newData);
+      return true;
     }
+    return this.props.updateExercise(this.props.id, newData);
   }
 
   submitInformation() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.informationForm.submit();
   }
 
@@ -151,7 +146,6 @@ class Index extends Component {
   }
 
   submitTemplate() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.templateForm.submit();
   }
 
@@ -262,14 +256,14 @@ class Index extends Component {
     );
 
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       exerciseIsDeletable ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}
@@ -281,36 +275,20 @@ class Index extends Component {
     ];
 
     const exportActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseExport.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="export"
         label="Export"
         primary={true}
         onClick={this.submitExport.bind(this)}
       />,
     ];
-
-    const confirmEmailActions = [
-      <FlatButton
-        key="no"
-        label="No"
-        primary={true}
-        onClick={this.handleCloseConfirmMailExpediteur.bind(this)}
-      />,
-      <FlatButton
-        key="yes"
-        label="Yes"
-        primary={true}
-        onClick={this.submitConfirmEmail.bind(this)}
-      />,
-    ];
-
-    const { exercise } = this.props;
+    const { classes, exercise } = this.props;
     const splittedStartDate = R.split(
       ' ',
       dateFormat(R.path(['exercise', 'exercise_start_date'], this.props)),
@@ -342,82 +320,93 @@ class Index extends Component {
         'exercise_animation_group',
       ]),
     );
-
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
     const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
+    console.log(informationValues);
     return (
-      <div>
-        {this.props.userCanUpdate ? (
-          <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+      <div style={{ width: 800, margin: '0 auto' }}>
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
             <div style={styles.PaperContent}>
-              <h2>Information</h2>
-              {/* eslint-disable */}
+              <Typography variant="h5" style={{ marginBottom: 20 }}>
+                Information
+              </Typography>
               <ExerciseForm
                 ref="informationForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
-                hideDates={true}
               />
-              {/* eslint-enable */}
               <br />
               <Button
-                type="submit"
-                label="Update"
+                variant="outlined"
+                color="secondary"
                 onClick={this.submitInformation.bind(this)}
-              />
+              >
+                <T>Update</T>
+              </Button>
             </div>
             <Dialog
-              title="Confirmer le changement de mail expéditeur"
-              modal={false}
               open={this.state.openConfirmMailExpediteur}
-              onRequestClose={this.handleCloseConfirmMailExpediteur.bind(this)}
-              actions={confirmEmailActions}
+              onClose={this.handleCloseConfirmMailExpediteur.bind(this)}
             >
-              <T>Confirmez vous le changement de mail expédieur ?</T>
+              <DialogContent>
+                <DialogContentText>
+                  <T>Do you want to change the sender email address?</T>
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseConfirmMailExpediteur.bind(this)}
+                >
+                  <T>Cancel</T>
+                </Button>
+                ,
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={this.submitConfirmEmail.bind(this)}
+                >
+                  <T>Confirm</T>
+                </Button>
+              </DialogActions>
             </Dialog>
           </Paper>
-        ) : (
-          ''
         )}
-
-        {this.props.userCanUpdate ? (
-          <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
             <div style={styles.PaperContent}>
-              <h2>
+              <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Messages template</T>
-              </h2>
-              {/* eslint-disable */}
+              </Typography>
               <TemplateForm
                 ref="templateForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
                 groups={this.props.groups}
               />
-              {/* eslint-enable */}
               <br />
               <Button
-                type="submit"
-                label="Update"
+                variant="outlined"
+                color="secondary"
                 onClick={this.submitTemplate.bind(this)}
-              />
+              >
+                <T>Update</T>
+              </Button>
             </div>
           </Paper>
-        ) : (
-          ''
         )}
-
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+        <Paper elevation={4} className={classes.paper}>
           <div style={styles.PaperContent}>
-            <h2>Image</h2>
-            <br />
-            {imageId ? (
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              Image
+            </Typography>
+            {imageId && (
               <Image
                 image_id={imageId}
                 alt="Exercise logo"
                 style={styles.image}
               />
-            ) : (
-              ''
             )}
             <br />
             <br />
@@ -442,43 +431,37 @@ class Index extends Component {
             )}
           </div>
         </Paper>
-
-        {this.props.userCanUpdate ? (
-          <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
             <div style={styles.PaperContent}>
-              <h2>
+              <Typography variant="h2">
                 <T>Delete</T>
-              </h2>
-              <p>
+              </Typography>
+              <Typography variant="body1">
                 <T>
                   Deleting an exercise will result in deleting all its content,
                   including objectives, events, incidents, injects and audience.
                   We do not recommend you do this.
                 </T>
-              </p>
-              {exerciseIsDeletable ? (
-                <Button
-                  label="Delete"
-                  onClick={this.handleOpenDelete.bind(this)}
-                />
-              ) : (
-                ''
+              </Typography>
+              {exerciseIsDeletable && (
+                <Button onClick={this.handleOpenDelete.bind(this)}>
+                  <T>Delete</T>
+                </Button>
               )}
               <Dialog
-                title="Confirmation"
-                modal={false}
                 open={this.state.openDelete}
-                onRequestClose={this.handleCloseDelete.bind(this)}
-                actions={deleteActions}
+                onClose={this.handleCloseDelete.bind(this)}
               >
-                <T>Do you want to delete this exercise?</T>
+                <DialogContent>
+                  <DialogContentText>
+                    <T>Do you want to delete this exercise?</T>
+                  </DialogContentText>
+                </DialogContent>
               </Dialog>
             </div>
           </Paper>
-        ) : (
-          ''
         )}
-
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2>
@@ -489,10 +472,8 @@ class Index extends Component {
             </p>
             <p>
               <T>
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                Note: You can import a previously exported exercise on "create
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                exercise" form.
+                Note: You can import a previously exported exercise from the
+                home page.
               </T>
             </p>
             <Button label="Export" onClick={this.handleOpenExport.bind(this)} />
@@ -614,18 +595,13 @@ class Index extends Component {
             </Dialog>
           </div>
         </Paper>
-
         <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
           <div style={styles.PaperContent}>
             <h2>
-              <T>Export des Emails</T>
+              <T>Emails export</T>
             </h2>
             <p>
-              <T>
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                Exporter de tous les injects de l'exercice au format EML dans
-                une archive.
-              </T>
+              <T>Export all email injects to files (.eml)</T>
             </p>
             <Button
               label="Exporter"
@@ -659,7 +635,7 @@ Index.propTypes = {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
   let userCanUpdate = R.path(
     [userId, 'user_admin'],
@@ -684,14 +660,12 @@ const checkUserCanUpdate = (state, ownProps) => {
       });
     });
   }
-
   return userCanUpdate;
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const exercise = R.prop(exerciseId, state.referential.entities.exercises);
-
   return {
     id: exerciseId,
     exercise,
@@ -704,14 +678,17 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  updateExercise,
-  redirectToHome,
-  deleteExercise,
-  exportInjectEml,
-  exportExercise,
-  fetchGroups,
-  shiftAllInjects,
-  addFile,
-  getImportFileSheetsName,
-})(Index);
+export default R.compose(
+  connect(select, {
+    updateExercise,
+    redirectToHome,
+    deleteExercise,
+    exportInjectEml,
+    exportExercise,
+    fetchGroups,
+    shiftAllInjects,
+    addFile,
+    getImportFileSheetsName,
+  }),
+  withStyles(styles),
+)(Index);

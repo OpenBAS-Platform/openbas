@@ -32,7 +32,11 @@ i18nRegister({
   },
 });
 
-const styles = () => ({
+const styles = (theme) => ({
+  appBar: {
+    width: '100%',
+    zIndex: theme.zIndex.drawer + 1,
+  },
   container: {
     padding: 20,
   },
@@ -44,6 +48,7 @@ const styles = () => ({
     fontSize: 25,
     marginLeft: 20,
   },
+  toolbar: theme.mixins.toolbar,
 });
 
 class RootAuthenticated extends Component {
@@ -69,7 +74,7 @@ class RootAuthenticated extends Component {
             <T>Action done.</T>
           </Alert>
         </Snackbar>
-        <AppBar position="static">
+        <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <img
               src="/images/logo_white.png"
@@ -81,6 +86,7 @@ class RootAuthenticated extends Component {
             <UserPopover />
           </Toolbar>
         </AppBar>
+        <div className={classes.toolbar} />
         <div className={classes.container}>
           <Switch>
             <Route path="/admin" component={UserIsAdmin(RootAdmin)} />

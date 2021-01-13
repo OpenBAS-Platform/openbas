@@ -3,21 +3,27 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
+import Button from '@material-ui/core/Button';
+import List from '@material-ui/core/List';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import { withStyles } from '@material-ui/core/styles';
 import * as Constants from '../../../constants/ComponentTypes';
 import Theme from '../../../components/Theme';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import { dateFormat, timeDiff } from '../../../utils/Time';
-import { List } from '../../../components/List';
-import { Dialog } from '../../../components/Dialog';
 import {
   MainListItem,
+  MainSmallListItem,
   SecondaryListItem,
   TertiaryListItem,
-  MainSmallListItem,
 } from '../../../components/list/ListItem';
 import { Icon } from '../../../components/Icon';
-import { FlatButton } from '../../../components/Button';
 import { fetchObjectives } from '../../../actions/Objective';
 import { fetchSubobjectives } from '../../../actions/Subobjective';
 import { fetchAudiences } from '../../../actions/Audience';
@@ -59,70 +65,12 @@ i18nRegister({
   },
 });
 
-const styles = {
-  columnLeft: {
-    float: 'left',
-    width: '48%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  columnRight: {
-    float: 'right',
-    width: '48%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  title: {
-    float: 'left',
-    fontSize: '13px',
-    height: '35px',
-    textTransform: 'uppercase',
-  },
-  priority: {
-    fontSize: '18px',
-    fontWeight: 500,
-    marginRight: '10px',
-  },
+const styles = () => ({
   empty: {
-    marginTop: 40,
-    fontSize: '18px',
-    fontWeight: 500,
-    textAlign: 'left',
+    marginTop: 15,
+    fontSize: 16,
   },
-  inject_title: {
-    float: 'left',
-    padding: '5px 0 0 0',
-  },
-  inject_date: {
-    float: 'right',
-    width: '130px',
-    padding: '5px 0 0 0',
-  },
-  audiences: {
-    position: 'absolute',
-    right: '5px',
-    top: '15px',
-  },
-  subobjectives: {
-    position: 'absolute',
-    right: '50px',
-    top: '15px',
-  },
-  expand: {
-    height: '25px',
-    paddingTop: '3px',
-    backgroundColor: '#F0F0F0',
-    cursor: 'pointer',
-    textAlign: 'center',
-    borderRadius: '5px',
-  },
-  more: {
-    float: 'left',
-    margin: '12px 0px 0px 5px',
-  },
-};
+});
 
 class IndexExercise extends Component {
   constructor(props) {
@@ -266,8 +214,9 @@ class IndexExercise extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const viewEventActions = [
-      <FlatButton
+      <Button
         key="closeEvent"
         label="Close"
         primary={true}
@@ -275,7 +224,7 @@ class IndexExercise extends Component {
       />,
     ];
     const viewIncidentActions = [
-      <FlatButton
+      <Button
         key="closeIncident"
         label="Close"
         primary={true}
@@ -283,7 +232,7 @@ class IndexExercise extends Component {
       />,
     ];
     const viewInjectActions = [
-      <FlatButton
+      <Button
         key="closeInject"
         label="Close"
         primary={true}
@@ -291,7 +240,7 @@ class IndexExercise extends Component {
       />,
     ];
     const viewAudienceActions = [
-      <FlatButton
+      <Button
         key="CloseAudience"
         label="Close"
         primary={true}
@@ -299,7 +248,7 @@ class IndexExercise extends Component {
       />,
     ];
     const viewObjectiveActions = [
-      <FlatButton
+      <Button
         key="closeObjective"
         label="Close"
         primary={true}
@@ -307,7 +256,7 @@ class IndexExercise extends Component {
       />,
     ];
     const audiencesActions = [
-      <FlatButton
+      <Button
         key="closeAudiences"
         label="Close"
         primary={true}
@@ -315,7 +264,7 @@ class IndexExercise extends Component {
       />,
     ];
     const objectivesActions = [
-      <FlatButton
+      <Button
         key="closeObjectives"
         label="Close"
         primary={true}
@@ -323,7 +272,7 @@ class IndexExercise extends Component {
       />,
     ];
     const injectAudiencesActions = [
-      <FlatButton
+      <Button
         key="closeAudiences"
         label="Close"
         primary={true}
@@ -333,52 +282,20 @@ class IndexExercise extends Component {
 
     return (
       <div>
-        <div style={styles.columnLeft}>
-          <div style={styles.title}>
-            <T>Main objectives</T>
-          </div>
-          <div className="clearfix"></div>
-          {this.props.objectives.length === 0 ? (
-            <div style={styles.empty}>
-              <T>You do not have any objectives in this exercise.</T>
-            </div>
-          ) : (
-            ''
-          )}
-          <List>
-            {R.take(3, this.props.objectives).map((objective) => (
-              <MainListItem
-                key={objective.objective_id}
-                onClick={this.handleOpenViewObjective.bind(this, objective)}
-                primaryText={objective.objective_title}
-                secondaryText={objective.objective_description}
-                leftIcon={
-                  <Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG} />
-                }
-              />
-            ))}
-          </List>
-          {this.props.objectives.length > 3 ? (
-            <div
-              onClick={this.handleOpenObjectives.bind(this)}
-              style={styles.expand}
-            >
-              <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN} />
-            </div>
-          ) : (
-            ''
-          )}
-          <Dialog
-            title="Main objectives"
-            modal={false}
-            open={this.state.openObjectives}
-            autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseObjectives.bind(this)}
-            actions={objectivesActions}
-          >
+        <Grid container spacing={3}>
+          <Grid item xs={6}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              <T>Main objectives</T>
+            </Typography>
+            <div className="clearfix" />
+            {this.props.objectives.length === 0 && (
+              <div className={classes.empty}>
+                <T>You do not have any objectives in this exercise.</T>
+              </div>
+            )}
             <List>
-              {this.props.objectives.map((objective) => (
-                <MainSmallListItem
+              {R.take(3, this.props.objectives).map((objective) => (
+                <MainListItem
                   key={objective.objective_id}
                   onClick={this.handleOpenViewObjective.bind(this, objective)}
                   primaryText={objective.objective_title}
@@ -391,101 +308,75 @@ class IndexExercise extends Component {
                 />
               ))}
             </List>
-          </Dialog>
-          <Dialog
-            title={R.propOr(
-              '-',
-              'objective_title',
-              this.state.currentObjective,
+            {this.props.objectives.length > 3 ? (
+              <div
+                onClick={this.handleOpenObjectives.bind(this)}
+                style={styles.expand}
+              >
+                <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN} />
+              </div>
+            ) : (
+              ''
             )}
-            modal={false}
-            open={this.state.openViewObjective}
-            autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseViewObjective.bind(this)}
-            actions={viewObjectiveActions}
-          >
-            <ObjectiveView objective={this.state.currentObjective} />
-          </Dialog>
-        </div>
-        <div style={styles.columnRight}>
-          <div style={styles.title}>Audiences</div>
-          <AudiencesPopover exerciseId={this.props.exerciseId} />
-          <div className="clearfix"></div>
-          {this.props.audiences.length === 0 ? (
-            <div style={styles.empty}>
-              <T>You do not have any audiences in this exercise.</T>
-            </div>
-          ) : (
-            ''
-          )}
-          <List>
-            {R.take(3, this.props.audiences).map((audience) => {
-              const playersText = `${
-                audience.audience_users_number
-              } ${this.props.intl.formatMessage({ id: 'players' })}`;
-              return (
-                <MainListItem
-                  rightIconButton={
-                    <AudiencePopover
-                      exerciseId={this.props.exerciseId}
-                      audience={audience}
-                    />
-                  }
-                  key={audience.audience_id}
-                  onClick={this.handleOpenViewAudience.bind(this, audience)}
-                  primaryText={
-                    <div
-                      style={{
-                        color: this.switchColor(!audience.audience_enabled),
-                      }}
-                    >
-                      {audience.audience_name}
-                    </div>
-                  }
-                  secondaryText={
-                    <div
-                      style={{
-                        color: this.switchColor(!audience.audience_enabled),
-                      }}
-                    >
-                      {playersText}
-                    </div>
-                  }
-                  leftIcon={
-                    <Icon
-                      name={Constants.ICON_NAME_SOCIAL_GROUP}
-                      color={this.switchColor(!audience.audience_enabled)}
-                    />
-                  }
-                />
-              );
-            })}
-          </List>
-          {this.props.audiences.length > 3 ? (
-            <div
-              onClick={this.handleOpenAudiences.bind(this)}
-              style={styles.expand}
+            <Dialog
+              title="Main objectives"
+              modal={false}
+              open={this.state.openObjectives}
+              autoScrollBodyContent={true}
+              onRequestClose={this.handleCloseObjectives.bind(this)}
+              actions={objectivesActions}
             >
-              <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN} />
-            </div>
-          ) : (
-            ''
-          )}
-          <Dialog
-            title="Audiences"
-            modal={false}
-            open={this.state.openAudiences}
-            autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseAudiences.bind(this)}
-            actions={audiencesActions}
-          >
+              <List>
+                {this.props.objectives.map((objective) => (
+                  <MainSmallListItem
+                    key={objective.objective_id}
+                    onClick={this.handleOpenViewObjective.bind(this, objective)}
+                    primaryText={objective.objective_title}
+                    secondaryText={objective.objective_description}
+                    leftIcon={
+                      <Icon
+                        name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_STRONG}
+                      />
+                    }
+                  />
+                ))}
+              </List>
+            </Dialog>
+            <Dialog
+              title={R.propOr(
+                '-',
+                'objective_title',
+                this.state.currentObjective,
+              )}
+              modal={false}
+              open={this.state.openViewObjective}
+              autoScrollBodyContent={true}
+              onRequestClose={this.handleCloseViewObjective.bind(this)}
+              actions={viewObjectiveActions}
+            >
+              <ObjectiveView objective={this.state.currentObjective} />
+            </Dialog>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              Audiences
+            </Typography>
+            <AudiencesPopover exerciseId={this.props.exerciseId} />
+            <div className="clearfix" />
+            {this.props.audiences.length === 0 ? (
+              <div className={classes.empty}>
+                <T>You do not have any audiences in this exercise.</T>
+              </div>
+            ) : (
+              ''
+            )}
             <List>
-              {this.props.audiences.map((audience) => {
+              {R.take(3, this.props.audiences).map((audience) => {
                 const playersText = `${
                   audience.audience_users_number
                 } ${this.props.intl.formatMessage({ id: 'players' })}`;
                 return (
-                  <MainSmallListItem
+                  <MainListItem
                     rightIconButton={
                       <AudiencePopover
                         exerciseId={this.props.exerciseId}
@@ -522,27 +413,87 @@ class IndexExercise extends Component {
                 );
               })}
             </List>
-          </Dialog>
-          <Dialog
-            title={R.propOr('-', 'audience_name', this.state.currentAudience)}
-            modal={false}
-            open={this.state.openViewAudience}
-            autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseViewAudience.bind(this)}
-            actions={viewAudienceActions}
-          >
-            <AudienceView
-              audience={this.state.currentAudience}
-              subaudiences={this.props.subaudiences}
-            />
-          </Dialog>
-        </div>
-        <div className="clearfix"></div>
+            {this.props.audiences.length > 3 ? (
+              <div
+                onClick={this.handleOpenAudiences.bind(this)}
+                style={styles.expand}
+              >
+                <Icon name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_DOWN} />
+              </div>
+            ) : (
+              ''
+            )}
+            <Dialog
+              title="Audiences"
+              modal={false}
+              open={this.state.openAudiences}
+              autoScrollBodyContent={true}
+              onRequestClose={this.handleCloseAudiences.bind(this)}
+              actions={audiencesActions}
+            >
+              <List>
+                {this.props.audiences.map((audience) => {
+                  const playersText = `${
+                    audience.audience_users_number
+                  } ${this.props.intl.formatMessage({ id: 'players' })}`;
+                  return (
+                    <MainSmallListItem
+                      rightIconButton={
+                        <AudiencePopover
+                          exerciseId={this.props.exerciseId}
+                          audience={audience}
+                        />
+                      }
+                      key={audience.audience_id}
+                      onClick={this.handleOpenViewAudience.bind(this, audience)}
+                      primaryText={
+                        <div
+                          style={{
+                            color: this.switchColor(!audience.audience_enabled),
+                          }}
+                        >
+                          {audience.audience_name}
+                        </div>
+                      }
+                      secondaryText={
+                        <div
+                          style={{
+                            color: this.switchColor(!audience.audience_enabled),
+                          }}
+                        >
+                          {playersText}
+                        </div>
+                      }
+                      leftIcon={
+                        <Icon
+                          name={Constants.ICON_NAME_SOCIAL_GROUP}
+                          color={this.switchColor(!audience.audience_enabled)}
+                        />
+                      }
+                    />
+                  );
+                })}
+              </List>
+            </Dialog>
+            <Dialog
+              title={R.propOr('-', 'audience_name', this.state.currentAudience)}
+              modal={false}
+              open={this.state.openViewAudience}
+              autoScrollBodyContent={true}
+              onRequestClose={this.handleCloseViewAudience.bind(this)}
+              actions={viewAudienceActions}
+            >
+              <AudienceView
+                audience={this.state.currentAudience}
+                subaudiences={this.props.subaudiences}
+              />
+            </Dialog>
+          </Grid>
+        </Grid>
         <br />
-        <br />
-        <div style={styles.title}>
+        <Typography variant="h5" style={{ float: 'left' }}>
           <T>Scenario</T>
-        </div>
+        </Typography>
         <ScenarioPopover
           exerciseId={this.props.exerciseId}
           injects={this.props.injects}
@@ -551,9 +502,9 @@ class IndexExercise extends Component {
           exerciseEndDate={this.props.exerciseEndDate}
           userCanUpdate={this.props.userCanUpdate}
         />
-        <div className="clearfix"></div>
+        <div className="clearfix" />
         {this.props.events.length === 0 ? (
-          <div style={styles.empty}>
+          <div className={classes.empty}>
             <T>You do not have any events in this exercise.</T>
           </div>
         ) : (
@@ -803,7 +754,7 @@ const getExerciseEndDate = (exercises) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const objectives = filterObjectives(
     state.referential.entities.objectives,
     exerciseId,
@@ -819,14 +770,11 @@ const select = (state, ownProps) => {
   const exerciseEndDate = getExerciseEndDate(
     state.referential.entities.exercises,
   );
-
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -864,16 +812,19 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  fetchObjectives,
-  fetchSubobjectives,
-  fetchAudiences,
-  fetchSubaudiences,
-  fetchEvents,
-  fetchIncidents,
-  fetchIncidentTypes,
-  fetchAllInjects,
-  fetchExercise,
-  fetchGroups,
-  downloadFile,
-})(injectIntl(IndexExercise));
+export default R.compose(
+  connect(select, {
+    fetchObjectives,
+    fetchSubobjectives,
+    fetchAudiences,
+    fetchSubaudiences,
+    fetchEvents,
+    fetchIncidents,
+    fetchIncidentTypes,
+    fetchAllInjects,
+    fetchExercise,
+    fetchGroups,
+    downloadFile,
+  }),
+  withStyles(styles),
+)(injectIntl(IndexExercise));

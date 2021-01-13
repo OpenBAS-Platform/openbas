@@ -11,8 +11,8 @@ import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
 /* eslint-disable */
-import { addComcheck } from '../../../../actions/Comcheck';
-import { redirectToComcheck } from '../../../../actions/Application';
+import { addComcheck } from "../../../../actions/Comcheck";
+import { redirectToComcheck } from "../../../../actions/Application";
 /* eslint-enable */
 import ComcheckForm from './ComcheckForm';
 
@@ -66,7 +66,6 @@ class DryrunsPopover extends Component {
   }
 
   submitFormLaunch() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.comcheckForm.submit();
   }
 
@@ -77,16 +76,12 @@ class DryrunsPopover extends Component {
   render() {
     const initialComcheckValues = {
       comcheck_subject: this.t('Communication check'),
-      comcheck_message:
-        `${this.t('Hello')
-        },<br /><br />${
-          this.t(
-            'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
-          )}`,
-      comcheck_footer:
-        `${this.t('Best regards')
-        },<br />${
-          this.t('The exercise control Team')}`,
+      comcheck_message: `${this.t('Hello')},<br /><br />${this.t(
+        'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
+      )}`,
+      comcheck_footer: `${this.t('Best regards')},<br />${this.t(
+        'The exercise control Team',
+      )}`,
     };
 
     const launchActions = [

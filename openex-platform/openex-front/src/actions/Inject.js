@@ -31,56 +31,28 @@ export const updateInject = (
   injectId,
   data,
 ) => (dispatch) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/events/${
-    eventId
-  }/incidents/${
-    incidentId
-  }/injects/${
-    injectId}`;
+  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects/${injectId}`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
 export const addInject = (exerciseId, eventId, incidentId, data) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/events/${
-    eventId
-  }/incidents/${
-    incidentId
-  }/injects`;
+  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects`;
   return postReferential(schema.inject, uri, data)(dispatch);
 };
 
 export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/events/${
-    eventId
-  }/incidents/${
-    incidentId
-  }/injects/${
-    injectId}`;
+  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
 };
 
 export const tryInject = (exerciseId, eventId, incidentId, injectId) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/events/${
-    eventId
-  }/incidents/${
-    incidentId
-  }/injects/${
-    injectId
-  }/try`;
+  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects/${injectId}/try`;
   return postReferential(null, uri, null)(dispatch);
 };
 
@@ -108,10 +80,7 @@ export const fetchInjectTypesExerciseSimple = () => (dispatch) => getReferential
   '/api/inject_types',
 )(dispatch);
 
-export const fetchInjectTypes = () => (dispatch) => getReferential(
-  schema.arrayOfInjectTypes,
-  '/api/inject_types',
-)(dispatch);
+export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
 
 export const injectDone = (injectId) => (dispatch) => {
   const data = { status: 'SUCCESS', message: ['Manual validation'] };

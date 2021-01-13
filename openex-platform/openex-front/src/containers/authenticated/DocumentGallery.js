@@ -173,13 +173,11 @@ class DocumentGallery extends Component {
   }
 
   openFileDialog() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
-    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props.addDocument(data).then((document) => {
       this.props.getDocument(document.result).then((finalDocument) => {
@@ -346,9 +344,9 @@ class DocumentGallery extends Component {
               styletype={Constants.FIELD_TYPE_RIGHT}
             />
           </div>
-          <div className="clearfix"/>
+          <div className="clearfix" />
         </div>
-        <div className="clearfix"/>
+        <div className="clearfix" />
         <div style={styles.searchDivTitle}>
           <T>Search by</T>
         </div>
@@ -402,7 +400,7 @@ class DocumentGallery extends Component {
               )}
           </div>
         </div>
-        <div className="clearfix"/>
+        <div className="clearfix" />
         <div style={styles.divDocuments}>
           <div style={styles.divDocumentsListe}>
             <div style={styles.divDocumentsTitle}>

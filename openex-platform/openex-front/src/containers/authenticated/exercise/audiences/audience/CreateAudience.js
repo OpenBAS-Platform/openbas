@@ -36,7 +36,6 @@ class CreateAudience extends Component {
   }
 
   submitForm() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.audienceForm.submit();
   }
 

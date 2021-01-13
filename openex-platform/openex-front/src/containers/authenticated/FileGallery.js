@@ -54,13 +54,11 @@ class FileGallery extends Component {
   }
 
   openFileDialog() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
-    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props.addFile(data);
   }
@@ -160,7 +158,7 @@ class FileGallery extends Component {
         <input
           type="file"
           ref="fileUpload"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
           onChange={this.handleFileChange.bind(this)}
         />
         {/* eslint-enable */}

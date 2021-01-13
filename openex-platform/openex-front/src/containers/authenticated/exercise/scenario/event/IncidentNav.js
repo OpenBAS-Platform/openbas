@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as Constants from '../../../../../constants/ComponentTypes';
 /* eslint-disable */
-import { selectIncident } from '../../../../../actions/Incident';
-import { Drawer } from '../../../../../components/Drawer';
-import { List } from '../../../../../components/List';
-import { ListItemLink } from '../../../../../components/list/ListItem';
-import { Icon } from '../../../../../components/Icon';
-import CreateIncident from './CreateIncident';
+import { selectIncident } from "../../../../../actions/Incident";
+import { Drawer } from "../../../../../components/Drawer";
+import { List } from "../../../../../components/List";
+import { ListItemLink } from "../../../../../components/list/ListItem";
+import { Icon } from "../../../../../components/Icon";
+import CreateIncident from "./CreateIncident";
 /* eslint-enable */
 
 class IncidentNav extends Component {
@@ -38,17 +38,17 @@ class IncidentNav extends Component {
         />
         <List>
           {this.props.incidents.map((incident) => (
-              <ListItemLink
-                type={Constants.LIST_ITEM_NOSPACE}
-                key={incident.incident_id}
-                active={this.props.selectedIncident === incident.incident_id}
-                onClick={this.handleChangeIncident.bind(
-                  this,
-                  incident.incident_id,
-                )}
-                label={incident.incident_title}
-                leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS} />}
-              />
+            <ListItemLink
+              type={Constants.LIST_ITEM_NOSPACE}
+              key={incident.incident_id}
+              active={this.props.selectedIncident === incident.incident_id}
+              onClick={this.handleChangeIncident.bind(
+                this,
+                incident.incident_id,
+              )}
+              label={incident.incident_title}
+              leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS} />}
+            />
           ))}
         </List>
       </Drawer>

@@ -4,10 +4,9 @@ import PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router';
 import { i18nRegister } from '../../../utils/Messages';
 import { T } from '../../../components/I18n';
-import { redirectToAdmin, toggleLeftBar } from '../../../actions/Application';
+import { redirectToAdmin } from '../../../actions/Application';
 import * as Constants from '../../../constants/ComponentTypes';
 import AppBar from '../../../components/AppBar';
-import NavBar from './nav/NavBar';
 import LeftBar from './nav/LeftBar';
 import UserPopover from '../UserPopover';
 import IndexAdmin from './Index';
@@ -57,7 +56,6 @@ class RootAuthenticated extends Component {
           iconElementRight={<UserPopover />}
           showMenuIconButton={false}
         />
-        <NavBar pathname={this.props.pathname} />
         <LeftBar pathname={this.props.pathname} />
 
         <Switch>
@@ -87,6 +85,4 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, { redirectToAdmin, toggleLeftBar })(
-  RootAuthenticated,
-);
+export default connect(select, { redirectToAdmin })(RootAuthenticated);

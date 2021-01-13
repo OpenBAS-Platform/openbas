@@ -4,9 +4,7 @@ import MUIPaper from '@material-ui/core/Paper';
 import * as Constants from '../constants/ComponentTypes';
 
 const paperStyle = {
-  [Constants.PAPER_TYPE_EXERCISE]: {
-
-  },
+  [Constants.PAPER_TYPE_EXERCISE]: {},
   [Constants.PAPER_TYPE_EVENT]: {
     display: 'inline-block',
     margin: '20px 20px 20px 20px',

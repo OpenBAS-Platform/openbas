@@ -19,9 +19,7 @@ export const timeDiff = (start, end) => parse(start).diff(parse(end));
 
 export const timeFormat = (data) => (data ? parse(data).format(timeDateFormat) : '-');
 
-export const dateFormat = (data, specificFormat) => (data
-  ? parse(data).format(specificFormat || openexDateFormat)
-  : '-');
+export const dateFormat = (data, specificFormat) => (data ? parse(data).format(specificFormat || openexDateFormat) : '-');
 
 export const dateToISO = (date) => {
   const momentDate = parse(date, openexDateFormat, true);

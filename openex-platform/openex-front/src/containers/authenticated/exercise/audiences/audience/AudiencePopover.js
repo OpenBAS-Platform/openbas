@@ -180,7 +180,6 @@ class AudiencePopover extends Component {
   }
 
   submitFormEdit() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.audienceForm.submit();
   }
 
@@ -196,7 +195,6 @@ class AudiencePopover extends Component {
   }
 
   submitFormComcheck() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.comCheck.submit();
   }
 

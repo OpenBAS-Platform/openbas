@@ -37,7 +37,6 @@ class CreateUser extends Component {
   }
 
   submitFormCreate() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.userForm.submit();
   }
 

@@ -13,7 +13,10 @@ const initialState = {
     logged: JSON.parse(localStorage.getItem('logged')),
     worker: { status: 'RUNNING' },
   }),
-  screen: Immutable({ navbar_left_open: false, navbar_right_open: true }),
+  screen: Immutable({
+    navbar_left_unfolding: true,
+    navbar_left_configuration: true,
+  }),
   referential: entitiesInitializer,
 };
 
@@ -21,7 +24,7 @@ export const history = createBrowserHistory();
 
 const logger = createLogger({
   predicate: (getState, action) => !action.type.startsWith('DATA_FETCH')
-        && !action.type.startsWith('@@redux-form'),
+    && !action.type.startsWith('@@redux-form'),
 });
 
 const initStore = () => {

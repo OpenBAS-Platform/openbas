@@ -30,7 +30,6 @@ class UserForm extends Component {
       (val) => val.organization_name,
       R.values(this.props.organizations),
     );
-
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <FormField

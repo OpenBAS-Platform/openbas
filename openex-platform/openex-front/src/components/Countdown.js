@@ -59,9 +59,9 @@ class Countdown extends Component {
       );
     }
     return (
-        <span style={styles[this.props.type]}>
-          ({dateFromNow(this.props.targetDate)})
-        </span>
+      <span style={styles[this.props.type]}>
+        ({dateFromNow(this.props.targetDate)})
+      </span>
     );
   }
 }

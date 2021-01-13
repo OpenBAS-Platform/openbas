@@ -17,34 +17,20 @@ export const updateSubobjective = (
   subobjectiveId,
   data,
 ) => (dispatch) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/objectives/${
-    objectiveId
-  }/subobjectives/${
-    subobjectiveId}`;
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/subobjectives/${subobjectiveId}`;
   return putReferential(schema.subobjective, uri, data)(dispatch);
 };
 
 export const addSubobjective = (exerciseId, objectiveId, data) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/objectives/${
-    objectiveId
-  }/subobjectives`;
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/subobjectives`;
   return postReferential(schema.subobjective, uri, data)(dispatch);
 };
 
 export const deleteSubobjective = (exerciseId, objectiveId, subobjectiveId) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/objectives/${
-    objectiveId
-  }/subobjectives/${
-    subobjectiveId}`;
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/subobjectives/${subobjectiveId}`;
   return delReferential(uri, 'subobjectives', subobjectiveId)(dispatch);
 };

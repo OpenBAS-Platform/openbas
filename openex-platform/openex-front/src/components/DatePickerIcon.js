@@ -117,7 +117,8 @@ class DatePickerIcon extends Component {
           </div>
         </div>
       );
-    } if (!this.props.enableDate && this.props.enableTime) {
+    }
+    if (!this.props.enableDate && this.props.enableTime) {
       return (
         <div style={styles.newInputDate.inputDateTimeLine}>
           <div style={styles.newInputDate.inputOnlyTimeIcon}>
@@ -151,75 +152,75 @@ class DatePickerIcon extends Component {
       );
     }
     return (
-        <div style={styles.newInputDate.inputDateTimeLine}>
-          <div style={styles.newInputDate.inputDateColumn}>
-            <div style={styles.newInputDate.inputDateIcon}>
-              <span
-                style={styles.newInputDate.iconCalendar}
-                ref={this.props.refIconDateOnly}
-                handleResult={this.props.replaceStartDateValue}
-                onClick={this.raiseDatePicker.bind(this)}
-              >
-                <Icon name={Constants.ICON_NAME_DATE_RANGE} />
-              </span>
-            </div>
-            <div style={styles.newInputDate.inputDateField}>
-              <FormField
-                fullWidth={true}
-                ref={this.props.refFieldDateOnly}
-                onChange={this.handleChange}
-                name={this.props.nameFieldDateOnly}
-                type="text"
-                label={this.props.labelFieldDateOnly}
-                hint="JJ/MM/AAAA"
-              />
-              <DateTimePicker
-                ref={this.props.refIconDateOnly}
-                handleResult={this.props.replaceStartDateValue}
-                onClick={this.raiseDatePicker.bind(this)}
-                defaultDate={this.props.defaultDate}
-              />
-            </div>
+      <div style={styles.newInputDate.inputDateTimeLine}>
+        <div style={styles.newInputDate.inputDateColumn}>
+          <div style={styles.newInputDate.inputDateIcon}>
+            <span
+              style={styles.newInputDate.iconCalendar}
+              ref={this.props.refIconDateOnly}
+              handleResult={this.props.replaceStartDateValue}
+              onClick={this.raiseDatePicker.bind(this)}
+            >
+              <Icon name={Constants.ICON_NAME_DATE_RANGE} />
+            </span>
           </div>
-
-          <div style={styles.newInputDate.inputTimeColumn}>
-            <div style={styles.newInputDate.inputDateIcon}>
-              <span
-                style={styles.newInputDate.iconCalendar}
-                ref={this.props.refIconTime}
-                handleResult={this.props.replaceStartTimeValue}
-                onClick={this.raiseTimePicker.bind(this)}
-              >
-                <Icon name={Constants.ICON_NAME_ACCESS_TIME} />
-              </span>
-            </div>
-            <div style={styles.newInputDate.inputDateField}>
-              <FormField
-                fullWidth={true}
-                ref={this.props.refFieldTime}
-                onChange={this.handleChange}
-                name={this.props.nameFieldTime}
-                type="text"
-                label={this.props.labelFieldTime}
-                hint="HH:MM"
-              />
-              <DateTimePicker
-                ref={this.props.refIconTime}
-                handleResult={this.props.replaceStartTimeValue}
-                onClick={this.raiseTimePicker.bind(this)}
-                defaultDate={this.props.defaultTime}
-              />
-            </div>
-          </div>
-
-          <div style={styles.fullDate}>
+          <div style={styles.newInputDate.inputDateField}>
             <FormField
-              ref={this.props.nameFullDate}
-              name={this.props.nameFullDate}
-              type="hidden"
+              fullWidth={true}
+              ref={this.props.refFieldDateOnly}
+              onChange={this.handleChange}
+              name={this.props.nameFieldDateOnly}
+              type="text"
+              label={this.props.labelFieldDateOnly}
+              hint="JJ/MM/AAAA"
+            />
+            <DateTimePicker
+              ref={this.props.refIconDateOnly}
+              handleResult={this.props.replaceStartDateValue}
+              onClick={this.raiseDatePicker.bind(this)}
+              defaultDate={this.props.defaultDate}
             />
           </div>
         </div>
+
+        <div style={styles.newInputDate.inputTimeColumn}>
+          <div style={styles.newInputDate.inputDateIcon}>
+            <span
+              style={styles.newInputDate.iconCalendar}
+              ref={this.props.refIconTime}
+              handleResult={this.props.replaceStartTimeValue}
+              onClick={this.raiseTimePicker.bind(this)}
+            >
+              <Icon name={Constants.ICON_NAME_ACCESS_TIME} />
+            </span>
+          </div>
+          <div style={styles.newInputDate.inputDateField}>
+            <FormField
+              fullWidth={true}
+              ref={this.props.refFieldTime}
+              onChange={this.handleChange}
+              name={this.props.nameFieldTime}
+              type="text"
+              label={this.props.labelFieldTime}
+              hint="HH:MM"
+            />
+            <DateTimePicker
+              ref={this.props.refIconTime}
+              handleResult={this.props.replaceStartTimeValue}
+              onClick={this.raiseTimePicker.bind(this)}
+              defaultDate={this.props.defaultTime}
+            />
+          </div>
+        </div>
+
+        <div style={styles.fullDate}>
+          <FormField
+            ref={this.props.nameFullDate}
+            name={this.props.nameFullDate}
+            type="hidden"
+          />
+        </div>
+      </div>
     );
   }
 }

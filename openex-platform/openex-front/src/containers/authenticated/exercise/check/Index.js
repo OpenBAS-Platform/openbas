@@ -176,7 +176,7 @@ class IndexExcerciseDryrun extends Component {
                       <div style={styles.dryrun_date}>
                         {dateFormat(comcheck.comcheck_start_date)}
                       </div>
-                      <div className="clearfix"/>
+                      <div className="clearfix" />
                     </div>
                   }
                   leftIcon={

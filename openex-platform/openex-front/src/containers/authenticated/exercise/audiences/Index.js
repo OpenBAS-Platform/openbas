@@ -89,7 +89,7 @@ class IndexAudiences extends Component {
             styletype={Constants.FIELD_TYPE_RIGHT}
           />
         </div>
-        <div className="clearfix"/>
+        <div className="clearfix" />
         {this.props.audiences.length === 0 ? (
           <div style={styles.empty}>
             <T>You do not have any audiences in this exercise.</T>

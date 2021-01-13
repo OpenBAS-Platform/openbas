@@ -60,7 +60,6 @@ class CreateIncident extends Component {
 
   handleNext() {
     if (this.state.stepIndex === 0) {
-      // eslint-disable-next-line react/no-string-refs
       this.refs.incidentForm.submit();
     } else if (this.state.stepIndex === 1) {
       this.createIncident();

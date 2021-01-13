@@ -82,7 +82,6 @@ class SubobjectivePopover extends Component {
   }
 
   submitFormEdit() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.subobjectiveForm.submit();
   }
 

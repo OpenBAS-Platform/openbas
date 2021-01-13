@@ -16,7 +16,10 @@ export const updateUser = (userId, data) => (dispatch) => putReferential(
   `/api/users/${userId}`,
   data,
 )(dispatch).then((finalData) => {
-  dispatch({ type: Constants.LANG_UPDATE_ON_USER_CHANGE, payload: finalData });
+  dispatch({
+    type: Constants.LANG_UPDATE_ON_USER_CHANGE,
+    payload: finalData,
+  });
 });
 
 export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);

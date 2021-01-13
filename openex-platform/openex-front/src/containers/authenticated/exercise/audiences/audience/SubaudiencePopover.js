@@ -83,7 +83,6 @@ class SubaudiencePopover extends Component {
   }
 
   submitFormEdit() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.subaudienceForm.submit();
   }
 

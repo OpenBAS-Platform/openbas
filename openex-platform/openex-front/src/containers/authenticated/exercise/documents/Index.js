@@ -304,13 +304,11 @@ class Index extends Component {
   }
 
   openFileDialog() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
-    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props.addDocument(data).then((documentId) => {
       this.props.getDocument(documentId.result).then((document) => {
@@ -339,7 +337,6 @@ class Index extends Component {
   }
 
   handleEditDocumentEditTag() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.documentForm.submit();
     this.handleCloseEditDocument();
     this.handleEditDocumentTag(this.state.selectedDocument.document_id);
@@ -383,7 +380,6 @@ class Index extends Component {
   }
 
   submitEditDocument() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.documentForm.submit();
   }
 

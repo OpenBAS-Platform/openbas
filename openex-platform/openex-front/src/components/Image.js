@@ -32,10 +32,9 @@ class ReactBackgroundImage extends Component {
   buildStyle() {
     return {
       ...this.props.style,
-      backgroundImage:
-        `url("${
-          this.state.imgData ? this.state.imgData : '/images/file_icon.png'
-        }")`,
+      backgroundImage: `url("${
+        this.state.imgData ? this.state.imgData : '/images/file_icon.png'
+      }")`,
       backgroundSize: '100%',
       backgroundRepeat: 'none',
       backgroundPosition: 'top',

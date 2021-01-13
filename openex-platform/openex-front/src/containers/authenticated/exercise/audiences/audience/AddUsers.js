@@ -179,7 +179,7 @@ class AddUsers extends Component {
                 {user.user_firstname} {user.user_lastname}
               </Chip>
             ))}
-            <div className="clearfix"/>
+            <div className="clearfix" />
           </div>
           <div>
             <List>

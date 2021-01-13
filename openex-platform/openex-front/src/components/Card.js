@@ -50,7 +50,9 @@ CardTitle.propTypes = {
   subtitleColor: PropTypes.string,
 };
 
-export const CardText = (props) => <MUICardContent>{props.children}</MUICardContent>;
+export const CardText = (props) => (
+  <MUICardContent>{props.children}</MUICardContent>
+);
 
 CardText.propTypes = {
   children: PropTypes.node,

@@ -52,8 +52,8 @@ div.line li:last-child {
   margin-right: 0;
 }
 
-div.line li::before{
-  content: '';
+div.line li::before {
+  content: "";
   position: absolute;
   top: 4px;
   left: -200px;

@@ -135,7 +135,6 @@ class EventPopover extends Component {
   }
 
   submitFormEdit() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.eventForm.submit();
   }
 
@@ -156,13 +155,11 @@ class EventPopover extends Component {
   }
 
   openFileDialog() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.fileUpload.click();
   }
 
   handleFileChange() {
     const data = new FormData();
-    // eslint-disable-next-line react/no-string-refs
     data.append('file', this.refs.fileUpload.files[0]);
     this.props
       .importEvent(this.props.exerciseId, this.props.eventId, data)
@@ -182,7 +179,6 @@ class EventPopover extends Component {
       this.props.event,
     );
     const { userCanUpdate } = this.props;
-
     const editActions = [
       <FlatButton
         key="cancel"
@@ -219,14 +215,12 @@ class EventPopover extends Component {
         ''
       ),
     ];
-
     const initialValues = R.pick(
       ['event_title', 'event_description', 'event_order'],
       this.props.event,
     );
     const { exerciseOwnerId } = this.props;
     const { userId } = this.props;
-
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -309,14 +303,12 @@ class EventPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          {/* eslint-disable */}
           <EventForm
             ref="eventForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
       </div>
     );

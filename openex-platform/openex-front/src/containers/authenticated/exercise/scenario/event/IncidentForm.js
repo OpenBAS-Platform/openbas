@@ -56,11 +56,11 @@ class IncidentForm extends Component {
         />
         <Select label={<T>Type</T>} name="incident_type" fullWidth={true}>
           {R.values(this.props.types).map((type) => (
-              <MenuItem
-                key={type.type_id}
-                value={type.type_id}
-                primaryText={<T>{type.type_name}</T>}
-              />
+            <MenuItem
+              key={type.type_id}
+              value={type.type_id}
+              primaryText={<T>{type.type_name}</T>}
+            />
           ))}
         </Select>
         <Select
@@ -69,11 +69,11 @@ class IncidentForm extends Component {
           fullWidth={true}
         >
           {weights.map((weight) => (
-              <MenuItem
-                key={weight.weight_id}
-                value={weight.weight_id}
-                primaryText={<T>{weight.weight_name}</T>}
-              />
+            <MenuItem
+              key={weight.weight_id}
+              value={weight.weight_id}
+              primaryText={<T>{weight.weight_name}</T>}
+            />
           ))}
         </Select>
         <FormField

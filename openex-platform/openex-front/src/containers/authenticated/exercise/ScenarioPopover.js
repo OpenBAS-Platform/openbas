@@ -316,7 +316,6 @@ class ScenarioPopover extends Component {
   }
 
   submitFormShift() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.shiftForm.submit();
   }
 

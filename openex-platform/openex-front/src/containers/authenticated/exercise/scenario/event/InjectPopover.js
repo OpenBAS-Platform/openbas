@@ -209,11 +209,9 @@ class InjectPopover extends Component {
   submitFormEdit() {
     switch (this.state.stepIndex) {
       case 0:
-        // eslint-disable-next-line react/no-string-refs
         this.refs.injectForm.submit();
         break;
       case 1:
-        // eslint-disable-next-line react/no-string-refs
         this.refs.contentForm.getWrappedInstance().submit();
         break;
       case 2:
@@ -351,7 +349,6 @@ class InjectPopover extends Component {
   }
 
   submitFormCopy() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.copyForm.submit();
   }
 

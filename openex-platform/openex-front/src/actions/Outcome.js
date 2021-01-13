@@ -9,13 +9,6 @@ export const updateOutcome = (
   outcomeId,
   data,
 ) => (dispatch) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/events/${
-    eventId
-  }/incidents/${
-    incidentId
-  }/outcome/${
-    outcomeId}`;
+  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/outcome/${outcomeId}`;
   return putReferential(schema.incident, uri, data)(dispatch);
 };

@@ -106,7 +106,6 @@ class ExercisePopover extends Component {
   }
 
   submitFormDryrun() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.dryrunForm.submit();
   }
 

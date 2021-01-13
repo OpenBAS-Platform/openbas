@@ -7,19 +7,19 @@ const renderDateTimePicker = ({
   meta: { submitting, error, touched },
   ...others
 }) => (
-    <KeyboardDateTimePicker
-      {...inputProps}
-      {...others}
-      format="yyyy-MM-dd HH:mm:ss"
-      value={value ? new Date(value) : null}
-      disabled={submitting}
-      onBlur={() => onBlur(value ? new Date(value).toISOString() : null)}
-      error={error && touched}
-      onChange={(date) => (Date.parse(date)
-        ? inputProps.onChange(date.toISOString())
-        : inputProps.onChange(null))
-      }
-    />
+  <KeyboardDateTimePicker
+    {...inputProps}
+    {...others}
+    format="yyyy-MM-dd HH:mm:ss"
+    value={value ? new Date(value) : null}
+    disabled={submitting}
+    onBlur={() => onBlur(value ? new Date(value).toISOString() : null)}
+    error={error && touched}
+    onChange={(date) => (Date.parse(date)
+      ? inputProps.onChange(date.toISOString())
+      : inputProps.onChange(null))
+    }
+  />
 );
 
 // eslint-disable-next-line import/prefer-default-export

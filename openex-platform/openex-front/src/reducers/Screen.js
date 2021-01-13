@@ -47,12 +47,18 @@ const screen = (state = Immutable({}), action) => {
       );
     }
 
-    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_SUBMITTED: {
-      return state.setIn(['navbar_left_open'], !state.navbar_left_open);
+    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_UNFOLDING: {
+      return state.setIn(
+        ['navbar_left_unfolding'],
+        !state.navbar_left_unfolding,
+      );
     }
 
-    case Constants.APPLICATION_NAVBAR_RIGHT_TOGGLE_SUBMITTED: {
-      return state.setIn(['navbar_right_open'], !state.navbar_right_open);
+    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_CONFIGURATION: {
+      return state.setIn(
+        ['navbar_left_configuration'],
+        !state.navbar_left_configuration,
+      );
     }
 
     default: {

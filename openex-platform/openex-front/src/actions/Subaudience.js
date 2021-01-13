@@ -18,13 +18,7 @@ export const downloadExportSubaudience = (
   audienceId,
   subaudienceId,
 ) => (dispatch) => fileSave(
-  `/api/exercises/${
-    exerciseId
-  }/audiences/${
-    audienceId
-  }/subaudiences/${
-    subaudienceId
-  }/users.xlsx`,
+  `/api/exercises/${exerciseId}/audiences/${audienceId}/subaudiences/${subaudienceId}/users.xlsx`,
 )(dispatch);
 
 export const updateSubaudience = (
@@ -33,33 +27,19 @@ export const updateSubaudience = (
   subaudienceId,
   data,
 ) => (dispatch) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/audiences/${
-    audienceId
-  }/subaudiences/${
-    subaudienceId}`;
+  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/subaudiences/${subaudienceId}`;
   return putReferential(schema.subaudience, uri, data)(dispatch);
 };
 
 export const addSubaudience = (exerciseId, audienceId, data) => (dispatch) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/audiences/${
-    audienceId
-  }/subaudiences`;
+  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/subaudiences`;
   return postReferential(schema.subaudience, uri, data)(dispatch);
 };
 
 export const deleteSubaudience = (exerciseId, audienceId, subaudienceId) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${
-    exerciseId
-  }/audiences/${
-    audienceId
-  }/subaudiences/${
-    subaudienceId}`;
+  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/subaudiences/${subaudienceId}`;
   return delReferential(uri, 'subaudiences', subaudienceId)(dispatch);
 };
 

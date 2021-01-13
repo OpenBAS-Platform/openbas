@@ -22,9 +22,7 @@ export const downloadExportAudiences = (exerciseId) => (dispatch) => fileSave(
   'audiences.xlsx',
 )(dispatch);
 
-export const downloadExportAudience = (exerciseId, audienceId) => (
-  dispatch,
-) => fileSave(
+export const downloadExportAudience = (exerciseId, audienceId) => (dispatch) => fileSave(
   `/api/exercises/${exerciseId}/audiences/${audienceId}/users.xlsx`,
   'users.xlsx',
 )(dispatch);

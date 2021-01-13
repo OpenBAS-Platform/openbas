@@ -243,7 +243,7 @@ class IndexExerciseLessons extends Component {
           ) : (
             ''
           )}
-          <div className="clearfix"/>
+          <div className="clearfix" />
           {this.props.logs.length === 0 ? (
             <div style={styles.empty}>
               <T>You do not have any entries in the exercise log.</T>
@@ -265,7 +265,7 @@ class IndexExerciseLessons extends Component {
                     <div style={styles.log_date}>
                       {dateFormat(log.log_date)}
                     </div>
-                    <div className="clearfix"/>
+                    <div className="clearfix" />
                   </div>
                 }
                 secondaryText={

@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
+import CardActionArea from '@material-ui/core/CardActionArea';
 import Grid from '@material-ui/core/Grid';
 import { Image } from './Image';
 
@@ -68,27 +70,34 @@ const Exercise = (props) => {
   return (
     <Grid item xs={3}>
       <Card className={classes.container} variant="outlined">
-        <CardHeader title={props.name} subheader={props.subtitle} />
-        <CardContent style={{ padding: 0, marginBottom: 40 }}>
-          <div className={classes.line}>
-            <div className={classes.dateLeft}>{props.startDate}</div>
-            <div className="line">
-              <ul>
-                <li> &nbsp; </li>
-                <li> &nbsp; </li>
-              </ul>
+        <CardActionArea
+          classes={{ root: classes.area }}
+          component={Link}
+          to={`/private/exercise/${props.id}`}
+        >
+          <CardHeader title={props.name} subheader={props.subtitle} />
+          <CardContent style={{ padding: 0, marginBottom: 40 }}>
+            <div className={classes.line}>
+              <div className={classes.dateLeft}>{props.startDate}</div>
+              <div className="line">
+                <ul>
+                  <li> &nbsp; </li>
+                  <li> &nbsp; </li>
+                </ul>
+              </div>
+              <div className={classes.dateRight}>{props.endDate}</div>
+              <div className="clearfix" />
             </div>
-            <div className={classes.dateRight}>{props.endDate}</div>
-            <div className="clearfix" />
-          </div>
-        </CardContent>
-        <Image image_id={props.image_id} style={{ width: '100%' }} />
+          </CardContent>
+          <Image image_id={props.image_id} style={{ width: '100%' }} />
+        </CardActionArea>
       </Card>
     </Grid>
   );
 };
 
 Exercise.propTypes = {
+  id: PropTypes.string,
   name: PropTypes.string,
   subtitle: PropTypes.string,
   description: PropTypes.string,

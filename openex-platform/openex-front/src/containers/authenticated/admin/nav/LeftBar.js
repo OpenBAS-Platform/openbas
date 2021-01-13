@@ -8,10 +8,7 @@ import { ListItemLink } from '../../../../components/list/ListItem';
 import AppBar from '../../../../components/AppBar';
 import { Icon } from '../../../../components/Icon';
 import { i18nRegister } from '../../../../utils/Messages';
-import {
-  redirectToAdmin,
-  toggleLeftBar,
-} from '../../../../actions/Application';
+import { redirectToAdmin } from '../../../../actions/Application';
 
 i18nRegister({
   fr: {
@@ -88,7 +85,6 @@ class LeftBar extends Component {
 
 LeftBar.propTypes = {
   pathname: PropTypes.string.isRequired,
-  toggleLeftBar: PropTypes.func,
   open: PropTypes.bool,
   redirectToAdmin: PropTypes.func,
 };
@@ -97,4 +93,4 @@ const select = (state) => ({
   open: state.screen.navbar_left_open,
 });
 
-export default connect(select, { redirectToAdmin, toggleLeftBar })(LeftBar);
+export default connect(select, { redirectToAdmin })(LeftBar);

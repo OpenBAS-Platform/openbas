@@ -144,11 +144,9 @@ class CreateInject extends Component {
   handleNext() {
     switch (this.state.stepIndex) {
       case 0:
-        // eslint-disable-next-line react/no-string-refs
         this.refs.injectForm.submit();
         break;
       case 1:
-        // eslint-disable-next-line react/no-string-refs
         this.refs.contentForm.getWrappedInstance().submit();
         break;
       case 2:

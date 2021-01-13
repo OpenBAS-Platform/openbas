@@ -29,11 +29,11 @@ class CopyForm extends Component {
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <Select label="Incident" name="incident_id" fullWidth={true}>
           {R.values(this.props.incidents).map((data) => (
-              <MenuItem
-                key={data.incident_id}
-                value={data.incident_id}
-                primaryText={data.incident_title}
-              />
+            <MenuItem
+              key={data.incident_id}
+              value={data.incident_id}
+              primaryText={data.incident_title}
+            />
           ))}
         </Select>
       </form>

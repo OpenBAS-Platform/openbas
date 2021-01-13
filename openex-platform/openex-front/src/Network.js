@@ -14,7 +14,7 @@ export const api = (schema) => {
     withCredentials: true,
     headers: { 'X-Authorization-Token': token, responseType: 'json' },
   });
-    // Intercept to apply schema and test unauthorized users
+  // Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(
     (response) => {
       const toImmutable = response.config.responseType === undefined; //= == json

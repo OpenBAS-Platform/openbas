@@ -60,6 +60,7 @@ class IndexAuthenticated extends Component {
             return (
               <Exercise
                 key={exercise.exercise_id}
+                id={exercise.exercise_id}
                 name={exercise.exercise_name}
                 subtitle={exercise.exercise_subtitle}
                 description={exercise.exercise_description}

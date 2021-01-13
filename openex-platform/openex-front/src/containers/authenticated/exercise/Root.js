@@ -2,18 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Route, Switch } from 'react-router';
-import {
-  redirectToExercise,
-  toggleLeftBar,
-} from '../../../actions/Application';
-import * as Constants from '../../../constants/ComponentTypes';
-import AppBar from '../../../components/AppBar';
-import { Chip } from '../../../components/Chip';
-import { T } from '../../../components/I18n';
-import NavBar from './nav/NavBar';
+import { Route, Switch, withRouter } from 'react-router';
+import { redirectToExercise } from '../../../actions/Application';
 import LeftBar from './nav/LeftBar';
-import UserPopover from '../UserPopover';
 import { fetchExercise } from '../../../actions/Exercise';
 import IndexExercise from './Index';
 import IndexExerciseExecution from './execution/Index';
@@ -29,26 +20,10 @@ import IndexExerciseAudiencesAudience from './audiences/audience/Index';
 import IndexExerciseDocuments from './documents/Index';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
-import IndexUserProfile from '../profile/Index';
-
-const styles = {
-  root: {
-    padding: '80px 20px 0 85px',
-  },
-  title: {
-    fontVariant: 'small-caps',
-    display: 'block',
-    float: 'left',
-  },
-};
 
 class RootAuthenticated extends Component {
   componentDidMount() {
     this.props.fetchExercise(this.props.id);
-  }
-
-  toggleLeftBar() {
-    this.props.toggleLeftBar();
   }
 
   redirectToExercise() {
@@ -57,35 +32,7 @@ class RootAuthenticated extends Component {
 
   render() {
     return (
-      <div>
-        <AppBar
-          title={
-            <div>
-              <span style={styles.title}>
-                {R.propOr('-', 'exercise_name', this.props.exercise)}
-              </span>
-              <Chip
-                backgroundColor="#C5CAE9"
-                type={Constants.CHIP_TYPE_FLOATING}
-              >
-                <T>{R.propOr('-', 'exercise_status', this.props.exercise)}</T>
-              </Chip>
-            </div>
-          }
-          type={Constants.APPBAR_TYPE_TOPBAR}
-          onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
-          iconElementRight={<UserPopover exerciseId={this.props.id} />}
-          showMenuIconButton={false}
-        />
-        <NavBar
-          id={this.props.id}
-          pathname={this.props.pathname}
-          exercise_type={R.propOr(
-            'standard',
-            'exercise_type',
-            this.props.exercise,
-          )}
-        />
+      <div style={{ paddingLeft: 180 }}>
         <LeftBar
           id={this.props.id}
           pathname={this.props.pathname}
@@ -95,38 +42,85 @@ class RootAuthenticated extends Component {
             this.props.exercise,
           )}
         />
-        <div style={styles.root}>
-          <Switch>
-            <Route exact path="/private/exercise/:exerciseId" component={IndexExercise} />
-            <Route path="execution" component={IndexExerciseExecution} />
-            <Route path="lessons" component={IndexExerciseLessons} />
-            <Route path="checks" component={IndexExerciseChecks} />
-            <Route
-                path="checks/dryrun/:dryrunId"
-                component={IndexExerciseDryrun}
-            />
-            <Route
-                path="checks/comcheck/:comcheckId"
-                component={IndexExerciseComcheck}
-            />
-            <Route path="objectives" component={IndexExerciseObjectives} />
-            <Route path="scenario" component={IndexExerciseScenario} />
-            <Route
-                path="scenario/:eventId"
-                component={IndexExerciseScenarioEvent}
-            />
-            <Route path="audiences" component={IndexExerciseAudiences} />
-            <Route
-                path="audiences/:audienceId"
-                component={IndexExerciseAudiencesAudience}
-            />
-            <Route path="calendar" component={IndexExercise} />
-            <Route path="documents" component={IndexExerciseDocuments} />
-            <Route path="statistics" component={IndexExerciseStatistics} />
-            <Route path="settings" component={IndexExerciseSettings} />
-            <Route path="profile" component={IndexUserProfile} />
-          </Switch>
-        </div>
+        <Switch>
+          <Route
+            exact
+            path="/private/exercise/:exerciseId"
+            component={() => <IndexExercise id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/execution"
+            component={() => <IndexExerciseExecution id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/lessons"
+            component={() => <IndexExerciseLessons id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/checks"
+            component={() => <IndexExerciseChecks id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/checks/dryrun/:dryrunId"
+            component={() => <IndexExerciseDryrun id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/checks/comcheck/:comcheckId"
+            component={() => <IndexExerciseComcheck id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/objectives"
+            component={() => <IndexExerciseObjectives id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/scenario"
+            component={() => <IndexExerciseScenario id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/scenario/:eventId"
+            component={() => <IndexExerciseScenarioEvent id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/audiences"
+            component={() => <IndexExerciseAudiences id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/audiences/:audienceId"
+            component={() => (
+              <IndexExerciseAudiencesAudience id={this.props.id} />
+            )}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/calendar"
+            component={() => <IndexExercise id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/documents"
+            component={() => <IndexExerciseDocuments id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/statistics"
+            component={() => <IndexExerciseStatistics id={this.props.id} />}
+          />
+          <Route
+            exact
+            path="/private/exercise/:exerciseId/settings"
+            component={() => <IndexExerciseSettings id={this.props.id} />}
+          />
+        </Switch>
       </div>
     );
   }
@@ -146,7 +140,7 @@ RootAuthenticated.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { exerciseId } = ownProps.match.params;
   const { pathname } = ownProps.location;
   return {
     id: exerciseId,
@@ -155,8 +149,10 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  redirectToExercise,
-  toggleLeftBar,
-  fetchExercise,
-})(RootAuthenticated);
+export default R.compose(
+  connect(select, {
+    redirectToExercise,
+    fetchExercise,
+  }),
+  withRouter,
+)(RootAuthenticated);

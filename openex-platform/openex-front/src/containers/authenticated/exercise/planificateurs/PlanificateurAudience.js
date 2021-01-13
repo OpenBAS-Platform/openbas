@@ -82,19 +82,17 @@ const PlanificateurAudience = ({
           </TableHead>
           <TableBody displayRowCheckbox={false}>
             {R.values(planificateursAudience).map((planificateur) => (
-                <TableRow key={planificateur.user_id}>
-                  <TableCell>
-                    {planificateur.user_firstname}
-                  </TableCell>
-                  <TableCell>{planificateur.user_lastname}</TableCell>
-                  <TableCell>{planificateur.user_email}</TableCell>
-                  <TableCell>
-                    <Checkbox
-                      defaultChecked={planificateur.is_planificateur_audience}
-                      onCheck={handleCheck(planificateur.user_id, audienceId)}
-                    />
-                  </TableCell>
-                </TableRow>
+              <TableRow key={planificateur.user_id}>
+                <TableCell>{planificateur.user_firstname}</TableCell>
+                <TableCell>{planificateur.user_lastname}</TableCell>
+                <TableCell>{planificateur.user_email}</TableCell>
+                <TableCell>
+                  <Checkbox
+                    defaultChecked={planificateur.is_planificateur_audience}
+                    onCheck={handleCheck(planificateur.user_id, audienceId)}
+                  />
+                </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>
