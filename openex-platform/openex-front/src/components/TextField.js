@@ -6,19 +6,18 @@ const renderTextField = ({
   label,
   input,
   meta: { touched, invalid, error },
-  ...custom
+  ...others
 }) => (
   <MuiTextField
     label={label}
-    placeholder={label}
     error={touched && invalid}
     helperText={touched && error}
     {...input}
-    {...custom}
+    {...others}
   />
 );
 
 // eslint-disable-next-line import/prefer-default-export
 export const TextField = (props) => (
-  <Field name={props.name} component={renderTextField} label={props.label} {...props} />
+  <Field name={props.name} component={renderTextField} {...props} />
 );

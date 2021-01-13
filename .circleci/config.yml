@@ -53,7 +53,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-api release/openex
       - run: cp -a ./openex-platform/openex-front/build/index.html release/openex/templates/views/Default/index.html.twig
       - run: cp -a ./openex-platform/openex-front/build/static release/openex/public/
-      - run: cp -a ./openex-platform/openex-front/build/images release/openex/public/
+      - run: rm -Rf release/openex/public/images && cp -a ./openex-platform/openex-front/build/images release/openex/public/
       - run: cp -a ./openex-platform/openex-front/build/ckeditor release/openex/public/
       - run: mkdir release/openex/player && cp -a ./openex-player/target/player-2.0.0.jar release/openex/player/ && cp -a ./openex-player/src/main/resources/application.properties release/openex/player/
       - run:

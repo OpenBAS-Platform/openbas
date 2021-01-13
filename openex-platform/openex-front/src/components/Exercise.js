@@ -1,22 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import * as Constants from '../constants/ComponentTypes';
-import { Paper } from './Paper';
-import { BackgroundImage } from './Image';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
+import Grid from '@material-ui/core/Grid';
+import { Image } from './Image';
 
-const styles = {
+const styles = () => ({
+  container: {
+    width: '100%',
+    height: '250px',
+    cursor: 'pointer',
+    position: 'relative',
+  },
   header: {
     width: '100%',
-    borderBottom: '1px solid #e6e6e6',
     fontWeight: 400,
-    padding: '10px 0 10px 0',
-    color: '#616161',
+    padding: 10,
   },
   subHeader: {
     width: '100%',
     fontWeight: 400,
     color: '#616161',
     height: '30px',
+    padding: 10,
   },
   title: {
     margin: '5px 0 5px 0',
@@ -29,17 +37,6 @@ const styles = {
     fontWeight: 300,
     color: '#808080',
   },
-  backgroundImage: {
-    height: '150px',
-    position: 'relative',
-  },
-  hover: {
-    position: 'absolute',
-    bottom: 0,
-    padding: '10px',
-    backgroundColor: 'rgba(0, 0, 0, .7)',
-    width: '380px',
-  },
   description: {
     padding: 0,
     margin: 0,
@@ -48,49 +45,48 @@ const styles = {
     fontSize: '13px',
   },
   line: {
+    marginTop: -10,
     position: 'relative',
+    padding: '0 20px 0 20px',
   },
   dateLeft: {
     fontSize: '13px',
     position: 'absolute',
+    left: 18,
     top: '8px',
-    left: '8px',
   },
   dateRight: {
     fontSize: '13px',
     position: 'absolute',
+    right: 20,
     top: '8px',
-    right: '8px',
   },
-};
+});
 
-// eslint-disable-next-line import/prefer-default-export
-export const Exercise = (props) => (
-  <Paper className="exercise" type={Constants.PAPER_TYPE_EXERCISE} zDepth={4}>
-    <div style={styles.header}>
-      <div style={styles.title}>{props.name}</div>
-      <div style={styles.subtitle}>{props.subtitle}</div>
-    </div>
-    <div style={styles.subHeader}>
-      <div style={styles.line}>
-        <div style={styles.dateLeft}>{props.startDate}</div>
-        <div className="line">
-          <ul>
-            <li></li>
-            <li></li>
-          </ul>
-        </div>
-        <div style={styles.dateRight}>{props.endDate}</div>
-        <div className="clearfix"></div>
-      </div>
-    </div>
-    <BackgroundImage style={styles.backgroundImage} image_id={props.image_id}>
-      <div className="exerciseHover" style={styles.hover}>
-        <p style={styles.description}>{props.description}</p>
-      </div>
-    </BackgroundImage>
-  </Paper>
-);
+const Exercise = (props) => {
+  const { classes } = props;
+  return (
+    <Grid item xs={3}>
+      <Card className={classes.container} variant="outlined">
+        <CardHeader title={props.name} subheader={props.subtitle} />
+        <CardContent style={{ padding: 0, marginBottom: 40 }}>
+          <div className={classes.line}>
+            <div className={classes.dateLeft}>{props.startDate}</div>
+            <div className="line">
+              <ul>
+                <li> &nbsp; </li>
+                <li> &nbsp; </li>
+              </ul>
+            </div>
+            <div className={classes.dateRight}>{props.endDate}</div>
+            <div className="clearfix" />
+          </div>
+        </CardContent>
+        <Image image_id={props.image_id} style={{ width: '100%' }} />
+      </Card>
+    </Grid>
+  );
+};
 
 Exercise.propTypes = {
   name: PropTypes.string,
@@ -103,3 +99,5 @@ Exercise.propTypes = {
   status: PropTypes.string,
   image_id: PropTypes.string,
 };
+
+export default withStyles(styles)(Exercise);

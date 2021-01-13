@@ -5,12 +5,7 @@ import * as Constants from '../constants/ComponentTypes';
 
 const paperStyle = {
   [Constants.PAPER_TYPE_EXERCISE]: {
-    display: 'inline-block',
-    margin: '20px 20px 20px 20px',
-    verticalAlign: 'top',
-    width: '400px',
-    height: '250px',
-    cursor: 'pointer',
+
   },
   [Constants.PAPER_TYPE_EVENT]: {
     display: 'inline-block',

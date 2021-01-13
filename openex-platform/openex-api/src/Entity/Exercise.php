@@ -40,9 +40,9 @@ class Exercise extends BaseEntity
      */
     protected $exercise_end_date;
     /**
-     * @ORM\Column(type="text", options={"default" : "animation@domaine.fr"})
+     * @ORM\Column(type="text")
      */
-    protected $exercise_mail_expediteur;
+    protected $exercise_mail_expediteur = "planners@openex.io";
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="exercise_owner", referencedColumnName="user_id")

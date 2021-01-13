@@ -4,11 +4,9 @@ import { connect } from 'react-redux';
 import { Route, Switch } from 'react-router';
 import * as Constants from '../../../constants/ComponentTypes';
 import AppBar from '../../../components/AppBar';
-/* eslint-disable */
-import UserPopover from "../UserPopover";
-import { redirectToHome } from "../../../actions/Application";
-import IndexUserProfile from "./profile/Index";
-/* eslint-enable */
+import UserPopover from '../UserPopover';
+import { redirectToHome } from '../../../actions/Application';
+import IndexUserProfile from './profile/Index';
 
 const styles = {
   container: {

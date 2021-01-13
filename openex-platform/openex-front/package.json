@@ -4,6 +4,7 @@
   "author": "Luatix",
   "license": "Apache-2.0",
   "dependencies": {
+    "@date-io/date-fns": "1.x",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
@@ -13,6 +14,7 @@
     "chart.js": "^2.9.4",
     "connected-react-router": "^6.8.0",
     "countdown": "^2.6.0",
+    "date-fns": "^2.16.1",
     "file-saver": "^2.0.2",
     "history": "^4.10.1",
     "moment": "^2.29.1",

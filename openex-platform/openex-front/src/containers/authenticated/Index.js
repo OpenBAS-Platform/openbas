@@ -6,10 +6,11 @@ import * as R from 'ramda';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
 import { dateFormat, timeDiff } from '../../utils/Time';
 import { fetchExercises } from '../../actions/Exercise';
 import { dataFile } from '../../actions/File';
-import { Exercise } from '../../components/Exercise';
+import Exercise from '../../components/Exercise';
 import UserPopover from './UserPopover';
 import { T } from '../../components/I18n';
 import { i18nRegister } from '../../utils/Messages';
@@ -23,8 +24,8 @@ i18nRegister({
 });
 
 const styles = () => ({
-  root: {
-    flexGrow: 1,
+  container: {
+    padding: 20,
   },
   logo: {
     width: '40px',
@@ -54,7 +55,7 @@ class IndexAuthenticated extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <div className={classes.root}>
+      <div>
         <AppBar position="static">
           <Toolbar>
             <img
@@ -73,26 +74,24 @@ class IndexAuthenticated extends Component {
               <T>You do not have any available exercise on this platform.</T>
             </div>
           )}
-          {this.props.exercises.map((exercise) => {
-            const startDate = dateFormat(
-              exercise.exercise_start_date,
-              'MMM D, YYYY',
-            );
-            const endDate = dateFormat(
-              exercise.exercise_end_date,
-              'MMM D, YYYY',
-            );
-            const fileId = R.pathOr(
-              null,
-              ['exercise_image', 'file_id'],
-              exercise,
-            );
-            return (
-              <Link
-                to={`/private/exercise/${exercise.exercise_id}`}
-                key={exercise.exercise_id}
-              >
+          <Grid container spacing={3}>
+            {this.props.exercises.map((exercise) => {
+              const startDate = dateFormat(
+                exercise.exercise_start_date,
+                'MMM D, YYYY',
+              );
+              const endDate = dateFormat(
+                exercise.exercise_end_date,
+                'MMM D, YYYY',
+              );
+              const fileId = R.pathOr(
+                null,
+                ['exercise_image', 'file_id'],
+                exercise,
+              );
+              return (
                 <Exercise
+                  key={exercise.exercise_id}
                   name={exercise.exercise_name}
                   subtitle={exercise.exercise_subtitle}
                   description={exercise.exercise_description}
@@ -102,9 +101,9 @@ class IndexAuthenticated extends Component {
                   organizer={exercise.exercise_organizer}
                   image_id={fileId}
                 />
-              </Link>
-            );
-          })}
+              );
+            })}
+          </Grid>
         </div>
         {this.props.userAdmin && <CreateExercise />}
       </div>

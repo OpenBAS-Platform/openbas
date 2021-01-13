@@ -23,8 +23,7 @@ const detectedLocale = R.pipe(
   R.flatten(), // flatten all arrays
   R.reject(R.isNil), // Remove undefined values
   R.map((x) => x.substr(0, 2)),
-  // eslint-disable-next-line max-len
-  R.find((x) => R.contains(x, availableLanguages)), // Returns first language matched in available languages
+  R.find((x) => R.contains(x, availableLanguages)), // Returns first language
 );
 
 // eslint-disable-next-line import/prefer-default-export

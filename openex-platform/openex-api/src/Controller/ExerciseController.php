@@ -145,7 +145,7 @@ class ExerciseController extends BaseController
 
         $exercise = new Exercise();
         $form = $this->createForm(ExerciseType::class, $exercise);
-        $form->submit($request->request->all());
+        $form->submit($request->request->all(), false);
         if ($form->isValid()) {
             $file = $repositoryFile->findOneBy(['file_name' => 'Exercise default']);
             $exercise->setExerciseCanceled(false);
@@ -153,7 +153,6 @@ class ExerciseController extends BaseController
             $exercise->setExerciseImage($file);
             $exercise->setExerciseMessageHeader('EXERCISE - EXERCISE - EXERCISE');
             $exercise->setExerciseMessageFooter('EXERCISE - EXERCISE - EXERCISE');
-
             $entityManager->persist($exercise);
             $entityManager->flush();
             return $exercise;

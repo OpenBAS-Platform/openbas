@@ -15,10 +15,6 @@ i18nRegister({
   },
 });
 
-const style = {
-  padding: '20px',
-};
-
 const validate = (values) => {
   const errors = {};
   const requiredFields = ['username', 'password'];
@@ -35,32 +31,34 @@ const LoginForm = (props) => {
     error, onSubmit, handleSubmit, pristine, submitting,
   } = props;
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={style}>
-      <TextField
-        name="username"
-        type="text"
-        label="Email address"
-        fullWidth={true}
-      />
-      <TextField
-        name="password"
-        type="password"
-        label="Password"
-        fullWidth={true}
-        style={{ marginTop: 20 }}
-        error={!!error}
-        helperText={error ? <T>Authentication failed</T> : ''}
-      />
-      <Button
-        type="submit"
-        variant="contained"
-        disabled={pristine || submitting}
-        onClick={handleSubmit(onSubmit)}
-        style={{ marginTop: 20 }}
-      >
-        <T>Sign in</T>
-      </Button>
-    </form>
+    <div style={{ padding: 15 }}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <TextField
+          name="username"
+          type="text"
+          label="Email address"
+          fullWidth={true}
+        />
+        <TextField
+          name="password"
+          type="password"
+          label="Password"
+          fullWidth={true}
+          style={{ marginTop: 20 }}
+          error={!!error}
+          helperText={error ? <T>Authentication failed</T> : ''}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={pristine || submitting}
+          onClick={handleSubmit(onSubmit)}
+          style={{ marginTop: 20 }}
+        >
+          <T>Sign in</T>
+        </Button>
+      </form>
+    </div>
   );
 };
 

@@ -2,10 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-/* eslint-disable */
-import { fetchOrganizations } from "../../../../actions/Organization";
-import { updateUser } from "../../../../actions/User";
-/* eslint-enable */
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { updateUser } from '../../../../actions/User';
 import { Paper } from '../../../../components/Paper';
 import { Button } from '../../../../components/Button';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -51,17 +49,14 @@ class Index extends Component {
   }
 
   submitUser() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.userForm.submit();
   }
 
   submitProfile() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.profileForm.submit();
   }
 
   submitPassword() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.passwordForm.submit();
   }
 
@@ -99,14 +94,12 @@ class Index extends Component {
             <h2>
               <T>Profile</T>
             </h2>
-            {/* eslint-disable */}
             <UserForm
               ref="userForm"
               organizations={this.props.organizations}
               onSubmit={this.onUpdate.bind(this)}
               initialValues={informationValues}
             />
-            {/* eslint-enable */}
             <br />
             <Button
               type="submit"
@@ -120,13 +113,11 @@ class Index extends Component {
             <h2>
               <T>Information</T>
             </h2>
-            {/* eslint-disable */}
             <ProfileForm
               ref="profileForm"
               onSubmit={this.onUpdate.bind(this)}
               initialValues={informationValues}
             />
-            {/* eslint-enable */}
             <br />
             <Button
               type="submit"
@@ -140,12 +131,10 @@ class Index extends Component {
             <h2>
               <T>Password</T>
             </h2>
-            {/* eslint-disable */}
             <PasswordForm
               ref="passwordForm"
               onSubmit={this.onUpdatePassword.bind(this)}
             />
-            {/* eslint-enable */}
             <br />
             <Button
               type="submit"

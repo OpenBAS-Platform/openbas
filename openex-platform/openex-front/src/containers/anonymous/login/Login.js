@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core/styles';
+import Toolbar from '@material-ui/core/Toolbar';
+import AppBar from '@material-ui/core/AppBar';
 import { askToken, checkKerberos } from '../../../actions/Application';
 import { T } from '../../../components/I18n';
-import { Toolbar } from '../../../components/Toolbar';
 import LoginForm from './LoginForm';
 import { i18nRegister } from '../../../utils/Messages';
-import * as Constants from '../../../constants/ComponentTypes';
 
 i18nRegister({
   fr: {
@@ -23,6 +23,10 @@ const styles = () => ({
     margin: '0 auto',
     width: 400,
   },
+  appBar: {
+    borderTopLeftRadius: '10px',
+    borderTopRightRadius: '10px',
+  },
   login: {
     height: loginHeight,
     border: '1px solid #ddd',
@@ -37,7 +41,6 @@ const styles = () => ({
     color: '#ffffff',
     fontWeight: 400,
     fontSize: 18,
-    marginTop: 10,
   },
 });
 
@@ -57,9 +60,15 @@ class Login extends Component {
       <div className={classes.container} style={{ paddingTop }}>
         <img src="images/logo_openex.png" alt="logo" className={classes.logo} />
         <div className={classes.login}>
-          <Toolbar type={Constants.TOOLBAR_TYPE_LOGIN}>
-            <div className={classes.subtitle}>{<T>Login</T>}</div>
-          </Toolbar>
+          <AppBar
+            color="primary"
+            position="relative"
+            className={classes.appBar}
+          >
+            <Toolbar>
+              <div className={classes.subtitle}>{<T>Login</T>}</div>
+            </Toolbar>
+          </AppBar>
           <LoginForm onSubmit={this.onSubmit.bind(this)} />
         </div>
       </div>

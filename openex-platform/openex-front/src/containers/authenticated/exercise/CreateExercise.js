@@ -13,9 +13,7 @@ import { Add } from '@material-ui/icons';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import ExerciseForm from './ExerciseForm';
-/* eslint-disable */
-import { addExercise } from "../../../actions/Exercise";
-/* eslint-enable */
+import { addExercise } from '../../../actions/Exercise';
 
 i18nRegister({
   fr: {
@@ -46,12 +44,10 @@ class CreateExercise extends Component {
   }
 
   submitForm() {
-    // eslint-disable-next-line react/no-string-refs
     this.refs.exerciseForm.submit();
   }
 
   onSubmit(data) {
-    console.log(data);
     return this.props.addExercise(data);
   }
 
@@ -72,12 +68,11 @@ class CreateExercise extends Component {
             <T>Create a new exercise</T>
           </DialogTitle>
           <DialogContent>
-            {/* eslint-disable */}
             <ExerciseForm
               ref="exerciseForm"
               onSubmit={this.onSubmit.bind(this)}
+              onSubmitSuccess={this.handleClose.bind(this)}
             />
-            {/* eslint-enable */}
           </DialogContent>
           <DialogActions>
             <Button variant="contained" onClick={this.handleClose.bind(this)}>
