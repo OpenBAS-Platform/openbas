@@ -71,7 +71,6 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
     .post(uri, data)
     .then((response) => {
       dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
-      dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
       return response.data;
     })
     .catch((error) => {
