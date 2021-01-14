@@ -101,6 +101,14 @@ const styles = (theme) => ({
   },
 });
 
+const dependencies = {
+  exercise: [],
+  audience: ['exercise'],
+  objective: ['exercise'],
+  scenarios: ['exercise'],
+  incidents: ['scenarios', 'exercise'],
+  injects: ['incidents', 'scenarios', 'exercise'],
+};
 class Index extends Component {
   constructor(props) {
     super(props);
@@ -157,13 +165,27 @@ class Index extends Component {
     this.setState({ openExport: false });
   }
 
-  handleExportCheck(type, event, isChecked) {
+  handleExportCheck(type, event) {
     const { typesToExport } = this.state;
+    const isChecked = event.target.checked;
+    typesToExport[type] = isChecked ? '1' : '0';
     if (isChecked) {
-      typesToExport[type] = '1';
+      // Check all dependencies
+      for (let index = 0; index < dependencies[type].length; index += 1) {
+        const typeElement = dependencies[type][index];
+        typesToExport[typeElement] = '1';
+      }
     } else {
-      typesToExport[type] = '0';
+      // Uncheck all dependent on this one
+      const entries = Object.entries(dependencies);
+      for (let index = 0; index < entries.length; index += 1) {
+        const [k, v] = entries[index];
+        if (v.includes(type)) {
+          typesToExport[k] = '0';
+        }
+      }
     }
+    // Type to export are hierarchical, check or uncheck must be propagated
     this.setState({ typesToExport });
   }
 
@@ -184,44 +206,8 @@ class Index extends Component {
   // eslint-disable-next-line consistent-return
   submitExport() {
     const dataToExport = this.state.typesToExport;
-    if (dataToExport.audience === '1' && dataToExport.exercise === '0') {
-      alert(
-        "Il est impossible d'exporter les audiences sans exporter l'exercice",
-      );
-    } else if (
-      dataToExport.objective === '1'
-      && dataToExport.exercise === '0'
-    ) {
-      alert(
-        "Il est impossible d'exporter les objectifs sans exporter l'exercice",
-      );
-    } else if (
-      dataToExport.scenarios === '1'
-      && dataToExport.exercise === '0'
-    ) {
-      alert(
-        "Il est impossible d'exporter les scénarios sans exporter l'exercice",
-      );
-    } else if (
-      dataToExport.incidents === '1'
-      && (dataToExport.scenarios === 0 || dataToExport.exercise === '0')
-    ) {
-      alert(
-        "Il est impossible d'exporter les incidents sans exporter l'exercice et les scénarios",
-      );
-    } else if (
-      dataToExport.injects === '1'
-      && (dataToExport.incidents === 0
-        || dataToExport.scenarios === 0
-        || dataToExport.exercise === '0')
-    ) {
-      alert(
-        "Il est impossible d'exporter les incidents sans exporter l'exercice, les scénarios et les incidents",
-      );
-    } else {
-      this.setState({ openExport: false });
-      return this.props.exportExercise(this.props.id, dataToExport);
-    }
+    this.setState({ openExport: false });
+    return this.props.exportExercise(this.props.id, dataToExport);
   }
 
   handleImageSelection(file) {
@@ -255,6 +241,8 @@ class Index extends Component {
     );
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
     const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
+    const { typesToExport } = this.state;
+    console.log(typesToExport);
     return (
       <div style={{ width: 800, margin: '0 auto' }}>
         {this.props.userCanUpdate && (
@@ -414,9 +402,9 @@ class Index extends Component {
                   <TableRow key="tab-exercise">
                     <TableCell width="30">
                       <Checkbox
-                        defaultChecked={true}
+                        checked={typesToExport.exercise === '1'}
                         name="chk-export-exercise"
-                        onCheck={this.handleExportCheck.bind(this, 'exercise')}
+                        onClick={this.handleExportCheck.bind(this, 'exercise')}
                       />
                     </TableCell>
                     <TableCell width="130">
@@ -429,9 +417,9 @@ class Index extends Component {
                   <TableRow key="tab-audiences">
                     <TableCell width="30">
                       <Checkbox
-                        defaultChecked={true}
+                        checked={typesToExport.audience === '1'}
                         name="chk-export-audiences"
-                        onCheck={this.handleExportCheck.bind(this, 'audience')}
+                        onClick={this.handleExportCheck.bind(this, 'audience')}
                       />
                     </TableCell>
                     <TableCell width="130">
@@ -444,9 +432,9 @@ class Index extends Component {
                   <TableRow key="tab-objective">
                     <TableCell width="30">
                       <Checkbox
-                        defaultChecked={true}
+                        checked={typesToExport.objective === '1'}
                         name="chk-export-objective"
-                        onCheck={this.handleExportCheck.bind(this, 'objective')}
+                        onClick={this.handleExportCheck.bind(this, 'objective')}
                       />
                     </TableCell>
                     <TableCell width="130">
@@ -459,9 +447,9 @@ class Index extends Component {
                   <TableRow key="tab-scenarios">
                     <TableCell width="30">
                       <Checkbox
-                        defaultChecked={true}
+                        checked={typesToExport.scenarios === '1'}
                         name="chk-export-scenarios"
-                        onCheck={this.handleExportCheck.bind(this, 'scenarios')}
+                        onClick={this.handleExportCheck.bind(this, 'scenarios')}
                       />
                     </TableCell>
                     <TableCell width="130">
@@ -474,9 +462,9 @@ class Index extends Component {
                   <TableRow key="tab-incidents">
                     <TableCell width="30">
                       <Checkbox
-                        defaultChecked={true}
+                        checked={typesToExport.incidents === '1'}
                         name="chk-export-incidents"
-                        onCheck={this.handleExportCheck.bind(this, 'incidents')}
+                        onClick={this.handleExportCheck.bind(this, 'incidents')}
                       />
                     </TableCell>
                     <TableCell width="130">
@@ -489,9 +477,9 @@ class Index extends Component {
                   <TableRow key="tab-injects">
                     <TableCell width="30">
                       <Checkbox
-                        defaultChecked={true}
+                        checked={typesToExport.injects === '1'}
                         name="chk-export-injects"
-                        onCheck={this.handleExportCheck.bind(this, 'injects')}
+                        onClick={this.handleExportCheck.bind(this, 'injects')}
                       />
                     </TableCell>
                     <TableCell width="130">
