@@ -20,7 +20,7 @@ class PasswordForm extends Component {
   render() {
     const { onSubmit } = this.props;
     return (
-      <Form onSubmit={onSubmit} validate={validate}>
+      <Form id="passwordForm" onSubmit={onSubmit} validate={validate}>
         {({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <TextField

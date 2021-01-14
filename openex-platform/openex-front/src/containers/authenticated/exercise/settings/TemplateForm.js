@@ -21,7 +21,7 @@ class TemplateForm extends Component {
     return (
       <Form onSubmit={onSubmit} initialValues={initialValues}>
         {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+          <form id="templateForm" onSubmit={handleSubmit}>
             <TextField
               name="exercise_message_header"
               fullWidth={true}

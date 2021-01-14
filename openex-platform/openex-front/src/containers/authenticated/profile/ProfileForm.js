@@ -18,7 +18,7 @@ class ProfileForm extends Component {
   render() {
     const { onSubmit, initialValues } = this.props;
     return (
-      <Form onSubmit={onSubmit} initialValues={initialValues}>
+      <Form id="profileForm" onSubmit={onSubmit} initialValues={initialValues}>
         {({ handleSubmit }) => (
           <form onSubmit={handleSubmit}>
             <TextField

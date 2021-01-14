@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -30,7 +31,6 @@ import { shiftAllInjects } from '../../../../actions/Inject';
 import { fetchGroups } from '../../../../actions/Group';
 import { redirectToHome } from '../../../../actions/Application';
 import { Image } from '../../../../components/Image';
-import { Checkbox } from '../../../../components/Checkbox';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import TemplateForm from './TemplateForm';
@@ -38,6 +38,7 @@ import ExerciseForm from '../ExerciseForm';
 import FileGallery from '../../FileGallery';
 import { dateToISO } from '../../../../utils/Time';
 import { addFile, getImportFileSheetsName } from '../../../../actions/File';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -72,9 +73,9 @@ i18nRegister({
     'Import data to an exercise.': 'Importer un exercice complet.',
     search: 'Parcourir',
     Export: 'Exporter',
-    'Please, chose data to export':
+    'Please, choose data to export':
       'Veuillez sélectionner les données à exporter :',
-    'Please, chose data to import':
+    'Please, choose data to import':
       'Veuillez sélectionner les données à importer :',
     'Export of Exercise': "Export de l'exercice",
     'Export all email injects to files (.eml) so you can use it into your mail client.':
@@ -136,16 +137,8 @@ class Index extends Component {
     return this.props.updateExercise(this.props.id, newData);
   }
 
-  submitInformation() {
-    this.refs.informationForm.submit();
-  }
-
   submitExportEml() {
     return this.props.exportInjectEml(this.props.id);
-  }
-
-  submitTemplate() {
-    this.refs.templateForm.submit();
   }
 
   handleOpenDelete() {
@@ -271,7 +264,6 @@ class Index extends Component {
             </Typography>
             {informationValues && (
               <ExerciseForm
-                ref="informationForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
               />
@@ -280,7 +272,7 @@ class Index extends Component {
             <Button
               variant="outlined"
               color="secondary"
-              onClick={this.submitInformation.bind(this)}
+              onClick={() => submitForm('exerciseForm')}
             >
               <T>Update</T>
             </Button>
@@ -293,7 +285,6 @@ class Index extends Component {
             </Typography>
             {informationValues && (
               <TemplateForm
-                ref="templateForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
                 groups={this.props.groups}
@@ -303,7 +294,7 @@ class Index extends Component {
             <Button
               variant="outlined"
               color="secondary"
-              onClick={this.submitTemplate.bind(this)}
+              onClick={() => submitForm('templateForm')}
             >
               <T>Update</T>
             </Button>
@@ -396,16 +387,15 @@ class Index extends Component {
             <T>Export</T>
           </Button>
           <Dialog
-            title=""
-            modal={true}
+            maxWidth="md"
             open={this.state.openExport}
-            onRequestClose={this.handleCloseExport.bind(this)}
+            onClose={this.handleCloseExport.bind(this)}
           >
             <DialogTitle>
               <T>Export of Exercise</T>
             </DialogTitle>
             <DialogContent>
-              <T>Please, chose data to export</T>
+              <T>Please, choose data to export</T>
               <Table selectable={true} style={{ marginTop: '5px' }}>
                 <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
