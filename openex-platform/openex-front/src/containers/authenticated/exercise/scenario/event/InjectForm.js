@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
-import { FormField } from '../../../../../components/Field';
+import { TextField } from '../../../../../components/TextField';
 import { Select } from '../../../../../components/Select';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
@@ -126,7 +126,7 @@ class InjectForm extends Component {
 
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="inject_title"
           fullWidth={true}
           type="text"
@@ -149,11 +149,11 @@ class InjectForm extends Component {
 
           <div style={styles.fullDate}>
             {/* eslint-disable-next-line react/no-string-refs */}
-            <FormField ref="inject_date" name="inject_date" type="hidden" />
+            <TextField ref="inject_date" name="inject_date" type="hidden" />
           </div>
         </div>
 
-        <FormField
+        <TextField
           name="inject_description"
           fullWidth={true}
           multiLine={true}
@@ -192,6 +192,4 @@ InjectForm.propTypes = {
   types: PropTypes.object,
 };
 
-export default reduxForm({ form: 'InjectForm', validate }, null, { change })(
-  InjectForm,
-);
+export default InjectForm;

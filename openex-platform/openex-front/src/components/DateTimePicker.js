@@ -1,6 +1,6 @@
 import React from 'react';
 import { KeyboardDateTimePicker } from '@material-ui/pickers';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 
 const renderDateTimePicker = ({
   input: { onBlur, value, ...inputProps },

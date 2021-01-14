@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../components/TextField';
+import { T } from '../../../components/I18n';
 
 const validate = (values) => {
   const errors = {};
@@ -17,21 +18,27 @@ const validate = (values) => {
 
 class PasswordForm extends Component {
   render() {
+    const { onSubmit } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
-          name="user_plain_password"
-          fullWidth={true}
-          type="password"
-          label="Password"
-        />
-        <FormField
-          name="password_confirmation"
-          fullWidth={true}
-          type="password"
-          label="Confirmation"
-        />
-      </form>
+      <Form onSubmit={onSubmit} validate={validate}>
+        {({ handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              name="user_plain_password"
+              fullWidth={true}
+              type="password"
+              label={<T>Password</T>}
+            />
+            <TextField
+              name="password_confirmation"
+              fullWidth={true}
+              type="password"
+              label={<T>Confirmation</T>}
+              style={{ marginTop: 20 }}
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }
@@ -45,6 +52,4 @@ PasswordForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'PasswordForm', validate }, null, { change })(
-  PasswordForm,
-);
+export default PasswordForm;

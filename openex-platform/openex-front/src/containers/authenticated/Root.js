@@ -24,7 +24,7 @@ const UserIsAdmin = connectedRouterRedirect({
 
 i18nRegister({
   fr: {
-    'Action done.': 'Action effectuée.',
+    'The operation has been done': "L'opération a été effectuée",
   },
 });
 
@@ -41,13 +41,8 @@ class RootAuthenticated extends Component {
           autoHideDuration={4000}
           onClose={this.props.savedDismiss.bind(this)}
         >
-          <Alert
-            severity="info"
-            onClose={this.props.savedDismiss.bind(this)}
-            elevation={6}
-            variant="outlined"
-          >
-            <T>Action done.</T>
+          <Alert severity="info" elevation={6}>
+            <T>The operation has been done</T>
           </Alert>
         </Snackbar>
         <Switch>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Icon } from './Icon';
 import * as Constants from '../constants/ComponentTypes';
-import { FormField } from './Field';
+import { TextField } from './TextField';
 import DatePickerOpx from './DatePickerOpx';
 
 const styles = {
@@ -51,7 +51,7 @@ class DatePickerIconOpx extends Component {
           </span>
         </div>
         <div style={styles.newInputDate.inputOnlyDateField}>
-          <FormField
+          <TextField
             fullWidth={true}
             onChange={this.handleChange}
             name={this.props.nameField}

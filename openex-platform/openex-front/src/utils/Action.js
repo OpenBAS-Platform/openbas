@@ -1,9 +1,15 @@
-import { SubmissionError } from 'redux-form';
 import Immutable from 'seamless-immutable';
 import * as R from 'ramda';
+import { FORM_ERROR } from 'final-form';
 import FileSaver from 'file-saver';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../Network';
+
+export const submitForm = (formId) => {
+  document
+    .getElementById(formId)
+    .dispatchEvent(new Event('submit', { cancelable: true }));
+};
 
 const submitErrors = (data) => {
   const errorsExtractor = R.pipe(
@@ -19,9 +25,9 @@ const submitErrors = (data) => {
       return [R.head(elem), extractErrorsPipe(elem)];
     }),
     R.fromPairs(),
-    R.set(R.lensProp('_error'), data.message),
+    R.set(R.lensProp(FORM_ERROR), data.message),
   );
-  return new SubmissionError(errorsExtractor(data));
+  return errorsExtractor(data);
 };
 
 export const fileSave = (uri, filename) => () => api()
@@ -55,7 +61,7 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR });
-      throw submitErrors(error);
+      return submitErrors(error);
     });
 };
 
@@ -70,7 +76,7 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR });
-      throw submitErrors(error);
+      return submitErrors(error);
     });
 };
 
@@ -86,6 +92,6 @@ export const delReferential = (uri, type, id) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR });
-      throw submitErrors(error);
+      return submitErrors(error);
     });
 };

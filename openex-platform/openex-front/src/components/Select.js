@@ -3,7 +3,7 @@ import MUISelect from '@material-ui/core/Select';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 
 const renderFromHelper = ({ touched, error }) => {
   if (!(touched && error)) {

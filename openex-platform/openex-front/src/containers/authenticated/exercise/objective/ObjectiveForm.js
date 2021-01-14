@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
-import { FormField } from '../../../../components/Field';
+import { TextField } from '../../../../components/TextField';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 import { Select } from '../../../../components/Select';
@@ -30,13 +30,13 @@ class ObjectiveForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="objective_title"
           fullWidth={true}
           type="text"
           label="Title"
         />
-        <FormField
+        <TextField
           name="objective_description"
           fullWidth={true}
           type="text"
@@ -72,6 +72,4 @@ ObjectiveForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'ObjectiveForm', validate }, null, { change })(
-  ObjectiveForm,
-);
+export default ObjectiveForm;

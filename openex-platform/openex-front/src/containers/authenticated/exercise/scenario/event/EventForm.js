@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
@@ -27,19 +27,19 @@ class EventForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="event_title"
           fullWidth={true}
           type="text"
           label="Title"
         />
-        <FormField
+        <TextField
           name="event_description"
           fullWidth={true}
           type="text"
           label="Description"
         />
-        <FormField
+        <TextField
           name="event_order"
           fullWidth={true}
           type="text"
@@ -59,6 +59,4 @@ EventForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'EventForm', validate }, null, { change })(
-  EventForm,
-);
+export default EventForm;

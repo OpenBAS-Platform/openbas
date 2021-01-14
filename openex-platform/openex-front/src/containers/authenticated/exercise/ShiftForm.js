@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import { i18nRegister } from '../../../utils/Messages';
-import { FormField } from '../../../components/Field';
+import { TextField } from '../../../components/TextField';
 import { timeDiff } from '../../../utils/Time';
 import { T } from '../../../components/I18n';
 import InjectTable from '../../../components/InjectTable';
@@ -132,7 +132,7 @@ class ShiftForm extends Component {
 
         <div style={styles.shiftDateForm.shiftDateLine}>
           <div style={styles.shiftDateForm.inputDay}>
-            <FormField
+            <TextField
               ref="shiftDay"
               name="shift_day"
               fullWidth={true}
@@ -142,7 +142,7 @@ class ShiftForm extends Component {
             />
           </div>
           <div style={styles.shiftDateForm.inputHour}>
-            <FormField
+            <TextField
               ref="shiftHour"
               name="shift_hour"
               fullWidth={true}
@@ -152,7 +152,7 @@ class ShiftForm extends Component {
             />
           </div>
           <div style={styles.shiftDateForm.inputMinute}>
-            <FormField
+            <TextField
               ref="shiftMinute"
               name="shift_minute"
               fullWidth={true}
@@ -177,6 +177,4 @@ ShiftForm.propTypes = {
   injects: PropTypes.object,
 };
 
-export default reduxForm({ form: 'ShiftForm', validate }, null, { change })(
-  ShiftForm,
-);
+export default ShiftForm;

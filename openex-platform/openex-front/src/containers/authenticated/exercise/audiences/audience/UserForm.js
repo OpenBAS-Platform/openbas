@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import * as R from 'ramda';
-import { FormField } from '../../../../../components/Field';
+import { TextField } from '../../../../../components/TextField';
 import { Autocomplete } from '../../../../../components/Autocomplete';
 import { i18nRegister } from '../../../../../utils/Messages';
 
@@ -28,25 +28,25 @@ class UserForm extends Component {
     );
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="user_email"
           fullWidth={true}
           type="text"
           label="Email address"
         />
-        <FormField
+        <TextField
           name="user_email2"
           fullWidth={true}
           type="text"
           label="Email address (secondary)"
         />
-        <FormField
+        <TextField
           name="user_firstname"
           fullWidth={true}
           type="text"
           label="Firstname"
         />
-        <FormField
+        <TextField
           name="user_lastname"
           fullWidth={true}
           type="text"
@@ -59,25 +59,25 @@ class UserForm extends Component {
           label="Organization"
           dataSource={dataSource}
         />
-        <FormField
+        <TextField
           name="user_phone2"
           fullWidth={true}
           type="text"
           label="Phone number (fix)"
         />
-        <FormField
+        <TextField
           name="user_phone"
           fullWidth={true}
           type="text"
           label="Phone number (mobile)"
         />
-        <FormField
+        <TextField
           name="user_phone3"
           fullWidth={true}
           type="text"
           label="Phone number (secondary)"
         />
-        <FormField
+        <TextField
           name="user_pgp_key"
           fullWidth={true}
           multiLine={true}
@@ -100,6 +100,4 @@ UserForm.propTypes = {
   organizations: PropTypes.object,
 };
 
-export default reduxForm({ form: 'UserForm' }, null, {
-  change,
-})(UserForm);
+export default UserForm;

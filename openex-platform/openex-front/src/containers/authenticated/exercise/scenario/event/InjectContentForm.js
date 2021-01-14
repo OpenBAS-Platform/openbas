@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
-import { FormField, CKEditorField } from '../../../../../components/Field';
+import { CKEditorField } from '../../../../../components/Field';
+import { TextField } from '../../../../../components/TextField';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { FlatButton, Button } from '../../../../../components/Button';
@@ -140,7 +141,7 @@ class InjectContentForm extends Component {
           switch (field.type) {
             case 'textarea':
               return (
-                <FormField
+                <TextField
                   key={field.name}
                   name={field.name}
                   fullWidth={true}
@@ -253,7 +254,7 @@ class InjectContentForm extends Component {
               );
             default:
               return (
-                <FormField
+                <TextField
                   key={field.name}
                   name={field.name}
                   fullWidth={true}
@@ -284,7 +285,5 @@ InjectContentForm.propTypes = {
   downloadAttachment: PropTypes.func,
 };
 
-const formComponent = reduxForm({ form: 'InjectContentForm', validate }, null, {
-  change,
-})(InjectContentForm);
+const formComponent = InjectContentForm;
 export default injectIntl(formComponent, { withRef: true });

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
@@ -25,7 +25,7 @@ class AudienceForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="audience_name"
           fullWidth={true}
           type="text"
@@ -45,6 +45,4 @@ AudienceForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'AudienceForm', validate }, null, { change })(
-  AudienceForm,
-);
+export default AudienceForm;

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
-import { FormField } from './Field';
+import { TextField } from './TextField';
 import { Icon } from './Icon';
 import * as Constants from '../constants/ComponentTypes';
 import DateTimePicker from './DateTimePicker';
@@ -99,7 +99,7 @@ class DatePickerIcon extends Component {
             </span>
           </div>
           <div style={styles.newInputDate.inputOnlyDateField}>
-            <FormField
+            <TextField
               fullWidth={true}
               ref={this.props.refFieldDateOnly}
               onChange={this.handleChange}
@@ -132,7 +132,7 @@ class DatePickerIcon extends Component {
             </span>
           </div>
           <div style={styles.newInputDate.inputOnlyTimeField}>
-            <FormField
+            <TextField
               fullWidth={true}
               ref={this.props.refFieldTime}
               onChange={this.handleChange}
@@ -165,7 +165,7 @@ class DatePickerIcon extends Component {
             </span>
           </div>
           <div style={styles.newInputDate.inputDateField}>
-            <FormField
+            <TextField
               fullWidth={true}
               ref={this.props.refFieldDateOnly}
               onChange={this.handleChange}
@@ -195,7 +195,7 @@ class DatePickerIcon extends Component {
             </span>
           </div>
           <div style={styles.newInputDate.inputDateField}>
-            <FormField
+            <TextField
               fullWidth={true}
               ref={this.props.refFieldTime}
               onChange={this.handleChange}
@@ -214,7 +214,7 @@ class DatePickerIcon extends Component {
         </div>
 
         <div style={styles.fullDate}>
-          <FormField
+          <TextField
             ref={this.props.nameFullDate}
             name={this.props.nameFullDate}
             type="hidden"

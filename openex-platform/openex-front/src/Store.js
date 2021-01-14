@@ -24,7 +24,7 @@ export const history = createBrowserHistory();
 
 const logger = createLogger({
   predicate: (getState, action) => !action.type.startsWith('DATA_FETCH')
-    && !action.type.startsWith('@@redux-form'),
+    && !action.type.startsWith('@@react-final-form'),
 });
 
 const initStore = () => {

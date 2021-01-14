@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../components/TextField';
 import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
@@ -26,13 +26,13 @@ class LogForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="log_title"
           fullWidth={true}
           type="text"
           label="Title"
         />
-        <FormField
+        <TextField
           name="log_content"
           fullWidth={true}
           multiLine={true}
@@ -54,6 +54,4 @@ LogForm.propTypes = {
   audiences: PropTypes.array,
 };
 
-export default reduxForm({ form: 'LogForm', validate }, null, { change })(
-  LogForm,
-);
+export default LogForm;

@@ -16,6 +16,7 @@ import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
 import UserPopover from '../UserPopover';
+import { submitForm } from '../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -64,18 +65,6 @@ class Index extends Component {
     return this.props.updateUser(this.props.user.user_id, {
       user_plain_password: data.user_plain_password,
     });
-  }
-
-  submitUser() {
-    this.refs.userForm.submit();
-  }
-
-  submitProfile() {
-    this.refs.profileForm.submit();
-  }
-
-  submitPassword() {
-    this.refs.passwordForm.submit();
   }
 
   redirectToHome() {
@@ -130,17 +119,18 @@ class Index extends Component {
               <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Profile</T>
               </Typography>
-              <UserForm
-                ref="userForm"
-                organizations={this.props.organizations}
-                onSubmit={this.onUpdate.bind(this)}
-                initialValues={informationValues}
-              />
+              {informationValues && (
+                <UserForm
+                  organizations={this.props.organizations}
+                  onSubmit={this.onUpdate.bind(this)}
+                  initialValues={informationValues}
+                />
+              )}
               <br />
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={this.submitUser.bind(this)}
+                onClick={() => submitForm('userForm')}
               >
                 <T>Update</T>
               </Button>
@@ -150,7 +140,6 @@ class Index extends Component {
                 <T>Information</T>
               </Typography>
               <ProfileForm
-                ref="profileForm"
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
               />
@@ -158,7 +147,7 @@ class Index extends Component {
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={this.submitProfile.bind(this)}
+                onClick={() => submitForm('profileForm')}
               >
                 <T>Update</T>
               </Button>
@@ -167,15 +156,12 @@ class Index extends Component {
               <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Password</T>
               </Typography>
-              <PasswordForm
-                ref="passwordForm"
-                onSubmit={this.onUpdatePassword.bind(this)}
-              />
+              <PasswordForm onSubmit={this.onUpdatePassword.bind(this)} />
               <br />
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={this.submitPassword.bind(this)}
+                onClick={() => submitForm('passwordForm')}
               >
                 <T>Update</T>
               </Button>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
@@ -25,7 +25,7 @@ class TagForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField name="tag_name" fullWidth={true} type="text" label="Name" />
+        <TextField name="tag_name" fullWidth={true} type="text" label="Name" />
       </form>
     );
   }
@@ -40,6 +40,4 @@ TagForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'TagForm', validate }, null, { change })(
-  TagForm,
-);
+export default TagForm;

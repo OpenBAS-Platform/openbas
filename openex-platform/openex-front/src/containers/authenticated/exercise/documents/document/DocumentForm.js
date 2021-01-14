@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
@@ -45,26 +45,26 @@ class DocumentForm extends Component {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <div style={style.display_none}>
-          <FormField
+          <TextField
             name="document_id"
             fullWidth={true}
             type="text"
             label="id"
           />
         </div>
-        <FormField
+        <TextField
           name="document_name"
           fullWidth={true}
           type="text"
           label="Name"
         />
-        <FormField
+        <TextField
           name="document_description"
           fullWidth={true}
           type="textarea"
           label="Description"
         />
-        <FormField
+        <TextField
           name="document_type"
           fullWidth={true}
           type="text"
@@ -83,6 +83,4 @@ DocumentForm.propTypes = {
   initialValues: PropTypes.object,
 };
 
-export default reduxForm({ form: 'DocumentForm', validate }, null, { change })(
-  DocumentForm,
-);
+export default DocumentForm;

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
-import { FormField } from '../../../../../components/Field';
+import { TextField } from '../../../../../components/TextField';
 import { T } from '../../../../../components/I18n';
 import { Select } from '../../../../../components/Select';
 import { i18nRegister } from '../../../../../utils/Messages';
@@ -48,7 +48,7 @@ class IncidentForm extends Component {
 
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="incident_title"
           fullWidth={true}
           type="text"
@@ -76,7 +76,7 @@ class IncidentForm extends Component {
             />
           ))}
         </Select>
-        <FormField
+        <TextField
           name="incident_story"
           fullWidth={true}
           multiLine={true}
@@ -84,7 +84,7 @@ class IncidentForm extends Component {
           type="text"
           label="Story"
         />
-        <FormField
+        <TextField
           name="incident_order"
           fullWidth={true}
           type="text"
@@ -105,6 +105,4 @@ IncidentForm.propTypes = {
   types: PropTypes.object,
 };
 
-export default reduxForm({ form: 'IncidentForm', validate }, null, { change })(
-  IncidentForm,
-);
+export default IncidentForm;

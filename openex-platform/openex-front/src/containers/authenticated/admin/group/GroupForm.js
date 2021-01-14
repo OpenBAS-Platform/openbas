@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../components/TextField';
 import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
@@ -14,7 +14,7 @@ class GroupForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="group_name"
           fullWidth={true}
           type="text"
@@ -34,4 +34,4 @@ GroupForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'GroupForm' }, null, { change })(GroupForm);
+export default GroupForm;

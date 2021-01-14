@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Select } from '../../../../../components/Select';
@@ -51,6 +51,4 @@ CopyForm.propTypes = {
   incidents: PropTypes.array,
 };
 
-export default reduxForm({ form: 'CopyForm', validate }, null, { change })(
-  CopyForm,
-);
+export default CopyForm;

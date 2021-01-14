@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import MUITextField from '@material-ui/core/TextField';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 import { injectIntl } from 'react-intl';
 import CKEditor4 from 'ckeditor4-react';
 
@@ -72,7 +72,7 @@ renderTextField.propTypes = {
   onChange: PropTypes.func,
 };
 
-export const FormFieldIntl = (props) => (
+export const TextFieldIntl = (props) => (
   <Field
     name={props.name}
     label={
@@ -95,9 +95,9 @@ export const FormFieldIntl = (props) => (
   />
 );
 
-export const FormField = injectIntl(FormFieldIntl);
+export const TextField = injectIntl(TextFieldIntl);
 
-FormFieldIntl.propTypes = {
+TextFieldIntl.propTypes = {
   placeholder: PropTypes.string,
   label: PropTypes.string,
   intl: PropTypes.object,

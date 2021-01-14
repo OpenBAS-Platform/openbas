@@ -1,4 +1,5 @@
 import { push } from 'connected-react-router';
+import { FORM_ERROR } from 'final-form';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
 import { postReferential, getReferential } from '../utils/Action';
@@ -10,7 +11,14 @@ export const askToken = (username, password) => (dispatch) => {
     '/api/auth',
     data,
   )(dispatch).then((finalData) => {
-    dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: finalData });
+    // eslint-disable-next-line no-underscore-dangle
+    if (finalData[FORM_ERROR]) {
+      return finalData;
+    }
+    return dispatch({
+      type: Constants.IDENTITY_LOGIN_SUCCESS,
+      payload: finalData,
+    });
   });
 };
 
@@ -78,7 +86,9 @@ export const redirectToChecks = (exerciseId) => (dispatch) => {
 };
 
 export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`));
+  dispatch(
+    push(`/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`),
+  );
 };
 
 export const redirectToDryrun = (exerciseId, dryrunId) => (dispatch) => {

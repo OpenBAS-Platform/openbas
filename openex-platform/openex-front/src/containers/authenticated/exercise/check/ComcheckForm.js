@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
-import { FormField, CKEditorField } from '../../../../components/Field';
+import { CKEditorField } from '../../../../components/Field';
+import { TextField } from '../../../../components/TextField';
 import { Select } from '../../../../components/Select';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
@@ -148,7 +149,7 @@ class ComcheckForm extends Component {
 
           <div style={styles.fullDate}>
             {/* eslint-disable */}
-            <FormField
+            <TextField
               ref="comcheck_end_date"
               name="comcheck_end_date"
               type="hidden"
@@ -157,7 +158,7 @@ class ComcheckForm extends Component {
           </div>
         </div>
 
-        <FormField
+        <TextField
           name="comcheck_subject"
           fullWidth={true}
           type="text"
@@ -208,6 +209,4 @@ ComcheckForm.propTypes = {
   audiences: PropTypes.array,
 };
 
-export default reduxForm({ form: 'ComcheckForm', validate }, null, { change })(
-  ComcheckForm,
-);
+export default ComcheckForm;

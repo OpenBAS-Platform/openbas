@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MUISwitch from '@material-ui/core/Switch';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 
 const renderToggleField = ({ input, label }) => (
   <MUISwitch

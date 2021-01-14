@@ -14,6 +14,7 @@ import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import ExerciseForm from './ExerciseForm';
 import { addExercise } from '../../../actions/Exercise';
+import { submitForm } from '../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -43,12 +44,8 @@ class CreateExercise extends Component {
     this.setState({ open: false });
   }
 
-  submitForm() {
-    this.refs.exerciseForm.submit();
-  }
-
   onSubmit(data) {
-    return this.props.addExercise(data);
+    return this.props.addExercise(data).then(() => this.handleClose());
   }
 
   render() {
@@ -68,11 +65,7 @@ class CreateExercise extends Component {
             <T>Create a new exercise</T>
           </DialogTitle>
           <DialogContent>
-            <ExerciseForm
-              ref="exerciseForm"
-              onSubmit={this.onSubmit.bind(this)}
-              onSubmitSuccess={this.handleClose.bind(this)}
-            />
+            <ExerciseForm onSubmit={this.onSubmit.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button variant="contained" onClick={this.handleClose.bind(this)}>
@@ -81,7 +74,7 @@ class CreateExercise extends Component {
             <Button
               variant="contained"
               color="secondary"
-              onClick={this.submitForm.bind(this)}
+              onClick={() => submitForm('exerciseForm')}
             >
               <T>Create</T>
             </Button>

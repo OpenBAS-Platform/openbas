@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { change, reduxForm } from 'redux-form';
+import { Form } from 'react-final-form';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { T } from '../../../components/I18n';
@@ -38,51 +38,59 @@ const validate = (values) => {
 
 class ExerciseForm extends Component {
   render() {
-    const { onSubmit, handleSubmit, edit } = this.props;
+    const { onSubmit, initialValues, edit } = this.props;
     return (
-      <form onSubmit={handleSubmit.bind(this, onSubmit)}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <TextField
-            name="exercise_name"
-            fullWidth={true}
-            label={<T>Name</T>}
-          />
-          <TextField
-            name="exercise_subtitle"
-            fullWidth={true}
-            label={<T>Subtitle</T>}
-            style={{ marginTop: 20 }}
-          />
-          <TextField
-            name="exercise_description"
-            fullWidth={true}
-            label={<T>Description</T>}
-            style={{ marginTop: 20 }}
-          />
-          {edit && (
-            <TextField
-              name="exercise_mail_expediteur"
-              fullWidth={true}
-              label={<T>Description</T>}
-              style={{ marginTop: 20 }}
-            />
-          )}
-          <DateTimePicker
-            name="exercise_start_date"
-            fullWidth={true}
-            label={<T>Start date</T>}
-            autoOk={true}
-            style={{ marginTop: 20 }}
-          />
-          <DateTimePicker
-            name="exercise_end_date"
-            fullWidth={true}
-            label={<T>End date</T>}
-            autoOk={true}
-            style={{ marginTop: 20 }}
-          />
-        </MuiPickersUtilsProvider>
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="exerciseForm" onSubmit={handleSubmit}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <TextField
+                name="exercise_name"
+                fullWidth={true}
+                label={<T>Name</T>}
+              />
+              <TextField
+                name="exercise_subtitle"
+                fullWidth={true}
+                label={<T>Subtitle</T>}
+                style={{ marginTop: 20 }}
+              />
+              <TextField
+                name="exercise_description"
+                fullWidth={true}
+                label={<T>Description</T>}
+                style={{ marginTop: 20 }}
+              />
+              {edit && (
+                <TextField
+                  name="exercise_mail_expediteur"
+                  fullWidth={true}
+                  label={<T>Description</T>}
+                  style={{ marginTop: 20 }}
+                />
+              )}
+              <DateTimePicker
+                name="exercise_start_date"
+                fullWidth={true}
+                label={<T>Start date</T>}
+                autoOk={true}
+                style={{ marginTop: 20 }}
+              />
+              <DateTimePicker
+                name="exercise_end_date"
+                fullWidth={true}
+                label={<T>End date</T>}
+                autoOk={true}
+                style={{ marginTop: 20 }}
+              />
+            </MuiPickersUtilsProvider>
+          </form>
+        )}
+      </Form>
     );
   }
 }
@@ -93,6 +101,4 @@ ExerciseForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'ExerciseForm', validate }, null, { change })(
-  ExerciseForm,
-);
+export default ExerciseForm;

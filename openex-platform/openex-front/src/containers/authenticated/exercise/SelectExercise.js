@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { i18nRegister } from '../../../utils/Messages';
@@ -139,6 +139,4 @@ SelectExercise.propTypes = {
   importExercise: PropTypes.func,
 };
 
-export default reduxForm({ form: 'SelectExercise' }, null, { change })(
-  SelectExercise,
-);
+export default SelectExercise;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
+import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../components/I18n';
 import { Select } from '../../../../components/Select';
@@ -57,6 +57,4 @@ DryrunForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default reduxForm({ form: 'DryrunForm', validate }, null, { change })(
-  DryrunForm,
-);
+export default DryrunForm;

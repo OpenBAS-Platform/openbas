@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { reduxForm, change } from 'redux-form';
-import { FormField } from '../../../../components/Field';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../components/TextField';
 import { SliderField } from '../../../../components/SliderField';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
@@ -29,7 +29,7 @@ class OutcomeForm extends Component {
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField
+        <TextField
           name="outcome_comment"
           fullWidth={true}
           multiLine={true}
@@ -57,6 +57,4 @@ OutcomeForm.propTypes = {
   audiences: PropTypes.array,
 };
 
-export default reduxForm({ form: 'OutcomeForm', validate }, null, { change })(
-  OutcomeForm,
-);
+export default OutcomeForm;

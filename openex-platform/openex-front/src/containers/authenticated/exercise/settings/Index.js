@@ -9,6 +9,9 @@ import TableCell from '@material-ui/core/TableCell';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -16,6 +19,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import * as R from 'ramda';
 import { withStyles } from '@material-ui/core/styles';
+import { Close } from '@material-ui/icons';
 import {
   deleteExercise,
   exportExercise,
@@ -32,7 +36,7 @@ import { i18nRegister } from '../../../../utils/Messages';
 import TemplateForm from './TemplateForm';
 import ExerciseForm from '../ExerciseForm';
 import FileGallery from '../../FileGallery';
-import { dateFormat, dateToISO } from '../../../../utils/Time';
+import { dateToISO } from '../../../../utils/Time';
 import { addFile, getImportFileSheetsName } from '../../../../actions/File';
 
 i18nRegister({
@@ -78,13 +82,21 @@ i18nRegister({
     'Do you want to change the sender email address?':
       "Souhaitez-vous changer l'adresse email de l'expéditeur ?",
     'Export of the emails': 'Export des emails',
+    'Files gallery': 'Galerie de fichiers',
   },
 });
 
-const styles = () => ({
+const styles = (theme) => ({
   paper: {
     padding: 20,
     marginBottom: 40,
+  },
+  appBar: {
+    position: 'relative',
+  },
+  title: {
+    marginLeft: theme.spacing(2),
+    flex: 1,
   },
 });
 
@@ -96,7 +108,6 @@ class Index extends Component {
       openGallery: false,
       openExport: false,
       openImport: false,
-      initialStartDate: '',
       newStartDate: '',
       newData: '',
       exerciseNameExist: false,
@@ -226,12 +237,6 @@ class Index extends Component {
     this.handleCloseGallery();
   }
 
-  submitConfirmEmail() {
-    const { newData } = this.state;
-    this.props.updateExercise(this.props.id, newData);
-    this.handleCloseConfirmMailExpediteur();
-  }
-
   render() {
     const exerciseIsDeletable = R.propOr(
       true,
@@ -264,11 +269,13 @@ class Index extends Component {
             <Typography variant="h5" style={{ marginBottom: 20 }}>
               Information
             </Typography>
-            <ExerciseForm
-              ref="informationForm"
-              onSubmit={this.onUpdate.bind(this)}
-              initialValues={informationValues}
-            />
+            {informationValues && (
+              <ExerciseForm
+                ref="informationForm"
+                onSubmit={this.onUpdate.bind(this)}
+                initialValues={informationValues}
+              />
+            )}
             <br />
             <Button
               variant="outlined"
@@ -284,12 +291,14 @@ class Index extends Component {
             <Typography variant="h5" style={{ marginBottom: 20 }}>
               <T>Messages template</T>
             </Typography>
-            <TemplateForm
-              ref="templateForm"
-              onSubmit={this.onUpdate.bind(this)}
-              initialValues={informationValues}
-              groups={this.props.groups}
-            />
+            {informationValues && (
+              <TemplateForm
+                ref="templateForm"
+                onSubmit={this.onUpdate.bind(this)}
+                initialValues={informationValues}
+                groups={this.props.groups}
+              />
+            )}
             <br />
             <Button
               variant="outlined"
@@ -301,39 +310,55 @@ class Index extends Component {
           </Paper>
         )}
         <Paper elevation={4} className={classes.paper}>
-          <div style={styles.PaperContent}>
-            <Typography variant="h5" style={{ marginBottom: 20 }}>
-              Image
-            </Typography>
-            {imageId && (
-              <Image
-                image_id={imageId}
-                alt="Exercise logo"
-                style={styles.image}
-              />
-            )}
-            <br />
-            <br />
-            {this.props.userCanUpdate ? (
-              <div>
-                <Button
-                  label="Change the image"
-                  onClick={this.handleOpenGallery.bind(this)}
-                />
-                <Dialog
-                  modal={false}
-                  open={this.state.openGallery}
-                  onRequestClose={this.handleCloseGallery.bind(this)}
-                >
+          <Typography variant="h5" style={{ marginBottom: 20 }}>
+            Image
+          </Typography>
+          {imageId && (
+            <Image
+              image_id={imageId}
+              alt="Exercise logo"
+              style={{ width: '90%' }}
+            />
+          )}
+          <br />
+          <br />
+          {this.props.userCanUpdate && (
+            <div>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.handleOpenGallery.bind(this)}
+              >
+                <T>Change the image</T>
+              </Button>
+              <Dialog
+                open={this.state.openGallery}
+                onClose={this.handleCloseGallery.bind(this)}
+                fullScreen={true}
+              >
+                <AppBar className={classes.appBar}>
+                  <Toolbar>
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      onClick={this.handleCloseGallery.bind(this)}
+                      aria-label="close"
+                    >
+                      <Close />
+                    </IconButton>
+                    <Typography variant="h6" className={classes.title}>
+                      <T>Files gallery</T>
+                    </Typography>
+                  </Toolbar>
+                </AppBar>
+                <DialogContent>
                   <FileGallery
                     fileSelector={this.handleImageSelection.bind(this)}
                   />
-                </Dialog>
-              </div>
-            ) : (
-              ''
-            )}
-          </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
         </Paper>
         <Paper elevation={4} className={classes.paper}>
           <Typography variant="h5" style={{ marginBottom: 20 }}>
@@ -565,7 +590,6 @@ Index.propTypes = {
   id: PropTypes.string,
   exercise: PropTypes.object,
   exercise_statuses: PropTypes.object,
-  initialStartDate: PropTypes.string,
   initialEmailExpediteur: PropTypes.string,
   params: PropTypes.object,
   updateExercise: PropTypes.func,
@@ -618,9 +642,6 @@ const select = (state, ownProps) => {
     exercise,
     groups: R.values(state.referential.entities.groups),
     userCanUpdate: checkUserCanUpdate(state, ownProps),
-    initialStartDate: dateToISO(
-      R.propOr('1970-01-01 08:00:00', 'exercise_start_date', exercise),
-    ),
     initialEmailExpediteur: R.prop('exercise_mail_expediteur', exercise),
   };
 };
