@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import AppBar from '../../../../../components/AppBar';
-import { Dialog } from '../../../../../components/Dialog';
-import {
-  FlatButton,
-  ActionButtonCreate,
-} from '../../../../../components/Button';
 import SubaudienceForm from './SubaudienceForm';
 import {
   addSubaudience,
@@ -55,13 +52,13 @@ class CreateSubaudience extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCreate.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create"
         primary={true}
@@ -76,7 +73,7 @@ class CreateSubaudience extends Component {
             title={<T>Sub-audiences</T>}
             showMenuIconButton={false}
             iconElementRight={
-              <ActionButtonCreate
+              <Button
                 type={Constants.BUTTON_TYPE_CREATE_RIGHT}
                 onClick={this.handleOpenCreate.bind(this)}
               />

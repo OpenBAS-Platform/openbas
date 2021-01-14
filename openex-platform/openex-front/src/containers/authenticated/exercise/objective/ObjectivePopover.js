@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Popover } from '../../../../components/Popover';
 import { Menu } from '../../../../components/Menu';
-import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import {
   MenuItemLink,
@@ -143,14 +144,14 @@ class ObjectivePopover extends Component {
     );
 
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
       objectiveIsUpdatable ? (
-        <FlatButton
+        <Button
           key="update"
           label="Update"
           primary={true}
@@ -161,14 +162,14 @@ class ObjectivePopover extends Component {
       ),
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       objectiveIsDeletable ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}
@@ -179,13 +180,13 @@ class ObjectivePopover extends Component {
       ),
     ];
     const createSubobjectiveActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCreateSubobjective.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create"
         primary={true}

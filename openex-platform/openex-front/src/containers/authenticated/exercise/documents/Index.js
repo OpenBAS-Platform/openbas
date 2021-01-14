@@ -2,165 +2,70 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Grid from '@material-ui/core/Grid';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
+import { injectIntl } from 'react-intl';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import { timeDiff } from '../../../../utils/Time';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { SearchField } from '../../../../components/SimpleTextField';
-/* eslint-disable */
-import { fetchGroups } from "../../../../actions/Group";
-import { fetchTags, deleteTag } from "../../../../actions/Tag";
+import { fetchGroups } from '../../../../actions/Group';
+import { deleteTag, fetchTags } from '../../../../actions/Tag';
 import {
   addDocument,
-  searchDocument,
-  saveDocument,
+  deleteDocument,
+  downloadDocument,
+  editDocumentTags,
+  editDocumentTagsExercise,
   getDocument,
   getDocumentTags,
   getDocumentTagsExercise,
-  editDocumentTags,
-  editDocumentTagsExercise,
-  deleteDocument,
-  downloadDocument,
-} from "../../../../actions/Document";
-import { fetchExercises } from "../../../../actions/Exercise";
-import { FlatButton } from "../../../../components/Button";
-import CreateTag from "./tag/CreateTag";
-/* eslint-enable */
+  saveDocument,
+  searchDocument,
+} from '../../../../actions/Document';
+import { fetchExercises } from '../../../../actions/Exercise';
+import CreateTag from './tag/CreateTag';
 import DocumentForm from './document/DocumentForm';
 import DocumentActionPopover from './tag/DocumentActionPopover';
 import DocumentTags from './document/DocumentTags';
 import {
-  TagListe,
-  TagExerciseListe,
   TagAddToFilter,
-  TagSmallListe,
+  TagExerciseListe,
+  TagListe,
   TagSmallExerciseListe,
+  TagSmallListe,
 } from './component/Tag';
 
-const styles = {
+const styles = () => ({
   container: {
-    textAlign: 'center',
-  },
-  title: {
-    float: 'left',
-    fontSize: '13px',
-    textTransform: 'uppercase',
-  },
-  titlePopover: {
-    float: 'left',
-    fontSize: '11px',
-    height: '35px',
-    textTransform: 'uppercase',
-  },
-  columnLeft: {
-    float: 'left',
-    width: '49%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  columnRight: {
-    float: 'right',
-    width: '49%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  searchDiv: {
-    float: 'left',
-    marginTop: '10px',
-    width: '100%',
-    border: '1px silver solid',
-    borderRadius: '4px',
-    paddingBottom: '10px',
-  },
-  searchDivTag: {
-    float: 'left',
-    width: '10%',
-    height: '100%',
-    marginTop: '10px',
-    minWidth: '120px',
-  },
-  searchDivTagDetail: {
-    float: 'left',
-    marginTop: '10px',
-    width: '89%',
-    textAlign: 'left',
-  },
-  searchDivTagLibelle: {
-    float: 'left',
-    border: '0px',
-    width: '100%',
-    textAlign: 'left',
-  },
-  searchDivTitle: {
-    marginTop: '20px',
-    fontSize: '13px',
-    textAlign: 'left',
-  },
-  divDocumentsListe: {
-    float: 'left',
-    width: '79%',
-    minHeight: '600px',
-    height: '100%',
-  },
-  divDocumentsListeDetail: {
-    width: '100%',
-    height: '100%',
-    minHeight: '540px',
-    maxHeight: '540px',
-    minWidth: '400px',
-    overflowY: 'auto',
-    border: '1px silver solid',
-    borderRadius: '4px',
-  },
-  divTagsListe: {
-    float: 'right',
-    width: '20%',
-    minHeight: '600px',
-    minWidth: '200px',
-    height: '100%',
-  },
-  divdivTagsListeDetail: {
-    width: '100%',
-    height: '100%',
-    minHeight: '540px',
-    border: '1px silver solid',
-    borderRadius: '4px',
-  },
-  divDocuments: {
-    float: 'left',
-    marginTop: '20px',
-    width: '100%',
-    minHeight: '600px',
-  },
-  divDocumentsTitle: {
-    fontSize: '15px',
-    textTransform: 'uppercase',
-    fontWeight: '800',
+    position: 'relative',
   },
   search: {
-    float: 'right',
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
-  empty: {
-    marginTop: 40,
-    fontSize: '18px',
-    fontWeight: 500,
-    textAlign: 'center',
+  tags: {
+    float: 'left',
+    marginLeft: 20,
   },
-};
+});
 
 i18nRegister({
   fr: {
-    'List Of Tags': 'Liste des tags',
-    'Document Gallery': 'Galerie de documents',
-    'Search by :': 'Rechercher par :',
+    Tags: 'Tags',
+    'Tag:': 'Tag :',
+    'List of tags': 'Liste des tags',
+    'Documents gallery': 'Galerie de documents',
+    'Search by:': 'Rechercher par :',
     'No added tags, select a tag from the list on the right to add it as a filter.':
       "Aucun tag ajouté, sélectionner un tag sur la liste de droite pour l'ajouter comme filtre.",
     'No Document available': 'Aucun document de disponible',
@@ -172,8 +77,11 @@ i18nRegister({
     'List of documents including the following tags : ':
       'Liste des documents incluant les Tags suivants : ',
     'Delete Tag': "Suppression d'un tag",
-    'Are you sure you want to delete this tag ?':
+    'Are you sure you want to delete this tag?':
       'Êtes-vous sûr de vouloir supprimer ce Tag ?',
+  },
+  en: {
+    Search: 'Search',
   },
 });
 
@@ -503,20 +411,21 @@ class Index extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const actionsEditDocument = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEditDocument.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="tags"
         label="List Of Tags"
         primary={true}
         onClick={this.handleEditDocumentEditTag.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="submit"
         label="Submit"
         primary={true}
@@ -525,13 +434,13 @@ class Index extends Component {
     ];
 
     const actionsOpenConfirmDeleteTag = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseConfirmDeleteTag.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="submit"
         label="Submit"
         primary={true}
@@ -540,13 +449,13 @@ class Index extends Component {
     ];
 
     const actionsEditDocumentTag = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEditDocumentTag.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="submit"
         label="Submit"
         primary={true}
@@ -555,69 +464,32 @@ class Index extends Component {
     ];
 
     return (
-      <div style={styles.container}>
-        <div style={styles.columnLeft}>
-          <div style={styles.title}>
-            <T>Document Gallery</T>
-          </div>
-          <div className="clearfix" />
-        </div>
-
-        <div style={styles.columnRight}>
-          <div style={styles.search}>
-            <SearchField
-              name="keyword"
-              fullWidth={true}
-              type="text"
-              hintText="Search"
-              onChange={this.handleSearchDocument.bind(this)}
-              styletype={Constants.FIELD_TYPE_RIGHT}
-            />
-          </div>
-          <div className="clearfix" />
-        </div>
-        <div className="clearfix" />
-        <div style={styles.searchDivTitle}>
-          <T>Search by :</T>
-        </div>
-        <div style={styles.searchDiv}>
-          <div style={styles.searchDivTag}>
-            <T>Tag :</T>
-          </div>
-          <div style={styles.searchDivTagDetail}>
-            {this.state.listeTagAddToFilter.length === 0
-            && this.state.listeTagExerciseAddToFilter.length === 0 ? (
-              <T>
-                No added tags, select a tag from the list on the right to add it
-                as a filter.
-              </T>
-              ) : (
-                ''
+      <div className={classes.container}>
+        <Typography variant="h5" style={{ marginBottom: 20, float: 'left' }}>
+          <T>Documents gallery</T>
+        </Typography>
+        <div className={classes.tags}>
+          {R.values(this.state.listeTagExerciseAddToFilter).map((exercise) => (
+            <TagAddToFilter
+              key={exercise.exercise_id}
+              value={exercise.exercise_name}
+              onRequestDelete={this.removeTagExerciseToFilter.bind(
+                this,
+                exercise,
               )}
-            {R.values(this.state.listeTagExerciseAddToFilter).map(
-              (exercise) => (
-                <TagAddToFilter
-                  key={exercise.exercise_id}
-                  value={exercise.exercise_name}
-                  onRequestDelete={this.removeTagExerciseToFilter.bind(
-                    this,
-                    exercise,
-                  )}
-                />
-              ),
-            )}
-            {R.values(this.state.listeTagAddToFilter).map((tag) => (
-              <TagAddToFilter
-                key={tag.tag_id}
-                value={tag.tag_name}
-                onRequestDelete={this.removeTagToFilter.bind(this, tag)}
-              />
-            ))}
-
-            <div className="clearfix"></div>
-            {this.state.listeTagAddToFilter.length !== 0
-            || this.state.listeTagExerciseAddToFilter.length !== 0 ? (
-              <div style={styles.searchDivTagLibelle}>
+            />
+          ))}
+          {R.values(this.state.listeTagAddToFilter).map((tag) => (
+            <TagAddToFilter
+              key={tag.tag_id}
+              value={tag.tag_name}
+              onRequestDelete={this.removeTagToFilter.bind(this, tag)}
+            />
+          ))}
+          <div className="clearfix" />
+          {this.state.listeTagAddToFilter.length !== 0
+            || (this.state.listeTagExerciseAddToFilter.length !== 0 && (
+              <div>
                 <T>List of documents including the following tags : </T>
                 {R.values(this.state.listeTagExerciseAddToFilter).map(
                   (exercise) => `${exercise.exercise_name}, `,
@@ -626,172 +498,152 @@ class Index extends Component {
                   (tag) => `${tag.tag_name}, `,
                 )}
               </div>
-              ) : (
-                ''
-              )}
-          </div>
+            ))}
         </div>
-
-        <div style={styles.divDocuments}>
-          <div style={styles.divDocumentsListe}>
-            <div style={styles.divDocumentsTitle}>
-              <T>List of Documents</T>
-            </div>
-            <div style={styles.divDocumentsListeDetail}>
-              {this.props.documents.length === 0 ? (
-                <div style={styles.empty}>
-                  <T>No Document available</T>
-                </div>
-              ) : (
-                ''
-              )}
-              <Table selectable={true} style={{ marginTop: '5px' }}>
-                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
-                  <TableRow>
-                    <TableCell>
-                      <T>Name</T>
-                    </TableCell>
-                    <TableCell>
-                      <T>Description</T>
-                    </TableCell>
-                    <TableCell>
-                      <T>Type</T>
-                    </TableCell>
-                    <TableCell>
-                      <T>Tags</T>
-                    </TableCell>
-                    <TableCell width="20">&nbsp;</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody displayRowCheckbox={false}>
-                  {this.props.documents.map((document) => {
-                    const listeTagAddToFilter = [
-                      ...this.state.listeTagAddToFilter,
-                    ];
-                    const listeTagExerciseAddToFilter = [
-                      ...this.state.listeTagExerciseAddToFilter,
-                    ];
-                    const toDisplay = this.checkIfDocumentIsDisplay(
-                      document,
-                      listeTagAddToFilter,
-                      listeTagExerciseAddToFilter,
-                      this.state.searchTerm,
-                    );
-                    return toDisplay === true ? (
-                      <TableRow key={document.document_id}>
-                        <TableCell>{document.document_name}</TableCell>
-                        <TableCell
-                          style={{
-                            wordWrap: 'break-word',
-                            whiteSpace: 'normal',
-                          }}
-                        >
-                          {document.document_description}
-                        </TableCell>
-                        <TableCell>{document.document_type}</TableCell>
-                        <TableCell>
-                          {document.document_liste_tags.map((tag) => (
-                            <TagSmallListe
-                              key={tag.tag_id}
-                              value={tag.tag_name}
+        <div className={classes.search}>
+          <TextField
+            name="keyword"
+            placeholder={this.props.intl.formatMessage({ id: 'Search' })}
+            onChange={this.handleSearchDocument.bind(this)}
+          />
+        </div>
+        <Grid container spacing={3}>
+          <Grid item xs={9}>
+            <Table selectable={true} style={{ marginTop: '5px' }}>
+              <TableHead adjustForCheckbox={false} displaySelectAll={false}>
+                <TableRow>
+                  <TableCell>
+                    <T>Name</T>
+                  </TableCell>
+                  <TableCell>
+                    <T>Description</T>
+                  </TableCell>
+                  <TableCell>
+                    <T>Type</T>
+                  </TableCell>
+                  <TableCell>
+                    <T>Tags</T>
+                  </TableCell>
+                  <TableCell width="20">&nbsp;</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody displayRowCheckbox={false}>
+                {this.props.documents.map((document) => {
+                  const listeTagAddToFilter = [
+                    ...this.state.listeTagAddToFilter,
+                  ];
+                  const listeTagExerciseAddToFilter = [
+                    ...this.state.listeTagExerciseAddToFilter,
+                  ];
+                  const toDisplay = this.checkIfDocumentIsDisplay(
+                    document,
+                    listeTagAddToFilter,
+                    listeTagExerciseAddToFilter,
+                    this.state.searchTerm,
+                  );
+                  return toDisplay === true ? (
+                    <TableRow key={document.document_id}>
+                      <TableCell>{document.document_name}</TableCell>
+                      <TableCell
+                        style={{
+                          wordWrap: 'break-word',
+                          whiteSpace: 'normal',
+                        }}
+                      >
+                        {document.document_description}
+                      </TableCell>
+                      <TableCell>{document.document_type}</TableCell>
+                      <TableCell>
+                        {document.document_liste_tags.map((tag) => (
+                          <TagSmallListe
+                            key={tag.tag_id}
+                            value={tag.tag_name}
+                          />
+                        ))}
+                        {document.document_liste_tags_exercise.map(
+                          (exercise) => (
+                            <TagSmallExerciseListe
+                              key={exercise.exercise_id}
+                              value={exercise.exercise_name}
                             />
-                          ))}
-                          {document.document_liste_tags_exercise.map(
-                            (exercise) => (
-                              <TagSmallExerciseListe
-                                key={exercise.exercise_id}
-                                value={exercise.exercise_name}
-                              />
-                            ),
+                          ),
+                        )}
+                      </TableCell>
+                      <TableCell width="20">
+                        <div>
+                          {this.props.userCanUpdate ? (
+                            <DocumentActionPopover
+                              document_id={document.document_id}
+                              document={document}
+                              handleEditDocument={this.handleEditDocument.bind(
+                                this,
+                              )}
+                              handleViewDocument={this.handleViewDocument.bind(
+                                this,
+                              )}
+                              handleEditDocumentTag={this.handleEditDocumentTag.bind(
+                                this,
+                              )}
+                              handleDeleteDocument={this.handleDeleteDocument.bind(
+                                this,
+                              )}
+                            />
+                          ) : (
+                            ''
                           )}
-                        </TableCell>
-                        <TableCell width="20">
-                          <div>
-                            {this.props.userCanUpdate ? (
-                              <DocumentActionPopover
-                                document_id={document.document_id}
-                                document={document}
-                                handleEditDocument={this.handleEditDocument.bind(
-                                  this,
-                                )}
-                                handleViewDocument={this.handleViewDocument.bind(
-                                  this,
-                                )}
-                                handleEditDocumentTag={this.handleEditDocumentTag.bind(
-                                  this,
-                                )}
-                                handleDeleteDocument={this.handleDeleteDocument.bind(
-                                  this,
-                                )}
-                              />
-                            ) : (
-                              ''
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      ''
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-            {this.props.userCanUpdate ? (
-              <FlatButton
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    ''
+                  );
+                })}
+              </TableBody>
+            </Table>
+            {this.props.userCanUpdate && (
+              <Button
                 label="Add new document"
                 primary={true}
                 onClick={this.openFileDialog.bind(this)}
               />
-            ) : (
-              ''
             )}
-          </div>
-          <div style={styles.divTagsListe}>
-            <div style={styles.divDocumentsTitle}>
-              <T>Liste des tags</T>
-            </div>
-            <div style={styles.divdivTagsListeDetail}>
-              {this.props.tags.length === 0 && this.props.exercises === 0 ? (
-                <div style={styles.empty}>
-                  <T>No Tag Available</T>
-                </div>
-              ) : (
-                ''
-              )}
-              {this.props.tags.map((tag) => (
-                <TagListe
-                  key={tag.tag_id}
-                  value={tag.tag_name}
-                  onClick={this.addAvailableTagToFilter.bind(this, tag)}
-                  onRequestDelete={this.handleOpenConfirmDeleteTag.bind(
-                    this,
-                    tag,
-                  )}
-                />
-              ))}
-              {this.props.exercises.map((exercise) => (
-                <TagExerciseListe
-                  key={exercise.exercise_id}
-                  value={exercise.exercise_name}
-                  onClick={this.addAvailableTagExerciseToFilter.bind(
-                    this,
-                    exercise,
-                  )}
-                />
-              ))}
-            </div>
+          </Grid>
+          <Grid item xs={3}>
+            {this.props.tags.length === 0 && this.props.exercises === 0 && (
+              <div style={styles.empty}>
+                <T>No Tag Available</T>
+              </div>
+            )}
+            {this.props.tags.map((tag) => (
+              <TagListe
+                key={tag.tag_id}
+                value={tag.tag_name}
+                onClick={this.addAvailableTagToFilter.bind(this, tag)}
+                onRequestDelete={this.handleOpenConfirmDeleteTag.bind(
+                  this,
+                  tag,
+                )}
+              />
+            ))}
+            {this.props.exercises.map((exercise) => (
+              <TagExerciseListe
+                key={exercise.exercise_id}
+                value={exercise.exercise_name}
+                onClick={this.addAvailableTagExerciseToFilter.bind(
+                  this,
+                  exercise,
+                )}
+              />
+            ))}
             {this.props.userCanUpdate ? <CreateTag /> : ''}
-          </div>
-        </div>
-        {/* eslint-disable */}
+          </Grid>
+        </Grid>
         <input
           type="file"
           ref="fileUpload"
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           onChange={this.handleFileChange.bind(this)}
         />
-        {/* eslint-enable */}
         {this.props.userCanUpdate ? (
           <Dialog
             title="Edit document"
@@ -800,14 +652,12 @@ class Index extends Component {
             onRequestClose={this.handleCloseEditDocument.bind(this)}
             actions={actionsEditDocument}
           >
-            {/* eslint-disable */}
             <DocumentForm
               ref="documentForm"
               initialValues={this.state.selectedDocument}
               onSubmit={this.onSubmitDocument.bind(this)}
               onSubmitSuccess={this.handleCloseEditDocument.bind(this)}
             />
-            {/* eslint-enable */}
           </Dialog>
         ) : (
           ''
@@ -820,7 +670,7 @@ class Index extends Component {
             onRequestClose={this.handleCloseConfirmDeleteTag.bind(this)}
             actions={actionsOpenConfirmDeleteTag}
           >
-            <T>Are you sure you want to delete this tag ?</T>
+            <T>Are you sure you want to delete this tag?</T>
           </Dialog>
         ) : (
           ''
@@ -898,14 +748,12 @@ Index.propTypes = {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -930,7 +778,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   return {
     exerciseId,
     userCanUpdate: checkUserCanUpdate(state, ownProps),
@@ -940,19 +788,23 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  fetchGroups,
-  fetchTags,
-  fetchExercises,
-  addDocument,
-  searchDocument,
-  saveDocument,
-  getDocument,
-  getDocumentTags,
-  getDocumentTagsExercise,
-  deleteTag,
-  editDocumentTags,
-  downloadDocument,
-  editDocumentTagsExercise,
-  deleteDocument,
-})(Index);
+export default R.compose(
+  connect(select, {
+    fetchGroups,
+    fetchTags,
+    fetchExercises,
+    addDocument,
+    searchDocument,
+    saveDocument,
+    getDocument,
+    getDocumentTags,
+    getDocumentTagsExercise,
+    deleteTag,
+    editDocumentTags,
+    downloadDocument,
+    editDocumentTagsExercise,
+    deleteDocument,
+  }),
+  withStyles(styles),
+  injectIntl,
+)(Index);

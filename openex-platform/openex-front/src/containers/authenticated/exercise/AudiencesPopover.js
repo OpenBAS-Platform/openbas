@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import IconButton from '@material-ui/core/IconButton';
 import { i18nRegister } from '../../../utils/Messages';
 import * as Constants from '../../../constants/ComponentTypes';
 import { Popover } from '../../../components/Popover';
 import { Menu } from '../../../components/Menu';
-import { IconButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemLink } from '../../../components/menu/MenuItem';
 import { downloadExportAudiences } from '../../../actions/Audience';

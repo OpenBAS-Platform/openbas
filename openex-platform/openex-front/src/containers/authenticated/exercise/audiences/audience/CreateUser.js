@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { addUser } from '../../../../../actions/User';
-import { Dialog } from '../../../../../components/Dialog';
-import { FlatButton } from '../../../../../components/Button';
 import UserForm from './UserForm';
 import * as Constants from '../../../../../constants/ComponentTypes';
 
@@ -39,13 +39,13 @@ class CreateUser extends Component {
 
   render() {
     const actionsCreateUser = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCreate.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create user"
         primary={true}
@@ -55,7 +55,7 @@ class CreateUser extends Component {
 
     return (
       <div>
-        <FlatButton
+        <Button
           label="Create a new user"
           secondary={true}
           onClick={this.handleOpenCreate.bind(this)}

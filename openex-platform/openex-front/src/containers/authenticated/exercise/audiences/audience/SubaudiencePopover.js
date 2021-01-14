@@ -3,14 +3,15 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
 import { T } from '../../../../../components/I18n';
 import Theme from '../../../../../components/Theme';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { Popover } from '../../../../../components/Popover';
 import { Menu } from '../../../../../components/Menu';
-import { Dialog } from '../../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../../components/Button';
 import { Icon } from '../../../../../components/Icon';
 import {
   MenuItemLink,
@@ -189,14 +190,14 @@ class SubaudiencePopover extends Component {
     );
 
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
       subaudienceIsUpdatable ? (
-        <FlatButton
+        <Button
           key="update"
           label="Update"
           primary={true}
@@ -207,14 +208,14 @@ class SubaudiencePopover extends Component {
       ),
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       subaudienceIsDeletable ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}
@@ -225,14 +226,14 @@ class SubaudiencePopover extends Component {
       ),
     ];
     const disableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
       subaudienceIsUpdatable ? (
-        <FlatButton
+        <Button
           key="disable"
           label="Disable"
           primary={true}
@@ -243,14 +244,14 @@ class SubaudiencePopover extends Component {
       ),
     ];
     const enableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
       subaudienceIsUpdatable ? (
-        <FlatButton
+        <Button
           key="enable"
           label="Enable"
           primary={true}

@@ -2,19 +2,19 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 import { dateFormat } from '../../../../../utils/Time';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import Theme from '../../../../../components/Theme';
 import { Toolbar } from '../../../../../components/Toolbar';
-import { Dialog } from '../../../../../components/Dialog';
 import { List } from '../../../../../components/List';
 import {
   HeaderItem,
   MainListItem,
 } from '../../../../../components/list/ListItem';
 import { Icon } from '../../../../../components/Icon';
-import { FlatButton } from '../../../../../components/Button';
 import { SearchField } from '../../../../../components/SimpleTextField';
 /* eslint-disable */
 import { fetchAudiences } from "../../../../../actions/Audience";
@@ -305,7 +305,7 @@ class Index extends Component {
 
   render() {
     const viewActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

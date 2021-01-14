@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { addEvent } from '../../../../../actions/Event';
-import { Dialog } from '../../../../../components/Dialog';
-import {
-  FlatButton,
-  FloatingActionsButtonCreate,
-} from '../../../../../components/Button';
 import EventForm from './EventForm';
 
 i18nRegister({
@@ -41,13 +39,13 @@ class CreateEvent extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleClose.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create"
         primary={true}
@@ -57,7 +55,7 @@ class CreateEvent extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate
+        <Fab
           type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpen.bind(this)}
         />

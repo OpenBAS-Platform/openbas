@@ -2,22 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { updateSubaudience } from "../../../../../actions/Subaudience";
-import { fetchUsers } from "../../../../../actions/User";
-import CreateUser from "./CreateUser";
-/* eslint-enable */
+import { updateSubaudience } from '../../../../../actions/Subaudience';
+import { fetchUsers } from '../../../../../actions/User';
+import CreateUser from './CreateUser';
 import { DialogTitleElement } from '../../../../../components/Dialog';
 import { Chip } from '../../../../../components/Chip';
 import { Avatar } from '../../../../../components/Avatar';
 import { List } from '../../../../../components/List';
 import { MainSmallListItem } from '../../../../../components/list/ListItem';
-import {
-  FlatButton,
-  FloatingActionsButtonCreate,
-} from '../../../../../components/Button';
 import { SimpleTextField } from '../../../../../components/SimpleTextField';
 
 const styles = {
@@ -117,13 +113,13 @@ class AddUsers extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseAddUsers.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="add"
         label="Add these users"
         primary={true}
@@ -143,7 +139,7 @@ class AddUsers extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate
+        <Fab
           type={Constants.BUTTON_TYPE_FLOATING_PADDING}
           onClick={this.handleOpenAddUsers.bind(this)}
         />

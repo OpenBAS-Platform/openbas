@@ -266,7 +266,8 @@ class ExerciseController extends BaseController
                     $injects = array_merge($injects, $repositoryInject->findBy(['inject_incident' => $incident, 'inject_enabled' => true]));
                 }
             }
-
+            $exercise->setUserCanUpdate($this->hasGranted(self::UPDATE, $exercise));
+            $exercise->setUserCanDelete($this->hasGranted(self::DELETE, $exercise));
             $exercise->computeExerciseStatus($injects);
             $exercise->computeStartEndDates($injects);
             $exercise->computeExerciseOwner();

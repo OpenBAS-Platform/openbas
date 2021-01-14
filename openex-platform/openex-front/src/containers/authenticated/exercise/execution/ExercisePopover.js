@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Popover } from '../../../../components/Popover';
 import { Menu } from '../../../../components/Menu';
-import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import {
   MenuItemButton,
@@ -122,14 +123,14 @@ class ExercisePopover extends Component {
     );
 
     const disableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
       exerciseIsUpdatable ? (
-        <FlatButton
+        <Button
           key="disable"
           label="Disable"
           primary={true}
@@ -140,14 +141,14 @@ class ExercisePopover extends Component {
       ),
     ];
     const enableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
       exerciseIsUpdatable ? (
-        <FlatButton
+        <Button
           key="enable"
           label="Enable"
           primary={true}
@@ -158,13 +159,13 @@ class ExercisePopover extends Component {
       ),
     ];
     const dryrunActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDryrun.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="launch"
         label="Launch"
         primary={true}

@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { Popover } from '../../../../../components/Popover';
 import { Menu } from '../../../../../components/Menu';
 import { Dialog, DialogTitleElement } from '../../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../../components/Button';
 import { Icon } from '../../../../../components/Icon';
 import {
   MenuItemLink,
@@ -192,14 +193,14 @@ class IncidentPopover extends Component {
     );
 
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
       incidentIsUpdatable ? (
-        <FlatButton
+        <Button
           key="update"
           label={this.state.stepIndex === 1 ? 'Update' : 'Next'}
           primary={true}
@@ -210,14 +211,14 @@ class IncidentPopover extends Component {
       ),
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       incidentIsDeletable ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { dayFormat, timeFormat, dateToISO } from '../../../../../utils/Time';
@@ -10,17 +12,15 @@ import * as Constants from '../../../../../constants/ComponentTypes';
 import { Popover } from '../../../../../components/Popover';
 import { Menu } from '../../../../../components/Menu';
 import { Dialog, DialogTitleElement } from '../../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../../components/Button';
 import { Icon } from '../../../../../components/Icon';
 import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
-/* eslint-disable */
-import { fetchIncident, selectIncident } from "../../../../../actions/Incident";
-import { downloadFile } from "../../../../../actions/File";
-import { redirectToEvent } from "../../../../../actions/Application";
+import { fetchIncident, selectIncident } from '../../../../../actions/Incident';
+import { downloadFile } from '../../../../../actions/File';
+import { redirectToEvent } from '../../../../../actions/Application';
 import {
   addInject,
   updateInject,
@@ -28,10 +28,9 @@ import {
   tryInject,
   injectDone,
   fetchInjectTypesExerciseSimple,
-} from "../../../../../actions/Inject";
-import InjectForm from "./InjectForm";
-import InjectContentForm from "./InjectContentForm";
-/* eslint-enable */
+} from '../../../../../actions/Inject';
+import InjectForm from './InjectForm';
+import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
 import CopyForm from './CopyForm';
 
@@ -545,14 +544,14 @@ class InjectPopover extends Component {
     const { userCanUpdate } = this.props;
 
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
       injectIsUpdatable && userCanUpdate ? (
-        <FlatButton
+        <Button
           key="update"
           label={this.state.stepIndex === 2 ? 'Update' : 'Next'}
           primary={true}
@@ -563,14 +562,14 @@ class InjectPopover extends Component {
       ),
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       injectIsDeletable && userCanUpdate ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}
@@ -581,14 +580,14 @@ class InjectPopover extends Component {
       ),
     ];
     const disableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
       injectIsUpdatable && userCanUpdate ? (
-        <FlatButton
+        <Button
           key="disable"
           label="Disable"
           primary={true}
@@ -599,14 +598,14 @@ class InjectPopover extends Component {
       ),
     ];
     const enableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
       injectIsUpdatable && userCanUpdate ? (
-        <FlatButton
+        <Button
           key="enable"
           label="Enable"
           primary={true}
@@ -617,13 +616,13 @@ class InjectPopover extends Component {
       ),
     ];
     const copyActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCopy.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="copy"
         label="Copy"
         primary={true}
@@ -631,13 +630,13 @@ class InjectPopover extends Component {
       />,
     ];
     const tryActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseTry.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="test"
         label="Test"
         primary={true}
@@ -645,13 +644,13 @@ class InjectPopover extends Component {
       />,
     ];
     const doneActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDone.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="done"
         label="Done"
         primary={true}
@@ -659,7 +658,7 @@ class InjectPopover extends Component {
       />,
     ];
     const resultActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

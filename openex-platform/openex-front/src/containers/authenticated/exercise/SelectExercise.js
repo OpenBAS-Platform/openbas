@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import Button from '@material-ui/core/Button';
 import { i18nRegister } from '../../../utils/Messages';
-import { FlatButton } from '../../../components/Button';
 
 i18nRegister({
   fr: {
@@ -76,17 +76,17 @@ class SelectExercise extends Component {
               audiences.
             </div>
             <div style={styles.buttons}>
-              <FlatButton
+              <Button
                 label="Cancel"
                 primary={true}
                 onClick={this.props.closeSelect}
               />
-              <FlatButton
+              <Button
                 label="Import"
                 primary={true}
                 onClick={this.props.importExercise}
               />
-              <FlatButton
+              <Button
                 label="Create"
                 primary={true}
                 onClick={this.props.createStandardExercise}
@@ -103,17 +103,17 @@ class SelectExercise extends Component {
               une seule audience.
             </div>
             <div style={styles.buttons}>
-              <FlatButton
+              <Button
                 label="Cancel"
                 primary={true}
                 onClick={this.props.closeSelect}
               />
-              <FlatButton
+              <Button
                 label="Import"
                 primary={true}
                 onClick={this.props.importExercise}
               />
-              <FlatButton
+              <Button
                 label="Create"
                 primary={true}
                 onClick={this.props.createSimpleExercise}

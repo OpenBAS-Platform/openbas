@@ -4,11 +4,11 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Checkbox from '@material-ui/core/Checkbox';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
-import { FlatButton } from '../../../../components/Button';
+import Button from '@material-ui/core/Button';
 import { T } from '../../../../components/I18n';
-import { Checkbox } from '../../../../components/Checkbox';
 import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
@@ -32,13 +32,13 @@ const PlanificateurAudience = ({
   submitFormPlanificateur,
 }) => {
   const planificateurActions = [
-    <FlatButton
+    <Button
       key="cancel"
       label="Cancel"
       primary={true}
       onClick={handleClosePlanificateur}
     />,
-    <FlatButton
+    <Button
       key="submit"
       label="Submit"
       primary={true}

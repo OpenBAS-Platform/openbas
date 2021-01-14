@@ -6,7 +6,10 @@ import { Route, Switch, withRouter } from 'react-router';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { withStyles } from '@material-ui/core/styles';
-import { redirectToExercise, redirectToHome } from '../../../actions/Application';
+import {
+  redirectToExercise,
+  redirectToHome,
+} from '../../../actions/Application';
 import LeftBar from './nav/LeftBar';
 import { fetchExercise } from '../../../actions/Exercise';
 import IndexExercise from './Index';

@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { DialogTitleElement } from '../../../../../components/Dialog';
-import {
-  FlatButton,
-  ActionButtonCreate,
-} from '../../../../../components/Button';
 import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
 import AppBar from '../../../../../components/AppBar';
 import IncidentForm from './IncidentForm';
@@ -90,7 +87,6 @@ class CreateIncident extends Component {
   getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
-        /* eslint-disable */
         return (
           <IncidentForm
             ref="incidentForm"
@@ -99,9 +95,7 @@ class CreateIncident extends Component {
             types={this.props.incident_types}
           />
         );
-      /* eslint-enable */
       case 1:
-        /* eslint-disable */
         return (
           <IncidentSubobjectives
             ref="incidentSubobjectives"
@@ -112,7 +106,6 @@ class CreateIncident extends Component {
             incidentSubobjectivesIds={[]}
           />
         );
-      /* eslint-enable */
       default:
         return 'Go away!';
     }
@@ -120,13 +113,13 @@ class CreateIncident extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCreate.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label={this.state.stepIndex === 1 ? 'Create' : 'Next'}
         primary={true}
@@ -141,7 +134,7 @@ class CreateIncident extends Component {
             title={<T>Incidents</T>}
             showMenuIconButton={false}
             iconElementRight={
-              <ActionButtonCreate
+              <Button
                 type={Constants.BUTTON_TYPE_CREATE_RIGHT}
                 onClick={this.handleOpenCreate.bind(this)}
               />

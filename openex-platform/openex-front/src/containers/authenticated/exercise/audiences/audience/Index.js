@@ -13,7 +13,7 @@ import { fetchOrganizations } from "../../../../../actions/Organization";
 import { fetchAudiences } from "../../../../../actions/Audience";
 import { fetchSubaudiences } from "../../../../../actions/Subaudience";
 import { fetchComchecks } from "../../../../../actions/Comcheck";
-import { FlatButton } from "../../../../../components/Button";
+import Button from "@material-ui/core/Button";
 import { Toolbar } from "../../../../../components/Toolbar";
 import { Dialog } from "../../../../../components/Dialog";
 import Theme from "../../../../../components/Theme";
@@ -214,7 +214,7 @@ class IndexAudience extends Component {
 
   render() {
     const viewActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

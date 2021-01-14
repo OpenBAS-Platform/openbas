@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Observable } from 'rxjs';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -12,18 +13,15 @@ import { List } from '../../../../components/List';
 import { MainListItem } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
-import { FlatButton } from '../../../../components/Button';
-/* eslint-disable */
-import { fetchIncidents } from "../../../../actions/Incident";
-import { fetchLogs } from "../../../../actions/Log";
-import { fetchGroups } from "../../../../actions/Group";
-import { equalsSelector } from "../../../../utils/Selectors";
-import LogsPopover from "./LogsPopover";
-import LogPopover from "./LogPopover";
-import IncidentPopover from "./IncidentPopover";
-import OutcomeView from "./OutcomeView";
-import LogView from "./LogView";
-/* eslint-enable */
+import { fetchIncidents } from '../../../../actions/Incident';
+import { fetchLogs } from '../../../../actions/Log';
+import { fetchGroups } from '../../../../actions/Group';
+import { equalsSelector } from '../../../../utils/Selectors';
+import LogsPopover from './LogsPopover';
+import LogPopover from './LogPopover';
+import IncidentPopover from './IncidentPopover';
+import OutcomeView from './OutcomeView';
+import LogView from './LogView';
 
 i18nRegister({
   fr: {
@@ -146,7 +144,7 @@ class IndexExerciseLessons extends Component {
 
   render() {
     const outcomeActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}
@@ -154,7 +152,7 @@ class IndexExerciseLessons extends Component {
       />,
     ];
     const logActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

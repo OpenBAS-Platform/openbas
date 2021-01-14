@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import * as Constants from '../../../constants/ComponentTypes';
 import { Popover } from '../../../components/Popover';
 import { Menu } from '../../../components/Menu';
 import { Dialog } from '../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemButton } from '../../../components/menu/MenuItem';
 import { updateAudience } from '../../../actions/Audience';
@@ -98,14 +99,14 @@ class AudiencePopover extends Component {
     );
 
     const disableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
       audienceIsUpdatable ? (
-        <FlatButton
+        <Button
           label="Disable"
           primary={true}
           onClick={this.submitDisable.bind(this)}
@@ -115,14 +116,14 @@ class AudiencePopover extends Component {
       ),
     ];
     const enableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
       audienceIsUpdatable ? (
-        <FlatButton
+        <Button
           label="Enable"
           primary={true}
           onClick={this.submitEnable.bind(this)}

@@ -4,13 +4,13 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Observable } from 'rxjs';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { List } from '../../../../components/List';
 import Theme from '../../../../components/Theme';
-import { FlatButton } from '../../../../components/Button';
 import { MainListItem } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
@@ -200,7 +200,7 @@ class IndexExerciseDryrun extends Component {
 
   render() {
     const viewActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}
@@ -208,7 +208,7 @@ class IndexExerciseDryrun extends Component {
       />,
     ];
     const statusActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

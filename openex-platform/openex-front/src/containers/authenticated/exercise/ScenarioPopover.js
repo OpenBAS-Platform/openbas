@@ -4,35 +4,33 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
+import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import Timeline from '../../../components/Timeline';
 import { timeDiff } from '../../../utils/Time';
 import { i18nRegister } from '../../../utils/Messages';
 import * as Constants from '../../../constants/ComponentTypes';
-import { Dialog } from '../../../components/Dialog';
 import { Popover } from '../../../components/Popover';
 import { Menu } from '../../../components/Menu';
-import { IconButton, FlatButton } from '../../../components/Button';
 import { Icon } from '../../../components/Icon';
 import { MenuItemLink } from '../../../components/menu/MenuItem';
-/* eslint-disable */
 import {
   downloadExportInjects,
   shiftAllInjects,
   simulateChangeDurationExercise,
   changeDurationExercise,
-} from "../../../actions/Inject";
-
-import ShiftForm from "./ShiftForm";
-import InjectTable from "../../../components/InjectTable";
-import { T } from "../../../components/I18n";
-import { fetchExercise } from "../../../actions/Exercise";
+} from '../../../actions/Inject';
+import ShiftForm from './ShiftForm';
+import InjectTable from '../../../components/InjectTable';
+import { T } from '../../../components/I18n';
+import { fetchExercise } from '../../../actions/Exercise';
 import {
   START_TIME_OF_DAY,
   END_TIME_OF_DAY,
-} from "../../../constants/ComponentTypes";
-import Theme from "../../../components/Theme";
-import { redirectToHome } from "../../../actions/Application";
-/* eslint-enable */
+} from '../../../constants/ComponentTypes';
+import Theme from '../../../components/Theme';
+import { redirectToHome } from '../../../actions/Application';
 
 const style = {
   float: 'left',
@@ -397,13 +395,13 @@ class ScenarioPopover extends Component {
 
   render() {
     const shiftActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCancelShift.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="shift"
         label="Shift"
         primary={true}
@@ -411,13 +409,13 @@ class ScenarioPopover extends Component {
       />,
     ];
     const changeActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCancelChangeDuration.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="change"
         label="Simulate"
         primary={true}
@@ -425,13 +423,13 @@ class ScenarioPopover extends Component {
       />,
     ];
     const resumeChangeDurationActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCancelResumeChangeDuration.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="change"
         label="Modify"
         primary={true}
@@ -439,7 +437,7 @@ class ScenarioPopover extends Component {
       />,
     ];
     const abstractShiftActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 import { CKEditorField } from '../../../../../components/Field';
 import { TextField } from '../../../../../components/TextField';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import { FlatButton, Button } from '../../../../../components/Button';
 import DocumentGallery from '../../../DocumentGallery';
 import * as Constants from '../../../../../constants/ComponentTypes';
-import { Dialog } from '../../../../../components/Dialog';
 import { ToggleField } from '../../../../../components/ToggleField';
 import { Icon } from '../../../../../components/Icon';
 import { Chip } from '../../../../../components/Chip';
@@ -119,7 +119,7 @@ class InjectContentForm extends Component {
       );
     }
     const documentGalleryActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}

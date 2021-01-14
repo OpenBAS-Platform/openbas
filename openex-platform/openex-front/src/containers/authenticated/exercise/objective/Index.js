@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
@@ -12,7 +13,6 @@ import {
   SecondaryListItem,
 } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
-import { FlatButton } from '../../../../components/Button';
 /* eslint-disable */
 import { fetchObjectives } from "../../../../actions/Objective";
 import { fetchSubobjectives } from "../../../../actions/Subobjective";
@@ -94,7 +94,7 @@ class IndexObjective extends Component {
 
   render() {
     const objectiveActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}
@@ -102,7 +102,7 @@ class IndexObjective extends Component {
       />,
     ];
     const subobjectiveActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

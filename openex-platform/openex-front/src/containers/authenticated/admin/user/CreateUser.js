@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 import { i18nRegister } from '../../../../utils/Messages';
 import { addUser } from '../../../../actions/User';
-import {
-  FlatButton,
-  FloatingActionsButtonCreate,
-} from '../../../../components/Button';
 import UserForm from './UserForm';
 import * as Constants from '../../../../constants/ComponentTypes';
 
@@ -42,13 +40,13 @@ class CreateUser extends Component {
 
   render() {
     const actionsCreateUser = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCreate.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create user"
         primary={true}
@@ -58,7 +56,7 @@ class CreateUser extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate
+        <Fab
           type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpenCreate.bind(this)}
         />

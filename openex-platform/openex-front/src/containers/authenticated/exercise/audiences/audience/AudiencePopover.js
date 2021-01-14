@@ -8,39 +8,38 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-/* eslint-disable */
 import {
   redirectToAudiences,
   redirectToComcheck,
-} from "../../../../../actions/Application";
-import * as Constants from "../../../../../constants/ComponentTypes";
-import { Popover } from "../../../../../components/Popover";
-import { Menu } from "../../../../../components/Menu";
-import { Dialog } from "../../../../../components/Dialog";
-import { IconButton, FlatButton } from "../../../../../components/Button";
-import { Checkbox } from "../../../../../components/Checkbox";
-import { Icon } from "../../../../../components/Icon";
+} from '../../../../../actions/Application';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import { Popover } from '../../../../../components/Popover';
+import { Menu } from '../../../../../components/Menu';
+import { Checkbox } from '../../../../../components/Checkbox';
+import { Icon } from '../../../../../components/Icon';
 import {
   MenuItemLink,
   MenuItemButton,
-} from "../../../../../components/menu/MenuItem";
-import { addComcheck } from "../../../../../actions/Comcheck";
+} from '../../../../../components/menu/MenuItem';
+import { addComcheck } from '../../../../../actions/Comcheck';
 import {
   updateAudience,
   downloadExportAudience,
   deleteAudience,
   copyAudienceToExercise,
-} from "../../../../../actions/Audience";
+} from '../../../../../actions/Audience';
 import {
   getPlanificateurUserForAudience,
   updatePlanificateurUserForAudience,
-} from "../../../../../actions/Planificateurs";
-import AudienceForm from "./AudienceForm";
-import ComcheckForm from "../../check/ComcheckForm";
-import { fetchExercises } from "../../../../../actions/Exercise";
-/* eslint-enable */
+} from '../../../../../actions/Planificateurs';
+import AudienceForm from './AudienceForm';
+import ComcheckForm from '../../check/ComcheckForm';
+import { fetchExercises } from '../../../../../actions/Exercise';
 import { dateFormat, timeDiff } from '../../../../../utils/Time';
 import PlanificateurAudience from '../../planificateurs/PlanificateurAudience';
 
@@ -324,13 +323,13 @@ class AudiencePopover extends Component {
     };
 
     const comCopyAudienceToOtherExercise = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCopyAudienceToOtherExercise.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="launch"
         label="Launch"
         primary={true}
@@ -339,13 +338,13 @@ class AudiencePopover extends Component {
     ];
 
     const comcheckActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseComcheck.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="launch"
         label="Launch"
         primary={true}
@@ -354,14 +353,14 @@ class AudiencePopover extends Component {
     ];
 
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
       audienceIsUpdatable ? (
-        <FlatButton
+        <Button
           key="update"
           label="Update"
           primary={true}
@@ -372,14 +371,14 @@ class AudiencePopover extends Component {
       ),
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       audienceIsDeletable ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}
@@ -390,14 +389,14 @@ class AudiencePopover extends Component {
       ),
     ];
     const disableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDisable.bind(this)}
       />,
       audienceIsUpdatable ? (
-        <FlatButton
+        <Button
           key="disable"
           label="Disable"
           primary={true}
@@ -408,14 +407,14 @@ class AudiencePopover extends Component {
       ),
     ];
     const enableActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEnable.bind(this)}
       />,
       audienceIsUpdatable ? (
-        <FlatButton
+        <Button
           key="enable"
           label="Enable"
           primary={true}

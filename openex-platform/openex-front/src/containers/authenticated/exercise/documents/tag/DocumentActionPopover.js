@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { Popover } from '../../../../../components/Popover';
 import { Menu } from '../../../../../components/Menu';
-import { Dialog } from '../../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../../components/Button';
 import { Icon } from '../../../../../components/Icon';
 import { MenuItemLink } from '../../../../../components/menu/MenuItem';
 import { T } from '../../../../../components/I18n';
@@ -77,13 +78,13 @@ class DocumentActionPopover extends Component {
 
   render() {
     const actionsOpenConfirmDelete = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseOpenConfirmDelete.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="submit"
         label="Submit"
         primary={true}

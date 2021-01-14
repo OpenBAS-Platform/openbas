@@ -7,13 +7,13 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Button from '@material-ui/core/Button';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Popover } from '../../../../components/Popover';
 import { Menu } from '../../../../components/Menu';
 import { Dialog, DialogTitleElement } from '../../../../components/Dialog';
-import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import {
   MenuItemLink,
@@ -25,14 +25,12 @@ import { Chip } from '../../../../components/Chip';
 import { Avatar } from '../../../../components/Avatar';
 import { List } from '../../../../components/List';
 import { MainSmallListItem } from '../../../../components/list/ListItem';
-/* eslint-disable */
 import {
   fetchGroup,
   updateGroup,
   deleteGroup,
-} from "../../../../actions/Group";
-import { addGrant, deleteGrant } from "../../../../actions/Grant";
-/* eslint-enable */
+} from '../../../../actions/Group';
+import { addGrant, deleteGrant } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
 
 i18nRegister({
@@ -215,13 +213,13 @@ class GroupPopover extends Component {
 
   render() {
     const grantsActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseGrants.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="update"
         label="Update"
         primary={true}
@@ -229,13 +227,13 @@ class GroupPopover extends Component {
       />,
     ];
     const usersActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseUsers.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="update"
         label="Update"
         primary={true}
@@ -243,13 +241,13 @@ class GroupPopover extends Component {
       />,
     ];
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="update"
         label="Update"
         primary={true}
@@ -257,13 +255,13 @@ class GroupPopover extends Component {
       />,
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="delete"
         label="Delete"
         primary={true}
@@ -284,9 +282,9 @@ class GroupPopover extends Component {
 
     return (
       <div style={styles.main}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
+        <Button onClick={this.handlePopoverOpen.bind(this)}>
           <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </IconButton>
+        </Button>
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}

@@ -2,30 +2,29 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
-/* eslint-disable */
-import { redirectToScenario } from "../../../../../actions/Application";
-import * as Constants from "../../../../../constants/ComponentTypes";
-import { Popover } from "../../../../../components/Popover";
-import { Menu } from "../../../../../components/Menu";
-import { Dialog } from "../../../../../components/Dialog";
-import { IconButton, FlatButton } from "../../../../../components/Button";
-import { Icon } from "../../../../../components/Icon";
+import { redirectToScenario } from '../../../../../actions/Application';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import { Popover } from '../../../../../components/Popover';
+import { Menu } from '../../../../../components/Menu';
+import { Icon } from '../../../../../components/Icon';
 import {
   MenuItemLink,
   MenuItemButton,
-} from "../../../../../components/menu/MenuItem";
+} from '../../../../../components/menu/MenuItem';
 import {
   updateEvent,
   deleteEvent,
   importEvent,
-} from "../../../../../actions/Event";
+} from '../../../../../actions/Event';
 import {
   getPlanificateurUserForEvent,
   updatePlanificateurUserForEvent,
-} from "../../../../../actions/Planificateurs";
-/* eslint-enable */
+} from '../../../../../actions/Planificateurs';
 import EventForm from './EventForm';
 import PlanificateurEvent from '../../planificateurs/PlanificateurEvent';
 
@@ -180,14 +179,14 @@ class EventPopover extends Component {
     );
     const { userCanUpdate } = this.props;
     const editActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseEdit.bind(this)}
       />,
       eventIsUpdatable ? (
-        <FlatButton
+        <Button
           key="update"
           label="Update"
           primary={true}
@@ -198,14 +197,14 @@ class EventPopover extends Component {
       ),
     ];
     const deleteActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseDelete.bind(this)}
       />,
       eventIsDeletable ? (
-        <FlatButton
+        <Button
           key="delete"
           label="Delete"
           primary={true}

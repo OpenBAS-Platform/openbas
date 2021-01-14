@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Observable } from 'rxjs';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
 import { equalsSelector } from '../../../../utils/Selectors';
@@ -14,7 +15,6 @@ import { List } from '../../../../components/List';
 import { MainListItem } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
-import { FlatButton } from '../../../../components/Button';
 import { CircularSpinner } from '../../../../components/Spinner';
 import Countdown from '../../../../components/Countdown';
 /* eslint-disable */
@@ -235,7 +235,7 @@ class IndexExecution extends Component {
 
   render() {
     const viewActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}
@@ -243,7 +243,7 @@ class IndexExecution extends Component {
       />,
     ];
     const statusActions = [
-      <FlatButton
+      <Button
         key="close"
         label="Close"
         primary={true}

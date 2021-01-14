@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
-import { Dialog } from '../../../../../components/Dialog';
-import { FlatButton } from '../../../../../components/Button';
 import { addTag } from '../../../../../actions/Tag';
 import TagForm from './TagForm';
 
@@ -37,13 +37,13 @@ class CreateTag extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleClose.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create"
         primary={true}
@@ -53,7 +53,7 @@ class CreateTag extends Component {
 
     return (
       <div>
-        <FlatButton
+        <Button
           label="Create a new tag"
           primary={true}
           onClick={this.handleOpen.bind(this)}

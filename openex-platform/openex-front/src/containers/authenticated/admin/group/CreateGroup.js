@@ -2,11 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
 import { addGroup } from '../../../../actions/Group';
-import {
-  FlatButton,
-  FloatingActionsButtonCreate,
-} from '../../../../components/Button';
 import UserForm from './GroupForm';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -42,13 +39,13 @@ class CreateGroup extends Component {
 
   render() {
     const actionsCreateGroup = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseCreate.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label="Create group"
         primary={true}
@@ -58,7 +55,7 @@ class CreateGroup extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate
+        <Button
           type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpenCreate.bind(this)}
         />

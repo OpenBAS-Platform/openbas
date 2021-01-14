@@ -7,6 +7,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Button from '@material-ui/core/Button';
 import { T } from '../../components/I18n';
 import { i18nRegister } from '../../utils/Messages';
 import { timeDiff } from '../../utils/Time';
@@ -28,7 +29,6 @@ import {
   TagSmallListe,
   TagSmallExerciseListe,
 } from './exercise/documents/component/Tag';
-import { FlatButton } from '../../components/Button';
 
 const styles = {
   container: {
@@ -488,7 +488,7 @@ class DocumentGallery extends Component {
                 </TableBody>
               </Table>
             </div>
-            <FlatButton
+            <Button
               label="Add new document"
               primary={true}
               onClick={this.openFileDialog.bind(this)}

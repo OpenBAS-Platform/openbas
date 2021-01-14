@@ -2,27 +2,23 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { dateToISO } from '../../../../../utils/Time';
 import * as Constants from '../../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchIncident } from "../../../../../actions/Incident";
-import { downloadFile } from "../../../../../actions/File";
+import { fetchIncident } from '../../../../../actions/Incident';
+import { downloadFile } from '../../../../../actions/File';
 import {
   addInject,
   updateInject,
   deleteInject,
-} from "../../../../../actions/Inject";
-import { DialogTitleElement } from "../../../../../components/Dialog";
-import { Step, Stepper, StepLabel } from "../../../../../components/Stepper";
-import {
-  FlatButton,
-  FloatingActionsButtonCreate,
-} from "../../../../../components/Button";
-import InjectForm from "./InjectForm";
-import InjectContentForm from "./InjectContentForm";
-/* eslint-enable */
+} from '../../../../../actions/Inject';
+import { DialogTitleElement } from '../../../../../components/Dialog';
+import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
+import InjectForm from './InjectForm';
+import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
 
 i18nRegister({
@@ -255,13 +251,13 @@ class CreateInject extends Component {
 
   render() {
     const actions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleClose.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="create"
         label={this.state.stepIndex === 2 ? 'Create' : 'Next'}
         primary={true}
@@ -271,7 +267,7 @@ class CreateInject extends Component {
 
     return (
       <div>
-        <FloatingActionsButtonCreate
+        <Fab
           type={Constants.BUTTON_TYPE_FLOATING_PADDING}
           onClick={this.handleOpen.bind(this)}
         />

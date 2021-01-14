@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Dialog from '@material-ui/core/Dialog';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
 import { Popover } from '../../../../components/Popover';
 import { Menu } from '../../../../components/Menu';
-import { IconButton, FlatButton } from '../../../../components/Button';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
 /* eslint-disable */
@@ -68,13 +69,13 @@ class DryrunsPopover extends Component {
 
   render() {
     const launchActions = [
-      <FlatButton
+      <Button
         key="cancel"
         label="Cancel"
         primary={true}
         onClick={this.handleCloseLaunch.bind(this)}
       />,
-      <FlatButton
+      <Button
         key="launch"
         label="Launch"
         primary={true}

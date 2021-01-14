@@ -7,10 +7,7 @@ const renderCheckbox = ({ input, label, style }) => (
   <div>
     <FormControlLabel
       control={
-        <MUICheckbox
-          checked={!!input.value}
-          onChange={input.onChange}
-        />
+        <MUICheckbox checked={!!input.value} onChange={input.onChange} />
       }
       label={label}
       style={style}

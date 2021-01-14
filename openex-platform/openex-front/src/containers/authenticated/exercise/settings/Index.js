@@ -124,10 +124,6 @@ class Index extends Component {
     };
   }
 
-  componentDidMount() {
-    this.props.fetchGroups();
-  }
-
   onUpdate(data) {
     const newData = R.pipe(
       // Need to convert date to ISO format with timezone
