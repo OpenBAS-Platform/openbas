@@ -9,23 +9,24 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import {
   redirectToAudiences,
   redirectToComcheck,
 } from '../../../../../actions/Application';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
 import { Checkbox } from '../../../../../components/Checkbox';
-import { Icon } from '../../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
 import { addComcheck } from '../../../../../actions/Comcheck';
 import {
   updateAudience,
@@ -42,10 +43,7 @@ import ComcheckForm from '../../check/ComcheckForm';
 import { fetchExercises } from '../../../../../actions/Exercise';
 import { dateFormat, timeDiff } from '../../../../../utils/Time';
 import PlanificateurAudience from '../../planificateurs/PlanificateurAudience';
-
-const style = {
-  margin: '8px -30px 0 0',
-};
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -53,7 +51,8 @@ i18nRegister({
     'Do you want to delete this audience?':
       'Souhaitez-vous supprimer cette audience ?',
     'Launch a comcheck': 'Lancer un test de communication',
-    'Copy Audience to Exercise': "Copier l'audience vers un autre exercice",
+    'Copy audience to another exercise':
+      "Copier l'audience vers un autre exercice",
     'Communication check': 'Test de communication',
     Hello: 'Bonjour',
     'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:':
@@ -70,13 +69,27 @@ i18nRegister({
     'Start Date': 'Date de début',
     'End Date': 'Date de fin',
     Copy: 'Copier',
+    'List of planners': 'Liste des planificateurs',
   },
 });
+
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -6,
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class AudiencePopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      anchorEl: null,
       openDelete: false,
       openEdit: false,
       openComcheck: false,
@@ -84,7 +97,6 @@ class AudiencePopover extends Component {
       openCopyAudience: false,
       openEnable: false,
       openDisable: false,
-      openPopover: false,
       exercicesToAdd: [],
       planificateursAudience: [],
     };
@@ -95,12 +107,11 @@ class AudiencePopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation();
-    this.setState({ openPopover: true, anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenPlanificateur() {
@@ -171,11 +182,13 @@ class AudiencePopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateAudience(
-      this.props.exerciseId,
-      this.props.audience.audience_id,
-      data,
-    );
+    return this.props
+      .updateAudience(
+        this.props.exerciseId,
+        this.props.audience.audience_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   submitFormEdit() {
@@ -293,6 +306,7 @@ class AudiencePopover extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const audienceEnabled = R.propOr(
       true,
       'audience_enabled',
@@ -308,9 +322,6 @@ class AudiencePopover extends Component {
       'user_can_delete',
       this.props.audience,
     );
-    const { exerciseOwnerId } = this.props;
-    const { userId } = this.props;
-
     const initialComcheckValues = {
       comcheck_audience: R.propOr(0, 'audience_id', this.props.audience),
       comcheck_subject: this.t('Communication check'),
@@ -321,7 +332,6 @@ class AudiencePopover extends Component {
         'The exercise control Team',
       )}`,
     };
-
     const comCopyAudienceToOtherExercise = [
       <Button
         key="cancel"
@@ -335,58 +345,6 @@ class AudiencePopover extends Component {
         primary={true}
         onClick={this.onSubmitCopyAudience.bind(this)}
       />,
-    ];
-
-    const comcheckActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseComcheck.bind(this)}
-      />,
-      <Button
-        key="launch"
-        label="Launch"
-        primary={true}
-        onClick={this.submitFormComcheck.bind(this)}
-      />,
-    ];
-
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      audienceIsUpdatable ? (
-        <Button
-          key="update"
-          label="Update"
-          primary={true}
-          onClick={this.submitFormEdit.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      audienceIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
     ];
     const disableActions = [
       <Button
@@ -424,111 +382,121 @@ class AudiencePopover extends Component {
         ''
       ),
     ];
-
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            color="#ffffff"
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-          />
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-        <Popover
-          open={this.state.openPopover}
+        <Menu
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Launch a comcheck"
-              onClick={this.handleOpenComcheck.bind(this)}
-            />
-            {exerciseOwnerId === userId ? (
-              <MenuItemLink
-                label="Liste des planificateurs"
-                onClick={this.handleOpenPlanificateur.bind(this)}
-              />
+          <MenuItem onClick={this.handleOpenComcheck.bind(this)}>
+            <T>Launch a comcheck</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenPlanificateur.bind(this)}>
+            <T>List of planners</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenCopyAudienceToOtherExercise.bind(this)}
+          >
+            <T>Copy audience to another exercise</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!audienceIsUpdatable}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          {audienceIsUpdatable
+            && (audienceEnabled ? (
+              <MenuItem onClick={this.handleOpenDisable.bind(this)}>
+                <T>Disable</T>
+              </MenuItem>
             ) : (
-              ''
-            )}
-            <MenuItemLink
-              label="Copy Audience to Exercise"
-              onClick={this.handleOpenCopyAudienceToOtherExercise.bind(this)}
-            />
-            {audienceIsUpdatable ? (
-              <MenuItemLink
-                label="Edit"
-                onClick={this.handleOpenEdit.bind(this)}
-              />
-            ) : (
-              ''
-            )}
-            {/* eslint-disable-next-line no-nested-ternary */}
-            {audienceIsUpdatable ? (
-              audienceEnabled ? (
-                <MenuItemButton
-                  label="Disable"
-                  onClick={this.handleOpenDisable.bind(this)}
-                />
-              ) : (
-                <MenuItemButton
-                  label="Enable"
-                  onClick={this.handleOpenEnable.bind(this)}
-                />
-              )
-            ) : (
-              ''
-            )}
-            <MenuItemLink
-              label="Export to XLS"
-              onClick={this.handleDownloadAudience.bind(this)}
-            />
-            {audienceIsDeletable ? (
-              <MenuItemButton
-                label="Delete"
-                onClick={this.handleOpenDelete.bind(this)}
-              />
-            ) : (
-              ''
-            )}
-          </Menu>
-        </Popover>
+              <MenuItem onClick={this.handleOpenEnable.bind(this)}>
+                <T>Enable</T>
+              </MenuItem>
+            ))}
+          <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
+            <T>Export to XLS</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!audienceIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the audience"
-          modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
         >
-          {/* eslint-disable */}
-          <AudienceForm
-            ref="audienceForm"
-            initialValues={R.pick(["audience_name"], this.props.audience)}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Update the audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <AudienceForm
+              initialValues={R.pick(['audience_name'], this.props.audience)}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('audienceForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
         <Dialog
-          title="Copy Audience to Exercise"
+          title=""
           modal={false}
           open={this.state.openCopyAudience}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseCopyAudienceToOtherExercise.bind(
-            this,
-          )}
+          onClose={this.handleCloseCopyAudienceToOtherExercise.bind(this)}
           actions={comCopyAudienceToOtherExercise}
         >
+          <DialogTitle>Copy audience to another exercise</DialogTitle>
           {this.props.exercises.length === 0 ? (
             <div>
               <T>No excercise found.</T>
@@ -589,24 +557,37 @@ class AudiencePopover extends Component {
           </form>
         </Dialog>
         <Dialog
-          title="Launch a comcheck"
-          modal={false}
           open={this.state.openComcheck}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseComcheck.bind(this)}
-          actions={comcheckActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseComcheck.bind(this)}
         >
-          {/* eslint-disable */}
-          <ComcheckForm
-            ref="comcheckForm"
-            audiences={this.props.audiences}
-            initialValues={initialComcheckValues}
-            onSubmit={this.onSubmitComcheck.bind(this)}
-            onSubmitSuccess={this.handleCloseComcheck.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Launch a comcheck</T>
+          </DialogTitle>
+          <DialogContent>
+            <ComcheckForm
+              audiences={this.props.audiences}
+              initialValues={initialComcheckValues}
+              onSubmit={this.onSubmitComcheck.bind(this)}
+              onSubmitSuccess={this.handleCloseComcheck.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseComcheck.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="seondary"
+              onClick={this.submitFormComcheck.bind(this)}
+            >
+              <T>Launch</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
         <PlanificateurAudience
           planificateursAudience={this.state.planificateursAudience}
           audienceId={this.props.audience.audience_id}
@@ -615,7 +596,6 @@ class AudiencePopover extends Component {
           handleClosePlanificateur={this.handleClosePlanificateur.bind(this)}
           submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
         />
-
         <Dialog
           title="Confirmation"
           modal={false}
@@ -685,15 +665,18 @@ AudiencePopover.propTypes = {
   exercises: PropTypes.array,
 };
 
-export default connect(select, {
-  getPlanificateurUserForAudience,
-  updatePlanificateurUserForAudience,
-  fetchExercises,
-  updateAudience,
-  copyAudienceToExercise,
-  downloadExportAudience,
-  deleteAudience,
-  addComcheck,
-  redirectToAudiences,
-  redirectToComcheck,
-})(injectIntl(AudiencePopover));
+export default R.compose(
+  connect(select, {
+    getPlanificateurUserForAudience,
+    updatePlanificateurUserForAudience,
+    fetchExercises,
+    updateAudience,
+    copyAudienceToExercise,
+    downloadExportAudience,
+    deleteAudience,
+    addComcheck,
+    redirectToAudiences,
+    redirectToComcheck,
+  }),
+  withStyles(styles),
+)(injectIntl(AudiencePopover));

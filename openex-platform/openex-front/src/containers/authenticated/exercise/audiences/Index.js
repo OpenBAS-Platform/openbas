@@ -2,39 +2,39 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Theme from '../../../../components/Theme';
+import Typography from '@material-ui/core/Typography';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { green, red } from '@material-ui/core/colors';
+import { withStyles } from '@material-ui/core/styles';
+import { GroupOutlined, KeyboardArrowRightOutlined } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchAudiences } from "../../../../actions/Audience";
-import { fetchGroups } from "../../../../actions/Group";
-import { SearchField } from "../../../../components/SimpleTextField";
-import { Icon } from "../../../../components/Icon";
-import { List } from "../../../../components/List";
-import { MainListItemLink } from "../../../../components/list/ListItem";
-import CreateAudience from "./audience/CreateAudience";
-/* eslint-enable */
+import { fetchAudiences } from '../../../../actions/Audience';
+import { fetchGroups } from '../../../../actions/Group';
+import { SearchField } from '../../../../components/SearchField';
+import CreateAudience from './audience/CreateAudience';
 
-const styles = {
+const styles = () => ({
   container: {
-    textAlign: 'left',
-  },
-  empty: {
-    marginTop: 30,
-    fontSize: '18px',
-    fontWeight: 500,
-    textAlign: 'center',
-  },
-  title: {
-    float: 'left',
-    fontSize: '13px',
-    textTransform: 'uppercase',
+    position: 'relative',
   },
   search: {
-    float: 'right',
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
-};
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
+  },
+});
 
 i18nRegister({
   fr: {
@@ -56,91 +56,64 @@ class IndexAudiences extends Component {
     this.props.fetchGroups();
   }
 
-  handleSearchAudiences(event, value) {
-    this.setState({ searchTerm: value });
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
+  handleSearchAudiences(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   render() {
-    const keyword = this.state.searchTerm;
-    const filterByKeyword = (n) => keyword === ''
-      || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const filteredAudiences = R.filter(filterByKeyword, this.props.audiences);
-
+    const { classes, audiences } = this.props;
+    const { searchTerm } = this.state;
+    const filterByKeyword = (n) => searchTerm === ''
+      || n.audience_name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1;
+    const filteredAudiences = R.filter(filterByKeyword, audiences);
     return (
-      <div style={styles.container}>
-        <div style={styles.title}>
-          <T>Audiences</T>
+      <div className={classes.container}>
+        <div>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            <T>Audiences</T>
+          </Typography>
+          <div className={classes.search}>
+            <SearchField onChange={this.handleSearchAudiences.bind(this)} />
+          </div>
+          <div className="clearfix" />
         </div>
-        <div style={styles.search}>
-          <SearchField
-            name="keyword"
-            fullWidth={true}
-            type="text"
-            hintText="Search"
-            onChange={this.handleSearchAudiences.bind(this)}
-            styletype={Constants.FIELD_TYPE_RIGHT}
-          />
-        </div>
-        <div className="clearfix" />
-        {this.props.audiences.length === 0 ? (
+        {this.props.audiences.length === 0 && (
           <div style={styles.empty}>
             <T>You do not have any audiences in this exercise.</T>
           </div>
-        ) : (
-          ''
         )}
         <List>
           {filteredAudiences.map((audience) => (
-            <MainListItemLink
-              to={`/private/exercise/${this.props.exerciseId}/audiences/${audience.audience_id}`}
+            <ListItem
               key={audience.audience_id}
-              leftIcon={
-                <Icon
-                  name={Constants.ICON_NAME_SOCIAL_GROUP}
-                  color={this.switchColor(!audience.audience_enabled)}
-                />
-              }
-              primaryText={
-                <div
-                  style={{
-                    color: this.switchColor(!audience.audience_enabled),
-                  }}
-                >
-                  {audience.audience_name}
-                </div>
-              }
-              secondaryText={
-                <div
-                  style={{
-                    color: this.switchColor(!audience.audience_enabled),
-                  }}
-                >
-                  {audience.audience_users_number}&nbsp;
-                  <T>players</T>
-                </div>
-              }
-              rightIcon={
-                <Icon
-                  name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
-                  color={this.switchColor(!audience.audience_enabled)}
-                />
-              }
-            />
+              component={Link}
+              button={true}
+              to={`/private/exercise/${this.props.exerciseId}/audiences/${audience.audience_id}`}
+              divider={true}
+            >
+              <ListItemIcon
+                className={
+                  audience.audience_enabled ? classes.enabled : classes.disabled
+                }
+              >
+                <GroupOutlined />
+              </ListItemIcon>
+              <ListItemText
+                primary={audience.audience_name}
+                secondary={
+                  <span>
+                    {audience.audience_users_number} <T>players</T>
+                  </span>
+                }
+              />
+              <ListItemSecondaryAction>
+                <KeyboardArrowRightOutlined />
+              </ListItemSecondaryAction>
+            </ListItem>
           ))}
         </List>
-
-        {this.props.userCanUpdate ? (
+        {this.props.userCanUpdate && (
           <CreateAudience exerciseId={this.props.exerciseId} />
-        ) : (
-          ''
         )}
       </div>
     );
@@ -165,14 +138,12 @@ const filteredAudiences = (audiences, exerciseId) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -192,18 +163,16 @@ const checkUserCanUpdate = (state, ownProps) => {
       });
     });
   }
-
   return userCanUpdate;
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const audiences = filteredAudiences(
     state.referential.entities.audiences,
     exerciseId,
   );
   const userCanUpdate = checkUserCanUpdate(state, ownProps);
-
   return {
     exerciseId,
     audiences,
@@ -211,7 +180,10 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  fetchAudiences,
-  fetchGroups,
-})(IndexAudiences);
+export default R.compose(
+  connect(select, {
+    fetchAudiences,
+    fetchGroups,
+  }),
+  withStyles(styles),
+)(IndexAudiences);

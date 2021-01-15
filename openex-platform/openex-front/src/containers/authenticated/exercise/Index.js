@@ -640,7 +640,6 @@ class IndexExercise extends Component {
               const playersText = `${
                 audienceUsers.length
               } ${this.props.intl.formatMessage({ id: 'players' })}`;
-
               return (
                 <MainSmallListItem
                   key={audienceId}

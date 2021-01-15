@@ -3,10 +3,8 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import * as Constants from '../../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchUsers } from "../../../../../actions/User";
-import { fetchOrganizations } from "../../../../../actions/Organization";
-/* eslint-enable */
+import { fetchUsers } from '../../../../../actions/User';
+import { fetchOrganizations } from '../../../../../actions/Organization';
 import {
   MainSmallListItem,
   SecondarySmallListItem,

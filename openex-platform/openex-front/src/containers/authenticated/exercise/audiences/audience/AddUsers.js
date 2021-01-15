@@ -4,12 +4,12 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
+import Dialog from '@material-ui/core/Dialog';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
 import { updateSubaudience } from '../../../../../actions/Subaudience';
 import { fetchUsers } from '../../../../../actions/User';
 import CreateUser from './CreateUser';
-import { DialogTitleElement } from '../../../../../components/Dialog';
 import { Chip } from '../../../../../components/Chip';
 import { Avatar } from '../../../../../components/Avatar';
 import { List } from '../../../../../components/List';
@@ -143,7 +143,7 @@ class AddUsers extends Component {
           type={Constants.BUTTON_TYPE_FLOATING_PADDING}
           onClick={this.handleOpenAddUsers.bind(this)}
         />
-        <DialogTitleElement
+        <Dialog
           title={
             <SimpleTextField
               name="keyword"
@@ -221,7 +221,7 @@ class AddUsers extends Component {
               })}
             </List>
           </div>
-        </DialogTitleElement>
+        </Dialog>
       </div>
     );
   }

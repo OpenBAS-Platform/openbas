@@ -1,22 +1,48 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
+import AppBar from '@material-ui/core/AppBar';
+import Typography from '@material-ui/core/Typography';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+import { Add } from '@material-ui/icons';
+import Toolbar from '@material-ui/core/Toolbar';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import AppBar from '../../../../../components/AppBar';
 import SubaudienceForm from './SubaudienceForm';
 import {
   addSubaudience,
   selectSubaudience,
 } from '../../../../../actions/Subaudience';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Sub-audiences': 'Sous-audiences',
     'Create a new sub-audience': 'Créer une nouvelle sous-audience',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
+  },
+  container: {
+    padding: 15,
   },
 });
 
@@ -46,57 +72,51 @@ class CreateSubaudience extends Component {
       });
   }
 
-  submitFormCreate() {
-    this.refs.subaudienceForm.submit();
-  }
-
   render() {
-    const actions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCreate.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create"
-        primary={true}
-        onClick={this.submitFormCreate.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
       <div>
-        {this.props.can_create ? (
-          <AppBar
-            title={<T>Sub-audiences</T>}
-            showMenuIconButton={false}
-            iconElementRight={
-              <Button
-                type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                onClick={this.handleOpenCreate.bind(this)}
-              />
-            }
-          />
-        ) : (
-          <AppBar title={<T>Sub-audiences</T>} showMenuIconButton={false} />
+        <Toolbar />
+        <div className={classes.container}>
+        <Typography variant="h5">
+          <T>Sub-audiences</T>
+        </Typography>
+        {this.props.can_create && (
+          <IconButton
+            className={classes.createButton}
+            onClick={this.handleOpenCreate.bind(this)}
+          >
+            <Add />
+          </IconButton>
         )}
         <Dialog
-          title="Create a new sub-audience"
-          modal={false}
           open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseCreate.bind(this)}
         >
-          {/* eslint-disable */}
-          <SubaudienceForm
-            ref="subaudienceForm"
-            onSubmit={this.onSubmitCreate.bind(this)}
-            onSubmitSuccess={this.handleCloseCreate.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Create a new sub-audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <SubaudienceForm onSubmit={this.onSubmitCreate.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('subaudienceForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
+      </div>
       </div>
     );
   }
@@ -110,7 +130,10 @@ CreateSubaudience.propTypes = {
   can_create: PropTypes.bool,
 };
 
-export default connect(null, {
-  addSubaudience,
-  selectSubaudience,
-})(CreateSubaudience);
+export default R.compose(
+  connect(null, {
+    addSubaudience,
+    selectSubaudience,
+  }),
+  withStyles(styles),
+)(CreateSubaudience);

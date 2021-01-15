@@ -15,7 +15,7 @@ import {
   MainListItem,
 } from '../../../../../components/list/ListItem';
 import { Icon } from '../../../../../components/Icon';
-import { SearchField } from '../../../../../components/SimpleTextField';
+import { SearchField } from '../../../../../components/SearchField';
 /* eslint-disable */
 import { fetchAudiences } from "../../../../../actions/Audience";
 import { fetchSubaudiences } from "../../../../../actions/Subaudience";

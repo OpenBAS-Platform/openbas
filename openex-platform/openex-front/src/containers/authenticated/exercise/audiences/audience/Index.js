@@ -2,35 +2,34 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { timeDiff } from '../../../../../utils/Time';
 import * as Constants from '../../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchGroups } from "../../../../../actions/Group";
-import { fetchUsers } from "../../../../../actions/User";
-import { fetchOrganizations } from "../../../../../actions/Organization";
-import { fetchAudiences } from "../../../../../actions/Audience";
-import { fetchSubaudiences } from "../../../../../actions/Subaudience";
-import { fetchComchecks } from "../../../../../actions/Comcheck";
-import Button from "@material-ui/core/Button";
-import { Toolbar } from "../../../../../components/Toolbar";
-import { Dialog } from "../../../../../components/Dialog";
-import Theme from "../../../../../components/Theme";
-import { List } from "../../../../../components/List";
+import { fetchGroups } from '../../../../../actions/Group';
+import { fetchUsers } from '../../../../../actions/User';
+import { fetchOrganizations } from '../../../../../actions/Organization';
+import { fetchAudiences } from '../../../../../actions/Audience';
+import { fetchSubaudiences } from '../../../../../actions/Subaudience';
+import { fetchComchecks } from '../../../../../actions/Comcheck';
+import Theme from '../../../../../components/Theme';
+import { List } from '../../../../../components/List';
 import {
   AvatarHeaderItem,
   AvatarListItem,
-} from "../../../../../components/list/ListItem";
-import { Avatar } from "../../../../../components/Avatar";
-import { Icon } from "../../../../../components/Icon";
-import { SearchField } from "../../../../../components/SimpleTextField";
-import SubaudienceNav from "./SubaudienceNav";
-import AudiencePopover from "./AudiencePopover";
-import SubaudiencePopover from "./SubaudiencePopover";
-import AddUsers from "./AddUsers";
-import UserPopover from "./UserPopover";
-/* eslint-enable */
+} from '../../../../../components/list/ListItem';
+import { Avatar } from '../../../../../components/Avatar';
+import { Icon } from '../../../../../components/Icon';
+import { SearchField } from '../../../../../components/SimpleTextField';
+import SubaudienceNav from './SubaudienceNav';
+import AudiencePopover from './AudiencePopover';
+import SubaudiencePopover from './SubaudiencePopover';
+import AddUsers from './AddUsers';
+import UserPopover from './UserPopover';
 import UserView from './UserView';
 
 i18nRegister({
@@ -48,9 +47,16 @@ i18nRegister({
   },
 });
 
-const styles = {
+const styles = () => ({
   container: {
     paddingRight: '300px',
+  },
+  toolbar: {
+    position: 'fixed',
+    top: 0,
+    right: 320,
+    zIndex: '5000',
+    backgroundColor: 'none',
   },
   header: {
     avatar: {
@@ -125,9 +131,9 @@ const styles = {
   users: {
     float: 'left',
     fontSize: '12px',
-    color: Theme.palette.accent3Color,
+    color: Theme.palette.secondary,
   },
-};
+});
 
 class IndexAudience extends Component {
   constructor(props) {
@@ -169,7 +175,7 @@ class IndexAudience extends Component {
     );
     return (
       <div
-        style={styles.header[field]}
+        className={this.props.classes.header[field]}
         onClick={this.reverseBy.bind(this, field)}
       >
         <T>{label}</T>
@@ -212,298 +218,218 @@ class IndexAudience extends Component {
     });
   }
 
-  render() {
-    const viewActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseView.bind(this)}
-      />,
-    ];
-
+  renderSubaudience() {
     const {
+      classes, exerciseId, audience, subaudience,
+    } = this.props;
+    const keyword = this.state.searchTerm;
+    const filterByKeyword = (n) => keyword === ''
+      || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const users = R.pipe(
+      R.map((data) => R.pathOr({}, ['users', data.user_id], this.props)),
+      R.filter(filterByKeyword),
+      R.sort((a, b) => {
+        // TODO replace with sortWith after Ramdajs new release
+        const fieldA = R.toLower(R.propOr('', this.state.sortBy, a));
+        const fieldB = R.toLower(R.propOr('', this.state.sortBy, b));
+        return this.state.orderAsc
+          ? this.ascend(fieldA, fieldB)
+          : this.descend(fieldA, fieldB);
+      }),
+    )(subaudience.subaudience_users);
+    return (
+      <div>
+        <div className={classes.users}>
+          {subaudience.subaudience_users.length} <T>user(s)</T>
+        </div>
+        <div className={classes.search}>
+          <SearchField
+            name="keyword"
+            fullWidth={true}
+            type="text"
+            hintText="Search"
+            onChange={this.handleSearchUsers.bind(this)}
+            styletype={Constants.FIELD_TYPE_RIGHT}
+          />
+        </div>
+        <div className="clearfix" />
+        <List>
+          {subaudience.subaudience_users.length === 0 ? (
+            <div className={classes.empty}>
+              <T>This sub-audience is empty.</T>
+            </div>
+          ) : (
+            <AvatarHeaderItem
+              leftAvatar={
+                <span className={classes.header.avatar}>
+                  <span
+                    style={{
+                      color: this.switchColor(
+                        !audience.audience_enabled
+                          || !subaudience.subaudience_enabled,
+                      ),
+                    }}
+                  >
+                    #
+                  </span>
+                </span>
+              }
+              rightIconButton={<Icon style={{ display: 'none' }} />}
+              primaryText={
+                <div>
+                  <span
+                    style={{
+                      color: this.switchColor(
+                        !audience.audience_enabled
+                          || !subaudience.subaudience_enabled,
+                      ),
+                    }}
+                  >
+                    {this.SortHeader('user_firstname', 'Name')}
+                  </span>
+                  <span
+                    style={{
+                      color: this.switchColor(
+                        !audience.audience_enabled
+                          || !subaudience.subaudience_enabled,
+                      ),
+                    }}
+                  >
+                    {this.SortHeader('user_email', 'Email address')}
+                  </span>
+                  <span
+                    style={{
+                      color: this.switchColor(
+                        !audience.audience_enabled
+                          || !subaudience.subaudience_enabled,
+                      ),
+                    }}
+                  >
+                    {this.SortHeader('user_organization', 'Organization')}
+                  </span>
+                  <div className="clearfix" />
+                </div>
+              }
+            />
+          )}
+          {users.map((user) => {
+            const userId = R.propOr(Math.random(), 'user_id', user);
+            const userFirstname = R.propOr('-', 'user_firstname', user);
+            const userLastname = R.propOr('-', 'user_lastname', user);
+            const userEmail = R.propOr('-', 'user_email', user);
+            const userGravatar = R.propOr('', 'user_gravatar', user);
+            const userOrganization = R.propOr(
+              {},
+              user.user_organization,
+              this.props.organizations,
+            );
+            const organizationName = R.propOr(
+              '-',
+              'organization_name',
+              userOrganization,
+            );
+            return (
+              <AvatarListItem
+                key={userId}
+                onClick={this.handleOpenView.bind(this, user)}
+                leftAvatar={
+                  <Avatar
+                    type={Constants.AVATAR_TYPE_MAINLIST}
+                    src={userGravatar}
+                  />
+                }
+                rightIconButton={
+                  <UserPopover
+                    exerciseId={exerciseId}
+                    audience={audience}
+                    subaudience={subaudience}
+                    user={user}
+                  />
+                }
+                primaryText={
+                  <div>
+                    <div className={classes.name}>
+                      <span
+                        style={{
+                          color: this.switchColor(
+                            !audience.audience_enabled
+                              || !subaudience.subaudience_enabled,
+                          ),
+                        }}
+                      >
+                        {userFirstname} {userLastname}
+                      </span>
+                    </div>
+                    <div className={classes.mail}>
+                      <span
+                        style={{
+                          color: this.switchColor(
+                            !audience.audience_enabled
+                              || !subaudience.subaudience_enabled,
+                          ),
+                        }}
+                      >
+                        {userEmail}
+                      </span>
+                    </div>
+                    <div className={classes.org}>
+                      <span
+                        style={{
+                          color: this.switchColor(
+                            !audience.audience_enabled
+                              || !subaudience.subaudience_enabled,
+                          ),
+                        }}
+                      >
+                        {organizationName}
+                      </span>
+                    </div>
+                    <div className="clearfix" />
+                  </div>
+                }
+              />
+            );
+          })}
+        </List>
+      </div>
+    );
+  }
+
+  render() {
+    const {
+      classes,
       exerciseId,
       audienceId,
       audience,
       subaudience,
       subaudiences,
     } = this.props;
-    const subaudienceIsUpdatable = R.propOr(
-      true,
-      'user_can_update',
-      subaudience,
-    );
-
-    if (audience && subaudience) {
-      const keyword = this.state.searchTerm;
-      const filterByKeyword = (n) => keyword === ''
-        || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-        || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-        || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-
-      const users = R.pipe(
-        R.map((data) => R.pathOr({}, ['users', data.user_id], this.props)),
-        R.filter(filterByKeyword),
-        R.sort((a, b) => {
-          // TODO replace with sortWith after Ramdajs new release
-          const fieldA = R.toLower(R.propOr('', this.state.sortBy, a));
-          const fieldB = R.toLower(R.propOr('', this.state.sortBy, b));
-          return this.state.orderAsc
-            ? this.ascend(fieldA, fieldB)
-            : this.descend(fieldA, fieldB);
-        }),
-      )(subaudience.subaudience_users);
-
-      return (
-        <div style={styles.container}>
-          <SubaudienceNav
-            selectedSubaudience={subaudience.subaudience_id}
-            exerciseId={exerciseId}
-            audienceId={audienceId}
-            audience={audience}
-            subaudiences={subaudiences}
-          />
-          <div>
-            <div style={styles.title}>
-              <span
-                style={{
-                  color: this.switchColor(
-                    !audience.audience_enabled
-                      || !subaudience.subaudience_enabled,
-                  ),
-                }}
-              >
-                {subaudience.subaudience_name}
-              </span>
-            </div>
-            {this.props.userCanUpdate ? (
-              <SubaudiencePopover
-                exerciseId={exerciseId}
-                audienceId={audienceId}
-                audience={audience}
-                subaudience={subaudience}
-                subaudiences={this.props.subaudiences}
-              />
-            ) : (
-              ''
-            )}
-            <div style={styles.users}>
-              {subaudience.subaudience_users.length} <T>user(s)</T>
-            </div>
-            <div style={styles.search}>
-              <SearchField
-                name="keyword"
-                fullWidth={true}
-                type="text"
-                hintText="Search"
-                onChange={this.handleSearchUsers.bind(this)}
-                styletype={Constants.FIELD_TYPE_RIGHT}
-              />
-            </div>
-            <div className="clearfix" />
-            <List>
-              {subaudience.subaudience_users.length === 0 ? (
-                <div style={styles.empty}>
-                  <T>This sub-audience is empty.</T>
-                </div>
-              ) : (
-                <AvatarHeaderItem
-                  leftAvatar={
-                    <span style={styles.header.avatar}>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        #
-                      </span>
-                    </span>
-                  }
-                  rightIconButton={<Icon style={{ display: 'none' }} />}
-                  primaryText={
-                    <div>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        {this.SortHeader('user_firstname', 'Name')}
-                      </span>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        {this.SortHeader('user_email', 'Email address')}
-                      </span>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        {this.SortHeader('user_organization', 'Organization')}
-                      </span>
-                      <div className="clearfix" />
-                    </div>
-                  }
-                />
-              )}
-
-              {users.map((user) => {
-                // Setup variables
-                const userId = R.propOr(Math.random(), 'user_id', user);
-                const userFirstname = R.propOr('-', 'user_firstname', user);
-                const userLastname = R.propOr('-', 'user_lastname', user);
-                const userEmail = R.propOr('-', 'user_email', user);
-                const userGravatar = R.propOr('', 'user_gravatar', user);
-                const userOrganization = R.propOr(
-                  {},
-                  user.user_organization,
-                  this.props.organizations,
-                );
-                const organizationName = R.propOr(
-                  '-',
-                  'organization_name',
-                  userOrganization,
-                );
-                // Return the dom
-                return (
-                  <AvatarListItem
-                    key={userId}
-                    onClick={this.handleOpenView.bind(this, user)}
-                    leftAvatar={
-                      <Avatar
-                        type={Constants.AVATAR_TYPE_MAINLIST}
-                        src={userGravatar}
-                      />
-                    }
-                    rightIconButton={
-                      <UserPopover
-                        exerciseId={exerciseId}
-                        audience={audience}
-                        subaudience={subaudience}
-                        user={user}
-                      />
-                    }
-                    primaryText={
-                      <div>
-                        <div style={styles.name}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !audience.audience_enabled
-                                  || !subaudience.subaudience_enabled,
-                              ),
-                            }}
-                          >
-                            {userFirstname} {userLastname}
-                          </span>
-                        </div>
-                        <div style={styles.mail}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !audience.audience_enabled
-                                  || !subaudience.subaudience_enabled,
-                              ),
-                            }}
-                          >
-                            {userEmail}
-                          </span>
-                        </div>
-                        <div style={styles.org}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !audience.audience_enabled
-                                  || !subaudience.subaudience_enabled,
-                              ),
-                            }}
-                          >
-                            {organizationName}
-                          </span>
-                        </div>
-                        <div className="clearfix" />
-                      </div>
-                    }
-                  />
-                );
-              })}
-            </List>
-            <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-              <AudiencePopover
-                exerciseId={exerciseId}
-                audienceId={audienceId}
-                audience={audience}
-                audiences={this.props.audiences}
-              />
-            </Toolbar>
-            <Dialog
-              title={`${this.state.currentUser.user_firstname} ${this.state.currentUser.user_lastname}`}
-              modal={false}
-              open={this.state.openView}
-              autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseView.bind(this)}
-              actions={viewActions}
-            >
-              <UserView
-                user={this.state.currentUser}
-                organizations={this.props.organizations}
-              />
-            </Dialog>
-            {subaudienceIsUpdatable ? (
-              <AddUsers
-                exerciseId={exerciseId}
-                audienceId={audienceId}
-                subaudienceId={subaudience.subaudience_id}
-                subaudienceUsersIds={subaudience.subaudience_users.map(
-                  (u) => u.user_id,
-                )}
-              />
-            ) : (
-              ''
-            )}
-          </div>
-        </div>
-      );
-    }
     if (audience) {
       return (
-        <div style={styles.container}>
+        <div className={classes.container}>
           <SubaudienceNav
             exerciseId={exerciseId}
             audienceId={audienceId}
             audience={audience}
             subaudiences={subaudiences}
           />
-          <div style={styles.empty}>
-            <T>This audience is empty.</T>
-          </div>
-          <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-            <AudiencePopover
-              exerciseId={exerciseId}
-              audienceId={audienceId}
-              audience={audience}
-              audiences={this.props.audiences}
-            />
-          </Toolbar>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            {audience.audience_name}
+          </Typography>
+          <AudiencePopover
+            exerciseId={exerciseId}
+            audienceId={audienceId}
+            audience={audience}
+            audiences={this.props.audiences}
+          />
+          <div className="clearfix" />
+          {subaudience && this.renderSubaudience()}
         </div>
       );
     }
-    return <div style={styles.container}> &nbsp; </div>;
+    return <div className={classes.container}> &nbsp; </div>;
   }
 }
 
@@ -556,7 +482,7 @@ const filterComchecks = (comchecks, audienceId) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
   let userCanUpdate = R.path(
     [userId, 'user_admin'],
@@ -586,8 +512,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
-  const { audienceId } = ownProps.params;
+  const { id: exerciseId, audienceId } = ownProps;
   const audience = R.prop(audienceId, state.referential.entities.audiences);
   const audiences = filterAudiences(
     state.referential.entities.audiences,
@@ -602,20 +527,16 @@ const select = (state, ownProps) => {
     audienceId,
   );
   const userCanUpdate = checkUserCanUpdate(state, ownProps);
-
-  // region get default incident
   const stateCurrentSubaudience = R.path(
     ['exercise', exerciseId, 'audience', audienceId, 'current_subaudience'],
     state.screen,
   );
   const subaudienceId = stateCurrentSubaudience === undefined && subaudiences.length > 0
     ? R.head(subaudiences).subaudience_id
-    : stateCurrentSubaudience; // Force a default subaudience if needed
+    : stateCurrentSubaudience;
   const subaudience = subaudienceId
     ? R.find((a) => a.subaudience_id === subaudienceId)(subaudiences)
     : undefined;
-  // endregion
-
   return {
     userCanUpdate,
     exerciseId,
@@ -630,11 +551,14 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  fetchGroups,
-  fetchUsers,
-  fetchAudiences,
-  fetchSubaudiences,
-  fetchOrganizations,
-  fetchComchecks,
-})(IndexAudience);
+export default R.compose(
+  connect(select, {
+    fetchGroups,
+    fetchUsers,
+    fetchAudiences,
+    fetchSubaudiences,
+    fetchOrganizations,
+    fetchComchecks,
+  }),
+  withStyles(styles),
+)(IndexAudience);

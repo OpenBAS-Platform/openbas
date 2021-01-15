@@ -2,16 +2,31 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import * as Constants from '../../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { selectSubaudience } from "../../../../../actions/Subaudience";
-import { Drawer } from "../../../../../components/Drawer";
-import { List } from "../../../../../components/List";
-import { ListItemLink } from "../../../../../components/list/ListItem";
-import { Icon } from "../../../../../components/Icon";
-import Theme from "../../../../../components/Theme";
-import CreateSubaudience from "./CreateSubaudience";
-/* eslint-enable */
+import { withStyles } from '@material-ui/core/styles';
+import Drawer from '@material-ui/core/Drawer';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { GroupOutlined } from '@material-ui/icons';
+import { green, red } from '@material-ui/core/colors';
+import { selectSubaudience } from '../../../../../actions/Subaudience';
+import CreateSubaudience from './CreateSubaudience';
+
+const styles = () => ({
+  drawerPaper: {
+    width: 300,
+  },
+  itemActive: {
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+  },
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
+  },
+});
 
 class SubaudienceNav extends Component {
   handleChangeAudience(subaudienceId) {
@@ -22,15 +37,8 @@ class SubaudienceNav extends Component {
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
-  }
-
   render() {
+    const { classes } = this.props;
     const subaudienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
@@ -38,11 +46,9 @@ class SubaudienceNav extends Component {
     );
     return (
       <Drawer
-        width={300}
-        docked={true}
-        open={true}
-        openSecondary={true}
-        zindex={50}
+        variant="permanent"
+        classes={{ paper: classes.drawerPaper }}
+        anchor="right"
       >
         <CreateSubaudience
           exerciseId={this.props.exerciseId}
@@ -51,31 +57,31 @@ class SubaudienceNav extends Component {
         />
         <List>
           {this.props.subaudiences.map((subaudience) => (
-            <ListItemLink
-              grey={
-                !subaudience.subaudience_enabled
-                || !this.props.audience.audience_enabled
-              }
-              type={Constants.LIST_ITEM_NOSPACE}
+            <ListItem
               key={subaudience.subaudience_id}
-              active={
+              className={
                 this.props.selectedSubaudience === subaudience.subaudience_id
+                  ? classes.itemActive
+                  : classes.item
               }
+              button={true}
+              divider={true}
               onClick={this.handleChangeAudience.bind(
                 this,
                 subaudience.subaudience_id,
               )}
-              label={subaudience.subaudience_name}
-              leftIcon={
-                <Icon
-                  name={Constants.ICON_NAME_SOCIAL_GROUP}
-                  color={this.switchColor(
-                    !subaudience.subaudience_enabled
-                      || !this.props.audience.audience_enabled,
-                  )}
-                />
-              }
-            />
+            >
+              <ListItemIcon
+                className={
+                  subaudience.subaudience_enabled
+                    ? classes.enabled
+                    : classes.disabled
+                }
+              >
+                <GroupOutlined />
+              </ListItemIcon>
+              <ListItemText primary={subaudience.subaudience_name} />
+            </ListItem>
           ))}
         </List>
       </Drawer>
@@ -92,6 +98,9 @@ SubaudienceNav.propTypes = {
   selectSubaudience: PropTypes.func,
 };
 
-export default connect(null, {
-  selectSubaudience,
-})(SubaudienceNav);
+export default R.compose(
+  connect(null, {
+    selectSubaudience,
+  }),
+  withStyles(styles),
+)(SubaudienceNav);

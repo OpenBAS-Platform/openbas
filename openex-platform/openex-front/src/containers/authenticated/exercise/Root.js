@@ -22,7 +22,7 @@ import IndexExerciseObjectives from './objective/Index';
 import IndexExerciseScenario from './scenario/Index';
 import IndexExerciseScenarioEvent from './scenario/event/Index';
 import IndexExerciseAudiences from './audiences/Index';
-import IndexExerciseAudiencesAudience from './audiences/audience/Index';
+import RootExerciseAudiencesAudience from './audiences/audience/Root';
 import IndexExerciseDocuments from './documents/Index';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
@@ -61,11 +61,11 @@ class RootExercise extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, id, exercise } = this.props;
     return (
       <div style={{ paddingLeft: 180 }}>
         <LeftBar
-          id={this.props.id}
+          id={id}
           pathname={this.props.pathname}
           exercise_type={R.propOr(
             'standard',
@@ -81,7 +81,9 @@ class RootExercise extends Component {
               className={classes.logo}
               onClick={this.redirectToHome.bind(this)}
             />
-            <div className={classes.title}>OpenEx</div>
+            <div className={classes.title}>
+              {R.propOr('', 'exercise_name', exercise)}
+            </div>
             <UserPopover />
           </Toolbar>
         </AppBar>
@@ -91,81 +93,77 @@ class RootExercise extends Component {
             <Route
               exact
               path="/private/exercise/:exerciseId"
-              component={() => <IndexExercise id={this.props.id} />}
+              component={() => <IndexExercise id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/execution"
-              component={() => <IndexExerciseExecution id={this.props.id} />}
+              component={() => <IndexExerciseExecution id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/lessons"
-              component={() => <IndexExerciseLessons id={this.props.id} />}
+              component={() => <IndexExerciseLessons id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/checks"
-              component={() => <IndexExerciseChecks id={this.props.id} />}
+              component={() => <IndexExerciseChecks id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/checks/dryrun/:dryrunId"
-              component={() => <IndexExerciseDryrun id={this.props.id} />}
+              component={() => <IndexExerciseDryrun id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/checks/comcheck/:comcheckId"
-              component={() => <IndexExerciseComcheck id={this.props.id} />}
+              component={() => <IndexExerciseComcheck id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/objectives"
-              component={() => <IndexExerciseObjectives id={this.props.id} />}
+              component={() => <IndexExerciseObjectives id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/scenario"
-              component={() => <IndexExerciseScenario id={this.props.id} />}
+              component={() => <IndexExerciseScenario id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/scenario/:eventId"
-              component={() => (
-                <IndexExerciseScenarioEvent id={this.props.id} />
-              )}
+              component={() => <IndexExerciseScenarioEvent id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/audiences"
-              component={() => <IndexExerciseAudiences id={this.props.id} />}
+              component={() => <IndexExerciseAudiences id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/audiences/:audienceId"
-              component={() => (
-                <IndexExerciseAudiencesAudience id={this.props.id} />
-              )}
+              component={() => <RootExerciseAudiencesAudience id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/calendar"
-              component={() => <IndexExercise id={this.props.id} />}
+              component={() => <IndexExercise id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/documents"
-              component={() => <IndexExerciseDocuments id={this.props.id} />}
+              component={() => <IndexExerciseDocuments id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/statistics"
-              component={() => <IndexExerciseStatistics id={this.props.id} />}
+              component={() => <IndexExerciseStatistics id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/settings"
-              component={() => <IndexExerciseSettings id={this.props.id} />}
+              component={() => <IndexExerciseSettings id={id} />}
             />
           </Switch>
         </div>
@@ -188,10 +186,11 @@ RootExercise.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.match.params;
+  const { exerciseId, audienceId } = ownProps.match.params;
   const { pathname } = ownProps.location;
   return {
     id: exerciseId,
+    audienceId,
     pathname,
     exercise: R.prop(exerciseId, state.referential.entities.exercises),
   };

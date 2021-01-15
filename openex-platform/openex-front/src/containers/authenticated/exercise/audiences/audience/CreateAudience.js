@@ -1,17 +1,38 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+import { Add } from '@material-ui/icons';
+import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import * as Constants from '../../../../../constants/ComponentTypes';
 import { addAudience } from '../../../../../actions/Audience';
 import AudienceForm from './AudienceForm';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Create a new audience': 'Créer une nouvelle audience',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
   },
 });
 
@@ -30,49 +51,46 @@ class CreateAudience extends Component {
   }
 
   onSubmit(data) {
-    return this.props.addAudience(this.props.exerciseId, data);
-  }
-
-  submitForm() {
-    this.refs.audienceForm.submit();
+    return this.props
+      .addAudience(this.props.exerciseId, data)
+      .then(() => this.handleClose());
   }
 
   render() {
-    const actions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleClose.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create"
-        primary={true}
-        onClick={this.submitForm.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
       <div>
         <Fab
-          type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpen.bind(this)}
-        />
-        <Dialog
-          title="Create a new audience"
-          modal={false}
-          open={this.state.open}
-          onRequestClose={this.handleClose.bind(this)}
-          actions={actions}
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
         >
-          {/* eslint-disable */}
-          <AudienceForm
-            ref="audienceForm"
-            onSubmit={this.onSubmit.bind(this)}
-            onSubmitSuccess={this.handleClose.bind(this)}
-          />
-          {/* eslint-enable */}
+          <Add />
+        </Fab>
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+        >
+          <DialogTitle>
+            <T>Create a new audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <AudienceForm onSubmit={this.onSubmit.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={this.handleClose.bind(this)}>
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('audienceForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -85,6 +103,9 @@ CreateAudience.propTypes = {
   onCreate: PropTypes.func,
 };
 
-export default connect(null, {
-  addAudience,
-})(CreateAudience);
+export default R.compose(
+  connect(null, {
+    addAudience,
+  }),
+  withStyles(styles),
+)(CreateAudience);

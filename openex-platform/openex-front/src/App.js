@@ -43,8 +43,20 @@ export const UserIsAuthenticated = connectedRouterRedirect({
 class IntlWrapper extends Component {
   render() {
     const { children, lang } = this.props;
+    const intlError = (error) => {
+      const matchingLocale = /for locale: "([a-z]+)"/gm;
+      const regMatch = matchingLocale.exec(error);
+      const currentLocale = regMatch !== null ? regMatch[1] : null;
+      // eslint-disable-next-line no-console
+      if (currentLocale && currentLocale !== 'en') console.error(error);
+    };
     return (
-      <IntlProvider locale={lang} key={lang} messages={i18n.messages[lang]}>
+      <IntlProvider
+        locale={lang}
+        onError={intlError}
+        key={lang}
+        messages={i18n.messages[lang]}
+      >
         {children}
       </IntlProvider>
     );

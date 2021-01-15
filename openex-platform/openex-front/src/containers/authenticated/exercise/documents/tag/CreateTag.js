@@ -9,7 +9,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import { Add } from '@material-ui/icons';
-import Fab from '@material-ui/core/Fab';
 import { withStyles } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
@@ -20,7 +19,7 @@ import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
-    'Create a new tag': 'Créer un nouveau TAG',
+    'Create a new tag': 'Créer un nouveau tag',
   },
 });
 

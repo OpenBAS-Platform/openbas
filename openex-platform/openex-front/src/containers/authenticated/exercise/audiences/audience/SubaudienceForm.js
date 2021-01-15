@@ -12,7 +12,7 @@ i18nRegister({
 
 const validate = (values) => {
   const errors = {};
-  const requiredFields = [];
+  const requiredFields = ['subaudience_name'];
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
@@ -23,15 +23,24 @@ const validate = (values) => {
 
 class SubaudienceForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="subaudience_name"
-          fullWidth={true}
-          type="text"
-          label="Name"
-        />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="subaudienceForm" onSubmit={handleSubmit}>
+            <TextField
+              name="subaudience_name"
+              fullWidth={true}
+              type="text"
+              label="Name"
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

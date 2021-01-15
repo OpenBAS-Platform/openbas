@@ -69,7 +69,6 @@ const styles = (theme) => ({
     cursor: 'pointer',
     height: 35,
   },
-  toolbar: theme.mixins.toolbar,
   menuItem: {
     height: 40,
     padding: '6px 10px 6px 10px',

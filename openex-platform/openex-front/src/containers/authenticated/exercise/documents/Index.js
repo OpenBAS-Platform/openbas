@@ -17,11 +17,10 @@ import Chip from '@material-ui/core/Chip';
 import Fab from '@material-ui/core/Fab';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import { injectIntl } from 'react-intl';
 import Slide from '@material-ui/core/Slide';
 import { Add } from '@material-ui/icons';
 import { T } from '../../../../components/I18n';
+import { SearchField } from '../../../../components/SearchField';
 import { i18nRegister } from '../../../../utils/Messages';
 import { timeDiff } from '../../../../utils/Time';
 import { fetchGroups } from '../../../../actions/Group';
@@ -58,7 +57,7 @@ i18nRegister({
     'Add new document': 'Ajouter un document',
     'No Tag Available': 'Aucun TAG de disponible',
     'Edit document': "Modification d'un document",
-    'List of Documents': 'Liste des documents',
+    'List of documents': 'Liste des documents',
     'Update tags of a document': "Modification des tags d'un document",
     'List of documents including the following tags : ':
       'Liste des documents incluant les Tags suivants : ',
@@ -449,12 +448,7 @@ class Index extends Component {
             ))}
           </div>
           <div className={classes.search}>
-            <TextField
-              name="keyword"
-              placeholder={this.props.intl.formatMessage({ id: 'Search' })}
-              onChange={this.handleSearchDocument.bind(this)}
-              style={{ width: 300 }}
-            />
+            <SearchField onChange={this.handleSearchDocument.bind(this)} />
           </div>
           <div className="clearfix" />
         </div>
@@ -810,5 +804,4 @@ export default R.compose(
     deleteDocument,
   }),
   withStyles(styles),
-  injectIntl,
 )(Index);
