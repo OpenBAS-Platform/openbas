@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUISwitch from '@material-ui/core/Switch';
 import { Field } from 'react-final-form';
 

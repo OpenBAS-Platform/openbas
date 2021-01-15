@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
@@ -12,7 +12,7 @@ i18nRegister({
 
 const validate = (values) => {
   const errors = {};
-  const requiredFields = [];
+  const requiredFields = ['tag_name'];
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
@@ -23,10 +23,20 @@ const validate = (values) => {
 
 class TagForm extends Component {
   render() {
+    const { onSubmit } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField name="tag_name" fullWidth={true} type="text" label="Name" />
-      </form>
+      <Form onSubmit={onSubmit} validate={validate}>
+        {({ handleSubmit }) => (
+          <form id='tagForm' onSubmit={handleSubmit}>
+            <TextField
+              name="tag_name"
+              fullWidth={true}
+              type="text"
+              label="Name"
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { withStyles } from '@material-ui/core/styles';
@@ -10,6 +10,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import { Add } from '@material-ui/icons';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import ExerciseForm from './ExerciseForm';
@@ -21,6 +22,11 @@ i18nRegister({
     'Create a new exercise': 'Créer un nouvel exercice',
   },
 });
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 const styles = () => ({
   createButton: {
@@ -60,7 +66,11 @@ class CreateExercise extends Component {
         >
           <Add />
         </Fab>
-        <Dialog open={this.state.open} onClose={this.handleClose.bind(this)}>
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+        >
           <DialogTitle>
             <T>Create a new exercise</T>
           </DialogTitle>

@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUITextField from '@material-ui/core/TextField';
 import { injectIntl } from 'react-intl';
 import * as Constants from '../constants/ComponentTypes';

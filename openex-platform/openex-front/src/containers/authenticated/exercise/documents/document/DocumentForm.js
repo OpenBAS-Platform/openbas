@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
@@ -31,46 +31,38 @@ const style = {
 };
 
 class DocumentForm extends Component {
-  componentWillMount() {
-    const initialDocument = this.props.initialValues;
-    this.props.initialize({
-      document_id: initialDocument.document_id,
-      document_name: initialDocument.document_name,
-      document_description: initialDocument.document_description,
-      document_type: initialDocument.document_type,
-    });
-  }
-
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <div style={style.display_none}>
-          <TextField
-            name="document_id"
-            fullWidth={true}
-            type="text"
-            label="id"
-          />
-        </div>
-        <TextField
-          name="document_name"
-          fullWidth={true}
-          type="text"
-          label="Name"
-        />
-        <TextField
-          name="document_description"
-          fullWidth={true}
-          type="textarea"
-          label="Description"
-        />
-        <TextField
-          name="document_type"
-          fullWidth={true}
-          type="text"
-          label="Type"
-        />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="documentForm" onSubmit={handleSubmit}>
+            <TextField
+              name="document_name"
+              fullWidth={true}
+              label="Name"
+            />
+            <TextField
+              name="document_description"
+              fullWidth={true}
+              multilines={true}
+              rows={3}
+              label="Description"
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="document_type"
+              fullWidth={true}
+              label="Type"
+              style={{ marginTop: 20 }}
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

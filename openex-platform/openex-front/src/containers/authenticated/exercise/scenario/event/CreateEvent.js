@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
@@ -66,13 +66,11 @@ class CreateEvent extends Component {
           onRequestClose={this.handleClose.bind(this)}
           actions={actions}
         >
-          {/* eslint-disable */}
           <EventForm
             ref="eventForm"
             onSubmit={this.onSubmit.bind(this)}
             onSubmitSuccess={this.handleClose.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
       </div>
     );

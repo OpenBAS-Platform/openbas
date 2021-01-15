@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUIGridList from '@material-ui/core/GridList';
 import MUIGridListTile from '@material-ui/core/GridListTile';
 import * as Constants from '../constants/ComponentTypes';

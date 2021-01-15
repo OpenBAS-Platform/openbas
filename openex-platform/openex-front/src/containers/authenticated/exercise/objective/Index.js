@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
@@ -13,16 +13,14 @@ import {
   SecondaryListItem,
 } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
-/* eslint-disable */
-import { fetchObjectives } from "../../../../actions/Objective";
-import { fetchSubobjectives } from "../../../../actions/Subobjective";
-import { fetchGroups } from "../../../../actions/Group";
-import ObjectivePopover from "./ObjectivePopover";
-import SubobjectivePopover from "./SubobjectivePopover";
-import CreateObjective from "./CreateObjective";
-import ObjectiveView from "./ObjectiveView";
-import SubobjectiveView from "./SubobjectiveView";
-/* eslint-enable */
+import { fetchObjectives } from '../../../../actions/Objective';
+import { fetchSubobjectives } from '../../../../actions/Subobjective';
+import { fetchGroups } from '../../../../actions/Group';
+import ObjectivePopover from './ObjectivePopover';
+import SubobjectivePopover from './SubobjectivePopover';
+import CreateObjective from './CreateObjective';
+import ObjectiveView from './ObjectiveView';
+import SubobjectiveView from './SubobjectiveView';
 
 i18nRegister({
   fr: {

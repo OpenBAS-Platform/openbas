@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
 import { TextField } from '../../../../components/TextField';

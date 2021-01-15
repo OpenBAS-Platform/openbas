@@ -6,7 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { timeDiff } from '../utils/Time';
 
 class InjectTable extends Component {

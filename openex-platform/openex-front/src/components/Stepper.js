@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUIStepper from '@material-ui/core/Stepper';
 import MUIStep from '@material-ui/core/Step';
 import MUIStepButton from '@material-ui/core/StepButton';

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Grid from '@material-ui/core/Grid';
@@ -9,11 +9,18 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import Chip from '@material-ui/core/Chip';
+import Fab from '@material-ui/core/Fab';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import { injectIntl } from 'react-intl';
+import Slide from '@material-ui/core/Slide';
+import { Add } from '@material-ui/icons';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import { timeDiff } from '../../../../utils/Time';
@@ -36,28 +43,7 @@ import CreateTag from './tag/CreateTag';
 import DocumentForm from './document/DocumentForm';
 import DocumentActionPopover from './tag/DocumentActionPopover';
 import DocumentTags from './document/DocumentTags';
-import {
-  TagAddToFilter,
-  TagExerciseListe,
-  TagListe,
-  TagSmallExerciseListe,
-  TagSmallListe,
-} from './component/Tag';
-
-const styles = () => ({
-  container: {
-    position: 'relative',
-  },
-  search: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  tags: {
-    float: 'left',
-    marginLeft: 20,
-  },
-});
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -73,7 +59,7 @@ i18nRegister({
     'No Tag Available': 'Aucun TAG de disponible',
     'Edit document': "Modification d'un document",
     'List of Documents': 'Liste des documents',
-    'Editing Tags in a document': "Modification des Tags d'un document",
+    'Update tags of a document': "Modification des tags d'un document",
     'List of documents including the following tags : ':
       'Liste des documents incluant les Tags suivants : ',
     'Delete Tag': "Suppression d'un tag",
@@ -82,6 +68,46 @@ i18nRegister({
   },
   en: {
     Search: 'Search',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = (theme) => ({
+  container: {
+    position: 'relative',
+  },
+  header: {
+    height: 50,
+  },
+  search: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  tags: {
+    float: 'left',
+    margin: '-5px 0 0 20px',
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(0.5),
+    },
+  },
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
+  },
+  tagsContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: '0 4px 10px 4px',
+    },
   },
 });
 
@@ -106,12 +132,12 @@ class Index extends Component {
     this.props.fetchGroups();
     this.props.fetchTags();
     this.props.fetchExercises();
-    this.props.searchDocument(null);
+    this.props.searchDocument('');
   }
 
-  handleSearchDocument(event, value) {
+  handleSearchDocument(event) {
     this.setState({
-      searchTerm: value,
+      searchTerm: event.target.value,
     });
   }
 
@@ -244,22 +270,14 @@ class Index extends Component {
     );
   }
 
-  handleEditDocumentEditTag() {
-    this.refs.documentForm.submit();
-    this.handleCloseEditDocument();
-    this.handleEditDocumentTag(this.state.selectedDocument.document_id);
-  }
-
   handleEditDocumentTag(documentId) {
     this.setState({
       selectedDocument: documentId,
     });
-    // recherche des tags du document
     this.props.getDocumentTags(documentId).then((tags) => {
       this.setState({
         documentsTags: tags.result,
       });
-      // recherche des tags 'exercices' du document
       this.props.getDocumentTagsExercise(documentId).then((tagsExercise) => {
         this.setState({
           documentsTagsExercise: tagsExercise.result,
@@ -282,13 +300,9 @@ class Index extends Component {
   }
 
   handleDeleteDocument(document) {
-    this.props.deleteDocument(document.document_id).then(() => {
-      window.location.reload();
-    });
-  }
-
-  submitEditDocument() {
-    this.refs.documentForm.submit();
+    this.props
+      .deleteDocument(document.document_id)
+      .then(() => this.handleCloseConfirmDeleteTag());
   }
 
   submitEditDocumentTag() {
@@ -298,19 +312,16 @@ class Index extends Component {
         tags: this.state.documentsTags,
       })
       .then(() => {
-        this.props
-          .editDocumentTagsExercise(this.state.selectedDocument, {
-            tags: this.state.documentsTagsExercise,
-          })
-          .then(() => {
-            window.location.reload();
-          });
-      });
+        this.props.editDocumentTagsExercise(this.state.selectedDocument, {
+          tags: this.state.documentsTagsExercise,
+        });
+      })
+      .then(() => this.props.searchDocument(this.state.searchTerm));
   }
 
   onSubmitDocument(data) {
     this.props.saveDocument(data.document_id, data).then(() => {
-      window.location.reload();
+      this.handleCloseEditDocument();
     });
   }
 
@@ -368,10 +379,8 @@ class Index extends Component {
       }
     }
     if (toDisplay === true) {
-      // pour chaque tag de la recherche
       listeTagAddToFilter.forEach((tagCritere) => {
         let exist = false;
-        // pour chaque tag document
         document.document_liste_tags.forEach((tagDocument) => {
           if (tagDocument.tag_id === tagCritere.tag_id) {
             exist = true;
@@ -379,8 +388,6 @@ class Index extends Component {
         });
         listeTagCritere.push({ tag_id: tagCritere.tag_id, exist });
       });
-
-      // pour chaque tag exercice
       listeTagExerciseAddToFilter.forEach((tagExerciseCritere) => {
         let exist = false;
         document.document_liste_tags_exercise.forEach((tagDocument) => {
@@ -393,7 +400,6 @@ class Index extends Component {
           exist,
         });
       });
-
       // eslint-disable-next-line no-plusplus
       for (let i = 0; i < listeTagCritere.length; i++) {
         if (listeTagCritere[i].exist === false) {
@@ -412,122 +418,70 @@ class Index extends Component {
 
   render() {
     const { classes } = this.props;
-    const actionsEditDocument = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEditDocument.bind(this)}
-      />,
-      <Button
-        key="tags"
-        label="List Of Tags"
-        primary={true}
-        onClick={this.handleEditDocumentEditTag.bind(this)}
-      />,
-      <Button
-        key="submit"
-        label="Submit"
-        primary={true}
-        onClick={this.submitEditDocument.bind(this)}
-      />,
-    ];
-
-    const actionsOpenConfirmDeleteTag = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseConfirmDeleteTag.bind(this)}
-      />,
-      <Button
-        key="submit"
-        label="Submit"
-        primary={true}
-        onClick={this.handleSubmitConfirmDeleteTag.bind(this)}
-      />,
-    ];
-
-    const actionsEditDocumentTag = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEditDocumentTag.bind(this)}
-      />,
-      <Button
-        key="submit"
-        label="Submit"
-        primary={true}
-        onClick={this.submitEditDocumentTag.bind(this)}
-      />,
-    ];
-
     return (
       <div className={classes.container}>
-        <Typography variant="h5" style={{ marginBottom: 20, float: 'left' }}>
-          <T>Documents gallery</T>
-        </Typography>
-        <div className={classes.tags}>
-          {R.values(this.state.listeTagExerciseAddToFilter).map((exercise) => (
-            <TagAddToFilter
-              key={exercise.exercise_id}
-              value={exercise.exercise_name}
-              onRequestDelete={this.removeTagExerciseToFilter.bind(
-                this,
-                exercise,
-              )}
-            />
-          ))}
-          {R.values(this.state.listeTagAddToFilter).map((tag) => (
-            <TagAddToFilter
-              key={tag.tag_id}
-              value={tag.tag_name}
-              onRequestDelete={this.removeTagToFilter.bind(this, tag)}
-            />
-          ))}
-          <div className="clearfix" />
-          {this.state.listeTagAddToFilter.length !== 0
-            || (this.state.listeTagExerciseAddToFilter.length !== 0 && (
-              <div>
-                <T>List of documents including the following tags : </T>
-                {R.values(this.state.listeTagExerciseAddToFilter).map(
-                  (exercise) => `${exercise.exercise_name}, `,
-                )}
-                {R.values(this.state.listeTagAddToFilter).map(
-                  (tag) => `${tag.tag_name}, `,
-                )}
-              </div>
+        <div className={classes.header}>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            <T>Documents gallery</T>
+          </Typography>
+          <div className={classes.tags}>
+            {R.values(this.state.listeTagExerciseAddToFilter).map(
+              (exercise) => (
+                <Chip
+                  key={exercise.exercise_id}
+                  className={classes.tag}
+                  variant="outlined"
+                  color="primary"
+                  label={exercise.exercise_name}
+                  onDelete={this.removeTagExerciseToFilter.bind(this, exercise)}
+                />
+              ),
+            )}
+            {R.values(this.state.listeTagAddToFilter).map((tag) => (
+              <Chip
+                key={tag.tag_id}
+                className={classes.tag}
+                variant="outlined"
+                color="primary"
+                label={tag.tag_name}
+                onDelete={this.removeTagToFilter.bind(this, tag)}
+              />
             ))}
-        </div>
-        <div className={classes.search}>
-          <TextField
-            name="keyword"
-            placeholder={this.props.intl.formatMessage({ id: 'Search' })}
-            onChange={this.handleSearchDocument.bind(this)}
-          />
+          </div>
+          <div className={classes.search}>
+            <TextField
+              name="keyword"
+              placeholder={this.props.intl.formatMessage({ id: 'Search' })}
+              onChange={this.handleSearchDocument.bind(this)}
+              style={{ width: 300 }}
+            />
+          </div>
+          <div className="clearfix" />
         </div>
         <Grid container spacing={3}>
           <Grid item xs={9}>
-            <Table selectable={true} style={{ marginTop: '5px' }}>
-              <TableHead adjustForCheckbox={false} displaySelectAll={false}>
+            <Typography variant="h6">
+              <T>List of documents</T>
+            </Typography>
+            <Table padding="none" style={{ marginTop: 20 }}>
+              <TableHead>
                 <TableRow>
-                  <TableCell>
+                  <TableCell style={{ width: '20%' }}>
                     <T>Name</T>
                   </TableCell>
-                  <TableCell>
+                  <TableCell style={{ width: '30%' }}>
                     <T>Description</T>
                   </TableCell>
-                  <TableCell>
+                  <TableCell style={{ width: '15%' }}>
                     <T>Type</T>
                   </TableCell>
                   <TableCell>
                     <T>Tags</T>
                   </TableCell>
-                  <TableCell width="20">&nbsp;</TableCell>
+                  <TableCell width="20"> &nbsp; </TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody displayRowCheckbox={false}>
+              <TableBody>
                 {this.props.documents.map((document) => {
                   const listeTagAddToFilter = [
                     ...this.state.listeTagAddToFilter,
@@ -541,101 +495,106 @@ class Index extends Component {
                     listeTagExerciseAddToFilter,
                     this.state.searchTerm,
                   );
-                  return toDisplay === true ? (
-                    <TableRow key={document.document_id}>
-                      <TableCell>{document.document_name}</TableCell>
-                      <TableCell
-                        style={{
-                          wordWrap: 'break-word',
-                          whiteSpace: 'normal',
-                        }}
-                      >
-                        {document.document_description}
-                      </TableCell>
-                      <TableCell>{document.document_type}</TableCell>
-                      <TableCell>
-                        {document.document_liste_tags.map((tag) => (
-                          <TagSmallListe
-                            key={tag.tag_id}
-                            value={tag.tag_name}
-                          />
-                        ))}
-                        {document.document_liste_tags_exercise.map(
-                          (exercise) => (
-                            <TagSmallExerciseListe
-                              key={exercise.exercise_id}
-                              value={exercise.exercise_name}
-                            />
-                          ),
-                        )}
-                      </TableCell>
-                      <TableCell width="20">
-                        <div>
-                          {this.props.userCanUpdate ? (
-                            <DocumentActionPopover
-                              document_id={document.document_id}
-                              document={document}
-                              handleEditDocument={this.handleEditDocument.bind(
-                                this,
-                              )}
-                              handleViewDocument={this.handleViewDocument.bind(
-                                this,
-                              )}
-                              handleEditDocumentTag={this.handleEditDocumentTag.bind(
-                                this,
-                              )}
-                              handleDeleteDocument={this.handleDeleteDocument.bind(
-                                this,
-                              )}
-                            />
-                          ) : (
-                            ''
+                  return (
+                    toDisplay === true && (
+                      <TableRow key={document.document_id}>
+                        <TableCell>{document.document_name}</TableCell>
+                        <TableCell
+                          style={{
+                            wordWrap: 'break-word',
+                            whiteSpace: 'normal',
+                          }}
+                        >
+                          {document.document_description}
+                        </TableCell>
+                        <TableCell>{document.document_type}</TableCell>
+                        <TableCell>
+                          {document.document_liste_tags.map((tag) => (
+                            <Chip key={tag.tag_id} label={tag.tag_name} />
+                          ))}
+                          {document.document_liste_tags_exercise.map(
+                            (exercise) => (
+                              <Chip
+                                key={exercise.exercise_id}
+                                label={exercise.exercise_name}
+                              />
+                            ),
                           )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    ''
+                        </TableCell>
+                        <TableCell width="20">
+                          <div>
+                            {this.props.userCanUpdate && (
+                              <DocumentActionPopover
+                                document_id={document.document_id}
+                                document={document}
+                                handleEditDocument={this.handleEditDocument.bind(
+                                  this,
+                                )}
+                                handleViewDocument={this.handleViewDocument.bind(
+                                  this,
+                                )}
+                                handleEditDocumentTag={this.handleEditDocumentTag.bind(
+                                  this,
+                                )}
+                                handleDeleteDocument={this.handleDeleteDocument.bind(
+                                  this,
+                                )}
+                              />
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
                   );
                 })}
               </TableBody>
             </Table>
             {this.props.userCanUpdate && (
-              <Button
-                label="Add new document"
-                primary={true}
+              <Fab
                 onClick={this.openFileDialog.bind(this)}
-              />
+                color="secondary"
+                aria-label="Add"
+                className={classes.createButton}
+              >
+                <Add />
+              </Fab>
             )}
           </Grid>
           <Grid item xs={3}>
-            {this.props.tags.length === 0 && this.props.exercises === 0 && (
-              <div style={styles.empty}>
-                <T>No Tag Available</T>
-              </div>
-            )}
-            {this.props.tags.map((tag) => (
-              <TagListe
-                key={tag.tag_id}
-                value={tag.tag_name}
-                onClick={this.addAvailableTagToFilter.bind(this, tag)}
-                onRequestDelete={this.handleOpenConfirmDeleteTag.bind(
-                  this,
-                  tag,
-                )}
-              />
-            ))}
-            {this.props.exercises.map((exercise) => (
-              <TagExerciseListe
-                key={exercise.exercise_id}
-                value={exercise.exercise_name}
-                onClick={this.addAvailableTagExerciseToFilter.bind(
-                  this,
-                  exercise,
-                )}
-              />
-            ))}
-            {this.props.userCanUpdate ? <CreateTag /> : ''}
+            <Typography
+              variant="h6"
+              style={{ float: 'left', marginBottom: 20 }}
+            >
+              <T>List of tags</T>
+            </Typography>
+            {this.props.userCanUpdate && <CreateTag />}
+            <div className="clearfix" />
+            <div className={classes.tagsContainer}>
+              {this.props.tags.map((tag) => (
+                <Chip
+                  key={tag.tag_id}
+                  className={classes.tag}
+                  variant="outlined"
+                  color="primary"
+                  label={tag.tag_name}
+                  onClick={this.addAvailableTagToFilter.bind(this, tag)}
+                  onDelete={this.handleOpenConfirmDeleteTag.bind(this, tag)}
+                />
+              ))}
+              {this.props.exercises.map((exercise) => (
+                <Chip
+                  key={exercise.exercise_id}
+                  className={classes.tag}
+                  variant="outlined"
+                  color="primary"
+                  label={exercise.exercise_name}
+                  onClick={this.addAvailableTagExerciseToFilter.bind(
+                    this,
+                    exercise,
+                  )}
+                />
+              ))}
+            </div>
           </Grid>
         </Grid>
         <input
@@ -644,64 +603,109 @@ class Index extends Component {
           style={{ display: 'none' }}
           onChange={this.handleFileChange.bind(this)}
         />
-        {this.props.userCanUpdate ? (
+        {this.props.userCanUpdate && (
           <Dialog
-            title="Edit document"
-            modal={false}
             open={this.state.openEditDocument}
-            onRequestClose={this.handleCloseEditDocument.bind(this)}
-            actions={actionsEditDocument}
+            TransitionComponent={Transition}
+            onClose={this.handleCloseEditDocument.bind(this)}
           >
-            <DocumentForm
-              ref="documentForm"
-              initialValues={this.state.selectedDocument}
-              onSubmit={this.onSubmitDocument.bind(this)}
-              onSubmitSuccess={this.handleCloseEditDocument.bind(this)}
-            />
+            <DialogTitle>
+              <T>Edit document</T>
+            </DialogTitle>
+            <DialogContent>
+              <DocumentForm
+                initialValues={this.state.selectedDocument}
+                onSubmit={this.onSubmitDocument.bind(this)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseEditDocument.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => submitForm('documentForm')}
+              >
+                <T>Update</T>
+              </Button>
+            </DialogActions>
           </Dialog>
-        ) : (
-          ''
         )}
-        {this.props.userCanUpdate ? (
+        {this.props.userCanUpdate && (
           <Dialog
-            title="Delete Tag"
-            modal={false}
             open={this.state.openConfirmDeleteTag}
-            onRequestClose={this.handleCloseConfirmDeleteTag.bind(this)}
-            actions={actionsOpenConfirmDeleteTag}
+            TransitionComponent={Transition}
+            onClose={this.handleCloseConfirmDeleteTag.bind(this)}
           >
-            <T>Are you sure you want to delete this tag?</T>
+            <DialogContent>
+              <T>Are you sure you want to delete this tag?</T>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseConfirmDeleteTag.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.handleSubmitConfirmDeleteTag.bind(this)}
+              >
+                <T>Delete</T>
+              </Button>
+            </DialogActions>
           </Dialog>
-        ) : (
-          ''
         )}
-
-        {this.props.userCanUpdate ? (
+        {this.props.userCanUpdate && (
           <Dialog
-            title="Editing Tags in a document"
-            modal={false}
             open={this.state.openEditDocumentTag}
-            onRequestClose={this.handleCloseEditDocumentTag.bind(this)}
-            actions={actionsEditDocumentTag}
+            TransitionComponent={Transition}
+            maxWidth="lg"
+            onClose={this.handleCloseEditDocumentTag.bind(this)}
           >
-            <DocumentTags
-              document_id={this.state.selectedDocument}
-              handleAddDocumentTag={this.handleAddDocumentTag.bind(this)}
-              handleRemoveDocumentTag={this.handleRemoveDocumentTag.bind(this)}
-              document_tags={this.state.documentsTags}
-              handleAddDocumentTagExercise={this.handleAddDocumentTagExercise.bind(
-                this,
-              )}
-              handleRemoveDocumentTagExercise={this.handleRemoveDocumentTagExercise.bind(
-                this,
-              )}
-              document_tags_exercise={this.state.documentsTagsExercise}
-              availables_tags={this.props.tags}
-              availables_exercises_tags={this.props.exercises}
-            />
+            <DialogTitle>
+              <T>Update tags of a document</T>
+            </DialogTitle>
+            <DialogContent>
+              <DocumentTags
+                document_id={this.state.selectedDocument}
+                handleAddDocumentTag={this.handleAddDocumentTag.bind(this)}
+                handleRemoveDocumentTag={this.handleRemoveDocumentTag.bind(
+                  this,
+                )}
+                document_tags={this.state.documentsTags}
+                handleAddDocumentTagExercise={this.handleAddDocumentTagExercise.bind(
+                  this,
+                )}
+                handleRemoveDocumentTagExercise={this.handleRemoveDocumentTagExercise.bind(
+                  this,
+                )}
+                document_tags_exercise={this.state.documentsTagsExercise}
+                availables_tags={this.props.tags}
+                availables_exercises_tags={this.props.exercises}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseEditDocumentTag.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitEditDocumentTag.bind(this)}
+              >
+                <T>Update</T>
+              </Button>
+            </DialogActions>
           </Dialog>
-        ) : (
-          ''
         )}
       </div>
     );

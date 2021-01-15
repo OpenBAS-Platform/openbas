@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -21,6 +21,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import * as R from 'ramda';
 import { withStyles } from '@material-ui/core/styles';
 import { Close } from '@material-ui/icons';
+import Slide from '@material-ui/core/Slide';
 import {
   deleteExercise,
   exportExercise,
@@ -86,6 +87,11 @@ i18nRegister({
     'Files gallery': 'Galerie de fichiers',
   },
 });
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 const styles = (theme) => ({
   paper: {
@@ -238,7 +244,6 @@ class Index extends Component {
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
     const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
     const { typesToExport } = this.state;
-    console.log(typesToExport);
     return (
       <div style={{ width: 800, margin: '0 auto' }}>
         {this.props.userCanUpdate && (
@@ -309,6 +314,7 @@ class Index extends Component {
               <Dialog
                 open={this.state.openGallery}
                 onClose={this.handleCloseGallery.bind(this)}
+                TransitionComponent={Transition}
                 fullScreen={true}
               >
                 <AppBar className={classes.appBar}>
@@ -372,6 +378,7 @@ class Index extends Component {
           </Button>
           <Dialog
             maxWidth="md"
+            TransitionComponent={Transition}
             open={this.state.openExport}
             onClose={this.handleCloseExport.bind(this)}
           >
@@ -528,6 +535,7 @@ class Index extends Component {
             )}
             <Dialog
               open={this.state.openDelete}
+              TransitionComponent={Transition}
               onClose={this.handleCloseDelete.bind(this)}
             >
               <DialogContent>

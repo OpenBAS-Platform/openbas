@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Route, Switch } from 'react-router';
 import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
@@ -38,6 +38,10 @@ class RootAuthenticated extends Component {
       <div>
         <Snackbar
           open={this.props.savedPopupOpen}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
           autoHideDuration={4000}
           onClose={this.props.savedDismiss.bind(this)}
         >

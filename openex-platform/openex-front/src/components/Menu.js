@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUIMenu from '@material-ui/core/Menu';
 
 // eslint-disable-next-line import/prefer-default-export

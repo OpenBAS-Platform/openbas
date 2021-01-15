@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatePicker from '@material-ui/pickers/DatePicker';
 import { injectIntl } from 'react-intl';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { dayFormat } from '../utils/Time';
 
 const styles = {

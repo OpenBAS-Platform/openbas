@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Chip from '@material-ui/core/Chip';
+import { withStyles } from '@material-ui/core/styles';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import { TagListe, TagExerciseListe } from '../component/Tag';
 
 i18nRegister({
   fr: {
@@ -13,11 +15,11 @@ i18nRegister({
   },
 });
 
-const styles = {
+const styles = () => ({
   container: {
     textAlign: 'center',
-    width: '100%',
-    height: '400px',
+    width: 600,
+    height: '100%',
   },
   divGauche: {
     float: 'left',
@@ -34,19 +36,31 @@ const styles = {
   divTitle: {
     textAlign: 'center',
     fontWeight: '600',
-    height: '5%',
+    marginBottom: 10,
   },
   ssDivGauche: {
     width: '100%',
     border: '1px silver solid',
     height: '95%',
+    padding: '10px 5px 10px 5px',
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: '0 4px 10px 4px',
+    },
   },
   ssDivDroite: {
     width: '100%',
     border: '1px silver solid',
     height: '95%',
+    padding: '10px 5px 10px 5px',
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: '0 4px 10px 4px',
+    },
   },
-};
+});
 
 class DocumentTags extends Component {
   constructor(props) {
@@ -71,13 +85,14 @@ class DocumentTags extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div style={styles.container}>
-        <div style={styles.divGauche}>
-          <div style={styles.divTitle}>
+      <div className={classes.container}>
+        <div className={classes.divGauche}>
+          <div className={classes.divTitle}>
             <T>Tags attributed to the document</T>
           </div>
-          <div style={styles.ssDivGauche}>
+          <div className={classes.ssDivGauche}>
             {this.props.availables_tags.map((tag) => {
               let exist = false;
               this.props.document_tags.forEach((documentTags) => {
@@ -87,9 +102,12 @@ class DocumentTags extends Component {
               });
               if (exist === true) {
                 return (
-                  <TagListe
+                  <Chip
                     key={tag.tag_id}
-                    value={tag.tag_name}
+                    className={classes.tag}
+                    variant="outlined"
+                    color="primary"
+                    label={tag.tag_name}
                     onClick={this.removeDocumentTag.bind(this, tag)}
                   />
                 );
@@ -105,9 +123,12 @@ class DocumentTags extends Component {
               });
               if (exist === true) {
                 return (
-                  <TagExerciseListe
+                  <Chip
                     key={exercise.exercise_id}
-                    value={exercise.exercise_name}
+                    className={classes.tag}
+                    variant="outlined"
+                    color="primary"
+                    label={exercise.exercise_name}
                     onClick={this.removeDocumentTagExercise.bind(
                       this,
                       exercise,
@@ -119,17 +140,15 @@ class DocumentTags extends Component {
             })}
           </div>
         </div>
-        <div style={styles.divDroite}>
-          <div style={styles.divTitle}>Available Tags</div>
-          <div style={styles.ssDivDroite}>
+        <div className={classes.divDroite}>
+          <div className={classes.divTitle}>Available Tags</div>
+          <div className={classes.ssDivDroite}>
             {this.props.availables_tags.length === 0
-            && this.props.availables_exercises_tags === 0 ? (
-              <div style={styles.empty}>
-                <T>No Tag available</T>
-              </div>
-              ) : (
-                ''
-              )}
+              && this.props.availables_exercises_tags === 0 && (
+                <div className={classes.empty}>
+                  <T>No Tag available</T>
+                </div>
+            )}
             {this.props.availables_tags.map((tag) => {
               let exist = false;
               this.props.document_tags.forEach((documentTags) => {
@@ -139,9 +158,12 @@ class DocumentTags extends Component {
               });
               if (exist === false) {
                 return (
-                  <TagListe
+                  <Chip
                     key={tag.tag_id}
-                    value={tag.tag_name}
+                    className={classes.tag}
+                    variant="outlined"
+                    color="primary"
+                    label={tag.tag_name}
                     onClick={this.addDocumentTag.bind(this, tag)}
                   />
                 );
@@ -157,9 +179,12 @@ class DocumentTags extends Component {
               });
               if (exist === false) {
                 return (
-                  <TagExerciseListe
+                  <Chip
                     key={exercise.exercise_id}
-                    value={exercise.exercise_name}
+                    className={classes.tag}
+                    variant="outlined"
+                    color="primary"
+                    label={exercise.exercise_name}
                     onClick={this.addDocumentTagExercise.bind(this, exercise)}
                   />
                 );
@@ -185,4 +210,4 @@ DocumentTags.propTypes = {
   availables_exercises_tags: PropTypes.array, // Liste des tags 'exercise' du document
 };
 
-export default connect(null, {})(DocumentTags);
+export default R.compose(connect(null, {}), withStyles(styles))(DocumentTags);

@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUIToolbar from '@material-ui/core/Toolbar';
 import Theme from './Theme';
 import * as Constants from '../constants/ComponentTypes';

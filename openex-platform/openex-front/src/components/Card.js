@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUICard from '@material-ui/core/Card';
 import MUICardHeader from '@material-ui/core/CardHeader';
 import MUICardMedia from '@material-ui/core/CardMedia';

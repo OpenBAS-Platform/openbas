@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';

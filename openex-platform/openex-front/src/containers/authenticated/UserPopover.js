@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import IconButton from '@material-ui/core/IconButton';
@@ -8,7 +8,6 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
-// eslint-disable-next-line import/no-cycle
 import { logout, fetchToken } from '../../actions/Application';
 import { i18nRegister } from '../../utils/Messages';
 import { T } from '../../components/I18n';

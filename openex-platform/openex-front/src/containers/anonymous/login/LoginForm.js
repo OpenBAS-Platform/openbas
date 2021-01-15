@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@material-ui/core/Button';
 import { i18nRegister } from '../../../utils/Messages';

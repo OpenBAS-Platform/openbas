@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router';
 import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
 import NotFound from './NotFound';

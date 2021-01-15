@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { T } from '../../../../../components/I18n';
 import Theme from '../../../../../components/Theme';

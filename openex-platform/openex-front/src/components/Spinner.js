@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import * as Constants from '../constants/ComponentTypes';
 

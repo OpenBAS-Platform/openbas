@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import MUIDialog from '@material-ui/core/Dialog';
 import { injectIntl } from 'react-intl';
 

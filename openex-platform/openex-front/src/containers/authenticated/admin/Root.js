@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
+import * as PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router';
 import { i18nRegister } from '../../../utils/Messages';
 import { T } from '../../../components/I18n';
