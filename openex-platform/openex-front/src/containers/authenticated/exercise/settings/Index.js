@@ -377,6 +377,7 @@ class Index extends Component {
             <T>Export</T>
           </Button>
           <Dialog
+            fullWidth={true}
             maxWidth="md"
             TransitionComponent={Transition}
             open={this.state.openExport}

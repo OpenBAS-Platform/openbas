@@ -11,6 +11,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import { Add } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
+import Typography from '@material-ui/core/Typography';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { addTag } from '../../../../../actions/Tag';
@@ -56,14 +57,16 @@ class CreateTag extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <div>
+      <div style={{ margin: '15px 0 0 15px' }}>
+        <Typography variant="h5" style={{ float: 'left' }}>
+          <T>Tags</T>
+        </Typography>
         <IconButton
           onClick={this.handleOpen.bind(this)}
-          color="secondary"
           aria-label="Add"
           className={classes.createButton}
         >
-          <Add />
+          <Add color="secondary" />
         </IconButton>
         <Dialog
           open={this.state.open}

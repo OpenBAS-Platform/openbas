@@ -45,9 +45,11 @@ export const deleteSubaudience = (exerciseId, audienceId, subaudienceId) => (
 
 export const selectSubaudience = (exerciseId, audienceId, subaudienceId) => (
   dispatch,
-) => {
-  dispatch({
-    type: Constants.APPLICATION_SELECT_SUBAUDIENCE,
-    payload: { exerciseId, audienceId, subaudienceId },
-  });
-};
+) => dispatch({
+  type: Constants.APPLICATION_SELECT_SUBAUDIENCE,
+  payload: {
+    exercise_id: exerciseId,
+    audience_id: audienceId,
+    subaudience_id: subaudienceId,
+  },
+});

@@ -10,8 +10,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { GroupOutlined } from '@material-ui/icons';
 import { green, red } from '@material-ui/core/colors';
+import Typography from '@material-ui/core/Typography';
+import Toolbar from '@material-ui/core/Toolbar';
 import { selectSubaudience } from '../../../../../actions/Subaudience';
 import CreateSubaudience from './CreateSubaudience';
+import { T } from '../../../../../components/I18n';
 
 const styles = () => ({
   drawerPaper: {
@@ -50,11 +53,17 @@ class SubaudienceNav extends Component {
         classes={{ paper: classes.drawerPaper }}
         anchor="right"
       >
-        <CreateSubaudience
-          exerciseId={this.props.exerciseId}
-          audienceId={this.props.audienceId}
-          can_create={subaudienceIsUpdatable}
-        />
+        <Toolbar />
+        {subaudienceIsUpdatable ? (
+          <CreateSubaudience
+            exerciseId={this.props.exerciseId}
+            audienceId={this.props.audienceId}
+          />
+        ) : (
+          <Typography variant="h5">
+            <T>Sub-audiences</T>
+          </Typography>
+        )}
         <List>
           {this.props.subaudiences.map((subaudience) => (
             <ListItem

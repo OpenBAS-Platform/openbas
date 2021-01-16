@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 export const T = (props) => {
   const id = props.children && props.children.replace(/(:(\w+))/g, '{$2}');
   if (id) {
-    console.log(id);
     return <FormattedMessage id={id} defaultMessage={id} values={props} />;
   }
   return '';

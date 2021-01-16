@@ -24,7 +24,7 @@ import {
 } from '../../../../../components/list/ListItem';
 import { Avatar } from '../../../../../components/Avatar';
 import { Icon } from '../../../../../components/Icon';
-import { SearchField } from '../../../../../components/SimpleTextField';
+import { SearchField } from '../../../../../components/SearchField';
 import SubaudienceNav from './SubaudienceNav';
 import AudiencePopover from './AudiencePopover';
 import SubaudiencePopover from './SubaudiencePopover';
@@ -220,7 +220,11 @@ class IndexAudience extends Component {
 
   renderSubaudience() {
     const {
-      classes, exerciseId, audience, subaudience,
+      classes,
+      exerciseId,
+      audienceId,
+      audience,
+      subaudience,
     } = this.props;
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
@@ -244,17 +248,6 @@ class IndexAudience extends Component {
         <div className={classes.users}>
           {subaudience.subaudience_users.length} <T>user(s)</T>
         </div>
-        <div className={classes.search}>
-          <SearchField
-            name="keyword"
-            fullWidth={true}
-            type="text"
-            hintText="Search"
-            onChange={this.handleSearchUsers.bind(this)}
-            styletype={Constants.FIELD_TYPE_RIGHT}
-          />
-        </div>
-        <div className="clearfix" />
         <List>
           {subaudience.subaudience_users.length === 0 ? (
             <div className={classes.empty}>
@@ -393,6 +386,14 @@ class IndexAudience extends Component {
             );
           })}
         </List>
+        <AddUsers
+          exerciseId={exerciseId}
+          audienceId={audienceId}
+          subaudienceId={subaudience.subaudience_id}
+          subaudienceUsersIds={subaudience.subaudience_users.map(
+            (u) => u.user_id,
+          )}
+        />
       </div>
     );
   }
@@ -414,6 +415,8 @@ class IndexAudience extends Component {
             audienceId={audienceId}
             audience={audience}
             subaudiences={subaudiences}
+            selectedSubaudience={R.propOr(null, 'subaudience_id', subaudience)}
+            sel
           />
           <Typography variant="h5" style={{ float: 'left' }}>
             {audience.audience_name}
@@ -424,8 +427,24 @@ class IndexAudience extends Component {
             audience={audience}
             audiences={this.props.audiences}
           />
+          <div className={classes.search}>
+            <SearchField
+              name="keyword"
+              fullWidth={true}
+              type="text"
+              hintText="Search"
+              onChange={this.handleSearchUsers.bind(this)}
+              styletype={Constants.FIELD_TYPE_RIGHT}
+            />
+          </div>
           <div className="clearfix" />
-          {subaudience && this.renderSubaudience()}
+          {subaudience ? (
+            this.renderSubaudience()
+          ) : (
+            <div className={classes.empty}>
+              <T>This audience is empty.</T>
+            </div>
+          )}
         </div>
       );
     }

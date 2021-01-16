@@ -47,7 +47,6 @@ const validate = (values) => {
     'comcheck_message',
     'comcheck_footer',
   ];
-
   const regexDateFr = RegExp(
     '^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d$',
   );
@@ -55,13 +54,11 @@ const validate = (values) => {
     '^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$',
   );
   const regexTime = RegExp('^([0-1][0-9]|2[0-3])[:]([0-5][0-9])$');
-
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
     }
   });
-
   if (
     !regexDateFr.test(values.comcheck_end_date_only)
     && !regexDateEn.test(values.comcheck_end_date_only)
@@ -71,7 +68,6 @@ const validate = (values) => {
   if (!regexTime.test(values.comcheck_end_time)) {
     errors.comcheck_end_time = 'Invalid time format';
   }
-
   return errors;
 };
 
@@ -87,7 +83,6 @@ class ComcheckForm extends Component {
       comcheck_message: '',
       comcheck_footer: '',
     };
-
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -119,82 +114,83 @@ class ComcheckForm extends Component {
   }
 
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <Select
-          label={<T>Target audience</T>}
-          name="comcheck_audience"
-          fullWidth={true}
-        >
-          {this.props.audiences.map((audience) => (
-            <MenuItem
-              key={audience.audience_id}
-              value={audience.audience_id}
-              primaryText={<T>{audience.audience_name}</T>}
-            />
-          ))}
-        </Select>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="comcheckForm" onSubmit={handleSubmit}>
+            <Select
+              label={<T>Target audience</T>}
+              name="comcheck_audience"
+              fullWidth={true}
+            >
+              {this.props.audiences.map((audience) => (
+                <MenuItem
+                  key={audience.audience_id}
+                  value={audience.audience_id}
+                  primaryText={<T>{audience.audience_name}</T>}
+                />
+              ))}
+            </Select>
 
-        <div style={styles.newInputDate.inputDateTimeLine}>
-          <DatePickerIconOpx
-            nameField="comcheck_end_date_only"
-            labelField="EndDate"
-            onChange={this.replaceDateEndValue.bind(this)}
-          />
-          <TimePickerIconOpx
-            nameField="comcheck_end_time"
-            labelField="EndTime"
-            onChange={this.replaceTimeEndValue.bind(this)}
-          />
-
-          <div style={styles.fullDate}>
-            {/* eslint-disable */}
+            <div style={styles.newInputDate.inputDateTimeLine}>
+              <DatePickerIconOpx
+                nameField="comcheck_end_date_only"
+                labelField="EndDate"
+                onChange={this.replaceDateEndValue.bind(this)}
+              />
+              <TimePickerIconOpx
+                nameField="comcheck_end_time"
+                labelField="EndTime"
+                onChange={this.replaceTimeEndValue.bind(this)}
+              />
+              <div style={styles.fullDate}>
+                <TextField
+                  name="comcheck_end_date"
+                  type="hidden"
+                />
+              </div>
+            </div>
             <TextField
-              ref="comcheck_end_date"
-              name="comcheck_end_date"
-              type="hidden"
+              name="comcheck_subject"
+              fullWidth={true}
+              type="text"
+              label="Subject"
             />
-            {/* eslint-enable */}
-          </div>
-        </div>
-
-        <TextField
-          name="comcheck_subject"
-          fullWidth={true}
-          type="text"
-          label="Subject"
-        />
-
-        <label>
-          Message
-          <CKEditorField name="comcheck_message" label="Message" />
-        </label>
-        <div style={styles.variables}>
-          Les variables disponibles sont : {'{'}
-          {'{'}NOM{'}'}
-          {'}'}, {'{'}
-          {'{'}PRENOM{'}'}
-          {'}'} et {'{'}
-          {'{'}ORGANISATION{'}'}
-          {'}'}.
-        </div>
-
-        <br />
-
-        <label>
-          Signature
-          <CKEditorField name="comcheck_footer" label="Signature" />
-        </label>
-        <div style={styles.variables}>
-          Les variables disponibles sont : {'{'}
-          {'{'}NOM{'}'}
-          {'}'}, {'{'}
-          {'{'}PRENOM{'}'}
-          {'}'} et {'{'}
-          {'{'}ORGANISATION{'}'}
-          {'}'}.
-        </div>
-      </form>
+            <label>
+              Message
+              <CKEditorField name="comcheck_message" label="Message" />
+            </label>
+            <div style={styles.variables}>
+              Les variables disponibles sont : {'{'}
+              {'{'}NOM{'}'}
+              {'}'}, {'{'}
+              {'{'}PRENOM{'}'}
+              {'}'} et {'{'}
+              {'{'}ORGANISATION{'}'}
+              {'}'}.
+            </div>
+            <br />
+            <label>
+              Signature
+              <CKEditorField name="comcheck_footer" label="Signature" />
+            </label>
+            <div style={styles.variables}>
+              Les variables disponibles sont : {'{'}
+              {'{'}NOM{'}'}
+              {'}'}, {'{'}
+              {'{'}PRENOM{'}'}
+              {'}'} et {'{'}
+              {'{'}ORGANISATION{'}'}
+              {'}'}.
+            </div>
+          </form>
+        )}
+      </Form>
     );
   }
 }

@@ -20,13 +20,8 @@ import { SearchField } from '../../../../components/SearchField';
 import CreateAudience from './audience/CreateAudience';
 
 const styles = () => ({
-  container: {
-    position: 'relative',
-  },
   search: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
+    float: 'right',
   },
   enabled: {
     color: green[500],

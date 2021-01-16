@@ -43,7 +43,11 @@ export const selectIncident = (exercieId, eventId, incidentId) => (
 ) => {
   dispatch({
     type: Constants.APPLICATION_SELECT_INCIDENT,
-    payload: { exercieId, eventId, incidentId },
+    payload: {
+      exercise_id: exercieId,
+      event_id: eventId,
+      incident_id: incidentId,
+    },
   });
 };
 

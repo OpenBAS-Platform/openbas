@@ -13,7 +13,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import Slide from '@material-ui/core/Slide';
 import { withStyles } from '@material-ui/core/styles';
 import { Add } from '@material-ui/icons';
-import Toolbar from '@material-ui/core/Toolbar';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import SubaudienceForm from './SubaudienceForm';
@@ -37,12 +36,8 @@ Transition.displayName = 'TransitionSlide';
 
 const styles = () => ({
   createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 30,
-  },
-  container: {
-    padding: 15,
+    float: 'left',
+    marginTop: -8,
   },
 });
 
@@ -69,26 +64,24 @@ class CreateSubaudience extends Component {
           this.props.audienceId,
           payload.result,
         );
-      });
+      })
+      .then(() => this.handleCloseCreate());
   }
 
   render() {
     const { classes } = this.props;
     return (
-      <div>
-        <Toolbar />
-        <div className={classes.container}>
-        <Typography variant="h5">
+      <div style={{ margin: '15px 0 0 15px' }}>
+        <Typography variant="h5" style={{ float: 'left' }}>
           <T>Sub-audiences</T>
         </Typography>
-        {this.props.can_create && (
-          <IconButton
-            className={classes.createButton}
-            onClick={this.handleOpenCreate.bind(this)}
-          >
-            <Add />
-          </IconButton>
-        )}
+        <IconButton
+          className={classes.createButton}
+          onClick={this.handleOpenCreate.bind(this)}
+          color="secondary"
+        >
+          <Add />
+        </IconButton>
         <Dialog
           open={this.state.openCreate}
           TransitionComponent={Transition}
@@ -117,7 +110,6 @@ class CreateSubaudience extends Component {
           </DialogActions>
         </Dialog>
       </div>
-      </div>
     );
   }
 }
@@ -127,7 +119,6 @@ CreateSubaudience.propTypes = {
   audienceId: PropTypes.string,
   addSubaudience: PropTypes.func,
   selectSubaudience: PropTypes.func,
-  can_create: PropTypes.bool,
 };
 
 export default R.compose(

@@ -14,6 +14,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Checkbox from '@material-ui/core/Checkbox';
 import { withStyles } from '@material-ui/core/styles';
 import { MoreVert } from '@material-ui/icons';
 import Menu from '@material-ui/core/Menu';
@@ -26,7 +27,6 @@ import {
   redirectToAudiences,
   redirectToComcheck,
 } from '../../../../../actions/Application';
-import { Checkbox } from '../../../../../components/Checkbox';
 import { addComcheck } from '../../../../../actions/Comcheck';
 import {
   updateAudience,
@@ -191,10 +191,6 @@ class AudiencePopover extends Component {
       .then(() => this.handleCloseEdit());
   }
 
-  submitFormEdit() {
-    this.refs.audienceForm.submit();
-  }
-
   onSubmitCopyAudience() {
     this.setState({ openCopyAudience: false });
     const exercicesToAdd = [...this.state.exercicesToAdd];
@@ -332,56 +328,6 @@ class AudiencePopover extends Component {
         'The exercise control Team',
       )}`,
     };
-    const comCopyAudienceToOtherExercise = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCopyAudienceToOtherExercise.bind(this)}
-      />,
-      <Button
-        key="launch"
-        label="Launch"
-        primary={true}
-        onClick={this.onSubmitCopyAudience.bind(this)}
-      />,
-    ];
-    const disableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDisable.bind(this)}
-      />,
-      audienceIsUpdatable ? (
-        <Button
-          key="disable"
-          label="Disable"
-          primary={true}
-          onClick={this.submitDisable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const enableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEnable.bind(this)}
-      />,
-      audienceIsUpdatable ? (
-        <Button
-          key="enable"
-          label="Enable"
-          primary={true}
-          onClick={this.submitEnable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
     return (
       <div className={classes.container}>
         <IconButton
@@ -413,16 +359,21 @@ class AudiencePopover extends Component {
           >
             <T>Edit</T>
           </MenuItem>
-          {audienceIsUpdatable
-            && (audienceEnabled ? (
-              <MenuItem onClick={this.handleOpenDisable.bind(this)}>
-                <T>Disable</T>
-              </MenuItem>
-            ) : (
-              <MenuItem onClick={this.handleOpenEnable.bind(this)}>
-                <T>Enable</T>
-              </MenuItem>
-            ))}
+          {audienceEnabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={!audienceIsUpdatable}
+            >
+              <T>Disable</T>
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={!audienceIsUpdatable}
+            >
+              <T>Enable</T>
+            </MenuItem>
+          )}
           <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
             <T>Export to XLS</T>
           </MenuItem>
@@ -490,71 +441,89 @@ class AudiencePopover extends Component {
           </DialogActions>
         </Dialog>
         <Dialog
-          title=""
-          modal={false}
           open={this.state.openCopyAudience}
+          TransitionComponent={Transition}
           onClose={this.handleCloseCopyAudienceToOtherExercise.bind(this)}
-          actions={comCopyAudienceToOtherExercise}
         >
           <DialogTitle>Copy audience to another exercise</DialogTitle>
           {this.props.exercises.length === 0 ? (
-            <div>
+            <DialogContentText>
               <T>No excercise found.</T>
-            </div>
+            </DialogContentText>
           ) : (
-            ''
+            <div>
+              <DialogContent>
+                <form
+                  onSubmit={this.onSubmitCopyAudience.bind(this)}
+                  id="copyExerciceForm"
+                >
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>
+                          <T>Exercise</T>
+                        </TableCell>
+                        <TableCell>
+                          <T>Start Date</T>
+                        </TableCell>
+                        <TableCell>
+                          <T>End Date</T>
+                        </TableCell>
+                        <TableCell>
+                          <T>Copy</T>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {R.values(this.props.exercises).map((exercise) => {
+                        const startDate = dateFormat(
+                          exercise.exercise_start_date,
+                          'MMM D, YYYY',
+                        );
+                        const endDate = dateFormat(
+                          exercise.exercise_end_date,
+                          'MMM D, YYYY',
+                        );
+                        return (
+                          <TableRow key={exercise.exercise_id}>
+                            <TableCell>{exercise.exercise_name}</TableCell>
+                            <TableCell>{startDate}</TableCell>
+                            <TableCell>{endDate}</TableCell>
+                            <TableCell>
+                              <Checkbox
+                                defaultChecked={false}
+                                onCheck={this.handleCopyCheck.bind(
+                                  this,
+                                  exercise.exercise_id,
+                                )}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </form>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseCopyAudienceToOtherExercise.bind(
+                    this,
+                  )}
+                >
+                  <T>Cancel</T>
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={this.onSubmitCopyAudience.bind(this)}
+                >
+                  <T>Copy</T>
+                </Button>
+              </DialogActions>
+            </div>
           )}
-          <form
-            onSubmit={this.onSubmitCopyAudience.bind(this)}
-            id="copyExerciceForm"
-          >
-            <Table selectable={false} style={{ marginTop: '5px' }}>
-              <TableHead adjustForCheckbox={false} displaySelectAll={false}>
-                <TableRow>
-                  <TableCell>
-                    <T>Exercise</T>
-                  </TableCell>
-                  <TableCell>
-                    <T>Start Date</T>
-                  </TableCell>
-                  <TableCell>
-                    <T>End Date</T>
-                  </TableCell>
-                  <TableCell>
-                    <T>Copy</T>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody displayRowCheckbox={false}>
-                {R.values(this.props.exercises).map((exercise) => {
-                  const startDate = dateFormat(
-                    exercise.exercise_start_date,
-                    'MMM D, YYYY',
-                  );
-                  const endDate = dateFormat(
-                    exercise.exercise_end_date,
-                    'MMM D, YYYY',
-                  );
-                  return (
-                    <TableRow key={exercise.exercise_id}>
-                      <TableCell>{exercise.exercise_name}</TableCell>
-                      <TableCell>{startDate}</TableCell>
-                      <TableCell>{endDate}</TableCell>
-                      <TableCell>
-                        <Checkbox
-                          defaultChecked={false}
-                          onCheck={this.handleCopyCheck.bind(
-                            this,
-                            exercise.exercise_id,
-                          )}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </form>
         </Dialog>
         <Dialog
           open={this.state.openComcheck}
@@ -569,7 +538,6 @@ class AudiencePopover extends Component {
               audiences={this.props.audiences}
               initialValues={initialComcheckValues}
               onSubmit={this.onSubmitComcheck.bind(this)}
-              onSubmitSuccess={this.handleCloseComcheck.bind(this)}
             />
           </DialogContent>
           <DialogActions>
@@ -582,7 +550,7 @@ class AudiencePopover extends Component {
             <Button
               variant="outlined"
               color="seondary"
-              onClick={this.submitFormComcheck.bind(this)}
+              onClick={() => submitForm('comcheckForm')}
             >
               <T>Launch</T>
             </Button>
@@ -597,22 +565,56 @@ class AudiencePopover extends Component {
           submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
         />
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDisable}
-          onRequestClose={this.handleCloseDisable.bind(this)}
-          actions={disableActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDisable.bind(this)}
         >
-          <T>Do you want to disable this audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to disable this audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openEnable}
-          onRequestClose={this.handleCloseEnable.bind(this)}
-          actions={enableActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEnable.bind(this)}
         >
-          <T>Do you want to enable this audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to enable this audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              <T>Enable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
