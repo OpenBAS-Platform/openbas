@@ -3,10 +3,14 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { addUser } from '../../../../../actions/User';
+import { T } from '../../../../../components/I18n';
 import UserForm from './UserForm';
-import * as Constants from '../../../../../constants/ComponentTypes';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -30,53 +34,47 @@ class CreateUser extends Component {
   }
 
   onSubmitCreate(data) {
-    return this.props.addUser(data);
-  }
-
-  submitFormCreate() {
-    this.refs.userForm.submit();
+    return this.props.addUser(data).then(() => this.handleCloseCreate());
   }
 
   render() {
-    const actionsCreateUser = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCreate.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create user"
-        primary={true}
-        onClick={this.submitFormCreate.bind(this)}
-      />,
-    ];
-
     return (
       <div>
         <Button
-          label="Create a new user"
-          secondary={true}
+          variant="outlined"
+          color="primary"
           onClick={this.handleOpenCreate.bind(this)}
-          type={Constants.BUTTON_TYPE_DIALOG_LEFT}
-        />
-        <Dialog
-          title="Create a new user"
-          modal={false}
-          open={this.state.openCreate}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actionsCreateUser}
         >
-          {/* eslint-disable */}
-          <UserForm
-            ref="userForm"
-            onSubmit={this.onSubmitCreate.bind(this)}
-            organizations={this.props.organizations}
-            onSubmitSuccess={this.handleCloseCreate.bind(this)}
-          />
-          {/* eslint-enable */}
+          <T>Create a user</T>
+        </Button>
+        <Dialog
+          open={this.state.openCreate}
+          onClose={this.handleCloseCreate.bind(this)}
+        >
+          <DialogTitle>
+            <T>Create a new user</T>
+          </DialogTitle>
+          <DialogContent>
+            <UserForm
+              onSubmit={this.onSubmitCreate.bind(this)}
+              organizations={this.props.organizations}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('userForm')}
+            >
+              <T>Create a user</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

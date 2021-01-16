@@ -230,7 +230,7 @@ class AddUsers extends Component {
             >
               <T>Add these users</T>
             </Button>
-            <CreateUser exerciseId={this.props.exerciseId} />,
+            <CreateUser exerciseId={this.props.exerciseId} />
           </DialogActions>
         </Dialog>
       </div>

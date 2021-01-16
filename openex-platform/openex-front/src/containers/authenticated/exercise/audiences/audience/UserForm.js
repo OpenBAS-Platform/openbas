@@ -22,70 +22,74 @@ i18nRegister({
 
 class UserForm extends Component {
   render() {
-    const dataSource = R.map(
+    const options = R.map(
       (val) => val.organization_name,
       R.values(this.props.organizations),
     );
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="user_email"
-          fullWidth={true}
-          type="text"
-          label="Email address"
-        />
-        <TextField
-          name="user_email2"
-          fullWidth={true}
-          type="text"
-          label="Email address (secondary)"
-        />
-        <TextField
-          name="user_firstname"
-          fullWidth={true}
-          type="text"
-          label="Firstname"
-        />
-        <TextField
-          name="user_lastname"
-          fullWidth={true}
-          type="text"
-          label="Lastname"
-        />
-        <Autocomplete
-          name="user_organization"
-          fullWidth={true}
-          type="text"
-          label="Organization"
-          dataSource={dataSource}
-        />
-        <TextField
-          name="user_phone2"
-          fullWidth={true}
-          type="text"
-          label="Phone number (fix)"
-        />
-        <TextField
-          name="user_phone"
-          fullWidth={true}
-          type="text"
-          label="Phone number (mobile)"
-        />
-        <TextField
-          name="user_phone3"
-          fullWidth={true}
-          type="text"
-          label="Phone number (secondary)"
-        />
-        <TextField
-          name="user_pgp_key"
-          fullWidth={true}
-          multiLine={true}
-          rows={5}
-          type="text"
-          label="PGP public key"
-        />
-      </form>
+      <Form initialValues={initialValues} onSubmit={onSubmit}>
+        {({ handleSubmit }) => (
+          <form id="userForm" onSubmit={handleSubmit}>
+            <TextField
+              name="user_email"
+              fullWidth={true}
+              label="Email address"
+            />
+            <TextField
+              name="user_email2"
+              fullWidth={true}
+              label="Email address (secondary)"
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_firstname"
+              fullWidth={true}
+              label="Firstname"
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_lastname"
+              fullWidth={true}
+              label="Lastname"
+              style={{ marginTop: 20 }}
+            />
+            <Autocomplete
+              name="user_organization"
+              fullWidth={true}
+              label="Organization"
+              options={options}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_phone2"
+              fullWidth={true}
+              label="Phone number (fix)"
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_phone"
+              fullWidth={true}
+              label="Phone number (mobile)"
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_phone3"
+              fullWidth={true}
+              label="Phone number (secondary)"
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_pgp_key"
+              fullWidth={true}
+              multiLine={true}
+              rows={5}
+              label="PGP public key"
+              style={{ marginTop: 20 }}
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

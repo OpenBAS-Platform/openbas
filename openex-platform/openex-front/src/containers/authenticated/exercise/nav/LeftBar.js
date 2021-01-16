@@ -51,7 +51,7 @@ i18nRegister({
   },
 });
 
-const styles = (theme) => ({
+const styles = () => ({
   drawerPaper: {
     width: 180,
   },
