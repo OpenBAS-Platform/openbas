@@ -6,6 +6,10 @@ import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import { Link } from 'react-router-dom';
+import MenuItem from '@material-ui/core/MenuItem';
+import { DescriptionOutlined } from '@material-ui/icons';
 import { dateFormat, timeDiff } from '../../utils/Time';
 import { fetchExercises } from '../../actions/Exercise';
 import { dataFile } from '../../actions/File';
@@ -45,6 +49,12 @@ const styles = (theme) => ({
     fontWeight: 500,
     textAlign: 'center',
   },
+  documents: {
+    color: '#ffffff',
+    position: 'absolute',
+    top: 8,
+    right: 70,
+  },
 });
 
 class IndexAuthenticated extends Component {
@@ -69,6 +79,13 @@ class IndexAuthenticated extends Component {
               onClick={this.redirectToHome.bind(this)}
             />
             <div className={classes.title}>OpenEx</div>
+            <IconButton
+              component={Link}
+              to='/private/documents'
+              className={classes.documents}
+            >
+              <DescriptionOutlined fontSize="medium" />
+            </IconButton>
             <UserPopover />
           </Toolbar>
         </AppBar>

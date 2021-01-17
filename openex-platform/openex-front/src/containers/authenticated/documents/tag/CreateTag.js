@@ -12,11 +12,11 @@ import { Add } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import Typography from '@material-ui/core/Typography';
-import { T } from '../../../../../components/I18n';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { addTag } from '../../../../../actions/Tag';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import { addTag } from '../../../../actions/Tag';
 import TagForm from './TagForm';
-import { submitForm } from '../../../../../utils/Action';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {

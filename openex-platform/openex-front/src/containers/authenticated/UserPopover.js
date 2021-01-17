@@ -3,11 +3,11 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import IconButton from '@material-ui/core/IconButton';
-import Avatar from '@material-ui/core/Avatar';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
+import { AccountCircleOutlined } from '@material-ui/icons';
 import { logout, fetchToken } from '../../actions/Application';
 import { i18nRegister } from '../../utils/Messages';
 import { T } from '../../components/I18n';
@@ -23,8 +23,9 @@ i18nRegister({
 const styles = () => ({
   topAvatar: {
     position: 'absolute',
-    top: 0,
+    top: 8,
     right: 15,
+    color: '#ffffff',
   },
 });
 
@@ -63,7 +64,7 @@ class UserPopover extends Component {
           onClick={this.handleOpen.bind(this)}
           className={classes.topAvatar}
         >
-          <Avatar src={this.props.userGravatar} />
+          <AccountCircleOutlined />
         </IconButton>
         <Menu
           style={{ marginTop: 40, zIndex: 2100 }}

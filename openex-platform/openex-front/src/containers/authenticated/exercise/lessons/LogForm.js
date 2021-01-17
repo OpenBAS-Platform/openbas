@@ -35,7 +35,7 @@ class LogForm extends Component {
         <TextField
           name="log_content"
           fullWidth={true}
-          multiLine={true}
+          multiline={true}
           rows={4}
           label="Content"
         />

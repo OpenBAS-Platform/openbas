@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { dayFormat, timeFormat, dateToISO } from '../../../../../utils/Time';
@@ -71,6 +72,11 @@ i18nRegister({
     Close: 'Fermer',
   },
 });
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class InjectPopover extends Component {
   constructor(props) {

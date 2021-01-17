@@ -145,7 +145,7 @@ class InjectContentForm extends Component {
                   key={field.name}
                   name={field.name}
                   fullWidth={true}
-                  multiLine={true}
+                  multiline={true}
                   rows={3}
                   type="text"
                   label={field.name}

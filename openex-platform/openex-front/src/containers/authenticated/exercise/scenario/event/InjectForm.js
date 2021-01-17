@@ -156,7 +156,7 @@ class InjectForm extends Component {
         <TextField
           name="inject_description"
           fullWidth={true}
-          multiLine={true}
+          multiline={true}
           rows={3}
           type="text"
           label="Description"

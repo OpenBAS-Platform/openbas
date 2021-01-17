@@ -8,11 +8,13 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { GroupOutlined } from '@material-ui/icons';
 import { green, red } from '@material-ui/core/colors';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 import { selectSubaudience } from '../../../../../actions/Subaudience';
+import SubaudiencePopover from './SubaudiencePopover';
 import CreateSubaudience from './CreateSubaudience';
 import { T } from '../../../../../components/I18n';
 
@@ -41,7 +43,9 @@ class SubaudienceNav extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const {
+      classes, audience, audienceId, exerciseId, subaudiences,
+    } = this.props;
     const subaudienceIsUpdatable = R.propOr(
       true,
       'user_can_update',
@@ -56,8 +60,8 @@ class SubaudienceNav extends Component {
         <Toolbar />
         {subaudienceIsUpdatable ? (
           <CreateSubaudience
-            exerciseId={this.props.exerciseId}
-            audienceId={this.props.audienceId}
+            exerciseId={exerciseId}
+            audienceId={audienceId}
           />
         ) : (
           <Typography variant="h5">
@@ -90,6 +94,15 @@ class SubaudienceNav extends Component {
                 <GroupOutlined />
               </ListItemIcon>
               <ListItemText primary={subaudience.subaudience_name} />
+              <ListItemSecondaryAction>
+                <SubaudiencePopover
+                  exerciseId={exerciseId}
+                  audienceId={audienceId}
+                  audience={audience}
+                  subaudience={subaudience}
+                  subaudiences={subaudiences}
+                />
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>

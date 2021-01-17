@@ -79,7 +79,7 @@ class IncidentForm extends Component {
         <TextField
           name="incident_story"
           fullWidth={true}
-          multiLine={true}
+          multiline={true}
           rows={3}
           type="text"
           label="Story"

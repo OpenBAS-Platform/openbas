@@ -12,6 +12,7 @@ import { i18nRegister } from '../../utils/Messages';
 import { savedDismiss } from '../../actions/Application';
 import IndexAuthenticated from './Index';
 import IndexProfile from './profile/Index';
+import IndexDocuments from './documents/Index';
 import RootAdmin from './admin/Root';
 import RootExercise from './exercise/Root';
 
@@ -53,6 +54,7 @@ class RootAuthenticated extends Component {
           <Route path="/admin" component={UserIsAdmin(RootAdmin)} />
           <Route exact path="/private" component={IndexAuthenticated} />
           <Route exact path="/private/profile" component={IndexProfile} />
+          <Route exact path="/private/documents" component={IndexDocuments} />
           <Route
             path="/private/exercise/:exerciseId"
             component={RootExercise}

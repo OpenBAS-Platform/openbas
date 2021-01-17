@@ -41,7 +41,7 @@ class ProfileForm extends Component {
             <TextField
               name="user_pgp_key"
               fullWidth={true}
-              multiLine={true}
+              multiline={true}
               rows={5}
               label={<T>PGP public key</T>}
               style={{ marginTop: 20 }}

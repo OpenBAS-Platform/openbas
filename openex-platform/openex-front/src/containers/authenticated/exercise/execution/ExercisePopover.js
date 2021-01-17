@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
@@ -39,6 +40,11 @@ i18nRegister({
   },
 });
 
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
 class ExercisePopover extends Component {
   constructor(props) {
     super(props);
@@ -52,11 +58,11 @@ class ExercisePopover extends Component {
 
   handlePopoverOpen(event) {
     event.stopPropagation();
-    this.setState({ openPopover: true, anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenDisable() {

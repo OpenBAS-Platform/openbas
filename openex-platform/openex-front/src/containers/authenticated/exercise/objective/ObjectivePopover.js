@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
@@ -15,14 +16,12 @@ import {
   MenuItemLink,
   MenuItemButton,
 } from '../../../../components/menu/MenuItem';
-/* eslint-disable */
 import {
   fetchObjective,
   updateObjective,
   deleteObjective,
-} from "../../../../actions/Objective";
-import { addSubobjective } from "../../../../actions/Subobjective";
-/* eslint-enable */
+} from '../../../../actions/Objective';
+import { addSubobjective } from '../../../../actions/Subobjective';
 import ObjectiveForm from './ObjectiveForm';
 import SubobjectiveForm from './SubobjectiveForm';
 
@@ -31,6 +30,11 @@ const style = {
   top: '10px',
   right: 0,
 };
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 i18nRegister({
   fr: {
@@ -62,7 +66,7 @@ class ObjectivePopover extends Component {
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
@@ -232,11 +236,9 @@ class ObjectivePopover extends Component {
           </Menu>
         </Popover>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this objective?</T>
         </Dialog>

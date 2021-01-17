@@ -29,6 +29,12 @@ const styles = () => ({
   disabled: {
     color: red[500],
   },
+  empty: {
+    marginTop: 30,
+    fontSize: '18px',
+    fontWeight: 500,
+    textAlign: 'center',
+  },
 });
 
 i18nRegister({
@@ -73,7 +79,7 @@ class IndexAudiences extends Component {
           <div className="clearfix" />
         </div>
         {this.props.audiences.length === 0 && (
-          <div style={styles.empty}>
+          <div className={classes.empty}>
             <T>You do not have any audiences in this exercise.</T>
           </div>
         )}

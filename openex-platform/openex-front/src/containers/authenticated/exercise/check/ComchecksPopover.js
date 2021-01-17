@@ -46,7 +46,7 @@ class DryrunsPopover extends Component {
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenLaunch() {

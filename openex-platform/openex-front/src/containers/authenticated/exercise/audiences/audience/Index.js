@@ -4,6 +4,15 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Avatar from '@material-ui/core/Avatar';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { T } from '../../../../../components/I18n';
@@ -17,17 +26,9 @@ import { fetchAudiences } from '../../../../../actions/Audience';
 import { fetchSubaudiences } from '../../../../../actions/Subaudience';
 import { fetchComchecks } from '../../../../../actions/Comcheck';
 import Theme from '../../../../../components/Theme';
-import { List } from '../../../../../components/List';
-import {
-  AvatarHeaderItem,
-  AvatarListItem,
-} from '../../../../../components/list/ListItem';
-import { Avatar } from '../../../../../components/Avatar';
-import { Icon } from '../../../../../components/Icon';
 import { SearchField } from '../../../../../components/SearchField';
 import SubaudienceNav from './SubaudienceNav';
 import AudiencePopover from './AudiencePopover';
-import SubaudiencePopover from './SubaudiencePopover';
 import AddUsers from './AddUsers';
 import UserPopover from './UserPopover';
 import UserView from './UserView';
@@ -128,11 +129,6 @@ const styles = () => ({
     float: 'left',
     margin: '-16px 0px 0px -15px',
   },
-  users: {
-    float: 'left',
-    fontSize: '12px',
-    color: Theme.palette.secondary,
-  },
 });
 
 class IndexAudience extends Component {
@@ -162,26 +158,6 @@ class IndexAudience extends Component {
 
   reverseBy(field) {
     this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
-  }
-
-  SortHeader(field, label) {
-    const icon = this.state.orderAsc
-      ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP;
-    const IconDisplay = this.state.sortBy === field ? (
-        <Icon type={Constants.ICON_TYPE_SORT} name={icon} />
-    ) : (
-      ''
-    );
-    return (
-      <div
-        className={this.props.classes.header[field]}
-        onClick={this.reverseBy.bind(this, field)}
-      >
-        <T>{label}</T>
-        {IconDisplay}
-      </div>
-    );
   }
 
   // TODO replace with sortWith after Ramdajs new release
@@ -226,6 +202,11 @@ class IndexAudience extends Component {
       audience,
       subaudience,
     } = this.props;
+    const subaudienceIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      subaudience,
+    );
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
@@ -245,68 +226,12 @@ class IndexAudience extends Component {
     )(subaudience.subaudience_users);
     return (
       <div>
-        <div className={classes.users}>
-          {subaudience.subaudience_users.length} <T>user(s)</T>
-        </div>
+        {subaudience.subaudience_users.length === 0 && (
+          <div className={classes.empty}>
+            <T>This sub-audience is empty.</T>
+          </div>
+        )}
         <List>
-          {subaudience.subaudience_users.length === 0 ? (
-            <div className={classes.empty}>
-              <T>This sub-audience is empty.</T>
-            </div>
-          ) : (
-            <AvatarHeaderItem
-              leftAvatar={
-                <span className={classes.header.avatar}>
-                  <span
-                    style={{
-                      color: this.switchColor(
-                        !audience.audience_enabled
-                          || !subaudience.subaudience_enabled,
-                      ),
-                    }}
-                  >
-                    #
-                  </span>
-                </span>
-              }
-              rightIconButton={<Icon style={{ display: 'none' }} />}
-              primaryText={
-                <div>
-                  <span
-                    style={{
-                      color: this.switchColor(
-                        !audience.audience_enabled
-                          || !subaudience.subaudience_enabled,
-                      ),
-                    }}
-                  >
-                    {this.SortHeader('user_firstname', 'Name')}
-                  </span>
-                  <span
-                    style={{
-                      color: this.switchColor(
-                        !audience.audience_enabled
-                          || !subaudience.subaudience_enabled,
-                      ),
-                    }}
-                  >
-                    {this.SortHeader('user_email', 'Email address')}
-                  </span>
-                  <span
-                    style={{
-                      color: this.switchColor(
-                        !audience.audience_enabled
-                          || !subaudience.subaudience_enabled,
-                      ),
-                    }}
-                  >
-                    {this.SortHeader('user_organization', 'Organization')}
-                  </span>
-                  <div className="clearfix" />
-                </div>
-              }
-            />
-          )}
           {users.map((user) => {
             const userId = R.propOr(Math.random(), 'user_id', user);
             const userFirstname = R.propOr('-', 'user_firstname', user);
@@ -324,76 +249,64 @@ class IndexAudience extends Component {
               userOrganization,
             );
             return (
-              <AvatarListItem
+              <ListItem
                 key={userId}
+                divider={true}
+                button={true}
                 onClick={this.handleOpenView.bind(this, user)}
-                leftAvatar={
-                  <Avatar
-                    type={Constants.AVATAR_TYPE_MAINLIST}
-                    src={userGravatar}
-                  />
-                }
-                rightIconButton={
+              >
+                <ListItemAvatar>
+                  <Avatar src={userGravatar} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={`${userFirstname} ${userLastname}`}
+                  secondary={userEmail}
+                />
+                <div style={{ marginRight: 200 }}>{organizationName}</div>
+                <ListItemSecondaryAction>
                   <UserPopover
                     exerciseId={exerciseId}
                     audience={audience}
                     subaudience={subaudience}
                     user={user}
                   />
-                }
-                primaryText={
-                  <div>
-                    <div className={classes.name}>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        {userFirstname} {userLastname}
-                      </span>
-                    </div>
-                    <div className={classes.mail}>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        {userEmail}
-                      </span>
-                    </div>
-                    <div className={classes.org}>
-                      <span
-                        style={{
-                          color: this.switchColor(
-                            !audience.audience_enabled
-                              || !subaudience.subaudience_enabled,
-                          ),
-                        }}
-                      >
-                        {organizationName}
-                      </span>
-                    </div>
-                    <div className="clearfix" />
-                  </div>
-                }
-              />
+                </ListItemSecondaryAction>
+              </ListItem>
             );
           })}
         </List>
-        <AddUsers
-          exerciseId={exerciseId}
-          audienceId={audienceId}
-          subaudienceId={subaudience.subaudience_id}
-          subaudienceUsersIds={subaudience.subaudience_users.map(
-            (u) => u.user_id,
-          )}
-        />
+        <Dialog
+          open={this.state.openView}
+          onClose={this.handleCloseView.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>{`${this.state.currentUser.user_firstname} ${this.state.currentUser.user_lastname}`}</DialogTitle>
+          <DialogContent>
+            <UserView
+              user={this.state.currentUser}
+              organizations={this.props.organizations}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseView.bind(this)}
+            >
+              <T>Close</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {subaudienceIsUpdatable && (
+          <AddUsers
+            exerciseId={exerciseId}
+            audienceId={audienceId}
+            subaudienceId={subaudience.subaudience_id}
+            subaudienceUsersIds={subaudience.subaudience_users.map(
+              (u) => u.user_id,
+            )}
+          />
+        )}
       </div>
     );
   }

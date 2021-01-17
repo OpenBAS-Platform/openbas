@@ -155,16 +155,11 @@ class AddUsers extends Component {
               {this.state.users.map((user) => (
                 <Chip
                   key={user.user_id}
-                  onRequestDelete={this.removeUser.bind(this, user)}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
-                  <Avatar
-                    src={user.user_gravatar}
-                    size={32}
-                    type={Constants.AVATAR_TYPE_CHIP}
-                  />
-                  {user.user_firstname} {user.user_lastname}
-                </Chip>
+                  onDelete={this.removeUser.bind(this, user)}
+                  avatar={<Avatar src={user.user_gravatar} />}
+                  variant="outlined"
+                  label={`${user.user_firstname} ${user.user_lastname}`}
+                />
               ))}
               <div className="clearfix" />
             </div>

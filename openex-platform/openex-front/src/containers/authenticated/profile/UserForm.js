@@ -61,6 +61,7 @@ class UserForm extends Component {
               label={<T>Organization</T>}
               options={options}
               style={{ marginTop: 20 }}
+              freeSolo={true}
             />
             <Select
               label={<T>Language</T>}

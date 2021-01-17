@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
@@ -36,6 +37,11 @@ const style = {
   right: 0,
 };
 
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
 class UserPopover extends Component {
   constructor(props) {
     super(props);
@@ -49,11 +55,11 @@ class UserPopover extends Component {
 
   handlePopoverOpen(event) {
     event.stopPropagation();
-    this.setState({ openPopover: true, anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
@@ -205,11 +211,9 @@ class UserPopover extends Component {
           </Menu>
         </Popover>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this user?</T>
         </Dialog>

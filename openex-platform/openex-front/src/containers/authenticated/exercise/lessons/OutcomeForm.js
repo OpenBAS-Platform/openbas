@@ -32,7 +32,7 @@ class OutcomeForm extends Component {
         <TextField
           name="outcome_comment"
           fullWidth={true}
-          multiLine={true}
+          multiline={true}
           rows={4}
           label="Comment"
         />

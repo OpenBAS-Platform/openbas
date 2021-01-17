@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
@@ -70,6 +71,11 @@ const styles = {
   },
 };
 
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
 class GroupPopover extends Component {
   constructor(props) {
     super(props);
@@ -95,7 +101,7 @@ class GroupPopover extends Component {
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
@@ -310,11 +316,9 @@ class GroupPopover extends Component {
           </Menu>
         </Popover>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this group?</T>
         </Dialog>

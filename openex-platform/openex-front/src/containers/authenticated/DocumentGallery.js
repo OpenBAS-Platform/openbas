@@ -28,7 +28,7 @@ import {
   TagAddToFilter,
   TagSmallListe,
   TagSmallExerciseListe,
-} from './exercise/documents/component/Tag';
+} from './documents/component/Tag';
 
 const styles = {
   container: {

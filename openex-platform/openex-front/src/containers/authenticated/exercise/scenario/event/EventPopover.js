@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
+import Slide from '@material-ui/core/Slide';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { redirectToScenario } from '../../../../../actions/Application';
@@ -40,6 +41,11 @@ i18nRegister({
     Import: 'Importer',
   },
 });
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class EventPopover extends Component {
   constructor(props) {
@@ -92,13 +98,13 @@ class EventPopover extends Component {
           listePlanificateursEvent.push(dataPlanificateur);
         });
         this.setState({ planificateursEvent: listePlanificateursEvent });
-        this.setState({ openPopover: false });
+        this.setState({ anchorEl: null });
         this.setState({ openPlanificateur: true });
       });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
@@ -287,11 +293,9 @@ class EventPopover extends Component {
         />
 
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this event?</T>
         </Dialog>

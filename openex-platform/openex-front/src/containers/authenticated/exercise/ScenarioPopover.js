@@ -212,11 +212,11 @@ class ScenarioPopover extends Component {
 
   handlePopoverOpen(event) {
     event.stopPropagation();
-    this.setState({ openPopover: true, anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleDownloadInjects() {

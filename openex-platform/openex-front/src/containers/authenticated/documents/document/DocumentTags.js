@@ -4,8 +4,8 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Chip from '@material-ui/core/Chip';
 import { withStyles } from '@material-ui/core/styles';
-import { T } from '../../../../../components/I18n';
-import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
   fr: {

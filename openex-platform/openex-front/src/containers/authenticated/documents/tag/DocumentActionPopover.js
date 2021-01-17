@@ -13,8 +13,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import Slide from '@material-ui/core/Slide';
 import { MoreVert } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
 
 i18nRegister({
   fr: {

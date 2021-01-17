@@ -6,6 +6,9 @@ import { Route, Switch, withRouter } from 'react-router';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import { withStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
+import { DescriptionOutlined } from '@material-ui/icons';
+import IconButton from '@material-ui/core/IconButton';
 import {
   redirectToExercise,
   redirectToHome,
@@ -23,7 +26,6 @@ import IndexExerciseScenario from './scenario/Index';
 import IndexExerciseScenarioEvent from './scenario/event/Index';
 import IndexExerciseAudiences from './audiences/Index';
 import RootExerciseAudiencesAudience from './audiences/audience/Root';
-import IndexExerciseDocuments from './documents/Index';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
 import UserPopover from '../UserPopover';
@@ -45,6 +47,12 @@ const styles = (theme) => ({
     marginLeft: 20,
   },
   toolbar: theme.mixins.toolbar,
+  documents: {
+    color: '#ffffff',
+    position: 'absolute',
+    top: 8,
+    right: 70,
+  },
 });
 
 class RootExercise extends Component {
@@ -84,6 +92,13 @@ class RootExercise extends Component {
             <div className={classes.title}>
               {R.propOr('', 'exercise_name', exercise)}
             </div>
+            <IconButton
+              component={Link}
+              to="/private/documents"
+              className={classes.documents}
+            >
+              <DescriptionOutlined fontSize="medium" />
+            </IconButton>
             <UserPopover />
           </Toolbar>
         </AppBar>
@@ -149,11 +164,6 @@ class RootExercise extends Component {
               exact
               path="/private/exercise/:exerciseId/calendar"
               component={() => <IndexExercise id={id} />}
-            />
-            <Route
-              exact
-              path="/private/exercise/:exerciseId/documents"
-              component={() => <IndexExerciseDocuments id={id} />}
             />
             <Route
               exact

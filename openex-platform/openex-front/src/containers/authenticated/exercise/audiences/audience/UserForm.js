@@ -82,7 +82,7 @@ class UserForm extends Component {
             <TextField
               name="user_pgp_key"
               fullWidth={true}
-              multiLine={true}
+              multiline={true}
               rows={5}
               label="PGP public key"
               style={{ marginTop: 20 }}

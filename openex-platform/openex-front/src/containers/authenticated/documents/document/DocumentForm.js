@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { TextField } from '../../../../../components/TextField';
-import { i18nRegister } from '../../../../../utils/Messages';
+import { TextField } from '../../../../components/TextField';
+import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
   fr: {

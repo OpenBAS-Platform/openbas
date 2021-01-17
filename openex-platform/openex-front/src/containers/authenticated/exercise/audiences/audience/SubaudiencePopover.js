@@ -6,17 +6,18 @@ import { injectIntl } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { MoreVert } from '@material-ui/icons';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
 import Theme from '../../../../../components/Theme';
 import { i18nRegister } from '../../../../../utils/Messages';
-import * as Constants from '../../../../../constants/ComponentTypes';
 import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
-import { Icon } from '../../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
 import {
   updateSubaudience,
   selectSubaudience,
@@ -44,6 +45,11 @@ i18nRegister({
   },
 });
 
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
 class SubaudiencePopover extends Component {
   constructor(props) {
     super(props);
@@ -58,11 +64,11 @@ class SubaudiencePopover extends Component {
 
   handlePopoverOpen(event) {
     event.stopPropagation();
-    this.setState({ openPopover: true, anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
@@ -264,67 +270,63 @@ class SubaudiencePopover extends Component {
 
     return (
       <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(
-              !this.props.audience.audience_enabled
-                || !this.props.subaudience.subaudience_enabled,
-            )}
-          />
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
           onRequestClose={this.handlePopoverClose.bind(this)}
         >
-          <Menu multiple={false}>
-            {subaudienceIsUpdatable ? (
-              <MenuItemLink
-                label="Edit"
-                onClick={this.handleOpenEdit.bind(this)}
-              />
+          <Menu
+            anchorEl={this.state.anchorEl}
+            open={Boolean(this.state.anchorEl)}
+            onClose={this.handlePopoverClose.bind(this)}
+            style={{ marginTop: 50 }}
+          >
+            <MenuItem
+              onClick={this.handleOpenEdit.bind(this)}
+              disabled={!subaudienceIsUpdatable}
+            >
+              <T>Edit</T>
+            </MenuItem>
+            {subaudienceEnabled ? (
+              <MenuItem
+                onClick={this.handleOpenDisable.bind(this)}
+                disabled={!subaudienceIsUpdatable}
+              >
+                <T>Disable</T>
+              </MenuItem>
             ) : (
-              ''
+              <MenuItem
+                onClick={this.handleOpenEnable.bind(this)}
+                disabled={!subaudienceIsUpdatable}
+              >
+                <T>Enable</T>
+              </MenuItem>
             )}
-            {/* eslint-disable-next-line no-nested-ternary */}
-            {subaudienceIsUpdatable ? (
-              subaudienceEnabled ? (
-                <MenuItemButton
-                  label="Disable"
-                  onClick={this.handleOpenDisable.bind(this)}
-                />
-              ) : (
-                <MenuItemButton
-                  label="Enable"
-                  onClick={this.handleOpenEnable.bind(this)}
-                />
-              )
-            ) : (
-              ''
-            )}
-            <MenuItemLink
-              label="Export to XLS"
-              onClick={this.handleDownloadAudience.bind(this)}
-            />
-            {subaudienceIsDeletable ? (
-              <MenuItemButton
-                label="Delete"
-                onClick={this.handleOpenDelete.bind(this)}
-              />
-            ) : (
-              ''
-            )}
+            <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
+              <T>Export to XLS</T>
+            </MenuItem>
+            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+              <T>Delete</T>
+            </MenuItem>
           </Menu>
         </Popover>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions></DialogActions>
         </Dialog>
         <Dialog
           title="Update the sub-audience"

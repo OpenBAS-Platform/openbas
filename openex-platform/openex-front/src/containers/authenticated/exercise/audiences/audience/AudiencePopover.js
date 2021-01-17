@@ -76,7 +76,7 @@ i18nRegister({
 const styles = () => ({
   container: {
     float: 'left',
-    marginTop: -6,
+    marginTop: -8,
   },
 });
 
@@ -136,7 +136,7 @@ class AudiencePopover extends Component {
           listePlanificateursAudience.push(dataPlanificateur);
         });
         this.setState({ planificateursAudience: listePlanificateursAudience });
-        this.setState({ openPopover: false });
+        this.setState({ anchorEl: null });
         this.setState({ openPlanificateur: true });
       });
   }

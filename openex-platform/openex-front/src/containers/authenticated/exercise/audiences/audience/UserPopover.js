@@ -5,6 +5,10 @@ import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import * as Constants from '../../../../../constants/ComponentTypes';
@@ -16,10 +20,8 @@ import {
   MenuItemButton,
 } from '../../../../../components/menu/MenuItem';
 import Theme from '../../../../../components/Theme';
-/* eslint-disable */
-import { updateUser } from "../../../../../actions/User";
-import { updateSubaudience } from "../../../../../actions/Subaudience";
-/* eslint-enable */
+import { updateUser } from '../../../../../actions/User';
+import { updateSubaudience } from '../../../../../actions/Subaudience';
 import UserForm from './UserForm';
 
 const style = {
@@ -38,6 +40,11 @@ i18nRegister({
   },
 });
 
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
 class UserPopover extends Component {
   constructor(props) {
     super(props);
@@ -46,11 +53,11 @@ class UserPopover extends Component {
 
   handlePopoverOpen(event) {
     event.stopPropagation();
-    this.setState({ openPopover: true, anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({ openPopover: false });
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
@@ -63,7 +70,9 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateUser(this.props.user.user_id, data);
+    return this.props
+      .updateUser(this.props.user.user_id, data)
+      .then(() => this.handleCloseEdit());
   }
 
   submitFormEdit() {
@@ -188,7 +197,6 @@ class UserPopover extends Component {
             )}
           />
         </IconButton>
-
         {userIsUpdatable || userIsDeletable ? (
           <Popover
             open={this.state.openPopover}
@@ -217,13 +225,10 @@ class UserPopover extends Component {
         ) : (
           ''
         )}
-
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to remove the user from this sub-audience?</T>
         </Dialog>
@@ -235,15 +240,12 @@ class UserPopover extends Component {
           onRequestClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          {/* eslint-disable */}
           <UserForm
-            ref="userForm"
             initialValues={initialValues}
             organizations={this.props.organizations}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
       </div>
     );

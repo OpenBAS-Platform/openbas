@@ -223,20 +223,6 @@ class LeftBar extends Component {
               </MenuItem>
               <MenuItem
                 component={Link}
-                to={`/private/exercise/${this.props.id}/documents`}
-                selected={pathname.includes(
-                  `/private/exercise/${this.props.id}/documents`,
-                )}
-                dense={false}
-                classes={{ root: classes.menuItemNested }}
-              >
-                <ListItemIcon style={{ minWidth: 35 }}>
-                  <DescriptionOutlined />
-                </ListItemIcon>
-                <ListItemText primary={<T>Documents</T>} />
-              </MenuItem>
-              <MenuItem
-                component={Link}
                 to={`/private/exercise/${this.props.id}/settings`}
                 selected={pathname.includes(
                   `/private/exercise/${this.props.id}/settings`,
