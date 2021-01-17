@@ -63,10 +63,6 @@ class DryrunsPopover extends Component {
     });
   }
 
-  submitFormLaunch() {
-    this.refs.dryrunForm.submit();
-  }
-
   render() {
     const launchActions = [
       <Button

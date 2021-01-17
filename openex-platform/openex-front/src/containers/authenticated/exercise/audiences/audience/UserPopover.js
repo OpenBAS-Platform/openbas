@@ -4,31 +4,21 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
-import { Icon } from '../../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
-import Theme from '../../../../../components/Theme';
 import { updateUser } from '../../../../../actions/User';
 import { updateSubaudience } from '../../../../../actions/Subaudience';
 import UserForm from './UserForm';
-
-const style = {
-  position: 'absolute',
-  top: '7px',
-  right: 0,
-};
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -48,11 +38,10 @@ Transition.displayName = 'TransitionSlide';
 class UserPopover extends Component {
   constructor(props) {
     super(props);
-    this.state = { openDelete: false, openEdit: false, openPopover: false };
+    this.state = { anchorEl: null, openDelete: false, openEdit: false };
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation();
     this.setState({ anchorEl: event.currentTarget });
   }
 
@@ -73,10 +62,6 @@ class UserPopover extends Component {
     return this.props
       .updateUser(this.props.user.user_id, data)
       .then(() => this.handleCloseEdit());
-  }
-
-  submitFormEdit() {
-    this.refs.userForm.submit();
   }
 
   handleOpenDelete() {
@@ -103,65 +88,9 @@ class UserPopover extends Component {
     this.handleCloseDelete();
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
-  }
-
   render() {
-    const subaudienceIsUpdatable = R.propOr(
-      true,
-      'user_can_update',
-      this.props.subaudience,
-    );
-    const subaudienceIsDeletable = R.propOr(
-      true,
-      'user_can_delete',
-      this.props.subaudience,
-    );
     const userIsUpdatable = R.propOr(true, 'user_can_update', this.props.user);
     const userIsDeletable = R.propOr(true, 'user_can_delete', this.props.user);
-
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      subaudienceIsUpdatable ? (
-        <Button
-          key="update"
-          label="Update"
-          primary={true}
-          onClick={this.submitFormEdit.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      subaudienceIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-
     const organizationPath = [
       R.prop('user_organization', this.props.user),
       'organization_name',
@@ -187,65 +116,88 @@ class UserPopover extends Component {
     )(this.props.user);
 
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(
-              !this.props.audience.audience_enabled
-                || !this.props.subaudience.subaudience_enabled,
-            )}
-          />
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-        {userIsUpdatable || userIsDeletable ? (
-          <Popover
-            open={this.state.openPopover}
-            anchorEl={this.state.anchorEl}
-            onRequestClose={this.handlePopoverClose.bind(this)}
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!userIsUpdatable}
           >
-            <Menu multiple={false}>
-              {userIsUpdatable ? (
-                <MenuItemLink
-                  label="Edit"
-                  onClick={this.handleOpenEdit.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {userIsDeletable ? (
-                <MenuItemButton
-                  label="Delete"
-                  onClick={this.handleOpenDelete.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-            </Menu>
-          </Popover>
-        ) : (
-          ''
-        )}
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!userIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to remove the user from this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to remove the user from this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the user"
-          modal={false}
           open={this.state.openEdit}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
         >
-          <UserForm
-            initialValues={initialValues}
-            organizations={this.props.organizations}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
+          <DialogTitle>
+            <T>Update the user</T>
+          </DialogTitle>
+          <DialogContent>
+            <UserForm
+              initialValues={initialValues}
+              organizations={this.props.organizations}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('userForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

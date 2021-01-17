@@ -15,9 +15,7 @@ import { MoreVert } from '@material-ui/icons';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
-import Theme from '../../../../../components/Theme';
 import { i18nRegister } from '../../../../../utils/Messages';
-import { Popover } from '../../../../../components/Popover';
 import {
   updateSubaudience,
   selectSubaudience,
@@ -25,11 +23,7 @@ import {
   deleteSubaudience,
 } from '../../../../../actions/Subaudience';
 import SubaudienceForm from './SubaudienceForm';
-
-const style = {
-  float: 'left',
-  marginTop: '-14px',
-};
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -81,16 +75,14 @@ class SubaudiencePopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateSubaudience(
-      this.props.exerciseId,
-      this.props.audienceId,
-      this.props.subaudience.subaudience_id,
-      data,
-    );
-  }
-
-  submitFormEdit() {
-    this.refs.subaudienceForm.submit();
+    return this.props
+      .updateSubaudience(
+        this.props.exerciseId,
+        this.props.audienceId,
+        this.props.subaudience.subaudience_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   handleOpenDelete() {
@@ -170,14 +162,6 @@ class SubaudiencePopover extends Component {
     this.handlePopoverClose();
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
-  }
-
   render() {
     const subaudienceEnabled = R.propOr(
       true,
@@ -194,128 +178,51 @@ class SubaudiencePopover extends Component {
       'user_can_delete',
       this.props.subaudience,
     );
-
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      subaudienceIsUpdatable ? (
-        <Button
-          key="update"
-          label="Update"
-          primary={true}
-          onClick={this.submitFormEdit.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      subaudienceIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const disableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDisable.bind(this)}
-      />,
-      subaudienceIsUpdatable ? (
-        <Button
-          key="disable"
-          label="Disable"
-          primary={true}
-          onClick={this.submitDisable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const enableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEnable.bind(this)}
-      />,
-      subaudienceIsUpdatable ? (
-        <Button
-          key="enable"
-          label="Enable"
-          primary={true}
-          onClick={this.submitEnable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-
     return (
-      <div style={style}>
+      <div>
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
         >
           <MoreVert />
         </IconButton>
-        <Popover
-          open={this.state.openPopover}
+        <Menu
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
         >
-          <Menu
-            anchorEl={this.state.anchorEl}
-            open={Boolean(this.state.anchorEl)}
-            onClose={this.handlePopoverClose.bind(this)}
-            style={{ marginTop: 50 }}
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!subaudienceIsUpdatable}
           >
+            <T>Edit</T>
+          </MenuItem>
+          {subaudienceEnabled ? (
             <MenuItem
-              onClick={this.handleOpenEdit.bind(this)}
+              onClick={this.handleOpenDisable.bind(this)}
               disabled={!subaudienceIsUpdatable}
             >
-              <T>Edit</T>
+              <T>Disable</T>
             </MenuItem>
-            {subaudienceEnabled ? (
-              <MenuItem
-                onClick={this.handleOpenDisable.bind(this)}
-                disabled={!subaudienceIsUpdatable}
-              >
-                <T>Disable</T>
-              </MenuItem>
-            ) : (
-              <MenuItem
-                onClick={this.handleOpenEnable.bind(this)}
-                disabled={!subaudienceIsUpdatable}
-              >
-                <T>Enable</T>
-              </MenuItem>
-            )}
-            <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
-              <T>Export to XLS</T>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={!subaudienceIsUpdatable}
+            >
+              <T>Enable</T>
             </MenuItem>
-            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
-              <T>Delete</T>
-            </MenuItem>
-          </Menu>
-        </Popover>
+          )}
+          <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
+            <T>Export to XLS</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!subaudienceIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
@@ -326,41 +233,106 @@ class SubaudiencePopover extends Component {
               <T>Do you want to delete this sub-audience?</T>
             </DialogContentText>
           </DialogContent>
-          <DialogActions></DialogActions>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the sub-audience"
-          modal={false}
           open={this.state.openEdit}
+          TransitionComponent={Transition}
           onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
         >
-          {/* eslint-disable */}
-          <SubaudienceForm
-            ref="subaudienceForm"
-            initialValues={R.pick(["subaudience_name"], this.props.subaudience)}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Update the sub-audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <SubaudienceForm
+              initialValues={R.pick(
+                ['subaudience_name'],
+                this.props.subaudience,
+              )}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('subaudienceForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDisable}
-          onRequestClose={this.handleCloseDisable.bind(this)}
-          actions={disableActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDisable.bind(this)}
         >
-          <T>Do you want to disable this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to disable this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openEnable}
-          onRequestClose={this.handleCloseEnable.bind(this)}
-          actions={enableActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEnable.bind(this)}
         >
-          <T>Do you want to enable this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to enable this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

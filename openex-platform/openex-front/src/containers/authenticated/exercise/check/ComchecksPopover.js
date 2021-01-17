@@ -66,10 +66,6 @@ class DryrunsPopover extends Component {
       });
   }
 
-  submitFormLaunch() {
-    this.refs.comcheckForm.submit();
-  }
-
   t(id) {
     return this.props.intl.formatMessage({ id });
   }

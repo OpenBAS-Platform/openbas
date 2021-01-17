@@ -202,10 +202,6 @@ class AudiencePopover extends Component {
     });
   }
 
-  submitFormComcheck() {
-    this.refs.comCheck.submit();
-  }
-
   submitFormPlanificateur() {
     this.props.updatePlanificateurUserForAudience(
       this.props.exerciseId,
