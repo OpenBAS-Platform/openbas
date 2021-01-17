@@ -71,7 +71,6 @@ class InjectPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openPopover: false,
       openDisable: false,
       openEnable: false,
       openDone: false,
@@ -102,17 +101,11 @@ class InjectPopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation();
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({
-      openPopover: false,
-    });
+    this.setState({ anchorEl: false });
   }
 
   handleInitializeInject() {

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Observable } from 'rxjs';
+import { interval, Observable } from 'rxjs';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
-import { FIVE_SECONDS, timeDiff, dateFormat } from '../../../../utils/Time';
+import { dateFormat, FIVE_SECONDS, timeDiff } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
 import { equalsSelector } from '../../../../utils/Selectors';
 import Theme from '../../../../components/Theme';
@@ -17,17 +17,17 @@ import { Icon } from '../../../../components/Icon';
 import { LinearProgress } from '../../../../components/LinearProgress';
 import { CircularSpinner } from '../../../../components/Spinner';
 import Countdown from '../../../../components/Countdown';
-/* eslint-disable */
-import { fetchGroups } from "../../../../actions/Group";
-import { fetchAudiences } from "../../../../actions/Audience";
-import { fetchSubaudiences } from "../../../../actions/Subaudience";
-import { fetchAllInjects, fetchInjectTypes } from "../../../../actions/Inject";
-import { downloadFile } from "../../../../actions/File";
-import ExercisePopover from "./ExercisePopover";
-import InjectPopover from "../scenario/event/InjectPopover";
-/* eslint-enable */
+import { fetchGroups } from '../../../../actions/Group';
+import { fetchAudiences } from '../../../../actions/Audience';
+import { fetchSubaudiences } from '../../../../actions/Subaudience';
+import { fetchAllInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { downloadFile } from '../../../../actions/File';
+import ExercisePopover from './ExercisePopover';
+import InjectPopover from '../scenario/event/InjectPopover';
 import InjectView from '../scenario/event/InjectView';
 import InjectStatusView from './InjectStatusView';
+
+const interval$ = interval(FIVE_SECONDS);
 
 i18nRegister({
   fr: {
@@ -116,13 +116,9 @@ class IndexExecution extends Component {
     this.props.fetchAudiences(this.props.exerciseId);
     this.props.fetchSubaudiences(this.props.exerciseId);
     this.props.fetchInjectTypes();
-    const initialStream = Observable.of(1); // Fetch on loading
-    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
-    this.subscription = initialStream
-      .merge(intervalStream)
-      // eslint-disable-next-line max-len
-      .exhaustMap(() => this.props.fetchAllInjects(this.props.exerciseId, true)) // Fetch only if previous call finished
-      .subscribe();
+    this.subscription = interval$.subscribe(() => {
+      this.props.fetchAllInjects(this.props.exerciseId, true);
+    });
   }
 
   componentWillUnmount() {
@@ -505,7 +501,7 @@ IndexExecution.propTypes = {
 
 const filterInjectsPending = (state, ownProps) => {
   const { injects } = state.referential.entities;
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const injectsFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => {
@@ -527,7 +523,7 @@ const nextInjectToExecute = (state, ownProps) => R.pipe(
 
 const filterInjectsProcessed = (state, ownProps) => {
   const { injects } = state.referential.entities;
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const injectsFilterAndSorting = R.pipe(
     R.values,
     R.filter(
@@ -543,7 +539,7 @@ const filterInjectsProcessed = (state, ownProps) => {
 
 const filterAudiences = (state, ownProps) => {
   const { audiences } = state.referential.entities;
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const audiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
@@ -553,19 +549,17 @@ const filterAudiences = (state, ownProps) => {
 };
 
 const exerciseSelector = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   return R.prop(exerciseId, state.referential.entities.exercises);
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -591,7 +585,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
-  exerciseId: (state, ownProps) => ownProps.params.exerciseId,
+  exerciseId: (state, ownProps) => ownProps.exerciseId,
   exercise: exerciseSelector,
   injectsPending: filterInjectsPending,
   nextInject: nextInjectToExecute,

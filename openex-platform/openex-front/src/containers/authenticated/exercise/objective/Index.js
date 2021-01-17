@@ -305,14 +305,12 @@ const filterSubobjectives = (subobjectives) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -337,7 +335,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const objectives = filterObjectives(
     state.referential.entities.objectives,
     exerciseId,

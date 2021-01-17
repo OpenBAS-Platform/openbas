@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Observable } from 'rxjs';
+import { interval } from 'rxjs';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
-import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
+import { dateFormat, FIVE_SECONDS } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import * as Constants from '../../../../constants/ComponentTypes';
@@ -22,6 +22,8 @@ import LogPopover from './LogPopover';
 import IncidentPopover from './IncidentPopover';
 import OutcomeView from './OutcomeView';
 import LogView from './LogView';
+
+const interval$ = interval(FIVE_SECONDS);
 
 i18nRegister({
   fr: {
@@ -111,15 +113,10 @@ class IndexExerciseLessons extends Component {
 
   componentDidMount() {
     this.props.fetchGroups();
-    const initialStream = Observable.of(1); // Fetch on loading
-    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
-    this.subscription = initialStream
-      .merge(intervalStream)
-      .exhaustMap(() => Promise.all([
-        this.props.fetchLogs(this.props.exerciseId, true),
-        this.props.fetchIncidents(this.props.exerciseId, true),
-      ]))
-      .subscribe();
+    this.subscription = interval$.subscribe(() => {
+      this.props.fetchLogs(this.props.exerciseId, true);
+      this.props.fetchIncidents(this.props.exerciseId, true);
+    });
   }
 
   componentWillUnmount() {
@@ -166,7 +163,7 @@ class IndexExerciseLessons extends Component {
           <div style={styles.title}>
             <T>Incidents outcomes</T>
           </div>
-          <div className="clearfix"></div>
+          <div className="clearfix"/>
           {this.props.incidents.length === 0 ? (
             <div style={styles.empty}>
               <T>You do not have any incidents in this exercise.</T>
@@ -198,7 +195,7 @@ class IndexExerciseLessons extends Component {
                         value={incident.incident_outcome.outcome_result}
                       />
                     </div>
-                    <div className="clearfix"></div>
+                    <div className="clearfix"/>
                   </div>
                 }
                 secondaryText={
@@ -305,7 +302,7 @@ IndexExerciseLessons.propTypes = {
 };
 
 const filterLogs = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const { logs } = state.referential.entities;
   const logsFilterAndSorting = R.pipe(
     R.values,
@@ -316,7 +313,7 @@ const filterLogs = (state, ownProps) => {
 };
 
 const filterIncidents = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const { incidents } = state.referential.entities;
   const incidentsFilterAndSorting = R.pipe(
     R.values,
@@ -327,7 +324,7 @@ const filterIncidents = (state, ownProps) => {
 };
 
 const exerciseStatusSelector = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   return R.path(
     [exerciseId, 'exercise_status'],
     state.referential.entities.exercises,
@@ -335,14 +332,12 @@ const exerciseStatusSelector = (state, ownProps) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -368,7 +363,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
-  exerciseId: (state, ownProps) => ownProps.params.exerciseId,
+  exerciseId: (state, ownProps) => ownProps.exerciseId,
   logs: filterLogs,
   userCanUpdate: checkUserCanUpdate,
   incidents: filterIncidents,

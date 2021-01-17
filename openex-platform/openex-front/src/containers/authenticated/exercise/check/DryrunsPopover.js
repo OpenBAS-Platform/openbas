@@ -10,11 +10,10 @@ import { Popover } from '../../../../components/Popover';
 import { Menu } from '../../../../components/Menu';
 import { Icon } from '../../../../components/Icon';
 import { MenuItemLink } from '../../../../components/menu/MenuItem';
-/* eslint-disable */
-import { addDryrun } from "../../../../actions/Dryrun";
-import { redirectToDryrun } from "../../../../actions/Application";
-/* eslint-enable */
+import { addDryrun } from '../../../../actions/Dryrun';
+import { redirectToDryrun } from '../../../../actions/Application';
 import DryrunForm from './DryrunForm';
+import { submitForm } from '../../../../utils/Action';
 
 const style = {
   float: 'left',
@@ -75,7 +74,7 @@ class DryrunsPopover extends Component {
         key="launch"
         label="Launch"
         primary={true}
-        onClick={this.submitFormLaunch.bind(this)}
+        onClick={() => submitForm('dryrunForm')}
       />,
     ];
 

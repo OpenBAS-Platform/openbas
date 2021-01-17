@@ -9,14 +9,12 @@ import * as Constants from '../../../../constants/ComponentTypes';
 import { List } from '../../../../components/List';
 import { MainListItemLink } from '../../../../components/list/ListItem';
 import { Icon } from '../../../../components/Icon';
-/* eslint-disable */
-import { fetchGroups } from "../../../../actions/Group";
-import { fetchAudiences } from "../../../../actions/Audience";
-import { fetchDryruns } from "../../../../actions/Dryrun";
-import { fetchComchecks } from "../../../../actions/Comcheck";
-import DryrunsPopover from "./DryrunsPopover";
-import ComchecksPopover from "./ComchecksPopover";
-/* eslint-enable */
+import { fetchGroups } from '../../../../actions/Group';
+import { fetchAudiences } from '../../../../actions/Audience';
+import { fetchDryruns } from '../../../../actions/Dryrun';
+import { fetchComchecks } from '../../../../actions/Comcheck';
+import DryrunsPopover from './DryrunsPopover';
+import ComchecksPopover from './ComchecksPopover';
 
 i18nRegister({
   fr: {
@@ -236,14 +234,12 @@ const filterAudiences = (audiences, exerciseId) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -268,7 +264,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId);
   const comchecks = filterComchecks(
     state.referential.entities.comchecks,
