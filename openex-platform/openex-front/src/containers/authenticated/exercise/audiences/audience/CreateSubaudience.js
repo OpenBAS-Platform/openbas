@@ -64,7 +64,7 @@ class CreateSubaudience extends Component {
           payload.result,
         );
       })
-      .then((result) => (result.result ? this.handleCloseCreate() : result));
+      .then(() => this.handleCloseCreate());
   }
 
   render() {

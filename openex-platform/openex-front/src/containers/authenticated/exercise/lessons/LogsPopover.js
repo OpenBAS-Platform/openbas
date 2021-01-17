@@ -86,7 +86,7 @@ class LogsPopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -99,7 +99,7 @@ class LogsPopover extends Component {
           title="Add an entry"
           modal={false}
           open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
+          onClose={this.handleCloseCreate.bind(this)}
           actions={createActions}
         >
           <LogForm

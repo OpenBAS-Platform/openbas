@@ -252,7 +252,7 @@ class SubaudiencePopover extends Component {
         <Dialog
           open={this.state.openEdit}
           TransitionComponent={Transition}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
         >
           <DialogTitle>
             <T>Update the sub-audience</T>
@@ -330,7 +330,7 @@ class SubaudiencePopover extends Component {
               color="secondary"
               onClick={this.submitEnable.bind(this)}
             >
-              <T>Disable</T>
+              <T>Enable</T>
             </Button>
           </DialogActions>
         </Dialog>

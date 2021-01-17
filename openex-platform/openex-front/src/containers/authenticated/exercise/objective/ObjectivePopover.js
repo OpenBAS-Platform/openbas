@@ -210,7 +210,7 @@ class ObjectivePopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -246,7 +246,7 @@ class ObjectivePopover extends Component {
           title="Update the objective"
           modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
           {/* eslint-disable */}
@@ -262,7 +262,7 @@ class ObjectivePopover extends Component {
           title="Create a new subobjective"
           modal={false}
           open={this.state.openCreateSubobjective}
-          onRequestClose={this.handleCloseCreateSubobjective.bind(this)}
+          onClose={this.handleCloseCreateSubobjective.bind(this)}
           actions={createSubobjectiveActions}
         >
           {/* eslint-disable */}

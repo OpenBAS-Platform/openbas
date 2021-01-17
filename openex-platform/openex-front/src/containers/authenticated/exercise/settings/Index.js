@@ -138,6 +138,10 @@ class Index extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.fetchGroups();
+  }
+
   onUpdate(data) {
     const newData = R.pipe(
       // Need to convert date to ISO format with timezone
@@ -239,6 +243,7 @@ class Index extends Component {
         'exercise_message_header',
         'exercise_message_footer',
         'exercise_mail_expediteur',
+        'exercise_animation_group',
       ]),
     );
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
@@ -254,7 +259,9 @@ class Index extends Component {
             {informationValues && (
               <ExerciseForm
                 onSubmit={this.onUpdate.bind(this)}
+                edit={true}
                 initialValues={informationValues}
+                groups={this.props.groups}
               />
             )}
             <br />
@@ -276,7 +283,6 @@ class Index extends Component {
               <TemplateForm
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={informationValues}
-                groups={this.props.groups}
               />
             )}
             <br />

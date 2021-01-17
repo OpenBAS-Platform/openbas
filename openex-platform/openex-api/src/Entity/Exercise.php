@@ -370,7 +370,6 @@ class Exercise extends BaseEntity
     {
         $firstInjectDateTime = null;
         $lastInjectDateTime = null;
-
         foreach ($injects as $inject) {
             if ($inject) {
                 if (!$firstInjectDateTime || $firstInjectDateTime->getTimestamp() > $inject->getInjectDate()->getTimestamp()) {
@@ -381,7 +380,6 @@ class Exercise extends BaseEntity
                 }
             }
         }
-
         if ($firstInjectDateTime) {
             $this->exercise_start_date = clone $firstInjectDateTime;
         }

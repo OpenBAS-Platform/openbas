@@ -63,7 +63,7 @@ class CreateGroup extends Component {
           title="Create a group"
           modal={false}
           open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
+          onClose={this.handleCloseCreate.bind(this)}
           actions={actionsCreateGroup}
         >
           {/* eslint-disable */}

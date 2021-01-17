@@ -294,7 +294,7 @@ class GroupPopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -326,7 +326,7 @@ class GroupPopover extends Component {
           title="Update the group"
           modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
           {/* eslint-disable */}
@@ -351,7 +351,7 @@ class GroupPopover extends Component {
           }
           modal={false}
           open={this.state.openUsers}
-          onRequestClose={this.handleCloseUsers.bind(this)}
+          onClose={this.handleCloseUsers.bind(this)}
           autoScrollBodyContent={true}
           actions={usersActions}
         >
@@ -426,7 +426,7 @@ class GroupPopover extends Component {
           title="Manage grants"
           modal={false}
           open={this.state.openGrants}
-          onRequestClose={this.handleCloseGrants.bind(this)}
+          onClose={this.handleCloseGrants.bind(this)}
           actions={grantsActions}
         >
           <Table selectable={false} style={{ marginTop: '5px' }}>

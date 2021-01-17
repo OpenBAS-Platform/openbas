@@ -228,7 +228,7 @@ class IndexObjective extends Component {
             modal={false}
             open={this.state.openObjective}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseObjective.bind(this)}
+            onClose={this.handleCloseObjective.bind(this)}
             actions={objectiveActions}
           >
             <ObjectiveView objective={this.state.currentObjective} />
@@ -243,7 +243,7 @@ class IndexObjective extends Component {
             modal={false}
             open={this.state.openSubobjective}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseSubobjective.bind(this)}
+            onClose={this.handleCloseSubobjective.bind(this)}
             actions={subobjectiveActions}
           >
             <SubobjectiveView subobjective={this.state.currentSubobjective} />

@@ -59,7 +59,7 @@ const PlanificateurEvent = ({
       modal={false}
       open={openPlanificateur}
       autoScrollBodyContent={true}
-      onRequestClose={handleClosePlanificateur}
+      onClose={handleClosePlanificateur}
       actions={planificateurActions}
     >
       <form onSubmit={submitFormPlanificateur}>

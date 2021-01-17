@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
+import { T } from '../../../../../components/I18n';
 import { TextField } from '../../../../../components/TextField';
 import { Autocomplete } from '../../../../../components/Autocomplete';
 import { i18nRegister } from '../../../../../utils/Messages';
@@ -34,49 +35,49 @@ class UserForm extends Component {
             <TextField
               name="user_email"
               fullWidth={true}
-              label="Email address"
+              label={<T>Email address</T>}
             />
             <TextField
               name="user_email2"
               fullWidth={true}
-              label="Email address (secondary)"
+              label={<T>Email address (secondary)</T>}
               style={{ marginTop: 20 }}
             />
             <TextField
               name="user_firstname"
               fullWidth={true}
-              label="Firstname"
+              label={<T>Firstname</T>}
               style={{ marginTop: 20 }}
             />
             <TextField
               name="user_lastname"
               fullWidth={true}
-              label="Lastname"
+              label={<T>Lastname</T>}
               style={{ marginTop: 20 }}
             />
             <Autocomplete
               name="user_organization"
               fullWidth={true}
-              label="Organization"
+              label={<T>Organization</T>}
               options={options}
               style={{ marginTop: 20 }}
             />
             <TextField
               name="user_phone2"
               fullWidth={true}
-              label="Phone number (fix)"
+              label={<T>Phone number (fix)</T>}
               style={{ marginTop: 20 }}
             />
             <TextField
               name="user_phone"
               fullWidth={true}
-              label="Phone number (mobile)"
+              label={<T>Phone number (mobile)</T>}
               style={{ marginTop: 20 }}
             />
             <TextField
               name="user_phone3"
               fullWidth={true}
-              label="Phone number (secondary)"
+              label={<T>Phone number (secondary)</T>}
               style={{ marginTop: 20 }}
             />
             <TextField
@@ -84,7 +85,7 @@ class UserForm extends Component {
               fullWidth={true}
               multiline={true}
               rows={5}
-              label="PGP public key"
+              label={<T>PGP public key</T>}
               style={{ marginTop: 20 }}
             />
           </form>

@@ -271,7 +271,6 @@ class ExerciseController extends BaseController
             $exercise->computeExerciseStatus($injects);
             $exercise->computeStartEndDates($injects);
             $exercise->computeExerciseOwner();
-
             return $exercise;
         } else {
             return $form;

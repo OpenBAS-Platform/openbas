@@ -9,7 +9,7 @@ export const Popover = (props) => (
     anchorEl={props.anchorEl}
     anchorOrigin={props.anchorOrigin}
     targetOrigin={props.targetOrigin}
-    onRequestClose={props.onRequestClose}
+    onClose={props.onClose}
   >
     {props.children}
   </MUIPopover>
@@ -20,6 +20,6 @@ Popover.propTypes = {
   anchorEl: PropTypes.object,
   anchorOrigin: PropTypes.object,
   targetOrigin: PropTypes.object,
-  onRequestClose: PropTypes.func,
+  onClose: PropTypes.func,
   children: PropTypes.node,
 };

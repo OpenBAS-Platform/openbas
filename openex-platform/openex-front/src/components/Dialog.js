@@ -12,7 +12,7 @@ export const DialogIntl = (props) => (
     open={props.open}
     contentStyle={props.contentStyle}
     style={{ zIndex: 2000 }}
-    onRequestClose={props.onRequestClose}
+    onClose={props.onClose}
     autoScrollBodyContent={props.autoScrollBodyContent}
     actions={props.actions}
   >
@@ -25,7 +25,7 @@ DialogIntl.propTypes = {
   title: PropTypes.string,
   modal: PropTypes.bool,
   open: PropTypes.bool,
-  onRequestClose: PropTypes.func,
+  onClose: PropTypes.func,
   intl: PropTypes.object,
   autoScrollBodyContent: PropTypes.bool,
   actions: PropTypes.node,
@@ -42,7 +42,7 @@ export const DialogTitleElementIntl = (props) => (
     bodyStyle={props.bodyStyle}
     style={{ zIndex: 2000 }}
     autoDetectWindowHeight={props.autoDetectWindowHeight}
-    onRequestClose={props.onRequestClose}
+    onClose={props.onClose}
     autoScrollBodyContent={props.autoScrollBodyContent}
     actions={props.actions}
   >
@@ -55,7 +55,7 @@ DialogTitleElementIntl.propTypes = {
   title: PropTypes.node,
   modal: PropTypes.bool,
   open: PropTypes.bool,
-  onRequestClose: PropTypes.func,
+  onClose: PropTypes.func,
   intl: PropTypes.object,
   autoScrollBodyContent: PropTypes.bool,
   autoDetectWindowHeight: PropTypes.bool,

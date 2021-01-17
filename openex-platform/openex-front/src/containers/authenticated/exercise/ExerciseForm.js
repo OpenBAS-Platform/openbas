@@ -3,10 +3,13 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import MenuItem from '@material-ui/core/MenuItem';
+import { InfoOutlined } from '@material-ui/icons';
 import { T } from '../../../components/I18n';
 import { TextField } from '../../../components/TextField';
 import { DateTimePicker } from '../../../components/DateTimePicker';
 import { i18nRegister } from '../../../utils/Messages';
+import { Select } from '../../../components/Select';
 
 i18nRegister({
   fr: {
@@ -16,6 +19,8 @@ i18nRegister({
     'Sender email address': "Adresse email de l'expéditeur",
     'Start date': 'Date de début',
     'End date': 'Date de fin',
+    'This group receives a copy of all injects and is used in dryruns.':
+      'Ce groupe reçoit une copie de tous les injects et est utilisé dans les dryruns.',
   },
 });
 
@@ -66,27 +71,47 @@ class ExerciseForm extends Component {
                 style={{ marginTop: 20 }}
               />
               {edit && (
-                <TextField
-                  name="exercise_mail_expediteur"
+                <Select
+                  label={<T>Exercise control (animation)</T>}
+                  name="exercise_animation_group"
                   fullWidth={true}
-                  label={<T>Description</T>}
+                  style={{ marginTop: 20 }}
+                  helperText={
+                    <span style={{ marginTop: 5, display: 'flex', alignItems: 'center' }}>
+                      <InfoOutlined color="primary" /> &nbsp;
+                      <T>
+                        This group receives a copy of all injects and is used in
+                        dryruns.
+                      </T>
+                    </span>
+                  }
+                >
+                  <MenuItem value={null}> &nbsp; </MenuItem>
+                  {this.props.groups.map((data) => (
+                    <MenuItem key={data.group_id} value={data.group_id}>
+                      {data.group_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+              {!edit && (
+                <DateTimePicker
+                  name="exercise_start_date"
+                  fullWidth={true}
+                  label={<T>Start date</T>}
+                  autoOk={true}
                   style={{ marginTop: 20 }}
                 />
               )}
-              <DateTimePicker
-                name="exercise_start_date"
-                fullWidth={true}
-                label={<T>Start date</T>}
-                autoOk={true}
-                style={{ marginTop: 20 }}
-              />
-              <DateTimePicker
-                name="exercise_end_date"
-                fullWidth={true}
-                label={<T>End date</T>}
-                autoOk={true}
-                style={{ marginTop: 20 }}
-              />
+              {!edit && (
+                <DateTimePicker
+                  name="exercise_end_date"
+                  fullWidth={true}
+                  label={<T>End date</T>}
+                  autoOk={true}
+                  style={{ marginTop: 20 }}
+                />
+              )}
             </MuiPickersUtilsProvider>
           </form>
         )}
@@ -99,6 +124,7 @@ ExerciseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   edit: PropTypes.bool,
   change: PropTypes.func,
+  groups: PropTypes.array,
 };
 
 export default ExerciseForm;

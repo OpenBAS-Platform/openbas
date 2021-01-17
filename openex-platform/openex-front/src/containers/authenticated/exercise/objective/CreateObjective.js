@@ -65,7 +65,7 @@ class CreateObjective extends Component {
           title="Create a new objective"
           modal={false}
           open={this.state.open}
-          onRequestClose={this.handleClose.bind(this)}
+          onClose={this.handleClose.bind(this)}
           actions={actions}
         >
           <ObjectiveForm

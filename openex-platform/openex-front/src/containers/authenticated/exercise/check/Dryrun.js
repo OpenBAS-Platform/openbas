@@ -327,7 +327,7 @@ class IndexExerciseDryrun extends Component {
             modal={false}
             open={this.state.openView}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseView.bind(this)}
+            onClose={this.handleCloseView.bind(this)}
             actions={viewActions}
           >
             <DryinjectView
@@ -381,7 +381,7 @@ class IndexExerciseDryrun extends Component {
             modal={false}
             open={this.state.openStatus}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseStatus.bind(this)}
+            onClose={this.handleCloseStatus.bind(this)}
             actions={statusActions}
           >
             <DryinjectStatusView dryinject={this.state.currentStatus} />

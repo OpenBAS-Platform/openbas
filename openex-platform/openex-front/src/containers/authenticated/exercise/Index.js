@@ -320,7 +320,7 @@ class IndexExercise extends Component {
               modal={false}
               open={this.state.openObjectives}
               autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseObjectives.bind(this)}
+              onClose={this.handleCloseObjectives.bind(this)}
               actions={objectivesActions}
             >
               <List>
@@ -348,7 +348,7 @@ class IndexExercise extends Component {
               modal={false}
               open={this.state.openViewObjective}
               autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseViewObjective.bind(this)}
+              onClose={this.handleCloseViewObjective.bind(this)}
               actions={viewObjectiveActions}
             >
               <ObjectiveView objective={this.state.currentObjective} />
@@ -425,7 +425,7 @@ class IndexExercise extends Component {
               modal={false}
               open={this.state.openAudiences}
               autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseAudiences.bind(this)}
+              onClose={this.handleCloseAudiences.bind(this)}
               actions={audiencesActions}
             >
               <List>
@@ -477,7 +477,7 @@ class IndexExercise extends Component {
               modal={false}
               open={this.state.openViewAudience}
               autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseViewAudience.bind(this)}
+              onClose={this.handleCloseViewAudience.bind(this)}
               actions={viewAudienceActions}
             >
               <AudienceView
@@ -584,7 +584,7 @@ class IndexExercise extends Component {
           modal={false}
           open={this.state.openViewEvent}
           autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseViewEvent.bind(this)}
+          onClose={this.handleCloseViewEvent.bind(this)}
           actions={viewEventActions}
         >
           <EventView event={this.state.currentEvent} />
@@ -594,7 +594,7 @@ class IndexExercise extends Component {
           modal={false}
           open={this.state.openViewIncident}
           autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseViewIncident.bind(this)}
+          onClose={this.handleCloseViewIncident.bind(this)}
           actions={viewIncidentActions}
         >
           <IncidentView
@@ -607,7 +607,7 @@ class IndexExercise extends Component {
           modal={false}
           open={this.state.openViewInject}
           autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseViewInject.bind(this)}
+          onClose={this.handleCloseViewInject.bind(this)}
           actions={viewInjectActions}
         >
           <InjectView
@@ -622,7 +622,7 @@ class IndexExercise extends Component {
           modal={false}
           open={this.state.openInjectAudiences}
           autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseInjectAudiences.bind(this)}
+          onClose={this.handleCloseInjectAudiences.bind(this)}
           actions={injectAudiencesActions}
         >
           <List>

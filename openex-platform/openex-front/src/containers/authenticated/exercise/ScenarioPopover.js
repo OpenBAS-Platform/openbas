@@ -453,7 +453,7 @@ class ScenarioPopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -483,7 +483,7 @@ class ScenarioPopover extends Component {
           title="Shift all injects"
           modal={false}
           open={this.state.openShift}
-          onRequestClose={this.handleCancelShift.bind(this)}
+          onClose={this.handleCancelShift.bind(this)}
           actions={shiftActions}
         >
           {/* eslint-disable */}
@@ -500,7 +500,7 @@ class ScenarioPopover extends Component {
           title="Abstract shift all injects"
           modal={true}
           open={this.state.openAbstractShift}
-          onRequestClose={this.handleAbstractCloseShift.bind(this)}
+          onClose={this.handleAbstractCloseShift.bind(this)}
           actions={abstractShiftActions}
         >
           <InjectTable injects={this.props.injects} />
@@ -510,7 +510,7 @@ class ScenarioPopover extends Component {
           title="Simulation of the modification of the exercise"
           modal={true}
           open={this.state.openResumeChangeDuration}
-          onRequestClose={this.handleCancelResumeChangeDuration.bind(this)}
+          onClose={this.handleCancelResumeChangeDuration.bind(this)}
           autoScrollBodyContent={true}
           actions={resumeChangeDurationActions}
         >
@@ -553,7 +553,7 @@ class ScenarioPopover extends Component {
           title="Change the duration of the exercise"
           modal={true}
           open={this.state.openChangeDuration}
-          onRequestClose={this.handleCancelChangeDuration.bind(this)}
+          onClose={this.handleCancelChangeDuration.bind(this)}
           actions={changeActions}
           autoScrollBodyContent={true}
         >

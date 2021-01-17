@@ -144,7 +144,7 @@ class AudiencePopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           {audienceIsUpdatable ? (
             <Menu multiple={false}>
@@ -173,7 +173,7 @@ class AudiencePopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openDisable}
-          onRequestClose={this.handleCloseDisable.bind(this)}
+          onClose={this.handleCloseDisable.bind(this)}
           actions={disableActions}
         >
           <T>Do you want to disable this audience?</T>
@@ -182,7 +182,7 @@ class AudiencePopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openEnable}
-          onRequestClose={this.handleCloseEnable.bind(this)}
+          onClose={this.handleCloseEnable.bind(this)}
           actions={enableActions}
         >
           <T>Do you want to enable this audience?</T>

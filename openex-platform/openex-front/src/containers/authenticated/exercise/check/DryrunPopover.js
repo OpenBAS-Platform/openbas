@@ -98,7 +98,7 @@ class DryrunPopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           {dryrunIsDeletable ? (
             <Menu multiple={false}>

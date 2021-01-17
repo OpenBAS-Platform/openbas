@@ -17,11 +17,17 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import { Add } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
+import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { updateSubaudience } from '../../../../../actions/Subaudience';
 import { fetchUsers } from '../../../../../actions/User';
 import CreateUser from './CreateUser';
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 const styles = () => ({
   createButton: {
@@ -122,7 +128,6 @@ class AddUsers extends Component {
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.filter(filterByKeyword, R.values(this.props.users));
     // endregion
-
     return (
       <div>
         <Fab
@@ -135,6 +140,7 @@ class AddUsers extends Component {
         </Fab>
         <Dialog
           open={this.state.openAddUsers}
+          TransitionComponent={Transition}
           onClose={this.handleCloseAddUsers.bind(this)}
           fullWidth={true}
           maxWidth="md"

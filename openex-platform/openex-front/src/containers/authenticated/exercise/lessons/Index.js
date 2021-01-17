@@ -223,7 +223,7 @@ class IndexExerciseLessons extends Component {
             modal={false}
             open={this.state.openOutcome}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseOutcome.bind(this)}
+            onClose={this.handleCloseOutcome.bind(this)}
             actions={outcomeActions}
           >
             <OutcomeView incident={this.state.currentIncident} />
@@ -280,7 +280,7 @@ class IndexExerciseLessons extends Component {
             modal={false}
             open={this.state.openLog}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseLog.bind(this)}
+            onClose={this.handleCloseLog.bind(this)}
             actions={logActions}
           >
             <LogView log={this.state.currentLog} />

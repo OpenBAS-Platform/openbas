@@ -193,7 +193,7 @@ class UserPopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -222,7 +222,7 @@ class UserPopover extends Component {
           modal={false}
           open={this.state.openEdit}
           autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
           {/* eslint-disable */}
@@ -241,7 +241,7 @@ class UserPopover extends Component {
           modal={false}
           open={this.state.openEditPassword}
           autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseEditPassword.bind(this)}
+          onClose={this.handleCloseEditPassword.bind(this)}
           actions={editPassword}
         >
           {/* eslint-disable */}

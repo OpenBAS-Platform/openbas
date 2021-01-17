@@ -108,7 +108,7 @@ class IncidentPopover extends Component {
           <Popover
             open={this.state.openPopover}
             anchorEl={this.state.anchorEl}
-            onRequestClose={this.handlePopoverClose.bind(this)}
+            onClose={this.handlePopoverClose.bind(this)}
           >
             <Menu multiple={false}>
               <MenuItemLink
@@ -125,7 +125,7 @@ class IncidentPopover extends Component {
           title="Update the outcome"
           modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
           {/* eslint-disable */}

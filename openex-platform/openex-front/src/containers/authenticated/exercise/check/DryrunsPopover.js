@@ -86,7 +86,7 @@ class DryrunsPopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -99,7 +99,7 @@ class DryrunsPopover extends Component {
           title="Launch a dryrun"
           modal={false}
           open={this.state.openLaunch}
-          onRequestClose={this.handleCloseLaunch.bind(this)}
+          onClose={this.handleCloseLaunch.bind(this)}
           actions={launchActions}
         >
           {/* eslint-disable */}

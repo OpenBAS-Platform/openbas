@@ -186,7 +186,7 @@ class SubobjectivePopover extends Component {
           <Popover
             open={this.state.openPopover}
             anchorEl={this.state.anchorEl}
-            onRequestClose={this.handlePopoverClose.bind(this)}
+            onClose={this.handlePopoverClose.bind(this)}
           >
             <Menu multiple={false}>
               {subobjectiveIsUpdatable ? (
@@ -222,7 +222,7 @@ class SubobjectivePopover extends Component {
           title="Update the subobjective"
           modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
           {/* eslint-disable */}

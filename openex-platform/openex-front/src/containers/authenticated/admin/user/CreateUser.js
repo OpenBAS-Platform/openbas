@@ -65,7 +65,7 @@ class CreateUser extends Component {
           autoScrollBodyContent={true}
           modal={false}
           open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
+          onClose={this.handleCloseCreate.bind(this)}
           actions={actionsCreateUser}
         >
           {/* eslint-disable */}

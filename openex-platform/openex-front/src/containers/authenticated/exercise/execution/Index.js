@@ -414,7 +414,7 @@ class IndexExecution extends Component {
             modal={false}
             open={this.state.openView}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseView.bind(this)}
+            onClose={this.handleCloseView.bind(this)}
             actions={viewActions}
           >
             <InjectView
@@ -470,7 +470,7 @@ class IndexExecution extends Component {
             modal={false}
             open={this.state.openStatus}
             autoScrollBodyContent={true}
-            onRequestClose={this.handleCloseStatus.bind(this)}
+            onClose={this.handleCloseStatus.bind(this)}
             actions={statusActions}
           >
             <InjectStatusView inject={this.state.currentStatus} />

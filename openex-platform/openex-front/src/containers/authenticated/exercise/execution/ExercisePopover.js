@@ -187,7 +187,7 @@ class ExercisePopover extends Component {
         <Popover
           open={this.state.openPopover}
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          onClose={this.handlePopoverClose.bind(this)}
         >
           <Menu multiple={false}>
             <MenuItemLink
@@ -216,7 +216,7 @@ class ExercisePopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openDisable}
-          onRequestClose={this.handleCloseDisable.bind(this)}
+          onClose={this.handleCloseDisable.bind(this)}
           actions={disableActions}
         >
           <T>Do you want to disable this exercise?</T>
@@ -225,7 +225,7 @@ class ExercisePopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openEnable}
-          onRequestClose={this.handleCloseEnable.bind(this)}
+          onClose={this.handleCloseEnable.bind(this)}
           actions={enableActions}
         >
           <T>Do you want to enable this exercise?</T>
@@ -234,7 +234,7 @@ class ExercisePopover extends Component {
           title="Launch a dryrun"
           modal={false}
           open={this.state.openDryrun}
-          onRequestClose={this.handleCloseDryrun.bind(this)}
+          onClose={this.handleCloseDryrun.bind(this)}
           actions={dryrunActions}
         >
           {/* eslint-disable */}

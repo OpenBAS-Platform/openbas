@@ -739,7 +739,7 @@ class InjectPopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
+          onClose={this.handleCloseDelete.bind(this)}
           actions={deleteActions}
         >
           <T>Do you want to delete this inject?</T>
@@ -767,7 +767,7 @@ class InjectPopover extends Component {
           autoScrollBodyContent={true}
           modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
+          onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
           <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
@@ -777,7 +777,7 @@ class InjectPopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openDisable}
-          onRequestClose={this.handleCloseDisable.bind(this)}
+          onClose={this.handleCloseDisable.bind(this)}
           actions={disableActions}
         >
           <T>Do you want to disable this inject?</T>
@@ -786,7 +786,7 @@ class InjectPopover extends Component {
           title="Confirmation"
           modal={false}
           open={this.state.openEnable}
-          onRequestClose={this.handleCloseEnable.bind(this)}
+          onClose={this.handleCloseEnable.bind(this)}
           actions={enableActions}
         >
           <T>Do you want to enable this inject?</T>
@@ -795,7 +795,7 @@ class InjectPopover extends Component {
           title="Done"
           modal={false}
           open={this.state.openDone}
-          onRequestClose={this.handleCloseDone.bind(this)}
+          onClose={this.handleCloseDone.bind(this)}
           actions={doneActions}
         >
           <T>Do you want to mark this inject as done?</T>
@@ -804,7 +804,7 @@ class InjectPopover extends Component {
           title="Copy"
           modal={false}
           open={this.state.openCopy}
-          onRequestClose={this.handleCloseCopy.bind(this)}
+          onClose={this.handleCloseCopy.bind(this)}
           actions={copyActions}
         >
           {/* eslint-disable */}
@@ -820,7 +820,7 @@ class InjectPopover extends Component {
           title="Test"
           modal={false}
           open={this.state.openTry}
-          onRequestClose={this.handleCloseTry.bind(this)}
+          onClose={this.handleCloseTry.bind(this)}
           actions={tryActions}
         >
           <T>Do you want to test this inject?</T>
@@ -829,7 +829,7 @@ class InjectPopover extends Component {
           title="Inject test result"
           modal={false}
           open={this.state.openResult}
-          onRequestClose={this.handleCloseResult.bind(this)}
+          onClose={this.handleCloseResult.bind(this)}
           actions={resultActions}
         >
           <div>
