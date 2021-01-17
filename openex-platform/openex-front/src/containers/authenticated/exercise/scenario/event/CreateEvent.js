@@ -1,17 +1,38 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
+import { Add } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
+import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import * as Constants from '../../../../../constants/ComponentTypes';
 import { addEvent } from '../../../../../actions/Event';
 import EventForm from './EventForm';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Create a new event': 'Créer un nouvel événement',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
   },
 });
 
@@ -30,47 +51,49 @@ class CreateEvent extends Component {
   }
 
   onSubmit(data) {
-    return this.props.addEvent(this.props.exerciseId, data);
-  }
-
-  submitForm() {
-    this.refs.eventForm.submit();
+    return this.props
+      .addEvent(this.props.exerciseId, data)
+      .then((result) => (result.result ? this.handleClose() : result));
   }
 
   render() {
-    const actions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleClose.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create"
-        primary={true}
-        onClick={this.submitForm.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
       <div>
         <Fab
-          type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpen.bind(this)}
-        />
-        <Dialog
-          title="Create a new event"
-          modal={false}
-          open={this.state.open}
-          onRequestClose={this.handleClose.bind(this)}
-          actions={actions}
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
         >
-          <EventForm
-            ref="eventForm"
-            onSubmit={this.onSubmit.bind(this)}
-            onSubmitSuccess={this.handleClose.bind(this)}
-          />
+          <Add />
+        </Fab>
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+        >
+          <DialogTitle>
+            <T>Create a new event</T>
+          </DialogTitle>
+          <DialogContent>
+            <EventForm
+              onSubmit={this.onSubmit.bind(this)}
+              onSubmitSuccess={this.handleClose.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={this.handleClose.bind(this)}>
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('eventForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -82,4 +105,7 @@ CreateEvent.propTypes = {
   addEvent: PropTypes.func,
 };
 
-export default connect(null, { addEvent })(CreateEvent);
+export default R.compose(
+  connect(null, { addEvent }),
+  withStyles(styles),
+)(CreateEvent);

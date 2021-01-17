@@ -818,7 +818,7 @@ Index.propTypes = {
   deleteTag: PropTypes.func,
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
+const checkUserCanUpdate = (state) => {
   const userId = R.path(['logged', 'user'], state.app);
   return R.path([userId, 'user_admin'], state.referential.entities.users);
 };

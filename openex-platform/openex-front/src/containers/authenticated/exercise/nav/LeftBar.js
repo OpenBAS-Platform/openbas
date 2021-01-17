@@ -20,7 +20,6 @@ import {
   FlagOutlined,
   LocalMoviesOutlined,
   GroupOutlined,
-  DescriptionOutlined,
   SettingsOutlined,
   SettingsInputCompositeOutlined,
 } from '@material-ui/icons';

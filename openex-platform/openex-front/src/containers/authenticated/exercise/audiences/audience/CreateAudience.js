@@ -53,7 +53,7 @@ class CreateAudience extends Component {
   onSubmit(data) {
     return this.props
       .addAudience(this.props.exerciseId, data)
-      .then(() => this.handleClose());
+      .then((result) => (result.result ? this.handleClose() : result));
   }
 
   render() {

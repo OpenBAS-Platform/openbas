@@ -195,8 +195,8 @@ class DocumentGallery extends Component {
     });
   }
 
-  handleSearchDocument(event, value) {
-    this.setState({ searchTerm: value });
+  handleSearchDocument(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addAvailableTagToFilter(tag) {

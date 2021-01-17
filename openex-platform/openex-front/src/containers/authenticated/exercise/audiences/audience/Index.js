@@ -18,7 +18,6 @@ import { withStyles } from '@material-ui/core/styles';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { timeDiff } from '../../../../../utils/Time';
-import * as Constants from '../../../../../constants/ComponentTypes';
 import { fetchGroups } from '../../../../../actions/Group';
 import { fetchUsers } from '../../../../../actions/User';
 import { fetchOrganizations } from '../../../../../actions/Organization';
@@ -152,8 +151,8 @@ class IndexAudience extends Component {
     this.props.fetchComchecks(this.props.exerciseId);
   }
 
-  handleSearchUsers(event, value) {
-    this.setState({ searchTerm: value });
+  handleSearchUsers(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   reverseBy(field) {
@@ -329,7 +328,6 @@ class IndexAudience extends Component {
             audience={audience}
             subaudiences={subaudiences}
             selectedSubaudience={R.propOr(null, 'subaudience_id', subaudience)}
-            sel
           />
           <Typography variant="h5" style={{ float: 'left' }}>
             {audience.audience_name}
@@ -341,14 +339,7 @@ class IndexAudience extends Component {
             audiences={this.props.audiences}
           />
           <div className={classes.search}>
-            <SearchField
-              name="keyword"
-              fullWidth={true}
-              type="text"
-              hintText="Search"
-              onChange={this.handleSearchUsers.bind(this)}
-              styletype={Constants.FIELD_TYPE_RIGHT}
-            />
+            <SearchField onChange={this.handleSearchUsers.bind(this)} />
           </div>
           <div className="clearfix" />
           {subaudience ? (

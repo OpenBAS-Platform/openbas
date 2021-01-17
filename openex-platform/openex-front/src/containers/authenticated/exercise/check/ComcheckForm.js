@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
-import { CKEditorField } from '../../../../components/Field';
+import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 import { TextField } from '../../../../components/TextField';
 import { Select } from '../../../../components/Select';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -163,7 +163,7 @@ class ComcheckForm extends Component {
             />
             <label>
               Message
-              <CKEditorField name="comcheck_message" label="Message" />
+              <EnrichedTextField name="comcheck_message" label="Message" />
             </label>
             <div style={styles.variables}>
               Les variables disponibles sont : {'{'}
@@ -177,7 +177,7 @@ class ComcheckForm extends Component {
             <br />
             <label>
               Signature
-              <CKEditorField name="comcheck_footer" label="Signature" />
+              <EnrichedTextField name="comcheck_footer" label="Signature" />
             </label>
             <div style={styles.variables}>
               Les variables disponibles sont : {'{'}

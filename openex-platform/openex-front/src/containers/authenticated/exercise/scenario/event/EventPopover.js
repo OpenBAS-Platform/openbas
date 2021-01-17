@@ -5,18 +5,18 @@ import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
 import Slide from '@material-ui/core/Slide';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { MoreVert } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { redirectToScenario } from '../../../../../actions/Application';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
-import { Icon } from '../../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
 import {
   updateEvent,
   deleteEvent,
@@ -28,10 +28,14 @@ import {
 } from '../../../../../actions/Planificateurs';
 import EventForm from './EventForm';
 import PlanificateurEvent from '../../planificateurs/PlanificateurEvent';
+import { submitForm } from '../../../../../utils/Action';
 
-const style = {
-  margin: '8px -30px 0 0',
-};
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 i18nRegister({
   fr: {
@@ -39,6 +43,7 @@ i18nRegister({
     'Do you want to delete this event?':
       'Souhaitez-vous supprimer cet événement ?',
     Import: 'Importer',
+    'Planners list': 'Liste des planificateurs',
   },
 });
 
@@ -132,11 +137,9 @@ class EventPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateEvent(
-      this.props.exerciseId,
-      this.props.eventId,
-      data,
-    );
+    return this.props
+      .updateEvent(this.props.exerciseId, this.props.eventId, data)
+      .then(() => this.handleCloseEdit());
   }
 
   submitFormEdit() {
@@ -173,6 +176,9 @@ class EventPopover extends Component {
   }
 
   render() {
+    const {
+      classes, exerciseOwnerId, userId, userCanUpdate,
+    } = this.props;
     const eventIsUpdatable = R.propOr(
       true,
       'user_can_update',
@@ -183,106 +189,55 @@ class EventPopover extends Component {
       'user_can_delete',
       this.props.event,
     );
-    const { userCanUpdate } = this.props;
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      eventIsUpdatable ? (
-        <Button
-          key="update"
-          label="Update"
-          primary={true}
-          onClick={this.submitFormEdit.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      eventIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
     const initialValues = R.pick(
       ['event_title', 'event_description', 'event_order'],
       this.props.event,
     );
-    const { exerciseOwnerId } = this.props;
-    const { userId } = this.props;
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            color="#ffffff"
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-          />
-        </IconButton>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          {(eventIsUpdatable || eventIsDeletable) && userCanUpdate ? (
-            <Menu multiple={false}>
-              <MenuItemLink
-                label="Import"
-                onClick={this.openFileDialog.bind(this)}
-              />
-              {exerciseOwnerId === userId ? (
-                <MenuItemLink
-                  label="Liste des planificateurs"
-                  onClick={this.handleOpenPlanificateur.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {eventIsUpdatable ? (
-                <MenuItemLink
-                  label="Edit"
-                  onClick={this.handleOpenEdit.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {eventIsDeletable ? (
-                <MenuItemButton
-                  label="Delete"
-                  onClick={this.handleOpenDelete.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-            </Menu>
-          ) : (
-            ''
-          )}
-          {/* eslint-disable */}
-          <input
-            type="file"
-            ref="fileUpload"
-            style={{ display: "none" }}
-            onChange={this.handleFileChange.bind(this)}
-          />
-          {/* eslint-enable */}
-        </Popover>
-
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.openFileDialog.bind(this)}
+            disabled={!eventIsUpdatable || !userCanUpdate}
+          >
+            <T>Import</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenPlanificateur.bind(this)}
+            disabled={exerciseOwnerId !== userId}
+          >
+            <T>Planners list</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!eventIsUpdatable || !userCanUpdate}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!eventIsDeletable || !userCanUpdate}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <input
+          type="file"
+          ref="fileUpload"
+          style={{ display: 'none' }}
+          onChange={this.handleFileChange.bind(this)}
+        />
         <PlanificateurEvent
           planificateursEvent={this.state.planificateursEvent}
           eventId={this.props.eventId}
@@ -291,27 +246,60 @@ class EventPopover extends Component {
           handleClosePlanificateur={this.handleClosePlanificateur.bind(this)}
           submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
         />
-
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this event?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this event?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the event"
-          modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          onClose={this.handleCloseEdit.bind(this)}
         >
-          <EventForm
-            ref="eventForm"
-            initialValues={initialValues}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
+          <DialogTitle>
+            <T>Update the event</T>
+          </DialogTitle>
+          <DialogContent>
+            <EventForm
+              initialValues={initialValues}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('eventForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -346,11 +334,14 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  updatePlanificateurUserForEvent,
-  getPlanificateurUserForEvent,
-  updateEvent,
-  deleteEvent,
-  importEvent,
-  redirectToScenario,
-})(EventPopover);
+export default R.compose(
+  connect(select, {
+    updatePlanificateurUserForEvent,
+    getPlanificateurUserForEvent,
+    updateEvent,
+    deleteEvent,
+    importEvent,
+    redirectToScenario,
+  }),
+  withStyles(styles),
+)(EventPopover);

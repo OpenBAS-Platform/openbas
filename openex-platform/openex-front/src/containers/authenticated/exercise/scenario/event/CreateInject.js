@@ -4,10 +4,19 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import Fab from '@material-ui/core/Fab';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Dialog from '@material-ui/core/Dialog';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import { withStyles } from '@material-ui/core/styles';
+import Slide from '@material-ui/core/Slide';
+import { Add } from '@material-ui/icons';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { dateToISO } from '../../../../../utils/Time';
-import * as Constants from '../../../../../constants/ComponentTypes';
 import { fetchIncident } from '../../../../../actions/Incident';
 import { downloadFile } from '../../../../../actions/File';
 import {
@@ -15,17 +24,29 @@ import {
   updateInject,
   deleteInject,
 } from '../../../../../actions/Inject';
-import { DialogTitleElement } from '../../../../../components/Dialog';
-import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
 import InjectForm from './InjectForm';
 import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     '1. Parameters': '1. Paramètres',
     '2. Content': '2. Contenu',
     '3. Audiences': '3. Audiences',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 330,
   },
 });
 
@@ -58,41 +79,7 @@ class CreateInject extends Component {
   }
 
   onGlobalSubmit(data) {
-    // eslint-disable-next-line no-param-reassign
-    data.inject_date = this.convertDate(
-      `${data.inject_date_only} ${data.inject_time}`,
-    );
-    // eslint-disable-next-line no-param-reassign
-    delete data.inject_date_only;
-    // eslint-disable-next-line no-param-reassign
-    delete data.inject_time;
-    this.setState({ injectData: data });
-  }
-
-  // eslint-disable-next-line consistent-return,class-methods-use-this
-  convertDate(dateToConvert) {
-    const regexDateFr = RegExp(
-      '^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
-    );
-    const regexDateEn = RegExp(
-      '^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$',
-    );
-    let timeSplitted;
-    let dateSplitted;
-    let split;
-    let newDate;
-
-    if (regexDateFr.test(dateToConvert)) {
-      split = dateToConvert.split(' ');
-      dateSplitted = split[0].split('/');
-      // eslint-disable-next-line prefer-destructuring
-      timeSplitted = split[1];
-      newDate = `${dateSplitted[2]}-${dateSplitted[1]}-${dateSplitted[0]} ${timeSplitted}`;
-      return newDate;
-    }
-    if (regexDateEn.test(dateToConvert)) {
-      return dateToConvert;
-    }
+    this.setState({ injectData: data }, () => this.selectContent());
   }
 
   onContentAttachmentAdd(file) {
@@ -116,7 +103,7 @@ class CreateInject extends Component {
     // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
     injectData.inject_content = JSON.stringify(data);
-    this.setState({ injectData });
+    this.setState({ injectData }, () => this.selectAudiences());
   }
 
   onAudiencesChange(data) {
@@ -140,10 +127,10 @@ class CreateInject extends Component {
   handleNext() {
     switch (this.state.stepIndex) {
       case 0:
-        this.refs.injectForm.submit();
+        submitForm('injectForm');
         break;
       case 1:
-        this.refs.contentForm.getWrappedInstance().submit();
+        submitForm('contentForm');
         break;
       case 2:
         this.createInject();
@@ -154,11 +141,7 @@ class CreateInject extends Component {
   }
 
   createInject() {
-    const data = R.assoc(
-      'inject_date',
-      dateToISO(this.state.injectData.inject_date),
-      this.state.injectData,
-    );
+    const data = this.state.injectData;
     this.props
       .addInject(
         this.props.exerciseId,
@@ -176,8 +159,8 @@ class CreateInject extends Component {
     this.handleClose();
   }
 
-  onInjectTypeChange(event, index, value) {
-    this.setState({ type: value });
+  onInjectTypeChange(event) {
+    this.setState({ type: event.target.value });
   }
 
   selectContent() {
@@ -195,41 +178,30 @@ class CreateInject extends Component {
   getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
-        /* eslint-disable */
         return (
           <InjectForm
-            ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
-            onSubmitSuccess={this.selectContent.bind(this)}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
-            initialValues={{ inject_type: "openex_manual" }}
             types={this.props.inject_types}
           />
         );
-      /* eslint-enable */
       case 1:
-        /* eslint-disable */
         return (
           <InjectContentForm
-            ref="contentForm"
             types={this.props.inject_types}
             type={this.state.type}
             onSubmit={this.onContentSubmit.bind(this)}
-            onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(
-              this
+              this,
             )}
             downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}
           />
         );
-      /* eslint-enable */
       case 2:
-        /* eslint-disable */
         return (
           <InjectAudiences
-            ref="injectAudiences"
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
@@ -243,36 +215,31 @@ class CreateInject extends Component {
             selectAll={false}
           />
         );
-      /* eslint-enable */
       default:
         return 'Go away!';
     }
   }
 
   render() {
-    const actions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleClose.bind(this)}
-      />,
-      <Button
-        key="create"
-        label={this.state.stepIndex === 2 ? 'Create' : 'Next'}
-        primary={true}
-        onClick={this.handleNext.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
       <div>
         <Fab
-          type={Constants.BUTTON_TYPE_FLOATING_PADDING}
           onClick={this.handleOpen.bind(this)}
-        />
-        <DialogTitleElement
-          title={
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
@@ -290,15 +257,23 @@ class CreateInject extends Component {
                 </StepLabel>
               </Step>
             </Stepper>
-          }
-          modal={false}
-          open={this.state.open}
-          onRequestClose={this.handleClose.bind(this)}
-          autoScrollBodyContent={true}
-          actions={actions}
-        >
-          <div>{this.getStepContent(this.state.stepIndex)}</div>
-        </DialogTitleElement>
+          </DialogTitle>
+          <DialogContent>
+            {this.getStepContent(this.state.stepIndex)}
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={this.handleClose.bind(this)}>
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.handleNext.bind(this)}
+            >
+              <T>{this.state.stepIndex === 2 ? 'Create' : 'Next'}</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -318,10 +293,13 @@ CreateInject.propTypes = {
   downloadFile: PropTypes.func,
 };
 
-export default connect(null, {
-  fetchIncident,
-  addInject,
-  updateInject,
-  deleteInject,
-  downloadFile,
-})(CreateInject);
+export default R.compose(
+  connect(null, {
+    fetchIncident,
+    addInject,
+    updateInject,
+    deleteInject,
+    downloadFile,
+  }),
+  withStyles(styles),
+)(CreateInject);

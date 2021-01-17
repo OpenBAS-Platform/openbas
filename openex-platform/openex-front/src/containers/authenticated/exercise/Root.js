@@ -23,7 +23,7 @@ import IndexExerciseDryrun from './check/Dryrun';
 import IndexExerciseComcheck from './check/Comcheck';
 import IndexExerciseObjectives from './objective/Index';
 import IndexExerciseScenario from './scenario/Index';
-import IndexExerciseScenarioEvent from './scenario/event/Index';
+import RootExerciseScenarioEvent from './scenario/event/Root';
 import IndexExerciseAudiences from './audiences/Index';
 import RootExerciseAudiencesAudience from './audiences/audience/Root';
 import IndexExerciseStatistics from './statistics/Index';
@@ -148,7 +148,7 @@ class RootExercise extends Component {
             <Route
               exact
               path="/private/exercise/:exerciseId/scenario/:eventId"
-              component={() => <IndexExerciseScenarioEvent id={id} />}
+              component={() => <RootExerciseScenarioEvent id={id} />}
             />
             <Route
               exact

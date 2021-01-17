@@ -29,6 +29,7 @@ const validate = (values) => {
     'incident_type',
     'incident_weight',
     'incident_story',
+    'incident_order',
   ];
   requiredFields.forEach((field) => {
     if (!values[field]) {
@@ -45,52 +46,62 @@ class IncidentForm extends Component {
       { weight_id: 3, weight_name: 'Medium' },
       { weight_id: 5, weight_name: 'Major' },
     ];
-
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="incident_title"
-          fullWidth={true}
-          type="text"
-          label="Title"
-        />
-        <Select label={<T>Type</T>} name="incident_type" fullWidth={true}>
-          {R.values(this.props.types).map((type) => (
-            <MenuItem
-              key={type.type_id}
-              value={type.type_id}
-              primaryText={<T>{type.type_name}</T>}
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="incidentForm" onSubmit={handleSubmit}>
+            <TextField
+              name="incident_title"
+              fullWidth={true}
+              label={<T>Title</T>}
             />
-          ))}
-        </Select>
-        <Select
-          label={<T>Significance</T>}
-          name="incident_weight"
-          fullWidth={true}
-        >
-          {weights.map((weight) => (
-            <MenuItem
-              key={weight.weight_id}
-              value={weight.weight_id}
-              primaryText={<T>{weight.weight_name}</T>}
+            <Select
+              label={<T>Type</T>}
+              name="incident_type"
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+            >
+              {R.values(this.props.types).map((type) => (
+                <MenuItem key={type.type_id} value={type.type_id}>
+                  <T>{type.type_name}</T>
+                </MenuItem>
+              ))}
+            </Select>
+            <Select
+              label={<T>Significance</T>}
+              name="incident_weight"
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+            >
+              {weights.map((weight) => (
+                <MenuItem key={weight.weight_id} value={weight.weight_id}>
+                  <T>{weight.weight_name}</T>
+                </MenuItem>
+              ))}
+            </Select>
+            <TextField
+              name="incident_story"
+              fullWidth={true}
+              multiline={true}
+              rows={3}
+              label={<T>Story</T>}
+              style={{ marginTop: 20 }}
             />
-          ))}
-        </Select>
-        <TextField
-          name="incident_story"
-          fullWidth={true}
-          multiline={true}
-          rows={3}
-          type="text"
-          label="Story"
-        />
-        <TextField
-          name="incident_order"
-          fullWidth={true}
-          type="text"
-          label="Order"
-        />
-      </form>
+            <TextField
+              name="incident_order"
+              fullWidth={true}
+              type="number"
+              label={<T>Order</T>}
+              style={{ marginTop: 20 }}
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

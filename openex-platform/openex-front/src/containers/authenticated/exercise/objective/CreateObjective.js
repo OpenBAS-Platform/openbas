@@ -30,7 +30,9 @@ class CreateObjective extends Component {
   }
 
   onSubmit(data) {
-    return this.props.addObjective(this.props.exerciseId, data);
+    return this.props
+      .addObjective(this.props.exerciseId, data)
+      .then((result) => (result.result ? this.handleClose() : result));
   }
 
   submitForm() {

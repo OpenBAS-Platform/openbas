@@ -19,7 +19,6 @@ import { Add } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import * as Constants from '../../../../../constants/ComponentTypes';
 import { updateSubaudience } from '../../../../../actions/Subaudience';
 import { fetchUsers } from '../../../../../actions/User';
 import CreateUser from './CreateUser';
@@ -78,10 +77,8 @@ class AddUsers extends Component {
     });
   }
 
-  handleSearchUsers(event, value) {
-    this.setState({
-      searchTerm: value,
-    });
+  handleSearchUsers(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addUser(user) {
@@ -163,53 +160,49 @@ class AddUsers extends Component {
               ))}
               <div className="clearfix" />
             </div>
-            <div>
-              <List>
-                {R.take(10, filteredUsers).map((user) => {
-                  const disabled = R.find(
-                    (u) => u.user_id === user.user_id,
-                    this.state.users,
-                  ) !== undefined
-                    || this.props.subaudienceUsersIds.includes(user.user_id);
-                  const userOrganization = R.propOr(
-                    {},
-                    user.user_organization,
-                    this.props.organizations,
-                  );
-                  const organizationName = R.propOr(
-                    '-',
-                    'organization_name',
-                    userOrganization,
-                  );
-                  return (
-                    <ListItem
-                      key={user.user_id}
-                      button={true}
-                      disabled={disabled}
-                      onClick={this.addUser.bind(this, user)}
-                    >
-                      <ListItemAvatar>
-                        <Avatar src={user.user_gravatar} />
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={
-                          <div>
-                            <div className={classes.name}>
-                              {user.user_firstname} {user.user_lastname}
-                            </div>
-                            <div className={classes.org}>
-                              {organizationName}
-                            </div>
-                            <div className="clearfix" />
+            <List>
+              {R.take(10, filteredUsers).map((user) => {
+                const disabled = R.find(
+                  (u) => u.user_id === user.user_id,
+                  this.state.users,
+                ) !== undefined
+                  || this.props.subaudienceUsersIds.includes(user.user_id);
+                const userOrganization = R.propOr(
+                  {},
+                  user.user_organization,
+                  this.props.organizations,
+                );
+                const organizationName = R.propOr(
+                  '-',
+                  'organization_name',
+                  userOrganization,
+                );
+                return (
+                  <ListItem
+                    key={user.user_id}
+                    button={true}
+                    disabled={disabled}
+                    onClick={this.addUser.bind(this, user)}
+                  >
+                    <ListItemAvatar>
+                      <Avatar src={user.user_gravatar} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.name}>
+                            {user.user_firstname} {user.user_lastname}
                           </div>
-                        }
-                        secondary={user.user_email}
-                      />
-                    </ListItem>
-                  );
-                })}
-              </List>
-            </div>
+                          <div className={classes.org}>{organizationName}</div>
+                          <div className="clearfix" />
+                        </div>
+                      }
+                      secondary={user.user_email}
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
           </DialogContent>
           <DialogActions>
             <Button

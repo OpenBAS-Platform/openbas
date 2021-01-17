@@ -2,34 +2,29 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { withStyles } from '@material-ui/core/styles';
+import { EventOutlined, KeyboardArrowRightOutlined } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
+import Typography from '@material-ui/core/Typography';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchEvents } from "../../../../actions/Event";
-import { fetchGroups } from "../../../../actions/Group";
-import { Icon } from "../../../../components/Icon";
-import { List } from "../../../../components/List";
-import { MainListItemLink } from "../../../../components/list/ListItem";
-import CreateEvent from "./event/CreateEvent";
-/* eslint-enable */
+import { fetchEvents } from '../../../../actions/Event';
+import { fetchGroups } from '../../../../actions/Group';
+import CreateEvent from './event/CreateEvent';
 
-const styles = {
-  container: {
-    textAlign: 'left',
-  },
+const styles = () => ({
   empty: {
     marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
     textAlign: 'center',
   },
-  title: {
-    float: 'left',
-    fontSize: '13px',
-    textTransform: 'uppercase',
-  },
-};
+});
 
 i18nRegister({
   fr: {
@@ -46,40 +41,42 @@ class IndexScenario extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div style={styles.container}>
-        <div style={styles.title}>
-          <T>Events</T>
-        </div>
+      <div className={classes.container}>
+        <Typography variant="h5" style={{ float: 'left' }}>
+          <T>Audiences</T>
+        </Typography>
         <div className="clearfix" />
-        {this.props.events.length === 0 ? (
-          <div style={styles.empty}>
+        {this.props.events.length === 0 && (
+          <div className={classes.empty}>
             <T>You do not have any events in this exercise.</T>
           </div>
-        ) : (
-          ''
         )}
         <List>
           {this.props.events.map((event) => (
-            <MainListItemLink
-              to={`/private/exercise/${this.props.exerciseId}/scenario/${event.event_id}`}
+            <ListItem
               key={event.event_id}
-              leftIcon={<Icon name={Constants.ICON_NAME_ACTION_EVENT} />}
-              primaryText={<div>{event.event_title}</div>}
-              secondaryText={event.event_description}
-              rightIcon={
-                <Icon
-                  name={Constants.ICON_NAME_HARDWARE_KEYBOARD_ARROW_RIGHT}
-                />
-              }
-            />
+              component={Link}
+              button={true}
+              to={`/private/exercise/${this.props.exerciseId}/scenario/${event.event_id}`}
+              divider={true}
+            >
+              <ListItemIcon>
+                <EventOutlined />
+              </ListItemIcon>
+              <ListItemText
+                primary={event.event_title}
+                secondary={event.event_description}
+              />
+              <ListItemSecondaryAction>
+                <KeyboardArrowRightOutlined />
+              </ListItemSecondaryAction>
+            </ListItem>
           ))}
         </List>
-
-        {this.props.userCanUpdate ? (
+        {this.props.userCanUpdate && (
           <CreateEvent exerciseId={this.props.exerciseId} />
-        ) : (
-          ''
         )}
       </div>
     );
@@ -104,14 +101,12 @@ const filteredEvents = (events, exerciseId) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
-  const isAdmin = R.path(
+  let userCanUpdate = R.path(
     [userId, 'user_admin'],
     state.referential.entities.users,
   );
-
-  let userCanUpdate = isAdmin;
   if (!userCanUpdate) {
     const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
@@ -136,10 +131,9 @@ const checkUserCanUpdate = (state, ownProps) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const events = filteredEvents(state.referential.entities.events, exerciseId);
   const userCanUpdate = checkUserCanUpdate(state, ownProps);
-
   return {
     exerciseId,
     events,
@@ -147,7 +141,10 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  fetchEvents,
-  fetchGroups,
-})(IndexScenario);
+export default R.compose(
+  connect(select, {
+    fetchEvents,
+    fetchGroups,
+  }),
+  withStyles(styles),
+)(IndexScenario);

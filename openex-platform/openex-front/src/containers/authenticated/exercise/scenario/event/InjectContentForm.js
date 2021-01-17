@@ -5,16 +5,17 @@ import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import { CKEditorField } from '../../../../../components/Field';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Chip from '@material-ui/core/Chip';
+import { AttachmentOutlined } from '@material-ui/icons';
+import { EnrichedTextField } from '../../../../../components/EnrichedTextField';
 import { TextField } from '../../../../../components/TextField';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import DocumentGallery from '../../../DocumentGallery';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { ToggleField } from '../../../../../components/ToggleField';
-import { Icon } from '../../../../../components/Icon';
-import { Chip } from '../../../../../components/Chip';
-import { Avatar } from '../../../../../components/Avatar';
+import { Switch } from '../../../../../components/Switch';
 
 const styles = {
   attachment: {
@@ -33,6 +34,7 @@ i18nRegister({
     message: 'Message',
     encrypted: 'Chiffrement',
     content: 'Contenu',
+    'Select a document': 'Sélectionner un document',
     'Add an attachment': 'Ajouter une pièce jointe',
     'No content available for this inject type.':
       "Aucun contenu disponible pour ce type d'injection",
@@ -70,12 +72,10 @@ const validate = (values, props) => {
 class InjectContentForm extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       openGallery: false,
       current_type: null,
     };
-
     // dirty hack to get types
     // when editing inject
     if (Array.isArray(this.props.types)) {
@@ -111,6 +111,7 @@ class InjectContentForm extends Component {
   }
 
   render() {
+    const { onSubmit, initialValues } = this.props;
     if (this.props.type === null) {
       return (
         <div>
@@ -118,15 +119,6 @@ class InjectContentForm extends Component {
         </div>
       );
     }
-    const documentGalleryActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseGallery.bind(this)}
-      />,
-    ];
-
     if (!this.state.current_type || !this.state.current_type.fields) {
       return (
         <div>
@@ -134,137 +126,150 @@ class InjectContentForm extends Component {
         </div>
       );
     }
-
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        {this.state.current_type.fields.map((field) => {
-          switch (field.type) {
-            case 'textarea':
-              return (
-                <TextField
-                  key={field.name}
-                  name={field.name}
-                  fullWidth={true}
-                  multiline={true}
-                  rows={3}
-                  type="text"
-                  label={field.name}
-                />
-              );
-            case 'richtextarea':
-              return (
-                <div key={field.name}>
-                  <label>
-                    Message
-                    <CKEditorField
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={(values) => validate(values, this.props)}
+      >
+        {({ handleSubmit }) => (
+          <form
+            id="contentForm"
+            onSubmit={handleSubmit}
+            style={{ marginTop: -20 }}
+          >
+            {this.state.current_type.fields.map((field) => {
+              switch (field.type) {
+                case 'textarea':
+                  return (
+                    <TextField
                       key={field.name}
                       name={field.name}
+                      fullWidth={true}
+                      multiline={true}
+                      rows={3}
                       label={field.name}
+                      style={{ marginTop: 20 }}
                     />
-                  </label>
-                  <div style={styles.variables}>
-                    Les variables disponibles sont :
-                    <kbd>
-                      {'{{'}NOM{'}}'}
-                    </kbd>
-                    ,{' '}
-                    <kbd>
-                      {'{{'}PRENOM{'}}'}
-                    </kbd>{' '}
-                    et{' '}
-                    <kbd>
-                      {'{{'}ORGANISATION{'}}'}
-                    </kbd>
-                    .
-                  </div>
-                </div>
-              );
-            case 'checkbox':
-              return (
-                <div key={field.name}>
-                  <br />
-                  <ToggleField
-                    key={field.name}
-                    name={field.name}
-                    label={<T>{field.name}</T>}
-                  />
-                </div>
-              );
-            case 'attachment':
-              return (
-                <div key={field.name} style={styles.attachment}>
-                  <Button
-                    label="Add an attachment"
-                    onClick={this.handleOpenGallery.bind(this)}
-                  />
-                  <Dialog
-                    modal={false}
-                    actions={documentGalleryActions}
-                    title="Selection d'un document"
-                    open={this.state.openGallery}
-                    onRequestClose={this.handleCloseGallery.bind(this)}
-                    contentStyle={{ width: '600px;', maxWidth: '70%' }}
-                  >
-                    <DocumentGallery
-                      fileSelector={this.handleDocumentSelection.bind(this)}
+                  );
+                case 'richtextarea':
+                  return (
+                    <div key={field.name} style={{ marginTop: 20 }}>
+                      <EnrichedTextField
+                        key={field.name}
+                        name={field.name}
+                        label={field.name}
+                      />
+                      <div style={styles.variables}>
+                        Les variables disponibles sont :
+                        <kbd>
+                          {'{{'}NOM{'}}'}
+                        </kbd>
+                        ,{' '}
+                        <kbd>
+                          {'{{'}PRENOM{'}}'}
+                        </kbd>{' '}
+                        et{' '}
+                        <kbd>
+                          {'{{'}ORGANISATION{'}}'}
+                        </kbd>
+                        .
+                      </div>
+                    </div>
+                  );
+                case 'checkbox':
+                  return (
+                    <Switch
+                      key={field.name}
+                      name={field.name}
+                      label={<T>{field.name}</T>}
+                      style={{ marginTop: 20 }}
                     />
-                  </Dialog>
-                  <div>
-                    {this.props.attachments.map((attachment) => {
-                      const documentName = R.propOr(
-                        '-',
-                        'document_name',
-                        attachment,
-                      );
-                      const documentId = R.propOr(
-                        '-',
-                        'document_id',
-                        attachment,
-                      );
-                      return (
-                        <Chip
-                          key={documentName}
-                          onRequestDelete={this.props.onContentAttachmentDelete.bind(
-                            this,
-                            documentName,
-                          )}
-                          type={Constants.CHIP_TYPE_LIST}
-                          onClick={this.props.downloadAttachment.bind(
-                            this,
-                            documentId,
-                            documentName,
-                          )}
-                        >
-                          <Avatar
-                            icon={
-                              <Icon
-                                name={Constants.ICON_NAME_EDITOR_ATTACH_FILE}
-                              />
-                            }
-                            size={32}
-                            type={Constants.AVATAR_TYPE_CHIP}
+                  );
+                case 'attachment':
+                  return (
+                    <div key={field.name} style={styles.attachment}>
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={this.handleOpenGallery.bind(this)}
+                      >
+                        <T>Add an attachment</T>
+                      </Button>
+                      <Dialog
+                        open={this.state.openGallery}
+                        onClose={this.handleCloseGallery.bind(this)}
+                        fullWidth={true}
+                        maxWidth="md"
+                      >
+                        <DialogTitle>
+                          <T>Select a document</T>
+                        </DialogTitle>
+                        <DialogContent>
+                          <DocumentGallery
+                            fileSelector={this.handleDocumentSelection.bind(
+                              this,
+                            )}
                           />
-                          {documentName}
-                        </Chip>
-                      );
-                    })}
-                    <div className="clearfix"></div>
-                  </div>
-                </div>
-              );
-            default:
-              return (
-                <TextField
-                  key={field.name}
-                  name={field.name}
-                  fullWidth={true}
-                  type="text"
-                  label={field.name}
-                />
-              );
-          }
-        })}
-      </form>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button
+                            variant="outlined"
+                            onClick={this.handleCloseGallery.bind(this)}
+                          >
+                            <T>Close</T>
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                      <div>
+                        {this.props.attachments.map((attachment) => {
+                          const documentName = R.propOr(
+                            '-',
+                            'document_name',
+                            attachment,
+                          );
+                          const documentId = R.propOr(
+                            '-',
+                            'document_id',
+                            attachment,
+                          );
+                          return (
+                            <Chip
+                              key={documentName}
+                              onDelete={this.props.onContentAttachmentDelete.bind(
+                                this,
+                                documentName,
+                              )}
+                              onClick={this.props.downloadAttachment.bind(
+                                this,
+                                documentId,
+                                documentName,
+                              )}
+                              icon={<AttachmentOutlined />}
+                              label={documentName}
+                            />
+                          );
+                        })}
+                        <div className="clearfix" />
+                      </div>
+                    </div>
+                  );
+                default:
+                  return (
+                    <TextField
+                      key={field.name}
+                      name={field.name}
+                      fullWidth={true}
+                      type="text"
+                      label={field.name}
+                      style={{ marginTop: 20 }}
+                    />
+                  );
+              }
+            })}
+          </form>
+        )}
+      </Form>
     );
   }
 }
@@ -286,4 +291,4 @@ InjectContentForm.propTypes = {
 };
 
 const formComponent = InjectContentForm;
-export default injectIntl(formComponent, { withRef: true });
+export default injectIntl(formComponent);

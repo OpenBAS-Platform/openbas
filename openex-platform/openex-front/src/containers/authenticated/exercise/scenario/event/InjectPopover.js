@@ -5,20 +5,20 @@ import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { dayFormat, timeFormat, dateToISO } from '../../../../../utils/Time';
-import Theme from '../../../../../components/Theme';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { Popover } from '../../../../../components/Popover';
-import { Menu } from '../../../../../components/Menu';
-import { Dialog, DialogTitleElement } from '../../../../../components/Dialog';
-import { Icon } from '../../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../../components/menu/MenuItem';
-import { Step, Stepper, StepLabel } from '../../../../../components/Stepper';
 import { fetchIncident, selectIncident } from '../../../../../actions/Incident';
 import { downloadFile } from '../../../../../actions/File';
 import { redirectToEvent } from '../../../../../actions/Application';
@@ -34,19 +34,6 @@ import InjectForm from './InjectForm';
 import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
 import CopyForm from './CopyForm';
-
-const styles = {
-  [Constants.INJECT_EXEC]: {
-    position: 'absolute',
-    top: '8px',
-    right: 0,
-  },
-  [Constants.INJECT_SCENARIO]: {
-    position: 'absolute',
-    top: '5px',
-    right: 0,
-  },
-};
 
 i18nRegister({
   fr: {
@@ -528,14 +515,6 @@ class InjectPopover extends Component {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
-  }
-
   render() {
     const injectIsUpdatable = R.propOr(
       true,
@@ -705,85 +684,65 @@ class InjectPopover extends Component {
     }
 
     return (
-      <div style={styles[this.props.type]}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(!injectEnabled || injectNotSupported)}
-          />
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-
-        {userCanUpdate ? (
-          <Popover
-            open={this.state.openPopover}
-            anchorEl={this.state.anchorEl}
-            onRequestClose={this.handlePopoverClose.bind(this)}
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!userCanUpdate || injectNotSupported}
           >
-            <Menu multiple={false}>
-              {!injectNotSupported ? (
-                <MenuItemLink
-                  label="Edit"
-                  onClick={this.handleOpenEdit.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {!injectNotSupported && this.props.location !== 'run' ? (
-                <MenuItemLink
-                  label="Copy"
-                  onClick={this.handleOpenCopy.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {injectEnabled && !injectNotSupported ? (
-                <MenuItemButton
-                  label="Disable"
-                  onClick={this.handleOpenDisable.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {!injectEnabled && !injectNotSupported ? (
-                <MenuItemButton
-                  label="Enable"
-                  onClick={this.handleOpenEnable.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {injectType === 'openex_manual'
-              && this.props.location === 'run' ? (
-                <MenuItemButton
-                  label="Mark as done"
-                  onClick={this.handleOpenDone.bind(this)}
-                />
-                ) : (
-                  ''
-                )}
-              {!injectNotSupported ? (
-                <MenuItemButton
-                  label="Test"
-                  onClick={this.handleOpenTry.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {injectIsDeletable ? (
-                <MenuItemButton
-                  label="Delete"
-                  onClick={this.handleOpenDelete.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-            </Menu>
-          </Popover>
-        ) : (
-          ''
-        )}
-
-        <DialogTitleElement
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenCopy.bind(this)}
+            disabled={injectNotSupported || this.props.location === 'run'}
+          >
+            <T>Copy</T>
+          </MenuItem>
+          {injectEnabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={injectNotSupported}
+            >
+              <T>Disable</T>
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={injectNotSupported}
+            >
+              <T>Enable</T>
+            </MenuItem>
+          )}
+          {injectType === 'openex_manual' && this.props.location === 'run' && (
+            <MenuItem onClick={this.handleOpenDone.bind(this)}>
+              <T>Mark as done</T>
+            </MenuItem>
+          )}
+          <MenuItem
+            onClick={this.handleOpenTry.bind(this)}
+            disabled={injectNotSupported}
+          >
+            <T>Test</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenTry.bind(this)}
+            disabled={injectNotSupported || !injectIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <Dialog
           title="Confirmation"
           modal={false}
           open={this.state.openDelete}
@@ -791,9 +750,8 @@ class InjectPopover extends Component {
           actions={deleteActions}
         >
           <T>Do you want to delete this inject?</T>
-        </DialogTitleElement>
-
-        <DialogTitleElement
+        </Dialog>
+        <Dialog
           title={
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
@@ -820,7 +778,7 @@ class InjectPopover extends Component {
           actions={editActions}
         >
           <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
-        </DialogTitleElement>
+        </Dialog>
 
         <Dialog
           title="Confirmation"

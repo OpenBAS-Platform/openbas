@@ -4,42 +4,43 @@ import * as R from 'ramda';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { withStyles } from '@material-ui/core/styles';
+import { EmailOutlined, SmsOutlined, InputOutlined } from '@material-ui/icons';
+import Typography from '@material-ui/core/Typography';
+import { green, red } from '@material-ui/core/colors';
 import { dateFormat } from '../../../../../utils/Time';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
-import Theme from '../../../../../components/Theme';
-import { Toolbar } from '../../../../../components/Toolbar';
-import { List } from '../../../../../components/List';
-import {
-  HeaderItem,
-  MainListItem,
-} from '../../../../../components/list/ListItem';
-import { Icon } from '../../../../../components/Icon';
 import { SearchField } from '../../../../../components/SearchField';
-/* eslint-disable */
-import { fetchAudiences } from "../../../../../actions/Audience";
-import { fetchSubaudiences } from "../../../../../actions/Subaudience";
-import { fetchSubobjectives } from "../../../../../actions/Subobjective";
-import { downloadFile } from "../../../../../actions/File";
-import { fetchEvents } from "../../../../../actions/Event";
+import { fetchAudiences } from '../../../../../actions/Audience';
+import { fetchSubaudiences } from '../../../../../actions/Subaudience';
+import { fetchSubobjectives } from '../../../../../actions/Subobjective';
+import { downloadFile } from '../../../../../actions/File';
+import { fetchEvents } from '../../../../../actions/Event';
 import {
   fetchIncidents,
   fetchIncidentTypes,
-} from "../../../../../actions/Incident";
+} from '../../../../../actions/Incident';
 import {
   fetchInjects,
   fetchInjectTypes,
   fetchInjectTypesExerciseSimple,
-} from "../../../../../actions/Inject";
-import { fetchGroups } from "../../../../../actions/Group";
-import * as Constants from "../../../../../constants/ComponentTypes";
-import IncidentNav from "./IncidentNav";
-import EventPopover from "./EventPopover";
-import IncidentPopover from "./IncidentPopover";
-import CreateInject from "./CreateInject";
-import InjectPopover from "./InjectPopover";
-import InjectView from "./InjectView";
-/* eslint-enable */
+} from '../../../../../actions/Inject';
+import { fetchGroups } from '../../../../../actions/Group';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import IncidentNav from './IncidentNav';
+import EventPopover from './EventPopover';
+import CreateInject from './CreateInject';
+import InjectPopover from './InjectPopover';
+import InjectView from './InjectView';
 
 i18nRegister({
   fr: {
@@ -52,9 +53,16 @@ i18nRegister({
   },
 });
 
-const styles = {
+const styles = () => ({
   container: {
     paddingRight: '300px',
+  },
+  toolbar: {
+    position: 'fixed',
+    top: 0,
+    right: 320,
+    zIndex: '5000',
+    backgroundColor: 'none',
   },
   header: {
     icon: {
@@ -101,7 +109,6 @@ const styles = {
   subobjectives: {
     float: 'left',
     fontSize: '12px',
-    color: Theme.palette.accent3Color,
   },
   empty: {
     marginTop: 30,
@@ -133,7 +140,13 @@ const styles = {
     padding: '5px 0 0 0',
     textAlign: 'center',
   },
-};
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
+  },
+});
 
 class Index extends Component {
   constructor(props) {
@@ -165,13 +178,11 @@ class Index extends Component {
           };
           return true;
         });
-
         return {
           inject_types: injectTypes,
         };
       }
     });
-
     this.props.fetchInjects(this.props.exerciseId, this.props.eventId);
     this.props.fetchGroups();
   }
@@ -181,55 +192,8 @@ class Index extends Component {
     this.props.fetchInjects(this.props.exerciseId, this.props.eventId);
   }
 
-  handleSearchInjects(event, value) {
-    this.setState({ searchTerm: value });
-  }
-
-  reverseBy(field) {
-    this.setState({
-      sortBy: field,
-      orderAsc: !this.state.orderAsc,
-    });
-  }
-
-  SortHeader(field, label) {
-    const icon = this.state.orderAsc
-      ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP;
-    const IconDisplay = this.state.sortBy === field ? (
-        <Icon type={Constants.ICON_TYPE_SORT} name={icon} />
-    ) : (
-      ''
-    );
-    return (
-      <div
-        style={styles.header[field]}
-        onClick={this.reverseBy.bind(this, field)}
-      >
-        <T>{label}</T>
-        {IconDisplay}
-      </div>
-    );
-  }
-
-  SortHeader2(field, element) {
-    const icon = this.state.orderAsc
-      ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP;
-    const IconDisplay = this.state.sortBy === field ? (
-        <Icon type={Constants.ICON_TYPE_SORT} name={icon} />
-    ) : (
-      ''
-    );
-    return (
-      <div
-        style={styles.header[field]}
-        onClick={this.reverseBy.bind(this, field)}
-      >
-        {element}
-        {IconDisplay}
-      </div>
-    );
+  handleSearchInjects(event) {
+    this.setState({ searchTerm: event.target.valuz });
   }
 
   // TODO replace with sortWith after Ramdajs new release
@@ -246,49 +210,17 @@ class Index extends Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  selectIcon(type, color) {
+  selectIcon(type) {
     switch (type) {
       case 'openex_email':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_CONTENT_MAIL}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <EmailOutlined />;
       case 'openex_ovh_sms':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_NOTIFICATION_SMS}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <SmsOutlined />;
       case 'openex_manual':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_ACTION_INPUT}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <InputOutlined />;
       default:
-        return (
-          <Icon
-            name={Constants.ICON_NAME_CONTENT_MAIL}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <InputOutlined />;
     }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
   }
 
   handleOpenView(inject) {
@@ -303,303 +235,214 @@ class Index extends Component {
     return this.props.downloadFile(fileId, fileName);
   }
 
-  render() {
-    const viewActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseView.bind(this)}
-      />,
-    ];
-
+  renderIncident() {
     const {
-      exerciseId, eventId, event, incident, incidents,
+      classes, exerciseId, eventId, incident,
+    } = this.props;
+    const keyword = this.state.searchTerm;
+    const filterByKeyword = (n) => keyword === ''
+      || n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || n.inject_content.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const injects = R.pipe(
+      R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
+      R.filter(filterByKeyword),
+      R.sort((a, b) => {
+        // TODO replace with sortWith after Ramdajs new release
+        const fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString());
+        const fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString());
+        return this.state.orderAsc
+          ? this.ascend(fieldA, fieldB)
+          : this.descend(fieldA, fieldB);
+      }),
+    )(incident.incident_injects);
+    const eventIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.event,
+    );
+    return (
+      <div>
+        {incident.incident_injects.length === 0 && (
+          <div className={classes.empty}>
+            <T>This incident is empty.</T>
+          </div>
+        )}
+        <List>
+          {injects.map((inject) => {
+            // Setup variables
+            const injectId = R.propOr(Math.random(), 'inject_id', inject);
+            const injectTitle = R.propOr('-', 'inject_title', inject);
+            const injectUser = R.propOr('-', 'inject_user', inject);
+            const injectDate = R.prop('inject_date', inject);
+            const injectType = R.propOr('-', 'inject_type', inject);
+            const injectAudiences = R.propOr([], 'inject_audiences', inject);
+            const injectSubaudiences = R.propOr(
+              [],
+              'inject_subaudiences',
+              inject,
+            );
+            const injectUsersNumber = R.propOr(
+              '-',
+              'inject_users_number',
+              inject,
+            );
+            const injectEnabled = R.propOr(true, 'inject_enabled', inject);
+            const injectTypeInHere = R.propOr(
+              false,
+              injectType,
+              this.props.inject_types,
+            );
+            const injectDisabled = !injectTypeInHere;
+            // Return the dom
+            return (
+              <ListItem
+                key={injectId}
+                onClick={this.handleOpenView.bind(this, inject)}
+                button={true}
+                divider={true}
+              >
+                <ListItemIcon
+                  className={
+                    !injectEnabled || injectDisabled
+                      ? classes.disabled
+                      : classes.enabled
+                  }
+                >
+                  {this.selectIcon(injectType)}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div className={classes.inject_title}>{injectTitle}</div>
+                      <div className={classes.inject_date}>
+                        {dateFormat(injectDate)}
+                      </div>
+                      <div className={classes.inject_user}>{injectUser}</div>
+                      <div className={classes.inject_audiences}>
+                        {injectUsersNumber.toString()}
+                      </div>
+                      <div className="clearfix" />
+                    </div>
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <InjectPopover
+                    type={Constants.INJECT_SCENARIO}
+                    exerciseId={exerciseId}
+                    eventId={eventId}
+                    incidentId={incident.incident_id}
+                    inject={inject}
+                    injectAudiencesIds={injectAudiences.map(
+                      (a) => a.audience_id,
+                    )}
+                    injectSubaudiencesIds={injectSubaudiences.map(
+                      (a) => a.subaudience_id,
+                    )}
+                    audiences={this.props.audiences}
+                    subaudiences={this.props.subaudiences}
+                    inject_types={this.props.inject_types}
+                    incidents={this.props.allIncidents}
+                    userCanUpdate={this.props.userCanUpdate}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
+        </List>
+        <Dialog
+          open={this.state.openView}
+          onClose={this.handleCloseView.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
+            {R.propOr('-', 'inject_title', this.state.currentInject)}
+          </DialogTitle>
+          <DialogContent>
+            <InjectView
+              downloadAttachment={this.downloadAttachment.bind(this)}
+              inject={this.state.currentInject}
+              audiences={this.props.audiences}
+              subaudiences={this.props.subaudiences}
+            />
+          </DialogContent>
+          <DialogActions>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseView.bind(this)}
+              >
+                <T>Close</T>
+              </Button>
+            </DialogActions>
+          </DialogActions>
+        </Dialog>
+        {eventIsUpdatable && this.props.userCanUpdate && (
+          <CreateInject
+            exerciseId={exerciseId}
+            eventId={eventId}
+            incidentId={incident.incident_id}
+            inject_types={this.props.inject_types}
+            audiences={this.props.audiences}
+            subaudiences={this.props.subaudiences}
+          />
+        )}
+      </div>
+    );
+  }
+
+  render() {
+    const {
+      classes,
+      exerciseId,
+      eventId,
+      event,
+      incident,
+      incidents,
     } = this.props;
     const eventIsUpdatable = R.propOr(
       true,
       'user_can_update',
       this.props.event,
     );
-
-    if (event && incident) {
-      const keyword = this.state.searchTerm;
-      const filterByKeyword = (n) => keyword === ''
-        || n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-        || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase())
-          !== -1
-        || n.inject_content.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-
-      const injects = R.pipe(
-        R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
-        R.filter(filterByKeyword),
-        R.sort((a, b) => {
-          // TODO replace with sortWith after Ramdajs new release
-          const fieldA = R.toLower(
-            R.propOr('', this.state.sortBy, a).toString(),
-          );
-          const fieldB = R.toLower(
-            R.propOr('', this.state.sortBy, b).toString(),
-          );
-          return this.state.orderAsc
-            ? this.ascend(fieldA, fieldB)
-            : this.descend(fieldA, fieldB);
-        }),
-      )(incident.incident_injects);
-
-      // Display the component
-      return (
-        <div style={styles.container}>
-          <IncidentNav
-            selectedIncident={incident.incident_id}
-            exerciseId={exerciseId}
-            eventId={eventId}
-            incidents={incidents}
-            incident_types={this.props.incident_types}
-            subobjectives={this.props.subobjectives}
-            can_create={eventIsUpdatable && this.props.userCanUpdate}
-          />
-          <div>
-            <div style={styles.title}>
-              {incident.incident_title}
-              &nbsp;
-            </div>
-            {this.props.userCanUpdate ? (
-              <IncidentPopover
-                exerciseId={exerciseId}
-                eventId={eventId}
-                incident={incident}
-                subobjectives={this.props.subobjectives}
-                incidentSubobjectivesIds={incident.incident_subobjectives.map(
-                  (i) => i.subobjective_id,
-                )}
-                incident_types={this.props.incident_types}
-              />
-            ) : (
-              ''
-            )}
-
-            <div style={styles.subobjectives}>
-              {incident.incident_subobjectives.length}
-              &nbsp;
-              <T>linked subobjective(s)</T>
-            </div>
-
-            <div style={styles.search}>
-              <SearchField
-                name="keyword"
-                fullWidth={true}
-                type="text"
-                hintText="Search"
-                onChange={this.handleSearchInjects.bind(this)}
-                styletype={Constants.FIELD_TYPE_RIGHT}
-              />
-            </div>
-
-            <div className="clearfix" />
-
-            <List>
-              {incident.incident_injects.length === 0 ? (
-                <div style={styles.empty}>
-                  <T>This incident is empty.</T>
-                </div>
-              ) : (
-                <HeaderItem
-                  leftIcon={<span style={styles.header.icon}>#</span>}
-                  rightIconButton={<Icon style={{ display: 'none' }} />}
-                  primaryText={
-                    <div>
-                      {this.SortHeader('inject_title', 'Title')}
-                      {this.SortHeader('inject_date', 'Date')}
-                      {this.SortHeader('inject_user', 'Author')}
-                      {this.SortHeader2(
-                        'inject_users_number',
-                        <Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />,
-                      )}
-                      <div className="clearfix" />
-                    </div>
-                  }
-                />
-              )}
-
-              {injects.map((inject) => {
-                // Setup variables
-                const injectId = R.propOr(Math.random(), 'inject_id', inject);
-                const injectTitle = R.propOr('-', 'inject_title', inject);
-                const injectUser = R.propOr('-', 'inject_user', inject);
-                const injectDate = R.prop('inject_date', inject);
-                const injectType = R.propOr('-', 'inject_type', inject);
-                const injectAudiences = R.propOr(
-                  [],
-                  'inject_audiences',
-                  inject,
-                );
-                const injectSubaudiences = R.propOr(
-                  [],
-                  'inject_subaudiences',
-                  inject,
-                );
-                const injectUsersNumber = R.propOr(
-                  '-',
-                  'inject_users_number',
-                  inject,
-                );
-                const injectEnabled = R.propOr(true, 'inject_enabled', inject);
-                const injectTypeInHere = R.propOr(
-                  false,
-                  injectType,
-                  this.props.inject_types,
-                );
-                const injectDisabled = !injectTypeInHere;
-                // Return the dom
-                return (
-                  <MainListItem
-                    key={injectId}
-                    leftIcon={this.selectIcon(
-                      injectType,
-                      this.switchColor(!injectEnabled || injectDisabled),
-                    )}
-                    onClick={this.handleOpenView.bind(this, inject)}
-                    rightIconButton={
-                      <InjectPopover
-                        type={Constants.INJECT_SCENARIO}
-                        exerciseId={exerciseId}
-                        eventId={eventId}
-                        incidentId={incident.incident_id}
-                        inject={inject}
-                        injectAudiencesIds={injectAudiences.map(
-                          (a) => a.audience_id,
-                        )}
-                        injectSubaudiencesIds={injectSubaudiences.map(
-                          (a) => a.subaudience_id,
-                        )}
-                        audiences={this.props.audiences}
-                        subaudiences={this.props.subaudiences}
-                        inject_types={this.props.inject_types}
-                        incidents={this.props.allIncidents}
-                        userCanUpdate={this.props.userCanUpdate}
-                      />
-                    }
-                    primaryText={
-                      <div>
-                        <div style={styles.inject_title}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !injectEnabled || injectDisabled,
-                              ),
-                            }}
-                          >
-                            {injectTitle}
-                          </span>
-                        </div>
-                        <div style={styles.inject_date}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !injectEnabled || injectDisabled,
-                              ),
-                            }}
-                          >
-                            {dateFormat(injectDate)}
-                          </span>
-                        </div>
-                        <div style={styles.inject_user}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !injectEnabled || injectDisabled,
-                              ),
-                            }}
-                          >
-                            {injectUser}
-                          </span>
-                        </div>
-                        <div style={styles.inject_audiences}>
-                          <span
-                            style={{
-                              color: this.switchColor(
-                                !injectEnabled || injectDisabled,
-                              ),
-                            }}
-                          >
-                            {injectUsersNumber.toString()}
-                          </span>
-                        </div>
-                        <div className="clearfix" />
-                      </div>
-                    }
-                  />
-                );
-              })}
-            </List>
-
-            {eventIsUpdatable && this.props.userCanUpdate ? (
-              <CreateInject
-                exerciseId={exerciseId}
-                eventId={eventId}
-                incidentId={incident.incident_id}
-                inject_types={this.props.inject_types}
-                audiences={this.props.audiences}
-                subaudiences={this.props.subaudiences}
-              />
-            ) : (
-              ''
-            )}
-            <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-              <EventPopover
-                exerciseId={exerciseId}
-                eventId={eventId}
-                event={event}
-                reloadEvent={this.reloadEvent.bind(this)}
-                userCanUpdate={this.props.userCanUpdate}
-              />
-            </Toolbar>
-            <Dialog
-              title={R.propOr('-', 'inject_title', this.state.currentInject)}
-              modal={false}
-              open={this.state.openView}
-              autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseView.bind(this)}
-              actions={viewActions}
-            >
-              <InjectView
-                downloadAttachment={this.downloadAttachment.bind(this)}
-                inject={this.state.currentInject}
-                audiences={this.props.audiences}
-                subaudiences={this.props.subaudiences}
-              />
-            </Dialog>
-          </div>
-        </div>
-      );
-    }
     if (event) {
       return (
-        <div style={styles.container}>
+        <div className={classes.container}>
           <IncidentNav
             exerciseId={exerciseId}
             eventId={eventId}
             incidents={incidents}
             incident_types={this.props.incident_types}
             can_create={eventIsUpdatable && this.props.userCanUpdate}
+            selectedIncident={R.propOr(null, 'incident_id', incident)}
           />
-          <div style={styles.empty}>
-            <T>This event is empty.</T>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            {event.event_title}
+          </Typography>
+          <EventPopover
+            exerciseId={exerciseId}
+            eventId={eventId}
+            event={event}
+            reloadEvent={this.reloadEvent.bind(this)}
+            userCanUpdate={this.props.userCanUpdate}
+          />
+          <div className={classes.search}>
+            <SearchField onChange={this.handleSearchInjects.bind(this)} />
           </div>
-          <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-            <EventPopover
-              exerciseId={exerciseId}
-              eventId={eventId}
-              event={event}
-              reloadEvent={this.reloadEvent.bind(this)}
-              userCanUpdate={this.props.userCanUpdate}
-            />
-          </Toolbar>
+          <div className="clearfix" />
+          {incident ? (
+            this.renderIncident()
+          ) : (
+            <div className={classes.empty}>
+              <T>This event is empty.</T>
+            </div>
+          )}
         </div>
       );
     }
-    return <div style={styles.container}> &nbsp; </div>;
+    return <div className={classes.container}> &nbsp; </div>;
   }
 }
 
@@ -667,7 +510,7 @@ const filterIncidents = (incidents, eventId) => {
 };
 
 const checkUserCanUpdate = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
+  const { id: exerciseId } = ownProps;
   const userId = R.path(['logged', 'user'], state.app);
   let userCanUpdate = R.path(
     [userId, 'user_admin'],
@@ -697,8 +540,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
-  const { eventId } = ownProps.params;
+  const { id: exerciseId, eventId } = ownProps;
   const audiences = filterAudiences(
     state.referential.entities.audiences,
     exerciseId,
@@ -728,9 +570,7 @@ const select = (state, ownProps) => {
     ? R.find((a) => a.incident_id === incidentId)(incidents)
     : undefined;
   // endregion
-
   const userCanUpdate = checkUserCanUpdate(state, ownProps);
-
   return {
     exerciseId,
     eventId,
@@ -748,16 +588,19 @@ const select = (state, ownProps) => {
   };
 };
 
-export default connect(select, {
-  fetchAudiences,
-  fetchSubaudiences,
-  fetchSubobjectives,
-  fetchEvents,
-  fetchIncidentTypes,
-  fetchIncidents,
-  fetchInjectTypes,
-  fetchInjectTypesExerciseSimple,
-  fetchInjects,
-  fetchGroups,
-  downloadFile,
-})(Index);
+export default R.compose(
+  connect(select, {
+    fetchAudiences,
+    fetchSubaudiences,
+    fetchSubobjectives,
+    fetchEvents,
+    fetchIncidentTypes,
+    fetchIncidents,
+    fetchInjectTypes,
+    fetchInjectTypesExerciseSimple,
+    fetchInjects,
+    fetchGroups,
+    downloadFile,
+  }),
+  withStyles(styles),
+)(Index);

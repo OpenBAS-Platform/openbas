@@ -5,7 +5,6 @@ import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Dialog from '@material-ui/core/Dialog';
-import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -65,7 +64,7 @@ class CreateSubaudience extends Component {
           payload.result,
         );
       })
-      .then(() => this.handleCloseCreate());
+      .then((result) => (result.result ? this.handleCloseCreate() : result));
   }
 
   render() {

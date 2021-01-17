@@ -51,7 +51,9 @@ class CreateTag extends Component {
   }
 
   onSubmit(data) {
-    this.props.addTag(data).then(() => this.handleClose());
+    this.props
+      .addTag(data)
+      .then((result) => (result.result ? this.handleClose() : result));
   }
 
   render() {

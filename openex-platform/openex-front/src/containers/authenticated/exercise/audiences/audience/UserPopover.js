@@ -83,7 +83,7 @@ class UserPopover extends Component {
       this.props.exerciseId,
       this.props.audience.audience_id,
       this.props.subaudience.subaudience_id,
-      userIds,
+      { subaudience_users: userIds },
     );
     this.handleCloseDelete();
   }

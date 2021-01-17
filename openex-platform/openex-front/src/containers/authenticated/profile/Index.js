@@ -8,6 +8,9 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import { Link } from 'react-router-dom';
+import { DescriptionOutlined } from '@material-ui/icons';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { updateUser } from '../../../actions/User';
 import { i18nRegister } from '../../../utils/Messages';
@@ -50,6 +53,12 @@ const styles = (theme) => ({
     marginLeft: 20,
   },
   toolbar: theme.mixins.toolbar,
+  documents: {
+    color: '#ffffff',
+    position: 'absolute',
+    top: 8,
+    right: 70,
+  },
 });
 
 class Index extends Component {
@@ -109,6 +118,13 @@ class Index extends Component {
               onClick={this.redirectToHome.bind(this)}
             />
             <div className={classes.title}>OpenEx</div>
+            <IconButton
+              component={Link}
+              to="/private/documents"
+              className={classes.documents}
+            >
+              <DescriptionOutlined fontSize="medium" />
+            </IconButton>
             <UserPopover />
           </Toolbar>
         </AppBar>

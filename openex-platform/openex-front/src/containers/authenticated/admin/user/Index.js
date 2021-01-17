@@ -145,8 +145,8 @@ class Index extends Component {
     this.props.fetchOrganizations();
   }
 
-  handleSearchUsers(event, value) {
-    this.setState({ searchTerm: value });
+  handleSearchUsers(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   reverseBy(field) {

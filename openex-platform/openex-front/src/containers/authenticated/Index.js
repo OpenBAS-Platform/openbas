@@ -8,7 +8,6 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import { Link } from 'react-router-dom';
-import MenuItem from '@material-ui/core/MenuItem';
 import { DescriptionOutlined } from '@material-ui/icons';
 import { dateFormat, timeDiff } from '../../utils/Time';
 import { fetchExercises } from '../../actions/Exercise';

@@ -5,27 +5,34 @@ import InputLabel from '@material-ui/core/InputLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import { Field } from 'react-final-form';
 
-const renderFromHelper = ({ touched, error }) => {
+const renderFromHelper = ({ touched, error, submitError }) => {
   if (!(touched && error)) {
     return '';
   }
-  return <FormHelperText>{touched && error}</FormHelperText>;
+  return <FormHelperText>{touched && (error || submitError)}</FormHelperText>;
 };
 
 const renderSelectField = ({
   name,
-  input,
+  input: { onChange, ...inputProps },
   label,
-  meta: { touched, error },
+  meta: { touched, error, submitError },
   children,
   fullWidth,
   style,
+  onChange: onChangePassed,
   ...others
 }) => (
   <FormControl error={touched && error} fullWidth={fullWidth} style={style}>
     <InputLabel htmlFor={name}>{label}</InputLabel>
     <MUISelect
-      {...input}
+      onChange={(event) => {
+        onChange(event.target.value);
+        if (typeof onChangePassed === 'function') {
+          onChangePassed(event);
+        }
+      }}
+      {...inputProps}
       {...others}
       inputProps={{
         name,
@@ -34,7 +41,7 @@ const renderSelectField = ({
     >
       {children}
     </MUISelect>
-    {renderFromHelper({ touched, error })}
+    {renderFromHelper({ touched, error, submitError })}
   </FormControl>
 );
 

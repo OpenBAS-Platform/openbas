@@ -126,8 +126,8 @@ class GroupPopover extends Component {
     this.handlePopoverClose();
   }
 
-  handleSearchUsers(event, value) {
-    this.setState({ searchTerm: value });
+  handleSearchUsers(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addUser(userId) {

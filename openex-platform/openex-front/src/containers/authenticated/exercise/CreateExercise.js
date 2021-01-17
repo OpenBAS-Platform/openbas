@@ -51,7 +51,9 @@ class CreateExercise extends Component {
   }
 
   onSubmit(data) {
-    return this.props.addExercise(data).then(() => this.handleClose());
+    return this.props
+      .addExercise(data)
+      .then((result) => (result.result ? this.handleClose() : result));
   }
 
   render() {

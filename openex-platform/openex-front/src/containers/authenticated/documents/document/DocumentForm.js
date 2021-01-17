@@ -24,12 +24,6 @@ const validate = (values) => {
   return errors;
 };
 
-const style = {
-  display_none: {
-    display: 'none',
-  },
-};
-
 class DocumentForm extends Component {
   render() {
     const { onSubmit, initialValues } = this.props;

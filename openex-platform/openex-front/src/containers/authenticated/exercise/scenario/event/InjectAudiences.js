@@ -53,8 +53,8 @@ class InjectAudiences extends Component {
     }
   }
 
-  handleSearchAudiences(event, value) {
-    this.setState({ searchTerm: value });
+  handleSearchAudiences(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addAudience(audienceId) {

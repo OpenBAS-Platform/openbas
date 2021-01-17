@@ -10,6 +10,7 @@ const renderDateTimePicker = ({
   <KeyboardDateTimePicker
     {...inputProps}
     {...others}
+    ampm={false}
     format="yyyy-MM-dd HH:mm:ss"
     value={value ? new Date(value) : null}
     disabled={submitting}

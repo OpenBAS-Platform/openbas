@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { T } from '../../../../../components/I18n';
 import { TextField } from '../../../../../components/TextField';
 import { i18nRegister } from '../../../../../utils/Messages';
 
@@ -14,7 +15,7 @@ i18nRegister({
 
 const validate = (values) => {
   const errors = {};
-  const requiredFields = [];
+  const requiredFields = ['event_title', 'event_description', 'event_order'];
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
@@ -25,27 +26,35 @@ const validate = (values) => {
 
 class EventForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="event_title"
-          fullWidth={true}
-          type="text"
-          label="Title"
-        />
-        <TextField
-          name="event_description"
-          fullWidth={true}
-          type="text"
-          label="Description"
-        />
-        <TextField
-          name="event_order"
-          fullWidth={true}
-          type="text"
-          label="Order"
-        />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="eventForm" onSubmit={handleSubmit}>
+            <TextField
+              name="event_title"
+              fullWidth={true}
+              label={<T>Title</T>}
+            />
+            <TextField
+              name="event_description"
+              fullWidth={true}
+              label={<T>Description</T>}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="event_order"
+              fullWidth={true}
+              label={<T>Order</T>}
+              style={{ marginTop: 20 }}
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

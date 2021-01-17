@@ -1,15 +1,37 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import * as Constants from '../../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { selectIncident } from "../../../../../actions/Incident";
-import { Drawer } from "../../../../../components/Drawer";
-import { List } from "../../../../../components/List";
-import { ListItemLink } from "../../../../../components/list/ListItem";
-import { Icon } from "../../../../../components/Icon";
-import CreateIncident from "./CreateIncident";
-/* eslint-enable */
+import * as R from 'ramda';
+import Drawer from '@material-ui/core/Drawer';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { LayersOutlined } from '@material-ui/icons';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { green, red } from '@material-ui/core/colors';
+import { T } from '../../../../../components/I18n';
+import CreateIncident from './CreateIncident';
+import { selectIncident } from '../../../../../actions/Incident';
+import IncidentPopover from './IncidentPopover';
+
+const styles = () => ({
+  drawerPaper: {
+    width: 300,
+  },
+  itemActive: {
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+  },
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
+  },
+});
 
 class IncidentNav extends Component {
   handleChangeIncident(incidentId) {
@@ -21,34 +43,59 @@ class IncidentNav extends Component {
   }
 
   render() {
+    const { classes, exerciseId, eventId } = this.props;
     return (
       <Drawer
-        width={300}
-        docked={true}
-        open={true}
-        openSecondary={true}
-        zindex={50}
+        variant="permanent"
+        classes={{ paper: classes.drawerPaper }}
+        anchor="right"
       >
-        <CreateIncident
-          exerciseId={this.props.exerciseId}
-          eventId={this.props.eventId}
-          incident_types={this.props.incident_types}
-          subobjectives={this.props.subobjectives}
-          can_create={this.props.can_create}
-        />
+        <Toolbar />
+        {this.props.can_create ? (
+          <CreateIncident
+            exerciseId={this.props.exerciseId}
+            eventId={this.props.eventId}
+            incident_types={this.props.incident_types}
+            subobjectives={this.props.subobjectives}
+          />
+        ) : (
+          <Typography variant="h5">
+            <T>Incidents</T>
+          </Typography>
+        )}
         <List>
           {this.props.incidents.map((incident) => (
-            <ListItemLink
-              type={Constants.LIST_ITEM_NOSPACE}
+            <ListItem
               key={incident.incident_id}
-              active={this.props.selectedIncident === incident.incident_id}
+              className={
+                this.props.selectedIncident === incident.incident_id
+                  ? classes.itemActive
+                  : classes.item
+              }
+              button={true}
+              divider={true}
               onClick={this.handleChangeIncident.bind(
                 this,
                 incident.incident_id,
               )}
-              label={incident.incident_title}
-              leftIcon={<Icon name={Constants.ICON_NAME_MAPS_LAYERS} />}
-            />
+            >
+              <ListItemIcon>
+                <LayersOutlined />
+              </ListItemIcon>
+              <ListItemText primary={incident.incident_title} />
+              <ListItemSecondaryAction>
+                <IncidentPopover
+                  exerciseId={exerciseId}
+                  eventId={eventId}
+                  incident={incident}
+                  subobjectives={this.props.subobjectives}
+                  incidentSubobjectivesIds={incident.incident_subobjectives.map(
+                    (i) => i.subobjective_id,
+                  )}
+                  incident_types={this.props.incident_types}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
           ))}
         </List>
       </Drawer>
@@ -67,4 +114,7 @@ IncidentNav.propTypes = {
   can_create: PropTypes.bool,
 };
 
-export default connect(null, { selectIncident })(IncidentNav);
+export default R.compose(
+  connect(null, { selectIncident }),
+  withStyles(styles),
+)(IncidentNav);
