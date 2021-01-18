@@ -1,83 +1,110 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import List from '@material-ui/core/List';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Drawer } from '../../../../components/Drawer';
-import { ListItemLink } from '../../../../components/list/ListItem';
-import AppBar from '../../../../components/AppBar';
-import { Icon } from '../../../../components/Icon';
+import { Link } from 'react-router-dom';
+import Drawer from '@material-ui/core/Drawer';
+import ListItemText from '@material-ui/core/ListItemText';
+import Toolbar from '@material-ui/core/Toolbar';
+import MenuList from '@material-ui/core/MenuList';
+import MenuItem from '@material-ui/core/MenuItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import {
+  DashboardOutlined,
+  PersonOutlined,
+  GroupOutlined,
+} from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
+import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import { redirectToAdmin } from '../../../../actions/Application';
 
 i18nRegister({
   fr: {
     Home: 'Accueil',
-    Users: 'Utilisateurs',
-    Groups: 'Groupes',
-    Tests: 'Tests',
+    Unfolding: 'Déroulement',
+    Execution: 'Exécution',
+    Lessons: 'Expérience',
+    Checks: 'Vérifications',
+    Configuration: 'Configuration',
+    Objectives: 'Objectifs',
+    Scenario: 'Scénario',
+    Audiences: 'Audiences',
+    Documents: 'Documents',
+    Statistics: 'Statistiques',
+    Settings: 'Paramètres',
+  },
+});
+
+const styles = () => ({
+  drawerPaper: {
+    width: 180,
+  },
+  menuList: {
+    height: '100%',
+  },
+  lastItem: {
+    bottom: 0,
+  },
+  logoButton: {
+    marginLeft: -23,
+    marginRight: 20,
+  },
+  logo: {
+    cursor: 'pointer',
+    height: 35,
+  },
+  menuItem: {
+    height: 40,
+    padding: '6px 10px 6px 10px',
+  },
+  menuItemNested: {
+    height: 40,
+    padding: '6px 10px 6px 25px',
   },
 });
 
 class LeftBar extends Component {
-  handleToggle() {
-    this.props.toggleLeftBar();
-  }
-
-  redirectToAdmin() {
-    this.props.redirectToAdmin();
-    this.handleToggle();
-  }
-
   render() {
+    const { classes, pathname } = this.props;
     return (
-      <Drawer
-        width={200}
-        docked={false}
-        open={this.props.open}
-        zindex={100}
-        onRequestChange={this.handleToggle.bind(this)}
-      >
-        <AppBar
-          title="OpenEx"
-          type={Constants.APPBAR_TYPE_LEFTBAR}
-          onTitleTouchTap={this.redirectToAdmin.bind(this)}
-          onLeftIconButtonTouchTap={this.handleToggle.bind(this)}
-        />
-        <List>
-          <ListItemLink
-            type={Constants.LIST_ITEM_NOSPACE}
-            active={this.props.pathname === '/private/admin/index'}
-            onClick={this.handleToggle.bind(this)}
-            to={'/private/admin/index'}
-            label="Home"
-            leftIcon={<Icon name={Constants.ICON_NAME_EDITOR_INSERT_CHART} />}
-          />
-          <ListItemLink
-            type={Constants.LIST_ITEM_NOSPACE}
-            active={this.props.pathname.includes('/private/admin/users')}
-            onClick={this.handleToggle.bind(this)}
+      <Drawer variant="permanent" classes={{ paper: classes.drawerPaper }}>
+        <Toolbar />
+        <MenuList component="nav">
+          <MenuItem
+            component={Link}
+            to={'/private/admin'}
+            selected={pathname === '/private/admin'}
+            dense={false}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 35 }}>
+              <DashboardOutlined />
+            </ListItemIcon>
+            <ListItemText primary={<T>Home</T>} />
+          </MenuItem>
+          <MenuItem
+            component={Link}
             to={'/private/admin/users'}
-            label="Users"
-            leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_PERSON} />}
-          />
-          <ListItemLink
-            type={Constants.LIST_ITEM_NOSPACE}
-            active={this.props.pathname === '/private/admin/groups'}
-            onClick={this.handleToggle.bind(this)}
+            selected={pathname === '/private/admin/users'}
+            dense={false}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 35 }}>
+              <PersonOutlined />
+            </ListItemIcon>
+            <ListItemText primary={<T>Users</T>} />
+          </MenuItem>
+          <MenuItem
+            component={Link}
             to={'/private/admin/groups'}
-            label="Groups"
-            leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />}
-          />
-          <ListItemLink
-            type={Constants.LIST_ITEM_NOSPACE}
-            active={this.props.pathname === '/private/admin/tests'}
-            onClick={this.handleToggle.bind(this)}
-            to={'/private/admin/tests'}
-            label="Tests"
-            leftIcon={<Icon name={Constants.ICON_NAME_TESTS} />}
-          />
-        </List>
+            selected={pathname === '/private/admin/groups'}
+            dense={false}
+            classes={{ root: classes.menuItem }}
+          >
+            <ListItemIcon style={{ minWidth: 35 }}>
+              <GroupOutlined />
+            </ListItemIcon>
+            <ListItemText primary={<T>Groups</T>} />
+          </MenuItem>
+        </MenuList>
       </Drawer>
     );
   }
@@ -85,12 +112,6 @@ class LeftBar extends Component {
 
 LeftBar.propTypes = {
   pathname: PropTypes.string.isRequired,
-  open: PropTypes.bool,
-  redirectToAdmin: PropTypes.func,
 };
 
-const select = (state) => ({
-  open: state.screen.navbar_left_open,
-});
-
-export default connect(select, { redirectToAdmin })(LeftBar);
+export default withStyles(styles)(LeftBar);

@@ -2,20 +2,22 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { GroupOutlined } from '@material-ui/icons';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchGroups } from "../../../../actions/Group";
-import { fetchUsers } from "../../../../actions/User";
-import { fetchOrganizations } from "../../../../actions/Organization";
-import { fetchExercises } from "../../../../actions/Exercise";
-import { List } from "../../../../components/List";
-import { MainListItem, HeaderItem } from "../../../../components/list/ListItem";
-import { Icon } from "../../../../components/Icon";
-import CreateGroup from "./CreateGroup";
-import GroupPopover from "./GroupPopover";
-/* eslint-enable */
+import { fetchGroups } from '../../../../actions/Group';
+import { fetchUsers } from '../../../../actions/User';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { fetchExercises } from '../../../../actions/Exercise';
+import CreateGroup from './CreateGroup';
+import GroupPopover from './GroupPopover';
 
 i18nRegister({
   fr: {
@@ -24,33 +26,11 @@ i18nRegister({
     Users: 'Utilisateurs',
     'You do not have any group on the platform.':
       "Vous n'avez aucun groupe sur cette plateforme.",
+    users: 'utilisateurs',
   },
 });
 
-const styles = {
-  header: {
-    icon: {
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-      padding: '8px 0 0 8px',
-    },
-    group_name: {
-      float: 'left',
-      width: '25%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    group_users: {
-      float: 'left',
-      width: '25%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      textAlign: 'center',
-      fontWeight: '700',
-    },
-  },
+const styles = () => ({
   title: {
     float: 'left',
     fontSize: '20px',
@@ -60,7 +40,7 @@ const styles = {
     marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
-    textAlign: 'left',
+    textAlign: 'center',
   },
   number: {
     float: 'right',
@@ -78,7 +58,7 @@ const styles = {
     width: '25%',
     padding: '5px 0 0 0',
   },
-};
+});
 
 class Index extends Component {
   constructor(props) {
@@ -97,25 +77,6 @@ class Index extends Component {
     this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
   }
 
-  SortHeader(field, label) {
-    const icon = this.state.orderAsc
-      ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP;
-    const IconDisplay = this.state.sortBy === field ? (
-        <Icon type={Constants.ICON_TYPE_SORT} name={icon} />
-    ) : (
-      ''
-    );
-    return (
-      <div
-        style={styles.header[field]}
-        onClick={this.reverseBy.bind(this, field)}
-      >
-        <T>{label}</T> {IconDisplay}
-      </div>
-    );
-  }
-
   // TODO replace with sortWith after Ramdajs new release
   // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
@@ -130,6 +91,7 @@ class Index extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const groups = R.pipe(
       R.values(),
       R.sort((a, b) => {
@@ -141,46 +103,41 @@ class Index extends Component {
           : this.descend(fieldA, fieldB);
       }),
     )(this.props.groups);
-
     return (
-      <div>
-        <div style={styles.title}>
-          <T>Groups management</T>
+      <div className={classes.container}>
+        <div>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            <T>Groups management</T>
+          </Typography>
+          <div className="clearfix" />
         </div>
-        <div className="clearfix"></div>
+        {groups.length === 0 && (
+          <div className={classes.empty}>
+            <T>You do not have any group on the platform.</T>
+          </div>
+        )}
         <List>
-          {groups.length === 0 ? (
-            <div style={styles.empty}>
-              <T>You do not have any group on the platform.</T>
-            </div>
-          ) : (
-            <HeaderItem
-              leftIcon={<span style={styles.header.icon}>#</span>}
-              rightIconButton={<Icon style={{ display: 'none' }} />}
-              primaryText={
-                <div>
-                  {this.SortHeader('group_name', 'Name')}
-                  {this.SortHeader('group_users', 'Users')}
-                  <div className="clearfix"></div>
-                </div>
-              }
-            />
-          )}
           {groups.map((group) => {
             const groupId = R.propOr(Math.random(), 'group_id', group);
             const groupName = R.propOr('-', 'group_name', group);
             const groupUsers = R.propOr([], 'group_users', group);
-
             return (
-              <MainListItem
-                key={groupId}
-                leftIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_SOCIAL_PUBLIC}
-                    type={Constants.ICON_TYPE_MAINLIST}
-                  />
-                }
-                rightIconButton={
+              <ListItem key={groupId} divider={true}>
+                <ListItemIcon>
+                  <GroupOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div className={classes.name}>{groupName}</div>
+                      <div className={classes.users}>
+                        {groupUsers.length} <T>users</T>
+                      </div>
+                      <div className="clearfix" />
+                    </div>
+                  }
+                />
+                <ListItemSecondaryAction>
                   <GroupPopover
                     group={group}
                     groupUsersIds={group.group_users.map((u) => u.user_id)}
@@ -188,15 +145,8 @@ class Index extends Component {
                     users={this.props.users}
                     exercises={this.props.exercises}
                   />
-                }
-                primaryText={
-                  <div>
-                    <div style={styles.name}>{groupName}</div>
-                    <div style={styles.users}>{groupUsers.length}</div>
-                    <div className="clearfix" />
-                  </div>
-                }
-              />
+                </ListItemSecondaryAction>
+              </ListItem>
             );
           })}
         </List>
@@ -224,9 +174,12 @@ const select = (state) => ({
   organizations: state.referential.entities.organizations,
 });
 
-export default connect(select, {
-  fetchGroups,
-  fetchExercises,
-  fetchUsers,
-  fetchOrganizations,
-})(Index);
+export default R.compose(
+  connect(select, {
+    fetchGroups,
+    fetchExercises,
+    fetchUsers,
+    fetchOrganizations,
+  }),
+  withStyles(styles),
+)(Index);

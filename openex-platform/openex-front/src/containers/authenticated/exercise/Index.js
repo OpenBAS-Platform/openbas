@@ -500,12 +500,10 @@ class IndexExercise extends Component {
           userCanUpdate={this.props.userCanUpdate}
         />
         <div className="clearfix" />
-        {this.props.events.length === 0 ? (
+        {this.props.events.length === 0 && (
           <div className={classes.empty}>
             <T>You do not have any events in this exercise.</T>
           </div>
-        ) : (
-          ''
         )}
         <List>
           {this.props.events.map((event) => {
@@ -565,7 +563,6 @@ class IndexExercise extends Component {
                 />
               );
             });
-
             return (
               <MainListItem
                 initiallyOpen={false}

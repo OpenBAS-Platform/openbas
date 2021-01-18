@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import { TextField } from '../../../../components/TextField';
 
@@ -41,13 +42,14 @@ class UserPasswordForm extends Component {
               name="user_plain_password"
               fullWidth={true}
               type="password"
-              label="Password"
+              label={<T>Password</T>}
             />
             <TextField
               name="password_confirmation"
               fullWidth={true}
               type="password"
-              label="Confirmation"
+              label={<T>Confirmation</T>}
+              style={{ marginTop: 20 }}
             />
           </form>
         )}

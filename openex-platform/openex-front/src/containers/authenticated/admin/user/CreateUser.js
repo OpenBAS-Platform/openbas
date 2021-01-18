@@ -1,13 +1,21 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
 import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+import { Add } from '@material-ui/icons';
 import { i18nRegister } from '../../../../utils/Messages';
 import { addUser } from '../../../../actions/User';
 import UserForm from './UserForm';
-import * as Constants from '../../../../constants/ComponentTypes';
+import { T } from '../../../../components/I18n';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -15,6 +23,19 @@ i18nRegister({
     'Create a user': 'Créer un utilisateur',
   },
 });
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class CreateUser extends Component {
   constructor(props) {
@@ -31,52 +52,51 @@ class CreateUser extends Component {
   }
 
   onSubmitCreate(data) {
-    return this.props.addUser(data);
-  }
-
-  submitFormCreate() {
-    this.refs.userForm.submit();
+    return this.props.addUser(data).then(() => this.handleCloseCreate());
   }
 
   render() {
-    const actionsCreateUser = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCreate.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create user"
-        primary={true}
-        onClick={this.submitFormCreate.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
       <div>
         <Fab
-          type={Constants.BUTTON_TYPE_FLOATING}
           onClick={this.handleOpenCreate.bind(this)}
-        />
-        <Dialog
-          title="Create a user"
-          autoScrollBodyContent={true}
-          modal={false}
-          open={this.state.openCreate}
-          onClose={this.handleCloseCreate.bind(this)}
-          actions={actionsCreateUser}
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
         >
-          {/* eslint-disable */}
-          <UserForm
-            ref="userForm"
-            editing={false}
-            onSubmit={this.onSubmitCreate.bind(this)}
-            organizations={this.props.organizations}
-            onSubmitSuccess={this.handleCloseCreate.bind(this)}
-          />
-          {/* eslint-enable */}
+          <Add />
+        </Fab>
+        <Dialog
+          open={this.state.openCreate}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseCreate.bind(this)}
+        >
+          <DialogTitle>
+            <T>Create a user</T>
+          </DialogTitle>
+          <DialogContent>
+            <UserForm
+              editing={false}
+              onSubmit={this.onSubmitCreate.bind(this)}
+              organizations={this.props.organizations}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('userForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -92,4 +112,7 @@ const select = (state) => ({
   organizations: state.referential.entities.organizations,
 });
 
-export default connect(select, { addUser })(CreateUser);
+export default R.compose(
+  connect(select, { addUser }),
+  withStyles(styles),
+)(CreateUser);

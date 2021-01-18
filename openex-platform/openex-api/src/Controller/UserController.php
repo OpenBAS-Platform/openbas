@@ -12,6 +12,7 @@ use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends BaseController
 {
@@ -108,7 +109,7 @@ class UserController extends BaseController
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
      * @Rest\Post("/api/users")
      */
-    public function postUsersAction(Request $request)
+    public function postUsersAction(Request $request, UserPasswordEncoderInterface $encoder)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -127,7 +128,6 @@ class UserController extends BaseController
             $user->setUserOrganization($organization);
 
             if (!empty($user->getUserPlainPassword())) {
-                $encoder = $this->get('security.password_encoder');
                 $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
                 $user->setUserPassword($encoded);
             }
@@ -183,7 +183,7 @@ class UserController extends BaseController
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Put("/api/users/{user_id}")
      */
-    public function updateUserAction(Request $request)
+    public function updateUserAction(Request $request,  UserPasswordEncoderInterface $encoder)
     {
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
@@ -211,7 +211,6 @@ class UserController extends BaseController
         $form->submit($request->request->all(), false);
         if ($form->isValid()) {
             if (!empty($user->getUserPlainPassword())) {
-                $encoder = $this->get('security.password_encoder');
                 $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
                 $user->setUserPassword($encoded);
             }

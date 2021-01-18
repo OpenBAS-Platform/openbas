@@ -1,19 +1,40 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Fab from '@material-ui/core/Fab';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
+import { Add } from '@material-ui/icons';
+import Slide from '@material-ui/core/Slide';
 import { addGroup } from '../../../../actions/Group';
-import UserForm from './GroupForm';
-import * as Constants from '../../../../constants/ComponentTypes';
+import GroupForm from './GroupForm';
+import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Create a group': 'Créer un groupe',
-    'Create group': 'Créer le groupe',
   },
 });
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -30,49 +51,47 @@ class CreateGroup extends Component {
   }
 
   onSubmitCreate(data) {
-    return this.props.addGroup(data);
-  }
-
-  submitFormCreate() {
-    this.refs.groupForm.submit();
+    return this.props.addGroup(data).then(() => this.handleCloseCreate());
   }
 
   render() {
-    const actionsCreateGroup = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCreate.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create group"
-        primary={true}
-        onClick={this.submitFormCreate.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
       <div>
-        <Button
-          type={Constants.BUTTON_TYPE_FLOATING}
+        <Fab
           onClick={this.handleOpenCreate.bind(this)}
-        />
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
         <Dialog
-          title="Create a group"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openCreate}
           onClose={this.handleCloseCreate.bind(this)}
-          actions={actionsCreateGroup}
         >
-          {/* eslint-disable */}
-          <UserForm
-            ref="groupForm"
-            onSubmit={this.onSubmitCreate.bind(this)}
-            onSubmitSuccess={this.handleCloseCreate.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Create a group</T>
+          </DialogTitle>
+          <DialogContent>
+            <GroupForm onSubmit={this.onSubmitCreate.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('groupForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -83,4 +102,7 @@ CreateGroup.propTypes = {
   addGroup: PropTypes.func,
 };
 
-export default connect(null, { addGroup })(CreateGroup);
+export default R.compose(
+  connect(null, { addGroup }),
+  withStyles(styles),
+)(CreateGroup);

@@ -3,22 +3,22 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Icon } from '../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../components/menu/MenuItem';
 import { updateUser, deleteUser } from '../../../../actions/User';
 import UserForm from './UserForm';
 import UserPasswordForm from './UserPasswordForm';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -30,12 +30,6 @@ i18nRegister({
     'Modify password': 'Modifier le mot de passe',
   },
 });
-
-const style = {
-  position: 'absolute',
-  top: '7px',
-  right: 0,
-};
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -72,10 +66,12 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateUser(
-      this.props.user.user_id,
-      R.assoc('user_admin', data.user_admin === true, data),
-    );
+    return this.props
+      .updateUser(
+        this.props.user.user_id,
+        R.assoc('user_admin', data.user_admin === true, data),
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   submitFormEdit() {
@@ -92,9 +88,11 @@ class UserPopover extends Component {
   }
 
   onSubmitEditPassword(data) {
-    return this.props.updateUser(this.props.user.user_id, {
-      user_plain_password: data.user_plain_password,
-    });
+    return this.props
+      .updateUser(this.props.user.user_id, {
+        user_plain_password: data.user_plain_password,
+      })
+      .then(() => this.handleCloseEditPassword());
   }
 
   submitFormEditPassword() {
@@ -116,34 +114,6 @@ class UserPopover extends Component {
   }
 
   render() {
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      <Button
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEdit.bind(this)}
-      />,
-    ];
-    const editPassword = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEditPassword.bind(this)}
-      />,
-      <Button
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEditPassword.bind(this)}
-      />,
-    ];
     const organizationPath = [
       R.prop('user_organization', this.props.user),
       'organization_name',
@@ -170,78 +140,113 @@ class UserPopover extends Component {
       ]),
     )(this.props.user);
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </IconButton>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onClose={this.handlePopoverClose.bind(this)}
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Edit"
-              onClick={this.handleOpenEdit.bind(this)}
-            />
-            <MenuItemLink
-              label="Modify password"
-              onClick={this.handleOpenEditPassword.bind(this)}
-            />
-            <MenuItemButton
-              label="Delete"
-              onClick={this.handleOpenDelete.bind(this)}
-            />
-          </Menu>
-        </Popover>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenEditPassword.bind(this)}>
+            <T>Modify password</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this user?</T>
-          <Button
-              key="cancel"
-              label="Cancel"
-              primary={true}
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this user?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
               onClick={this.handleCloseDelete.bind(this)}
-          />
-          <Button
-              key="delete"
-              label="Delete"
-              primary={true}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
               onClick={this.submitDelete.bind(this)}
-          />
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the user"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openEdit}
-          autoScrollBodyContent={true}
           onClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
         >
-          <UserForm
-            initialValues={initialValues}
-            editing={true}
-            organizations={this.props.organizations}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
+          <DialogTitle>
+            <T>Update the user</T>
+          </DialogTitle>
+          <DialogContent>
+            <UserForm
+              initialValues={initialValues}
+              editing={true}
+              organizations={this.props.organizations}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('userForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the user password"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openEditPassword}
-          autoScrollBodyContent={true}
           onClose={this.handleCloseEditPassword.bind(this)}
-          actions={editPassword}
         >
-          <UserPasswordForm
-            ref="userPasswordForm"
-            onSubmit={this.onSubmitEditPassword.bind(this)}
-            onSubmitSuccess={this.handleCloseEditPassword.bind(this)}
-          />
+          <DialogTitle>
+            <T>Update the user password</T>
+          </DialogTitle>
+          <DialogContent>
+            <UserPasswordForm onSubmit={this.onSubmitEditPassword.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEditPassword.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('passwordForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

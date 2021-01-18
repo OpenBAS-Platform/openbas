@@ -84,7 +84,7 @@ class UserPopover extends Component {
             <T>Profile</T>
           </MenuItem>
           {this.props.userAdmin && (
-            <MenuItem component={Link} to="/private/admin/index">
+            <MenuItem component={Link} to="/private/admin">
               <T>Admin</T>
             </MenuItem>
           )}

@@ -62,7 +62,7 @@ export const redirectToHome = () => (dispatch) => {
 };
 
 export const redirectToAdmin = () => (dispatch) => {
-  dispatch(push('/private/admin/index'));
+  dispatch(push('/private/admin'));
 };
 
 export const redirectToExercise = (exerciseId) => (dispatch) => {

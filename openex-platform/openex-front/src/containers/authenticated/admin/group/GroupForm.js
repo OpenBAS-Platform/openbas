@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { TextField } from '../../../../components/TextField';
+import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
@@ -35,8 +36,7 @@ class GroupForm extends Component {
             <TextField
               name="group_name"
               fullWidth={true}
-              type="text"
-              label="Name"
+              label={<T>Name</T>}
             />
           </form>
         )}

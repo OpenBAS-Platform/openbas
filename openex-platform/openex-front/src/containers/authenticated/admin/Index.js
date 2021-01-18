@@ -2,16 +2,18 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import * as Constants from '../../../constants/ComponentTypes';
-import Theme from '../../../components/Theme';
+import { withStyles } from '@material-ui/core/styles';
+import {
+  RowingOutlined,
+  GroupOutlined,
+  CallToActionOutlined,
+} from '@material-ui/icons';
+import Grid from '@material-ui/core/Grid';
 import { T } from '../../../components/I18n';
-import { Icon } from '../../../components/Icon';
 import { i18nRegister } from '../../../utils/Messages';
-/* eslint-disable */
-import { fetchExercises } from "../../../actions/Exercise";
-import { fetchUsers } from "../../../actions/User";
-import { fetchGlobalInjects } from "../../../actions/Inject";
-/* eslint-enable */
+import { fetchExercises } from '../../../actions/Exercise';
+import { fetchUsers } from '../../../actions/User';
+import { fetchGlobalInjects } from '../../../actions/Inject';
 
 i18nRegister({
   fr: {
@@ -21,31 +23,25 @@ i18nRegister({
   },
 });
 
-const styles = {
+const styles = (theme) => ({
   container: {
     padding: '50px 0px 0px 0px',
     textAlign: 'center',
   },
-  stat: {
-    display: 'inline-block',
-    width: '300px',
-  },
   number: {
-    color: Theme.palette.primary1Color,
     fontSize: '60px',
     fontWeight: '400',
+    color: theme.palette.primary.main,
   },
   icon: {
-    color: Theme.palette.primary1Color,
     margin: '35px 0px 0px 0px',
     fontWeight: '400',
   },
   name: {
-    color: Theme.palette.disabledColor,
     fontSize: '12px',
     textTransform: 'uppercase',
   },
-};
+});
 
 class Index extends Component {
   componentDidMount() {
@@ -55,47 +51,38 @@ class Index extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div style={styles.container}>
-        <div style={styles.stat}>
-          <div style={styles.number}>{this.props.exercises.length}</div>
-          <div style={styles.icon}>
-            <Icon
-              name={Constants.ICON_NAME_ACTION_ROWING}
-              style={{ width: '40px', height: '40px' }}
-              color={Theme.palette.disabledColor}
-            />
-          </div>
-          <div style={styles.name}>
-            <T>Exercises</T>
-          </div>
-        </div>
-        <div style={styles.stat}>
-          <div style={styles.number}>{this.props.users.length}</div>
-          <div style={styles.icon}>
-            <Icon
-              name={Constants.ICON_NAME_SOCIAL_GROUP}
-              style={{ width: '40px', height: '40px' }}
-              color={Theme.palette.disabledColor}
-            />
-          </div>
-          <div style={styles.name}>
-            <T>Users</T>
-          </div>
-        </div>
-        <div style={styles.stat}>
-          <div style={styles.number}>{this.props.injects.length}</div>
-          <div style={styles.icon}>
-            <Icon
-              name={Constants.ICON_NAME_AV_CALL_TO_ACTION}
-              style={{ width: '40px', height: '40px' }}
-              color={Theme.palette.disabledColor}
-            />
-          </div>
-          <div style={styles.name}>
-            <T>Injects</T>
-          </div>
-        </div>
+      <div className={classes.container}>
+        <Grid container={true} spacing={3}>
+          <Grid item={true} xs={4}>
+            <div className={classes.number}>{this.props.exercises.length}</div>
+            <div className={classes.icon}>
+              <RowingOutlined fontSize="large" color="primary" />
+            </div>
+            <div className={classes.name}>
+              <T>Exercises</T>
+            </div>
+          </Grid>
+          <Grid item={true} xs={4}>
+            <div className={classes.number}>{this.props.users.length}</div>
+            <div className={classes.icon}>
+              <GroupOutlined fontSize="large" color="primary" />
+            </div>
+            <div className={classes.name}>
+              <T>Users</T>
+            </div>
+          </Grid>
+          <Grid item={true} xs={4}>
+            <div className={classes.number}>{this.props.injects.length}</div>
+            <div className={classes.icon}>
+              <CallToActionOutlined fontSize="large" color="primary" />
+            </div>
+            <div className={classes.name}>
+              <T>Injects</T>
+            </div>
+          </Grid>
+        </Grid>
       </div>
     );
   }
@@ -116,8 +103,11 @@ const select = (state) => ({
   injects: R.values(state.referential.entities.injects),
 });
 
-export default connect(select, {
-  fetchExercises,
-  fetchUsers,
-  fetchGlobalInjects,
-})(Index);
+export default R.compose(
+  connect(select, {
+    fetchExercises,
+    fetchUsers,
+    fetchGlobalInjects,
+  }),
+  withStyles(styles),
+)(Index);

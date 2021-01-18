@@ -37,7 +37,7 @@ const styles = (theme) => ({
     zIndex: theme.zIndex.drawer + 1,
   },
   container: {
-    padding: 20,
+    padding: '20px 20px 20px 200px',
   },
   logo: {
     width: '40px',
@@ -72,7 +72,7 @@ class RootExercise extends Component {
   render() {
     const { classes, id, exercise } = this.props;
     return (
-      <div style={{ paddingLeft: 180 }}>
+      <div>
         <LeftBar
           id={id}
           pathname={this.props.pathname}

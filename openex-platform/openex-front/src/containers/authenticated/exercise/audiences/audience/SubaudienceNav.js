@@ -22,9 +22,6 @@ const styles = () => ({
   drawerPaper: {
     width: 300,
   },
-  itemActive: {
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  },
   enabled: {
     color: green[500],
   },
@@ -75,10 +72,8 @@ class SubaudienceNav extends Component {
           {this.props.subaudiences.map((subaudience) => (
             <ListItem
               key={subaudience.subaudience_id}
-              className={
+              selected={
                 this.props.selectedSubaudience === subaudience.subaudience_id
-                  ? classes.itemActive
-                  : classes.item
               }
               button={true}
               divider={true}

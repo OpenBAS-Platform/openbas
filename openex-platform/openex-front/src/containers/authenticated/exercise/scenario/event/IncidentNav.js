@@ -69,11 +69,7 @@ class IncidentNav extends Component {
           {this.props.incidents.map((incident) => (
             <ListItem
               key={incident.incident_id}
-              className={
-                this.props.selectedIncident === incident.incident_id
-                  ? classes.itemActive
-                  : classes.item
-              }
+              selected={this.props.selectedIncident === incident.incident_id}
               button={true}
               divider={true}
               onClick={this.handleChangeIncident.bind(

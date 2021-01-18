@@ -4,7 +4,7 @@ import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
-import { ToggleField } from '../../../../components/ToggleField';
+import { Switch } from '../../../../components/Switch';
 import { TextField } from '../../../../components/TextField';
 import { Autocomplete } from '../../../../components/Autocomplete';
 
@@ -32,83 +32,79 @@ class UserForm extends Component {
     );
     const { onSubmit, initialValues } = this.props;
     return (
-      <Form
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-      >
+      <Form initialValues={initialValues} onSubmit={onSubmit}>
         {({ handleSubmit }) => (
           <form id="userForm" onSubmit={handleSubmit}>
             <TextField
               name="user_email"
               fullWidth={true}
-              type="text"
-              label="Email address"
+              label={<T>Email address</T>}
             />
             <TextField
               name="user_email2"
               fullWidth={true}
-              type="text"
-              label="Email address (secondary)"
+              label={<T>Email address (secondary)</T>}
+              style={{ marginTop: 20 }}
             />
             <TextField
               name="user_firstname"
               fullWidth={true}
-              type="text"
-              label="Firstname"
+              label={<T>Firstname</T>}
+              style={{ marginTop: 20 }}
             />
             <TextField
               name="user_lastname"
               fullWidth={true}
-              type="text"
-              label="Lastname"
+              label={<T>Lastname</T>}
+              style={{ marginTop: 20 }}
             />
             <Autocomplete
               name="user_organization"
               fullWidth={true}
-              type="text"
-              label="Organization"
-              dataSource={dataSource}
+              label={<T>Organization</T>}
+              options={dataSource}
+              style={{ marginTop: 20 }}
             />
             <TextField
               name="user_phone2"
               fullWidth={true}
-              type="text"
-              label="Phone number (fix)"
+              label={<T>Phone number (fix)</T>}
+              style={{ marginTop: 20 }}
             />
             <TextField
               name="user_phone"
               fullWidth={true}
-              type="text"
-              label="Phone number (mobile)"
+              label={<T>Phone number (mobile)</T>}
+              style={{ marginTop: 20 }}
             />
             <TextField
               name="user_phone3"
               fullWidth={true}
-              type="text"
-              label="Phone number (secondary)"
+              label={<T>Phone number (secondary)</T>}
+              style={{ marginTop: 20 }}
             />
             <TextField
               name="user_pgp_key"
               fullWidth={true}
               multiline={true}
               rows={5}
-              type="text"
-              label="PGP public key"
+              label={<T>PGP public key</T>}
+              style={{ marginTop: 20 }}
             />
-            {this.props.editing ? (
-              ''
-            ) : (
+            {!this.props.editing && (
               <TextField
                 name="user_plain_password"
                 fullWidth={true}
                 type="password"
-                label="Password"
+                label={<T>Password</T>}
+                style={{ marginTop: 20 }}
               />
             )}
-            <ToggleField name="user_admin" label={<T>Administrator</T>} />
-            <br />
-            <ToggleField name="user_planificateur" label={<T>Planner</T>} />
-            <br />
+            <Switch
+              name="user_admin"
+              label={<T>Administrator</T>}
+              style={{ marginTop: 20 }}
+            />
           </form>
         )}
       </Form>

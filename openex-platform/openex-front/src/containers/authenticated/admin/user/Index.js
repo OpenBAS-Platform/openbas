@@ -2,23 +2,22 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
+import Typography from '@material-ui/core/Typography';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { withStyles } from '@material-ui/core/styles';
+import Avatar from '@material-ui/core/Avatar';
+import { FlashOnOutlined, FaceOutlined } from '@material-ui/icons';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchUsers } from "../../../../actions/User";
-import { fetchOrganizations } from "../../../../actions/Organization";
-import { List } from "../../../../components/List";
-import {
-  AvatarListItem,
-  AvatarHeaderItem,
-} from "../../../../components/list/ListItem";
-import { Avatar } from "../../../../components/Avatar";
-import { Icon } from "../../../../components/Icon";
-import { SearchField } from "../../../../components/SimpleTextField";
-import CreateUser from "./CreateUser";
-import UserPopover from "./UserPopover";
-/* eslint-enable */
+import { fetchUsers } from '../../../../actions/User';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { SearchField } from '../../../../components/SearchField';
+import CreateUser from './CreateUser';
+import UserPopover from './UserPopover';
 
 i18nRegister({
   fr: {
@@ -28,57 +27,13 @@ i18nRegister({
     Organization: 'Organisation',
     Administrator: 'Administrateur',
     Planner: 'Planificateur',
+    User: 'Utilisateur',
   },
 });
 
-const styles = {
+const styles = () => ({
   search: {
     float: 'right',
-  },
-  header: {
-    avatar: {
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-      padding: '12px 0 0 15px',
-    },
-    user_firstname: {
-      float: 'left',
-      width: '20%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    user_email: {
-      float: 'left',
-      width: '30%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    user_organization: {
-      float: 'left',
-      width: '25%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    user_admin: {
-      textAlign: 'center',
-      float: 'left',
-      width: '10%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    user_planificateur: {
-      textAlign: 'center',
-      float: 'left',
-      width: '10%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
   },
   title: {
     float: 'left',
@@ -125,6 +80,7 @@ const styles = {
     textAlign: 'center',
     width: '10%',
     padding: '5px 0 0 0',
+    display: 'flex',
   },
   planificateur: {
     float: 'left',
@@ -132,7 +88,7 @@ const styles = {
     width: '10%',
     padding: '5px 0 0 0',
   },
-};
+});
 
 class Index extends Component {
   constructor(props) {
@@ -153,25 +109,6 @@ class Index extends Component {
     this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
   }
 
-  SortHeader(field, label) {
-    const icon = this.state.orderAsc
-      ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP;
-    const IconDisplay = this.state.sortBy === field ? (
-        <Icon type={Constants.ICON_TYPE_SORT} name={icon} />
-    ) : (
-      ''
-    );
-    return (
-      <div
-        style={styles.header[field]}
-        onClick={this.reverseBy.bind(this, field)}
-      >
-        <T>{label}</T> {IconDisplay}
-      </div>
-    );
-  }
-
   // TODO replace with sortWith after Ramdajs new release
   // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
@@ -186,12 +123,12 @@ class Index extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-
     const users = R.pipe(
       R.values(),
       R.filter(filterByKeyword),
@@ -204,39 +141,18 @@ class Index extends Component {
           : this.descend(fieldA, fieldB);
       }),
     )(this.props.users);
-
     return (
-      <div>
-        <div style={styles.title}>
-          <T>Users management</T>
+      <div className={classes.container}>
+        <div>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            <T>Users management</T>
+          </Typography>
+          <div className={classes.search}>
+            <SearchField onChange={this.handleSearchUsers.bind(this)} />
+          </div>
+          <div className="clearfix" />
         </div>
-        <div style={styles.search}>
-          <SearchField
-            name="keyword"
-            fullWidth={true}
-            type="text"
-            hintText="Search"
-            onChange={this.handleSearchUsers.bind(this)}
-            styletype={Constants.FIELD_TYPE_RIGHT}
-          />
-        </div>
-        <div className="clearfix"></div>
         <List>
-          <AvatarHeaderItem
-            leftAvatar={<span style={styles.header.avatar}>#</span>}
-            rightIconButton={<Icon style={{ display: 'none' }} />}
-            primaryText={
-              <div>
-                {this.SortHeader('user_firstname', 'Name')}
-                {this.SortHeader('user_email', 'Email address')}
-                {this.SortHeader('user_organization', 'Organization')}
-                {this.SortHeader('user_admin', 'Administrator')}
-                {this.SortHeader('user_planificateur', 'Planner')}
-                <div className="clearfix"></div>
-              </div>
-            }
-          />
-
           {R.take(20, users).map((user) => {
             const userId = R.propOr(Math.random(), 'user_id', user);
             const userFirstname = R.propOr('-', 'user_firstname', user);
@@ -244,7 +160,6 @@ class Index extends Component {
             const userEmail = R.propOr('-', 'user_email', user);
             const userGravatar = R.propOr('', 'user_gravatar', user);
             const userAdmin = R.propOr('-', 'user_admin', user);
-            const userPlanificateur = R.propOr('-', 'user_planificateur', user);
             const userOrganization = R.propOr(
               {},
               user.user_organization,
@@ -255,46 +170,39 @@ class Index extends Component {
               'organization_name',
               userOrganization,
             );
-
             return (
-              <AvatarListItem
-                key={userId}
-                leftAvatar={
-                  <Avatar
-                    type={Constants.AVATAR_TYPE_MAINLIST}
-                    src={userGravatar}
-                  />
-                }
-                rightIconButton={<UserPopover user={user} />}
-                primaryText={
-                  <div>
-                    <div style={styles.name}>
-                      {userFirstname} {userLastname}
-                    </div>
-                    <div style={styles.mail}>{userEmail}</div>
-                    <div style={styles.org}>{organizationName}</div>
-                    <div style={styles.admin}>
+              <ListItem key={userId} divider={true}>
+                <ListItemAvatar>
+                  <Avatar src={userGravatar} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div className={classes.name}>
+                        {userFirstname} {userLastname}
+                      </div>
+                      <div className={classes.mail}>{userEmail}</div>
+                      <div className={classes.org}>{organizationName}</div>
                       {userAdmin ? (
-                        <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE} />
+                        <div className={classes.admin}>
+                          <FlashOnOutlined color="primary" />&nbsp;&nbsp;
+                          <T>Administrator</T>
+
+                        </div>
                       ) : (
-                        <Icon
-                          name={Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE}
-                        />
+                        <div className={classes.admin}>
+                          <FaceOutlined color="primary" />&nbsp;&nbsp;
+                          <T>User</T>
+                        </div>
                       )}
+                      <div className="clearfix" />
                     </div>
-                    <div style={styles.planificateur}>
-                      {userPlanificateur ? (
-                        <Icon name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE} />
-                      ) : (
-                        <Icon
-                          name={Constants.ICON_NAME_CONTENT_REMOVE_CIRCLE}
-                        />
-                      )}
-                    </div>
-                    <div className="clearfix" />
-                  </div>
-                }
-              />
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <UserPopover user={user} />
+                </ListItemSecondaryAction>
+              </ListItem>
             );
           })}
         </List>
@@ -316,4 +224,7 @@ const select = (state) => ({
   organizations: state.referential.entities.organizations,
 });
 
-export default connect(select, { fetchUsers, fetchOrganizations })(Index);
+export default R.compose(
+  connect(select, { fetchUsers, fetchOrganizations }),
+  withStyles(styles),
+)(Index);

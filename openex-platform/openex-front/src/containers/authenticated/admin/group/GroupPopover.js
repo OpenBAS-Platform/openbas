@@ -9,23 +9,25 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import Button from '@material-ui/core/Button';
 import Slide from '@material-ui/core/Slide';
+import Chip from '@material-ui/core/Chip';
+import Avatar from '@material-ui/core/Avatar';
+import Checkbox from '@material-ui/core/Checkbox';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import IconButton from '@material-ui/core/IconButton';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { withStyles } from '@material-ui/core/styles';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Dialog, DialogTitleElement } from '../../../../components/Dialog';
-import { Icon } from '../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../components/menu/MenuItem';
-import { SimpleTextField } from '../../../../components/SimpleTextField';
-import { Checkbox } from '../../../../components/Checkbox';
-import { Chip } from '../../../../components/Chip';
-import { Avatar } from '../../../../components/Avatar';
-import { List } from '../../../../components/List';
-import { MainSmallListItem } from '../../../../components/list/ListItem';
 import {
   fetchGroup,
   updateGroup,
@@ -33,6 +35,8 @@ import {
 } from '../../../../actions/Group';
 import { addGrant, deleteGrant } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
+import { submitForm } from '../../../../utils/Action';
+import { SearchField } from '../../../../components/SearchField';
 
 i18nRegister({
   fr: {
@@ -93,11 +97,7 @@ class GroupPopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.preventDefault();
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
@@ -160,7 +160,8 @@ class GroupPopover extends Component {
     this.setState({ openGrants: false });
   }
 
-  handleGrantCheck(exerciseId, grantId, grantName, event, isChecked) {
+  handleGrantCheck(exerciseId, grantId, grantName, event) {
+    const isChecked = event.target.checked;
     // the grant already exists
     if (grantId !== null && isChecked) {
       return;
@@ -191,7 +192,6 @@ class GroupPopover extends Component {
       });
     R.forEach(internalAddGrant, grantsToAdd);
     this.setState({ grantsToAdd: [] });
-
     const { grantsToRemove } = this.state;
     // eslint-disable-next-line max-len
     const internalDeleteGrant = (n) => this.props.deleteGrant(this.props.group.group_id, n.grant_id).then(() => {
@@ -218,48 +218,7 @@ class GroupPopover extends Component {
   }
 
   render() {
-    const grantsActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseGrants.bind(this)}
-      />,
-      <Button
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitGrants.bind(this)}
-      />,
-    ];
-    const usersActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseUsers.bind(this)}
-      />,
-      <Button
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitAddUsers.bind(this)}
-      />,
-    ];
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      <Button
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEdit.bind(this)}
-      />,
-    ];
+    const { classes } = this.props;
     const initialValues = R.pick(['group_name'], this.props.group); // Pickup only needed fields
     // region filter users by active keyword
     const keyword = this.state.searchTerm;
@@ -269,112 +228,122 @@ class GroupPopover extends Component {
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.filter(filterByKeyword, R.values(this.props.users));
     // endregion
-
     return (
-      <div style={styles.main}>
-        <Button onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </Button>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onClose={this.handlePopoverClose.bind(this)}
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Edit"
-              onClick={this.handleOpenEdit.bind(this)}
-            />
-            <MenuItemLink
-              label="Manage users"
-              onClick={this.handleOpenUsers.bind(this)}
-            />
-            <MenuItemLink
-              label="Manage grants"
-              onClick={this.handleOpenGrants.bind(this)}
-            />
-            <MenuItemButton
-              label="Delete"
-              onClick={this.handleOpenDelete.bind(this)}
-            />
-          </Menu>
-        </Popover>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenUsers.bind(this)}>
+            <T>Manage users</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenGrants.bind(this)}>
+            <T>Manage grants</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this group?</T>
-          <Button
-            key="cancel"
-            label="Cancel"
-            primary={true}
-            onClick={this.handleCloseDelete.bind(this)}
-          />
-          <Button
-            key="delete"
-            label="Delete"
-            primary={true}
-            onClick={this.submitDelete.bind(this)}
-          />
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this group?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the group"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
         >
-          {/* eslint-disable */}
-          <GroupForm
-            ref="groupForm"
-            initialValues={initialValues}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
-          {/* eslint-enable */}
-        </Dialog>
-        <DialogTitleElement
-          title={
-            <SimpleTextField
-              name="keyword"
-              fullWidth={true}
-              type="text"
-              hintText="Search for a user"
-              onChange={this.handleSearchUsers.bind(this)}
-              styletype={Constants.FIELD_TYPE_INTITLE}
+          <DialogTitle>
+            <T>Update the group</T>
+          </DialogTitle>
+          <DialogContent>
+            <GroupForm
+              initialValues={initialValues}
+              onSubmit={this.onSubmitEdit.bind(this)}
+              onSubmitSuccess={this.handleCloseEdit.bind(this)}
             />
-          }
-          modal={false}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('groupForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
           open={this.state.openUsers}
+          TransitionComponent={Transition}
           onClose={this.handleCloseUsers.bind(this)}
-          autoScrollBodyContent={true}
-          actions={usersActions}
+          fullWidth={true}
+          maxWidth="md"
         >
-          <div>
-            {this.state.usersIds.map((userId) => {
-              const user = R.propOr({}, userId, this.props.users);
-              const userFirstname = R.propOr('-', 'user_firstname', user);
-              const userLastname = R.propOr('-', 'user_lastname', user);
-              const userGravatar = R.propOr('-', 'user_gravatar', user);
-              return (
-                <Chip
-                  key={userId}
-                  onRequestDelete={this.removeUser.bind(this, userId)}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
-                  <Avatar
-                    src={userGravatar}
-                    size={32}
-                    type={Constants.AVATAR_TYPE_CHIP}
+          <DialogTitle>
+            <SearchField
+              onChange={this.handleSearchUsers.bind(this)}
+              fullWidth={true}
+            />
+          </DialogTitle>
+          <DialogContent>
+            <duv>
+              {this.state.usersIds.map((userId) => {
+                const user = R.propOr({}, userId, this.props.users);
+                const userFirstname = R.propOr('-', 'user_firstname', user);
+                const userLastname = R.propOr('-', 'user_lastname', user);
+                const userGravatar = R.propOr('-', 'user_gravatar', user);
+                return (
+                  <Chip
+                    key={userId}
+                    onDelete={this.removeUser.bind(this, userId)}
+                    label={`${userFirstname} ${userLastname}`}
+                    variant="outlined"
+                    avatar={<Avatar src={userGravatar} size={32} />}
                   />
-                  {userFirstname} {userLastname}
-                </Chip>
-              );
-            })}
-            <div className="clearfix" />
-          </div>
-          <div>
+                );
+              })}
+              <div className="clearfix" />
+            </duv>
             <List>
               {filteredUsers.map((user) => {
                 const disabled = R.find(
@@ -392,100 +361,135 @@ class GroupPopover extends Component {
                   userOrganization,
                 );
                 return (
-                  <MainSmallListItem
+                  <ListItem
                     key={user.user_id}
                     disabled={disabled}
+                    button={true}
+                    divider={true}
                     onClick={this.addUser.bind(this, user.user_id)}
-                    primaryText={
-                      <div>
-                        <div style={styles.name}>
-                          {user.user_firstname} {user.user_lastname}
+                  >
+                    <ListItemAvatar>
+                      <Avatar src={user.user_gravatar} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.name}>
+                            {user.user_firstname} {user.user_lastname}
+                          </div>
+                          <div className={classes.mail}>{user.user_email}</div>
+                          <div className={classes.org}>{organizationName}</div>
+                          <div className="clearfix" />
                         </div>
-                        <div style={styles.mail}>{user.user_email}</div>
-                        <div style={styles.org}>{organizationName}</div>
-                        <div className="clearfix"></div>
-                      </div>
-                    }
-                    leftAvatar={
-                      <Avatar
-                        type={Constants.AVATAR_TYPE_LIST}
-                        src={user.user_gravatar}
-                      />
-                    }
-                  />
+                      }
+                    />
+                  </ListItem>
                 );
               })}
             </List>
-          </div>
-        </DialogTitleElement>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseUsers.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitAddUsers.bind(this)}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Dialog
-          title="Manage grants"
-          modal={false}
           open={this.state.openGrants}
           onClose={this.handleCloseGrants.bind(this)}
-          actions={grantsActions}
+          fullWidth={true}
+          maxWidth="md"
         >
-          <Table selectable={false} style={{ marginTop: '5px' }}>
-            <TableHead adjustForCheckbox={false} displaySelectAll={false}>
-              <TableRow>
-                <TableCell>
-                  <T>Exercise</T>
-                </TableCell>
-                <TableCell>
-                  <T>Read/Write</T>
-                </TableCell>
-                <TableCell>
-                  <T>Read only</T>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody displayRowCheckbox={false}>
-              {R.values(this.props.exercises).map((exercise) => {
-                const grantPlanner = R.find(
-                  (g) => g.grant_exercise.exercise_id === exercise.exercise_id
-                    && g.grant_name === 'PLANNER',
-                )(this.props.group.group_grants);
-                const grantObserver = R.find(
-                  (g) => g.grant_exercise.exercise_id === exercise.exercise_id
-                    && g.grant_name === 'OBSERVER',
-                )(this.props.group.group_grants);
-                const grantPlannerId = R.propOr(null, 'grant_id', grantPlanner);
-                const grantObserverId = R.propOr(
-                  null,
-                  'grant_id',
-                  grantObserver,
-                );
-
-                return (
-                  <TableRow key={exercise.exercise_id}>
-                    <TableCell>{exercise.exercise_name}</TableCell>
-                    <TableCell>
-                      <Checkbox
-                        defaultChecked={grantPlannerId !== null}
-                        onCheck={this.handleGrantCheck.bind(
-                          this,
-                          exercise.exercise_id,
-                          grantPlannerId,
-                          'PLANNER',
-                        )}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Checkbox
-                        defaultChecked={grantObserverId !== null}
-                        onCheck={this.handleGrantCheck.bind(
-                          this,
-                          exercise.exercise_id,
-                          grantObserverId,
-                          'OBSERVER',
-                        )}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          <DialogTitle>
+            <T>Manage grants</T>
+          </DialogTitle>
+          <DialogContent>
+            <Table selectable={false} style={{ marginTop: '5px' }}>
+              <TableHead adjustForCheckbox={false} displaySelectAll={false}>
+                <TableRow>
+                  <TableCell>
+                    <T>Exercise</T>
+                  </TableCell>
+                  <TableCell>
+                    <T>Read/Write</T>
+                  </TableCell>
+                  <TableCell>
+                    <T>Read only</T>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody displayRowCheckbox={false}>
+                {R.values(this.props.exercises).map((exercise) => {
+                  const grantPlanner = R.find(
+                    (g) => g.grant_exercise.exercise_id === exercise.exercise_id
+                      && g.grant_name === 'PLANNER',
+                  )(this.props.group.group_grants);
+                  const grantObserver = R.find(
+                    (g) => g.grant_exercise.exercise_id === exercise.exercise_id
+                      && g.grant_name === 'OBSERVER',
+                  )(this.props.group.group_grants);
+                  const grantPlannerId = R.propOr(
+                    null,
+                    'grant_id',
+                    grantPlanner,
+                  );
+                  const grantObserverId = R.propOr(
+                    null,
+                    'grant_id',
+                    grantObserver,
+                  );
+                  return (
+                    <TableRow key={exercise.exercise_id}>
+                      <TableCell>{exercise.exercise_name}</TableCell>
+                      <TableCell>
+                        <Checkbox
+                          checked={grantPlannerId !== null}
+                          onChange={this.handleGrantCheck.bind(
+                            this,
+                            exercise.exercise_id,
+                            grantPlannerId,
+                            'PLANNER',
+                          )}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Checkbox
+                          checked={grantObserverId !== null}
+                          onChange={this.handleGrantCheck.bind(
+                            this,
+                            exercise.exercise_id,
+                            grantObserverId,
+                            'OBSERVER',
+                          )}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseGrants.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button variant="outlined" onClick={this.submitGrants.bind(this)}>
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -512,10 +516,13 @@ GroupPopover.propTypes = {
   children: PropTypes.node,
 };
 
-export default connect(select, {
-  fetchGroup,
-  updateGroup,
-  deleteGroup,
-  addGrant,
-  deleteGrant,
-})(GroupPopover);
+export default R.compose(
+  connect(select, {
+    fetchGroup,
+    updateGroup,
+    deleteGroup,
+    addGrant,
+    deleteGrant,
+  }),
+  withStyles(styles),
+)(GroupPopover);

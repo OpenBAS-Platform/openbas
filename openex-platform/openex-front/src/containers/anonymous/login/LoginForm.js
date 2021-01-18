@@ -38,14 +38,14 @@ const LoginForm = (props) => {
             <TextField
               name="username"
               type="text"
-              label="Email address"
+              label={<T>Email address</T>}
               fullWidth={true}
               style={{ marginTop: 5 }}
             />
             <TextField
               name="password"
               type="password"
-              label="Password"
+              label={<T>Password</T>}
               fullWidth={true}
               style={{ marginTop: 20 }}
               error={error || submitError}
@@ -56,6 +56,7 @@ const LoginForm = (props) => {
             <Button
               type="submit"
               variant="contained"
+              color="secondary"
               disabled={pristine || submitting}
               onClick={handleSubmit}
               style={{ marginTop: 20 }}

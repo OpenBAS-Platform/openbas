@@ -3,31 +3,31 @@ import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Route, Switch } from 'react-router';
-import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { withRouter } from 'react-router-dom';
+import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
 import { T } from '../../components/I18n';
 import { i18nRegister } from '../../utils/Messages';
 import { savedDismiss } from '../../actions/Application';
 import IndexAuthenticated from './Index';
 import IndexProfile from './profile/Index';
 import IndexDocuments from './documents/Index';
-import RootAdmin from './admin/Root';
 import RootExercise from './exercise/Root';
 import NotFound from '../anonymous/NotFound';
+import RootAdmin from './admin/Root';
+
+i18nRegister({
+  fr: {
+    'The operation has been done': "L'opération a été effectuée",
+  },
+});
 
 const UserIsAdmin = connectedRouterRedirect({
   authenticatedSelector: (state) => state.app.logged.admin === true,
   redirectPath: '/private',
   allowRedirectBack: false,
   wrapperDisplayName: 'UserIsAdmin',
-});
-
-i18nRegister({
-  fr: {
-    'The operation has been done': "L'opération a été effectuée",
-  },
 });
 
 class RootAuthenticated extends Component {
@@ -56,7 +56,6 @@ class RootAuthenticated extends Component {
           </Alert>
         </Snackbar>
         <Switch>
-          <Route path="/admin" component={UserIsAdmin(RootAdmin)} />
           <Route exact path="/private" component={IndexAuthenticated} />
           <Route exact path="/private/profile" component={IndexProfile} />
           <Route exact path="/private/documents" component={IndexDocuments} />
@@ -64,6 +63,7 @@ class RootAuthenticated extends Component {
             path="/private/exercise/:exerciseId"
             component={RootExercise}
           />
+          <Route path="/private/admin" component={UserIsAdmin(RootAdmin)} />
           <Route component={NotFound} />
         </Switch>
       </div>
