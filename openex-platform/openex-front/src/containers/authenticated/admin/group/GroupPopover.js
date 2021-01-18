@@ -91,8 +91,6 @@ class GroupPopover extends Component {
       openPopover: false,
       searchTerm: '',
       usersIds: this.props.groupUsersIds,
-      grantsToAdd: [],
-      grantsToRemove: [],
     };
   }
 
@@ -162,45 +160,22 @@ class GroupPopover extends Component {
 
   handleGrantCheck(exerciseId, grantId, grantName, event) {
     const isChecked = event.target.checked;
-    // the grant already exists
-    if (grantId !== null && isChecked) {
-      return;
-      // the grant does not exist yet
-    }
     if (isChecked) {
-      const { grantsToAdd } = this.state;
-      grantsToAdd.push({ exercise_id: exerciseId, grant_name: grantName });
-      this.setState({ grantsToAdd });
+      this.props
+        .addGrant(this.props.group.group_id, {
+          grant_name: grantName,
+          grant_exercise: exerciseId,
+        })
+        .then(() => {
+          this.props.fetchGroup(this.props.group.group_id);
+        });
     }
     // the grand does not exist
     if (!isChecked && grantId !== null) {
-      const { grantsToRemove } = this.state;
-      grantsToRemove.push({ exercise_id: exerciseId, grant_id: grantId });
-      this.setState({ grantsToRemove });
-    }
-  }
-
-  submitGrants() {
-    const { grantsToAdd } = this.state;
-    const internalAddGrant = (n) => this.props
-      .addGrant(this.props.group.group_id, {
-        grant_name: n.grant_name,
-        grant_exercise: n.exercise_id,
-      })
-      .then(() => {
+      this.props.deleteGrant(this.props.group.group_id, grantId).then(() => {
         this.props.fetchGroup(this.props.group.group_id);
       });
-    R.forEach(internalAddGrant, grantsToAdd);
-    this.setState({ grantsToAdd: [] });
-    const { grantsToRemove } = this.state;
-    // eslint-disable-next-line max-len
-    const internalDeleteGrant = (n) => this.props.deleteGrant(this.props.group.group_id, n.grant_id).then(() => {
-      this.props.fetchGroup(this.props.group.group_id);
-    });
-    R.forEach(internalDeleteGrant, grantsToRemove);
-    this.setState({ grantsToRemove: [] });
-
-    this.handleCloseGrants();
+    }
   }
 
   handleOpenDelete() {
@@ -406,6 +381,7 @@ class GroupPopover extends Component {
         </Dialog>
         <Dialog
           open={this.state.openGrants}
+          TransitionComponent={Transition}
           onClose={this.handleCloseGrants.bind(this)}
           fullWidth={true}
           maxWidth="md"
@@ -464,7 +440,10 @@ class GroupPopover extends Component {
                       </TableCell>
                       <TableCell>
                         <Checkbox
-                          checked={grantObserverId !== null}
+                          checked={
+                            grantObserverId !== null || grantPlannerId !== null
+                          }
+                          disabled={grantPlannerId !== null}
                           onChange={this.handleGrantCheck.bind(
                             this,
                             exercise.exercise_id,
@@ -484,10 +463,7 @@ class GroupPopover extends Component {
               variant="outlined"
               onClick={this.handleCloseGrants.bind(this)}
             >
-              <T>Cancel</T>
-            </Button>
-            <Button variant="outlined" onClick={this.submitGrants.bind(this)}>
-              <T>Update</T>
+              <T>Close</T>
             </Button>
           </DialogActions>
         </Dialog>
