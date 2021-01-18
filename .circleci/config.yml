@@ -54,6 +54,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/index.html release/openex/templates/views/Default/index.html.twig
       - run: cp -a ./openex-platform/openex-front/build/static release/openex/public/
       - run: rm -Rf release/openex/public/images && cp -a ./openex-platform/openex-front/build/images release/openex/public/
+      - run: cp -a ./openex-platform/openex-front/build/ckeditor release/openex/public/
       - run: mkdir release/openex/player && cp -a ./openex-player/target/player-2.0.0.jar release/openex/player/ && cp -a ./openex-player/src/main/resources/application.properties release/openex/player/
       - run:
           working_directory: ~/openex/release
@@ -86,6 +87,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
       - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
       - run: mv ./deploy/openex-player/target/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/target/
       - run:
           working_directory: ~/openex/deploy
@@ -118,6 +120,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
       - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
       - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
       - run: mv ./deploy/openex-player/target/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/target/
       - run:
           working_directory: ~/openex/deploy
@@ -137,6 +140,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/index.html ./openex-platform/openex-api/templates/views/Default/index.html.twig
       - run: cp -a ./openex-platform/openex-front/build/static ./openex-platform/openex-api/public/
       - run: cp -a ./openex-platform/openex-front/build/images ./openex-platform/openex-api/public/
+      - run: cp -a ./openex-platform/openex-front/build/ckeditor ./openex-platform/openex-api/public/
       - run:
           working_directory: ~/openex/openex-platform
           name: Build Docker image openexhq/platform
@@ -163,6 +167,7 @@ jobs:
       - run: cp -a ./openex-platform/openex-front/build/index.html ./openex-platform/openex-api/templates/views/Default/index.html.twig
       - run: cp -a ./openex-platform/openex-front/build/static ./openex-platform/openex-api/public/
       - run: cp -a ./openex-platform/openex-front/build/images ./openex-platform/openex-api/public/
+      - run: cp -a ./openex-platform/openex-front/build/ckeditor ./openex-platform/openex-api/public/
       - run:
           working_directory: ~/openex/openex-platform
           name: Build Docker image openexhq/platform
