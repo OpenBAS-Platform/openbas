@@ -1,217 +1,136 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import * as R from 'ramda'
-import {FormField} from '../../../components/Field'
-import {i18nRegister} from '../../../utils/Messages'
-import DatePickerIconOpx from '../../../components/DatePickerIconOpx'
-import TimePickerIconOpx from '../../../components/TimePickerIconOpx'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
+import MenuItem from '@material-ui/core/MenuItem';
+import { InfoOutlined } from '@material-ui/icons';
+import { T } from '../../../components/I18n';
+import { TextField } from '../../../components/TextField';
+import { DateTimePicker } from '../../../components/DateTimePicker';
+import { i18nRegister } from '../../../utils/Messages';
+import { Select } from '../../../components/Select';
 
 i18nRegister({
   fr: {
-    'Name': 'Nom',
-    'Subtitle': 'Sous-titre',
-    'Description': 'Description',
-    'StartDay': 'Date de début',
-    'StartTime': 'Heure de début',
-    'EndDay': 'Date de fin',
-    'EndTime': 'Heure de fin',
-    'MailExpediteur': 'Mail Expéditeur'
-  }
-})
-
-const styles = {
-  tabDesc: {
-    padding: '12px',
-    fontSize: '12px',
-    textAlign: 'center',
+    Name: 'Nom',
+    Subtitle: 'Sous-titre',
+    Description: 'Description',
+    'Sender email address': "Adresse email de l'expéditeur",
+    'Start date': 'Date de début',
+    'End date': 'Date de fin',
+    'This group receives a copy of all injects and is used in dryruns.':
+      'Ce groupe reçoit une copie de tous les injects et est utilisé dans les dryruns.',
   },
-  newInputDate: {
-    inputDateTimeLine: {
-      display: 'inline-block',
-      width: '100%',
-      verticalAlign: 'middle'
+});
+
+const validate = (values) => {
+  const errors = {};
+  const requiredFields = [
+    'exercise_name',
+    'exercise_subtitle',
+    'exercise_description',
+    'exercise_start_date',
+    'exercise_end_date',
+  ];
+  requiredFields.forEach((field) => {
+    if (!values[field]) {
+      errors[field] = 'Required';
     }
-  },
-  fullDate: {
-    display: 'none'
-  }
-}
-
-const validate = values => {
-  const errors = {}
-
-  let regexDateFr = RegExp('^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d$')
-  let regexDateEn = RegExp('^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$')
-  let regexTime = RegExp('^([0-1][0-9]|2[0-3])[:]([0-5][0-9])$')
-
-  if (!values.exercise_name) {
-    errors.exercise_name = 'Required'
-  }
-  if (!values.exercise_subtitle) {
-    errors.exercise_subtitle = 'Required'
-  }
-  if (!values.exercise_description) {
-    errors.exercise_description = 'Required'
-  }
-  if (!values.exercise_mail_expediteur) {
-    errors.exercise_mail_expediteur = 'Required'
-  }
-
-  if (!values.exercise_start_date_only) {
-    errors.exercise_start_date_only = 'Required'
-  } else if (!regexDateFr.test(values.exercise_start_date_only) && !regexDateEn.test(values.exercise_start_date_only)) {
-    errors.exercise_start_date_only = 'Invalid date format'
-  }
-  if (!values.exercise_start_time) {
-    errors.exercise_start_time = 'Required'
-  } else if (!regexTime.test(values.exercise_start_time)) {
-    errors.exercise_start_time = 'Invalid time format'
-  }
-
-  if (!values.exercise_end_date_only) {
-    errors.exercise_end_date_only = 'Required'
-  } else if (!regexDateFr.test(values.exercise_end_date_only) && !regexDateEn.test(values.exercise_end_date_only)) {
-    errors.exercise_end_date_only = 'Invalid date format'
-  }
-  if (!values.exercise_end_time) {
-    errors.exercise_end_time = 'Required'
-  } else if (!regexTime.test(values.exercise_end_time)) {
-    errors.exercise_end_time = 'Invalid time format'
-  }
-
-  return errors
-}
+  });
+  return errors;
+};
 
 class ExerciseForm extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      exercise_name: '',
-      exercise_subtitle: '',
-      exercise_description: '',
-      exercise_start_date: '',
-      exercise_start_date_only: '',
-      exercise_start_time: '',
-      exercise_end_date: '',
-      exercise_end_date_only: '',
-      exercise_end_time: '',
-      exercise_mail_expediteur: '',
-    };
-
-    this.handleChange = this.handleChange.bind(this);
-  }
-
-  handleChange(event) {
-    const target = event.target;
-    const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
-
-    this.setState({
-      [name]: value
-    });
-  }
-
-  replaceStartDateValue(value) {
-    this.props.change('exercise_start_date_only', value)
-    this.setState({exercise_start_date_only: value})
-    this.computeDateTime('exercise_start_date', value, this.state.exercise_start_time)
-  }
-
-  replaceStartTimeValue(value) {
-    this.props.change('exercise_start_time', value)
-    this.setState({exercise_start_time: value})
-    this.computeDateTime('exercise_start_date', this.state.exercise_start_date_only, value)
-  }
-
-  replaceEndDateValue(value) {
-    this.props.change('exercise_end_date_only', value)
-    this.setState({exercise_end_date_only: value})
-    this.computeDateTime('exercise_end_date', value, this.state.exercise_end_time)
-  }
-
-  replaceEndTimeValue(value) {
-    this.props.change('exercise_end_time', value)
-    this.setState({exercise_end_time: value})
-    this.computeDateTime('exercise_end_date', this.state.exercise_end_date_only, value)
-  }
-
-  computeDateTime(momentDay, valueDay, valueTime) {
-    var valueDate = valueDay + ' ' + valueTime
-    this.props.change(momentDay, valueDate)
-  }
-
   render() {
-    let exercise_start_date_only = R.pathOr(undefined, ['initialDateValues', 'exercise_start_date_only'], this.props)
-    let exercise_start_time = R.pathOr(undefined, ['initialTimeValues', 'exercise_start_time'], this.props)
-    let exercise_end_date_only = R.pathOr(undefined, ['initialDateValues', 'exercise_end_date_only'], this.props)
-    let exercise_end_time = R.pathOr(undefined, ['initialTimeValues', 'exercise_end_time'], this.props)
-
+    const { onSubmit, initialValues, edit } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField name="exercise_name" fullWidth={true}
-                   onChange={this.handleChange} type="text" label="Name"/>
-        <FormField name="exercise_subtitle" fullWidth={true}
-                   onChange={this.handleChange} type="text" label="Subtitle"/>
-        <FormField name="exercise_description" fullWidth={true}
-                   onChange={this.handleChange} type="text" label="Description"/>
-
-        <FormField name="exercise_mail_expediteur" fullWidth={true}
-                   onChange={this.handleChange} type="text" label="MailExpediteur"/>
-
-        <div style={this.props.hideDates ? {display: 'none'} : {}}>
-
-          <div style={styles.newInputDate.inputDateTimeLine}>
-            <DatePickerIconOpx
-              nameField="exercise_start_date_only"
-              labelField="StartDay"
-              onChange={this.replaceStartDateValue.bind(this)}
-              defaultDate={exercise_start_date_only}
-            />
-            <TimePickerIconOpx
-              nameField="exercise_start_time"
-              labelField="StartTime"
-              onChange={this.replaceStartTimeValue.bind(this)}
-              defaultTime={exercise_start_time}
-            />
-
-            <div style={styles.fullDate}>
-              <FormField ref="exercise_start_date" name="exercise_start_date" type="hidden"/>
-            </div>
-          </div>
-
-          <div style={styles.newInputDate.inputDateTimeLine}>
-            <DatePickerIconOpx
-              nameField="exercise_end_date_only"
-              labelField="EndDay"
-              onChange={this.replaceEndDateValue.bind(this)}
-              defaultDate={exercise_end_date_only}
-            />
-            <TimePickerIconOpx
-              nameField="exercise_end_time"
-              labelField="EndTime"
-              onChange={this.replaceEndTimeValue.bind(this)}
-              defaultTime={exercise_end_time}
-            />
-
-            <div style={styles.fullDate}>
-              <FormField ref="exercise_end_date" name="exercise_end_date" type="hidden"/>
-            </div>
-          </div>
-        </div>
-      </form>
-    )
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="exerciseForm" onSubmit={handleSubmit}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <TextField
+                name="exercise_name"
+                fullWidth={true}
+                label={<T>Name</T>}
+              />
+              <TextField
+                name="exercise_subtitle"
+                fullWidth={true}
+                label={<T>Subtitle</T>}
+                style={{ marginTop: 20 }}
+              />
+              <TextField
+                name="exercise_description"
+                fullWidth={true}
+                label={<T>Description</T>}
+                style={{ marginTop: 20 }}
+              />
+              {edit && (
+                <Select
+                  label={<T>Exercise control (animation)</T>}
+                  name="exercise_animation_group"
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                  helperText={
+                    <span
+                      style={{
+                        marginTop: 5,
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <InfoOutlined color="primary" /> &nbsp;
+                      <T>
+                        This group receives a copy of all injects and is used in
+                        dryruns.
+                      </T>
+                    </span>
+                  }
+                >
+                  <MenuItem value={null}> &nbsp; </MenuItem>
+                  {this.props.groups.map((data) => (
+                    <MenuItem key={data.group_id} value={data.group_id}>
+                      {data.group_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+              {!edit && (
+                <DateTimePicker
+                  name="exercise_start_date"
+                  fullWidth={true}
+                  label={<T>Start date</T>}
+                  autoOk={true}
+                  style={{ marginTop: 20 }}
+                />
+              )}
+              {!edit && (
+                <DateTimePicker
+                  name="exercise_end_date"
+                  fullWidth={true}
+                  label={<T>End date</T>}
+                  autoOk={true}
+                  style={{ marginTop: 20 }}
+                />
+              )}
+            </MuiPickersUtilsProvider>
+          </form>
+        )}
+      </Form>
+    );
   }
 }
 
 ExerciseForm.propTypes = {
-  error: PropTypes.string,
-  pristine: PropTypes.bool,
-  hideDates: PropTypes.bool,
-  submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func,
-  change: PropTypes.func
-}
+  edit: PropTypes.bool,
+  change: PropTypes.func,
+  groups: PropTypes.array,
+};
 
-export default reduxForm({form: 'ExerciseForm', validate}, null, {change})(ExerciseForm)
+export default ExerciseForm;

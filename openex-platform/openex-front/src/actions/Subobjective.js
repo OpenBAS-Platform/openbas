@@ -1,22 +1,36 @@
-import * as schema from './Schema'
-import {getReferential, putReferential, postReferential, delReferential} from '../utils/Action'
+import * as schema from './Schema';
+import {
+  getReferential,
+  putReferential,
+  postReferential,
+  delReferential,
+} from '../utils/Action';
 
 export const fetchSubobjectives = (exerciseId) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/subobjectives'
-    return getReferential(schema.arrayOfSubobjectives, uri)(dispatch)
-}
+  const uri = `/api/exercises/${exerciseId}/subobjectives`;
+  return getReferential(schema.arrayOfSubobjectives, uri)(dispatch);
+};
 
-export const updateSubobjective = (exerciseId, objectiveId, subobjectiveId, data) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/objectives/' + objectiveId + '/subobjectives/' + subobjectiveId
-    return putReferential(schema.subobjective, uri, data)(dispatch)
-}
+export const updateSubobjective = (
+  exerciseId,
+  objectiveId,
+  subobjectiveId,
+  data,
+) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/subobjectives/${subobjectiveId}`;
+  return putReferential(schema.subobjective, uri, data)(dispatch);
+};
 
-export const addSubobjective = (exerciseId, objectiveId, data) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/objectives/' + objectiveId + '/subobjectives'
-    return postReferential(schema.subobjective, uri, data)(dispatch)
-}
+export const addSubobjective = (exerciseId, objectiveId, data) => (
+  dispatch,
+) => {
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/subobjectives`;
+  return postReferential(schema.subobjective, uri, data)(dispatch);
+};
 
-export const deleteSubobjective = (exerciseId, objectiveId, subobjectiveId) => (dispatch) => {
-    let uri = '/api/exercises/' + exerciseId + '/objectives/' + objectiveId + '/subobjectives/' + subobjectiveId
-    return delReferential(uri, 'subobjectives', subobjectiveId)(dispatch)
-}
+export const deleteSubobjective = (exerciseId, objectiveId, subobjectiveId) => (
+  dispatch,
+) => {
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/subobjectives/${subobjectiveId}`;
+  return delReferential(uri, 'subobjectives', subobjectiveId)(dispatch);
+};

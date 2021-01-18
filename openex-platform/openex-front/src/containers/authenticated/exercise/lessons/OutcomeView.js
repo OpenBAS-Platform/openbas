@@ -1,39 +1,44 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import * as R from 'ramda'
-import Theme from '../../../../components/Theme'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import Theme from '../../../../components/Theme';
 
 const styles = {
-  'container': {
+  container: {
     color: Theme.palette.textColor,
-    padding: '10px 0px 10px 0px'
+    padding: '10px 0px 10px 0px',
   },
-  'title': {
+  title: {
     fontSize: '16px',
-    fontWeight: '500'
+    fontWeight: '500',
   },
-  'story': {
-
-  }
-}
+  story: {},
+};
 
 class OutcomeView extends Component {
-
   render() {
-    let outcome_result = R.pathOr('-', ['incident_outcome', 'outcome_result'], this.props.incident)
-    let outcome_comment = R.pathOr('-', ['incident_outcome', 'outcome_comment'], this.props.incident)
+    const outcomeResult = R.pathOr(
+      '-',
+      ['incident_outcome', 'outcome_result'],
+      this.props.incident,
+    );
+    const outcomeComment = R.pathOr(
+      '-',
+      ['incident_outcome', 'outcome_comment'],
+      this.props.incident,
+    );
 
     return (
       <div style={styles.container}>
-        <div style={styles.title}>{outcome_result}</div>
-        <div style={styles.story}>{outcome_comment}</div>
+        <div style={styles.title}>{outcomeResult}</div>
+        <div style={styles.story}>{outcomeComment}</div>
       </div>
-    )
+    );
   }
 }
 
 OutcomeView.propTypes = {
-  incident: PropTypes.object
-}
+  incident: PropTypes.object,
+};
 
-export default OutcomeView
+export default OutcomeView;

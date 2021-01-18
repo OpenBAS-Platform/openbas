@@ -19,11 +19,11 @@ class Comcheck extends BaseEntity
      */
     protected $comcheck_id;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $comcheck_start_date;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $comcheck_end_date;
     /**

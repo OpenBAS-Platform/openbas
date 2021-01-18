@@ -1,48 +1,51 @@
-import * as schema from './Schema'
-import {getReferential, postReferential, delReferential, fileSave} from '../utils/Action'
+import * as schema from './Schema';
+import {
+  getReferential,
+  postReferential,
+  delReferential,
+  fileSave,
+} from '../utils/Action';
 
 export const addDocument = (data) => (dispatch) => {
-  let uri = '/api/document'
-  return postReferential(schema.document, uri, data)(dispatch)
-}
+  const uri = '/api/document';
+  return postReferential(schema.document, uri, data)(dispatch);
+};
 
 export const searchDocument = (data) => (dispatch) => {
-  let uri = '/api/document/search'
-  return postReferential(schema.arrayOfDocument, uri, data)(dispatch)
-}
+  const uri = '/api/document/search';
+  return postReferential(schema.arrayOfDocument, uri, data)(dispatch);
+};
 
-export const saveDocument = (document_id, data) => (dispatch) => {
-  let uri = '/api/document/save/' + document_id
-  return postReferential(schema.document, uri, data)(dispatch)
-}
+export const saveDocument = (documentId, data) => (dispatch) => {
+  const uri = `/api/document/save/${documentId}`;
+  return postReferential(schema.document, uri, data)(dispatch);
+};
 
-export const getDocument = (document_id) => (dispatch) => {
-  return getReferential(schema.document, '/api/document/' + document_id)(dispatch)
-}
+export const getDocument = (documentId) => (dispatch) => getReferential(schema.document, `/api/document/${documentId}`)(dispatch);
 
-export const getDocumentTags = (document_id) => (dispatch) => {
-  return getReferential(schema.arrayOfTags, '/api/document/' + document_id + '/tags')(dispatch)
-}
+export const getDocumentTags = (documentId) => (dispatch) => getReferential(
+  schema.arrayOfTags,
+  `/api/document/${documentId}/tags`,
+)(dispatch);
 
-export const getDocumentTagsExercise = (document_id) => (dispatch) => {
-  return getReferential(schema.arrayOfExercises, '/api/document/' + document_id + '/tags/exercise')(dispatch)
-}
+export const getDocumentTagsExercise = (documentId) => (dispatch) => getReferential(
+  schema.arrayOfExercises,
+  `/api/document/${documentId}/tags/exercise`,
+)(dispatch);
 
-export const editDocumentTags = (document_id, data) => (dispatch) => {
-  let uri = '/api/document/' + document_id + '/save/tags'
-  return postReferential(schema.document, uri, data)(dispatch)
-}
+export const editDocumentTags = (documentId, data) => (dispatch) => {
+  const uri = `/api/document/${documentId}/save/tags`;
+  return postReferential(schema.document, uri, data)(dispatch);
+};
 
-export const editDocumentTagsExercise = (document_id, data) => (dispatch) => {
-  let uri = '/api/document/' + document_id + '/save/tags/exercise'
-  return postReferential(schema.document, uri, data)(dispatch)
-}
+export const editDocumentTagsExercise = (documentId, data) => (dispatch) => {
+  const uri = `/api/document/${documentId}/save/tags/exercise`;
+  return postReferential(schema.document, uri, data)(dispatch);
+};
 
-export const deleteDocument = (document_id) => (dispatch) => {
-  let uri = '/api/document/' + document_id
-  return delReferential(uri, 'document', document_id)(dispatch)
-}
+export const deleteDocument = (documentId) => (dispatch) => {
+  const uri = `/api/document/${documentId}`;
+  return delReferential(uri, 'document', documentId)(dispatch);
+};
 
-export const downloadDocument = (document_id, document_name) => (dispatch) => {
-  return fileSave('/api/files/' + document_id, document_name)(dispatch)
-}
+export const downloadDocument = (documentId, documentName) => (dispatch) => fileSave(`/api/files/${documentId}`, documentName)(dispatch);

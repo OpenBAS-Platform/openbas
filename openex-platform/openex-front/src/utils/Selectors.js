@@ -1,11 +1,19 @@
-import {createSelectorCreator, createStructuredSelector, defaultMemoize} from 'reselect'
-import {debug} from './Messages'
-import * as R from 'ramda'
+import {
+  createSelectorCreator,
+  createStructuredSelector,
+  defaultMemoize,
+} from 'reselect';
+import * as R from 'ramda';
+import { debug } from './Messages';
 
 const customComparator = (previousState, state) => {
-    var equals = R.equals(previousState, state);
-    if(!equals) debug("Reselect", "Redisplay the react component")
-    return equals
-}
+  const equals = R.equals(previousState, state);
+  if (!equals) debug('Reselect', 'Redisplay the react component');
+  return equals;
+};
 
-export const equalsSelector = (s) => createStructuredSelector(s, createSelectorCreator(defaultMemoize, customComparator))
+// eslint-disable-next-line import/prefer-default-export
+export const equalsSelector = (s) => createStructuredSelector(
+  s,
+  createSelectorCreator(defaultMemoize, customComparator),
+);

@@ -1,66 +1,190 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {redirectToExercise, toggleLeftBar} from '../../../actions/Application'
-import * as Constants from '../../../constants/ComponentTypes'
-import {AppBar} from '../../../components/AppBar'
-import {Chip} from '../../../components/Chip'
-import {T} from '../../../components/I18n'
-import * as R from 'ramda'
-import NavBar from './nav/NavBar'
-import LeftBar from './nav/LeftBar'
-import UserPopover from './../UserPopover'
-import {fetchExercise} from '../../../actions/Exercise'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import { Route, Switch, withRouter } from 'react-router';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import { withStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
+import { DescriptionOutlined } from '@material-ui/icons';
+import IconButton from '@material-ui/core/IconButton';
+import {
+  redirectToExercise,
+  redirectToHome,
+} from '../../../actions/Application';
+import LeftBar from './nav/LeftBar';
+import { fetchExercise } from '../../../actions/Exercise';
+import IndexExercise from './Index';
+import IndexExerciseExecution from './execution/Index';
+import IndexExerciseLessons from './lessons/Index';
+import IndexExerciseChecks from './check/Index';
+import RootExerciseDryrun from './check/dryrun/Root';
+import RootExerciseComcheck from './check/comcheck/Root';
+import IndexExerciseObjectives from './objective/Index';
+import IndexExerciseScenario from './scenario/Index';
+import RootExerciseScenarioEvent from './scenario/event/Root';
+import IndexExerciseAudiences from './audiences/Index';
+import RootExerciseAudiencesAudience from './audiences/audience/Root';
+import IndexExerciseStatistics from './statistics/Index';
+import IndexExerciseSettings from './settings/Index';
+import UserPopover from '../UserPopover';
+import NotFound from '../../anonymous/NotFound';
 
-const styles = {
-  root: {
-    padding: '80px 20px 0 85px',
+const styles = (theme) => ({
+  appBar: {
+    width: '100%',
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  container: {
+    padding: 20,
+  },
+  logo: {
+    width: '40px',
+    cursor: 'pointer',
   },
   title: {
-    fontVariant: 'small-caps',
-    display: 'block',
-    float: 'left'
-  }
-}
+    fontSize: 25,
+    marginLeft: 20,
+  },
+  toolbar: theme.mixins.toolbar,
+  documents: {
+    color: '#ffffff',
+    position: 'absolute',
+    top: 8,
+    right: 70,
+  },
+});
 
-class RootAuthenticated extends Component {
+class RootExercise extends Component {
   componentDidMount() {
-    this.props.fetchExercise(this.props.id)
-  }
-
-  toggleLeftBar() {
-    this.props.toggleLeftBar()
+    this.props.fetchExercise(this.props.id);
   }
 
   redirectToExercise() {
-    this.props.redirectToExercise(this.props.id)
+    this.props.redirectToExercise(this.props.id);
+  }
+
+  redirectToHome() {
+    this.props.redirectToHome();
   }
 
   render() {
+    const { classes, id, exercise } = this.props;
     return (
-      <div>
-        <AppBar
-          title={
-            <div>
-              <span style={styles.title}>{R.propOr('-', 'exercise_name', this.props.exercise)}</span>
-              <Chip backgroundColor="#C5CAE9" type={Constants.CHIP_TYPE_FLOATING}><T>{R.propOr('-', 'exercise_status', this.props.exercise)}</T></Chip>
+      <div style={{ paddingLeft: 180 }}>
+        <LeftBar
+          id={id}
+          pathname={this.props.pathname}
+          exercise_type={R.propOr(
+            'standard',
+            'exercise_type',
+            this.props.exercise,
+          )}
+        />
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <img
+              src="/images/logo_white.png"
+              alt="logo"
+              className={classes.logo}
+              onClick={this.redirectToHome.bind(this)}
+            />
+            <div className={classes.title}>
+              {R.propOr('', 'exercise_name', exercise)}
             </div>
-          }
-          type={Constants.APPBAR_TYPE_TOPBAR}
-          onLeftIconButtonTouchTap={this.toggleLeftBar.bind(this)}
-          iconElementRight={<UserPopover exerciseId={this.props.id}/>}
-          showMenuIconButton={false}/>
-        <NavBar id={this.props.id} pathname={this.props.pathname} exercise_type={R.propOr('standard', 'exercise_type', this.props.exercise)}/>
-        <LeftBar id={this.props.id} pathname={this.props.pathname} exercise_type={R.propOr('standard', 'exercise_type', this.props.exercise)}/>
-        <div style={styles.root}>
-          {this.props.children}
+            <IconButton
+              component={Link}
+              to="/private/documents"
+              className={classes.documents}
+            >
+              <DescriptionOutlined fontSize="medium" />
+            </IconButton>
+            <UserPopover />
+          </Toolbar>
+        </AppBar>
+        <div className={classes.toolbar} />
+        <div className={classes.container}>
+          <Switch>
+            <Route
+              exact
+              path="/private/exercise/:exerciseId"
+              component={() => <IndexExercise id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/execution"
+              component={() => <IndexExerciseExecution id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/lessons"
+              component={() => <IndexExerciseLessons id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/checks"
+              component={() => <IndexExerciseChecks id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/checks/dryrun/:dryrunId"
+              component={() => <RootExerciseDryrun id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/checks/comcheck/:comcheckId"
+              component={() => <RootExerciseComcheck id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/objectives"
+              component={() => <IndexExerciseObjectives id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/scenario"
+              component={() => <IndexExerciseScenario id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/scenario/:eventId"
+              component={() => <RootExerciseScenarioEvent id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/audiences"
+              component={() => <IndexExerciseAudiences id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/audiences/:audienceId"
+              component={() => <RootExerciseAudiencesAudience id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/calendar"
+              component={() => <IndexExercise id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/statistics"
+              component={() => <IndexExerciseStatistics id={id} />}
+            />
+            <Route
+              exact
+              path="/private/exercise/:exerciseId/settings"
+              component={() => <IndexExerciseSettings id={id} />}
+            />
+            <Route component={NotFound} />
+          </Switch>
         </div>
       </div>
-    )
+    );
   }
 }
 
-RootAuthenticated.propTypes = {
+RootExercise.propTypes = {
   id: PropTypes.string,
   pathname: PropTypes.string,
   leftBarOpen: PropTypes.bool,
@@ -70,17 +194,26 @@ RootAuthenticated.propTypes = {
   redirectToExercise: PropTypes.func,
   children: PropTypes.node,
   fetchExercise: PropTypes.func.isRequired,
-  params: PropTypes.object
-}
+  params: PropTypes.object,
+};
 
 const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let pathname = ownProps.location.pathname
+  const { exerciseId, audienceId } = ownProps.match.params;
+  const { pathname } = ownProps.location;
   return {
     id: exerciseId,
+    audienceId,
     pathname,
     exercise: R.prop(exerciseId, state.referential.entities.exercises),
-  }
-}
+  };
+};
 
-export default connect(select, {redirectToExercise, toggleLeftBar, fetchExercise})(RootAuthenticated)
+export default R.compose(
+  withRouter,
+  connect(select, {
+    redirectToExercise,
+    redirectToHome,
+    fetchExercise,
+  }),
+  withStyles(styles),
+)(RootExercise);

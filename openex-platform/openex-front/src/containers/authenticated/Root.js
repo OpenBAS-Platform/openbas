@@ -1,48 +1,87 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
-import {savedDismiss} from '../../actions/Application'
-import {Snackbar} from '../../components/Snackbar'
-import {T} from '../../components/I18n'
-import {i18nRegister} from '../../utils/Messages'
-import * as Constants from '../../constants/ComponentTypes'
-import {Icon} from '../../components/Icon'
-import DocumentTitle from '../../components/DocumentTitle'
-import PropTypes from 'prop-types'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { Route, Switch } from 'react-router';
+import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
+import { withRouter } from 'react-router-dom';
+import { T } from '../../components/I18n';
+import { i18nRegister } from '../../utils/Messages';
+import { savedDismiss } from '../../actions/Application';
+import IndexAuthenticated from './Index';
+import IndexProfile from './profile/Index';
+import IndexDocuments from './documents/Index';
+import RootAdmin from './admin/Root';
+import RootExercise from './exercise/Root';
+import NotFound from '../anonymous/NotFound';
+
+const UserIsAdmin = connectedRouterRedirect({
+  authenticatedSelector: (state) => state.app.logged.admin === true,
+  redirectPath: '/private',
+  allowRedirectBack: false,
+  wrapperDisplayName: 'UserIsAdmin',
+});
 
 i18nRegister({
   fr: {
-    'Action done.': 'Action effectuée.'
-  }
-})
+    'The operation has been done': "L'opération a été effectuée",
+  },
+});
 
 class RootAuthenticated extends Component {
+  redirectToHome() {
+    this.props.history.push('/private');
+  }
+
   render() {
     return (
-      <DocumentTitle title='OpenEx - Crisis management exercises platform'>
-        <div>
-          <Snackbar open={this.props.savedPopupOpen} autoHideDuration={1500}
-                    onRequestClose={this.props.savedDismiss.bind(this)} message={
-            <div>
-              <Icon name={Constants.ICON_NAME_ACTION_DONE} color="#ffffff" type={Constants.ICON_TYPE_LEFT}/>
-              <T>Action done.</T>
-            </div>}/>
-          {this.props.children}
-        </div>
-      </DocumentTitle>
-    )
+      <div>
+        <Snackbar
+          open={this.props.savedPopupOpen}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          autoHideDuration={1000}
+          onClose={this.props.savedDismiss.bind(this)}
+        >
+          <Alert
+            severity="info"
+            elevation={6}
+            onClose={this.props.savedDismiss.bind(this)}
+          >
+            <T>The operation has been done</T>
+          </Alert>
+        </Snackbar>
+        <Switch>
+          <Route path="/admin" component={UserIsAdmin(RootAdmin)} />
+          <Route exact path="/private" component={IndexAuthenticated} />
+          <Route exact path="/private/profile" component={IndexProfile} />
+          <Route exact path="/private/documents" component={IndexDocuments} />
+          <Route
+            path="/private/exercise/:exerciseId"
+            component={RootExercise}
+          />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
+    );
   }
 }
 
 RootAuthenticated.propTypes = {
   children: PropTypes.node,
   savedPopupOpen: PropTypes.bool,
-  savedDismiss: PropTypes.func
-}
+  savedDismiss: PropTypes.func,
+};
 
-const select = (state) => {
-  return {
-    savedPopupOpen: state.screen.saved || false,
-  }
-}
+const select = (state) => ({
+  savedPopupOpen: state.screen.saved || false,
+});
 
-export default connect(select, {savedDismiss})(RootAuthenticated)
+export default R.compose(
+  withRouter,
+  connect(select, { savedDismiss }),
+)(RootAuthenticated);

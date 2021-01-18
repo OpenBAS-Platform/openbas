@@ -1,69 +1,99 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as Constants from '../../constants/ComponentTypes'
-import * as R from 'ramda'
-import {Popover} from '../../components/Popover'
-import {Avatar} from '../../components/Avatar'
-import {Menu} from '../../components/Menu'
-import {MenuItemLink, MenuItemButton} from "../../components/menu/MenuItem"
-import {logout, fetchToken} from '../../actions/Application'
-import {i18nRegister} from '../../utils/Messages'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { Link } from 'react-router-dom';
+import { withStyles } from '@material-ui/core/styles';
+import { AccountCircleOutlined } from '@material-ui/icons';
+import { logout, fetchToken } from '../../actions/Application';
+import { i18nRegister } from '../../utils/Messages';
+import { T } from '../../components/I18n';
 
 i18nRegister({
   fr: {
     'Sign out': 'Se déconnecter',
-    'Profile': 'Profil',
-    'Admin': 'Admin'
-  }
-})
+    Profile: 'Profil',
+    Admin: 'Admin',
+  },
+});
+
+const styles = () => ({
+  topAvatar: {
+    position: 'absolute',
+    top: 8,
+    right: 15,
+    color: '#ffffff',
+  },
+});
 
 class UserPopover extends Component {
   constructor(props) {
     super(props);
-    this.state = {open: false}
+    this.state = { open: false };
   }
 
   componentDidMount() {
-    this.props.fetchToken()
+    this.props.fetchToken();
   }
 
   handleOpen(event) {
-    event.preventDefault()
+    event.preventDefault();
     this.setState({
       open: true,
       anchorEl: event.currentTarget,
-    })
+    });
   }
 
   handleClose() {
-    this.setState({open: false})
+    this.setState({ open: false });
   }
 
   logoutClick() {
     this.handleClose();
-    this.props.logout()
+    this.props.logout();
   }
 
   render() {
+    const { classes } = this.props;
     return (
       <div>
-        <Avatar
-          src={this.props.userGravatar}
+        <IconButton
           onClick={this.handleOpen.bind(this)}
-          type={Constants.AVATAR_TYPE_TOPBAR}
-        />
-        <Popover open={this.state.open}
-                 anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handleClose.bind(this)}>
-          <Menu multiple={false}>
-            <MenuItemLink label="Profile" onClick={this.handleClose.bind(this)} to={this.props.exerciseId ? '/private/exercise/' + this.props.exerciseId + '/profile': '/private/user/profile'}/>
-            {this.props.userAdmin ? <MenuItemLink label="Admin" to='/private/admin/index'/> :""}
-            <MenuItemButton label="Sign out" onClick={this.logoutClick.bind(this)}/>
-          </Menu>
-        </Popover>
+          className={classes.topAvatar}
+        >
+          <AccountCircleOutlined />
+        </IconButton>
+        <Menu
+          style={{ marginTop: 40, zIndex: 2100 }}
+          anchorEl={this.state.anchorEl}
+          open={this.state.open}
+          onClose={this.handleClose.bind(this)}
+        >
+          <MenuItem
+            onClick={this.handleClose.bind(this)}
+            component={Link}
+            to={
+              this.props.exerciseId
+                ? `/private/exercise/${this.props.exerciseId}/profile`
+                : '/private/profile'
+            }
+          >
+            <T>Profile</T>
+          </MenuItem>
+          {this.props.userAdmin && (
+            <MenuItem component={Link} to="/private/admin/index">
+              <T>Admin</T>
+            </MenuItem>
+          )}
+          <MenuItem onClick={this.logoutClick.bind(this)}>
+            <T>Sign out</T>
+          </MenuItem>
+        </Menu>
       </div>
-    )
+    );
   }
 }
 
@@ -73,15 +103,21 @@ UserPopover.propTypes = {
   userAdmin: PropTypes.bool,
   logout: PropTypes.func,
   fetchToken: PropTypes.func,
-  children: PropTypes.node
-}
+  children: PropTypes.node,
+};
 
 const select = (state) => {
-  var userId = R.path(['logged', 'user'], state.app)
+  const userId = R.path(['logged', 'user'], state.app);
   return {
-    userGravatar: R.path([userId, 'user_gravatar'], state.referential.entities.users),
-    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users)
-  }
-}
+    userGravatar: R.path(
+      [userId, 'user_gravatar'],
+      state.referential.entities.users,
+    ),
+    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
+  };
+};
 
-export default connect(select, {fetchToken, logout})(UserPopover)
+export default R.compose(
+  connect(select, { fetchToken, logout }),
+  withStyles(styles),
+)(UserPopover);

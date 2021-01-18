@@ -1,32 +1,40 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
-import * as Constants from '../../../../constants/ComponentTypes'
-import {Popover} from '../../../../components/Popover'
-import {Menu} from '../../../../components/Menu'
-import {Dialog} from '../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../components/Button'
-import {Icon} from '../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../components/menu/MenuItem"
-import {fetchObjective} from '../../../../actions/Objective'
-import {updateSubobjective, deleteSubobjective} from '../../../../actions/Subobjective'
-import SubobjectiveForm from './SubobjectiveForm'
-
-const style = {
-  position: 'absolute',
-  top: '10px',
-  right: 0,
-}
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import { fetchObjective } from '../../../../actions/Objective';
+import {
+  updateSubobjective,
+  deleteSubobjective,
+} from '../../../../actions/Subobjective';
+import SubobjectiveForm from './SubobjectiveForm';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Update the subobjective': 'Modifier le sous-objectif',
-    'Do you want to delete this subobjective?': 'Souhaitez-vous supprimer ce sous-objectif ?',
-  }
-})
+    'Do you want to delete this subobjective?':
+      'Souhaitez-vous supprimer ce sous-objectif ?',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class SubobjectivePopover extends Component {
   constructor(props) {
@@ -34,114 +42,179 @@ class SubobjectivePopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openPopover: false
-    }
+      openPopover: false,
+    };
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation()
+    event.stopPropagation();
     this.setState({
       openPopover: true,
       anchorEl: event.currentTarget,
-    })
+    });
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
     this.setState({
-      openEdit: true
-    })
-    this.handlePopoverClose()
+      openEdit: true,
+    });
+    this.handlePopoverClose();
   }
 
   handleCloseEdit() {
     this.setState({
-      openEdit: false
-    })
+      openEdit: false,
+    });
   }
 
   onSubmitEdit(data) {
-    return this.props.updateSubobjective(this.props.exerciseId, this.props.objectiveId, this.props.subobjective.subobjective_id, data)
-  }
-
-  submitFormEdit() {
-    this.refs.subobjectiveForm.submit()
+    return this.props
+      .updateSubobjective(
+        this.props.exerciseId,
+        this.props.objectiveId,
+        this.props.subobjective.subobjective_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   handleOpenDelete() {
     this.setState({
-      openDelete: true
-    })
-    this.handlePopoverClose()
+      openDelete: true,
+    });
+    this.handlePopoverClose();
   }
 
   handleCloseDelete() {
     this.setState({
-      openDelete: false
-    })
+      openDelete: false,
+    });
   }
 
   submitDelete() {
-    this.props.deleteSubobjective(this.props.exerciseId, this.props.objectiveId, this.props.subobjective.subobjective_id).then(() => {
-        this.props.fetchObjective(this.props.exerciseId, this.props.objectiveId)
-      }
-    )
-    this.handleCloseDelete()
+    this.props
+      .deleteSubobjective(
+        this.props.exerciseId,
+        this.props.objectiveId,
+        this.props.subobjective.subobjective_id,
+      )
+      .then(() => {
+        this.props.fetchObjective(
+          this.props.exerciseId,
+          this.props.objectiveId,
+        );
+      });
+    this.handleCloseDelete();
   }
 
   render() {
-    let subobjective_is_updatable = R.propOr(true, 'user_can_update', this.props.subobjective)
-    let subobjective_is_deletable = R.propOr(true, 'user_can_delete', this.props.subobjective)
-        
-    const editActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)} />,
-      subobjective_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)} />: ""
-    ];
-    const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)} />,
-      subobjective_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)} />: ""
-    ];
-
-    let initialValues = R.pick(['subobjective_title', 'subobjective_description', 'subobjective_priority'], this.props.subobjective)
+    const subobjectiveIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.subobjective,
+    );
+    const subobjectiveIsDeletable = R.propOr(
+      true,
+      'user_can_delete',
+      this.props.subobjective,
+    );
+    const initialValues = R.pick(
+      [
+        'subobjective_title',
+        'subobjective_description',
+        'subobjective_priority',
+      ],
+      this.props.subobjective,
+    );
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
-        </IconButton>
-        
-        {(subobjective_is_updatable || subobjective_is_deletable)
-        ?
-          <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl} onRequestClose={this.handlePopoverClose.bind(this)}>
-            <Menu multiple={false}>
-              {subobjective_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>: ""}
-              {subobjective_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
-            </Menu>
-          </Popover>
-        : ""}       
-          
-        <Dialog
-          title="Confirmation"
-          modal={false}
-          open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <T>Do you want to delete this subobjective?</T>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!subobjectiveIsUpdatable}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!subobjectiveIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <Dialog
+          open={this.state.openDelete}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this subobjective?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the subobjective"
-          modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
         >
-          <SubobjectiveForm ref="subobjectiveForm" initialValues={initialValues} onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+          <DialogTitle>
+            <T>Update the subobjective</T>
+          </DialogTitle>
+          <DialogContent>
+            <SubobjectiveForm
+              initialValues={initialValues}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('subobjectiveForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -152,7 +225,11 @@ SubobjectivePopover.propTypes = {
   deleteSubobjective: PropTypes.func,
   updateSubobjective: PropTypes.func,
   subobjective: PropTypes.object,
-  children: PropTypes.node
-}
+  children: PropTypes.node,
+};
 
-export default connect(null, {fetchObjective, updateSubobjective, deleteSubobjective})(SubobjectivePopover)
+export default connect(null, {
+  fetchObjective,
+  updateSubobjective,
+  deleteSubobjective,
+})(SubobjectivePopover);

@@ -1,19 +1,20 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUIDrawer from 'material-ui/Drawer'
-import {zIndex} from 'material-ui/styles'
+import React from 'react';
+import * as PropTypes from 'prop-types';
+import MUIDrawer from '@material-ui/core/Drawer';
 
+// eslint-disable-next-line import/prefer-default-export
 export const Drawer = (props) => (
   <MUIDrawer
     width={props.width}
     docked={props.docked}
     open={props.open}
     openSecondary={props.openSecondary}
-    style={{zIndex: zIndex.drawer - props.zindex}}
-    onRequestChange={props.onRequestChange}>
+    style={{ zIndex: 2000 - props.zindex }}
+    onRequestChange={props.onRequestChange}
+  >
     {props.children}
   </MUIDrawer>
-)
+);
 
 Drawer.propTypes = {
   width: PropTypes.number,
@@ -22,5 +23,5 @@ Drawer.propTypes = {
   openSecondary: PropTypes.bool,
   onRequestChange: PropTypes.func,
   children: PropTypes.node,
-  zindex: PropTypes.number
-}
+  zindex: PropTypes.number,
+};

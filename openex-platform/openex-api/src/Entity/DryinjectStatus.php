@@ -34,7 +34,7 @@ class DryinjectStatus
     protected $status_message;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetimetz", nullable=true)
      */
     protected $status_date;
 

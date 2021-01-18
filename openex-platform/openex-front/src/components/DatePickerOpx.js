@@ -1,8 +1,8 @@
-import React, {Component} from 'react'
-import DatePicker from 'material-ui/DatePicker'
-import {injectIntl} from 'react-intl'
-import PropTypes from 'prop-types'
-import {dayFormat} from '../utils/Time'
+import React, { Component } from 'react';
+import DatePicker from '@material-ui/pickers/DatePicker';
+import { injectIntl } from 'react-intl';
+import * as PropTypes from 'prop-types';
+import { dayFormat } from '../utils/Time';
 
 const styles = {
   global: {
@@ -11,13 +11,12 @@ const styles = {
   picker: {
     position: 'absolute',
     top: '40px',
-  }
-}
+  },
+};
 
 class DatePickerOpx extends Component {
-
-  handleChange = (event, date) => {
-    this.props.handleResult(dayFormat(date))
+  handleChange(event, date) {
+    this.props.handleResult(dayFormat(date));
   }
 
   render() {
@@ -32,11 +31,11 @@ class DatePickerOpx extends Component {
         onChange={this.handleChange}
         floatingLabelText="Date"
         locale={this.props.intl.locale}
-        cancelLabel={this.props.intl.formatMessage({id: 'Cancel'})}
+        cancelLabel={this.props.intl.formatMessage({ id: 'Cancel' })}
         style={styles.global}
-        dialogContainerStyle={{zIndex: 2100}}
+        dialogContainerStyle={{ zIndex: 2100 }}
       />
-    )
+    );
   }
 }
 
@@ -44,7 +43,7 @@ DatePickerOpx.propTypes = {
   handleResult: PropTypes.func,
   defaultDate: PropTypes.string,
   datePickerRef: PropTypes.object,
-  intl: PropTypes.object
-}
+  intl: PropTypes.object,
+};
 
-export default injectIntl(DatePickerOpx, {withRef: true})
+export default injectIntl(DatePickerOpx, { withRef: true });

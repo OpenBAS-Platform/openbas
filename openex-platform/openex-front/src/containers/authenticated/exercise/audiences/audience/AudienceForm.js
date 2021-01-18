@@ -1,33 +1,42 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import {FormField} from '../../../../../components/Field'
-import {i18nRegister} from '../../../../../utils/Messages'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import { TextField } from '../../../../../components/TextField';
+import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
   fr: {
-    'Name': 'Nom',
-  }
-})
+    Name: 'Nom',
+  },
+});
 
-const validate = values => {
-  const errors = {}
-  const requiredFields = []
-  requiredFields.forEach(field => {
+const validate = (values) => {
+  const errors = {};
+  const requiredFields = ['audience_name'];
+  requiredFields.forEach((field) => {
     if (!values[field]) {
-      errors[field] = 'Required'
+      errors[field] = 'Required';
     }
-  })
-  return errors
-}
+  });
+  return errors;
+};
 
 class AudienceForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <FormField name="audience_name" fullWidth={true} type="text" label="Name"/>
-      </form>
-    )
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="audienceForm" onSubmit={handleSubmit}>
+            <TextField name="audience_name" fullWidth={true} label="Name" />
+          </form>
+        )}
+      </Form>
+    );
   }
 }
 
@@ -37,11 +46,7 @@ AudienceForm.propTypes = {
   submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
-  change: PropTypes.func
-}
+  change: PropTypes.func,
+};
 
-export default reduxForm(
-  {form: 'AudienceForm', validate},
-  null,
-  {change}
-)(AudienceForm)
+export default AudienceForm;

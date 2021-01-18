@@ -1,418 +1,577 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table'
-import {updateExercise, deleteExercise, exportExercise, exportInjectEml} from '../../../../actions/Exercise'
-import {shiftAllInjects} from '../../../../actions/Inject'
-import {fetchGroups} from '../../../../actions/Group'
-import {redirectToHome} from '../../../../actions/Application'
-import {Paper} from '../../../../components/Paper'
-import {Button, FlatButton} from '../../../../components/Button'
-import {Image} from '../../../../components/Image'
-import {Checkbox} from '../../../../components/Checkbox'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
-import {Dialog} from '../../../../components/Dialog'
-import * as Constants from '../../../../constants/ComponentTypes'
-import * as R from 'ramda'
-import TemplateForm from './TemplateForm'
-import ExerciseForm from '../ExerciseForm'
-import FileGallery from '../../FileGallery'
-import {dateFormat, dateToISO} from '../../../../utils/Time'
-import {addFile, getImportFileSheetsName} from '../../../../actions/File'
-
-const styles = {
-  PaperContent: {
-    padding: '20px'
-  },
-  image: {
-    width: '90%'
-  },
-  divWarning: {
-    border: '2px #FFBF00 solid',
-    padding: '10px',
-    borderRadius: '5px',
-    marginTop: '10px',
-    marginBottom: '10px',
-    fontWeight: '400',
-    backgroundColor: '#F5DA81',
-    textAlign: 'center'
-  }
-}
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Checkbox from '@material-ui/core/Checkbox';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import * as R from 'ramda';
+import { withStyles } from '@material-ui/core/styles';
+import { Close } from '@material-ui/icons';
+import Slide from '@material-ui/core/Slide';
+import {
+  deleteExercise,
+  exportExercise,
+  exportInjectEml,
+  updateExercise,
+} from '../../../../actions/Exercise';
+import { shiftAllInjects } from '../../../../actions/Inject';
+import { fetchGroups } from '../../../../actions/Group';
+import { redirectToHome } from '../../../../actions/Application';
+import { Image } from '../../../../components/Image';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import TemplateForm from './TemplateForm';
+import ExerciseForm from '../ExerciseForm';
+import FileGallery from '../../FileGallery';
+import { dateToISO } from '../../../../utils/Time';
+import { addFile, getImportFileSheetsName } from '../../../../actions/File';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Start date': 'Date de début',
     'End date': 'Date de fin',
-    'Subtitle': 'Sous-titre',
-    'Change the image': 'Changer l\'image',
+    Subtitle: 'Sous-titre',
+    'Change the image': "Changer l'image",
     'Messages template': 'Modèle des messages',
-    'Do you want to delete this exercise?': 'Souhaitez-vous supprimer cet exercice ?',
-    'Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.': 'Supprimer un exercice conduit à la suppression de son contenu, incluant ses objectifs, événéments, incidents, injects et audiences. Nous vous déconseillons de faire cela.',
-    'You changed the start date of the exercise, do you want to reschedule all injects relatively to the difference with the original start date?': 'Vous avez changé la date du début de l\'exercice, souhaitez-vous replanifier toutes les injections relativement à l\'écart avec la date de début originale ?',
-    'Reschedule': 'Replanifier',
-    'No': 'Non',
-    'Export data of current exercise' : 'Exporter les données de l\'exercice courant',
-    'Item' : 'Element',
+    'Do you want to delete this exercise?':
+      'Souhaitez-vous supprimer cet exercice ?',
+    'Deleting an exercise will result in deleting all its content, including objectives, events, incidents, injects and audience. We do not recommend you do this.':
+      'Supprimer un exercice conduit à la suppression de son contenu, incluant ses objectifs, événéments, incidents, injects et audiences. Nous vous déconseillons de faire cela.',
+    'You changed the start date of the exercise, do you want to reschedule all injects relatively to the difference with the original start date?':
+      "Vous avez changé la date du début de l'exercice, souhaitez-vous replanifier toutes les injections relativement à l'écart avec la date de début originale ?",
+    Reschedule: 'Replanifier',
+    No: 'Non',
+    'Export data of current exercise':
+      "Exporter les données de l'exercice courant",
+    Item: 'Element',
     'Export audiences data': 'Exporter les données concernant les audiences',
-    'Objective': 'Objectifs',
+    Objective: 'Objectifs',
     'Export objectives data': 'Exporter les données concernant les objectifs',
-    'Events': 'Evenements',
+    Events: 'Evenements',
     'Export events data': 'Exporter les données concernant les événements',
     'Export incidents data': 'Exporter les données concernant les incidents',
-    'Inject': 'Injections',
+    Inject: 'Injections',
     'Export injects data': 'Exporter les données concernant les injections',
-    'Export an exercise': 'Exporter un exercice',
+    'Export of the exercise': "Export de l'exercice",
     'Full export for an excercise.': 'Exporter un exercice complet.',
-    'Note: You can import a previously exported exercise on "create exercise" form.': 'Note : Vous pouvez importer un exercice préalablement exporté à partir du formulaire de création d\'un nouvel exercice.',
+    'Note: you can import a previously exported exercise from the home page.':
+      "Note : vous pouvez importer un exercice préalablement exporté depuis la page d'accueil.",
     'Import data to an exercise.': 'Importer un exercice complet.',
-    'search': 'Parcourir',
-    'Export': 'Exporter',
-    'Please, chose data to export': 'Veuillez sélectionner les données à exporter :',
-    'Please, chose data to import': 'Veuillez sélectionner les données à importer :',
-    'Export of Exercise': 'Export de l\'exercice'
-  }
-})
+    search: 'Parcourir',
+    Export: 'Exporter',
+    'Please, choose data to export':
+      'Veuillez sélectionner les données à exporter :',
+    'Please, choose data to import':
+      'Veuillez sélectionner les données à importer :',
+    'Export of Exercise': "Export de l'exercice",
+    'Export all email injects to files (.eml) so you can use it into your mail client.':
+      'Exporter tous les injects emails vers des fichiers (.eml) pour les utiliser dans votre client mail.',
+    'Do you want to change the sender email address?':
+      "Souhaitez-vous changer l'adresse email de l'expéditeur ?",
+    'Export of the emails': 'Export des emails',
+    'Files gallery': 'Galerie de fichiers',
+  },
+});
 
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = (theme) => ({
+  paper: {
+    padding: 20,
+    marginBottom: 40,
+  },
+  appBar: {
+    position: 'relative',
+  },
+  title: {
+    marginLeft: theme.spacing(2),
+    flex: 1,
+  },
+});
+
+const dependencies = {
+  exercise: [],
+  audience: ['exercise'],
+  objective: ['exercise'],
+  scenarios: ['exercise'],
+  incidents: ['scenarios', 'exercise'],
+  injects: ['incidents', 'scenarios', 'exercise'],
+};
 class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        openDelete: false,
-        openGallery: false,
-        openConfirmMailExpediteur: false,
-        openExport: false,
-        openImport: false,
-        initialStartDate: '',
-        initialEmailExpediteur: '',
-        newStartDate: '',
-        newData: '',
-        exerciseNameExist: false,
-        file: {'file_id': '0'},
-        typesToExport: {
-          'exercise': '1',
-          'audience': '1',
-          'objective': '1',
-          'scenarios': '1',
-          'incidents': '1',
-          'injects': '1'
-        }
-      }
+      openDelete: false,
+      openGallery: false,
+      openExport: false,
+      openImport: false,
+      newStartDate: '',
+      newData: '',
+      exerciseNameExist: false,
+      file: { file_id: '0' },
+      typesToExport: {
+        exercise: '1',
+        audience: '1',
+        objective: '1',
+        scenarios: '1',
+        incidents: '1',
+        injects: '1',
+      },
+    };
   }
+
   componentDidMount() {
-    this.props.fetchGroups()
+    this.props.fetchGroups();
   }
 
   onUpdate(data) {
-    let newData = R.pipe( //Need to convert date to ISO format with timezone
+    const newData = R.pipe(
+      // Need to convert date to ISO format with timezone
       R.assoc('exercise_start_date', dateToISO(data.exercise_start_date)),
       R.assoc('exercise_end_date', dateToISO(data.exercise_end_date)),
-      R.assoc('exercise_mail_expediteur', data.exercise_mail_expediteur)
-    )(data)
-
-    if (newData.exercise_mail_expediteur !== this.props.initialEmailExpediteur) {
-      this.setState({newData: newData})
-      this.setState({openConfirmMailExpediteur: true})
-    } else {
-        return this.props.updateExercise(this.props.id, newData)
-    }
-  }
-
-  submitInformation() {
-    this.refs.informationForm.submit()
+    )(data);
+    return this.props.updateExercise(this.props.id, newData);
   }
 
   submitExportEml() {
-    return this.props.exportInjectEml(this.props.id)
-  }
-
-  submitTemplate() {
-    this.refs.templateForm.submit()
+    return this.props.exportInjectEml(this.props.id);
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
+    this.setState({ openDelete: true });
   }
 
   handleOpenExport() {
-    this.setState({openExport: true})
+    this.setState({ openExport: true });
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({ openDelete: false });
   }
 
   handleCloseExport() {
-    this.setState({openExport: false})
+    this.setState({ openExport: false });
   }
 
-
-  handleExportCheck(type, event, isChecked) {
-    let typesToExport = this.state.typesToExport
+  handleExportCheck(type, event) {
+    const { typesToExport } = this.state;
+    const isChecked = event.target.checked;
+    typesToExport[type] = isChecked ? '1' : '0';
     if (isChecked) {
-      typesToExport[type] = '1'
+      // Check all dependencies
+      for (let index = 0; index < dependencies[type].length; index += 1) {
+        const typeElement = dependencies[type][index];
+        typesToExport[typeElement] = '1';
+      }
     } else {
-      typesToExport[type] = '0'
+      // Uncheck all dependent on this one
+      const entries = Object.entries(dependencies);
+      for (let index = 0; index < entries.length; index += 1) {
+        const [k, v] = entries[index];
+        if (v.includes(type)) {
+          typesToExport[k] = '0';
+        }
+      }
     }
-    this.setState({typesToExport: typesToExport})
+    // Type to export are hierarchical, check or uncheck must be propagated
+    this.setState({ typesToExport });
   }
-
 
   handleOpenGallery() {
-    this.setState({openGallery: true})
+    this.setState({ openGallery: true });
   }
 
   handleCloseGallery() {
-    this.setState({openGallery: false})
+    this.setState({ openGallery: false });
   }
 
   submitDelete() {
-    return this.props.deleteExercise(this.props.id).then(() => this.props.redirectToHome())
+    return this.props
+      .deleteExercise(this.props.id)
+      .then(() => this.props.redirectToHome());
   }
 
+  // eslint-disable-next-line consistent-return
   submitExport() {
-    let dataToExport = this.state.typesToExport
-    if ((dataToExport['audience'] === '1') && (dataToExport['exercise'] === '0')) {
-        alert("Il est impossible d'exporter les audiences sans exporter l'exercice")
-    } else if ((dataToExport['objective'] === '1') && (dataToExport['exercise'] === '0')) {
-        alert("Il est impossible d'exporter les objectifs sans exporter l'exercice")
-    } else if ((dataToExport['scenarios'] === '1') && (dataToExport['exercise'] === '0')) {
-        alert("Il est impossible d'exporter les scénarios sans exporter l'exercice")
-    } else if ((dataToExport['incidents'] === '1') && (dataToExport['scenarios'] === 0 || dataToExport['exercise'] === '0')) {
-        alert("Il est impossible d'exporter les incidents sans exporter l'exercice et les scénarios")
-    } else if ((dataToExport['injects'] === '1') && (dataToExport['incidents'] === 0 || dataToExport['scenarios'] === 0 || dataToExport['exercise'] === '0')) {
-        alert("Il est impossible d'exporter les incidents sans exporter l'exercice, les scénarios et les incidents")
-    } else {
-      this.setState({openExport: false})
-      return this.props.exportExercise(this.props.id, dataToExport);
-    }
+    const dataToExport = this.state.typesToExport;
+    this.setState({ openExport: false });
+    return this.props.exportExercise(this.props.id, dataToExport);
   }
-
 
   handleImageSelection(file) {
-    let data = {"exercise_image": file.file_id}
-    this.props.updateExercise(this.props.id, data)
-    this.handleCloseGallery()
-  }
-
-  handleCloseConfirmMailExpediteur() {
-   this.setState({openConfirmMailExpediteur: false})
-  }
-
-  submitConfirmEmail(data) {
-    let newData = this.state.newData
-    this.props.updateExercise(this.props.id, newData)
-    this.handleCloseConfirmMailExpediteur()
+    const data = { exercise_image: file.file_id };
+    this.props.updateExercise(this.props.id, data);
+    this.handleCloseGallery();
   }
 
   render() {
-    let exercise_is_deletable = R.propOr(true, 'user_can_delete', this.props.exercise)
-
-    const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      exercise_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
-    ]
-
-    const exportActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseExport.bind(this)}/>,
-      <FlatButton key="export" label="Export" primary={true} onClick={this.submitExport.bind(this)}/>,
-    ]
-
-    const confirmEmailActions = [
-      <FlatButton key="no" label="No" primary={true} onClick={this.handleCloseConfirmMailExpediteur.bind(this)}/>,
-      <FlatButton key="yes" label="Yes" primary={true} onClick={this.submitConfirmEmail.bind(this)}/>
-    ]
-
-    const {exercise} = this.props
-    let splittedStartDate = R.split(' ', dateFormat(R.path(['exercise', 'exercise_start_date'], this.props)))
-    let splittedEndDate = R.split(' ', dateFormat(R.path(['exercise', 'exercise_end_date'], this.props)))
-    let initPipe = R.pipe(
-      R.assoc('exercise_start_date_only', splittedStartDate[0]),
-      R.assoc('exercise_start_time', splittedStartDate[1]),
-      R.assoc('exercise_end_date_only', splittedEndDate[0]),
-      R.assoc('exercise_end_time', splittedStartDate[1]),
-      R.assoc('exercise_animation_group', R.path(['exercise', 'exercise_animation_group', 'group_id'], this.props)),
+    const exerciseIsDeletable = R.propOr(
+      true,
+      'user_can_delete',
+      this.props.exercise,
+    );
+    const { classes, exercise } = this.props;
+    const initPipe = R.pipe(
+      R.assoc(
+        'exercise_animation_group',
+        R.path(['exercise', 'exercise_animation_group', 'group_id'], this.props),
+      ),
       R.pick([
         'exercise_name',
         'exercise_description',
         'exercise_subtitle',
-        'exercise_start_date_only',
-        'exercise_start_time',
-        'exercise_end_date_only',
-        'exercise_end_time',
+        'exercise_start_date',
+        'exercise_end_date',
         'exercise_message_header',
         'exercise_message_footer',
         'exercise_mail_expediteur',
-        'exercise_animation_group'])
-    )
-
-    const informationValues = exercise !== undefined ? initPipe(exercise) : undefined
-    const image_id = R.pathOr(null, ['exercise_image', 'file_id'], exercise)
+        'exercise_animation_group',
+      ]),
+    );
+    const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
+    const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
+    const { typesToExport } = this.state;
     return (
-      <div>
-
-        {this.props.userCanUpdate ?
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2>Information</h2>
-            <ExerciseForm
-              ref="informationForm"
-              onSubmit={this.onUpdate.bind(this)}
-              initialValues={informationValues}
-              hideDates={true}
-            />
+      <div style={{ width: 800, margin: '0 auto' }}>
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              Information
+            </Typography>
+            {informationValues && (
+              <ExerciseForm
+                onSubmit={this.onUpdate.bind(this)}
+                edit={true}
+                initialValues={informationValues}
+                groups={this.props.groups}
+              />
+            )}
             <br />
-            <Button type="submit" label="Update" onClick={this.submitInformation.bind(this)}/>
-          </div>
-          <Dialog
-            title="Confirmer le changement de mail expéditeur"
-            modal={false}
-            open={this.state.openConfirmMailExpediteur}
-            onRequestClose={this.handleCloseConfirmMailExpediteur.bind(this)}
-            actions={confirmEmailActions}
-          >
-            <T>Confirmez vous le changement de mail expédieur ?</T>
-          </Dialog>
-        </Paper>
-        : ""
-        }
-
-        {this.props.userCanUpdate ?
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2><T>Messages template</T></h2>
-            <TemplateForm ref="templateForm" onSubmit={this.onUpdate.bind(this)} initialValues={informationValues}
-                          groups={this.props.groups}/>
-            <br />
-            <Button type="submit" label="Update" onClick={this.submitTemplate.bind(this)}/>
-          </div>
-        </Paper>
-        : ""
-        }
-
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2>Image</h2>
-            <br />
-            {image_id ? <Image image_id={image_id} alt="Exercise logo" style={styles.image}/> : ""}
-            <br /><br />
-            {this.props.userCanUpdate ?
-              <div>
-                <Button
-                  label='Change the image'
-                  onClick={this.handleOpenGallery.bind(this)}
-                />
-                <Dialog
-                  modal={false}
-                  open={this.state.openGallery}
-                  onRequestClose={this.handleCloseGallery.bind(this)}
-                >
-                  <FileGallery fileSelector={this.handleImageSelection.bind(this)}/>
-                </Dialog>
-              </div>
-              : ""
-            }
-          </div>
-        </Paper>
-
-        {this.props.userCanUpdate ?
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2><T>Delete</T></h2>
-            <p><T>Deleting an exercise will result in deleting all its content, including objectives, events, incidents,
-              injects and audience. We do not recommend you do this.</T></p>
-            {exercise_is_deletable ? <Button label="Delete" onClick={this.handleOpenDelete.bind(this)}/> : ""}
-            <Dialog
-              title="Confirmation"
-              modal={false}
-              open={this.state.openDelete}
-              onRequestClose={this.handleCloseDelete.bind(this)}
-              actions={deleteActions}
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('exerciseForm')}
             >
-              <T>Do you want to delete this exercise?</T>
-            </Dialog>
-          </div>
+              <T>Update</T>
+            </Button>
+          </Paper>
+        )}
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              <T>Messages template</T>
+            </Typography>
+            {informationValues && (
+              <TemplateForm
+                onSubmit={this.onUpdate.bind(this)}
+                initialValues={informationValues}
+              />
+            )}
+            <br />
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('templateForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </Paper>
+        )}
+        <Paper elevation={4} className={classes.paper}>
+          <Typography variant="h5" style={{ marginBottom: 20 }}>
+            Image
+          </Typography>
+          {imageId && (
+            <Image
+              image_id={imageId}
+              alt="Exercise logo"
+              style={{ width: '90%' }}
+            />
+          )}
+          <br />
+          <br />
+          {this.props.userCanUpdate && (
+            <div>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.handleOpenGallery.bind(this)}
+              >
+                <T>Change the image</T>
+              </Button>
+              <Dialog
+                open={this.state.openGallery}
+                onClose={this.handleCloseGallery.bind(this)}
+                TransitionComponent={Transition}
+                fullScreen={true}
+              >
+                <AppBar className={classes.appBar}>
+                  <Toolbar>
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      onClick={this.handleCloseGallery.bind(this)}
+                      aria-label="close"
+                    >
+                      <Close />
+                    </IconButton>
+                    <Typography variant="h6" className={classes.title}>
+                      <T>Files gallery</T>
+                    </Typography>
+                  </Toolbar>
+                </AppBar>
+                <DialogContent>
+                  <FileGallery
+                    fileSelector={this.handleImageSelection.bind(this)}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
+          )}
         </Paper>
-        : ""
-        }
-
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-             <h2><T>Export an exercise</T></h2>
-              <p><T>Full export for an excercise.</T></p>
-              <p><T>Note: You can import a previously exported exercise on "create exercise" form.</T></p>
-              <Button label="Export" onClick={this.handleOpenExport.bind(this)}/>
-            <Dialog title="Export of Exercise" modal={true} open={this.state.openExport}
-                    onRequestClose={this.handleCloseExport.bind(this)}
-                    actions={exportActions}>
-              <T>Please, chose data to export</T>
-              <Table selectable={true} style={{marginTop: '5px'}}>
-                <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+        <Paper elevation={4} className={classes.paper}>
+          <Typography variant="h5" style={{ marginBottom: 20 }}>
+            <T>Export of the emails</T>
+          </Typography>
+          <Typography variant="body1" style={{ marginBottom: 20 }}>
+            <T>
+              Export all email injects to files (.eml) so you can use it into
+              your mail client.
+            </T>
+          </Typography>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.submitExportEml.bind(this)}
+          >
+            <T>Export</T>
+          </Button>
+        </Paper>
+        <Paper elevation={4} className={classes.paper}>
+          <Typography variant="h5" style={{ marginBottom: 20 }}>
+            <T>Export of the exercise</T>
+          </Typography>
+          <Typography variant="body1" style={{ marginBottom: 20 }}>
+            <T>
+              Note: you can import a previously exported exercise from the home
+              page.
+            </T>
+          </Typography>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={this.handleOpenExport.bind(this)}
+          >
+            <T>Export</T>
+          </Button>
+          <Dialog
+            fullWidth={true}
+            maxWidth="md"
+            TransitionComponent={Transition}
+            open={this.state.openExport}
+            onClose={this.handleCloseExport.bind(this)}
+          >
+            <DialogTitle>
+              <T>Export of Exercise</T>
+            </DialogTitle>
+            <DialogContent>
+              <T>Please, choose data to export</T>
+              <Table selectable={true} style={{ marginTop: '5px' }}>
+                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                   <TableRow>
-                    <TableHeaderColumn width='30'><T>Export</T></TableHeaderColumn>
-                    <TableHeaderColumn width='130'><T>Item</T></TableHeaderColumn>
-                    <TableHeaderColumn><T>Description</T></TableHeaderColumn>
+                    <TableCell width="30">
+                      <T>Export</T>
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Item</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Description</T>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
+                </TableHead>
                 <TableBody displayRowCheckbox={false}>
                   <TableRow key="tab-exercise">
-                    <TableRowColumn width='30'>
-                      <Checkbox defaultChecked={true} name="chk-export-exercise" onCheck={this.handleExportCheck.bind(this, 'exercise')}/>
-                    </TableRowColumn>
-                    <TableRowColumn width='130'><T>Exercise</T></TableRowColumn>
-                    <TableRowColumn><T>Export data of current exercise</T></TableRowColumn>
+                    <TableCell width="30">
+                      <Checkbox
+                        checked={typesToExport.exercise === '1'}
+                        name="chk-export-exercise"
+                        onClick={this.handleExportCheck.bind(this, 'exercise')}
+                      />
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Exercise</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Export data of current exercise</T>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-audiences">
-                    <TableRowColumn width='30'>
-                      <Checkbox defaultChecked={true} name="chk-export-audiences" onCheck={this.handleExportCheck.bind(this, 'audience')}/>
-                    </TableRowColumn>
-                    <TableRowColumn width='130'><T>Audiences</T></TableRowColumn>
-                    <TableRowColumn><T>Export audiences data</T></TableRowColumn>
+                    <TableCell width="30">
+                      <Checkbox
+                        checked={typesToExport.audience === '1'}
+                        name="chk-export-audiences"
+                        onClick={this.handleExportCheck.bind(this, 'audience')}
+                      />
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Audiences</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Export audiences data</T>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-objective">
-                    <TableRowColumn width='30'>
-                      <Checkbox defaultChecked={true} name="chk-export-objective" onCheck={this.handleExportCheck.bind(this, 'objective')}/>
-                    </TableRowColumn>
-                    <TableRowColumn width='130'><T>Objective</T></TableRowColumn>
-                    <TableRowColumn><T>Export objectives data</T></TableRowColumn>
+                    <TableCell width="30">
+                      <Checkbox
+                        checked={typesToExport.objective === '1'}
+                        name="chk-export-objective"
+                        onClick={this.handleExportCheck.bind(this, 'objective')}
+                      />
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Objective</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Export objectives data</T>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-scenarios">
-                    <TableRowColumn width='30'>
-                      <Checkbox defaultChecked={true} name="chk-export-scenarios" onCheck={this.handleExportCheck.bind(this, 'scenarios')}/>
-                    </TableRowColumn>
-                    <TableRowColumn width='130'><T>Events</T></TableRowColumn>
-                    <TableRowColumn><T>Export events data</T></TableRowColumn>
+                    <TableCell width="30">
+                      <Checkbox
+                        checked={typesToExport.scenarios === '1'}
+                        name="chk-export-scenarios"
+                        onClick={this.handleExportCheck.bind(this, 'scenarios')}
+                      />
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Events</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Export events data</T>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-incidents">
-                    <TableRowColumn width='30'>
-                      <Checkbox defaultChecked={true} name="chk-export-incidents" onCheck={this.handleExportCheck.bind(this, 'incidents')}/>
-                    </TableRowColumn>
-                    <TableRowColumn width='130'><T>Incidents</T></TableRowColumn>
-                    <TableRowColumn><T>Export incidents data</T></TableRowColumn>
+                    <TableCell width="30">
+                      <Checkbox
+                        checked={typesToExport.incidents === '1'}
+                        name="chk-export-incidents"
+                        onClick={this.handleExportCheck.bind(this, 'incidents')}
+                      />
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Incidents</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Export incidents data</T>
+                    </TableCell>
                   </TableRow>
                   <TableRow key="tab-injects">
-                    <TableRowColumn width='30'>
-                      <Checkbox defaultChecked={true} name="chk-export-injects" onCheck={this.handleExportCheck.bind(this, 'injects')}/>
-                    </TableRowColumn>
-                    <TableRowColumn width='130'><T>Injects</T></TableRowColumn>
-                    <TableRowColumn><T>Export injects data</T></TableRowColumn>
+                    <TableCell width="30">
+                      <Checkbox
+                        checked={typesToExport.injects === '1'}
+                        name="chk-export-injects"
+                        onClick={this.handleExportCheck.bind(this, 'injects')}
+                      />
+                    </TableCell>
+                    <TableCell width="130">
+                      <T>Injects</T>
+                    </TableCell>
+                    <TableCell>
+                      <T>Export injects data</T>
+                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseExport.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitExport.bind(this)}
+              >
+                <T>Export</T>
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Paper>
+        {this.props.userCanUpdate && (
+          <Paper elevation={4} className={classes.paper}>
+            <Typography variant="h5" style={{ marginBottom: 20 }}>
+              <T>Delete</T>
+            </Typography>
+            <Typography variant="body1" style={{ marginBottom: 20 }}>
+              <T>
+                Deleting an exercise will result in deleting all its content,
+                including objectives, events, incidents, injects and audience.
+                We do not recommend you do this.
+              </T>
+            </Typography>
+            {exerciseIsDeletable && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={this.handleOpenDelete.bind(this)}
+              >
+                <T>Delete</T>
+              </Button>
+            )}
+            <Dialog
+              open={this.state.openDelete}
+              TransitionComponent={Transition}
+              onClose={this.handleCloseDelete.bind(this)}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  <T>Do you want to delete this exercise?</T>
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseDelete.bind(this)}
+                >
+                  <T>Cancel</T>
+                </Button>
+                {exerciseIsDeletable && (
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={this.submitDelete.bind(this)}
+                  >
+                    <T>Delete</T>
+                  </Button>
+                )}
+              </DialogActions>
             </Dialog>
-          </div>
-        </Paper>
-
-        <Paper type={Constants.PAPER_TYPE_SETTINGS} zDepth={2}>
-          <div style={styles.PaperContent}>
-            <h2><T>Export des Emails</T></h2>
-            <p><T>Exporter de tous les injects de l'exercice au format EML dans une archive.</T></p>
-            <Button label='Exporter' onClick={this.submitExportEml.bind(this)}/>
-          </div>
-        </Paper>
-
+          </Paper>
+        )}
       </div>
-    )
+    );
   }
 }
 
@@ -420,7 +579,6 @@ Index.propTypes = {
   id: PropTypes.string,
   exercise: PropTypes.object,
   exercise_statuses: PropTypes.object,
-  initialStartDate: PropTypes.string,
   initialEmailExpediteur: PropTypes.string,
   params: PropTypes.object,
   updateExercise: PropTypes.func,
@@ -433,50 +591,61 @@ Index.propTypes = {
   groups: PropTypes.array,
   addFile: PropTypes.func,
   userCanUpdate: PropTypes.bool,
-  getImportFileSheetsName: PropTypes.func
-}
+  getImportFileSheetsName: PropTypes.func,
+};
 
 const checkUserCanUpdate = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let userId = R.path(['logged', 'user'], state.app)
-  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
-
-  let userCanUpdate = isAdmin
+  const { id: exerciseId } = ownProps;
+  const userId = R.path(['logged', 'user'], state.app);
+  let userCanUpdate = R.path(
+    [userId, 'user_admin'],
+    state.referential.entities.users,
+  );
   if (!userCanUpdate) {
-    let groupValues = R.values(state.referential.entities.groups)
+    const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
       group.group_grants.forEach((grant) => {
         if (
           grant
           && grant.grant_exercise
-          && (grant.grant_exercise.exercise_id === exerciseId)
-          && (grant.grant_name === 'PLANNER')
+          && grant.grant_exercise.exercise_id === exerciseId
+          && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && (user.user_id === userId)) {
-              userCanUpdate = true
+            if (user && user.user_id === userId) {
+              userCanUpdate = true;
             }
-          })
+          });
         }
-      })
-    })
+      });
+    });
   }
-
-  return userCanUpdate
-}
+  return userCanUpdate;
+};
 
 const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let exercise = R.prop(exerciseId, state.referential.entities.exercises)
-
+  const { id: exerciseId } = ownProps;
+  const exercise = R.prop(exerciseId, state.referential.entities.exercises);
   return {
     id: exerciseId,
-    exercise: exercise,
+    exercise,
     groups: R.values(state.referential.entities.groups),
     userCanUpdate: checkUserCanUpdate(state, ownProps),
-    initialStartDate: dateToISO(R.propOr('1970-01-01 08:00:00', 'exercise_start_date', exercise)),
-    initialEmailExpediteur: R.prop('exercise_mail_expediteur', exercise)
-  }
-}
+    initialEmailExpediteur: R.prop('exercise_mail_expediteur', exercise),
+  };
+};
 
-export default connect(select, {updateExercise, redirectToHome, deleteExercise, exportInjectEml, exportExercise , fetchGroups, shiftAllInjects, addFile, getImportFileSheetsName})(Index)
+export default R.compose(
+  connect(select, {
+    updateExercise,
+    redirectToHome,
+    deleteExercise,
+    exportInjectEml,
+    exportExercise,
+    fetchGroups,
+    shiftAllInjects,
+    addFile,
+    getImportFileSheetsName,
+  }),
+  withStyles(styles),
+)(Index);

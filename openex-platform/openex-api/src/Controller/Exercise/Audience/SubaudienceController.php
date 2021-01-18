@@ -28,29 +28,21 @@ class SubaudienceController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
-
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
-
         $this->denyAccessUnlessGranted('select', $exercise);
-
-        $objective = $em->getRepository('App:Audience')->find($request->get('audience_id'));
-        /* @var $audience Audience */
-
+        $audience = $em->getRepository('App:Audience')->find($request->get('audience_id'));
         if (empty($audience) || $audience->getAudienceExercise() != $exercise) {
             return $this->audienceNotFound();
         }
-
         $subaudiences = $em->getRepository('App:Subaudience')->findBy(['subaudience_audience' => $audience]);
         /* @var $subaudiences Subaudience[] */
-
         foreach ($subaudiences as &$subaudience) {
             $subaudience->setSubaudienceExercise($exercise->getExerciseId());
             $subaudience->setUserCanUpdate($this->hasGranted(self::UPDATE, $subaudience));
             $subaudience->setUserCanDelete($this->hasGranted(self::DELETE, $subaudience));
         }
-
         return $subaudiences;
     }
 
@@ -76,20 +68,16 @@ class SubaudienceController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
-
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
-
         $this->denyAccessUnlessGranted('update', $exercise);
-
         $audience = $em->getRepository('App:Audience')->find($request->get('audience_id'));
         /* @var $audience Audience */
 
         if (empty($audience) || $audience->getAudienceExercise() != $exercise) {
             return $this->audienceNotFound();
         }
-
         $subaudience = new Subaudience();
         $subaudience->setSubaudienceName($request->get('subaudience_name'));
         $subaudience->setSubaudienceAudience($audience);
@@ -115,27 +103,21 @@ class SubaudienceController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
-
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
-
         $this->denyAccessUnlessGranted('update', $exercise);
-
         $audience = $em->getRepository('App:Audience')->find($request->get('audience_id'));
         /* @var $audience Audience */
-
         if (empty($audience) || $audience->getAudienceExercise() != $exercise) {
             return $this->audienceNotFound();
         }
-
         $subaudience = $em->getRepository('App:Subaudience')->find($request->get('subaudience_id'));
         /* @var $subaudience Subaudience */
 
         if (empty($subaudience) || $subaudience->getSubaudienceAudience() != $audience) {
             return $this->subaudienceNotFound();
         }
-
         $em->remove($subaudience);
         $em->flush();
     }
@@ -162,50 +144,47 @@ class SubaudienceController extends BaseController
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
-
         $this->denyAccessUnlessGranted('update', $exercise);
-
         $audience = $em->getRepository('App:Audience')->find($request->get('audience_id'));
         /* @var $audience Audience */
 
         if (empty($audience) || $audience->getAudienceExercise() != $exercise) {
             return $this->audienceNotFound();
         }
-
         $subaudience = $em->getRepository('App:Subaudience')->find($request->get('subaudience_id'));
         /* @var $subaudience Subaudience */
 
         if (empty($subaudience) || $subaudience->getSubaudienceAudience() != $audience) {
             return $this->subaudienceNotFound();
         }
-
         $form = $this->createForm(SubaudienceType::class, $subaudience);
-
         $subAudienceData = $request->request->all();
+        $usersHasBeenUpdated = false;
         if (isset($subAudienceData['subaudience_users'])) {
+            $usersHasBeenUpdated = true;
             $subAudienceUsersData = $subAudienceData['subaudience_users'];
             unset($subAudienceData['subaudience_users']);
         }
-
         $form->submit($subAudienceData, false);
         if ($form->isValid()) {
-            foreach ($subaudience->getSubaudienceUsers() as $subaudienceUser) {
-                $isUserFoundInSubaudience = false;
-                foreach ($subAudienceUsersData as $key => $userId) {
-                    if ($userId === $subaudienceUser->getUserId()) {
-                        $isUserFoundInSubaudience = true;
+            if( $usersHasBeenUpdated ) {
+                foreach ($subaudience->getSubaudienceUsers() as $subaudienceUser) {
+                    $isUserFoundInSubaudience = false;
+                    foreach ($subAudienceUsersData as $key => $userId) {
+                        if ($userId === $subaudienceUser->getUserId()) {
+                            $isUserFoundInSubaudience = true;
+                        }
+                    }
+                    if (!$isUserFoundInSubaudience) {
+                        $subaudience->removeSubaudienceUser($subaudienceUser);
                     }
                 }
-                if (!$isUserFoundInSubaudience) {
-                    $subaudience->removeSubaudienceUser($subaudienceUser);
-                }
-            }
-
-            if (count($subAudienceUsersData) > 0) {
-                foreach ($subAudienceUsersData as $key => $userId) {
-                    $oUser = $em->getRepository('App:User')->find($userId);
-                    if ($oUser) {
-                        $subaudience->addSubaudienceUser($oUser);
+                if (count($subAudienceUsersData) > 0) {
+                    foreach ($subAudienceUsersData as $key => $userId) {
+                        $oUser = $em->getRepository('App:User')->find($userId);
+                        if ($oUser) {
+                            $subaudience->addSubaudienceUser($oUser);
+                        }
                     }
                 }
             }

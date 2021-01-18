@@ -1,70 +1,103 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {T} from '../../../../../components/I18n'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {redirectToAudiences, redirectToComcheck} from '../../../../../actions/Application'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import * as R from 'ramda'
-import {Popover} from '../../../../../components/Popover'
-import {Menu} from '../../../../../components/Menu'
-import {Dialog} from '../../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../../components/Button'
-import {Checkbox} from '../../../../../components/Checkbox'
-import {Icon} from '../../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {addComcheck} from '../../../../../actions/Comcheck'
-import {updateAudience, downloadExportAudience, deleteAudience, copyAudienceToExercise} from '../../../../../actions/Audience'
-import {getPlanificateurUserForAudience, updatePlanificateurUserForAudience} from '../../../../../actions/Planificateurs'
-import AudienceForm from './AudienceForm'
-import ComcheckForm from '../../check/ComcheckForm'
-import {injectIntl} from 'react-intl'
-import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table'
-import {fetchExercises} from '../../../../../actions/Exercise'
-import {dateFormat, timeDiff} from '../../../../../utils/Time'
-import PlanificateurAudience from '../../planificateurs/PlanificateurAudience'
-
-const style = {
-  margin: '8px -30px 0 0'
-}
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import { injectIntl } from 'react-intl';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Checkbox from '@material-ui/core/Checkbox';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Slide from '@material-ui/core/Slide';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import {
+  redirectToAudiences,
+  redirectToComcheck,
+} from '../../../../../actions/Application';
+import { addComcheck } from '../../../../../actions/Comcheck';
+import {
+  updateAudience,
+  downloadExportAudience,
+  deleteAudience,
+  copyAudienceToExercise,
+} from '../../../../../actions/Audience';
+import {
+  getPlanificateurUserForAudience,
+  updatePlanificateurUserForAudience,
+} from '../../../../../actions/Planificateurs';
+import AudienceForm from './AudienceForm';
+import ComcheckForm from '../../check/comcheck/ComcheckForm';
+import { fetchExercises } from '../../../../../actions/Exercise';
+import { dateFormat, timeDiff } from '../../../../../utils/Time';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
-    'Update the audience': 'Modifier l\'audience',
-    'Do you want to delete this audience?': 'Souhaitez-vous supprimer cette audience ?',
+    'Update the audience': "Modifier l'audience",
+    'Do you want to delete this audience?':
+      'Souhaitez-vous supprimer cette audience ?',
     'Launch a comcheck': 'Lancer un test de communication',
-    'Copy Audience to Exercise': 'Copier l\'audience vers un autre exercice',
+    'Copy audience to another exercise':
+      "Copier l'audience vers un autre exercice",
     'Communication check': 'Test de communication',
-    'Hello': 'Bonjour',
-    'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:': 'Ceci est un test de communication avant le début de l\'exercice. Merci de cliquer sur le lien ci-dessous afin de confirmer que vous avez bien reçu ce message :',
+    Hello: 'Bonjour',
+    'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:':
+      "Ceci est un test de communication avant le début de l'exercice. Merci de cliquer sur le lien ci-dessous afin de confirmer que vous avez bien reçu ce message :",
     'Best regards': 'Cordialement',
-    'The exercise control Team': 'La direction de l\'animation',
-    'Do you want to disable this audience?': 'Souhaitez-vous désactiver cette audience ?',
-    'Do you want to enable this audience?': 'Souhaitez-vous activer cette audience ?',
-    'Disable': 'Désactiver',
-    'Enable': 'Activer',
+    'The exercise control Team': "La direction de l'animation",
+    'Do you want to disable this audience?':
+      'Souhaitez-vous désactiver cette audience ?',
+    'Do you want to enable this audience?':
+      'Souhaitez-vous activer cette audience ?',
+    Disable: 'Désactiver',
+    Enable: 'Activer',
     'No excercise found': 'Aucun exercice trouvé',
     'Start Date': 'Date de début',
     'End Date': 'Date de fin',
-    'Copy': 'Copier'
-  }
-})
+    Copy: 'Copier',
+    'List of planners': 'Liste des planificateurs',
+  },
+});
+
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class AudiencePopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      anchorEl: null,
       openDelete: false,
       openEdit: false,
       openComcheck: false,
-      openPlanificateur: false,
       openCopyAudience: false,
       openEnable: false,
       openDisable: false,
-      openPopover: false,
       exercicesToAdd: [],
-      planificateursAudience: []
-    }
+      planificateursAudience: [],
+    };
   }
 
   componentDidMount() {
@@ -72,350 +105,482 @@ class AudiencePopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation()
-    this.setState({openPopover: true, anchorEl: event.currentTarget})
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
-  }
-
-  handleOpenPlanificateur() {
-    this.props.getPlanificateurUserForAudience(this.props.exerciseId, this.props.audience.audience_id).then(data => {
-        this.setState({planificateursAudience: []})
-        let listePlanificateursAudience = [...this.state.planificateursAudience]
-        data.result.forEach(function(planificateur) {
-
-            let dataPlanificateur = {
-                user_id: planificateur.user_id,
-                user_firstname: planificateur.user_firstname,
-                user_lastname: planificateur.user_lastname,
-                user_email: planificateur.user_email,
-                is_planificateur_audience: planificateur.is_planificateur_audience
-            }
-            listePlanificateursAudience.push(dataPlanificateur)
-        })
-        this.setState({planificateursAudience: listePlanificateursAudience})
-        this.setState({openPopover: false})
-        this.setState({openPlanificateur: true})
-    })
+    this.setState({ anchorEl: null });
   }
 
   handleOpenComcheck() {
-    this.setState({openComcheck: true})
-    this.handlePopoverClose()
+    this.setState({ openComcheck: true });
+    this.handlePopoverClose();
   }
 
   handleOpenCopyAudienceToOtherExercise(event) {
-    event.stopPropagation()
-    this.setState({openCopyAudience: true})
-    this.handlePopoverClose()
+    event.stopPropagation();
+    this.setState({ openCopyAudience: true });
+    this.handlePopoverClose();
   }
 
   handleCloseComcheck() {
-    this.setState({openComcheck: false})
-  }
-
-  handleClosePlanificateur() {
-    this.setState({openPlanificateur: false})
+    this.setState({ openComcheck: false });
   }
 
   handleCloseCopyAudienceToOtherExercise() {
-      this.setState({openCopyAudience: false})
+    this.setState({ openCopyAudience: false });
   }
 
   onSubmitComcheck(data) {
-    return this.props.addComcheck(this.props.exerciseId, data).then((payload) => {
-      this.props.redirectToComcheck(this.props.exerciseId, payload.result)
-    })
+    return this.props
+      .addComcheck(this.props.exerciseId, data)
+      .then((payload) => {
+        this.props.redirectToComcheck(this.props.exerciseId, payload.result);
+      });
   }
 
   handleOpenEdit() {
-    this.setState({openEdit: true})
-    this.handlePopoverClose()
+    this.setState({ openEdit: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false})
+    this.setState({ openEdit: false });
   }
 
   onSubmitEdit(data) {
-    return this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, data)
+    return this.props
+      .updateAudience(
+        this.props.exerciseId,
+        this.props.audience.audience_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
-  submitFormEdit() {
-    this.refs.audienceForm.submit()
+  onSubmitCopyAudience() {
+    this.setState({ openCopyAudience: false });
+    const exercicesToAdd = [...this.state.exercicesToAdd];
+    const audienceId = this.props.audience.audience_id;
+    const { copyAudienceToExerciseAction } = this.props;
+    exercicesToAdd.forEach((exerciseId) => {
+      const data = { audience_id: audienceId, exercise_id: exerciseId };
+      copyAudienceToExerciseAction(exerciseId, audienceId, data);
+    });
   }
 
-  onSubmitCopyAudience(event) {
-        this.setState({openCopyAudience: false})
-        let exercicesToAdd = [...this.state.exercicesToAdd]
-        let audienceId = this.props.audience.audience_id
-        let copyAudienceToExercise = this.props.copyAudienceToExercise
-        exercicesToAdd.forEach(function(exerciseId) {
-            let data = {'audience_id': audienceId, 'exercise_id': exerciseId}
-            copyAudienceToExercise(exerciseId, audienceId, data)
-        })
+  handleCopyCheck(exerciceId, event, isChecked) {
+    const exercicesToAdd = [...this.state.exercicesToAdd];
+    if (isChecked) {
+      exercicesToAdd.push(exerciceId);
+    } else {
+      const index = exercicesToAdd.indexOf(exerciceId);
+      exercicesToAdd.splice(index, 1);
     }
-
-  submitFormComcheck() {
-      this.refs.comCheck.submit()
-  }
-
-  submitFormPlanificateur() {
-      this.props.updatePlanificateurUserForAudience(this.props.exerciseId, this.props.audience.audience_id, this.state.planificateursAudience)
-      this.setState({openPlanificateur: false})
-  }
-
-  handleCopyCheck(exerciceId, event, isChecked ) {
-      let exercicesToAdd = [...this.state.exercicesToAdd]
-      if (isChecked) {
-        exercicesToAdd.push(exerciceId)
-      } else {
-          var index = exercicesToAdd.indexOf(exerciceId)
-          exercicesToAdd.splice(index, 1);
-      }
-      this.setState({exercicesToAdd: exercicesToAdd})
+    this.setState({ exercicesToAdd });
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
-    this.handlePopoverClose()
+    this.setState({ openDelete: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({ openDelete: false });
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.exerciseId, this.props.audience.audience_id).then(() => this.props.redirectToAudiences(this.props.exerciseId))
-    this.handleCloseDelete()
+    this.props
+      .deleteAudience(this.props.exerciseId, this.props.audience.audience_id)
+      .then(() => this.props.redirectToAudiences(this.props.exerciseId));
+    this.handleCloseDelete();
   }
 
   handleOpenDisable() {
-    this.setState({openDisable: true})
-    this.handlePopoverClose()
+    this.setState({ openDisable: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDisable() {
-    this.setState({openDisable: false})
+    this.setState({ openDisable: false });
   }
 
   submitDisable() {
-    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {'audience_enabled': false})
-    this.handleCloseDisable()
+    this.props.updateAudience(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      { audience_enabled: false },
+    );
+    this.handleCloseDisable();
   }
 
   handleOpenEnable() {
-    this.setState({openEnable: true})
-    this.handlePopoverClose()
+    this.setState({ openEnable: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEnable() {
-    this.setState({openEnable: false})
-  }
-
-  handleCheckPlanificateur(userId, audienceId, isChecked ) {
-
-      let liste_planificateurs = [...this.state.planificateursAudience]
-      liste_planificateurs.forEach(function(user) {
-          if (user.user_id === userId) {
-              user.is_planificateur_audience = isChecked;
-          }
-      })
-      this.setState({planificateursAudience:liste_planificateurs})
+    this.setState({ openEnable: false });
   }
 
   submitEnable() {
-    this.props.updateAudience(this.props.exerciseId, this.props.audience.audience_id, {'audience_enabled': true})
-    this.handleCloseEnable()
+    this.props.updateAudience(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      { audience_enabled: true },
+    );
+    this.handleCloseEnable();
   }
 
   t(id) {
-    return this.props.intl.formatMessage({id})
+    return this.props.intl.formatMessage({ id });
   }
 
   handleDownloadAudience() {
-    this.props.downloadExportAudience(this.props.exerciseId, this.props.audience.audience_id)
-    this.handlePopoverClose()
+    this.props.downloadExportAudience(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+    );
+    this.handlePopoverClose();
   }
 
   render() {
-    let audience_enabled = R.propOr(true, 'audience_enabled', this.props.audience)
-    let audience_is_updatable = R.propOr(true, 'user_can_update', this.props.audience)
-    let audience_is_deletable = R.propOr(true, 'user_can_delete', this.props.audience)
-    let exerciseOwnerId = this.props.exerciseOwnerId
-    let userId = this.props.userId
-
+    const { classes } = this.props;
+    const audienceEnabled = R.propOr(
+      true,
+      'audience_enabled',
+      this.props.audience,
+    );
+    const audienceIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.audience,
+    );
+    const audienceIsDeletable = R.propOr(
+      true,
+      'user_can_delete',
+      this.props.audience,
+    );
     const initialComcheckValues = {
       comcheck_audience: R.propOr(0, 'audience_id', this.props.audience),
-      comcheck_subject: this.t("Communication check"),
-      comcheck_message: this.t("Hello") + ',<br /><br />' + this.t("This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:"),
-      comcheck_footer: this.t("Best regards") + ',<br />' + this.t("The exercise control Team")
-    }
-
-    const comCopyAudienceToOtherExercise = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCopyAudienceToOtherExercise.bind(this)}/>,
-      <FlatButton key="launch" label="Launch" primary={true} onClick={this.onSubmitCopyAudience.bind(this)}/>,
-    ]
-
-    const comcheckActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseComcheck.bind(this)}/>,
-      <FlatButton key="launch" label="Launch" primary={true} onClick={this.submitFormComcheck.bind(this)}/>,
-    ]
-
-
-
-    const editActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      audience_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/>: ""
-    ]
-    const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      audience_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
-    ]
-    const disableActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
-      audience_is_updatable ? <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/> : ""
-    ]
-    const enableActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
-      audience_is_updatable ? <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/>: ""
-    ]
-
+      comcheck_subject: this.t('Communication check'),
+      comcheck_message: `${this.t('Hello')},<br /><br />${this.t(
+        'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
+      )}`,
+      comcheck_footer: `${this.t('Best regards')},<br />${this.t(
+        'The exercise control Team',
+      )}`,
+    };
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon color="#ffffff" name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-        <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl}
-                 onRequestClose={this.handlePopoverClose.bind(this)}>
-          <Menu multiple={false}>
-            <MenuItemLink label="Launch a comcheck" onClick={this.handleOpenComcheck.bind(this)}/>
-            {(exerciseOwnerId === userId) ? <MenuItemLink label="Liste des planificateurs" onClick={this.handleOpenPlanificateur.bind(this)}/> : ""}
-            <MenuItemLink label="Copy Audience to Exercise" onClick={this.handleOpenCopyAudienceToOtherExercise.bind(this)}/>
-            {audience_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ""}
-            {audience_is_updatable ?
-                audience_enabled ?
-                  <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/> :
-                  <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/>
-              : ""}
-            <MenuItemLink label="Export to XLS" onClick={this.handleDownloadAudience.bind(this)}/>
-            {audience_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/> : ""}
-          </Menu>
-        </Popover>
-        <Dialog title="Confirmation" modal={false}
-                open={this.state.openDelete}
-                onRequestClose={this.handleCloseDelete.bind(this)}
-                actions={deleteActions}>
-          <T>Do you want to delete this audience?</T>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.handleOpenComcheck.bind(this)}>
+            <T>Launch a comcheck</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenCopyAudienceToOtherExercise.bind(this)}
+          >
+            <T>Copy audience to another exercise</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!audienceIsUpdatable}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          {audienceEnabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={!audienceIsUpdatable}
+            >
+              <T>Disable</T>
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={!audienceIsUpdatable}
+            >
+              <T>Enable</T>
+            </MenuItem>
+          )}
+          <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
+            <T>Export to XLS</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!audienceIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <Dialog
+          open={this.state.openDelete}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-        <Dialog title="Update the audience" modal={false}
-                open={this.state.openEdit}
-                onRequestClose={this.handleCloseEdit.bind(this)}
-                actions={editActions}>
-          <AudienceForm ref="audienceForm" initialValues={R.pick(['audience_name'], this.props.audience)}
-                        onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}/>
+        <Dialog
+          open={this.state.openEdit}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
+        >
+          <DialogTitle>
+            <T>Update the audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <AudienceForm
+              initialValues={R.pick(['audience_name'], this.props.audience)}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('audienceForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
-        <Dialog title="Copy Audience to Exercise" modal={false}
-                open={this.state.openCopyAudience}
-                autoScrollBodyContent={true}
-                onRequestClose={this.handleCloseCopyAudienceToOtherExercise.bind(this)}
-                actions={comCopyAudienceToOtherExercise}>
-        {this.props.exercises.length === 0 ? <div><T>No excercise found.</T></div> : ""}
-            <form onSubmit={this.onSubmitCopyAudience.bind(this)} id='copyExerciceForm'>
-                <Table selectable={false} style={{marginTop: '5px'}}>
-                    <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
+        <Dialog
+          open={this.state.openCopyAudience}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseCopyAudienceToOtherExercise.bind(this)}
+        >
+          <DialogTitle>Copy audience to another exercise</DialogTitle>
+          {this.props.exercises.length === 0 ? (
+            <DialogContentText>
+              <T>No excercise found.</T>
+            </DialogContentText>
+          ) : (
+            <div>
+              <DialogContent>
+                <form
+                  onSubmit={this.onSubmitCopyAudience.bind(this)}
+                  id="copyExerciceForm"
+                >
+                  <Table>
+                    <TableHead>
                       <TableRow>
-                        <TableHeaderColumn><T>Exercise</T></TableHeaderColumn>
-                        <TableHeaderColumn><T>Start Date</T></TableHeaderColumn>
-                        <TableHeaderColumn><T>End Date</T></TableHeaderColumn>
-                        <TableHeaderColumn><T>Copy</T></TableHeaderColumn>
+                        <TableCell>
+                          <T>Exercise</T>
+                        </TableCell>
+                        <TableCell>
+                          <T>Start Date</T>
+                        </TableCell>
+                        <TableCell>
+                          <T>End Date</T>
+                        </TableCell>
+                        <TableCell>
+                          <T>Copy</T>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody displayRowCheckbox={false}>
-                    {R.values(this.props.exercises).map(exercise => {
-                        let start_date = dateFormat(exercise.exercise_start_date, 'MMM D, YYYY')
-                        let end_date = dateFormat(exercise.exercise_end_date, 'MMM D, YYYY')
+                    </TableHead>
+                    <TableBody>
+                      {R.values(this.props.exercises).map((exercise) => {
+                        const startDate = dateFormat(
+                          exercise.exercise_start_date,
+                          'MMM D, YYYY',
+                        );
+                        const endDate = dateFormat(
+                          exercise.exercise_end_date,
+                          'MMM D, YYYY',
+                        );
                         return (
-                                <TableRow key={exercise.exercise_id}>
-                                   <TableRowColumn>{exercise.exercise_name}</TableRowColumn>
-                                   <TableRowColumn>{start_date}</TableRowColumn>
-                                   <TableRowColumn>{end_date}</TableRowColumn>
-                                   <TableRowColumn>
-                                       <Checkbox defaultChecked={false} onCheck={this.handleCopyCheck.bind(this, exercise.exercise_id)}/>
-                                   </TableRowColumn>
-                                </TableRow>
-                            )
-                        })
-                    }
+                          <TableRow key={exercise.exercise_id}>
+                            <TableCell>{exercise.exercise_name}</TableCell>
+                            <TableCell>{startDate}</TableCell>
+                            <TableCell>{endDate}</TableCell>
+                            <TableCell>
+                              <Checkbox
+                                defaultChecked={false}
+                                onCheck={this.handleCopyCheck.bind(
+                                  this,
+                                  exercise.exercise_id,
+                                )}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
-                </Table>
-            </form>
-
-
+                  </Table>
+                </form>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseCopyAudienceToOtherExercise.bind(
+                    this,
+                  )}
+                >
+                  <T>Cancel</T>
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={this.onSubmitCopyAudience.bind(this)}
+                >
+                  <T>Copy</T>
+                </Button>
+              </DialogActions>
+            </div>
+          )}
         </Dialog>
-        <Dialog title="Launch a comcheck" modal={false}
-                open={this.state.openComcheck}
-                autoScrollBodyContent={true}
-                onRequestClose={this.handleCloseComcheck.bind(this)}
-                actions={comcheckActions}>
-          <ComcheckForm ref="comcheckForm"
-                        audiences={this.props.audiences}
-                        initialValues={initialComcheckValues}
-                        onSubmit={this.onSubmitComcheck.bind(this)}
-                        onSubmitSuccess={this.handleCloseComcheck.bind(this)}/>
+        <Dialog
+          open={this.state.openComcheck}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseComcheck.bind(this)}
+          maxWidth="md"
+          fullWidth={true}
+        >
+          <DialogTitle>
+            <T>Launch a comcheck</T>
+          </DialogTitle>
+          <DialogContent>
+            <ComcheckForm
+              audiences={this.props.audiences}
+              initialValues={initialComcheckValues}
+              onSubmit={this.onSubmitComcheck.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseComcheck.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('comcheckForm')}
+            >
+              <T>Launch</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
-        <PlanificateurAudience
-            planificateursAudience={this.state.planificateursAudience}
-            audienceId={this.props.audience.audience_id}
-            handleCheckPlanificateur={this.handleCheckPlanificateur.bind(this)}
-            openPlanificateur={this.state.openPlanificateur}
-            handleClosePlanificateur={this.handleClosePlanificateur.bind(this)}
-            submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
-        />
-
-        <Dialog title="Confirmation" modal={false}
-                open={this.state.openDisable}
-                onRequestClose={this.handleCloseDisable.bind(this)}
-                actions={disableActions}>
-          <T>Do you want to disable this audience?</T>
+        <Dialog
+          open={this.state.openDisable}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDisable.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to disable this audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-        <Dialog title="Confirmation" modal={false}
-                open={this.state.openEnable}
-                onRequestClose={this.handleCloseEnable.bind(this)}
-                actions={enableActions}>
-          <T>Do you want to enable this audience?</T>
+        <Dialog
+          open={this.state.openEnable}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEnable.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to enable this audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              <T>Enable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
-    )
+    );
   }
 }
 
+const sortExercises = (exercises, exerciseId) => {
+  const exercisesSorting = R.pipe(
+    R.filter((n) => n.exercise_id !== exerciseId),
+    R.sort((a, b) => timeDiff(a.exercise_start_date, b.exercise_start_date)),
+  );
 
+  return exercisesSorting(exercises);
+};
 
 const select = (state, ownProps) => {
-  let userId = R.path(['logged', 'user'], state.app)
-  let exercise = R.prop(ownProps.exerciseId, state.referential.entities.exercises)
-  let exerciseOwnerId = R.prop('exercise_owner_id', exercise)
+  const userId = R.path(['logged', 'user'], state.app);
+  const exercise = R.prop(
+    ownProps.exerciseId,
+    state.referential.entities.exercises,
+  );
+  const exerciseOwnerId = R.prop('exercise_owner_id', exercise);
   return {
-    exercises: sortExercises(R.values(state.referential.entities.exercises), ownProps.exerciseId),
+    exercises: sortExercises(
+      R.values(state.referential.entities.exercises),
+      ownProps.exerciseId,
+    ),
     userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
-    exerciseOwnerId: exerciseOwnerId,
-    userId: userId
-  }
-}
-
-const sortExercises = (exercises, exercise_id) => {
-    let exercisesSorting = R.pipe(
-    R.filter(n => n.exercise_id !== exercise_id),
-    R.sort((a, b) => timeDiff(a.exercise_start_date, b.exercise_start_date))
-  )
-
-  return exercisesSorting(exercises)
-}
+    exerciseOwnerId,
+    userId,
+  };
+};
 
 AudiencePopover.propTypes = {
   exerciseId: PropTypes.string,
@@ -433,18 +598,21 @@ AudiencePopover.propTypes = {
   fetchExercises: PropTypes.func,
   getPlanificateurUserForAudience: PropTypes.func,
   updatePlanificateurUserForAudience: PropTypes.func,
-  exercises: PropTypes.array
-}
+  exercises: PropTypes.array,
+};
 
-export default connect(select, {
-  getPlanificateurUserForAudience,
-  updatePlanificateurUserForAudience,
-  fetchExercises,
-  updateAudience,
-  copyAudienceToExercise,
-  downloadExportAudience,
-  deleteAudience,
-  addComcheck,
-  redirectToAudiences,
-  redirectToComcheck
-})(injectIntl(AudiencePopover))
+export default R.compose(
+  connect(select, {
+    getPlanificateurUserForAudience,
+    updatePlanificateurUserForAudience,
+    fetchExercises,
+    updateAudience,
+    copyAudienceToExercise,
+    downloadExportAudience,
+    deleteAudience,
+    addComcheck,
+    redirectToAudiences,
+    redirectToComcheck,
+  }),
+  withStyles(styles),
+)(injectIntl(AudiencePopover));

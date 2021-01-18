@@ -1,31 +1,32 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import {i18nRegister} from '../../../utils/Messages'
-import {Tabs, Tab} from 'material-ui/Tabs'
-import {FlatButton} from "../../../components/Button";
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Button from '@material-ui/core/Button';
+import { i18nRegister } from '../../../utils/Messages';
 
 i18nRegister({
   fr: {
     'Simple exercise': 'Exercice simple',
     'Standard exercise': 'Exercice standard',
-  }
-})
+  },
+});
 
 const styles = {
   tabDesc: {
-    'padding': '30px',
-    'fontSize': '16px',
-    'textAlign': 'center',
-    'color': 'black'
+    padding: '30px',
+    fontSize: '16px',
+    textAlign: 'center',
+    color: 'black',
   },
   tabs: {
-    marginTop: '15px'
+    marginTop: '15px',
   },
   buttons: {
-    float: 'right'
-  }
-}
+    float: 'right',
+  },
+};
 
 class SelectExercise extends Component {
   constructor(props) {
@@ -36,57 +37,92 @@ class SelectExercise extends Component {
   }
 
   handleChangeTabs(tab) {
-    this.changeValuesTabs(tab.props.value)
+    this.changeValuesTabs(tab.props.value);
   }
 
   changeValuesTabs(val) {
-    this.setState({tabs: val})
-    this.props.change('tabs', val)
+    this.setState({ tabs: val });
+    this.props.change('tabs', val);
   }
 
   handleSelectStandardExercise() {
-    this.props.createStandardExercise()
+    this.props.createStandardExercise();
   }
 
   handleSelectSimpleExercise() {
-    this.props.createSimpleExercise()
+    this.props.createSimpleExercise();
   }
 
   handleCloseSelect() {
-    this.props.closeSelect()
+    this.props.closeSelect();
   }
 
   handleImportExercise() {
-    this.props.importExercise()
+    this.props.importExercise();
   }
 
   render() {
     return (
       <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
         <Tabs style={styles.tabs}>
-          <Tab label="Exercice standard" value="tabStandardExercise" onActive={this.handleChangeTabs.bind(this)}>
+          <Tab
+            label="Exercice standard"
+            value="tabStandardExercise"
+            onActive={this.handleChangeTabs.bind(this)}
+          >
             <div style={styles.tabDesc}>
-              Un exercice standard est un exercice répondant à la norme ISO 22301, permettant de manier plusieurs événements et plusieurs audiences.
+              Un exercice standard est un exercice répondant à la norme ISO
+              22301, permettant de manier plusieurs événements et plusieurs
+              audiences.
             </div>
             <div style={styles.buttons}>
-              <FlatButton label="Cancel" primary={true} onClick={this.props.closeSelect}/>
-              <FlatButton label="Import" primary={true} onClick={this.props.importExercise}/>
-              <FlatButton label="Create" primary={true} onClick={this.props.createStandardExercise}/>
+              <Button
+                label="Cancel"
+                primary={true}
+                onClick={this.props.closeSelect}
+              />
+              <Button
+                label="Import"
+                primary={true}
+                onClick={this.props.importExercise}
+              />
+              <Button
+                label="Create"
+                primary={true}
+                onClick={this.props.createStandardExercise}
+              />
             </div>
           </Tab>
-          <Tab label="Exercice simple" value="tabSimpleExercise" onActive={this.handleChangeTabs.bind(this)}>
+          <Tab
+            label="Exercice simple"
+            value="tabSimpleExercise"
+            onActive={this.handleChangeTabs.bind(this)}
+          >
             <div style={styles.tabDesc}>
-              Un exercice simple est un exercice réduit à un seul événement et une seule audience.
+              Un exercice simple est un exercice réduit à un seul événement et
+              une seule audience.
             </div>
             <div style={styles.buttons}>
-              <FlatButton label="Cancel" primary={true} onClick={this.props.closeSelect}/>
-              <FlatButton label="Import" primary={true} onClick={this.props.importExercise}/>
-              <FlatButton label="Create" primary={true} onClick={this.props.createSimpleExercise}/>
+              <Button
+                label="Cancel"
+                primary={true}
+                onClick={this.props.closeSelect}
+              />
+              <Button
+                label="Import"
+                primary={true}
+                onClick={this.props.importExercise}
+              />
+              <Button
+                label="Create"
+                primary={true}
+                onClick={this.props.createSimpleExercise}
+              />
             </div>
           </Tab>
         </Tabs>
       </form>
-    )
+    );
   }
 }
 
@@ -100,7 +136,7 @@ SelectExercise.propTypes = {
   createSimpleExercise: PropTypes.func,
   createStandardExercise: PropTypes.func,
   closeSelect: PropTypes.func,
-  importExercise: PropTypes.func
-}
+  importExercise: PropTypes.func,
+};
 
-export default reduxForm({form: 'SelectExercise'}, null, {change})(SelectExercise)
+export default SelectExercise;

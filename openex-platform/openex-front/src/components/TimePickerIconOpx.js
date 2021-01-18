@@ -1,14 +1,14 @@
-import React, {Component} from 'react'
-import {Icon} from './Icon'
-import * as Constants from '../constants/ComponentTypes'
-import {FormField} from './Field'
-import TimePickerOpx from './TimePickerOpx'
-import PropTypes from 'prop-types'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Icon } from './Icon';
+import * as Constants from '../constants/ComponentTypes';
+import { TextField } from './TextField';
+import TimePickerOpx from './TimePickerOpx';
 
 const styles = {
   newInputDate: {
     iconCalendar: {
-      cursor: 'pointer'
+      cursor: 'pointer',
     },
     inputOnlyTimeField: {
       display: 'inline-block',
@@ -19,37 +19,40 @@ const styles = {
     inputOnlyTimeIcon: {
       display: 'inline-block',
       width: '5%',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
     },
     inputTimeColumn: {
       display: 'inline-block',
       width: '48%',
       marginLeft: '4%',
-      verticalAlign: 'middle'
-    }
-  }
-}
+      verticalAlign: 'middle',
+    },
+  },
+};
 
 class TimePickerIconOpx extends Component {
-
-  refTimePicker = React.createRef()
+  constructor(props) {
+    super(props);
+    this.refTimePicker = React.createRef();
+  }
 
   raiseDatePicker() {
-    this.refTimePicker.current.openDialog()
+    this.refTimePicker.current.openDialog();
   }
 
   render() {
     return (
       <div style={styles.newInputDate.inputTimeColumn}>
         <div style={styles.newInputDate.inputOnlyTimeIcon}>
-            <span style={styles.newInputDate.iconCalendar}
-                  onClick={this.raiseDatePicker.bind(this)}
-            >
-              <Icon name={Constants.ICON_NAME_ACCESS_TIME}/>
-            </span>
+          <span
+            style={styles.newInputDate.iconCalendar}
+            onClick={this.raiseDatePicker.bind(this)}
+          >
+            <Icon name={Constants.ICON_NAME_ACCESS_TIME} />
+          </span>
         </div>
         <div style={styles.newInputDate.inputOnlyTimeField}>
-          <FormField
+          <TextField
             fullWidth={true}
             onChange={this.handleChange}
             name={this.props.nameField}
@@ -64,13 +67,13 @@ class TimePickerIconOpx extends Component {
           />
         </div>
       </div>
-    )
+    );
   }
 }
 
 TimePickerIconOpx.propTypes = {
   onChange: PropTypes.func,
-  defaultDate: PropTypes.string
-}
+  defaultDate: PropTypes.string,
+};
 
-export default TimePickerIconOpx
+export default TimePickerIconOpx;

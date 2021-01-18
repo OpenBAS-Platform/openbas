@@ -1,54 +1,57 @@
-import React, {Component} from 'react'
-import {Icon} from './Icon'
-import * as Constants from '../constants/ComponentTypes'
-import {FormField} from './Field'
-import DatePickerOpx from './DatePickerOpx'
-import PropTypes from "prop-types"
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Icon } from './Icon';
+import * as Constants from '../constants/ComponentTypes';
+import { TextField } from './TextField';
+import DatePickerOpx from './DatePickerOpx';
 
 const styles = {
   newInputDate: {
     iconCalendar: {
-      cursor: 'pointer'
+      cursor: 'pointer',
     },
     inputOnlyDateField: {
       display: 'inline-block',
       width: '90%',
       marginLeft: '4%',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
     },
     inputOnlyDateIcon: {
       display: 'inline-block',
       width: '5%',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
     },
     inputDateColumn: {
       display: 'inline-block',
       width: '48%',
-      verticalAlign: 'middle'
-    }
-  }
-}
+      verticalAlign: 'middle',
+    },
+  },
+};
 
 class DatePickerIconOpx extends Component {
-
-  refDatePicker = React.createRef()
+  constructor(props) {
+    super(props);
+    this.refDatePicker = React.createRef();
+  }
 
   raiseDatePicker() {
-    this.refDatePicker.current.openDialog()
+    this.refDatePicker.current.openDialog();
   }
 
   render() {
     return (
       <div style={styles.newInputDate.inputDateColumn}>
         <div style={styles.newInputDate.inputOnlyDateIcon}>
-            <span style={styles.newInputDate.iconCalendar}
-                  onClick={this.raiseDatePicker.bind(this)}
-            >
-              <Icon name={Constants.ICON_NAME_DATE_RANGE}/>
-            </span>
+          <span
+            style={styles.newInputDate.iconCalendar}
+            onClick={this.raiseDatePicker.bind(this)}
+          >
+            <Icon name={Constants.ICON_NAME_DATE_RANGE} />
+          </span>
         </div>
         <div style={styles.newInputDate.inputOnlyDateField}>
-          <FormField
+          <TextField
             fullWidth={true}
             onChange={this.handleChange}
             name={this.props.nameField}
@@ -63,13 +66,13 @@ class DatePickerIconOpx extends Component {
           />
         </div>
       </div>
-    )
+    );
   }
 }
 
 DatePickerIconOpx.propTypes = {
   onChange: PropTypes.func,
-  defaultDate: PropTypes.string
-}
+  defaultDate: PropTypes.string,
+};
 
-export default DatePickerIconOpx
+export default DatePickerIconOpx;

@@ -1,177 +1,212 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {T} from '../../../../../components/I18n'
-import {i18nRegister} from '../../../../../utils/Messages'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {Popover} from '../../../../../components/Popover'
-import {Menu} from '../../../../../components/Menu'
-import {Dialog} from '../../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../../components/Button'
-import {Icon} from '../../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from '../../../../../components/menu/MenuItem'
-import Theme from '../../../../../components/Theme'
-import {updateUser} from '../../../../../actions/User'
-import {updateSubaudience} from '../../../../../actions/Subaudience'
-import UserForm from './UserForm'
-
-const style = {
-  position: 'absolute',
-  top: '7px',
-  right: 0,
-}
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import MenuItem from '@material-ui/core/MenuItem';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { updateUser } from '../../../../../actions/User';
+import { updateSubaudience } from '../../../../../actions/Subaudience';
+import UserForm from './UserForm';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
-    'Do you want to remove the user from this sub-audience?': 'Souhaitez-vous supprimer l\'utilisateur de cette sous-audience ?',
-    'Update the user': 'Modifier l\'utilisateur',
-    'Update the profile': 'Modifier le profil de l\'utilisateur',
-    'Profile': 'Profil'
-  }
-})
+    'Do you want to remove the user from this sub-audience?':
+      "Souhaitez-vous supprimer l'utilisateur de cette sous-audience ?",
+    'Update the user': "Modifier l'utilisateur",
+    'Update the profile': "Modifier le profil de l'utilisateur",
+    Profile: 'Profil',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class UserPopover extends Component {
   constructor(props) {
-    super(props)
-    this.state = {openDelete: false, openEdit: false, openPopover: false}
+    super(props);
+    this.state = { anchorEl: null, openDelete: false, openEdit: false };
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation()
-    this.setState({openPopover: true, anchorEl: event.currentTarget})
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
-    this.setState({openEdit: true})
-    this.handlePopoverClose()
+    this.setState({ openEdit: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false})
+    this.setState({ openEdit: false });
   }
 
   onSubmitEdit(data) {
-    return this.props.updateUser(this.props.user.user_id, data)
-  }
-
-  submitFormEdit() {
-    this.refs.userForm.submit()
+    return this.props
+      .updateUser(this.props.user.user_id, data)
+      .then(() => this.handleCloseEdit());
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
-    this.handlePopoverClose()
+    this.setState({ openDelete: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({ openDelete: false });
   }
 
   submitDelete() {
-    const user_ids = R.pipe(
+    const userIds = R.pipe(
       R.values,
-      R.filter(a => a.user_id !== this.props.user.user_id),
-      R.map(u => u.user_id)
-    )(this.props.subaudience.subaudience_users)
-    this.props.updateSubaudience(this.props.exerciseId, this.props.audience.audience_id, this.props.subaudience.subaudience_id, {subaudience_users: user_ids})
-    this.handleCloseDelete()
-  }
-
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor
-    } else {
-      return Theme.palette.textColor
-    }
+      R.filter((a) => a.user_id !== this.props.user.user_id),
+      R.map((u) => u.user_id),
+    )(this.props.subaudience.subaudience_users);
+    this.props.updateSubaudience(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      this.props.subaudience.subaudience_id,
+      { subaudience_users: userIds },
+    );
+    this.handleCloseDelete();
   }
 
   render() {
-    let subaudience_is_updatable = R.propOr(true, 'user_can_update', this.props.subaudience)
-    let subaudience_is_deletable = R.propOr(true, 'user_can_delete', this.props.subaudience)
-    let user_is_updatable = R.propOr(true, 'user_can_update', this.props.user)
-    let user_is_deletable = R.propOr(true, 'user_can_delete', this.props.user)
-
-    const editActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      subaudience_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/> : ""
-    ]
-    const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      subaudience_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
-    ]
-
-    var organizationPath = [R.prop('user_organization', this.props.user), 'organization_name']
-    let organization_name = R.pathOr('-', organizationPath, this.props.organizations)
-    let initialValues = R.pipe(
-      R.assoc('user_organization', organization_name),
-      R.pick(['user_firstname', 'user_lastname', 'user_email', 'user_email2', 'user_organization', 'user_phone', 'user_phone2', 'user_phone3', 'user_pgp_key'])
-    )(this.props.user)
+    const userIsUpdatable = R.propOr(true, 'user_can_update', this.props.user);
+    const userIsDeletable = R.propOr(true, 'user_can_delete', this.props.user);
+    const organizationPath = [
+      R.prop('user_organization', this.props.user),
+      'organization_name',
+    ];
+    const organizationName = R.pathOr(
+      '-',
+      organizationPath,
+      this.props.organizations,
+    );
+    const initialValues = R.pipe(
+      R.assoc('user_organization', organizationName),
+      R.pick([
+        'user_firstname',
+        'user_lastname',
+        'user_email',
+        'user_email2',
+        'user_organization',
+        'user_phone',
+        'user_phone2',
+        'user_phone3',
+        'user_pgp_key',
+      ]),
+    )(this.props.user);
 
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(!this.props.audience.audience_enabled || !this.props.subaudience.subaudience_enabled)}
-          />
-        </IconButton>
-
-        {
-          (user_is_updatable || user_is_deletable) ?
-            <Popover
-              open={this.state.openPopover}
-              anchorEl={this.state.anchorEl}
-              onRequestClose={this.handlePopoverClose.bind(this)}
-            >
-              <Menu multiple={false}>
-                {user_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ""}
-                {user_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/> : ""}
-              </Menu>
-            </Popover>
-          :
-            ""
-        }
-
-        <Dialog
-          title="Confirmation"
-          modal={false}
-          open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <T>Do you want to remove the user from this sub-audience?</T>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!userIsUpdatable}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!userIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <Dialog
+          open={this.state.openDelete}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to remove the user from this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the user"
-          modal={false}
           open={this.state.openEdit}
-          autoScrollBodyContent={true}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
         >
-          <UserForm
-            ref="userForm"
-            initialValues={initialValues}
-            organizations={this.props.organizations}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
+          <DialogTitle>
+            <T>Update the user</T>
+          </DialogTitle>
+          <DialogContent>
+            <UserForm
+              initialValues={initialValues}
+              organizations={this.props.organizations}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('userForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
-    )
+    );
   }
 }
 
-const select = (state) => {
-  return {
-    organizations: state.referential.entities.organizations
-  }
-}
+const select = (state) => ({
+  organizations: state.referential.entities.organizations,
+});
 
 UserPopover.propTypes = {
   exerciseId: PropTypes.string,
@@ -181,10 +216,10 @@ UserPopover.propTypes = {
   audience: PropTypes.object,
   subaudience: PropTypes.object,
   organizations: PropTypes.object,
-  children: PropTypes.node
-}
+  children: PropTypes.node,
+};
 
 export default connect(select, {
   updateUser,
-  updateSubaudience
-})(UserPopover)
+  updateSubaudience,
+})(UserPopover);

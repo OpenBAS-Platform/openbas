@@ -1,6 +1,5 @@
-import * as schema from './Schema'
-import {getReferential} from '../utils/Action'
+import * as schema from './Schema';
+import { getReferential } from '../utils/Action';
 
-export const fetchOrganizations = () => (dispatch) => {
-    return getReferential(schema.arrayOfOrganizations, '/api/organizations')(dispatch)
-}
+// eslint-disable-next-line import/prefer-default-export
+export const fetchOrganizations = () => (dispatch) => getReferential(schema.arrayOfOrganizations, '/api/organizations')(dispatch);

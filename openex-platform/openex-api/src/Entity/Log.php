@@ -28,7 +28,7 @@ class Log
     protected $log_content;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $log_date;
 

@@ -1,0 +1,177 @@
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
+
+i18nRegister({
+  fr: {
+    Edit: 'Modifier',
+    'List of TAGS': 'Liste des Tags',
+    Delete: 'Supprimer',
+    Download: 'Télécharger',
+    'Delete Document': 'Supprimer un document',
+    'Are you sure you want to delete this document?':
+      'Êtes vous sûr de vouloir supprimer ce document ?',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = (theme) => ({
+  container: {
+    margin: 0,
+  },
+  drawerPaper: {
+    minHeight: '100vh',
+    width: '50%',
+    position: 'fixed',
+    overflow: 'auto',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    padding: 0,
+  },
+});
+
+class DocumentActionPopover extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      anchorEl: null,
+      openConfirmDelete: false,
+    };
+  }
+
+  handlePopoverOpen(event) {
+    this.setState({ anchorEl: event.currentTarget });
+  }
+
+  handlePopoverClose() {
+    this.setState({ anchorEl: null });
+  }
+
+  handleCloseOpenConfirmDelete() {
+    this.setState({ openConfirmDelete: false });
+  }
+
+  handleOpenConfirmDelete() {
+    this.handlePopoverClose();
+    this.setState({ openConfirmDelete: true });
+  }
+
+  editDocument() {
+    this.handlePopoverClose();
+    return this.props.handleEditDocument(this.props.document);
+  }
+
+  viewDocument() {
+    this.handlePopoverClose();
+    return this.props.handleViewDocument(this.props.document);
+  }
+
+  editDocumentTag() {
+    this.handlePopoverClose();
+    return this.props.handleEditDocumentTag(this.props.document.document_id);
+  }
+
+  deleteDocument() {
+    this.handleCloseOpenConfirmDelete();
+    return this.props.handleDeleteDocument(this.props.document);
+  }
+
+  render() {
+    const { classes } = this.props;
+    return (
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.editDocument.bind(this)}>
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem onClick={this.viewDocument.bind(this)}>
+            <T>Download</T>
+          </MenuItem>
+          <MenuItem onClick={this.editDocumentTag.bind(this)}>
+            <T>List of tags</T>
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenConfirmDelete.bind(this)}>
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <Dialog
+          open={this.state.openConfirmDelete}
+          keepMounted={true}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseOpenConfirmDelete.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Are you sure you want to delete this document?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseOpenConfirmDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={this.deleteDocument.bind(this)}
+              color="secondary"
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    );
+  }
+}
+
+DocumentActionPopover.propTypes = {
+  document_id: PropTypes.string,
+  document: PropTypes.object,
+  documents: PropTypes.object,
+  handleEditDocument: PropTypes.func,
+  handleViewDocument: PropTypes.func,
+  handleEditDocumentTag: PropTypes.func,
+  handleDeleteDocument: PropTypes.func,
+};
+
+const select = (state) => ({
+  documents: state.referential.entities.document,
+});
+
+export default R.compose(
+  connect(select, {}),
+  withStyles(styles),
+)(DocumentActionPopover);

@@ -1,79 +1,96 @@
-import * as Constants from '../constants/ActionTypes'
-import {SubmissionError} from 'redux-form'
-import Immutable from 'seamless-immutable'
-import {api} from '../App'
-import * as R from 'ramda'
-import FileSaver from 'file-saver'
+import Immutable from 'seamless-immutable';
+import * as R from 'ramda';
+import { FORM_ERROR } from 'final-form';
+import FileSaver from 'file-saver';
+import * as Constants from '../constants/ActionTypes';
+import { api } from '../Network';
+
+export const submitForm = (formId) => {
+  document
+    .getElementById(formId)
+    .dispatchEvent(new Event('submit', { cancelable: true }));
+};
 
 const submitErrors = (data) => {
   const errorsExtractor = R.pipe(
     R.pathOr({}, ['errors', 'children']),
     R.toPairs(),
-    R.map(elem => {
+    R.map((elem) => {
       const extractErrorsPipe = R.pipe(
         R.tail(),
         R.head(),
         R.propOr([], 'errors'),
-        R.head()
-      )
-      return [R.head(elem), extractErrorsPipe(elem)]
+        R.head(),
+      );
+      return [R.head(elem), extractErrorsPipe(elem)];
     }),
     R.fromPairs(),
-    R.set(R.lensProp('_error'), data.message)
-  )
-  return new SubmissionError(errorsExtractor(data))
-}
+    R.set(R.lensProp(FORM_ERROR), data.message),
+  );
+  return errorsExtractor(data);
+};
 
-export const fileSave = (uri, filename) => () => {
-  return api().get(uri, {responseType: 'blob'}).then(function (response) {
-    FileSaver.saveAs(response.data, filename)
-  })
-}
+export const fileSave = (uri, filename) => () => api()
+  .get(uri, { responseType: 'blob' })
+  .then((response) => {
+    FileSaver.saveAs(response.data, filename);
+  });
 
-export const fileDownload = (uri) => () => {
-  return api().get(uri, {responseType: 'blob'})
-}
+export const fileDownload = (uri) => () => api().get(uri, { responseType: 'blob' });
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {
   if (noloading !== true) {
-    dispatch({type: Constants.DATA_FETCH_SUBMITTED})
+    dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
   }
-  return api(schema).get(uri).then(function (response) {
-    dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
-    return response.data
-  })
-}
+  return api(schema)
+    .get(uri)
+    .then((response) => {
+      dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
+      return response.data;
+    });
+};
 
 export const putReferential = (schema, uri, data) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
-  return api(schema).put(uri, data).then(function (response) {
-    dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
-    dispatch({type: Constants.DATA_UPDATE_SUCCESS, payload: response.data})
-    return response.data
-  }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR})
-    throw submitErrors(data)
-  })
-}
+  dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
+  return api(schema)
+    .put(uri, data)
+    .then((response) => {
+      dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
+      dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
+      return response.data;
+    })
+    .catch((error) => {
+      dispatch({ type: Constants.DATA_FETCH_ERROR });
+      return submitErrors(error);
+    });
+};
 
 export const postReferential = (schema, uri, data) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
-  return api(schema).post(uri, data).then(function (response) {
-    dispatch({type: Constants.DATA_FETCH_SUCCESS, payload: response.data})
-    dispatch({type: Constants.DATA_UPDATE_SUCCESS, payload: response.data})
-    return response.data
-  }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR})
-    throw submitErrors(data)
-  })
-}
+  dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
+  return api(schema)
+    .post(uri, data)
+    .then((response) => {
+      dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
+      return response.data;
+    })
+    .catch((error) => {
+      dispatch({ type: Constants.DATA_FETCH_ERROR });
+      return submitErrors(error);
+    });
+};
 
 export const delReferential = (uri, type, id) => (dispatch) => {
-  dispatch({type: Constants.DATA_FETCH_SUBMITTED})
-  return api().delete(uri).then(function () {
-    dispatch({type: Constants.DATA_DELETE_SUCCESS, payload: Immutable({type, id})})
-  }).catch(function (data) {
-    dispatch({type: Constants.DATA_FETCH_ERROR})
-    throw submitErrors(data)
-  })
-}
+  dispatch({ type: Constants.DATA_FETCH_SUBMITTED });
+  return api()
+    .delete(uri)
+    .then(() => {
+      dispatch({
+        type: Constants.DATA_DELETE_SUCCESS,
+        payload: Immutable({ type, id }),
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: Constants.DATA_FETCH_ERROR });
+      return submitErrors(error);
+    });
+};

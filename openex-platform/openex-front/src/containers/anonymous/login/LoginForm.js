@@ -1,54 +1,80 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm} from 'redux-form'
-import {FormField} from '../../../components/Field'
-import {Button} from '../../../components/Button'
-import {i18nRegister} from '../../../utils/Messages'
+import React from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import Button from '@material-ui/core/Button';
+import { i18nRegister } from '../../../utils/Messages';
+import { T } from '../../../components/I18n';
+import { TextField } from '../../../components/TextField';
 
 i18nRegister({
   fr: {
     'Email address': 'Adresse email',
-    'Password': 'Mot de passe',
-    'Sign in': 'Se connecter'
-  }
-})
+    Password: 'Mot de passe',
+    'Sign in': 'Se connecter',
+    'Authentication failed': "Echec de l'authentification",
+  },
+});
 
-const style = {
-  padding: '20px'
-}
-
-const validate = values => {
-  const errors = {}
-  const requiredFields = []
-  requiredFields.forEach(field => {
+const validate = (values) => {
+  const errors = {};
+  const requiredFields = ['username', 'password'];
+  requiredFields.forEach((field) => {
     if (!values[field]) {
-      errors[field] = 'Required'
+      errors[field] = 'Required';
     }
-  })
-  return errors
-}
+  });
+  return errors;
+};
 
 const LoginForm = (props) => {
-  const {error, onSubmit, handleSubmit, pristine, submitting} = props
+  const {
+    error, onSubmit, pristine, submitting,
+  } = props;
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={style}>
-      {error && <div><strong>{error}</strong><br/></div>}
-      <FormField name="username" type="text" hint="Email address" fullWidth={true}/>
-      <FormField name="password" type="password" hint="Password" fullWidth={true}/>
-      <Button type="submit" disabled={pristine || submitting} label="Sign in"/>
-    </form>
-  )
-}
+    <div style={{ padding: 15 }}>
+      <Form onSubmit={onSubmit} validate={validate}>
+        {({ handleSubmit, submitError, touched }) => (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              name="username"
+              type="text"
+              label="Email address"
+              fullWidth={true}
+              style={{ marginTop: 5 }}
+            />
+            <TextField
+              name="password"
+              type="password"
+              label="Password"
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              error={error || submitError}
+              helperText={
+                (error || submitError) && touched && (error || submitError)
+              }
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={pristine || submitting}
+              onClick={handleSubmit}
+              style={{ marginTop: 20 }}
+            >
+              <T>Sign in</T>
+            </Button>
+          </form>
+        )}
+      </Form>
+    </div>
+  );
+};
 
 LoginForm.propTypes = {
   error: PropTypes.string,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func
-}
+  handleSubmit: PropTypes.func,
+};
 
-export default reduxForm({
-  form: 'LoginForm',
-  validate
-})(LoginForm)
+export default LoginForm;

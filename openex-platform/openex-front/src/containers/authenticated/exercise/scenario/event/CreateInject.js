@@ -1,28 +1,53 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import {dateToISO} from '../../../../../utils/Time'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {fetchIncident} from '../../../../../actions/Incident'
-import {downloadFile} from '../../../../../actions/File'
-import {addInject, updateInject, deleteInject} from '../../../../../actions/Inject'
-import {DialogTitleElement} from '../../../../../components/Dialog'
-import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button'
-import InjectForm from './InjectForm'
-import InjectContentForm from './InjectContentForm'
-import InjectAudiences from './InjectAudiences'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Dialog from '@material-ui/core/Dialog';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import { withStyles } from '@material-ui/core/styles';
+import Slide from '@material-ui/core/Slide';
+import { Add } from '@material-ui/icons';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import { fetchIncident } from '../../../../../actions/Incident';
+import { downloadFile } from '../../../../../actions/File';
+import {
+  addInject,
+  updateInject,
+  deleteInject,
+} from '../../../../../actions/Inject';
+import InjectForm from './InjectForm';
+import InjectContentForm from './InjectContentForm';
+import InjectAudiences from './InjectAudiences';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     '1. Parameters': '1. Paramètres',
     '2. Content': '2. Contenu',
     '3. Audiences': '3. Audiences',
-  }
-})
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 330,
+  },
+});
 
 class CreateInject extends Component {
   constructor(props) {
@@ -33,12 +58,12 @@ class CreateInject extends Component {
       finished: false,
       type: 'openex_manual',
       injectData: null,
-      injectAttachments: []
-    }
+      injectAttachments: [],
+    };
   }
 
   handleOpen() {
-    this.setState({open: true})
+    this.setState({ open: true });
   }
 
   handleClose() {
@@ -48,79 +73,66 @@ class CreateInject extends Component {
       finished: false,
       type: 'openex_manual',
       injectData: null,
-      injectAttachments: []
-    })
+      injectAttachments: [],
+    });
   }
 
   onGlobalSubmit(data) {
-    data.inject_date = this.convertDate(data.inject_date_only + ' ' + data.inject_time);
-
-    delete data.inject_date_only
-    delete data.inject_time
-
-    this.setState({injectData: data})
-  }
-
-  convertDate(dateToConvert) {
-    let regexDateFr = RegExp('^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$')
-    let regexDateEn = RegExp('^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[ ]([0-1][0-9]|2[0-3])[:]([0-5][0-9])$')
-    let timeSplitted, dateSplitted, split, newDate;
-
-    if (regexDateFr.test(dateToConvert)) {
-      split = dateToConvert.split(' ');
-      dateSplitted = split[0].split('/')
-      timeSplitted = split[1]
-      newDate = dateSplitted[2] + '-' + dateSplitted[1] + '-' + dateSplitted[0] + ' ' + timeSplitted
-      return newDate
-    } else if (regexDateEn.test(dateToConvert)) {
-      return dateToConvert
-    }
+    this.setState({ injectData: data }, () => this.selectContent());
   }
 
   onContentAttachmentAdd(file) {
-    this.setState({injectAttachments: R.append(file, this.state.injectAttachments)})
+    this.setState({
+      injectAttachments: R.append(file, this.state.injectAttachments),
+    });
   }
 
   onContentAttachmentDelete(name, event) {
-    event.stopPropagation()
-    this.setState({injectAttachments: R.filter(a => a.file_name !== name, this.state.injectAttachments)})
+    event.stopPropagation();
+    this.setState({
+      injectAttachments: R.filter(
+        (a) => a.document_name !== name,
+        this.state.injectAttachments,
+      ),
+    });
   }
 
   onContentSubmit(data) {
-    let injectData = this.state.injectData
-    data.attachments = this.state.injectAttachments
-    injectData.inject_content = JSON.stringify(data)
-    this.setState({injectData: injectData})
+    const { injectData } = this.state;
+    // eslint-disable-next-line no-param-reassign
+    data.attachments = this.state.injectAttachments;
+    injectData.inject_content = JSON.stringify(data);
+    this.setState({ injectData }, () => this.selectAudiences());
   }
 
   onAudiencesChange(data) {
-    let injectData = this.state.injectData
-    injectData.inject_audiences = data
-    this.setState({injectData: injectData})
+    const { injectData } = this.state;
+    injectData.inject_audiences = data;
+    this.setState({ injectData });
   }
 
   onSubaudiencesChange(data) {
-    let injectData = this.state.injectData
-    injectData.inject_subaudiences = data
-    this.setState({injectData: injectData})
+    const { injectData } = this.state;
+    injectData.inject_subaudiences = data;
+    this.setState({ injectData });
   }
 
   onSelectAllAudiences(value) {
-    let injectData = this.state.injectData
-    injectData.inject_all_audiences = value
-    this.setState({injectData: injectData})
+    const { injectData } = this.state;
+    injectData.inject_all_audiences = value;
+    this.setState({ injectData });
   }
 
   handleNext() {
     switch (this.state.stepIndex) {
       case 0:
-        this.refs.injectForm.submit()
+        submitForm('injectForm');
         break;
       case 1:
-        this.refs.contentForm.getWrappedInstance().submit()
+        submitForm('contentForm');
         break;
       case 2:
-        this.createInject()
+        this.createInject();
         break;
       default:
         break;
@@ -128,27 +140,38 @@ class CreateInject extends Component {
   }
 
   createInject() {
-    let data = R.assoc('inject_date', dateToISO(this.state.injectData.inject_date), this.state.injectData)
-    this.props.addInject(this.props.exerciseId, this.props.eventId, this.props.incidentId, data).then(() => {
-      this.props.fetchIncident(this.props.exerciseId, this.props.eventId, this.props.incidentId)
-    })
-    this.handleClose()
+    const data = this.state.injectData;
+    this.props
+      .addInject(
+        this.props.exerciseId,
+        this.props.eventId,
+        this.props.incidentId,
+        data,
+      )
+      .then(() => {
+        this.props.fetchIncident(
+          this.props.exerciseId,
+          this.props.eventId,
+          this.props.incidentId,
+        );
+      });
+    this.handleClose();
   }
 
-  onInjectTypeChange(event, index, value) {
-    this.setState({type: value})
+  onInjectTypeChange(event) {
+    this.setState({ type: event.target.value });
   }
 
   selectContent() {
-    this.setState({stepIndex: 1})
+    this.setState({ stepIndex: 1 });
   }
 
   selectAudiences() {
-    this.setState({stepIndex: 2, finished: true})
+    this.setState({ stepIndex: 2, finished: true });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name)
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
   }
 
   getStepContent(stepIndex) {
@@ -156,30 +179,28 @@ class CreateInject extends Component {
       case 0:
         return (
           <InjectForm
-            ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
-            onSubmitSuccess={this.selectContent.bind(this)}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
-            initialValues={{inject_type: 'openex_manual'}}
-            types={this.props.inject_types}/>
-        )
+            types={this.props.inject_types}
+          />
+        );
       case 1:
         return (
           <InjectContentForm
-            ref="contentForm"
             types={this.props.inject_types}
             type={this.state.type}
             onSubmit={this.onContentSubmit.bind(this)}
-            onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
-            onContentAttachmentDelete={this.onContentAttachmentDelete.bind(this)}
+            onContentAttachmentDelete={this.onContentAttachmentDelete.bind(
+              this,
+            )}
             downloadAttachment={this.downloadAttachment.bind(this)}
-            attachments={this.state.injectAttachments}/>
-        )
+            attachments={this.state.injectAttachments}
+          />
+        );
       case 2:
         return (
           <InjectAudiences
-            ref="injectAudiences"
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
@@ -192,36 +213,32 @@ class CreateInject extends Component {
             injectSubaudiencesIds={[]}
             selectAll={false}
           />
-        )
+        );
       default:
-        return 'Go away!'
+        return 'Go away!';
     }
   }
 
   render() {
-    const actions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleClose.bind(this)}
-      />,
-      <FlatButton
-        key="create"
-        label={this.state.stepIndex === 2 ? "Create" : "Next"}
-        primary={true}
-        onClick={this.handleNext.bind(this)}
-      />,
-    ]
-
+    const { classes } = this.props;
     return (
       <div>
-        <FloatingActionsButtonCreate
-          type={Constants.BUTTON_TYPE_FLOATING_PADDING}
+        <Fab
           onClick={this.handleOpen.bind(this)}
-        />
-        <DialogTitleElement
-          title={
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
@@ -239,17 +256,25 @@ class CreateInject extends Component {
                 </StepLabel>
               </Step>
             </Stepper>
-          }
-          modal={false}
-          open={this.state.open}
-          onRequestClose={this.handleClose.bind(this)}
-          autoScrollBodyContent={true}
-          actions={actions}
-        >
-          <div>{this.getStepContent(this.state.stepIndex)}</div>
-        </DialogTitleElement>
+          </DialogTitle>
+          <DialogContent>
+            {this.getStepContent(this.state.stepIndex)}
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={this.handleClose.bind(this)}>
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.handleNext.bind(this)}
+            >
+              <T>{this.state.stepIndex === 2 ? 'Create' : 'Next'}</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -264,7 +289,16 @@ CreateInject.propTypes = {
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
-  downloadFile: PropTypes.func
-}
+  downloadFile: PropTypes.func,
+};
 
-export default connect(null, {fetchIncident, addInject, updateInject, deleteInject, downloadFile})(CreateInject);
+export default R.compose(
+  connect(null, {
+    fetchIncident,
+    addInject,
+    updateInject,
+    deleteInject,
+    downloadFile,
+  }),
+  withStyles(styles),
+)(CreateInject);

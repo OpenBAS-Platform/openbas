@@ -32,17 +32,17 @@ class Exercise extends BaseEntity
      */
     protected $exercise_description;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $exercise_start_date;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $exercise_end_date;
     /**
-     * @ORM\Column(type="text", options={"default" : "animation@domaine.fr"})
+     * @ORM\Column(type="text")
      */
-    protected $exercise_mail_expediteur;
+    protected $exercise_mail_expediteur = "planners@openex.io";
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="exercise_owner", referencedColumnName="user_id")
@@ -370,7 +370,6 @@ class Exercise extends BaseEntity
     {
         $firstInjectDateTime = null;
         $lastInjectDateTime = null;
-
         foreach ($injects as $inject) {
             if ($inject) {
                 if (!$firstInjectDateTime || $firstInjectDateTime->getTimestamp() > $inject->getInjectDate()->getTimestamp()) {
@@ -381,7 +380,6 @@ class Exercise extends BaseEntity
                 }
             }
         }
-
         if ($firstInjectDateTime) {
             $this->exercise_start_date = clone $firstInjectDateTime;
         }

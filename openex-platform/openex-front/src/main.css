@@ -1,5 +1,4 @@
 html {
-  overflow-y:scroll;
   height: 100%;
 }
 
@@ -11,6 +10,7 @@ body {
   font-weight: normal;
   line-height: 20px;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 input:-webkit-autofill {
@@ -19,36 +19,19 @@ input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
 }
 
-hr {
-  margin: 0;
-  padding: 0;
-  border: none;
-  height: 1px;
-  color: #E0E0E0;
-  background-color: #E0E0E0;
+a,
+a:hover,
+a:visited,
+a:focus {
+  text-decoration: none;
 }
 
-h2 {
-  margin: 10px 0 20px 0 !important;
-  -webkit-margin-before: 0 !important;
-  -webkit-margin-after: 0 !important;
-  font-size: 20px;
+a {
+  color: #ff4081;
 }
 
-h3 {
-  padding: 24px 24px 5px 21px !important;
-}
-
-h4 {
-  padding: 10px !important;
-}
-
-div.exercise:hover {
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 14px 60px, rgba(0, 0, 0, 0.3) 0px 10px 30px !important;
-}
-
-div.event:hover {
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 14px 60px, rgba(0, 0, 0, 0.3) 0px 10px 30px !important;
+a .MuiListItemText-primary {
+  color: #000000;
 }
 
 div.line {
@@ -84,8 +67,8 @@ div.line li:last-child {
   margin-right: 0;
 }
 
-div.line li::before{
-  content: '';
+div.line li::before {
+  content: "";
   position: absolute;
   top: 4px;
   left: -200px;
@@ -113,74 +96,4 @@ div.line .active ~ li::before {
 
 div.clearfix {
   clear: both;
-}
-
-.time-line-ctnr .time-line {
-  position: relative;
-  margin: 0 0 0px 0;
-  padding: 0;
-  list-style: none;
-}
-.time-line-ctnr .time-line:before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: -10px;
-  width: 2px;
-  background: #3498db;
-  left: 32px;
-  border-radius: 2px;
-}
-.time-line-ctnr .time-line > .time-label > span {
-  font-weight: 600;
-  padding: 5px 10px;
-  display: inline-block;
-  background-color: #e74c3c;
-  color: #fff;
-  border-radius: 2px;
-  font-size: 14px;
-}
-.time-line-ctnr .time-line > li {
-  position: relative;
-  margin-bottom: 10px;
-  margin-right: 0;
-}
-.time-line-ctnr .time-line > li > .time-line-item {
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
-  background: #fff;
-  color: #444;
-  margin-right: 15px;
-  position: relative;
-  margin-left: 50px;
-}
-.time-line-ctnr .time-line > li > .time-line-item > .time-line-header,
-.time-line-ctnr .time-line > li > .time-line-item .time {
-  font-size: 14px;
-  padding: 6px 10px;
-}
-.time-line-ctnr .time-line > li > .time-line-item .time {
-  font-size: 12px;
-  color: #999;
-  float: right;
-}
-.time-line-ctnr .time-line > li > .time-line-item .time-line-header {
-  margin: 0;
-  color: #555;
-  border-bottom: 1px solid #f4f4f4;
-  line-height: 1.1;
-}
-.time-line-ctnr .time-line > li > .fa {
-  position: absolute;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  color: #666;
-  background: #ecf0f1;
-  left: 28px;
-  top: 9px;
-  border: 2px solid #3498db;
-  display: inline-block;
-  box-sizing: border-box;
 }

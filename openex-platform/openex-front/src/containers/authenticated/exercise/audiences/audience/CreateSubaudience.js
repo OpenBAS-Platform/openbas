@@ -1,86 +1,112 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {addSubaudience, selectSubaudience} from '../../../../../actions/Subaudience'
-import {Dialog} from '../../../../../components/Dialog'
-import {FlatButton} from '../../../../../components/Button'
-import SubaudienceForm from './SubaudienceForm'
-import {ActionButtonCreate} from '../../../../../components/Button'
-import {AppBar} from '../../../../../components/AppBar'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import Typography from '@material-ui/core/Typography';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+import { Add } from '@material-ui/icons';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import SubaudienceForm from './SubaudienceForm';
+import {
+  addSubaudience,
+  selectSubaudience,
+} from '../../../../../actions/Subaudience';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Sub-audiences': 'Sous-audiences',
-    'Create a new sub-audience': 'Créer une nouvelle sous-audience'
-  }
-})
+    'Create a new sub-audience': 'Créer une nouvelle sous-audience',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 class CreateSubaudience extends Component {
   constructor(props) {
     super(props);
-    this.state = {openCreate: false}
+    this.state = { openCreate: false };
   }
 
   handleOpenCreate() {
-    this.setState({openCreate: true})
+    this.setState({ openCreate: true });
   }
 
   handleCloseCreate() {
-    this.setState({openCreate: false})
+    this.setState({ openCreate: false });
   }
 
   onSubmitCreate(data) {
-    return this.props.addSubaudience(this.props.exerciseId, this.props.audienceId, data)
+    return this.props
+      .addSubaudience(this.props.exerciseId, this.props.audienceId, data)
       .then((payload) => {
-        this.props.selectSubaudience(this.props.exerciseId, this.props.audienceId, payload.result)
+        this.props.selectSubaudience(
+          this.props.exerciseId,
+          this.props.audienceId,
+          payload.result,
+        );
       })
-  }
-
-  submitFormCreate() {
-    this.refs.subaudienceForm.submit()
+      .then(() => this.handleCloseCreate());
   }
 
   render() {
-    const actions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton key="create" label="Create" primary={true} onClick={this.submitFormCreate.bind(this)}/>,
-    ]
-
+    const { classes } = this.props;
     return (
-      <div>
-        {
-          (this.props.can_create) ?
-            <AppBar
-              title={<T>Sub-audiences</T>}
-              showMenuIconButton={false}
-              iconElementRight={
-                <ActionButtonCreate
-                  type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                  onClick={this.handleOpenCreate.bind(this)}
-                />
-              }
-            />
-          :
-            <AppBar
-              title={<T>Sub-audiences</T>}
-              showMenuIconButton={false}
-            />
-        }
-        <Dialog
-          title="Create a new sub-audience"
-          modal={false}
-          open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
-          actions={actions}
+      <div style={{ margin: '15px 0 0 15px' }}>
+        <Typography variant="h5" style={{ float: 'left' }}>
+          <T>Sub-audiences</T>
+        </Typography>
+        <IconButton
+          className={classes.createButton}
+          onClick={this.handleOpenCreate.bind(this)}
+          color="secondary"
         >
-          <SubaudienceForm
-            ref="subaudienceForm"
-            onSubmit={this.onSubmitCreate.bind(this)}
-            onSubmitSuccess={this.handleCloseCreate.bind(this)}
-          />
+          <Add />
+        </IconButton>
+        <Dialog
+          open={this.state.openCreate}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseCreate.bind(this)}
+        >
+          <DialogTitle>
+            <T>Create a new sub-audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <SubaudienceForm onSubmit={this.onSubmitCreate.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('subaudienceForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -92,10 +118,12 @@ CreateSubaudience.propTypes = {
   audienceId: PropTypes.string,
   addSubaudience: PropTypes.func,
   selectSubaudience: PropTypes.func,
-  can_create: PropTypes.bool
-}
+};
 
-export default connect(null, {
-  addSubaudience,
-  selectSubaudience
-})(CreateSubaudience);
+export default R.compose(
+  connect(null, {
+    addSubaudience,
+    selectSubaudience,
+  }),
+  withStyles(styles),
+)(CreateSubaudience);

@@ -1,19 +1,21 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUICheckbox from 'material-ui/Checkbox'
+import React from 'react';
+import MUICheckbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { Field } from 'react-final-form';
 
+const renderCheckbox = ({ input, label, style }) => (
+  <div>
+    <FormControlLabel
+      control={
+        <MUICheckbox checked={!!input.value} onChange={input.onChange} />
+      }
+      label={label}
+      style={style}
+    />
+  </div>
+);
+
+// eslint-disable-next-line import/prefer-default-export
 export const Checkbox = (props) => (
-  <MUICheckbox
-    label={props.label}
-    onCheck={props.onCheck}
-    defaultChecked={props.defaultChecked}
-    name={props.name ? props.name : ''}
-  />
-)
-
-Checkbox.propTypes = {
-  label: PropTypes.node,
-  defaultChecked: PropTypes.bool,
-  onCheck: PropTypes.func,
-  name: PropTypes.string 
-}
+  <Field name={props.name} component={renderCheckbox} {...props} />
+);

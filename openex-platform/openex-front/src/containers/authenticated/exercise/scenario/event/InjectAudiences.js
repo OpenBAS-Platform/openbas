@@ -1,37 +1,39 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import * as R from 'ramda'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {Chip} from '../../../../../components/Chip'
-import {Toggle} from '../../../../../components/Toggle'
-import {Avatar} from '../../../../../components/Avatar'
-import {List} from '../../../../../components/List'
-import {MainSmallListItem, SecondarySmallListItem} from '../../../../../components/list/ListItem'
-import {SimpleTextField} from '../../../../../components/SimpleTextField'
-import {Icon} from '../../../../../components/Icon'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
+import Chip from '@material-ui/core/Chip';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import Collapse from '@material-ui/core/Collapse';
+import { GroupOutlined } from '@material-ui/icons';
+import * as R from 'ramda';
+import { withStyles } from '@material-ui/core/styles';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import { SearchField } from '../../../../../components/SearchField';
 
-const styles = {
-  'name': {
-    float: 'left',
-    width: '80%',
-    padding: '5px 0 0 0'
+const styles = (theme) => ({
+  nested: {
+    paddingLeft: theme.spacing(4),
   },
-  'empty': {
+  empty: {
     margin: '0 auto',
     marginTop: '10px',
-    textAlign: 'center'
-  }
-}
+    textAlign: 'center',
+  },
+});
 
 i18nRegister({
   fr: {
     'No audience found.': 'Aucune audience trouvée.',
     'Search for an audience': 'Rechercher une audience',
-    'All audiences': 'Toutes les audiences'
-  }
-})
+    'All audiences': 'Toutes les audiences',
+  },
+});
 
 class InjectAudiences extends Component {
   constructor(props) {
@@ -40,163 +42,236 @@ class InjectAudiences extends Component {
       audiencesIds: this.props.injectAudiencesIds,
       subaudiencesIds: this.props.injectSubaudiencesIds,
       searchTerm: '',
-      selectAll: this.props.selectAll
-    }
+      selectAll: this.props.selectAll,
+    };
   }
 
   componentDidMount() {
     if (this.state.audiencesIds.length === this.props.audiences.length) {
-      this.setState({selectAll: true})
+      this.setState({ selectAll: true });
     }
   }
 
-  handleSearchAudiences(event, value) {
-    this.setState({searchTerm: value})
+  handleSearchAudiences(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addAudience(audienceId) {
     if (!this.state.audiencesIds.includes(audienceId)) {
-      let audiencesIds = R.append(audienceId, this.state.audiencesIds)
-      this.setState({audiencesIds: audiencesIds})
-      this.submitAudiences(audiencesIds)
+      const audiencesIds = R.append(audienceId, this.state.audiencesIds);
+      this.setState({ audiencesIds });
+      this.submitAudiences(audiencesIds);
     }
   }
 
   removeAudience(audienceId) {
-    let audiencesIds = R.filter(a => a !== audienceId, this.state.audiencesIds)
-    this.setState({audiencesIds: audiencesIds})
-    this.submitAudiences(audiencesIds)
+    const audiencesIds = R.filter(
+      (a) => a !== audienceId,
+      this.state.audiencesIds,
+    );
+    this.setState({ audiencesIds });
+    this.submitAudiences(audiencesIds);
   }
 
   addSubaudience(subaudienceId) {
     if (!this.state.subaudiencesIds.includes(subaudienceId)) {
-      let subaudiencesIds = R.append(subaudienceId, this.state.subaudiencesIds)
-      this.setState({subaudiencesIds: subaudiencesIds})
-      this.submitSubaudiences(subaudiencesIds)
+      const subaudiencesIds = R.append(
+        subaudienceId,
+        this.state.subaudiencesIds,
+      );
+      this.setState({ subaudiencesIds });
+      this.submitSubaudiences(subaudiencesIds);
     }
   }
 
   removeSubaudience(subaudienceId) {
-    let subaudiencesIds = R.filter(a => a !== subaudienceId, this.state.subaudiencesIds)
-    this.setState({subaudiencesIds: subaudiencesIds})
-    this.submitSubaudiences(subaudiencesIds)
+    const subaudiencesIds = R.filter(
+      (a) => a !== subaudienceId,
+      this.state.subaudiencesIds,
+    );
+    this.setState({ subaudiencesIds });
+    this.submitSubaudiences(subaudiencesIds);
   }
 
-  toggleAll(event, value) {
-    this.setState({selectAll: value})
-    this.submitSelectAll(value)
+  toggleAll(event) {
+    this.setState({ selectAll: event.target.checked });
+    this.submitSelectAll(event.target.checked);
   }
 
-  submitAudiences(audiences_ids) {
-    this.props.onChangeAudiences(audiences_ids)
+  submitAudiences(audiencesIds) {
+    this.props.onChangeAudiences(audiencesIds);
   }
 
-  submitSubaudiences(subaudiences_ids) {
-    this.props.onChangeSubaudiences(subaudiences_ids)
+  submitSubaudiences(subaudiencesIds) {
+    this.props.onChangeSubaudiences(subaudiencesIds);
   }
 
   submitSelectAll(selectAll) {
-    this.props.onChangeSelectAll(selectAll)
+    this.props.onChangeSelectAll(selectAll);
   }
 
   render() {
-    //region filter audiences by active keyword
-    const keyword = this.state.searchTerm
-    let filterAudiencesByKeyword = n => keyword === '' || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    let filteredAudiences = R.filter(filterAudiencesByKeyword, this.props.audiences)
-    //endregion
-
+    const { classes } = this.props;
+    // region filter audiences by active keyword
+    const keyword = this.state.searchTerm;
+    const filterAudiencesByKeyword = (n) => keyword === ''
+      || n.audience_name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const filteredAudiences = R.filter(
+      filterAudiencesByKeyword,
+      this.props.audiences,
+    );
+    // endregion
     return (
       <div>
-        <Toggle name="all" label={<strong><T>All audiences</T></strong>} onToggle={this.toggleAll.bind(this)}
-                toggled={this.state.selectAll}/>
+        <FormGroup row={true}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.state.selectAll}
+                onChange={this.toggleAll.bind(this)}
+                color="primary"
+              />
+            }
+            label={
+              <strong>
+                <T>All audiences</T>
+              </strong>
+            }
+          />
+        </FormGroup>
         <br />
-        {this.state.selectAll ? '' :
-          <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for an audience"
-                           onChange={this.handleSearchAudiences.bind(this)} styletype={Constants.FIELD_TYPE_INLINE}/>}
         <div>
-          {this.state.selectAll ? '' :
-            this.state.audiencesIds.map(audienceId => {
-              let audience = R.find(a => a.audience_id === audienceId)(this.props.audiences)
-              let audience_name = R.propOr('-', 'audience_name', audience)
+          <div>
+            <SearchField
+              fullWidth={true}
+              onChange={this.handleSearchAudiences.bind(this)}
+              style={{ marginBottom: 20 }}
+              disabled={this.state.selectAll}
+            />
+            {this.state.audiencesIds.map((audienceId) => {
+              const audience = R.find((a) => a.audience_id === audienceId)(
+                this.props.audiences,
+              );
+              const audienceName = R.propOr('-', 'audience_name', audience);
               return (
-                <Chip key={audienceId} onRequestDelete={this.removeAudience.bind(this, audienceId)}
-                      type={Constants.CHIP_TYPE_LIST}>
-                  <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
-                          type={Constants.AVATAR_TYPE_CHIP}/>
-                  {audience_name}
-                </Chip>
-              )
+                <Chip
+                  key={audienceId}
+                  onDelete={this.removeAudience.bind(this, audienceId)}
+                  icon={<GroupOutlined />}
+                  label={audienceName}
+                />
+              );
             })}
-          {this.state.selectAll ? '' :
-            this.state.subaudiencesIds.map(subaudienceId => {
-              let subaudience = R.find(a => a.subaudience_id === subaudienceId)(this.props.subaudiences)
-              let audience = R.find(a => a.audience_id === subaudience.subaudience_audience.audience_id)(this.props.audiences)
-              let audience_name = R.propOr('-', 'audience_name', audience)
-              let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
-              let disabled = R.find(audience_id => audience_id === subaudience.subaudience_audience.audience_id, this.state.audiencesIds) !== undefined
-
+            {this.state.subaudiencesIds.map((subaudienceId) => {
+              const subaudience = R.find(
+                (a) => a.subaudience_id === subaudienceId,
+              )(this.props.subaudiences);
+              const audience = R.find(
+                (a) => a.audience_id === subaudience.subaudience_audience.audience_id,
+              )(this.props.audiences);
+              const audienceName = R.propOr('-', 'audience_name', audience);
+              const subaudienceName = R.propOr(
+                '-',
+                'subaudience_name',
+                subaudience,
+              );
+              const disabled = this.state.selectAll
+                || R.find(
+                  (audienceId) => audienceId === subaudience.subaudience_audience.audience_id,
+                  this.state.audiencesIds,
+                ) !== undefined;
               if (!disabled) {
                 return (
-                  <Chip key={subaudienceId} onRequestDelete={this.removeSubaudience.bind(this, subaudienceId)}
-                        type={Constants.CHIP_TYPE_LIST}>
-                    <Avatar icon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>} size={32}
-                            type={Constants.AVATAR_TYPE_CHIP}/>
-                    [{audience_name}] {subaudience_name}
-                  </Chip>
-                )
-              } else {
-                return (<div></div>)
-              }
-            })}
-          <div className="clearfix"></div>
-        </div>
-        <div>
-          {filteredAudiences.length === 0 ? <div style={styles.empty}><T>No audience found.</T></div> : ""}
-          <List>
-            {this.state.selectAll ? '' :
-              filteredAudiences.map(audience => {
-                let disabled = R.find(audience_id => audience_id === audience.audience_id, this.state.audiencesIds) !== undefined
-                    let nestedItems = !disabled ? audience.audience_subaudiences.map(data => {
-                        let subaaudienceDisabled = R.find(subaudience_id => subaudience_id === data.subaudience_id, this.state.subaudiencesIds) !== undefined
-                        let subaudience = R.find(a => a.subaudience_id === data.subaudience_id)(this.props.subaudiences)
-                        let subaudience_id = R.propOr(data.subaudience_id, 'subaudience_id', subaudience)
-                        let subaudience_name = R.propOr('-', 'subaudience_name', subaudience)
-
-                        return <SecondarySmallListItem
-                          key={subaudience_id}
-                          disabled={subaaudienceDisabled}
-                          onClick={this.addSubaudience.bind(this, subaudience.subaudience_id)}
-                          primaryText={
-                            <div>
-                              <div style={styles.name}>{subaudience_name}</div>
-                              <div className="clearfix"></div>
-                            </div>
-                          }
-                          leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}/>
-                      }
-                    ) : ''
-
-                return (
-                  <MainSmallListItem
-                    key={audience.audience_id}
-                    disabled={disabled}
-                    onClick={this.addAudience.bind(this, audience.audience_id)}
-                    primaryText={
-                      <div>
-                        <div style={styles.name}>{audience.audience_name}</div>
-                        <div className="clearfix"></div>
-                      </div>
-                    }
-                    leftAvatar={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} type={Constants.ICON_TYPE_LIST}/>}
-                    nestedItems={nestedItems}
+                  <Chip
+                    key={subaudienceId}
+                    onDelete={this.removeSubaudience.bind(this, subaudienceId)}
+                    icon={<GroupOutlined />}
+                    label={`[${audienceName}] ${subaudienceName}`}
                   />
-                )
+                );
+              }
+              return <div key={subaudienceId}> &nbsp; </div>;
+            })}
+            <div className="clearfix" />
+          </div>
+          <div>
+            {filteredAudiences.length === 0 && (
+              <div className={classes.empty}>
+                <T>No audience found.</T>
+              </div>
+            )}
+            <List>
+              {filteredAudiences.map((audience) => {
+                const disabled = this.state.selectAll
+                  || R.find(
+                    (audienceId) => audienceId === audience.audience_id,
+                    this.state.audiencesIds,
+                  ) !== undefined;
+                const nestedItems = !disabled
+                  && audience.audience_subaudiences.map((data) => {
+                    const subaaudienceDisabled = R.find(
+                      (subaudienceId) => subaudienceId === data.subaudience_id,
+                      this.state.subaudiencesIds,
+                    ) !== undefined;
+                    const subaudience = R.find(
+                      (a) => a.subaudience_id === data.subaudience_id,
+                    )(this.props.subaudiences);
+                    const subaudienceId = R.propOr(
+                      data.subaudience_id,
+                      'subaudience_id',
+                      subaudience,
+                    );
+                    const subaudienceName = R.propOr(
+                      '-',
+                      'subaudience_name',
+                      subaudience,
+                    );
+                    return (
+                      <ListItem
+                        key={subaudienceId}
+                        disabled={subaaudienceDisabled}
+                        onClick={this.addSubaudience.bind(
+                          this,
+                          subaudience.subaudience_id,
+                        )}
+                        button={true}
+                        divider={true}
+                        className={classes.nested}
+                      >
+                        <ListItemIcon>
+                          <GroupOutlined />
+                        </ListItemIcon>
+                        <ListItemText primary={subaudienceName} />
+                      </ListItem>
+                    );
+                  });
+                return (
+                  <div key={audience.audience_id}>
+                    <ListItem
+                      disabled={disabled}
+                      onClick={this.addAudience.bind(
+                        this,
+                        audience.audience_id,
+                      )}
+                      button={true}
+                      divider={true}
+                    >
+                      <ListItemIcon>
+                        <GroupOutlined />
+                      </ListItemIcon>
+                      <ListItemText primary={audience.audience_name} />
+                    </ListItem>
+                    <Collapse in={true}>
+                      <List>{nestedItems}</List>
+                    </Collapse>
+                  </div>
+                );
               })}
-          </List>
+            </List>
+          </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -211,7 +286,7 @@ InjectAudiences.propTypes = {
   injectSubaudiencesIds: PropTypes.array,
   audiences: PropTypes.array,
   subaudiences: PropTypes.array,
-  selectAll: PropTypes.bool
-}
+  selectAll: PropTypes.bool,
+};
 
-export default InjectAudiences
+export default withStyles(styles)(InjectAudiences);

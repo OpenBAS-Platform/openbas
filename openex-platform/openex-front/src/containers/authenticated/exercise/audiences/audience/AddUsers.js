@@ -1,53 +1,63 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {i18nRegister} from '../../../../../utils/Messages'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {updateSubaudience} from '../../../../../actions/Subaudience'
-import {fetchUsers} from '../../../../../actions/User'
-import {DialogTitleElement} from '../../../../../components/Dialog'
-import {Chip} from '../../../../../components/Chip'
-import {Avatar} from '../../../../../components/Avatar'
-import {List} from '../../../../../components/List'
-import {MainSmallListItem} from '../../../../../components/list/ListItem'
-import {FlatButton, FloatingActionsButtonCreate} from '../../../../../components/Button'
-import {SimpleTextField} from '../../../../../components/SimpleTextField'
-import CreateUser from './CreateUser'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import Fab from '@material-ui/core/Fab';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Chip from '@material-ui/core/Chip';
+import Avatar from '@material-ui/core/Avatar';
+import List from '@material-ui/core/List';
+import TextField from '@material-ui/core/TextField';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import { Add } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
+import Slide from '@material-ui/core/Slide';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { updateSubaudience } from '../../../../../actions/Subaudience';
+import { fetchUsers } from '../../../../../actions/User';
+import CreateUser from './CreateUser';
 
-const styles = {
-  'name': {
-    float: 'left',
-    width: '30%',
-    padding: '5px 0 0 0',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 330,
   },
-  'mail': {
+  name: {
     float: 'left',
     width: '40%',
     padding: '5px 0 0 0',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
   },
-  'org': {
+  org: {
     float: 'left',
-    width: '25%',
     padding: '5px 0 0 0',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
   },
-}
+});
 
 i18nRegister({
   fr: {
     'Add these users': 'Ajouter ces utilisateurs',
-    'Search for a user': 'Rechercher un utilisateur'
-  }
-})
+    'Search for a user': 'Rechercher un utilisateur',
+  },
+});
 
 class AddUsers extends Component {
   constructor(props) {
@@ -55,145 +65,170 @@ class AddUsers extends Component {
     this.state = {
       openAddUsers: false,
       searchTerm: '',
-      users: []
-    }
+      users: [],
+    };
   }
 
   handleOpenAddUsers() {
     this.setState({
-      openAddUsers: true
-    })
+      openAddUsers: true,
+    });
   }
 
   handleCloseAddUsers() {
     this.setState({
       openAddUsers: false,
       searchTerm: '',
-      users: []
-    })
+      users: [],
+    });
   }
 
-  handleSearchUsers(event, value) {
-    this.setState({
-      searchTerm: value
-    })
+  handleSearchUsers(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addUser(user) {
-    if (!this.props.subaudienceUsersIds.includes(user.user_id) && !this.state.users.includes(user)) {
+    if (
+      !this.props.subaudienceUsersIds.includes(user.user_id)
+      && !this.state.users.includes(user)
+    ) {
       this.setState({
-        users: R.append(user, this.state.users)
-      })
+        users: R.append(user, this.state.users),
+      });
     }
   }
 
   removeUser(user) {
     this.setState({
-      users: R.filter(u => u.user_id !== user.user_id, this.state.users)
-    })
+      users: R.filter((u) => u.user_id !== user.user_id, this.state.users),
+    });
   }
 
   submitAddUsers() {
-    let usersList = R.pipe(
-      R.map(u => u.user_id),
-      R.concat(this.props.subaudienceUsersIds)
-    )(this.state.users)
+    const usersList = R.pipe(
+      R.map((u) => u.user_id),
+      R.concat(this.props.subaudienceUsersIds),
+    )(this.state.users);
     this.props.updateSubaudience(
       this.props.exerciseId,
       this.props.audienceId,
       this.props.subaudienceId,
-      {subaudience_users: usersList}
-    )
-    this.handleCloseAddUsers()
+      { subaudience_users: usersList },
+    );
+    this.handleCloseAddUsers();
   }
 
   render() {
-    const actions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseAddUsers.bind(this)}/>,
-      <FlatButton key="add" label="Add these users" primary={true} onClick={this.submitAddUsers.bind(this)}/>,
-      <CreateUser key="create" exerciseId={this.props.exerciseId} />
-    ]
-
-    //region filter users by active keyword
-    const keyword = this.state.searchTerm
-    let filterByKeyword = n => keyword === '' ||
-      n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-      n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-      n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    let filteredUsers = R.filter(filterByKeyword, R.values(this.props.users))
-    //endregion
-
+    const { classes } = this.props;
+    // region filter users by active keyword
+    const keyword = this.state.searchTerm;
+    const filterByKeyword = (n) => keyword === ''
+      || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const filteredUsers = R.filter(filterByKeyword, R.values(this.props.users));
+    // endregion
     return (
       <div>
-        <FloatingActionsButtonCreate
-          type={Constants.BUTTON_TYPE_FLOATING_PADDING}
+        <Fab
           onClick={this.handleOpenAddUsers.bind(this)}
-        />
-        <DialogTitleElement
-          title={
-            <SimpleTextField
+          color="secondary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+        <Dialog
+          open={this.state.openAddUsers}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseAddUsers.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
+            <TextField
               name="keyword"
               fullWidth={true}
-              type="text"
-              hintText="Search for a user"
+              label={<T>Search for a user</T>}
               onChange={this.handleSearchUsers.bind(this)}
-              styletype={Constants.FIELD_TYPE_INTITLE}
             />
-          }
-          modal={false}
-          open={this.state.openAddUsers}
-          onRequestClose={this.handleCloseAddUsers.bind(this)}
-          autoScrollBodyContent={true}
-          actions={actions}
-        >
-          <div>
-            {this.state.users.map(user => {
-              return (
+          </DialogTitle>
+          <DialogContent>
+            <div>
+              {this.state.users.map((user) => (
                 <Chip
                   key={user.user_id}
-                  onRequestDelete={this.removeUser.bind(this, user)}
-                  type={Constants.CHIP_TYPE_LIST}
-                >
-                  <Avatar
-                    src={user.user_gravatar}
-                    size={32}
-                    type={Constants.AVATAR_TYPE_CHIP}
-                  />
-                  {user.user_firstname} {user.user_lastname}
-                </Chip>
-              )
-            })}
-            <div className="clearfix"></div>
-          </div>
-          <div>
+                  onDelete={this.removeUser.bind(this, user)}
+                  avatar={<Avatar src={user.user_gravatar} />}
+                  variant="outlined"
+                  label={`${user.user_firstname} ${user.user_lastname}`}
+                />
+              ))}
+              <div className="clearfix" />
+            </div>
             <List>
-              {R.take(10, filteredUsers).map(user => {
-                let disabled = R.find(u => u.user_id === user.user_id, this.state.users) !== undefined
-                  || this.props.subaudienceUsersIds.includes(user.user_id)
-                let user_organization = R.propOr({}, user.user_organization, this.props.organizations)
-                let organizationName = R.propOr('-', 'organization_name', user_organization)
+              {R.take(10, filteredUsers).map((user) => {
+                const disabled = R.find(
+                  (u) => u.user_id === user.user_id,
+                  this.state.users,
+                ) !== undefined
+                  || this.props.subaudienceUsersIds.includes(user.user_id);
+                const userOrganization = R.propOr(
+                  {},
+                  user.user_organization,
+                  this.props.organizations,
+                );
+                const organizationName = R.propOr(
+                  '-',
+                  'organization_name',
+                  userOrganization,
+                );
                 return (
-                  <MainSmallListItem
+                  <ListItem
                     key={user.user_id}
+                    button={true}
                     disabled={disabled}
                     onClick={this.addUser.bind(this, user)}
-                    primaryText={
-                      <div>
-                        <div style={styles.name}>{user.user_firstname} {user.user_lastname}</div>
-                        <div style={styles.mail}>{user.user_email}</div>
-                        <div style={styles.org}>{organizationName}</div>
-                        <div className="clearfix"></div>
-                      </div>
-                    }
-                    leftAvatar={<Avatar type={Constants.AVATAR_TYPE_LIST} src={user.user_gravatar}/>}
-                  />
-                )
+                  >
+                    <ListItemAvatar>
+                      <Avatar src={user.user_gravatar} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.name}>
+                            {user.user_firstname} {user.user_lastname}
+                          </div>
+                          <div className={classes.org}>{organizationName}</div>
+                          <div className="clearfix" />
+                        </div>
+                      }
+                      secondary={user.user_email}
+                    />
+                  </ListItem>
+                );
               })}
             </List>
-          </div>
-        </DialogTitleElement>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseAddUsers.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitAddUsers.bind(this)}
+            >
+              <T>Add these users</T>
+            </Button>
+            <CreateUser exerciseId={this.props.exerciseId} />
+          </DialogActions>
+        </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -205,17 +240,18 @@ AddUsers.propTypes = {
   updateSubaudience: PropTypes.func,
   users: PropTypes.object,
   organizations: PropTypes.object,
-  subaudienceUsersIds: PropTypes.array
-}
+  subaudienceUsersIds: PropTypes.array,
+};
 
-const select = (state) => {
-  return {
-    users: state.referential.entities.users,
-    organizations: state.referential.entities.organizations
-  }
-}
+const select = (state) => ({
+  users: state.referential.entities.users,
+  organizations: state.referential.entities.organizations,
+});
 
-export default connect(select, {
-  fetchUsers,
-  updateSubaudience
-})(AddUsers)
+export default R.compose(
+  connect(select, {
+    fetchUsers,
+    updateSubaudience,
+  }),
+  withStyles(styles),
+)(AddUsers);

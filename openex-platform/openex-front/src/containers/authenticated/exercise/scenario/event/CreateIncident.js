@@ -1,68 +1,109 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {addIncident, selectIncident} from '../../../../../actions/Incident'
-import {DialogTitleElement} from '../../../../../components/Dialog'
-import {FlatButton} from '../../../../../components/Button'
-import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
-import {ActionButtonCreate} from '../../../../../components/Button'
-import {AppBar} from '../../../../../components/AppBar'
-import IncidentForm from './IncidentForm'
-import IncidentSubobjectives from './IncidentSubobjectives'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import { Add } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
+import Slide from '@material-ui/core/Slide';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import Dialog from '@material-ui/core/Dialog';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import IncidentForm from './IncidentForm';
+import IncidentSubobjectives from './IncidentSubobjectives';
+import { addIncident, selectIncident } from '../../../../../actions/Incident';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     '1. Parameters': '1. Paramètres',
     '2. Subobjectives': '2. Sous-objectifs',
-    'Incidents': 'Incidents',
-    'Create a new incident': 'Créer un nouvel incident'
-  }
-})
+    Incidents: 'Incidents',
+    'Create a new incident': 'Créer un nouvel incident',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  createButton: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 class CreateIncident extends Component {
   constructor(props) {
     super(props);
-    this.state = {openCreate: false, stepIndex: 0, finished: false, incidentData: null}
+    this.state = {
+      openCreate: false,
+      stepIndex: 0,
+      finished: false,
+      incidentData: null,
+    };
   }
 
   handleOpenCreate() {
-    this.setState({openCreate: true})
+    this.setState({ openCreate: true });
   }
 
   handleCloseCreate() {
-    this.setState({openCreate: false, stepIndex: 0, finished: false, incidentData: null})
+    this.setState({
+      openCreate: false,
+      stepIndex: 0,
+      finished: false,
+      incidentData: null,
+    });
   }
 
   onGlobalSubmit(data) {
-    this.setState({incidentData: data})
+    this.setState({ incidentData: data }, () => this.selectSubobjectives());
   }
 
   onSubobjectivesChange(data) {
-    let incidentData = this.state.incidentData
-    incidentData.incident_subobjectives = data
-    this.setState({incidentData: incidentData})
+    const { incidentData } = this.state;
+    incidentData.incident_subobjectives = data;
+    this.setState({ incidentData });
   }
 
   handleNext() {
     if (this.state.stepIndex === 0) {
-      this.refs.incidentForm.submit()
+      submitForm('incidentForm');
     } else if (this.state.stepIndex === 1) {
-      this.createIncident()
+      this.createIncident();
     }
   }
 
   selectSubobjectives() {
-    this.setState({stepIndex: 1, finished: true})
+    this.setState({ stepIndex: 1, finished: true });
   }
 
   createIncident() {
-    this.props.addIncident(this.props.exerciseId, this.props.eventId, this.state.incidentData).then((payload) => {
-      this.props.selectIncident(this.props.exerciseId, this.props.eventId, payload.result)
-    })
-    this.handleCloseCreate()
+    this.props
+      .addIncident(
+        this.props.exerciseId,
+        this.props.eventId,
+        this.state.incidentData,
+      )
+      .then((payload) => {
+        this.props.selectIncident(
+          this.props.exerciseId,
+          this.props.eventId,
+          payload.result,
+        );
+      });
+    this.handleCloseCreate();
   }
 
   getStepContent(stepIndex) {
@@ -70,48 +111,47 @@ class CreateIncident extends Component {
       case 0:
         return (
           <IncidentForm
-            ref="incidentForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
-            onSubmitSuccess={this.selectSubobjectives.bind(this)}
-            types={this.props.incident_types}/>
-        )
+            types={this.props.incident_types}
+          />
+        );
       case 1:
         return (
           <IncidentSubobjectives
-            ref="incidentSubobjectives"
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             onChange={this.onSubobjectivesChange.bind(this)}
             subobjectives={this.props.subobjectives}
             incidentSubobjectivesIds={[]}
           />
-        )
+        );
       default:
-        return 'Go away!'
+        return 'Go away!';
     }
   }
 
   render() {
-    const actions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseCreate.bind(this)}/>,
-      <FlatButton key="create" label={this.state.stepIndex === 1 ? "Create" : "Next"} primary={true}
-                  onClick={this.handleNext.bind(this)}/>,
-    ]
-
+    const { classes } = this.props;
     return (
-      <div>
-        {(this.props.can_create) ?
-            <AppBar title={<T>Incidents</T>}
-                showMenuIconButton={false}
-                iconElementRight={<ActionButtonCreate type={Constants.BUTTON_TYPE_CREATE_RIGHT}
-                onClick={this.handleOpenCreate.bind(this)}/>}/>
-        :
-           <AppBar title={<T>Incidents</T>}
-                showMenuIconButton={false}/>
-        }
-
-        <DialogTitleElement
-          title={
+      <div style={{ margin: '15px 0 0 15px' }}>
+        <Typography variant="h5" style={{ float: 'left' }}>
+          <T>Incidents</T>
+        </Typography>
+        <IconButton
+          className={classes.createButton}
+          onClick={this.handleOpenCreate.bind(this)}
+          color="secondary"
+        >
+          <Add />
+        </IconButton>
+        <Dialog
+          open={this.state.openCreate}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseCreate.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
@@ -124,16 +164,28 @@ class CreateIncident extends Component {
                 </StepLabel>
               </Step>
             </Stepper>
-          }
-          modal={false}
-          open={this.state.openCreate}
-          onRequestClose={this.handleCloseCreate.bind(this)}
-          autoScrollBodyContent={true}
-          actions={actions}>
-          <div>{this.getStepContent(this.state.stepIndex)}</div>
-        </DialogTitleElement>
+          </DialogTitle>
+          <DialogContent>
+            {this.getStepContent(this.state.stepIndex)}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.handleNext.bind(this)}
+            >
+              <T>{this.state.stepIndex === 1 ? 'Create' : 'Next'}</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -144,7 +196,10 @@ CreateIncident.propTypes = {
   subobjectives: PropTypes.array,
   addIncident: PropTypes.func,
   selectIncident: PropTypes.func,
-  can_create: PropTypes.bool
-}
+  can_create: PropTypes.bool,
+};
 
-export default connect(null, {addIncident, selectIncident})(CreateIncident);
+export default R.compose(
+  connect(null, { addIncident, selectIncident }),
+  withStyles(styles),
+)(CreateIncident);

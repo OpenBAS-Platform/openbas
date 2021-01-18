@@ -19,7 +19,7 @@ class Dryrun extends BaseEntity
      */
     protected $dryrun_id;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $dryrun_date;
     /**

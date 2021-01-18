@@ -1,88 +1,90 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import MUIListItem from 'material-ui/List/ListItem'
-import {injectIntl} from 'react-intl'
-import {Link} from 'react-router'
-import Theme from '../Theme'
-import * as Constants from '../../constants/ComponentTypes'
+import React from 'react';
+import * as PropTypes from 'prop-types';
+import MUIListItem from '@material-ui/core/ListItem';
+import { injectIntl } from 'react-intl';
+import { Link } from 'react-router-dom';
+import Theme from '../Theme';
+import * as Constants from '../../constants/ComponentTypes';
 
 const styles = {
-  'headeritem': {
-    height: '50px'
+  headeritem: {
+    height: '50px',
   },
-  'active': {
+  active: {
     backgroundColor: '#BDBDBD',
   },
-  'inactive': {
-  },
-  'mainitem': {
+  inactive: {},
+  mainitem: {
     borderBottom: '1px solid #E0E0E0',
   },
-  'mainitemdisabled': {
+  mainitemdisabled: {
     borderBottom: '1px solid #E0E0E0',
-    backgroundColor: '#F0F0F0'
+    backgroundColor: '#F0F0F0',
   },
-  'secondaryitem': {
-    marginLeft: '30px',
-    borderBottom: '1px solid #E0E0E0'
-  },
-  'secondaryitemdisabled': {
+  secondaryitem: {
     marginLeft: '30px',
     borderBottom: '1px solid #E0E0E0',
-    backgroundColor: '#F0F0F0'
   },
-  'tertiaryitem': {
+  secondaryitemdisabled: {
+    marginLeft: '30px',
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0',
+  },
+  tertiaryitem: {
     marginLeft: '60px',
-    borderBottom: '1px solid #E0E0E0'
+    borderBottom: '1px solid #E0E0E0',
   },
-  'tertiaryitemdisabled': {
+  tertiaryitemdisabled: {
     marginLeft: '60px',
     borderBottom: '1px solid #E0E0E0',
-    backgroundColor: '#F0F0F0'
+    backgroundColor: '#F0F0F0',
   },
-  'mainsmallitem': {
-    borderBottom: '1px solid #E0E0E0'
-  },
-  'mainsmallitemdisabled': {
+  mainsmallitem: {
     borderBottom: '1px solid #E0E0E0',
-    backgroundColor: '#F0F0F0'
   },
-  'secondarysmallitem': {
-    marginLeft: '15px',
-    borderBottom: '1px solid #E0E0E0'
+  mainsmallitemdisabled: {
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0',
   },
-  'secondarysmallitemdisabled': {
+  secondarysmallitem: {
     marginLeft: '15px',
     borderBottom: '1px solid #E0E0E0',
-    backgroundColor: '#F0F0F0'
-  }
-}
+  },
+  secondarysmallitemdisabled: {
+    marginLeft: '15px',
+    borderBottom: '1px solid #E0E0E0',
+    backgroundColor: '#F0F0F0',
+  },
+};
 
 const innerDivStyle = {
-  [ Constants.LIST_ITEM_NOSPACE ]: {
-    padding: '16px 16px 16px 55px'
-  }
-}
+  [Constants.LIST_ITEM_NOSPACE]: {
+    padding: '16px 16px 16px 55px',
+  },
+};
 
 const innerDivStyleGrey = {
-  [ Constants.LIST_ITEM_NOSPACE ]: {
+  [Constants.LIST_ITEM_NOSPACE]: {
     padding: '16px 16px 16px 55px',
-    color: Theme.palette.disabledColor
-  }
-}
+    color: Theme.palette.disabledColor,
+  },
+};
 
 const ListItemLinkIntl = (props) => (
   <MUIListItem
-    primaryText={props.intl.formatMessage({id: props.label})}
-    containerElement={<Link to={props.to}/>}
+    primaryText={props.intl.formatMessage({ id: props.label })}
+    containerElement={<Link to={props.to} />}
     style={props.active ? styles.active : styles.inactive}
-    innerDivStyle={props.grey ? innerDivStyleGrey[props.type] : innerDivStyle[props.type]}
+    innerDivStyle={
+      props.grey ? innerDivStyleGrey[props.type] : innerDivStyle[props.type]
+    }
     leftIcon={props.leftIcon}
     rightIcon={props.rightIcon}
     onClick={props.onClick}
-    disabled={props.disabled}/>
-)
-export const ListItemLink = injectIntl(ListItemLinkIntl)
+    disabled={props.disabled}
+  />
+);
+export const ListItemLink = injectIntl(ListItemLinkIntl);
 
 ListItemLinkIntl.propTypes = {
   label: PropTypes.string,
@@ -94,26 +96,27 @@ ListItemLinkIntl.propTypes = {
   disabled: PropTypes.bool,
   active: PropTypes.bool,
   type: PropTypes.string,
-  grey: PropTypes.bool
-}
+  grey: PropTypes.bool,
+};
 
 export const IconListItemLink = (props) => (
   <MUIListItem
-    containerElement={<Link to={props.to}/>}
+    containerElement={<Link to={props.to} />}
     value={props.to}
     disabled={props.disabled}
     leftIcon={props.leftIcon}
     style={props.active === true ? styles.active : styles.inactive}
-    innerDivStyle={{padding: '20px 10px 20px 10px'}}/>
-)
+    innerDivStyle={{ padding: '20px 10px 20px 10px' }}
+  />
+);
 
 IconListItemLink.propTypes = {
   intl: PropTypes.object,
   to: PropTypes.string,
   leftIcon: PropTypes.element,
   disabled: PropTypes.bool,
-  active: PropTypes.bool
-}
+  active: PropTypes.bool,
+};
 
 export const AvatarListItem = (props) => (
   <MUIListItem
@@ -127,8 +130,9 @@ export const AvatarListItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={true}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
-    rightIconButton={props.rightIconButton}/>
-)
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 AvatarListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -139,8 +143,8 @@ AvatarListItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.node,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const AvatarHeaderItem = (props) => (
   <MUIListItem
@@ -155,8 +159,9 @@ export const AvatarHeaderItem = (props) => (
     style={styles.headeritem}
     hoverColor="#ffffff"
     disableKeyboardFocus={true}
-    rightIconButton={props.rightIconButton}/>
-)
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 AvatarHeaderItem.propTypes = {
   primaryText: PropTypes.node,
@@ -166,8 +171,8 @@ AvatarHeaderItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.element,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const MainListItem = (props) => (
   <MUIListItem
@@ -182,9 +187,10 @@ export const MainListItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={props.initiallyOpen}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
-    innerDivStyle={{padding: '20px 10px 20px 60px'}}
-    rightIconButton={props.rightIconButton}/>
-)
+    innerDivStyle={{ padding: '20px 10px 20px 60px' }}
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 MainListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -197,12 +203,12 @@ MainListItem.propTypes = {
   disabled: PropTypes.bool,
   initiallyOpen: PropTypes.bool,
   rightIconButton: PropTypes.node,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const MainListItemLink = (props) => (
   <MUIListItem
-    containerElement={<Link to={props.to}/>}
+    containerElement={<Link to={props.to} />}
     primaryText={props.primaryText}
     secondaryText={props.secondaryText}
     leftAvatar={props.leftAvatar}
@@ -213,9 +219,10 @@ export const MainListItemLink = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={props.initiallyOpen}
     style={props.disabled ? styles.mainitemdisabled : styles.mainitem}
-    innerDivStyle={{padding: '20px 10px 20px 60px'}}
-    rightIconButton={props.rightIconButton}/>
-)
+    innerDivStyle={{ padding: '20px 10px 20px 60px' }}
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 MainListItemLink.propTypes = {
   to: PropTypes.string,
@@ -228,8 +235,8 @@ MainListItemLink.propTypes = {
   disabled: PropTypes.bool,
   initiallyOpen: PropTypes.bool,
   rightIconButton: PropTypes.node,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const SecondaryListItem = (props) => (
   <MUIListItem
@@ -243,9 +250,10 @@ export const SecondaryListItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={props.initiallyOpen}
     style={props.disabled ? styles.secondaryitemdisabled : styles.secondaryitem}
-    innerDivStyle={{padding: '20px 10px 20px 60px'}}
-    rightIconButton={props.rightIconButton}/>
-)
+    innerDivStyle={{ padding: '20px 10px 20px 60px' }}
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 SecondaryListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -257,8 +265,8 @@ SecondaryListItem.propTypes = {
   disabled: PropTypes.bool,
   initiallyOpen: PropTypes.bool,
   rightIconButton: PropTypes.node,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const TertiaryListItem = (props) => (
   <MUIListItem
@@ -272,9 +280,10 @@ export const TertiaryListItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={false}
     style={props.disabled ? styles.tertiaryitemdisabled : styles.tertiaryitem}
-    innerDivStyle={{padding: '20px 20px 20px 60px'}}
-    rightIconButton={props.rightIconButton}/>
-)
+    innerDivStyle={{ padding: '20px 20px 20px 60px' }}
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 TertiaryListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -285,8 +294,8 @@ TertiaryListItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.node,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const SecondarySmallListItem = (props) => (
   <MUIListItem
@@ -297,9 +306,14 @@ export const SecondarySmallListItem = (props) => (
     rightIcon={props.rightIcon}
     onClick={props.onClick}
     disabled={props.disabled}
-    style={props.disabled ? styles.secondarysmallitemdisabled : styles.secondarysmallitem}
-    rightIconButton={props.rightIconButton}/>
-)
+    style={
+      props.disabled
+        ? styles.secondarysmallitemdisabled
+        : styles.secondarysmallitem
+    }
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 SecondarySmallListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -310,7 +324,7 @@ SecondarySmallListItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.node,
-}
+};
 
 export const MainSmallListItem = (props) => (
   <MUIListItem
@@ -324,8 +338,9 @@ export const MainSmallListItem = (props) => (
     initiallyOpen={true}
     disabled={props.disabled}
     style={props.disabled ? styles.mainsmallitemdisabled : styles.mainsmallitem}
-    rightIconButton={props.rightIconButton}/>
-)
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 MainSmallListItem.propTypes = {
   primaryText: PropTypes.node,
@@ -336,8 +351,8 @@ MainSmallListItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.node,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};
 
 export const HeaderItem = (props) => (
   <MUIListItem
@@ -350,11 +365,12 @@ export const HeaderItem = (props) => (
     nestedItems={props.nestedItems}
     initiallyOpen={true}
     style={styles.headeritem}
-    innerDivStyle={{padding: '20px 10px 20px 60px'}}
+    innerDivStyle={{ padding: '20px 10px 20px 60px' }}
     hoverColor="#ffffff"
     disableKeyboardFocus={true}
-    rightIconButton={props.rightIconButton}/>
-)
+    rightIconButton={props.rightIconButton}
+  />
+);
 
 HeaderItem.propTypes = {
   primaryText: PropTypes.node,
@@ -364,5 +380,5 @@ HeaderItem.propTypes = {
   onClick: PropTypes.func,
   disabled: PropTypes.bool,
   rightIconButton: PropTypes.element,
-  nestedItems: PropTypes.arrayOf(PropTypes.node)
-}
+  nestedItems: PropTypes.arrayOf(PropTypes.node),
+};

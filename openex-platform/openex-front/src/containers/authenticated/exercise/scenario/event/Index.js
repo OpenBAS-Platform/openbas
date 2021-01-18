@@ -1,127 +1,114 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import * as R from 'ramda'
-import {dateFormat} from '../../../../../utils/Time'
-import {connect} from 'react-redux'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import Theme from '../../../../../components/Theme'
-import {Toolbar, ToolbarTitle} from '../../../../../components/Toolbar'
-import {Dialog} from '../../../../../components/Dialog'
-import {List} from '../../../../../components/List'
-import {MainListItem, HeaderItem} from '../../../../../components/list/ListItem'
-import {Icon} from '../../../../../components/Icon'
-import {FlatButton} from '../../../../../components/Button'
-import {SearchField} from '../../../../../components/SimpleTextField'
-import {fetchAudiences} from '../../../../../actions/Audience'
-import {fetchSubaudiences} from '../../../../../actions/Subaudience'
-import {fetchSubobjectives} from '../../../../../actions/Subobjective'
-import {downloadFile} from '../../../../../actions/File'
-import {fetchEvents} from '../../../../../actions/Event'
-import {fetchIncidentTypes, fetchIncidents} from '../../../../../actions/Incident'
-import {fetchInjectTypes, fetchInjectTypesExerciseSimple, fetchInjects} from '../../../../../actions/Inject'
-import {fetchGroups} from '../../../../../actions/Group'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import IncidentNav from './IncidentNav'
-import EventPopover from './EventPopover'
-import IncidentPopover from './IncidentPopover'
-import CreateInject from './CreateInject'
-import InjectPopover from './InjectPopover'
-import InjectView from './InjectView'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { connect } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import { withStyles } from '@material-ui/core/styles';
+import {
+  EventOutlined,
+  EmailOutlined,
+  SmsOutlined,
+  InputOutlined,
+} from '@material-ui/icons';
+import Typography from '@material-ui/core/Typography';
+import { green, red } from '@material-ui/core/colors';
+import { dateFormat } from '../../../../../utils/Time';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import { SearchField } from '../../../../../components/SearchField';
+import { fetchAudiences } from '../../../../../actions/Audience';
+import { fetchSubaudiences } from '../../../../../actions/Subaudience';
+import { fetchSubobjectives } from '../../../../../actions/Subobjective';
+import { downloadFile } from '../../../../../actions/File';
+import { fetchEvents } from '../../../../../actions/Event';
+import {
+  fetchIncidents,
+  fetchIncidentTypes,
+} from '../../../../../actions/Incident';
+import {
+  fetchInjects,
+  fetchInjectTypes,
+  fetchInjectTypesExerciseSimple,
+} from '../../../../../actions/Inject';
+import { fetchGroups } from '../../../../../actions/Group';
+import * as Constants from '../../../../../constants/ComponentTypes';
+import IncidentNav from './IncidentNav';
+import EventPopover from './EventPopover';
+import CreateInject from './CreateInject';
+import InjectPopover from './InjectPopover';
+import InjectView from './InjectView';
 
 i18nRegister({
   fr: {
     'This event is empty.': 'Cet événement est vide.',
     'This incident is empty.': 'Cet incident est vide.',
-    'Title': 'Titre',
-    'Date': 'Date',
-    'Author': 'Auteur',
-    'linked subobjective(s)': 'sous-objectif(s) lié(s)'
-  }
-})
+    Title: 'Titre',
+    Date: 'Date',
+    Author: 'Auteur',
+    'linked subobjective(s)': 'sous-objectif(s) lié(s)',
+  },
+});
 
-const styles = {
-  'container': {
+const styles = () => ({
+  container: {
     paddingRight: '300px',
   },
-  'header': {
-    'icon': {
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-      padding: '8px 0 0 8px'
-    },
-    'inject_title': {
-      float: 'left',
-      width: '50%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700'
-    },
-    'inject_date': {
-      float: 'left',
-      width: '20%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700'
-    },
-    'inject_user': {
-      float: 'left',
-      width: '18%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700'
-    },
-    'inject_audiences': {
-      float: 'left',
-      textAlign: 'center',
-      width: '2%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700'
-    }
+  toolbar: {
+    position: 'fixed',
+    top: 0,
+    right: 320,
+    zIndex: '5000',
+    backgroundColor: 'none',
   },
-  'title': {
+  title: {
     float: 'left',
     fontSize: '13px',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
   },
-  'subobjectives': {
+  subobjectives: {
     float: 'left',
     fontSize: '12px',
-    color: Theme.palette.accent3Color
   },
-  'empty': {
+  empty: {
     marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  'search': {
+  search: {
     float: 'right',
   },
-  'inject_title': {
+  inject_date: {
     float: 'left',
-    width: '50%',
-    padding: '5px 0 0 0'
+    width: '30%',
+    padding: '5px 0 0 0',
   },
-  'inject_date': {
-    float: 'left',
-    width: '20%',
-    padding: '5px 0 0 0'
-  },
-  'inject_user': {
-    width: '18%',
-    float: 'left',
-    padding: '5px 0 0 0'
-  },
-  'inject_audiences': {
-    width: '2%',
+  inject_user: {
+    width: '40%',
     float: 'left',
     padding: '5px 0 0 0',
-    textAlign: 'center'
-  }
-}
+  },
+  inject_audiences: {
+    float: 'left',
+    padding: '5px 0 0 0',
+    fontWeight: 600,
+  },
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
+  },
+});
 
 class Index extends Component {
   constructor(props) {
@@ -131,317 +118,278 @@ class Index extends Component {
       orderAsc: true,
       searchTerm: '',
       openView: false,
-      currentInject: {}
-    }
+      currentInject: {},
+    };
   }
 
   componentDidMount() {
-    this.props.fetchSubobjectives(this.props.exerciseId)
-    this.props.fetchAudiences(this.props.exerciseId)
-    this.props.fetchSubaudiences(this.props.exerciseId)
-    this.props.fetchEvents(this.props.exerciseId)
-    this.props.fetchIncidentTypes()
-    this.props.fetchIncidents(this.props.exerciseId)
-    this.props.fetchInjectTypes()
-      .then(value => {
-        if (value.result.length !== 0) {
-
-          // Build object from array
-          let injectTypes = {}
-          value.result.map(type => {
-            injectTypes[type] = {
-              type: type
-            }
-            return true
-          })
-
-          return {
-            inject_types: injectTypes
+    this.props.fetchSubobjectives(this.props.exerciseId);
+    this.props.fetchAudiences(this.props.exerciseId);
+    this.props.fetchSubaudiences(this.props.exerciseId);
+    this.props.fetchEvents(this.props.exerciseId);
+    this.props.fetchIncidentTypes();
+    this.props.fetchIncidents(this.props.exerciseId);
+    // eslint-disable-next-line consistent-return
+    this.props.fetchInjectTypes().then((value) => {
+      if (value.result.length !== 0) {
+        // Build object from array
+        const injectTypes = {};
+        value.result.map((type) => {
+          injectTypes[type] = {
+            type,
           };
-        }
-      })
-
-    this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
-    this.props.fetchGroups()
+          return true;
+        });
+        return {
+          inject_types: injectTypes,
+        };
+      }
+    });
+    this.props.fetchInjects(this.props.exerciseId, this.props.eventId);
+    this.props.fetchGroups();
   }
 
   reloadEvent() {
-    this.props.fetchIncidents(this.props.exerciseId)
-    this.props.fetchInjects(this.props.exerciseId, this.props.eventId)
+    this.props.fetchIncidents(this.props.exerciseId);
+    this.props.fetchInjects(this.props.exerciseId, this.props.eventId);
   }
 
-  handleSearchInjects(event, value) {
-    this.setState({searchTerm: value})
+  handleSearchInjects(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
-  reverseBy(field) {
-    this.setState({
-      sortBy: field,
-      orderAsc: !this.state.orderAsc
-    })
-  }
-
-  SortHeader(field, label) {
-    var icon = this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
-    const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
-    return (
-      <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-        <T>{label}</T>
-        {IconDisplay}
-      </div>
-    )
-  }
-
-  SortHeader2(field, element) {
-    var icon = this.state.orderAsc ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP
-    const IconDisplay = this.state.sortBy === field ? <Icon type={Constants.ICON_TYPE_SORT} name={icon}/> : ""
-    return (
-      <div style={styles.header[field]} onClick={this.reverseBy.bind(this, field)}>
-        {element}
-        {IconDisplay}
-      </div>
-    )
-  }
-
-  //TODO replace with sortWith after Ramdajs new release
+  // TODO replace with sortWith after Ramdajs new release
+  // eslint-disable-next-line class-methods-use-this
   ascend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   descend(a, b) {
+    // eslint-disable-next-line no-nested-ternary
     return a > b ? -1 : a < b ? 1 : 0;
   }
 
-  selectIcon(type, color) {
+  // eslint-disable-next-line class-methods-use-this
+  selectIcon(type) {
     switch (type) {
       case 'openex_email':
-        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+        return <EmailOutlined />;
       case 'openex_ovh_sms':
-        return <Icon name={Constants.ICON_NAME_NOTIFICATION_SMS} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+        return <SmsOutlined />;
       case 'openex_manual':
-        return <Icon name={Constants.ICON_NAME_ACTION_INPUT} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
+        return <InputOutlined />;
       default:
-        return <Icon name={Constants.ICON_NAME_CONTENT_MAIL} type={Constants.ICON_TYPE_MAINLIST} color={color}/>
-    }
-  }
-
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor
-    } else {
-      return Theme.palette.textColor
+        return <InputOutlined />;
     }
   }
 
   handleOpenView(inject) {
-    this.setState({currentInject: inject, openView: true})
+    this.setState({ currentInject: inject, openView: true });
   }
 
   handleCloseView() {
-    this.setState({openView: false})
+    this.setState({ openView: false });
   }
 
-  downloadAttachment(file_id, file_name) {
-    return this.props.downloadFile(file_id, file_name)
+  downloadAttachment(fileId, fileName) {
+    return this.props.downloadFile(fileId, fileName);
+  }
+
+  renderIncident() {
+    const {
+      classes, exerciseId, eventId, incident,
+    } = this.props;
+    const keyword = this.state.searchTerm;
+    const filterByKeyword = (n) => keyword === ''
+      || n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || n.inject_content.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const injects = R.pipe(
+      R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
+      R.filter(filterByKeyword),
+      R.sort((a, b) => {
+        // TODO replace with sortWith after Ramdajs new release
+        const fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString());
+        const fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString());
+        return this.state.orderAsc
+          ? this.ascend(fieldA, fieldB)
+          : this.descend(fieldA, fieldB);
+      }),
+    )(incident.incident_injects);
+    const eventIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.event,
+    );
+    return (
+      <div>
+        {incident.incident_injects.length === 0 && (
+          <div className={classes.empty}>
+            <T>This incident is empty.</T>
+          </div>
+        )}
+        <List>
+          {injects.map((inject) => {
+            // Setup variables
+            const injectId = R.propOr(Math.random(), 'inject_id', inject);
+            const injectTitle = R.propOr('-', 'inject_title', inject);
+            const injectDescription = R.propOr(
+              '-',
+              'inject_description',
+              inject,
+            );
+            const injectUser = R.propOr('-', 'inject_user', inject);
+            const injectDate = R.prop('inject_date', inject);
+            const injectType = R.propOr('-', 'inject_type', inject);
+            const injectAudiences = R.propOr([], 'inject_audiences', inject);
+            const injectSubaudiences = R.propOr(
+              [],
+              'inject_subaudiences',
+              inject,
+            );
+            const injectUsersNumber = R.propOr(
+              '-',
+              'inject_users_number',
+              inject,
+            );
+            const injectEnabled = R.propOr(true, 'inject_enabled', inject);
+            const injectTypeInHere = R.propOr(
+              false,
+              injectType,
+              this.props.inject_types,
+            );
+            const injectDisabled = !injectTypeInHere;
+            // Return the dom
+            return (
+              <ListItem
+                key={injectId}
+                onClick={this.handleOpenView.bind(this, inject)}
+                button={true}
+                divider={true}
+              >
+                <ListItemIcon
+                  className={
+                    !injectEnabled || injectDisabled
+                      ? classes.disabled
+                      : classes.enabled
+                  }
+                >
+                  {this.selectIcon(injectType)}
+                </ListItemIcon>
+                <ListItemText
+                  primary={injectTitle}
+                  secondary={injectDescription}
+                />
+                <div style={{ width: 500 }}>
+                  <div className={classes.inject_date}>
+                    {dateFormat(injectDate)}
+                  </div>
+                  <div className={classes.inject_user}>{injectUser}</div>
+                  <div className={classes.inject_audiences}>
+                    {injectUsersNumber.toString()} <T>players</T>
+                  </div>
+                  <div className="clearfix" />
+                </div>
+                <ListItemSecondaryAction>
+                  <InjectPopover
+                    type={Constants.INJECT_SCENARIO}
+                    exerciseId={exerciseId}
+                    eventId={eventId}
+                    incidentId={incident.incident_id}
+                    inject={inject}
+                    injectAudiencesIds={injectAudiences.map(
+                      (a) => a.audience_id,
+                    )}
+                    injectSubaudiencesIds={injectSubaudiences.map(
+                      (a) => a.subaudience_id,
+                    )}
+                    audiences={this.props.audiences}
+                    subaudiences={this.props.subaudiences}
+                    inject_types={this.props.inject_types}
+                    incidents={this.props.allIncidents}
+                    userCanUpdate={this.props.userCanUpdate}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
+        </List>
+        <Dialog
+          open={this.state.openView}
+          onClose={this.handleCloseView.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
+            {R.propOr('-', 'inject_title', this.state.currentInject)}
+          </DialogTitle>
+          <DialogContent>
+            <InjectView
+              downloadAttachment={this.downloadAttachment.bind(this)}
+              inject={this.state.currentInject}
+              audiences={this.props.audiences}
+              subaudiences={this.props.subaudiences}
+            />
+          </DialogContent>
+          <DialogActions>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseView.bind(this)}
+              >
+                <T>Close</T>
+              </Button>
+            </DialogActions>
+          </DialogActions>
+        </Dialog>
+        {eventIsUpdatable && this.props.userCanUpdate && (
+          <CreateInject
+            exerciseId={exerciseId}
+            eventId={eventId}
+            incidentId={incident.incident_id}
+            inject_types={this.props.inject_types}
+            audiences={this.props.audiences}
+            subaudiences={this.props.subaudiences}
+          />
+        )}
+      </div>
+    );
   }
 
   render() {
-    const viewActions = [
-      <FlatButton key="close" label="Close" primary={true} onClick={this.handleCloseView.bind(this)}/>,
-    ]
-
-    let {exerciseId, eventId, event, incident, incidents} = this.props
-    let event_title = R.propOr('-', 'event_title', event)
-    let event_is_updatable = R.propOr(true, 'user_can_update', this.props.event)
-
-    if (event && incident) {
-      const keyword = this.state.searchTerm
-      let filterByKeyword = n => keyword === '' ||
-      n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-      n.inject_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-      n.inject_content.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-
-      const injects = R.pipe(
-        R.map(data => R.pathOr({}, ['injects', data.inject_id], this.props)),
-        R.filter(filterByKeyword),
-        R.sort((a, b) => { //TODO replace with sortWith after Ramdajs new release
-          let fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString())
-          let fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString())
-          return this.state.orderAsc ? this.ascend(fieldA, fieldB) : this.descend(fieldA, fieldB)
-        })
-      )(incident.incident_injects)
-
-      // Display the component
+    const {
+      classes,
+      exerciseId,
+      eventId,
+      event,
+      incident,
+      incidents,
+    } = this.props;
+    const eventIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.event,
+    );
+    if (event) {
       return (
-        <div style={styles.container}>
+        <div className={classes.container}>
           <IncidentNav
-            selectedIncident={incident.incident_id}
             exerciseId={exerciseId}
             eventId={eventId}
             incidents={incidents}
             incident_types={this.props.incident_types}
-            subobjectives={this.props.subobjectives}
-            can_create={event_is_updatable && this.props.userCanUpdate}
+            can_create={eventIsUpdatable && this.props.userCanUpdate}
+            selectedIncident={R.propOr(null, 'incident_id', incident)}
           />
-          <div>
-            <div style={styles.title}>
-              {incident.incident_title}
-              &nbsp;
-            </div>
-            {this.props.userCanUpdate ?
-              <IncidentPopover
-                exerciseId={exerciseId}
-                eventId={eventId}
-                incident={incident}
-                subobjectives={this.props.subobjectives}
-                incidentSubobjectivesIds={incident.incident_subobjectives.map(i => i.subobjective_id)}
-                incident_types={this.props.incident_types}
-              />
-              : ""
-            }
-
-            <div style={styles.subobjectives}>
-              {incident.incident_subobjectives.length}
-              &nbsp;
-              <T>linked subobjective(s)</T>
-            </div>
-
-            <div style={styles.search}>
-              <SearchField
-                name="keyword"
-                fullWidth={true}
-                type="text"
-                hintText="Search"
-                onChange={this.handleSearchInjects.bind(this)}
-                styletype={Constants.FIELD_TYPE_RIGHT}
-              />
-            </div>
-
-            <div className="clearfix"></div>
-
-            <List>
-              {(incident.incident_injects.length === 0)
-                ? (<div style={styles.empty}><T>This incident is empty.</T></div>)
-                : (
-                  <HeaderItem
-                    leftIcon={<span style={styles.header.icon}>#</span>}
-                    rightIconButton={<Icon style={{display: 'none'}}/>}
-                    primaryText={<div>
-                      {this.SortHeader('inject_title', 'Title')}
-                      {this.SortHeader('inject_date', 'Date')}
-                      {this.SortHeader('inject_user', 'Author')}
-                      {this.SortHeader2('inject_users_number', <Icon name={Constants.ICON_NAME_SOCIAL_GROUP}/>)}
-                      <div className="clearfix"></div>
-                    </div>}
-                  />
-                )
-              }
-
-              {injects.map(inject => {
-                //Setup variables
-                let injectId = R.propOr(Math.random(), 'inject_id', inject)
-                let inject_title = R.propOr('-', 'inject_title', inject)
-                let inject_user = R.propOr('-', 'inject_user', inject)
-                let inject_date = R.prop('inject_date', inject)
-                let inject_type = R.propOr('-', 'inject_type', inject)
-                let inject_audiences = R.propOr([], 'inject_audiences', inject)
-                let inject_subaudiences = R.propOr([], 'inject_subaudiences', inject)
-                let inject_users_number = R.propOr('-', 'inject_users_number', inject)
-                let inject_enabled = R.propOr(true, 'inject_enabled', inject)
-                let injectType = R.propOr(false, inject_type, this.props.inject_types)
-                let injectDisabled = injectType ? false : true
-                //Return the dom
-                return (
-                  <MainListItem
-                    key={injectId}
-                    leftIcon={this.selectIcon(inject_type, this.switchColor(!inject_enabled || injectDisabled))}
-                    onClick={this.handleOpenView.bind(this, inject)}
-                    rightIconButton={
-                      <InjectPopover
-                        type={Constants.INJECT_SCENARIO}
-                        exerciseId={exerciseId}
-                        eventId={eventId}
-                        incidentId={incident.incident_id}
-                        inject={inject}
-                        injectAudiencesIds={inject_audiences.map(a => a.audience_id)}
-                        injectSubaudiencesIds={inject_subaudiences.map(a => a.subaudience_id)}
-                        audiences={this.props.audiences}
-                        subaudiences={this.props.subaudiences}
-                        inject_types={this.props.inject_types}
-                        incidents={this.props.allIncidents}
-                        userCanUpdate={this.props.userCanUpdate}
-                      />
-                    }
-                    primaryText={
-                      <div>
-                        <div style={styles.inject_title}><span
-                          style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_title}</span></div>
-                        <div style={styles.inject_date}><span
-                          style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{dateFormat(inject_date)}</span></div>
-                        <div style={styles.inject_user}><span
-                          style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_user}</span></div>
-                        <div style={styles.inject_audiences}><span
-                          style={{color: this.switchColor(!inject_enabled || injectDisabled)}}>{inject_users_number.toString()}</span></div>
-                        <div className="clearfix"></div>
-                      </div>
-                    }
-                  />
-                )
-              })}
-            </List>
-
-            {(event_is_updatable && this.props.userCanUpdate) ?
-                <CreateInject
-                  exerciseId={exerciseId}
-                  eventId={eventId}
-                  incidentId={incident.incident_id}
-                  inject_types={this.props.inject_types}
-                  audiences={this.props.audiences}
-                  subaudiences={this.props.subaudiences}
-                />
-             : ""}
-            <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-              <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
-              <EventPopover
-                exerciseId={exerciseId}
-                eventId={eventId}
-                event={event}
-                reloadEvent={this.reloadEvent.bind(this)}
-                userCanUpdate={this.props.userCanUpdate}
-              />
-            </Toolbar>
-            <Dialog
-              title={R.propOr('-', 'inject_title', this.state.currentInject)}
-              modal={false}
-              open={this.state.openView}
-              autoScrollBodyContent={true}
-              onRequestClose={this.handleCloseView.bind(this)}
-              actions={viewActions}
-            >
-              <InjectView
-                downloadAttachment={this.downloadAttachment.bind(this)}
-                inject={this.state.currentInject}
-                audiences={this.props.audiences}
-                subaudiences={this.props.subaudiences}
-              />
-            </Dialog>
+          <div style={{ float: 'left', display: 'flex' }}>
+            <EventOutlined fontSize="large" style={{ marginRight: 10 }} />
+            <Typography variant="h5" style={{ float: 'left' }}>
+              {event.event_title}
+            </Typography>
           </div>
-        </div>
-      )
-    } else if (event) {
-      return (<div style={styles.container}>
-        <IncidentNav
-          exerciseId={exerciseId}
-          eventId={eventId}
-          incidents={incidents}
-          incident_types={this.props.incident_types}
-          can_create={event_is_updatable && this.props.userCanUpdate}
-        />
-        <div style={styles.empty}><T>This event is empty.</T></div>
-        <Toolbar type={Constants.TOOLBAR_TYPE_EVENT}>
-          <ToolbarTitle type={Constants.TOOLBAR_TYPE_EVENT} text={event_title}/>
           <EventPopover
             exerciseId={exerciseId}
             eventId={eventId}
@@ -449,11 +397,21 @@ class Index extends Component {
             reloadEvent={this.reloadEvent.bind(this)}
             userCanUpdate={this.props.userCanUpdate}
           />
-        </Toolbar>
-      </div>)
-    } else {
-      return (<div style={styles.container}></div>)
+          <div className={classes.search}>
+            <SearchField onChange={this.handleSearchInjects.bind(this)} />
+          </div>
+          <div className="clearfix" />
+          {incident ? (
+            this.renderIncident()
+          ) : (
+            <div className={classes.empty}>
+              <T>This event is empty.</T>
+            </div>
+          )}
+        </div>
+      );
     }
+    return <div className={classes.container}> &nbsp; </div>;
   }
 }
 
@@ -481,90 +439,107 @@ Index.propTypes = {
   fetchInjects: PropTypes.func,
   fetchGroups: PropTypes.func,
   downloadFile: PropTypes.func,
-  userCanUpdate: PropTypes.bool
-}
+  userCanUpdate: PropTypes.bool,
+};
 
 const filterAudiences = (audiences, exerciseId) => {
-  let audiencesFilterAndSorting = R.pipe(
+  const audiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.audience_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
-  )
-  return audiencesFilterAndSorting(audiences)
-}
+    R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
+  );
+  return audiencesFilterAndSorting(audiences);
+};
 
 const filterSubaudiences = (subaudiences, exerciseId) => {
-  let subaudiencesFilterAndSorting = R.pipe(
+  const subaudiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.subaudience_exercise === exerciseId),
-    R.sort((a, b) => a.subaudience_name.localeCompare(b.subaudience_name))
-  )
-  return subaudiencesFilterAndSorting(subaudiences)
-}
+    R.filter((n) => n.subaudience_exercise === exerciseId),
+    R.sort((a, b) => a.subaudience_name.localeCompare(b.subaudience_name)),
+  );
+  return subaudiencesFilterAndSorting(subaudiences);
+};
 
 const filterSubobjectives = (subobjectives, exerciseId) => {
-  let subobjectivesFilterAndSorting = R.pipe(
+  const subobjectivesFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.subobjective_exercise === exerciseId),
-    R.sort((a, b) => a.subobjective_title.localeCompare(b.subobjective_title))
-  )
-  return subobjectivesFilterAndSorting(subobjectives)
-}
+    R.filter((n) => n.subobjective_exercise === exerciseId),
+    R.sort((a, b) => a.subobjective_title.localeCompare(b.subobjective_title)),
+  );
+  return subobjectivesFilterAndSorting(subobjectives);
+};
 
 const filterIncidents = (incidents, eventId) => {
-  let incidentsFilterAndSorting = R.pipe(
+  const incidentsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.incident_event.event_id === eventId),
-    R.sort((a, b) => a.incident_order > b.incident_order)
-  )
-  return incidentsFilterAndSorting(incidents)
-}
+    R.filter((n) => n.incident_event.event_id === eventId),
+    R.sort((a, b) => a.incident_order > b.incident_order),
+  );
+  return incidentsFilterAndSorting(incidents);
+};
 
 const checkUserCanUpdate = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let userId = R.path(['logged', 'user'], state.app)
-  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
-
-  let userCanUpdate = isAdmin
+  const { id: exerciseId } = ownProps;
+  const userId = R.path(['logged', 'user'], state.app);
+  let userCanUpdate = R.path(
+    [userId, 'user_admin'],
+    state.referential.entities.users,
+  );
   if (!userCanUpdate) {
-    let groupValues = R.values(state.referential.entities.groups)
+    const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
       group.group_grants.forEach((grant) => {
         if (
           grant
           && grant.grant_exercise
-          && (grant.grant_exercise.exercise_id === exerciseId)
-          && (grant.grant_name === 'PLANNER')
+          && grant.grant_exercise.exercise_id === exerciseId
+          && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && (user.user_id === userId)) {
-              userCanUpdate = true
+            if (user && user.user_id === userId) {
+              userCanUpdate = true;
             }
-          })
+          });
         }
-      })
-    })
+      });
+    });
   }
 
-  return userCanUpdate
-}
+  return userCanUpdate;
+};
 
 const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let eventId = ownProps.params.eventId
-  let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
-  let subaudiences = filterSubaudiences(state.referential.entities.subaudiences, exerciseId)
-  let subobjectives = filterSubobjectives(state.referential.entities.subobjectives, exerciseId)
-  let event = R.prop(eventId, state.referential.entities.events)
-  let incidents = filterIncidents(state.referential.entities.incidents, eventId)
-  //region get default incident
-  let stateCurrentIncident = R.path(['exercise', exerciseId, 'event', eventId, 'current_incident'], state.screen)
-  let incidentId = stateCurrentIncident === undefined && incidents.length > 0 ? R.head(incidents).incident_id : stateCurrentIncident //Force a default incident if needed
-  let incident = incidentId ? R.find(a => a.incident_id === incidentId)(incidents) : undefined
-  //endregion
-
-  let userCanUpdate = checkUserCanUpdate(state, ownProps)
-
+  const { id: exerciseId, eventId } = ownProps;
+  const audiences = filterAudiences(
+    state.referential.entities.audiences,
+    exerciseId,
+  );
+  const subaudiences = filterSubaudiences(
+    state.referential.entities.subaudiences,
+    exerciseId,
+  );
+  const subobjectives = filterSubobjectives(
+    state.referential.entities.subobjectives,
+    exerciseId,
+  );
+  const event = R.prop(eventId, state.referential.entities.events);
+  const incidents = filterIncidents(
+    state.referential.entities.incidents,
+    eventId,
+  );
+  // region get default incident
+  const stateCurrentIncident = R.path(
+    ['exercise', exerciseId, 'event', eventId, 'current_incident'],
+    state.screen,
+  );
+  const incidentId = stateCurrentIncident === undefined && incidents.length > 0
+    ? R.head(incidents).incident_id
+    : stateCurrentIncident; // Force a default incident if needed
+  const incident = incidentId
+    ? R.find((a) => a.incident_id === incidentId)(incidents)
+    : undefined;
+  // endregion
+  const userCanUpdate = checkUserCanUpdate(state, ownProps);
   return {
     exerciseId,
     eventId,
@@ -578,20 +553,23 @@ const select = (state, ownProps) => {
     incident_types: state.referential.entities.incident_types,
     inject_types: state.referential.entities.inject_types,
     allIncidents: R.values(state.referential.entities.incidents),
-    userCanUpdate
-  }
-}
+    userCanUpdate,
+  };
+};
 
-export default connect(select, {
-  fetchAudiences,
-  fetchSubaudiences,
-  fetchSubobjectives,
-  fetchEvents,
-  fetchIncidentTypes,
-  fetchIncidents,
-  fetchInjectTypes,
-  fetchInjectTypesExerciseSimple,
-  fetchInjects,
-  fetchGroups,
-  downloadFile
-})(Index);
+export default R.compose(
+  connect(select, {
+    fetchAudiences,
+    fetchSubaudiences,
+    fetchSubobjectives,
+    fetchEvents,
+    fetchIncidentTypes,
+    fetchIncidents,
+    fetchInjectTypes,
+    fetchInjectTypesExerciseSimple,
+    fetchInjects,
+    fetchGroups,
+    downloadFile,
+  }),
+  withStyles(styles),
+)(Index);

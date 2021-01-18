@@ -1,86 +1,86 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import {i18nRegister} from '../../../utils/Messages'
-import {FormField} from '../../../components/Field'
-import * as R from 'ramda'
-import {timeDiff} from '../../../utils/Time'
-import {T} from "../../../components/I18n";
-import InjectTable from '../../../components/InjectTable'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import * as R from 'ramda';
+import { i18nRegister } from '../../../utils/Messages';
+import { TextField } from '../../../components/TextField';
+import { timeDiff } from '../../../utils/Time';
+import { T } from '../../../components/I18n';
+import InjectTable from '../../../components/InjectTable';
 
 i18nRegister({
   en: {
-    'shiftInjectsBy': "Shift injects by:",
-    'shiftDay': "days",
-    'shiftHour': "hours",
-    'shiftMinute': "minutes"
+    shiftInjectsBy: 'Shift injects by:',
+    shiftDay: 'days',
+    shiftHour: 'hours',
+    shiftMinute: 'minutes',
   },
   fr: {
-    'shiftInjectsBy': "Décaler les injections de:",
-    'shiftDay': "jours",
-    'shiftHour': "heures",
-    'shiftMinute': "minutes"
-  }
-})
+    shiftInjectsBy: 'Décaler les injections de:',
+    shiftDay: 'jours',
+    shiftHour: 'heures',
+    shiftMinute: 'minutes',
+  },
+});
 
 const styles = {
   hidden: {
-    display: 'none'
+    display: 'none',
   },
   shiftInjectsBy: {
-    marginTop: '14px'
+    marginTop: '14px',
   },
   shiftDateForm: {
     shiftDateLine: {
       width: '100%',
-      verticalAlign: 'top'
+      verticalAlign: 'top',
     },
     inputDay: {
       display: 'inline-block',
       width: '30%',
-      verticalAlign: 'top'
+      verticalAlign: 'top',
     },
     inputHour: {
       display: 'inline-block',
       width: '33%',
       margin: '0px 10px',
-      verticalAlign: 'top'
+      verticalAlign: 'top',
     },
     inputMinute: {
       display: 'inline-block',
       width: '33%',
-      verticalAlign: 'top'
-    }
+      verticalAlign: 'top',
+    },
   },
   errorStyle: {
     border: '1px solid pink',
   },
-}
+};
 
-const validate = values => {
-  const errors = {}
+const validate = (values) => {
+  const errors = {};
 
-  let regexOnlyNumber = RegExp('^[0-9]*$')
+  const regexOnlyNumber = RegExp('^[0-9]*$');
 
   switch (values.tabs) {
     case 'tabShiftDate':
       break;
     case 'tabShiftDay':
       if (values.shift_day && !regexOnlyNumber.test(values.shift_day)) {
-        errors.shift_day = 'Invalid number format'
+        errors.shift_day = 'Invalid number format';
       }
       if (values.shift_hour && !regexOnlyNumber.test(values.shift_hour)) {
-        errors.shift_hour = 'Invalid number format'
+        errors.shift_hour = 'Invalid number format';
       }
       if (values.shift_minute && !regexOnlyNumber.test(values.shift_minute)) {
-        errors.shift_minute = 'Invalid number format'
+        errors.shift_minute = 'Invalid number format';
       }
       break;
     default:
   }
 
-  return errors
-}
+  return errors;
+};
 
 class ShiftForm extends Component {
   constructor(props) {
@@ -104,67 +104,75 @@ class ShiftForm extends Component {
   }
 
   handleChange(event) {
-    const target = event.target;
+    const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-    const name = target.name;
+    const { name } = target;
 
     this.setState({
-      [name]: value
+      [name]: value,
     });
   }
 
   getAllInject() {
-    let allInject = R.pipe(
+    return R.pipe(
       R.values,
-      R.sort((a, b) => timeDiff(a.inject_date, b.inject_date))
-    )(this.props.injects)
-    return allInject
+      R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
+    )(this.props.injects);
   }
 
+  /* eslint-disable react/no-string-refs */
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <InjectTable injects={this.props.injects}/>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="shiftForm" onSubmit={handleSubmit}>
+            <InjectTable injects={this.props.injects} />
 
-        <div style={styles.shiftInjectsBy}>
-          <T>shiftInjectsBy</T>
-        </div>
+            <div style={styles.shiftInjectsBy}>
+              <T>shiftInjectsBy</T>
+            </div>
 
-        <div style={styles.shiftDateForm.shiftDateLine}>
-          <div style={styles.shiftDateForm.inputDay}>
-            <FormField
-              ref="shiftDay"
-              name="shift_day"
-              fullWidth={true}
-              type="number"
-              label="shiftDay"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div style={styles.shiftDateForm.inputHour}>
-            <FormField
-              ref="shiftHour"
-              name="shift_hour"
-              fullWidth={true}
-              type="number"
-              label="shiftHour"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div style={styles.shiftDateForm.inputMinute}>
-            <FormField
-              ref="shiftMinute"
-              name="shift_minute"
-              fullWidth={true}
-              type="number"
-              label="shiftMinute"
-              onChange={this.handleChange}
-            />
-          </div>
-        </div>
-
-      </form>
-    )
+            <div style={styles.shiftDateForm.shiftDateLine}>
+              <div style={styles.shiftDateForm.inputDay}>
+                <TextField
+                  ref="shiftDay"
+                  name="shift_day"
+                  fullWidth={true}
+                  type="number"
+                  label="shiftDay"
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div style={styles.shiftDateForm.inputHour}>
+                <TextField
+                  ref="shiftHour"
+                  name="shift_hour"
+                  fullWidth={true}
+                  type="number"
+                  label="shiftHour"
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div style={styles.shiftDateForm.inputMinute}>
+                <TextField
+                  ref="shiftMinute"
+                  name="shift_minute"
+                  fullWidth={true}
+                  type="number"
+                  label="shiftMinute"
+                  onChange={this.handleChange}
+                />
+              </div>
+            </div>
+          </form>
+        )}
+      </Form>
+    );
   }
 }
 
@@ -175,7 +183,7 @@ ShiftForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  injects: PropTypes.object
-}
+  injects: PropTypes.object,
+};
 
-export default reduxForm({form: 'ShiftForm', validate}, null, {change})(ShiftForm)
+export default ShiftForm;

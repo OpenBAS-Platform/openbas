@@ -16,6 +16,9 @@ public class OpenExConfig {
     private String token;
 
     @NotNull
+    private String injectUri;
+
+    @NotNull
     private String attachmentUri;
 
     public String getApi() {
@@ -30,6 +33,13 @@ public class OpenExConfig {
     }
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getInjectUri() {
+        return injectUri;
+    }
+    public void setInjectUri(String injectUri) {
+        this.injectUri = injectUri;
     }
 
     public String getAttachmentUri() {

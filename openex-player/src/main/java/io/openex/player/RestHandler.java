@@ -31,7 +31,7 @@ public class RestHandler {
         return contracts.stream().filter(Contract::expose).map(Contract::toRest).collect(Collectors.toList());
     }
 
-    @PostMapping("/worker/{id}")
+    @PostMapping("/player/{id}")
     public Execution execute(@PathVariable String id, @RequestBody String jsonRequest) throws Exception {
         Map<String, Contract> contractsById = contracts.stream().collect(Collectors.toMap(Contract::id, contract -> contract));
         Contract contract = contractsById.get(id);

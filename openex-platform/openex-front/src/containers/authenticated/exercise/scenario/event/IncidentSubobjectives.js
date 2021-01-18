@@ -1,115 +1,146 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import * as R from 'ramda'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {Chip} from '../../../../../components/Chip'
-import {Avatar} from '../../../../../components/Avatar'
-import {List} from '../../../../../components/List'
-import {MainSmallListItem} from '../../../../../components/list/ListItem'
-import {SimpleTextField} from '../../../../../components/SimpleTextField'
-import {Icon} from '../../../../../components/Icon'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import { CenterFocusWeakOutlined } from '@material-ui/icons';
+import Chip from '@material-ui/core/Chip';
+import { withStyles } from '@material-ui/core/styles';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import { SearchField } from '../../../../../components/SearchField';
 
-const styles = {
-  'name': {
-    float: 'left',
-    width: '80%',
-    padding: '5px 0 0 0'
-  },
-  'empty': {
+const styles = () => ({
+  empty: {
     margin: '0 auto',
     marginTop: '10px',
-    textAlign: 'center'
-  }
-}
+    textAlign: 'center',
+  },
+});
 
 i18nRegister({
   fr: {
     'No subobjective found.': 'Aucun sous-objectif trouvé.',
-    'Search for a subobjective': 'Rechercher un sous-objectif'
-  }
-})
+    'Search for a subobjective': 'Rechercher un sous-objectif',
+  },
+});
 
 class IncidentSubobjectives extends Component {
   constructor(props) {
     super(props);
-    this.state = {subobjectivesIds: this.props.incidentSubobjectivesIds, searchTerm: ''}
+    this.state = {
+      subobjectivesIds: this.props.incidentSubobjectivesIds,
+      searchTerm: '',
+    };
   }
 
-  handleSearchAudiences(event, value) {
-    this.setState({searchTerm: value})
+  handleSearchSubobjectives(event) {
+    this.setState({ searchTerm: event.target.value });
   }
 
   addSubobjective(subobjectiveId) {
-    let subobjectivesIds = R.append(subobjectiveId, this.state.subobjectivesIds)
-    this.setState({subobjectivesIds: subobjectivesIds})
-    this.submitSubobjectives(subobjectivesIds)
+    const subobjectivesIds = R.append(
+      subobjectiveId,
+      this.state.subobjectivesIds,
+    );
+    this.setState({ subobjectivesIds });
+    this.submitSubobjectives(subobjectivesIds);
   }
 
   removeSubobjective(subobjectiveId) {
-    let subobjectivesIds = R.filter(a => a !== subobjectiveId, this.state.subobjectivesIds)
-    this.setState({subobjectivesIds: subobjectivesIds})
-    this.submitSubobjectives(subobjectivesIds)
+    const subobjectivesIds = R.filter(
+      (a) => a !== subobjectiveId,
+      this.state.subobjectivesIds,
+    );
+    this.setState({ subobjectivesIds });
+    this.submitSubobjectives(subobjectivesIds);
   }
 
-  submitSubobjectives(subobjectives_ids) {
-    this.props.onChange(subobjectives_ids)
+  submitSubobjectives(subobjectivesIds) {
+    this.props.onChange(subobjectivesIds);
   }
 
   render() {
-    //region filter subobjectives by active keyword
-    const keyword = this.state.searchTerm
-    let filterByKeyword = n => keyword === '' ||
-    n.subobjective_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1 ||
-    n.subobjective_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-    let filteredSubobjectives = R.filter(filterByKeyword, R.values(this.props.subobjectives))
-    //endregion
-
+    const { classes } = this.props;
+    // region filter subobjectives by active keyword
+    const keyword = this.state.searchTerm;
+    const filterByKeyword = (n) => keyword === ''
+      || n.subobjective_title.toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || n.subobjective_description
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
+    const filteredSubobjectives = R.filter(
+      filterByKeyword,
+      R.values(this.props.subobjectives),
+    );
+    // endregion
     return (
       <div>
-        <SimpleTextField name="keyword" fullWidth={true} type="text" hintText="Search for a subobjective"
-                         onChange={this.handleSearchAudiences.bind(this)} styletype={Constants.FIELD_TYPE_INLINE}/>
+        <SearchField
+          onChange={this.handleSearchSubobjectives.bind(this)}
+          fullWidth={true}
+        />
         <div>
-          {this.state.subobjectivesIds.map(subobjectiveId => {
-            let subobjective = R.find(a => a.subobjective_id === subobjectiveId)(this.props.subobjectives)
-            let subobjective_title = R.propOr('-', 'subobjective_title', subobjective)
+          {this.state.subobjectivesIds.map((subobjectiveId) => {
+            const subobjective = R.find(
+              (a) => a.subobjective_id === subobjectiveId,
+            )(this.props.subobjectives);
+            const subobjectiveTitle = R.propOr(
+              '-',
+              'subobjective_title',
+              subobjective,
+            );
             return (
-              <Chip key={subobjectiveId}  onRequestDelete={this.removeSubobjective.bind(this, subobjectiveId)}
-                    type={Constants.CHIP_TYPE_LIST}>
-                <Avatar icon={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}/>} size={32}
-                        type={Constants.AVATAR_TYPE_CHIP}/>
-                {subobjective_title}
-              </Chip>
-            )
+              <Chip
+                key={subobjectiveId}
+                onDelete={this.removeSubobjective.bind(this, subobjectiveId)}
+                icon={<CenterFocusWeakOutlined />}
+                variant="outlined"
+                label={subobjectiveTitle}
+              />
+            );
           })}
-          <div className="clearfix"></div>
+          <div className="clearfix" />
         </div>
         <div>
-          {filteredSubobjectives.length === 0 ? <div style={styles.empty}><T>No subobjective found.</T></div> : ""}
+          {filteredSubobjectives.length === 0 && (
+            <div className={classes.empty}>
+              <T>No subobjective found.</T>
+            </div>
+          )}
           <List>
-            {filteredSubobjectives.map(subobjective => {
-              let disabled = R.find(subobjective_id => subobjective_id === subobjective.subobjective_id, this.state.subobjectivesIds) !== undefined
+            {filteredSubobjectives.map((subobjective) => {
+              const disabled = R.find(
+                (subobjectiveId) => subobjectiveId === subobjective.subobjective_id,
+                this.state.subobjectivesIds,
+              ) !== undefined;
               return (
-                <MainSmallListItem
+                <ListItem
                   key={subobjective.subobjective_id}
                   disabled={disabled}
-                  onClick={this.addSubobjective.bind(this, subobjective.subobjective_id)}
-                  primaryText={
-                    <div>
-                      <div style={styles.title}>{subobjective.subobjective_title}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                  leftAvatar={<Icon name={Constants.ICON_NAME_IMAGE_CENTER_FOCUS_WEAK}
-                                    type={Constants.ICON_TYPE_LIST}/>}
-                />
-              )
+                  onClick={this.addSubobjective.bind(
+                    this,
+                    subobjective.subobjective_id,
+                  )}
+                  button={true}
+                >
+                  <ListItemIcon>
+                    <CenterFocusWeakOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={subobjective.subobjective_title}
+                    secondary={subobjective.subobjective_description}
+                  />
+                </ListItem>
+              );
             })}
           </List>
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -121,6 +152,6 @@ IncidentSubobjectives.propTypes = {
   onChange: PropTypes.func,
   incidentSubobjectivesIds: PropTypes.array,
   subobjectives: PropTypes.array,
-}
+};
 
-export default IncidentSubobjectives
+export default withStyles(styles)(IncidentSubobjectives);

@@ -38,7 +38,7 @@ public class HttpCaller {
     public HttpCaller(OpenExConfig config) throws URISyntaxException {
         this.config = config;
         injectsRequest = HttpRequest.newBuilder().version(HttpClient.Version.HTTP_1_1)
-                .uri(new URI(config.getApi()))
+                .uri(new URI(config.getApi() + config.getInjectUri()))
                 .header(AUTHORIZATION, config.getToken())
                 .header("Content-Type", "application/json; charset=UTF-8")
                 .build();

@@ -1,36 +1,48 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import {T} from '../../../../../components/I18n'
-import Theme from '../../../../../components/Theme'
-import {i18nRegister} from '../../../../../utils/Messages'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import * as R from 'ramda'
-import {Popover} from '../../../../../components/Popover'
-import {Menu} from '../../../../../components/Menu'
-import {Dialog} from '../../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../../components/Button'
-import {Icon} from '../../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {updateSubaudience, selectSubaudience, downloadExportSubaudience, deleteSubaudience} from '../../../../../actions/Subaudience'
-import SubaudienceForm from './SubaudienceForm'
-import {injectIntl} from 'react-intl'
-
-const style = {
-  float: 'left',
-  marginTop: '-14px'
-}
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import { injectIntl } from 'react-intl';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { MoreVert } from '@material-ui/icons';
+import Slide from '@material-ui/core/Slide';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import {
+  updateSubaudience,
+  selectSubaudience,
+  downloadExportSubaudience,
+  deleteSubaudience,
+} from '../../../../../actions/Subaudience';
+import SubaudienceForm from './SubaudienceForm';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Update the sub-audience': 'Modifier la sous-audience',
-    'Do you want to delete this sub-audience?': 'Souhaitez-vous supprimer cette sous-audience ?',
-    'Do you want to disable this sub-audience?': 'Souhaitez-vous désactiver cette sous-audience ?',
-    'Do you want to enable this sub-audience?': 'Souhaitez-vous activer cette sous-audience ?',
-    'Disable': 'Désactiver',
-    'Enable': 'Activer'
-  }
-})
+    'Do you want to delete this sub-audience?':
+      'Souhaitez-vous supprimer cette sous-audience ?',
+    'Do you want to disable this sub-audience?':
+      'Souhaitez-vous désactiver cette sous-audience ?',
+    'Do you want to enable this sub-audience?':
+      'Souhaitez-vous activer cette sous-audience ?',
+    Disable: 'Désactiver',
+    Enable: 'Activer',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class SubaudiencePopover extends Component {
   constructor(props) {
@@ -40,190 +52,290 @@ class SubaudiencePopover extends Component {
       openEdit: false,
       openEnable: false,
       openDisable: false,
-      openPopover: false
-    }
+      openPopover: false,
+    };
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation()
-    this.setState({openPopover: true, anchorEl: event.currentTarget})
+    event.stopPropagation();
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
-    this.setState({openEdit: true})
-    this.handlePopoverClose()
+    this.setState({ openEdit: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false})
+    this.setState({ openEdit: false });
   }
 
   onSubmitEdit(data) {
-    return this.props.updateSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudience.subaudience_id, data)
-  }
-
-  submitFormEdit() {
-    this.refs.subaudienceForm.submit()
+    return this.props
+      .updateSubaudience(
+        this.props.exerciseId,
+        this.props.audienceId,
+        this.props.subaudience.subaudience_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
-    this.handlePopoverClose()
+    this.setState({ openDelete: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({ openDelete: false });
   }
 
   submitDelete() {
-    this.props.deleteSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudience.subaudience_id).then(() => {
-      this.props.selectSubaudience(this.props.exerciseId, this.props.audienceId, undefined)
-    })
-    this.handleCloseDelete()
+    this.props
+      .deleteSubaudience(
+        this.props.exerciseId,
+        this.props.audienceId,
+        this.props.subaudience.subaudience_id,
+      )
+      .then(() => {
+        this.props.selectSubaudience(
+          this.props.exerciseId,
+          this.props.audienceId,
+          undefined,
+        );
+      });
+    this.handleCloseDelete();
   }
 
   handleOpenDisable() {
-    this.setState({openDisable: true})
-    this.handlePopoverClose()
+    this.setState({ openDisable: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDisable() {
-    this.setState({openDisable: false})
+    this.setState({ openDisable: false });
   }
 
   submitDisable() {
-    this.props.updateSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudience.subaudience_id, {'subaudience_enabled': false})
-    this.handleCloseDisable()
+    this.props.updateSubaudience(
+      this.props.exerciseId,
+      this.props.audienceId,
+      this.props.subaudience.subaudience_id,
+      { subaudience_enabled: false },
+    );
+    this.handleCloseDisable();
   }
 
   handleOpenEnable() {
-    this.setState({openEnable: true})
-    this.handlePopoverClose()
+    this.setState({ openEnable: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEnable() {
-    this.setState({openEnable: false})
+    this.setState({ openEnable: false });
   }
 
   submitEnable() {
-    this.props.updateSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudience.subaudience_id, {'subaudience_enabled': true})
-    this.handleCloseEnable()
+    this.props.updateSubaudience(
+      this.props.exerciseId,
+      this.props.audienceId,
+      this.props.subaudience.subaudience_id,
+      { subaudience_enabled: true },
+    );
+    this.handleCloseEnable();
   }
 
   t(id) {
-    return this.props.intl.formatMessage({id})
+    return this.props.intl.formatMessage({ id });
   }
 
   handleDownloadAudience() {
-    this.props.downloadExportSubaudience(this.props.exerciseId, this.props.audienceId, this.props.subaudience.subaudience_id)
-    this.handlePopoverClose()
-  }
-
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor
-    } else {
-      return Theme.palette.textColor
-    }
+    this.props.downloadExportSubaudience(
+      this.props.exerciseId,
+      this.props.audienceId,
+      this.props.subaudience.subaudience_id,
+    );
+    this.handlePopoverClose();
   }
 
   render() {
-    let subaudience_enabled = R.propOr(true, 'subaudience_enabled', this.props.subaudience)
-    let subaudience_is_updatable = R.propOr(true, 'user_can_update', this.props.subaudience)
-    let subaudience_is_deletable = R.propOr(true, 'user_can_delete', this.props.subaudience)
-
-    const editActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      subaudience_is_updatable ? <FlatButton key="update" label="Update" primary={true} onClick={this.submitFormEdit.bind(this)}/> : ""
-    ]
-    const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      subaudience_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/> : ""
-    ]
-    const disableActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDisable.bind(this)}/>,
-      subaudience_is_updatable ? <FlatButton key="disable" label="Disable" primary={true} onClick={this.submitDisable.bind(this)}/>: ""
-    ]
-    const enableActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEnable.bind(this)}/>,
-      subaudience_is_updatable ? <FlatButton key="enable" label="Enable" primary={true} onClick={this.submitEnable.bind(this)}/> : ""
-    ]
-
+    const subaudienceEnabled = R.propOr(
+      true,
+      'subaudience_enabled',
+      this.props.subaudience,
+    );
+    const subaudienceIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.subaudience,
+    );
+    const subaudienceIsDeletable = R.propOr(
+      true,
+      'user_can_delete',
+      this.props.subaudience,
+    );
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon
-            name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}
-            color={this.switchColor(!this.props.audience.audience_enabled ||!this.props.subaudience.subaudience_enabled)}
-          />
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-        <Popover
-          open={this.state.openPopover}
+        <Menu
           anchorEl={this.state.anchorEl}
-          onRequestClose={this.handlePopoverClose.bind(this)}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
         >
-
-          <Menu multiple={false}>
-            {(subaudience_is_updatable) ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/> : ""}
-            {
-              subaudience_is_updatable ?
-                subaudience_enabled ?
-                  <MenuItemButton label="Disable" onClick={this.handleOpenDisable.bind(this)}/>
-                :
-                  <MenuItemButton label="Enable" onClick={this.handleOpenEnable.bind(this)}/>
-              :
-                ""
-            }
-            <MenuItemLink label="Export to XLS" onClick={this.handleDownloadAudience.bind(this)}/>
-            {subaudience_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
-          </Menu>
-        </Popover>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!subaudienceIsUpdatable}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          {subaudienceEnabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={!subaudienceIsUpdatable}
+            >
+              <T>Disable</T>
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={!subaudienceIsUpdatable}
+            >
+              <T>Enable</T>
+            </MenuItem>
+          )}
+          <MenuItem onClick={this.handleDownloadAudience.bind(this)}>
+            <T>Export to XLS</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!subaudienceIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDelete}
-          onRequestClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the sub-audience"
-          modal={false}
           open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
         >
-          <SubaudienceForm
-            ref="subaudienceForm"
-            initialValues={R.pick(['subaudience_name'], this.props.subaudience)}
-            onSubmit={this.onSubmitEdit.bind(this)} onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
+          <DialogTitle>
+            <T>Update the sub-audience</T>
+          </DialogTitle>
+          <DialogContent>
+            <SubaudienceForm
+              initialValues={R.pick(
+                ['subaudience_name'],
+                this.props.subaudience,
+              )}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('subaudienceForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDisable}
-          onRequestClose={this.handleCloseDisable.bind(this)}
-          actions={disableActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDisable.bind(this)}
         >
-          <T>Do you want to disable this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to disable this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openEnable}
-          onRequestClose={this.handleCloseEnable.bind(this)}
-          actions={enableActions}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEnable.bind(this)}
         >
-          <T>Do you want to enable this sub-audience?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to enable this sub-audience?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              <T>Enable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -238,12 +350,12 @@ SubaudiencePopover.propTypes = {
   subaudience: PropTypes.object,
   subaudiences: PropTypes.array,
   children: PropTypes.node,
-  intl: PropTypes.object
-}
+  intl: PropTypes.object,
+};
 
 export default connect(null, {
   updateSubaudience,
   selectSubaudience,
   downloadExportSubaudience,
-  deleteSubaudience
-})(injectIntl(SubaudiencePopover))
+  deleteSubaudience,
+})(injectIntl(SubaudiencePopover));

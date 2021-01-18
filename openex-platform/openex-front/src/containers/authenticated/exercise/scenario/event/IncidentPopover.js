@@ -1,48 +1,57 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {i18nRegister} from '../../../../../utils/Messages'
-import {T} from '../../../../../components/I18n'
-import * as Constants from '../../../../../constants/ComponentTypes'
-import {Popover} from '../../../../../components/Popover'
-import {Menu} from '../../../../../components/Menu'
-import {Dialog, DialogTitleElement} from '../../../../../components/Dialog'
-import {IconButton, FlatButton} from '../../../../../components/Button'
-import {Icon} from '../../../../../components/Icon'
-import {MenuItemLink, MenuItemButton} from "../../../../../components/menu/MenuItem"
-import {Step, Stepper, StepLabel,} from '../../../../../components/Stepper'
-import {updateIncident, deleteIncident, selectIncident} from '../../../../../actions/Incident'
-import IncidentForm from './IncidentForm'
-import IncidentSubobjectives from './IncidentSubobjectives'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import { withStyles } from '@material-ui/core/styles';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
+import {
+  updateIncident,
+  deleteIncident,
+  selectIncident,
+} from '../../../../../actions/Incident';
+import IncidentForm from './IncidentForm';
+import IncidentSubobjectives from './IncidentSubobjectives';
+import { submitForm } from '../../../../../utils/Action';
 
-const styles = {
-  container: {
-    float: 'left',
-    marginTop: '-14px'
-  },
-  'title': {
-    float: 'left',
-    width: '80%',
-    padding: '5px 0 0 0'
-  },
-  'empty': {
+const styles = () => ({
+  empty: {
     margin: '0 auto',
     marginTop: '10px',
-    textAlign: 'center'
-  }
-}
+    textAlign: 'center',
+  },
+});
 
 i18nRegister({
   fr: {
     '1. Parameters': '1. Paramètres',
     '2. Subobjectives': '2. Sous-objectifs',
-    'Update the incident': 'Modifier l\'incident',
-    'Do you want to delete this incident?': 'Souhaitez-vous supprimer cet incident ?',
+    'Update the incident': "Modifier l'incident",
+    'Do you want to delete this incident?':
+      'Souhaitez-vous supprimer cet incident ?',
     'No subobjective found.': 'Aucun sous-objectif trouvé.',
-    'Search for a subobjective': 'Rechercher un sous-objectif'
-  }
-})
+    'Search for a subobjective': 'Rechercher un sous-objectif',
+  },
+});
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class IncidentPopover extends Component {
   constructor(props) {
@@ -50,73 +59,91 @@ class IncidentPopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
-      openPopover: false,
       subobjectivesIds: this.props.incidentSubobjectivesIds,
       stepIndex: 0,
       finished: false,
-      incidentData: null
-    }
+      incidentData: null,
+    };
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation()
-    this.setState({openPopover: true, anchorEl: event.currentTarget})
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
-    this.setState({openPopover: false})
+    this.setState({ anchorEl: null });
   }
 
   handleOpenEdit() {
-    this.setState({openEdit: true})
-    this.handlePopoverClose()
+    this.setState({ openEdit: true });
+    this.handlePopoverClose();
   }
 
   handleCloseEdit() {
-    this.setState({openEdit: false, stepIndex: 0, finished: false, injectData: null})
+    this.setState({
+      openEdit: false,
+      stepIndex: 0,
+      finished: false,
+      injectData: null,
+    });
   }
 
   onGlobalSubmit(data) {
-    this.setState({incidentData: data})
+    this.setState({ incidentData: data }, () => this.selectSubobjectives());
   }
 
   onSubobjectivesChange(data) {
-    let incidentData = this.state.incidentData
-    incidentData.incident_subobjectives = data
-    this.setState({incidentData: incidentData})
+    const { incidentData } = this.state;
+    incidentData.incident_subobjectives = data;
+    this.setState({ incidentData });
   }
 
   handleNext() {
     if (this.state.stepIndex === 0) {
-      this.refs.incidentForm.submit()
+      submitForm('incidentForm');
     } else if (this.state.stepIndex === 1) {
-      this.updateIncident()
+      this.updateIncident();
     }
   }
 
   selectSubobjectives() {
-    this.setState({stepIndex: 1, finished: true})
+    this.setState({ stepIndex: 1, finished: true });
   }
 
   updateIncident() {
-    this.props.updateIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id, this.state.incidentData)
-    this.handleCloseEdit()
+    this.props.updateIncident(
+      this.props.exerciseId,
+      this.props.eventId,
+      this.props.incident.incident_id,
+      this.state.incidentData,
+    );
+    this.handleCloseEdit();
   }
 
   handleOpenDelete() {
-    this.setState({openDelete: true})
-    this.handlePopoverClose()
+    this.setState({ openDelete: true });
+    this.handlePopoverClose();
   }
 
   handleCloseDelete() {
-    this.setState({openDelete: false})
+    this.setState({ openDelete: false });
   }
 
   submitDelete() {
-    this.props.deleteIncident(this.props.exerciseId, this.props.eventId, this.props.incident.incident_id).then(() => {
-      this.props.selectIncident(this.props.exerciseId, this.props.eventId, undefined)
-    })
-    this.handleCloseDelete()
+    this.props
+      .deleteIncident(
+        this.props.exerciseId,
+        this.props.eventId,
+        this.props.incident.incident_id,
+      )
+      .then(() => {
+        this.props.selectIncident(
+          this.props.exerciseId,
+          this.props.eventId,
+          undefined,
+        );
+      });
+    this.handleCloseDelete();
   }
 
   getStepContent(stepIndex, initialValues) {
@@ -124,65 +151,108 @@ class IncidentPopover extends Component {
       case 0:
         return (
           <IncidentForm
-            ref="incidentForm"
             initialValues={initialValues}
             onSubmit={this.onGlobalSubmit.bind(this)}
-            onSubmitSuccess={this.selectSubobjectives.bind(this)}
-            types={this.props.incident_types}/>
-        )
+            types={this.props.incident_types}
+          />
+        );
       case 1:
         return (
           <IncidentSubobjectives
-            ref="incidentSubobjectives"
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             onChange={this.onSubobjectivesChange.bind(this)}
             subobjectives={this.props.subobjectives}
             incidentSubobjectivesIds={this.props.incidentSubobjectivesIds}
           />
-        )
+        );
       default:
-        return 'Go away!'
+        return 'Go away!';
     }
   }
 
   render() {
-    let incident_is_updatable = R.propOr(true, 'user_can_update', this.props.incident) 
-    let incident_is_deletable = R.propOr(true, 'user_can_delete', this.props.incident) 
-      
-    const editActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseEdit.bind(this)}/>,
-      incident_is_updatable ? <FlatButton key="update" label={this.state.stepIndex === 1 ? "Update" : "Next"} primary={true} onClick={this.handleNext.bind(this)}/>: ""
-    ]
-    const deleteActions = [
-      <FlatButton key="cancel" label="Cancel" primary={true} onClick={this.handleCloseDelete.bind(this)}/>,
-      incident_is_deletable ? <FlatButton key="delete" label="Delete" primary={true} onClick={this.submitDelete.bind(this)}/>: ""
-    ]
-
-    let initialValues = R.pick(['incident_title', 'incident_story', 'incident_type', 'incident_weight', 'incident_order'], this.props.incident)
-
+    const incidentIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.incident,
+    );
+    const incidentIsDeletable = R.propOr(
+      true,
+      'user_can_delete',
+      this.props.incident,
+    );
+    const initialValues = R.pick(
+      [
+        'incident_title',
+        'incident_story',
+        'incident_type',
+        'incident_weight',
+        'incident_order',
+      ],
+      this.props.incident,
+    );
     return (
-      <div style={styles.container}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT}/>
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-        
-        {(incident_is_updatable || incident_is_deletable)
-        ?
-          <Popover open={this.state.openPopover} anchorEl={this.state.anchorEl} onRequestClose={this.handlePopoverClose.bind(this)}>
-            <Menu multiple={false}>
-              {incident_is_updatable ? <MenuItemLink label="Edit" onClick={this.handleOpenEdit.bind(this)}/>: ""}
-              {incident_is_deletable ? <MenuItemButton label="Delete" onClick={this.handleOpenDelete.bind(this)}/>: ""}
-            </Menu>          
-          </Popover>
-        : ""}
-        
-        <Dialog title="Confirmation" modal={false} open={this.state.openDelete}
-                onRequestClose={this.handleCloseDelete.bind(this)} actions={deleteActions}>
-          <T>Do you want to delete this incident?</T>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!incidentIsUpdatable}
+          >
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!incidentIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
+        <Dialog
+          open={this.state.openDelete}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this incident?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-        <DialogTitleElement
-          title={
+        <Dialog
+          open={this.state.openEdit}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseEdit.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
@@ -195,16 +265,28 @@ class IncidentPopover extends Component {
                 </StepLabel>
               </Step>
             </Stepper>
-          }
-          modal={false}
-          open={this.state.openEdit}
-          onRequestClose={this.handleCloseEdit.bind(this)}
-          autoScrollBodyContent={true}
-          actions={editActions}>
-          <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
-        </DialogTitleElement>
+          </DialogTitle>
+          <DialogContent>
+            {this.getStepContent(this.state.stepIndex, initialValues)}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.handleNext.bind(this)}
+            >
+              <T>{this.state.stepIndex === 1 ? 'Update' : 'Next'}</T>
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
-    )
+    );
   }
 }
 
@@ -218,13 +300,18 @@ IncidentPopover.propTypes = {
   incident: PropTypes.object,
   incident_types: PropTypes.object,
   incidentSubobjectivesIds: PropTypes.array,
-  subobjectives: PropTypes.array
-}
+  subobjectives: PropTypes.array,
+};
 
-const select = (state) => {
-  return {
-    incident_types: state.referential.entities.incident_types,
-  }
-}
+const select = (state) => ({
+  incident_types: state.referential.entities.incident_types,
+});
 
-export default connect(select, {updateIncident, deleteIncident, selectIncident})(IncidentPopover)
+export default R.compose(
+  connect(select, {
+    updateIncident,
+    deleteIncident,
+    selectIncident,
+  }),
+  withStyles(styles),
+)(IncidentPopover);

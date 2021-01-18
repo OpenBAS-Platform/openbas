@@ -1,36 +1,37 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import * as R from 'ramda'
-import Theme from '../../../../../components/Theme'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import Theme from '../../../../../components/Theme';
 
 const styles = {
-  'container': {
+  container: {
     color: Theme.palette.textColor,
-    padding: '10px 0px 10px 0px'
+    padding: '10px 0px 10px 0px',
   },
-  'title': {
+  title: {
     fontSize: '16px',
-    fontWeight: '500'
+    fontWeight: '500',
   },
-  'story': {
-
-  }
-}
+  story: {},
+};
 
 class EventView extends Component {
-
   render() {
-    let event_description = R.propOr('-', 'event_description', this.props.event)
+    const eventDescription = R.propOr(
+      '-',
+      'event_description',
+      this.props.event,
+    );
     return (
       <div style={styles.container}>
-        <div style={styles.story}>{event_description}</div>
+        <div style={styles.story}>{eventDescription}</div>
       </div>
-    )
+    );
   }
 }
 
 EventView.propTypes = {
-  event: PropTypes.object
-}
+  event: PropTypes.object,
+};
 
-export default EventView
+export default EventView;

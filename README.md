@@ -37,6 +37,22 @@ All you need to install the OpenEx platform can be found in the [official docume
 * [Use Docker](https://www.notion.so/luatix/Using-Docker-03d5c0592b9d4547800cc9f4ff7be2b8) (recommended)
 * [Install manually](https://www.notion.so/luatix/Manual-deployment-b911beba44234f179841582ab3894bb1)
 
+## Luatix's members
+
+### Founders
+
+<p align="left">
+  <a href="https://www.ssi.gouv.fr" alt="ANSSI"><img src="https://www.luatix.org/wp-content/uploads/2020/04/Anssi.png" width="80" /></a>
+  <a href="https://cert.europa.eu" alt="CERT-EU"><img src="https://www.luatix.org/wp-content/uploads/2020/04/Certeu.png" width="83" /></a>
+</p>
+
+### Sponsors
+
+<p align="left">
+  <a href="https://www.intrinsec.com" alt="Intrinsec"><img src="https://www.luatix.org/wp-content/uploads/2020/12/intrinsec.png" width="80" /></a>
+  <a href="https://www.thalesgroup.com" alt="Thales"><img src="https://www.luatix.org/wp-content/uploads/2020/04/Thales.png" width="80" /></a>
+</p>
+
 ## Contributing
 
 ### Code of Conduct

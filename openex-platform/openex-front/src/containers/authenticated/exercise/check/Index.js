@@ -1,156 +1,215 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {connect} from 'react-redux'
-import * as R from 'ramda'
-import {T} from '../../../../components/I18n'
-import {i18nRegister} from '../../../../utils/Messages'
-import {dateFormat} from '../../../../utils/Time'
-import * as Constants from '../../../../constants/ComponentTypes'
-import {List} from '../../../../components/List'
-import {MainListItemLink} from '../../../../components/list/ListItem'
-import {Icon} from '../../../../components/Icon'
-import {fetchGroups} from '../../../../actions/Group'
-import {fetchAudiences} from '../../../../actions/Audience'
-import {fetchDryruns} from '../../../../actions/Dryrun'
-import {fetchComchecks} from '../../../../actions/Comcheck'
-import DryrunsPopover from './DryrunsPopover'
-import ComchecksPopover from './ComchecksPopover'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import {
+  OndemandVideoOutlined,
+  NetworkCheckOutlined,
+} from '@material-ui/icons';
+import { Link } from 'react-router-dom';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import { dateFormat } from '../../../../utils/Time';
+import { fetchGroups } from '../../../../actions/Group';
+import { fetchAudiences } from '../../../../actions/Audience';
+import { fetchDryruns } from '../../../../actions/Dryrun';
+import { fetchComchecks } from '../../../../actions/Comcheck';
+import DryrunsPopover from './dryrun/DryrunsPopover';
+import ComchecksPopover from './comcheck/ComchecksPopover';
 
 i18nRegister({
   fr: {
-    'Dryruns': 'Simulations',
-    'Comchecks': 'Tests de communication',
-    'You do not have any dryruns in this exercise.': 'Vous n\'avez aucune simulation dans cet exercice.',
-    'You do not have any comchecks in this exercise.': 'Vous n\'avez aucun test de communication dans cet exercice.'
-  }
-})
-
-const styles = {
-  'container': {
-    textAlign: 'center'
+    Dryruns: 'Simulations',
+    Comchecks: 'Tests de communication',
+    'You do not have any dryruns in this exercise.':
+      "Vous n'avez aucune simulation dans cet exercice.",
+    'You do not have any comchecks in this exercise.':
+      "Vous n'avez aucun test de communication dans cet exercice.",
   },
-  'columnLeft': {
+});
+
+const styles = () => ({
+  container: {
+    textAlign: 'center',
+  },
+  columnLeft: {
     float: 'left',
     width: '48%',
     margin: 0,
     padding: 0,
-    textAlign: 'left'
+    textAlign: 'left',
   },
-  'columnRight': {
+  columnRight: {
     float: 'right',
     width: '48%',
     margin: 0,
     padding: 0,
-    textAlign: 'left'
+    textAlign: 'left',
   },
-  'headtitle': {
+  headtitle: {
     fontWeight: '600',
-    fontSize: '18px'
+    fontSize: '18px',
   },
-  'headsubtitle': {
-    fontSize: '15px'
+  headsubtitle: {
+    fontSize: '15px',
   },
-  'title': {
+  title: {
     float: 'left',
     fontSize: '13px',
-    textTransform: 'uppercase'
+    textTransform: 'uppercase',
   },
-  'empty': {
+  empty: {
     marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
-    textAlign: 'left'
+    textAlign: 'left',
   },
-  'dryrun_audience': {
+  dryrun_audience: {
     float: 'left',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
   },
-  'dryrun_status': {
+  dryrun_status: {
     float: 'left',
-    padding: '5px 0 0 0'
+    padding: '5px 0 0 0',
   },
-  'dryrun_date': {
+  dryrun_date: {
     float: 'right',
     width: '130px',
-    padding: '5px 0 0 0'
-  }
-}
+    padding: '5px 0 0 0',
+  },
+});
 
 class IndexExcerciseDryrun extends Component {
   componentDidMount() {
-    this.props.fetchGroups()
-    this.props.fetchAudiences(this.props.exerciseId)
-    this.props.fetchDryruns(this.props.exerciseId)
-    this.props.fetchComchecks(this.props.exerciseId)
+    this.props.fetchGroups();
+    this.props.fetchAudiences(this.props.exerciseId);
+    this.props.fetchDryruns(this.props.exerciseId);
+    this.props.fetchComchecks(this.props.exerciseId);
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div style={styles.container}>
-        <div style={styles.columnLeft}>
-          <div style={styles.title}><T>Dryruns</T></div>
-          {this.props.userCanUpdate ?
-            <DryrunsPopover exerciseId={this.props.exerciseId}/>
-            : ""
-          }
-          <div className="clearfix"></div>
-          {this.props.dryruns.length === 0 ?
-            <div style={styles.empty}><T>You do not have any dryruns in this exercise.</T></div> : ""}
-          <List>
-            {this.props.dryruns.map(dryrun => {
-              return (
-                <MainListItemLink
-                  to={'/private/exercise/' + this.props.exerciseId + '/checks/dryrun/' + dryrun.dryrun_id}
+      <div className={classes.container}>
+        <Grid container={true} spacing={3}>
+          <Grid item={true} xs={6}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              <T>Dryruns</T>
+            </Typography>
+            {this.props.userCanUpdate && (
+              <DryrunsPopover exerciseId={this.props.exerciseId} />
+            )}
+            <div className="clearfix" />
+            {this.props.dryruns.length === 0 && (
+              <div className={classes.empty}>
+                <T>You do not have any dryruns in this exercise.</T>
+              </div>
+            )}
+            <List>
+              {this.props.dryruns.map((dryrun) => (
+                <ListItem
                   key={dryrun.dryrun_id}
-                  primaryText={
-                    <div>
-                      <div style={styles.dryrun_audience}><T>Dryrun</T></div>
-                      <div style={styles.dryrun_date}>{dateFormat(dryrun.dryrun_date)}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_ONDEMAND_VIDEO}
-                                  type={Constants.ICON_TYPE_MAINLIST}
-                                  color={dryrun.dryrun_finished ? "#666666" : "#E91E63"}/>}
-                />
-              )
-            })}
-          </List>
-        </div>
-        <div style={styles.columnRight}>
-          <div style={styles.title}><T>Comchecks</T></div>
-          {this.props.userCanUpdate ?
-            <ComchecksPopover exerciseId={this.props.exerciseId} audiences={this.props.audiences}/>
-            : ""
-          }
-          <div className="clearfix"></div>
-          {this.props.comchecks.length === 0 ?
-            <div style={styles.empty}><T>You do not have any comchecks in this exercise.</T></div> : ""}
-          <List>
-            {this.props.comchecks.map(comcheck => {
-              let comcheck_audience = R.find(a => a.audience_id === comcheck.comcheck_audience.audience_id, this.props.audiences)
-              let audienceName = R.propOr('-', 'audience_name', comcheck_audience)
-              return (
-                <MainListItemLink
-                  to={'/private/exercise/' + this.props.exerciseId + '/checks/comcheck/' + comcheck.comcheck_id}
-                  key={comcheck.comcheck_id}
-                  primaryText={
-                    <div>
-                      <div style={styles.dryrun_audience}>{audienceName}</div>
-                      <div style={styles.dryrun_date}>{dateFormat(comcheck.comcheck_start_date)}</div>
-                      <div className="clearfix"></div>
-                    </div>
-                  }
-                  leftIcon={<Icon name={Constants.ICON_NAME_NOTIFICATION_NETWORK_CHECK}
-                                  type={Constants.ICON_TYPE_MAINLIST}
-                                  color={comcheck.comcheck_finished ? "#666666" : "#E91E63"}/>}
-                />
-              )
-            })}
-          </List>
-        </div>
+                  component={Link}
+                  button={true}
+                  divider={true}
+                  to={`/private/exercise/${this.props.exerciseId}/checks/dryrun/${dryrun.dryrun_id}`}
+                >
+                  <ListItemIcon
+                    style={{
+                      color: dryrun.dryrun_finished ? '#666666' : '#E91E63',
+                    }}
+                  >
+                    <OndemandVideoOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <div>
+                        <div className={classes.dryrun_audience}>
+                          <T>Dryrun</T>
+                        </div>
+                        <div className={classes.dryrun_date}>
+                          {dateFormat(dryrun.dryrun_date)}
+                        </div>
+                        <div className="clearfix" />
+                      </div>
+                    }
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Grid>
+          <Grid item={true} xs={6}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              <T>Comchecks</T>
+            </Typography>
+            {this.props.userCanUpdate && (
+              <ComchecksPopover
+                exerciseId={this.props.exerciseId}
+                audiences={this.props.audiences}
+              />
+            )}
+            <div className="clearfix" />
+            {this.props.comchecks.length === 0 && (
+              <div className={classes.empty}>
+                <T>You do not have any comchecks in this exercise.</T>
+              </div>
+            )}
+            <List>
+              {this.props.comchecks.map((comcheck) => {
+                const comcheckAudience = R.find(
+                  (a) => a.audience_id === comcheck.comcheck_audience.audience_id,
+                  this.props.audiences,
+                );
+                const audienceName = R.propOr(
+                  '-',
+                  'audience_name',
+                  comcheckAudience,
+                );
+                return (
+                  <ListItem
+                    key={comcheck.comcheck_id}
+                    component={Link}
+                    button={true}
+                    divider={true}
+                    to={`/private/exercise/${this.props.exerciseId}/checks/comcheck/${comcheck.comcheck_id}`}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: comcheck.comcheck_finished
+                          ? '#666666'
+                          : '#E91E63',
+                      }}
+                    >
+                      <NetworkCheckOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.dryrun_audience}>
+                            {audienceName}
+                          </div>
+                          <div className={classes.dryrun_date}>
+                            {dateFormat(comcheck.comcheck_start_date)}
+                          </div>
+                          <div className="clearfix" />
+                        </div>
+                      }
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+          </Grid>
+        </Grid>
       </div>
-    )
+    );
   }
 }
 
@@ -163,84 +222,94 @@ IndexExcerciseDryrun.propTypes = {
   fetchGroups: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchDryruns: PropTypes.func,
-  fetchComchecks: PropTypes.func
-}
+  fetchComchecks: PropTypes.func,
+};
 
 const filterDryruns = (dryruns, exerciseId) => {
-  let dryrunsFilterAndSorting = R.pipe(
+  const dryrunsFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.dryrun_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.dryrun_date < b.dryrun_date)
-  )
-  return dryrunsFilterAndSorting(dryruns)
-}
+    R.filter((n) => n.dryrun_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.dryrun_date < b.dryrun_date),
+  );
+  return dryrunsFilterAndSorting(dryruns);
+};
 
 const filterComchecks = (comchecks, exerciseId) => {
-  let comchecksFilterAndSorting = R.pipe(
+  const comchecksFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.comcheck_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.comcheck_start_date < b.comcheck_start_date)
-  )
-  return comchecksFilterAndSorting(comchecks)
-}
+    R.filter((n) => n.comcheck_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.comcheck_start_date < b.comcheck_start_date),
+  );
+  return comchecksFilterAndSorting(comchecks);
+};
 
 const filterAudiences = (audiences, exerciseId) => {
-  let audiencesFilterAndSorting = R.pipe(
+  const audiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter(n => n.audience_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name))
-  )
-  return audiencesFilterAndSorting(audiences)
-}
+    R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
+    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
+  );
+  return audiencesFilterAndSorting(audiences);
+};
 
 const checkUserCanUpdate = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let userId = R.path(['logged', 'user'], state.app)
-  let isAdmin = R.path([userId, 'user_admin'], state.referential.entities.users)
-
-  let userCanUpdate = isAdmin
+  const { id: exerciseId } = ownProps;
+  const userId = R.path(['logged', 'user'], state.app);
+  let userCanUpdate = R.path(
+    [userId, 'user_admin'],
+    state.referential.entities.users,
+  );
   if (!userCanUpdate) {
-    let groupValues = R.values(state.referential.entities.groups)
+    const groupValues = R.values(state.referential.entities.groups);
     groupValues.forEach((group) => {
       group.group_grants.forEach((grant) => {
         if (
           grant
           && grant.grant_exercise
-          && (grant.grant_exercise.exercise_id === exerciseId)
-          && (grant.grant_name === 'PLANNER')
+          && grant.grant_exercise.exercise_id === exerciseId
+          && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && (user.user_id === userId)) {
-              userCanUpdate = true
+            if (user && user.user_id === userId) {
+              userCanUpdate = true;
             }
-          })
+          });
         }
-      })
-    })
+      });
+    });
   }
 
-  return userCanUpdate
-}
+  return userCanUpdate;
+};
 
 const select = (state, ownProps) => {
-  let exerciseId = ownProps.params.exerciseId
-  let dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId)
-  let comchecks = filterComchecks(state.referential.entities.comchecks, exerciseId)
-  let audiences = filterAudiences(state.referential.entities.audiences, exerciseId)
-  let userCanUpdate = checkUserCanUpdate(state, ownProps)
+  const { id: exerciseId } = ownProps;
+  const dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId);
+  const comchecks = filterComchecks(
+    state.referential.entities.comchecks,
+    exerciseId,
+  );
+  const audiences = filterAudiences(
+    state.referential.entities.audiences,
+    exerciseId,
+  );
+  const userCanUpdate = checkUserCanUpdate(state, ownProps);
 
   return {
     exerciseId,
     userCanUpdate,
     audiences,
     dryruns,
-    comchecks
-  }
-}
+    comchecks,
+  };
+};
 
-export default connect(select, {
-  fetchGroups,
-  fetchAudiences,
-  fetchDryruns,
-  fetchComchecks
-})(IndexExcerciseDryrun)
+export default R.compose(
+  connect(select, {
+    fetchGroups,
+    fetchAudiences,
+    fetchDryruns,
+    fetchComchecks,
+  }),
+  withStyles(styles),
+)(IndexExcerciseDryrun);

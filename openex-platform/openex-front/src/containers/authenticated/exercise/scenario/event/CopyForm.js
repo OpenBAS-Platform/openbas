@@ -1,39 +1,52 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {reduxForm, change} from 'redux-form'
-import * as R from 'ramda'
-import {SelectField} from '../../../../../components/SelectField'
-import {i18nRegister} from '../../../../../utils/Messages'
-import MenuItem from 'material-ui/MenuItem'
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import * as R from 'ramda';
+import MenuItem from '@material-ui/core/MenuItem';
+import { Select } from '../../../../../components/Select';
+import { i18nRegister } from '../../../../../utils/Messages';
 
 i18nRegister({
   fr: {
-    'Incident': 'Incident'
-  }
-})
+    Incident: 'Incident',
+  },
+});
 
-const validate = values => {
-  const errors = {}
-  const requiredFields = ['incident_id']
-  requiredFields.forEach(field => {
+const validate = (values) => {
+  const errors = {};
+  const requiredFields = ['incident_id'];
+  requiredFields.forEach((field) => {
     if (!values[field]) {
-      errors[field] = 'Required'
+      errors[field] = 'Required';
     }
-  })
-  return errors
-}
+  });
+  return errors;
+};
 
 class CopyForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <SelectField label="Incident" name="incident_id" fullWidth={true}>
-          {R.values(this.props.incidents).map(data => {
-            return (<MenuItem key={data.incident_id} value={data.incident_id} primaryText={data.incident_title}/>)
-          })}
-        </SelectField>
-      </form>
-    )
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="copyForm" onSubmit={handleSubmit}>
+            <Select label="Incident" name="incident_id" fullWidth={true}>
+              {R.values(this.props.incidents).map((data) => (
+                <MenuItem
+                  key={data.incident_id}
+                  value={data.incident_id}
+                  primaryText={data.incident_title}
+                />
+              ))}
+            </Select>
+          </form>
+        )}
+      </Form>
+    );
   }
 }
 
@@ -44,7 +57,7 @@ CopyForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  incidents: PropTypes.array
-}
+  incidents: PropTypes.array,
+};
 
-export default reduxForm({form: 'CopyForm', validate}, null, {change})(CopyForm)
+export default CopyForm;

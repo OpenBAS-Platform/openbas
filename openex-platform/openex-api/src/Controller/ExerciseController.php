@@ -145,7 +145,7 @@ class ExerciseController extends BaseController
 
         $exercise = new Exercise();
         $form = $this->createForm(ExerciseType::class, $exercise);
-        $form->submit($request->request->all());
+        $form->submit($request->request->all(), false);
         if ($form->isValid()) {
             $file = $repositoryFile->findOneBy(['file_name' => 'Exercise default']);
             $exercise->setExerciseCanceled(false);
@@ -153,7 +153,6 @@ class ExerciseController extends BaseController
             $exercise->setExerciseImage($file);
             $exercise->setExerciseMessageHeader('EXERCISE - EXERCISE - EXERCISE');
             $exercise->setExerciseMessageFooter('EXERCISE - EXERCISE - EXERCISE');
-
             $entityManager->persist($exercise);
             $entityManager->flush();
             return $exercise;
@@ -267,11 +266,11 @@ class ExerciseController extends BaseController
                     $injects = array_merge($injects, $repositoryInject->findBy(['inject_incident' => $incident, 'inject_enabled' => true]));
                 }
             }
-
+            $exercise->setUserCanUpdate($this->hasGranted(self::UPDATE, $exercise));
+            $exercise->setUserCanDelete($this->hasGranted(self::DELETE, $exercise));
             $exercise->computeExerciseStatus($injects);
             $exercise->computeStartEndDates($injects);
             $exercise->computeExerciseOwner();
-
             return $exercise;
         } else {
             return $form;

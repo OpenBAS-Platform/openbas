@@ -69,8 +69,8 @@ class InitDatabaseCommand extends Command
         $this->createIncidentType('STRATEGIC');
         $output->writeln('Creating default incident types');
 
-        $this->createFile('Exercise default', 'default_exercise.png', 'png');
-        $this->createFile('Event default', 'default_event.png', 'png');
+        $this->createFile('Exercise default', '../../public/images/default_exercise.png', 'png');
+        $this->createFile('Event default', '../../public/images/default_event.png', 'png');
         $output->writeln('Creating default files');
 
         $userAdmin = $this->createUser('admin@openex.io', 'admin', 'John', 'Doe', true, false, null);

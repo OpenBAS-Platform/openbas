@@ -75,7 +75,6 @@ class AudienceController extends BaseController
 
         $this->denyAccessUnlessGranted('select', $exercise);
 
-
         $audiences = $em->getRepository('App:Audience')->findBy(['audience_exercise' => $exercise], array('audience_name' => 'ASC'));
         /* @var $audiences Audience[] */
 
