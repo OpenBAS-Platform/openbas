@@ -3,7 +3,7 @@
 </h1>
 <p align="center">
   <a href="https://www.openex.io" alt="Website"><img src="https://img.shields.io/badge/website-openex.io-blue.svg" /></a>
-  <a href="https://www.notion.so/luatix/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0" alt="Documentation"><img src="https://img.shields.io/badge/Documentation-RTFM-orange.svg" /></a>
+  <a href="https://www.notion.so/luatix/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0" alt="Documentation"><img src="https://img.shields.io/badge/Documentation-Notion-orange.svg" /></a>
   <a href="https://slack.luatix.org" alt="Slack"><img src="https://slack.luatix.org/badge.svg" /></a>
   <a href="https://cloud.drone.io/OpenEx-Platform/openex"><img src="https://cloud.drone.io/api/badges/OpenEx-Platform/openex/status.svg" /></a>
   <a href="https://codecov.io/gh/OpenEx-Platform/openex"><img src="https://codecov.io/gh/OpenEx-Platform/openex/graph/badge.svg" /></a>
@@ -19,7 +19,9 @@ OpenEx is an open source platform allowing organizations to plan, schedule and c
 
 ## Objective
 
-The goal is to create a powerful, reliable and open source tool to effectively plan all types of crisis management exercises. The need for rationalization and capitalization from one year to the next, as well as the publication of ISO 22398: 2013 standard necessarily lead to the need to acquire specific software. OpenEx aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, audiences, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
+The goal is to create a powerful, reliable and open source tool to effectively plan all types of crisis management exercises. The need for rationalization and capitalization from one year to the next, as well as the publication of ISO 22398: 2013 standard necessarily lead to the need to acquire specific software. 
+
+OpenEx aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, audiences, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
 
 ## Documentation and demonstration
 
