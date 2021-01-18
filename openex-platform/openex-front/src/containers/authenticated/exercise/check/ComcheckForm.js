@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 import { TextField } from '../../../../components/TextField';
+import { DateTimePicker } from '../../../../components/DateTimePicker';
 import { Select } from '../../../../components/Select';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
-import DatePickerIconOpx from '../../../../components/DatePickerIconOpx';
-import TimePickerIconOpx from '../../../../components/TimePickerIconOpx';
 
 i18nRegister({
   fr: {
@@ -16,7 +17,7 @@ i18nRegister({
     Subject: 'Sujet',
     Message: 'Message',
     Signature: 'Signature',
-    EndDate: 'Date de fin',
+    'End date': 'Date de fin',
   },
 });
 
@@ -40,34 +41,16 @@ const validate = (values) => {
   const errors = {};
   const requiredFields = [
     'comcheck_audience',
-    'comcheck_end_date_only',
-    'comcheck_end_time',
     'comcheck_end_date',
     'comcheck_subject',
     'comcheck_message',
     'comcheck_footer',
   ];
-  const regexDateFr = RegExp(
-    '^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\\d\\d$',
-  );
-  const regexDateEn = RegExp(
-    '^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$',
-  );
-  const regexTime = RegExp('^([0-1][0-9]|2[0-3])[:]([0-5][0-9])$');
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
     }
   });
-  if (
-    !regexDateFr.test(values.comcheck_end_date_only)
-    && !regexDateEn.test(values.comcheck_end_date_only)
-  ) {
-    errors.comcheck_end_date_only = 'Invalid date format';
-  }
-  if (!regexTime.test(values.comcheck_end_time)) {
-    errors.comcheck_end_time = 'Invalid time format';
-  }
   return errors;
 };
 
@@ -123,71 +106,63 @@ class ComcheckForm extends Component {
       >
         {({ handleSubmit }) => (
           <form id="comcheckForm" onSubmit={handleSubmit}>
-            <Select
-              label={<T>Target audience</T>}
-              name="comcheck_audience"
-              fullWidth={true}
-            >
-              {this.props.audiences.map((audience) => (
-                <MenuItem
-                  key={audience.audience_id}
-                  value={audience.audience_id}
-                  primaryText={<T>{audience.audience_name}</T>}
-                />
-              ))}
-            </Select>
-
-            <div style={styles.newInputDate.inputDateTimeLine}>
-              <DatePickerIconOpx
-                nameField="comcheck_end_date_only"
-                labelField="EndDate"
-                onChange={this.replaceDateEndValue.bind(this)}
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <Select
+                label={<T>Target audience</T>}
+                name="comcheck_audience"
+                fullWidth={true}
+              >
+                {this.props.audiences.map((audience) => (
+                  <MenuItem
+                    key={audience.audience_id}
+                    value={audience.audience_id}
+                  >
+                    <T>{audience.audience_name}</T>
+                  </MenuItem>
+                ))}
+              </Select>
+              <DateTimePicker
+                name="comcheck_end_date"
+                fullWidth={true}
+                label={<T>End date</T>}
+                autoOk={true}
+                style={{ marginTop: 20 }}
               />
-              <TimePickerIconOpx
-                nameField="comcheck_end_time"
-                labelField="EndTime"
-                onChange={this.replaceTimeEndValue.bind(this)}
+              <TextField
+                name="comcheck_subject"
+                fullWidth={true}
+                label={<T>Subject</T>}
+                style={{ marginTop: 20 }}
               />
-              <div style={styles.fullDate}>
-                <TextField
-                  name="comcheck_end_date"
-                  type="hidden"
+              <div style={{ marginTop: 20 }}>
+                <EnrichedTextField
+                  name="comcheck_message"
+                  label="Message"
+                  style={{ marginTop: 20 }}
                 />
+                <div style={styles.variables}>
+                  Les variables disponibles sont : {'{'}
+                  {'{'}NOM{'}'}
+                  {'}'}, {'{'}
+                  {'{'}PRENOM{'}'}
+                  {'}'} et {'{'}
+                  {'{'}ORGANISATION{'}'}
+                  {'}'}.
+                </div>
               </div>
-            </div>
-            <TextField
-              name="comcheck_subject"
-              fullWidth={true}
-              type="text"
-              label="Subject"
-            />
-            <label>
-              Message
-              <EnrichedTextField name="comcheck_message" label="Message" />
-            </label>
-            <div style={styles.variables}>
-              Les variables disponibles sont : {'{'}
-              {'{'}NOM{'}'}
-              {'}'}, {'{'}
-              {'{'}PRENOM{'}'}
-              {'}'} et {'{'}
-              {'{'}ORGANISATION{'}'}
-              {'}'}.
-            </div>
-            <br />
-            <label>
-              Signature
-              <EnrichedTextField name="comcheck_footer" label="Signature" />
-            </label>
-            <div style={styles.variables}>
-              Les variables disponibles sont : {'{'}
-              {'{'}NOM{'}'}
-              {'}'}, {'{'}
-              {'{'}PRENOM{'}'}
-              {'}'} et {'{'}
-              {'{'}ORGANISATION{'}'}
-              {'}'}.
-            </div>
+              <div style={{ marginTop: 20 }}>
+                <EnrichedTextField name="comcheck_footer" label="Signature" />
+                <div style={styles.variables}>
+                  Les variables disponibles sont : {'{'}
+                  {'{'}NOM{'}'}
+                  {'}'}, {'{'}
+                  {'{'}PRENOM{'}'}
+                  {'}'} et {'{'}
+                  {'{'}ORGANISATION{'}'}
+                  {'}'}.
+                </div>
+              </div>
+            </MuiPickersUtilsProvider>
           </form>
         )}
       </Form>

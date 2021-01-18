@@ -274,6 +274,7 @@ class EventPopover extends Component {
         </Dialog>
         <Dialog
           open={this.state.openEdit}
+          TransitionComponent={Transition}
           onClose={this.handleCloseEdit.bind(this)}
         >
           <DialogTitle>

@@ -16,7 +16,6 @@ import Slide from '@material-ui/core/Slide';
 import { Add } from '@material-ui/icons';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
-import { dateToISO } from '../../../../../utils/Time';
 import { fetchIncident } from '../../../../../actions/Incident';
 import { downloadFile } from '../../../../../actions/File';
 import {

@@ -86,7 +86,7 @@ class TryController extends AbstractController
                 $data['data']['users'][] = $userData;
             }
 
-            $url = $this->getParameter('player_url') . '/cxf/worker/' . $data['context']['type'];
+            $url = $this->getParameter('player_url') . '/player/' . $data['context']['type'];
             $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
             $response = json_decode($response->raw_body, true);
             return ["result" => $response];

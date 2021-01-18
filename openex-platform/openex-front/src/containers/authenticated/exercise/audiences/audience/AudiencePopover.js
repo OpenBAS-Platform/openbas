@@ -341,9 +341,6 @@ class AudiencePopover extends Component {
           <MenuItem onClick={this.handleOpenComcheck.bind(this)}>
             <T>Launch a comcheck</T>
           </MenuItem>
-          <MenuItem onClick={this.handleOpenPlanificateur.bind(this)}>
-            <T>List of planners</T>
-          </MenuItem>
           <MenuItem
             onClick={this.handleOpenCopyAudienceToOtherExercise.bind(this)}
           >
@@ -525,6 +522,8 @@ class AudiencePopover extends Component {
           open={this.state.openComcheck}
           TransitionComponent={Transition}
           onClose={this.handleCloseComcheck.bind(this)}
+          maxWidth="md"
+          fullWidth={true}
         >
           <DialogTitle>
             <T>Launch a comcheck</T>
@@ -545,7 +544,7 @@ class AudiencePopover extends Component {
             </Button>
             <Button
               variant="outlined"
-              color="seondary"
+              color="secondary"
               onClick={() => submitForm('comcheckForm')}
             >
               <T>Launch</T>

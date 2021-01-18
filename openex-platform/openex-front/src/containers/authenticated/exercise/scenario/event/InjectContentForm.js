@@ -5,11 +5,12 @@ import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import Chip from '@material-ui/core/Chip';
 import { AttachmentOutlined } from '@material-ui/icons';
+import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
 import { EnrichedTextField } from '../../../../../components/EnrichedTextField';
 import { TextField } from '../../../../../components/TextField';
 import { T } from '../../../../../components/I18n';
@@ -17,14 +18,19 @@ import { i18nRegister } from '../../../../../utils/Messages';
 import DocumentGallery from '../../../DocumentGallery';
 import { Switch } from '../../../../../components/Switch';
 
-const styles = {
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
   attachment: {
     margin: '10px 0px 0px -4px',
   },
   variables: {
     fontSize: '14px',
   },
-};
+});
 
 i18nRegister({
   fr: {
@@ -111,7 +117,7 @@ class InjectContentForm extends Component {
   }
 
   render() {
-    const { onSubmit, initialValues } = this.props;
+    const { classes, onSubmit, initialValues } = this.props;
     if (this.props.type === null) {
       return (
         <div>
@@ -155,12 +161,8 @@ class InjectContentForm extends Component {
                 case 'richtextarea':
                   return (
                     <div key={field.name} style={{ marginTop: 20 }}>
-                      <EnrichedTextField
-                        key={field.name}
-                        name={field.name}
-                        label={field.name}
-                      />
-                      <div style={styles.variables}>
+                      <EnrichedTextField name={field.name} label={field.name} />
+                      <div className={classes.variables}>
                         Les variables disponibles sont :
                         <kbd>
                           {'{{'}NOM{'}}'}
@@ -188,7 +190,7 @@ class InjectContentForm extends Component {
                   );
                 case 'attachment':
                   return (
-                    <div key={field.name} style={styles.attachment}>
+                    <div key={field.name} className={classes.attachment}>
                       <Button
                         variant="outlined"
                         color="primary"
@@ -198,13 +200,10 @@ class InjectContentForm extends Component {
                       </Button>
                       <Dialog
                         open={this.state.openGallery}
+                        TransitionComponent={Transition}
                         onClose={this.handleCloseGallery.bind(this)}
-                        fullWidth={true}
-                        maxWidth="md"
+                        fullScreen={true}
                       >
-                        <DialogTitle>
-                          <T>Select a document</T>
-                        </DialogTitle>
                         <DialogContent>
                           <DocumentGallery
                             fileSelector={this.handleDocumentSelection.bind(
@@ -291,4 +290,4 @@ InjectContentForm.propTypes = {
 };
 
 const formComponent = InjectContentForm;
-export default injectIntl(formComponent);
+export default R.compose(injectIntl, withStyles(styles))(formComponent);

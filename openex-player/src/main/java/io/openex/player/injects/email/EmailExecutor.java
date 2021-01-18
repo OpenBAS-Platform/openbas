@@ -9,6 +9,7 @@ import io.openex.player.utils.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,7 +25,7 @@ public class EmailExecutor implements Executor<EmailInject> {
         String body = inject.getBody();
         String replyTo = inject.getReplyTo();
         // Resolve the attachments only one
-        List<EmailAttachment> attachments = eMailService.resolveAttachments(inject.getAttachments());
+        List<EmailAttachment> attachments = inject.getAttachments() != null ? eMailService.resolveAttachments(inject.getAttachments()) : new ArrayList<>();
         List<User> users = inject.getUsers();
         int numberOfExpected = users.size();
         AtomicInteger errors = new AtomicInteger(0);
@@ -35,6 +36,7 @@ public class EmailExecutor implements Executor<EmailInject> {
                 execution.addMessage("Mail sent to " + email);
             } catch (Exception e) {
                 // TODO ADD AN ERROR LOGGER
+                e.printStackTrace();
                 errors.incrementAndGet();
                 execution.addMessage(e.getMessage());
             }

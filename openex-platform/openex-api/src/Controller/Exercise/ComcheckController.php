@@ -130,7 +130,7 @@ class ComcheckController extends BaseController
                 }
             }
 
-            $link = $this->getParameter('protocol') . '://' . $request->getHost() . '/comcheck/' . '${user_comcheck_id}';
+            $link = $request->getSchemeAndHttpHost() . '/comcheck/' . '${user_comcheck_id}';
             $data = array();
             $data['data'] = array();
             $data['data']['sender'] = $this->getParameter('mail_sender');
@@ -146,7 +146,6 @@ class ComcheckController extends BaseController
                 $status->setStatusState(0);
                 $em->persist($status);
                 $em->flush();
-
                 $userData = array();
                 $userData['user_comcheck_id'] = $status->getStatusId();
                 $userData['user_firstname'] = $user->getUserFirstname();
@@ -159,9 +158,10 @@ class ComcheckController extends BaseController
                 $userData['user_organization'] = array();
                 $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;
+                $data["data"]["replyto"] = $exercise->getExerciseMailExpediteur();
             }
 
-            $url = $this->getParameter('player_url') . '/cxf/worker/openex_email';
+            $url = $this->getParameter('player_url') . '/player/openex_email';
             $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
 
             return $comcheck;

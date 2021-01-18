@@ -43,10 +43,14 @@ class RootAuthenticated extends Component {
             vertical: 'top',
             horizontal: 'right',
           }}
-          autoHideDuration={1000}
+          autoHideDuration={2000}
           onClose={this.props.savedDismiss.bind(this)}
         >
-          <Alert severity="info" elevation={6}>
+          <Alert
+            severity="info"
+            elevation={6}
+            onClose={this.props.savedDismiss.bind(this)}
+          >
             <T>The operation has been done</T>
           </Alert>
         </Snackbar>

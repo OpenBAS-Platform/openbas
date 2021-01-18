@@ -13,7 +13,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import { withStyles } from '@material-ui/core/styles';
-import { EmailOutlined, SmsOutlined, InputOutlined } from '@material-ui/icons';
+import {
+  EventOutlined,
+  EmailOutlined,
+  SmsOutlined,
+  InputOutlined,
+} from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import { green, red } from '@material-ui/core/colors';
 import { dateFormat } from '../../../../../utils/Time';
@@ -193,7 +198,7 @@ class Index extends Component {
   }
 
   handleSearchInjects(event) {
-    this.setState({ searchTerm: event.target.valuz });
+    this.setState({ searchTerm: event.target.value });
   }
 
   // TODO replace with sortWith after Ramdajs new release
@@ -418,9 +423,12 @@ class Index extends Component {
             can_create={eventIsUpdatable && this.props.userCanUpdate}
             selectedIncident={R.propOr(null, 'incident_id', incident)}
           />
-          <Typography variant="h5" style={{ float: 'left' }}>
-            {event.event_title}
-          </Typography>
+          <div style={{ float: 'left', display: 'flex' }}>
+            <EventOutlined fontSize="large" style={{ marginRight: 10 }} />
+            <Typography variant="h5" style={{ float: 'left' }}>
+              {event.event_title}
+            </Typography>
+          </div>
           <EventPopover
             exerciseId={exerciseId}
             eventId={eventId}

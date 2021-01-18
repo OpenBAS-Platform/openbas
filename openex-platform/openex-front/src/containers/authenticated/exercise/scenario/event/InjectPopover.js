@@ -34,6 +34,7 @@ import InjectForm from './InjectForm';
 import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
 import CopyForm from './CopyForm';
+import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -57,6 +58,7 @@ i18nRegister({
       'Souhaitez-vous marquer cette injection comme réalisée ?',
     'Inject test result': "Résultat du test d'inject",
     Close: 'Fermer',
+    'Copy this inject': 'Copier cette injection',
   },
 });
 
@@ -136,19 +138,16 @@ class InjectPopover extends Component {
   }
 
   onGlobalSubmit(data) {
-    this.setState({
-      injectData: data,
-    });
+    this.setState({ injectData: data }, () => this.selectContent());
   }
 
   onContentSubmit(data) {
     const { injectData } = this.state;
+    console.log(data);
     // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
     injectData.inject_content = JSON.stringify(data);
-    this.setState({
-      injectData,
-    });
+    this.setState({ injectData }, () => this.selectAudiences());
   }
 
   onContentAttachmentAdd(file) {
@@ -194,10 +193,10 @@ class InjectPopover extends Component {
   submitFormEdit() {
     switch (this.state.stepIndex) {
       case 0:
-        this.refs.injectForm.submit();
+        submitForm('injectForm');
         break;
       case 1:
-        this.refs.contentForm.getWrappedInstance().submit();
+        submitForm('contentForm');
         break;
       case 2:
         this.updateInject();
@@ -379,7 +378,6 @@ class InjectPopover extends Component {
       R.assoc('inject_audiences', audiencesList),
       R.assoc('inject_subaudiences', subaudiencesList),
     )(this.props.inject);
-
     this.props
       .addInject(
         this.props.exerciseId,
@@ -401,7 +399,6 @@ class InjectPopover extends Component {
             );
           });
       });
-
     this.props.selectIncident(
       this.props.exerciseId,
       incident.incident_event.event_id,
@@ -450,23 +447,17 @@ class InjectPopover extends Component {
   getStepContent(stepIndex, initialValues) {
     switch (stepIndex) {
       case 0:
-        /* eslint-disable */
         return (
           <InjectForm
-            ref="injectForm"
             onSubmit={this.onGlobalSubmit.bind(this)}
-            onSubmitSuccess={this.selectContent.bind(this)}
             initialValues={initialValues}
             onInjectTypeChange={this.onInjectTypeChange.bind(this)}
             types={this.state.inject_types}
           />
         );
-      /* eslint-enable */
       case 1:
-        /* eslint-disable */
         return (
           <InjectContentForm
-            ref="contentForm"
             initialValues={this.readJSON(initialValues.inject_content)}
             types={this.state.inject_types}
             type={
@@ -476,18 +467,15 @@ class InjectPopover extends Component {
             onSubmitSuccess={this.selectAudiences.bind(this)}
             onContentAttachmentAdd={this.onContentAttachmentAdd.bind(this)}
             onContentAttachmentDelete={this.onContentAttachmentDelete.bind(
-              this
+              this,
             )}
             downloadAttachment={this.downloadAttachment.bind(this)}
             attachments={this.state.injectAttachments}
           />
         );
-      /* eslint-enable */
       case 2:
-        /* eslint-disable */
         return (
           <InjectAudiences
-            ref="injectAudiences"
             exerciseId={this.props.exerciseId}
             eventId={this.props.eventId}
             incidentId={this.props.incidentId}
@@ -502,7 +490,6 @@ class InjectPopover extends Component {
             selectAll={this.props.inject.inject_all_audiences}
           />
         );
-      /* eslint-enable */
       default:
         return 'Go away!';
     }
@@ -520,121 +507,6 @@ class InjectPopover extends Component {
       this.props.inject,
     );
     const { userCanUpdate } = this.props;
-
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      injectIsUpdatable && userCanUpdate ? (
-        <Button
-          key="update"
-          label={this.state.stepIndex === 2 ? 'Update' : 'Next'}
-          primary={true}
-          onClick={this.submitFormEdit.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      injectIsDeletable && userCanUpdate ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const disableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDisable.bind(this)}
-      />,
-      injectIsUpdatable && userCanUpdate ? (
-        <Button
-          key="disable"
-          label="Disable"
-          primary={true}
-          onClick={this.submitDisable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const enableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEnable.bind(this)}
-      />,
-      injectIsUpdatable && userCanUpdate ? (
-        <Button
-          key="enable"
-          label="Enable"
-          primary={true}
-          onClick={this.submitEnable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const copyActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCopy.bind(this)}
-      />,
-      <Button
-        key="copy"
-        label="Copy"
-        primary={true}
-        onClick={this.submitFormCopy.bind(this)}
-      />,
-    ];
-    const tryActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseTry.bind(this)}
-      />,
-      <Button
-        key="test"
-        label="Test"
-        primary={true}
-        onClick={this.submitTry.bind(this)}
-      />,
-    ];
-    const doneActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDone.bind(this)}
-      />,
-      <Button
-        key="done"
-        label="Done"
-        primary={true}
-        onClick={this.submitDone.bind(this)}
-      />,
-    ];
     const resultActions = [
       <Button
         key="close"
@@ -643,7 +515,6 @@ class InjectPopover extends Component {
         onClick={this.handleCloseResult.bind(this)}
       />,
     ];
-
     const initPipe = R.pipe(
       R.assoc(
         'inject_date_only',
@@ -671,11 +542,6 @@ class InjectPopover extends Component {
       injectType,
       this.props.inject_types,
     );
-
-    if (!userCanUpdate) {
-      return '';
-    }
-
     return (
       <div>
         <IconButton
@@ -692,7 +558,9 @@ class InjectPopover extends Component {
         >
           <MenuItem
             onClick={this.handleOpenEdit.bind(this)}
-            disabled={!userCanUpdate || injectNotSupported}
+            disabled={
+              !userCanUpdate || injectNotSupported || !injectIsUpdatable
+            }
           >
             <T>Edit</T>
           </MenuItem>
@@ -729,23 +597,46 @@ class InjectPopover extends Component {
             <T>Test</T>
           </MenuItem>
           <MenuItem
-            onClick={this.handleOpenTry.bind(this)}
+            onClick={this.handleOpenDelete.bind(this)}
             disabled={injectNotSupported || !injectIsDeletable}
           >
             <T>Delete</T>
           </MenuItem>
         </Menu>
         <Dialog
-          title="Confirmation"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openDelete}
           onClose={this.handleCloseDelete.bind(this)}
-          actions={deleteActions}
         >
-          <T>Do you want to delete this inject?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this inject?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title={
+          TransitionComponent={Transition}
+          fullWidth={true}
+          maxWidth="md"
+          open={this.state.openEdit}
+          onClose={this.handleCloseEdit.bind(this)}
+        >
+          <DialogTitle>
             <Stepper linear={false} activeStep={this.state.stepIndex}>
               <Step>
                 <StepLabel>
@@ -763,69 +654,159 @@ class InjectPopover extends Component {
                 </StepLabel>
               </Step>
             </Stepper>
-          }
-          autoScrollBodyContent={true}
-          modal={false}
-          open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
-        >
-          <div>{this.getStepContent(this.state.stepIndex, initialValues)}</div>
+          </DialogTitle>
+          <DialogContent>
+            {this.getStepContent(this.state.stepIndex, initialValues)}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitFormEdit.bind(this)}
+            >
+              <T>{this.state.stepIndex === 2 ? 'Update' : 'Next'}</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
         <Dialog
-          title="Confirmation"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openDisable}
           onClose={this.handleCloseDisable.bind(this)}
-          actions={disableActions}
         >
-          <T>Do you want to disable this inject?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to disable this inject?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openEnable}
           onClose={this.handleCloseEnable.bind(this)}
-          actions={enableActions}
         >
-          <T>Do you want to enable this inject?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to enable this inject?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              <T>Enable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Done"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openDone}
           onClose={this.handleCloseDone.bind(this)}
-          actions={doneActions}
         >
-          <T>Do you want to mark this inject as done?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to mark this inject as done?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDone.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDone.bind(this)}
+            >
+              <T>Done</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Copy"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openCopy}
           onClose={this.handleCloseCopy.bind(this)}
-          actions={copyActions}
         >
-          {/* eslint-disable */}
-          <CopyForm
-            ref="copyForm"
-            incidents={this.props.incidents}
-            onSubmit={this.onCopySubmit.bind(this)}
-            onSubmitSuccess={this.handleCloseCopy.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Copy this inject</T>
+          </DialogTitle>
+          <DialogContent>
+            <CopyForm
+              incidents={this.props.incidents}
+              onSubmit={this.onCopySubmit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCopy.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('copyForm')}
+            >
+              <T>Copy</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Test"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openTry}
           onClose={this.handleCloseTry.bind(this)}
-          actions={tryActions}
         >
-          <T>Do you want to test this inject?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to test this inject?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={this.handleCloseTry.bind(this)}>
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitTry.bind(this)}
+            >
+              <T>Test</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
+          TransitionComponent={Transition}
           title="Inject test result"
           modal={false}
           open={this.state.openResult}

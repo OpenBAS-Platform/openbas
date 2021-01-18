@@ -17,9 +17,9 @@ const renderSwitch = ({
     <FormControlLabel
       control={
         <MuiSwitch
-          toggled={input.value}
+          checked={input.value}
           onChange={(event) => {
-            input.onChange(event.target.value);
+            input.onChange(event.target.checked);
           }}
           {...others}
         />

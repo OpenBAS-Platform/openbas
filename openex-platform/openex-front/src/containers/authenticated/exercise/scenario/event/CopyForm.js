@@ -25,18 +25,27 @@ const validate = (values) => {
 
 class CopyForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <Select label="Incident" name="incident_id" fullWidth={true}>
-          {R.values(this.props.incidents).map((data) => (
-            <MenuItem
-              key={data.incident_id}
-              value={data.incident_id}
-              primaryText={data.incident_title}
-            />
-          ))}
-        </Select>
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="copyForm" onSubmit={handleSubmit}>
+            <Select label="Incident" name="incident_id" fullWidth={true}>
+              {R.values(this.props.incidents).map((data) => (
+                <MenuItem
+                  key={data.incident_id}
+                  value={data.incident_id}
+                  primaryText={data.incident_title}
+                />
+              ))}
+            </Select>
+          </form>
+        )}
+      </Form>
     );
   }
 }

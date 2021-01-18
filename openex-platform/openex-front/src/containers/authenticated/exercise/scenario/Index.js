@@ -45,7 +45,7 @@ class IndexScenario extends Component {
     return (
       <div className={classes.container}>
         <Typography variant="h5" style={{ float: 'left' }}>
-          <T>Audiences</T>
+          <T>Events</T>
         </Typography>
         <div className="clearfix" />
         {this.props.events.length === 0 && (

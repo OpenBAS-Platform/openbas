@@ -14,6 +14,7 @@ public class User {
     private String email;
     private String phone;
     private String pgpKey;
+    private String comcheckId;
     private Organization organization;
 
     public Map<String, Object> toMarkerMap() {
@@ -21,6 +22,7 @@ public class User {
         map.put("NOM", firstname);
         map.put("PRENOM", lastname);
         map.put("ORGANISATION", organization != null ? organization.getName() : "");
+        map.put("user_comcheck_id", comcheckId);
         return map;
     }
 
@@ -70,5 +72,13 @@ public class User {
     }
     public void setPgpKey(String pgpKey) {
         this.pgpKey = pgpKey;
+    }
+
+    @JsonProperty("user_comcheck_id")
+    public String getComcheckId() {
+        return comcheckId;
+    }
+    public void setComcheckId(String comcheckId) {
+        this.comcheckId = comcheckId;
     }
 }

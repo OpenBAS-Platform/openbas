@@ -15,6 +15,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { GroupOutlined } from '@material-ui/icons';
+import { green, red } from '@material-ui/core/colors';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { timeDiff } from '../../../../../utils/Time';
@@ -127,6 +129,12 @@ const styles = () => ({
   comcheck: {
     float: 'left',
     margin: '-16px 0px 0px -15px',
+  },
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
   },
 });
 
@@ -329,9 +337,16 @@ class IndexAudience extends Component {
             subaudiences={subaudiences}
             selectedSubaudience={R.propOr(null, 'subaudience_id', subaudience)}
           />
-          <Typography variant="h5" style={{ float: 'left' }}>
-            {audience.audience_name}
-          </Typography>
+          <div style={{ float: 'left', display: 'flex' }}>
+            <GroupOutlined
+              fontSize="large"
+              className={
+                audience.audience_enabled ? classes.enabled : classes.disabled
+              }
+              style={{ marginRight: 10 }}
+            />
+            <Typography variant="h5">{audience.audience_name}</Typography>
+          </div>
           <AudiencePopover
             exerciseId={exerciseId}
             audienceId={audienceId}
