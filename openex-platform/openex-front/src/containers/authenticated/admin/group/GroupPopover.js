@@ -260,23 +260,7 @@ class GroupPopover extends Component {
         onClick={this.submitFormEdit.bind(this)}
       />,
     ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      <Button
-        key="delete"
-        label="Delete"
-        primary={true}
-        onClick={this.submitDelete.bind(this)}
-      />,
-    ];
-
     const initialValues = R.pick(['group_name'], this.props.group); // Pickup only needed fields
-
     // region filter users by active keyword
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
@@ -321,6 +305,18 @@ class GroupPopover extends Component {
           onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this group?</T>
+          <Button
+            key="cancel"
+            label="Cancel"
+            primary={true}
+            onClick={this.handleCloseDelete.bind(this)}
+          />
+          <Button
+            key="delete"
+            label="Delete"
+            primary={true}
+            onClick={this.submitDelete.bind(this)}
+          />
         </Dialog>
         <Dialog
           title="Update the group"
@@ -376,7 +372,7 @@ class GroupPopover extends Component {
                 </Chip>
               );
             })}
-            <div className="clearfix"></div>
+            <div className="clearfix" />
           </div>
           <div>
             <List>

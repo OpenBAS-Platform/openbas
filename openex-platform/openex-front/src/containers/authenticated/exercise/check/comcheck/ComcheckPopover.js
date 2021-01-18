@@ -3,23 +3,27 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Icon } from '../../../../components/Icon';
-import { MenuItemButton } from '../../../../components/menu/MenuItem';
-import { redirectToChecks } from '../../../../actions/Application';
-import { deleteComcheck } from '../../../../actions/Comcheck';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { redirectToChecks } from '../../../../../actions/Application';
+import { deleteComcheck } from '../../../../../actions/Comcheck';
 
-const style = {
-  float: 'left',
-  marginTop: '-14px',
-};
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 i18nRegister({
   fr: {
@@ -68,58 +72,58 @@ class ComcheckPopover extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const comcheckIsDeletable = R.propOr(
       true,
       'user_can_delete',
       this.props.comcheck,
     );
-
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      comcheckIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </IconButton>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onClose={this.handlePopoverClose.bind(this)}
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          {comcheckIsDeletable ? (
-            <Menu multiple={false}>
-              <MenuItemButton
-                label="Delete"
-                onClick={this.handleOpenDelete.bind(this)}
-              />
-            </Menu>
-          ) : (
-            ''
-          )}
-        </Popover>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!comcheckIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this comcheck?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this comcheck?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -134,6 +138,7 @@ ComcheckPopover.propTypes = {
   comcheck: PropTypes.object,
 };
 
-export default connect(null, { deleteComcheck, redirectToChecks })(
-  ComcheckPopover,
-);
+export default R.compose(
+  connect(null, { deleteComcheck, redirectToChecks }),
+  withStyles(styles),
+)(ComcheckPopover);

@@ -103,21 +103,6 @@ class LogPopover extends Component {
         onClick={this.submitFormEdit.bind(this)}
       />,
     ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      <Button
-        key="delete"
-        label="Delete"
-        primary={true}
-        onClick={this.submitDelete.bind(this)}
-      />,
-    ];
-
     const initialValues = R.pick(['log_title', 'log_content'], this.props.log);
     return (
       <div style={style}>
@@ -149,6 +134,18 @@ class LogPopover extends Component {
           onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this log entry?</T>
+          <Button
+            key="cancel"
+            label="Cancel"
+            primary={true}
+            onClick={this.handleCloseDelete.bind(this)}
+          />
+          <Button
+            key="delete"
+            label="Delete"
+            primary={true}
+            onClick={this.submitDelete.bind(this)}
+          />
         </Dialog>
         <Dialog
           title="Update the log entry"
@@ -157,14 +154,11 @@ class LogPopover extends Component {
           onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          {/* eslint-disable */}
           <LogForm
-            ref="logForm"
             initialValues={initialValues}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
       </div>
     );

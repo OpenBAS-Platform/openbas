@@ -2,30 +2,30 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { Observable } from 'rxjs';
-import { FIVE_SECONDS, dateFormat } from '../../../../utils/Time';
-import Theme from '../../../../components/Theme';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-/* eslint-disable */
-import { fetchUsers } from "../../../../actions/User";
-import { fetchOrganizations } from "../../../../actions/Organization";
-import { fetchAudiences } from "../../../../actions/Audience";
+import { interval } from 'rxjs';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemText from '@material-ui/core/ListItemText';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { withStyles } from '@material-ui/core/styles';
+import { DoneAllOutlined, CheckCircleOutlined } from '@material-ui/icons';
+import Typography from '@material-ui/core/Typography';
+import Avatar from '@material-ui/core/Avatar';
+import { FIVE_SECONDS, dateFormat } from '../../../../../utils/Time';
+import Theme from '../../../../../components/Theme';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { fetchUsers } from '../../../../../actions/User';
+import { fetchOrganizations } from '../../../../../actions/Organization';
+import { fetchAudiences } from '../../../../../actions/Audience';
 import {
   fetchComcheck,
   fetchComcheckStatuses,
-} from "../../../../actions/Comcheck";
-import { List } from "../../../../components/List";
-import {
-  AvatarListItem,
-  AvatarHeaderItem,
-} from "../../../../components/list/ListItem";
-import { Avatar } from "../../../../components/Avatar";
-import { CircularSpinner } from "../../../../components/Spinner";
-import { Icon } from "../../../../components/Icon";
-import ComcheckPopover from "./ComcheckPopover";
-/* eslint-enable */
+} from '../../../../../actions/Comcheck';
+import ComcheckPopover from './ComcheckPopover';
+
+const interval$ = interval(FIVE_SECONDS);
 
 i18nRegister({
   fr: {
@@ -38,51 +38,7 @@ i18nRegister({
   },
 });
 
-const styles = {
-  header: {
-    avatar: {
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-      padding: '12px 0 0 15px',
-    },
-    user_firstname: {
-      float: 'left',
-      width: '22%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    user_email: {
-      float: 'left',
-      width: '35%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    user_organization: {
-      float: 'left',
-      width: '22%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    status_last_update: {
-      float: 'left',
-      width: '15%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    status_state: {
-      float: 'right',
-      width: '6%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      textAlign: 'center',
-      fontWeight: '700',
-    },
-  },
+const styles = () => ({
   title: {
     float: 'left',
     fontSize: '13px',
@@ -138,7 +94,7 @@ const styles = {
   comcheck_state: {
     float: 'right',
   },
-};
+});
 
 class Comcheck extends Component {
   constructor(props) {
@@ -150,39 +106,18 @@ class Comcheck extends Component {
     this.props.fetchAudiences(this.props.exerciseId);
     this.props.fetchUsers();
     this.props.fetchOrganizations();
-    // Scheduler listener
-    const initialStream = Observable.of(1); // Fetch on loading
-    const intervalStream = Observable.interval(FIVE_SECONDS); // Fetch every five seconds
-    const cancelStream = Observable.create((obs) => {
-      this.cancelStreamEvent = () => {
-        obs.next(1);
-      };
+    this.subscription = interval$.subscribe(() => {
+      this.props.fetchComcheck(
+        this.props.exerciseId,
+        this.props.comcheckId,
+        true,
+      );
+      this.props.fetchComcheckStatuses(
+        this.props.exerciseId,
+        this.props.comcheckId,
+        true,
+      );
     });
-    this.subscription = initialStream
-      .merge(intervalStream)
-      .takeUntil(cancelStream)
-      .exhaustMap(() => Promise.all([
-        this.props.fetchComcheck(
-          this.props.exerciseId,
-          this.props.comcheckId,
-          true,
-        ),
-        this.props.fetchComcheckStatuses(
-          this.props.exerciseId,
-          this.props.comcheckId,
-          true,
-        ),
-      ]))
-      .subscribe();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const comcheckFinished = R.propOr(
-      false,
-      'comcheck_finished',
-      nextProps.comcheck,
-    );
-    if (comcheckFinished) this.cancelStreamEvent();
   }
 
   componentWillUnmount() {
@@ -191,25 +126,6 @@ class Comcheck extends Component {
 
   reverseBy(field) {
     this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
-  }
-
-  SortHeader(field, label) {
-    const icon = this.state.orderAsc
-      ? Constants.ICON_NAME_NAVIGATION_ARROW_DROP_DOWN
-      : Constants.ICON_NAME_NAVIGATION_ARROW_DROP_UP;
-    const IconDisplay = this.state.sortBy === field ? (
-        <Icon type={Constants.ICON_TYPE_SORT} name={icon} />
-    ) : (
-      ''
-    );
-    return (
-      <div
-        style={styles.header[field]}
-        onClick={this.reverseBy.bind(this, field)}
-      >
-        <T>{label}</T> {IconDisplay}
-      </div>
-    );
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -236,7 +152,6 @@ class Comcheck extends Component {
   }
 
   // TODO MOVE THAT TO UTILS
-
   buildUserModel(status) {
     const userId = R.pathOr(Math.random(), ['status_user', 'user_id'], status);
     const user = R.propOr({}, userId, this.props.users);
@@ -258,33 +173,32 @@ class Comcheck extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     const data = R.pipe(
       R.map((status) => this.buildUserModel(status)),
       R.sort((a, b) => this.modelSorting(this.state.sortBy, this.state.orderAsc, a, b)),
     )(this.props.comcheck_statuses);
-
     const comcheckFinished = R.propOr(
       false,
       'comcheck_finished',
       this.props.comcheck,
     );
-
     return (
       <div>
         <div>
-          <div style={styles.title}>
+          <Typography variant="h5" style={{ float: 'left' }}>
             <T>Comcheck</T>
-          </div>
+          </Typography>
           <ComcheckPopover
             exerciseId={this.props.exerciseId}
             comcheck={this.props.comcheck}
             listenDeletionCall={this.cancelStreamEvent}
           />
-          <div style={styles.audience}>
+          <div className={classes.audience}>
             {R.propOr('-', 'audience_name', this.props.audience)}
           </div>
           <div className="clearfix" />
-          <div style={styles.subtitle}>
+          <div className={classes.subtitle}>
             {dateFormat(
               R.propOr(undefined, 'comcheck_start_date', this.props.comcheck),
             )}
@@ -293,62 +207,45 @@ class Comcheck extends Component {
               R.propOr(undefined, 'comcheck_end_date', this.props.comcheck),
             )}
           </div>
-          <div style={styles.comcheck_state}>
+          <div className={classes.comcheck_state}>
             {comcheckFinished ? (
-              <Icon
-                name={Constants.ICON_NAME_ACTION_DONE_ALL}
-                color={Theme.palette.primary1Color}
-              />
+              <DoneAllOutlined style={{ color: Theme.palette.primary.main }} />
             ) : (
-              <CircularSpinner size={20} color={Theme.palette.primary1Color} />
+              <CircularProgress size={20} color="secondary" />
             )}
           </div>
           <div className="clearfix" />
           <List>
-            <AvatarHeaderItem
-              leftAvatar={<span style={styles.header.avatar}>#</span>}
-              primaryText={
-                <div>
-                  {this.SortHeader('user_firstname', 'Name')}
-                  {this.SortHeader('user_email', 'Email address')}
-                  {this.SortHeader('user_organization', 'Organization')}
-                  {this.SortHeader('status_last_update', 'Last update')}
-                  {this.SortHeader('status_state', 'State')}
-                  <div className="clearfix" />
-                </div>
-              }
-            />
-
             {data.map((item) => (
-              // Return the dom
-              <AvatarListItem
-                key={item.status_id}
-                leftAvatar={
-                  <Avatar
-                    type={Constants.AVATAR_TYPE_MAINLIST}
-                    src={item.user_gravatar}
-                  />
-                }
-                primaryText={
-                  <div>
-                    <div style={styles.name}>
-                      {item.user_firstname} {item.user_lastname}
+              <ListItem key={item.status_id} divider={true}>
+                <ListItemAvatar>
+                  <Avatar src={item.user_gravatar} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div className={classes.name}>
+                        {item.user_firstname} {item.user_lastname}
+                      </div>
+                      <div className={classes.mail}>{item.user_email}</div>
+                      <div className={classes.org}>
+                        {item.user_organization}
+                      </div>
+                      <div className={classes.update}>
+                        {dateFormat(item.status_last_update)}
+                      </div>
+                      <div className={classes.state}>
+                        <CheckCircleOutlined
+                          style={{
+                            color: item.status_state ? '#4CAF50' : '#F44336',
+                          }}
+                        />
+                      </div>
+                      <div className="clearfix" />
                     </div>
-                    <div style={styles.mail}>{item.user_email}</div>
-                    <div style={styles.org}>{item.user_organization}</div>
-                    <div style={styles.update}>
-                      {dateFormat(item.status_last_update)}
-                    </div>
-                    <div style={styles.state}>
-                      <Icon
-                        name={Constants.ICON_NAME_ACTION_CHECK_CIRCLE}
-                        color={item.status_state ? '#4CAF50' : '#F44336'}
-                      />
-                    </div>
-                    <div className="clearfix" />
-                  </div>
-                }
-              />
+                  }
+                />
+              </ListItem>
             ))}
           </List>
         </div>
@@ -381,8 +278,7 @@ const filterComcheckStatuses = (statuses, comcheckId) => {
 };
 
 const select = (state, ownProps) => {
-  const { exerciseId } = ownProps.params;
-  const { comcheckId } = ownProps.params;
+  const { id: exerciseId, comcheckId } = ownProps;
   const comcheck = R.propOr(
     {},
     comcheckId,
@@ -399,22 +295,24 @@ const select = (state, ownProps) => {
     state.referential.entities.comchecks_statuses,
     comcheckId,
   );
-
   return {
     exerciseId,
     comcheckId,
     audience,
     comcheck,
-    comcheckStatuses,
+    comcheck_statuses: comcheckStatuses,
     users: state.referential.entities.users,
     organizations: state.referential.entities.organizations,
   };
 };
 
-export default connect(select, {
-  fetchComcheck,
-  fetchComcheckStatuses,
-  fetchUsers,
-  fetchAudiences,
-  fetchOrganizations,
-})(Comcheck);
+export default R.compose(
+  connect(select, {
+    fetchComcheck,
+    fetchComcheckStatuses,
+    fetchUsers,
+    fetchAudiences,
+    fetchOrganizations,
+  }),
+  withStyles(styles),
+)(Comcheck);

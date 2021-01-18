@@ -4,12 +4,12 @@ import { Form } from 'react-final-form';
 import MenuItem from '@material-ui/core/MenuItem';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import { EnrichedTextField } from '../../../../components/EnrichedTextField';
-import { TextField } from '../../../../components/TextField';
-import { DateTimePicker } from '../../../../components/DateTimePicker';
-import { Select } from '../../../../components/Select';
-import { i18nRegister } from '../../../../utils/Messages';
-import { T } from '../../../../components/I18n';
+import { EnrichedTextField } from '../../../../../components/EnrichedTextField';
+import { TextField } from '../../../../../components/TextField';
+import { DateTimePicker } from '../../../../../components/DateTimePicker';
+import { Select } from '../../../../../components/Select';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
 
 i18nRegister({
   fr: {

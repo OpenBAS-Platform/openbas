@@ -27,7 +27,7 @@ class TagForm extends Component {
     return (
       <Form onSubmit={onSubmit} validate={validate}>
         {({ handleSubmit }) => (
-          <form id='tagForm' onSubmit={handleSubmit}>
+          <form id="tagForm" onSubmit={handleSubmit}>
             <TextField
               name="tag_name"
               fullWidth={true}

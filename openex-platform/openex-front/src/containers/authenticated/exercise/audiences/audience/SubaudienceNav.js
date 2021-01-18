@@ -44,7 +44,11 @@ class SubaudienceNav extends Component {
 
   render() {
     const {
-      classes, audience, audienceId, exerciseId, subaudiences,
+      classes,
+      audience,
+      audienceId,
+      exerciseId,
+      subaudiences,
     } = this.props;
     const subaudienceIsUpdatable = R.propOr(
       true,
@@ -59,14 +63,13 @@ class SubaudienceNav extends Component {
       >
         <Toolbar />
         {subaudienceIsUpdatable ? (
-          <CreateSubaudience
-            exerciseId={exerciseId}
-            audienceId={audienceId}
-          />
+          <CreateSubaudience exerciseId={exerciseId} audienceId={audienceId} />
         ) : (
-          <Typography variant="h5">
-            <T>Sub-audiences</T>
-          </Typography>
+          <div style={{ margin: '15px 0 0 15px' }}>
+            <Typography variant="h5">
+              <T>Sub-audiences</T>
+            </Typography>
+          </div>
         )}
         <List>
           {this.props.subaudiences.map((subaudience) => (

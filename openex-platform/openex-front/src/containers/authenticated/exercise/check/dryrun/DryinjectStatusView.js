@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import Theme from '../../../../components/Theme';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
-import { dateFormat, convertToCountdown } from '../../../../utils/Time';
+import Theme from '../../../../../components/Theme';
+import { T } from '../../../../../components/I18n';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { dateFormat, convertToCountdown } from '../../../../../utils/Time';
 
 i18nRegister({
   fr: {

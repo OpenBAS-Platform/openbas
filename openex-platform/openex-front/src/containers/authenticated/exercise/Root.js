@@ -19,8 +19,8 @@ import IndexExercise from './Index';
 import IndexExerciseExecution from './execution/Index';
 import IndexExerciseLessons from './lessons/Index';
 import IndexExerciseChecks from './check/Index';
-import IndexExerciseDryrun from './check/Dryrun';
-import IndexExerciseComcheck from './check/Comcheck';
+import RootExerciseDryrun from './check/dryrun/Root';
+import RootExerciseComcheck from './check/comcheck/Root';
 import IndexExerciseObjectives from './objective/Index';
 import IndexExerciseScenario from './scenario/Index';
 import RootExerciseScenarioEvent from './scenario/event/Root';
@@ -29,6 +29,7 @@ import RootExerciseAudiencesAudience from './audiences/audience/Root';
 import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
 import UserPopover from '../UserPopover';
+import NotFound from '../../anonymous/NotFound';
 
 const styles = (theme) => ({
   appBar: {
@@ -128,12 +129,12 @@ class RootExercise extends Component {
             <Route
               exact
               path="/private/exercise/:exerciseId/checks/dryrun/:dryrunId"
-              component={() => <IndexExerciseDryrun id={id} />}
+              component={() => <RootExerciseDryrun id={id} />}
             />
             <Route
               exact
               path="/private/exercise/:exerciseId/checks/comcheck/:comcheckId"
-              component={() => <IndexExerciseComcheck id={id} />}
+              component={() => <RootExerciseComcheck id={id} />}
             />
             <Route
               exact
@@ -175,6 +176,7 @@ class RootExercise extends Component {
               path="/private/exercise/:exerciseId/settings"
               component={() => <IndexExerciseSettings id={id} />}
             />
+            <Route component={NotFound} />
           </Switch>
         </div>
       </div>

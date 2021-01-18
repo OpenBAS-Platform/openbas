@@ -34,7 +34,7 @@ class Inject extends BaseEntity
      */
     protected $inject_content;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $inject_date;
     /**

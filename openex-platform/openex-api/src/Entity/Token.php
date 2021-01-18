@@ -24,7 +24,7 @@ class Token
     protected $token_value;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      * @var DateTime
      */
     protected $token_created_at;

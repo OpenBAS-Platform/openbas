@@ -35,11 +35,7 @@ class DocumentForm extends Component {
       >
         {({ handleSubmit }) => (
           <form id="documentForm" onSubmit={handleSubmit}>
-            <TextField
-              name="document_name"
-              fullWidth={true}
-              label="Name"
-            />
+            <TextField name="document_name" fullWidth={true} label="Name" />
             <TextField
               name="document_description"
               fullWidth={true}

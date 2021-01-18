@@ -39,7 +39,7 @@ import {
   updatePlanificateurUserForAudience,
 } from '../../../../../actions/Planificateurs';
 import AudienceForm from './AudienceForm';
-import ComcheckForm from '../../check/ComcheckForm';
+import ComcheckForm from '../../check/comcheck/ComcheckForm';
 import { fetchExercises } from '../../../../../actions/Exercise';
 import { dateFormat, timeDiff } from '../../../../../utils/Time';
 import { submitForm } from '../../../../../utils/Action';
@@ -169,15 +169,6 @@ class AudiencePopover extends Component {
     });
   }
 
-  submitFormPlanificateur() {
-    this.props.updatePlanificateurUserForAudience(
-      this.props.exerciseId,
-      this.props.audience.audience_id,
-      this.state.planificateursAudience,
-    );
-    this.setState({ openPlanificateur: false });
-  }
-
   handleCopyCheck(exerciceId, event, isChecked) {
     const exercicesToAdd = [...this.state.exercicesToAdd];
     if (isChecked) {
@@ -230,17 +221,6 @@ class AudiencePopover extends Component {
 
   handleCloseEnable() {
     this.setState({ openEnable: false });
-  }
-
-  handleCheckPlanificateur(userId, audienceId, isChecked) {
-    const listePlanificateurs = [...this.state.planificateursAudience];
-    listePlanificateurs.forEach((user) => {
-      if (user.user_id === userId) {
-        // eslint-disable-next-line no-param-reassign
-        user.is_planificateur_audience = isChecked;
-      }
-    });
-    this.setState({ planificateursAudience: listePlanificateurs });
   }
 
   submitEnable() {

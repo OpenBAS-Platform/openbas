@@ -21,7 +21,7 @@ import { updateExercise } from "../../../../actions/Exercise";
 import { addDryrun } from "../../../../actions/Dryrun";
 import { redirectToDryrun } from "../../../../actions/Application";
 /* eslint-enable */
-import DryrunForm from '../check/DryrunForm';
+import DryrunForm from '../check/dryrun/DryrunForm';
 
 const style = {
   float: 'left',

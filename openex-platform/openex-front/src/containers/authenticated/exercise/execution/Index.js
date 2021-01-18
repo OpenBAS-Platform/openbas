@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { interval, Observable } from 'rxjs';
+import { interval } from 'rxjs';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';

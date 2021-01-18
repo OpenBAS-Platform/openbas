@@ -144,21 +144,6 @@ class UserPopover extends Component {
         onClick={this.submitFormEditPassword.bind(this)}
       />,
     ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      <Button
-        key="delete"
-        label="Delete"
-        primary={true}
-        onClick={this.submitDelete.bind(this)}
-      />,
-    ];
-
     const organizationPath = [
       R.prop('user_organization', this.props.user),
       'organization_name',
@@ -184,7 +169,6 @@ class UserPopover extends Component {
         'user_planificateur',
       ]),
     )(this.props.user);
-
     return (
       <div style={style}>
         <IconButton onClick={this.handlePopoverOpen.bind(this)}>
@@ -216,6 +200,18 @@ class UserPopover extends Component {
           onClose={this.handleCloseDelete.bind(this)}
         >
           <T>Do you want to delete this user?</T>
+          <Button
+              key="cancel"
+              label="Cancel"
+              primary={true}
+              onClick={this.handleCloseDelete.bind(this)}
+          />
+          <Button
+              key="delete"
+              label="Delete"
+              primary={true}
+              onClick={this.submitDelete.bind(this)}
+          />
         </Dialog>
         <Dialog
           title="Update the user"
@@ -225,16 +221,13 @@ class UserPopover extends Component {
           onClose={this.handleCloseEdit.bind(this)}
           actions={editActions}
         >
-          {/* eslint-disable */}
           <UserForm
-            ref="userForm"
             initialValues={initialValues}
             editing={true}
             organizations={this.props.organizations}
             onSubmit={this.onSubmitEdit.bind(this)}
             onSubmitSuccess={this.handleCloseEdit.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
         <Dialog
           title="Update the user password"
@@ -244,13 +237,11 @@ class UserPopover extends Component {
           onClose={this.handleCloseEditPassword.bind(this)}
           actions={editPassword}
         >
-          {/* eslint-disable */}
           <UserPasswordForm
             ref="userPasswordForm"
             onSubmit={this.onSubmitEditPassword.bind(this)}
             onSubmitSuccess={this.handleCloseEditPassword.bind(this)}
           />
-          {/* eslint-enable */}
         </Dialog>
       </div>
     );

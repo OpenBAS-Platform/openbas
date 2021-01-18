@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { TextField } from '../../../../components/TextField';
+import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
@@ -13,7 +14,7 @@ i18nRegister({
 
 const validate = (values) => {
   const errors = {};
-  const requiredFields = [];
+  const requiredFields = ['log_title', 'log_content'];
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
@@ -24,22 +25,27 @@ const validate = (values) => {
 
 class LogForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="log_title"
-          fullWidth={true}
-          type="text"
-          label="Title"
-        />
-        <TextField
-          name="log_content"
-          fullWidth={true}
-          multiline={true}
-          rows={4}
-          label="Content"
-        />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="logForm" onSubmit={handleSubmit}>
+            <TextField name="log_title" fullWidth={true} label={<T>Title</T>} />
+            <TextField
+              name="log_content"
+              fullWidth={true}
+              multiline={true}
+              rows={4}
+              label={<T>Content</T>}
+              style={{ marginTop: 20 }}
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

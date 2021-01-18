@@ -32,11 +32,11 @@ class Exercise extends BaseEntity
      */
     protected $exercise_description;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $exercise_start_date;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $exercise_end_date;
     /**

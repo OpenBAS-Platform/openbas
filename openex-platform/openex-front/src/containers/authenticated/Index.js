@@ -80,7 +80,7 @@ class IndexAuthenticated extends Component {
             <div className={classes.title}>OpenEx</div>
             <IconButton
               component={Link}
-              to='/private/documents'
+              to="/private/documents"
               className={classes.documents}
             >
               <DescriptionOutlined fontSize="medium" />

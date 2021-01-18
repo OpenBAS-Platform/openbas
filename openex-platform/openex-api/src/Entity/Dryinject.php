@@ -26,7 +26,7 @@ class Dryinject extends BaseEntity
      */
     protected $dryinject_content;
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $dryinject_date;
     /**

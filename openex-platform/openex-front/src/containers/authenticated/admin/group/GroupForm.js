@@ -10,17 +10,37 @@ i18nRegister({
   },
 });
 
+const validate = (values) => {
+  const errors = {};
+  const requiredFields = ['group_name'];
+  requiredFields.forEach((field) => {
+    if (!values[field]) {
+      errors[field] = 'Required';
+    }
+  });
+  return errors;
+};
+
 class GroupForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="group_name"
-          fullWidth={true}
-          type="text"
-          label="Name"
-        />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="groupForm" onSubmit={handleSubmit}>
+            <TextField
+              name="group_name"
+              fullWidth={true}
+              type="text"
+              label="Name"
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

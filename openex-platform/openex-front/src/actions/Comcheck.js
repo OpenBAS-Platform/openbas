@@ -39,6 +39,6 @@ export const fetchComcheckStatuses = (exerciseId, comcheckId, noloading) => (
 };
 
 export const fetchComcheckStatus = (statusId) => (dispatch) => {
-  const uri = `/api/anonymous/comcheck/${statusId}`;
+  const uri = `/api/comcheck/${statusId}`;
   return getReferential(schema.comcheckStatus, uri)(dispatch);
 };

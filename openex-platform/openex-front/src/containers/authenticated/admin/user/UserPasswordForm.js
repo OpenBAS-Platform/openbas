@@ -28,21 +28,30 @@ const validate = (values) => {
 
 class UserPasswordForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="user_plain_password"
-          fullWidth={true}
-          type="password"
-          label="Password"
-        />
-        <TextField
-          name="password_confirmation"
-          fullWidth={true}
-          type="password"
-          label="Confirmation"
-        />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="passwordForm" onSubmit={handleSubmit}>
+            <TextField
+              name="user_plain_password"
+              fullWidth={true}
+              type="password"
+              label="Password"
+            />
+            <TextField
+              name="password_confirmation"
+              fullWidth={true}
+              type="password"
+              label="Confirmation"
+            />
+          </form>
+        )}
+      </Form>
     );
   }
 }

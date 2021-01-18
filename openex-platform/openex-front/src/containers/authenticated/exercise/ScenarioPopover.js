@@ -333,15 +333,18 @@ class ScenarioPopover extends Component {
 
   submitFormChangeDuration() {
     if (this.state.duration_desired === '') {
+      // eslint-disable-next-line no-alert
       alert('Please, choose duration for this exercise');
     } else {
       const regexOnlyNumber = RegExp('^[0-9]*$');
       if (!regexOnlyNumber.test(this.state.duration_desired)) {
+        // eslint-disable-next-line no-alert
         alert('Please, choose valid number');
       } else if (
         parseInt(this.state.start_time_of_day, 10)
         >= parseInt(this.state.end_time_of_day, 10)
       ) {
+        // eslint-disable-next-line no-alert
         alert('Please check start and end day hours');
       } else {
         const data = {

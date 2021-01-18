@@ -122,47 +122,56 @@ class ShiftForm extends Component {
 
   /* eslint-disable react/no-string-refs */
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <InjectTable injects={this.props.injects} />
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="shiftForm" onSubmit={handleSubmit}>
+            <InjectTable injects={this.props.injects} />
 
-        <div style={styles.shiftInjectsBy}>
-          <T>shiftInjectsBy</T>
-        </div>
+            <div style={styles.shiftInjectsBy}>
+              <T>shiftInjectsBy</T>
+            </div>
 
-        <div style={styles.shiftDateForm.shiftDateLine}>
-          <div style={styles.shiftDateForm.inputDay}>
-            <TextField
-              ref="shiftDay"
-              name="shift_day"
-              fullWidth={true}
-              type="number"
-              label="shiftDay"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div style={styles.shiftDateForm.inputHour}>
-            <TextField
-              ref="shiftHour"
-              name="shift_hour"
-              fullWidth={true}
-              type="number"
-              label="shiftHour"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div style={styles.shiftDateForm.inputMinute}>
-            <TextField
-              ref="shiftMinute"
-              name="shift_minute"
-              fullWidth={true}
-              type="number"
-              label="shiftMinute"
-              onChange={this.handleChange}
-            />
-          </div>
-        </div>
-      </form>
+            <div style={styles.shiftDateForm.shiftDateLine}>
+              <div style={styles.shiftDateForm.inputDay}>
+                <TextField
+                  ref="shiftDay"
+                  name="shift_day"
+                  fullWidth={true}
+                  type="number"
+                  label="shiftDay"
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div style={styles.shiftDateForm.inputHour}>
+                <TextField
+                  ref="shiftHour"
+                  name="shift_hour"
+                  fullWidth={true}
+                  type="number"
+                  label="shiftHour"
+                  onChange={this.handleChange}
+                />
+              </div>
+              <div style={styles.shiftDateForm.inputMinute}>
+                <TextField
+                  ref="shiftMinute"
+                  name="shift_minute"
+                  fullWidth={true}
+                  type="number"
+                  label="shiftMinute"
+                  onChange={this.handleChange}
+                />
+              </div>
+            </div>
+          </form>
+        )}
+      </Form>
     );
   }
 }

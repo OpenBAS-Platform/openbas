@@ -45,7 +45,10 @@ const renderSelectField = ({
       {children}
     </MUISelect>
     {renderFromHelper({
-      touched, error, submitError, helperText,
+      touched,
+      error,
+      submitError,
+      helperText,
     })}
   </FormControl>
 );

@@ -32,11 +32,7 @@ class AudienceForm extends Component {
       >
         {({ handleSubmit }) => (
           <form id="audienceForm" onSubmit={handleSubmit}>
-            <TextField
-              name="audience_name"
-              fullWidth={true}
-              label="Name"
-            />
+            <TextField name="audience_name" fullWidth={true} label="Name" />
           </form>
         )}
       </Form>

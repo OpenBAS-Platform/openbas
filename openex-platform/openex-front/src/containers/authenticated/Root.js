@@ -15,6 +15,7 @@ import IndexProfile from './profile/Index';
 import IndexDocuments from './documents/Index';
 import RootAdmin from './admin/Root';
 import RootExercise from './exercise/Root';
+import NotFound from '../anonymous/NotFound';
 
 const UserIsAdmin = connectedRouterRedirect({
   authenticatedSelector: (state) => state.app.logged.admin === true,
@@ -63,6 +64,7 @@ class RootAuthenticated extends Component {
             path="/private/exercise/:exerciseId"
             component={RootExercise}
           />
+          <Route component={NotFound} />
         </Switch>
       </div>
     );

@@ -59,9 +59,11 @@ class IncidentNav extends Component {
             subobjectives={this.props.subobjectives}
           />
         ) : (
-          <Typography variant="h5">
-            <T>Incidents</T>
-          </Typography>
+          <div style={{ margin: '15px 0 0 15px' }}>
+            <Typography variant="h5">
+              <T>Incidents</T>
+            </Typography>
+          </div>
         )}
         <List>
           {this.props.incidents.map((incident) => (

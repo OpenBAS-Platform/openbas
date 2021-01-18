@@ -77,7 +77,13 @@ class ExerciseForm extends Component {
                   fullWidth={true}
                   style={{ marginTop: 20 }}
                   helperText={
-                    <span style={{ marginTop: 5, display: 'flex', alignItems: 'center' }}>
+                    <span
+                      style={{
+                        marginTop: 5,
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
+                    >
                       <InfoOutlined color="primary" /> &nbsp;
                       <T>
                         This group receives a copy of all injects and is used in

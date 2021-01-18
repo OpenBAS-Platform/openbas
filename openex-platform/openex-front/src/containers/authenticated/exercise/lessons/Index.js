@@ -163,7 +163,7 @@ class IndexExerciseLessons extends Component {
           <div style={styles.title}>
             <T>Incidents outcomes</T>
           </div>
-          <div className="clearfix"/>
+          <div className="clearfix" />
           {this.props.incidents.length === 0 ? (
             <div style={styles.empty}>
               <T>You do not have any incidents in this exercise.</T>
@@ -195,7 +195,7 @@ class IndexExerciseLessons extends Component {
                         value={incident.incident_outcome.outcome_result}
                       />
                     </div>
-                    <div className="clearfix"/>
+                    <div className="clearfix" />
                   </div>
                 }
                 secondaryText={

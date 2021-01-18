@@ -32,7 +32,7 @@ class ComcheckStatus
     protected $status_comcheck;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetimetz")
      */
     protected $status_last_update;
 

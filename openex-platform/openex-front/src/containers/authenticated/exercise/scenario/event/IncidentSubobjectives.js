@@ -79,7 +79,10 @@ class IncidentSubobjectives extends Component {
     // endregion
     return (
       <div>
-        <SearchField onChange={this.handleSearchSubobjectives.bind(this)} fullWidth={true} />
+        <SearchField
+          onChange={this.handleSearchSubobjectives.bind(this)}
+          fullWidth={true}
+        />
         <div>
           {this.state.subobjectivesIds.map((subobjectiveId) => {
             const subobjective = R.find(

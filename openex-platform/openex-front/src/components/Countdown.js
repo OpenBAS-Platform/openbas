@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { Observable } from 'rxjs';
 import { injectIntl } from 'react-intl';
 import countdown from 'countdown';
 import { T } from './I18n';
-import {
-  ONE_SECOND, dateFromNow, now, parse,
-} from '../utils/Time';
+import { dateFromNow, now, parse } from '../utils/Time';
 import * as Constants from '../constants/ComponentTypes';
 import { i18nRegister } from '../utils/Messages';
 
@@ -35,19 +32,6 @@ class Countdown extends Component {
     this.state = { startDate: now() };
     const options = this.translate(' ms| s| m| h| d| w| m| y| d| c| m');
     countdown.setLabels(options, options, ', ', ', ', this.translate('now'));
-  }
-
-  componentDidMount() {
-    const initialStream = Observable.of(1);
-    const intervalStream = Observable.interval(ONE_SECOND);
-    this.subscription = initialStream
-      .merge(intervalStream)
-      .do(() => this.setState({ startDate: now() }))
-      .subscribe();
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
   }
 
   render() {

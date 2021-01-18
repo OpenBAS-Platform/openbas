@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import Theme from '../../../../components/Theme';
-import { i18nRegister } from '../../../../utils/Messages';
-import { T } from '../../../../components/I18n';
+import Theme from '../../../../../components/Theme';
+import { i18nRegister } from '../../../../../utils/Messages';
+import { T } from '../../../../../components/I18n';
 
 i18nRegister({
   fr: {

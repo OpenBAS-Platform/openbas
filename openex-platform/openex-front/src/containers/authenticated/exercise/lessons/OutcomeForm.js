@@ -16,7 +16,7 @@ i18nRegister({
 
 const validate = (values) => {
   const errors = {};
-  const requiredFields = [];
+  const requiredFields = ['outcome_comment'];
   requiredFields.forEach((field) => {
     if (!values[field]) {
       errors[field] = 'Required';
@@ -27,22 +27,31 @@ const validate = (values) => {
 
 class OutcomeForm extends Component {
   render() {
+    const { onSubmit, initialValues } = this.props;
     return (
-      <form onSubmit={this.props.handleSubmit(this.props.onSubmit)}>
-        <TextField
-          name="outcome_comment"
-          fullWidth={true}
-          multiline={true}
-          rows={4}
-          label="Comment"
-        />
-        <br />
-        <br />
-        <span style={{ fontSize: '13px' }}>
-          <T>Players response evaluation</T>
-        </span>
-        <SliderField name="outcome_result" min={0} max={100} step={1} />
-      </form>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={validate}
+      >
+        {({ handleSubmit }) => (
+          <form id="outcomForm" onSubmit={handleSubmit}>
+            <TextField
+              name="outcome_comment"
+              fullWidth={true}
+              multiline={true}
+              rows={4}
+              label="Comment"
+            />
+            <br />
+            <br />
+            <span style={{ fontSize: '13px' }}>
+              <T>Players response evaluation</T>
+            </span>
+            <SliderField name="outcome_result" min={0} max={100} step={1} />
+          </form>
+        )}
+      </Form>
     );
   }
 }
