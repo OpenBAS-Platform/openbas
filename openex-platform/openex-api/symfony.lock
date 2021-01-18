@@ -78,6 +78,9 @@
     "doctrine/sql-formatter": {
         "version": "1.1.1"
     },
+    "drenso/symfony-oidc-bundle": {
+        "version": "v1.10.0"
+    },
     "egulias/email-validator": {
         "version": "2.1.23"
     },
@@ -98,6 +101,9 @@
         "files": [
             "config/packages/fos_rest.yaml"
         ]
+    },
+    "jumbojett/openid-connect-php": {
+        "version": "v0.9.2"
     },
     "laminas/laminas-code": {
         "version": "4.0.0"
@@ -146,7 +152,7 @@
         "version": "2.2.3"
     },
     "php": {
-        "version": "7.3"
+        "version": "7.4"
     },
     "phpdocumentor/reflection-common": {
         "version": "2.2.0"
@@ -159,6 +165,9 @@
     },
     "phpoffice/phpspreadsheet": {
         "version": "1.15.0"
+    },
+    "phpseclib/phpseclib": {
+        "version": "2.0.30"
     },
     "psr/cache": {
         "version": "1.0.1"

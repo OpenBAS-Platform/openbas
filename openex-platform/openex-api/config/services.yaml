@@ -8,11 +8,21 @@ parameters:
   player_url: '%env(PLAYER_URL)%'
   admin_token: '%env(ADMIN_TOKEN)%'
   mail_sender: no-reply@openex.io
+  auth_openid_provider: '%env(AUTH_OPENID_PROVIDER)%'
+  auth_openid_client_id: '%env(AUTH_OPENID_CLIENT_ID)%'
+  auth_openid_client_secret: '%env(AUTH_OPENID_CLIENT_SECRET)%'
 
 services:
   _defaults:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  Drenso\OidcBundle\OidcClient:
+    arguments:
+      $wellKnownUrl: '%auth_openid_provider%'
+      $clientId: '%auth_openid_client_id%'
+      $clientSecret: '%auth_openid_client_secret%'
+      $redirectRoute: connect_oidc_check
 
   mylogger.db:
     alias: logger
