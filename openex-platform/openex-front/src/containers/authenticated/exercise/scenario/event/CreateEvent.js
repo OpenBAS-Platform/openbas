@@ -77,10 +77,7 @@ class CreateEvent extends Component {
             <T>Create a new event</T>
           </DialogTitle>
           <DialogContent>
-            <EventForm
-              onSubmit={this.onSubmit.bind(this)}
-              onSubmitSuccess={this.handleClose.bind(this)}
-            />
+            <EventForm onSubmit={this.onSubmit.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button variant="outlined" onClick={this.handleClose.bind(this)}>

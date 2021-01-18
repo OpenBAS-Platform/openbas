@@ -43,7 +43,7 @@ class RootAuthenticated extends Component {
             vertical: 'top',
             horizontal: 'right',
           }}
-          autoHideDuration={2000}
+          autoHideDuration={1000}
           onClose={this.props.savedDismiss.bind(this)}
         >
           <Alert

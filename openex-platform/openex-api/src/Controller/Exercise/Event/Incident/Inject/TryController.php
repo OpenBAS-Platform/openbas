@@ -63,9 +63,8 @@ class TryController extends AbstractController
 
         if ($exercise->getExerciseAnimationGroup() != null) {
             $data = array();
-            $data['context']['id'] = $inject->getInjectId();
-            $data['context']['type'] = $inject->getInjectType();
-            //$data['context']['callback_url'] = $this->getParameter('protocol') . '://' . $request->getHost() . '/api/injects/' . $inject->getInjectId() . '/status';
+            $data['id'] = $inject->getInjectId();
+            $data['type'] = $inject->getInjectType();
             $data['data'] = json_decode($inject->getInjectContent(), true);
             $data['data']['content_header'] = $inject->getInjectHeader();
             $data['data']['content_footer'] = $inject->getInjectFooter();
@@ -85,8 +84,7 @@ class TryController extends AbstractController
                 $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
                 $data['data']['users'][] = $userData;
             }
-
-            $url = $this->getParameter('player_url') . '/player/' . $data['context']['type'];
+            $url = $this->getParameter('player_url') . '/player/' . $data['type'];
             $response = \Httpful\Request::post($url)->sendsJson()->body($data)->send();
             $response = json_decode($response->raw_body, true);
             return ["result" => $response];

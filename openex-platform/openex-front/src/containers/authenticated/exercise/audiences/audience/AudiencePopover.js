@@ -42,7 +42,6 @@ import AudienceForm from './AudienceForm';
 import ComcheckForm from '../../check/ComcheckForm';
 import { fetchExercises } from '../../../../../actions/Exercise';
 import { dateFormat, timeDiff } from '../../../../../utils/Time';
-import PlanificateurAudience from '../../planificateurs/PlanificateurAudience';
 import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
@@ -93,7 +92,6 @@ class AudiencePopover extends Component {
       openDelete: false,
       openEdit: false,
       openComcheck: false,
-      openPlanificateur: false,
       openCopyAudience: false,
       openEnable: false,
       openDisable: false,
@@ -114,33 +112,6 @@ class AudiencePopover extends Component {
     this.setState({ anchorEl: null });
   }
 
-  handleOpenPlanificateur() {
-    this.props
-      .getPlanificateurUserForAudience(
-        this.props.exerciseId,
-        this.props.audience.audience_id,
-      )
-      .then((data) => {
-        this.setState({ planificateursAudience: [] });
-        const listePlanificateursAudience = [
-          ...this.state.planificateursAudience,
-        ];
-        data.result.forEach((planificateur) => {
-          const dataPlanificateur = {
-            user_id: planificateur.user_id,
-            user_firstname: planificateur.user_firstname,
-            user_lastname: planificateur.user_lastname,
-            user_email: planificateur.user_email,
-            is_planificateur_audience: planificateur.is_planificateur_audience,
-          };
-          listePlanificateursAudience.push(dataPlanificateur);
-        });
-        this.setState({ planificateursAudience: listePlanificateursAudience });
-        this.setState({ anchorEl: null });
-        this.setState({ openPlanificateur: true });
-      });
-  }
-
   handleOpenComcheck() {
     this.setState({ openComcheck: true });
     this.handlePopoverClose();
@@ -154,10 +125,6 @@ class AudiencePopover extends Component {
 
   handleCloseComcheck() {
     this.setState({ openComcheck: false });
-  }
-
-  handleClosePlanificateur() {
-    this.setState({ openPlanificateur: false });
   }
 
   handleCloseCopyAudienceToOtherExercise() {
@@ -551,14 +518,6 @@ class AudiencePopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <PlanificateurAudience
-          planificateursAudience={this.state.planificateursAudience}
-          audienceId={this.props.audience.audience_id}
-          handleCheckPlanificateur={this.handleCheckPlanificateur.bind(this)}
-          openPlanificateur={this.state.openPlanificateur}
-          handleClosePlanificateur={this.handleClosePlanificateur.bind(this)}
-          submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
-        />
         <Dialog
           open={this.state.openDisable}
           TransitionComponent={Transition}

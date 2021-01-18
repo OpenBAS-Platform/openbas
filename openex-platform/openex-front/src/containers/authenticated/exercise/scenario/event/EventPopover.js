@@ -27,7 +27,6 @@ import {
   updatePlanificateurUserForEvent,
 } from '../../../../../actions/Planificateurs';
 import EventForm from './EventForm';
-import PlanificateurEvent from '../../planificateurs/PlanificateurEvent';
 import { submitForm } from '../../../../../utils/Action';
 
 const styles = () => ({
@@ -142,10 +141,6 @@ class EventPopover extends Component {
       .then(() => this.handleCloseEdit());
   }
 
-  submitFormEdit() {
-    this.refs.eventForm.submit();
-  }
-
   handleOpenDelete() {
     this.setState({ openDelete: true });
     this.handlePopoverClose();
@@ -176,9 +171,7 @@ class EventPopover extends Component {
   }
 
   render() {
-    const {
-      classes, exerciseOwnerId, userId, userCanUpdate,
-    } = this.props;
+    const { classes, userCanUpdate } = this.props;
     const eventIsUpdatable = R.propOr(
       true,
       'user_can_update',
@@ -214,12 +207,6 @@ class EventPopover extends Component {
             <T>Import</T>
           </MenuItem>
           <MenuItem
-            onClick={this.handleOpenPlanificateur.bind(this)}
-            disabled={exerciseOwnerId !== userId}
-          >
-            <T>Planners list</T>
-          </MenuItem>
-          <MenuItem
             onClick={this.handleOpenEdit.bind(this)}
             disabled={!eventIsUpdatable || !userCanUpdate}
           >
@@ -237,14 +224,6 @@ class EventPopover extends Component {
           ref="fileUpload"
           style={{ display: 'none' }}
           onChange={this.handleFileChange.bind(this)}
-        />
-        <PlanificateurEvent
-          planificateursEvent={this.state.planificateursEvent}
-          eventId={this.props.eventId}
-          handleCheckPlanificateur={this.handleCheckPlanificateur.bind(this)}
-          openPlanificateur={this.state.openPlanificateur}
-          handleClosePlanificateur={this.handleClosePlanificateur.bind(this)}
-          submitFormPlanificateur={this.submitFormPlanificateur.bind(this)}
         />
         <Dialog
           open={this.state.openDelete}

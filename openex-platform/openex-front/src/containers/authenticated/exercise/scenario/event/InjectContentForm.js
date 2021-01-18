@@ -5,10 +5,12 @@ import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
 import Chip from '@material-ui/core/Chip';
-import { AttachmentOutlined } from '@material-ui/icons';
+import { AttachmentOutlined, CloseOutlined } from '@material-ui/icons';
 import Slide from '@material-ui/core/Slide';
 import { withStyles } from '@material-ui/core/styles';
 import { EnrichedTextField } from '../../../../../components/EnrichedTextField';
@@ -29,6 +31,9 @@ const styles = () => ({
   },
   variables: {
     fontSize: '14px',
+  },
+  appBar: {
+    zIndex: 10000,
   },
 });
 
@@ -204,23 +209,26 @@ class InjectContentForm extends Component {
                         onClose={this.handleCloseGallery.bind(this)}
                         fullScreen={true}
                       >
-                        <DialogContent>
-                          <DocumentGallery
-                            fileSelector={this.handleDocumentSelection.bind(
-                              this,
-                            )}
-                          />
-                        </DialogContent>
-                        <DialogActions>
-                          <Button
-                            variant="outlined"
-                            onClick={this.handleCloseGallery.bind(this)}
-                          >
-                            <T>Close</T>
-                          </Button>
-                        </DialogActions>
+                        <AppBar className={classes.appBar}>
+                          <Toolbar>
+                            <IconButton
+                              edge="start"
+                              color="inherit"
+                              onClick={this.handleCloseGallery.bind(this)}
+                              aria-label="close"
+                            >
+                              <CloseOutlined />
+                            </IconButton>
+                            <Typography variant="h6" className={classes.title}>
+                              <T>Select a file</T>
+                            </Typography>
+                          </Toolbar>
+                        </AppBar>
+                        <DocumentGallery
+                          fileSelector={this.handleDocumentSelection.bind(this)}
+                        />
                       </Dialog>
-                      <div>
+                      <div style={{ marginTop: 20 }}>
                         {this.props.attachments.map((attachment) => {
                           const documentName = R.propOr(
                             '-',

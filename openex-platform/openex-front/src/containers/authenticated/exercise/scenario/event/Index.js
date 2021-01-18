@@ -69,43 +69,6 @@ const styles = () => ({
     zIndex: '5000',
     backgroundColor: 'none',
   },
-  header: {
-    icon: {
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-      padding: '8px 0 0 8px',
-    },
-    inject_title: {
-      float: 'left',
-      width: '50%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    inject_date: {
-      float: 'left',
-      width: '20%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    inject_user: {
-      float: 'left',
-      width: '18%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-    inject_audiences: {
-      float: 'left',
-      textAlign: 'center',
-      width: '2%',
-      fontSize: '12px',
-      textTransform: 'uppercase',
-      fontWeight: '700',
-    },
-  },
   title: {
     float: 'left',
     fontSize: '13px',
@@ -124,26 +87,20 @@ const styles = () => ({
   search: {
     float: 'right',
   },
-  inject_title: {
-    float: 'left',
-    width: '50%',
-    padding: '5px 0 0 0',
-  },
   inject_date: {
     float: 'left',
-    width: '20%',
+    width: '30%',
     padding: '5px 0 0 0',
   },
   inject_user: {
-    width: '18%',
+    width: '40%',
     float: 'left',
     padding: '5px 0 0 0',
   },
   inject_audiences: {
-    width: '2%',
     float: 'left',
     padding: '5px 0 0 0',
-    textAlign: 'center',
+    fontWeight: 600,
   },
   enabled: {
     color: green[500],
@@ -279,6 +236,11 @@ class Index extends Component {
             // Setup variables
             const injectId = R.propOr(Math.random(), 'inject_id', inject);
             const injectTitle = R.propOr('-', 'inject_title', inject);
+            const injectDescription = R.propOr(
+              '-',
+              'inject_description',
+              inject,
+            );
             const injectUser = R.propOr('-', 'inject_user', inject);
             const injectDate = R.prop('inject_date', inject);
             const injectType = R.propOr('-', 'inject_type', inject);
@@ -318,20 +280,19 @@ class Index extends Component {
                   {this.selectIcon(injectType)}
                 </ListItemIcon>
                 <ListItemText
-                  primary={
-                    <div>
-                      <div className={classes.inject_title}>{injectTitle}</div>
-                      <div className={classes.inject_date}>
-                        {dateFormat(injectDate)}
-                      </div>
-                      <div className={classes.inject_user}>{injectUser}</div>
-                      <div className={classes.inject_audiences}>
-                        {injectUsersNumber.toString()}
-                      </div>
-                      <div className="clearfix" />
-                    </div>
-                  }
+                  primary={injectTitle}
+                  secondary={injectDescription}
                 />
+                <div style={{ width: 500 }}>
+                  <div className={classes.inject_date}>
+                    {dateFormat(injectDate)}
+                  </div>
+                  <div className={classes.inject_user}>{injectUser}</div>
+                  <div className={classes.inject_audiences}>
+                    {injectUsersNumber.toString()} <T>players</T>
+                  </div>
+                  <div className="clearfix" />
+                </div>
                 <ListItemSecondaryAction>
                   <InjectPopover
                     type={Constants.INJECT_SCENARIO}

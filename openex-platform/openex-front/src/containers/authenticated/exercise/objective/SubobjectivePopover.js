@@ -3,31 +3,25 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Icon } from '../../../../components/Icon';
-import {
-  MenuItemLink,
-  MenuItemButton,
-} from '../../../../components/menu/MenuItem';
 import { fetchObjective } from '../../../../actions/Objective';
 import {
   updateSubobjective,
   deleteSubobjective,
 } from '../../../../actions/Subobjective';
 import SubobjectiveForm from './SubobjectiveForm';
-
-const style = {
-  position: 'absolute',
-  top: '10px',
-  right: 0,
-};
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -78,16 +72,14 @@ class SubobjectivePopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateSubobjective(
-      this.props.exerciseId,
-      this.props.objectiveId,
-      this.props.subobjective.subobjective_id,
-      data,
-    );
-  }
-
-  submitFormEdit() {
-    this.refs.subobjectiveForm.submit();
+    return this.props
+      .updateSubobjective(
+        this.props.exerciseId,
+        this.props.objectiveId,
+        this.props.subobjective.subobjective_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   handleOpenDelete() {
@@ -130,44 +122,6 @@ class SubobjectivePopover extends Component {
       'user_can_delete',
       this.props.subobjective,
     );
-
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      subobjectiveIsUpdatable ? (
-        <Button
-          key="update"
-          label="Update"
-          primary={true}
-          onClick={this.submitFormEdit.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const deleteActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDelete.bind(this)}
-      />,
-      subobjectiveIsDeletable ? (
-        <Button
-          key="delete"
-          label="Delete"
-          primary={true}
-          onClick={this.submitDelete.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-
     const initialValues = R.pick(
       [
         'subobjective_title',
@@ -177,62 +131,87 @@ class SubobjectivePopover extends Component {
       this.props.subobjective,
     );
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-
-        {subobjectiveIsUpdatable || subobjectiveIsDeletable ? (
-          <Popover
-            open={this.state.openPopover}
-            anchorEl={this.state.anchorEl}
-            onClose={this.handlePopoverClose.bind(this)}
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!subobjectiveIsUpdatable}
           >
-            <Menu multiple={false}>
-              {subobjectiveIsUpdatable ? (
-                <MenuItemLink
-                  label="Edit"
-                  onClick={this.handleOpenEdit.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-              {subobjectiveIsDeletable ? (
-                <MenuItemButton
-                  label="Delete"
-                  onClick={this.handleOpenDelete.bind(this)}
-                />
-              ) : (
-                ''
-              )}
-            </Menu>
-          </Popover>
-        ) : (
-          ''
-        )}
-
+            <T>Edit</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={!subobjectiveIsDeletable}
+          >
+            <T>Delete</T>
+          </MenuItem>
+        </Menu>
         <Dialog
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
         >
-          <T>Do you want to delete this subobjective?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to delete this subobjective?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Update the subobjective"
-          modal={false}
           open={this.state.openEdit}
+          TransitionComponent={Transition}
           onClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
         >
-          {/* eslint-disable */}
-          <SubobjectiveForm
-            ref="subobjectiveForm"
-            initialValues={initialValues}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Update the subobjective</T>
+          </DialogTitle>
+          <DialogContent>
+            <SubobjectiveForm
+              initialValues={initialValues}
+              onSubmit={this.onSubmitEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('subobjectiveForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

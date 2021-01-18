@@ -91,7 +91,7 @@ class CreateInject extends Component {
     event.stopPropagation();
     this.setState({
       injectAttachments: R.filter(
-        (a) => a.file_name !== name,
+        (a) => a.document_name !== name,
         this.state.injectAttachments,
       ),
     });

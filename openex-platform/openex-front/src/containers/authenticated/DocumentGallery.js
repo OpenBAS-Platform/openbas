@@ -2,18 +2,22 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import Button from '@material-ui/core/Button';
-import { T } from '../../components/I18n';
-import { i18nRegister } from '../../utils/Messages';
-import { timeDiff } from '../../utils/Time';
-import * as Constants from '../../constants/ComponentTypes';
-import { SearchField } from '../../components/SimpleTextField';
-import { fetchTags } from '../../actions/Tag';
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Chip from '@material-ui/core/Chip';
+import List from '@material-ui/core/List';
+import Toolbar from '@material-ui/core/Toolbar';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import {
+  Add,
+  InsertDriveFileOutlined,
+  LabelOutlined,
+} from '@material-ui/icons';
+import ListItemText from '@material-ui/core/ListItemText';
+import Drawer from '@material-ui/core/Drawer';
+import Fab from '@material-ui/core/Fab';
+import { fetchExercises } from '../../actions/Exercise';
 import {
   addDocument,
   searchDocument,
@@ -21,126 +25,72 @@ import {
   getDocumentTags,
   getDocumentTagsExercise,
 } from '../../actions/Document';
-import { fetchExercises } from '../../actions/Exercise';
-import {
-  TagListe,
-  TagExerciseListe,
-  TagAddToFilter,
-  TagSmallListe,
-  TagSmallExerciseListe,
-} from './documents/component/Tag';
+import { fetchTags } from '../../actions/Tag';
+import { SearchField } from '../../components/SearchField';
+import { timeDiff } from '../../utils/Time';
+import { i18nRegister } from '../../utils/Messages';
+import { T } from '../../components/I18n';
 
-const styles = {
-  container: {
-    textAlign: 'center',
-    marginTop: '20px',
-  },
-  title: {
-    float: 'left',
-    fontSize: '13px',
-    textTransform: 'uppercase',
-  },
-  titlePopover: {
-    float: 'left',
-    fontSize: '11px',
-    height: '35px',
-    textTransform: 'uppercase',
-  },
-  columnLeft: {
-    float: 'left',
-    width: '49%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  columnRight: {
-    float: 'right',
-    width: '49%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  searchDiv: {
-    float: 'left',
-    marginTop: '10px',
-    width: '100%',
-    border: '1px silver solid',
-    borderRadius: '4px',
-    paddingBottom: '10px',
-  },
-  searchDivTag: {
-    float: 'left',
-    width: '10%',
-    marginTop: '10px',
-    minWidth: '120px',
-  },
-  searchDivTagDetail: {
-    float: 'left',
-    marginTop: '10px',
-    width: '89%',
-    textAlign: 'left',
-  },
-  searchDivTagLibelle: {
-    float: 'left',
-    border: '0px',
-    width: '100%',
-    textAlign: 'left',
-  },
-  searchDivTitle: {
-    marginTop: '10px',
-    fontSize: '13px',
-    textAlign: 'left',
-  },
-  divDocumentsListe: {
-    float: 'left',
-    width: '79%',
-    minHeight: '400px',
-    height: '100%',
-  },
-  divDocumentsListeDetail: {
-    width: '100%',
-    height: '100%',
-    minHeight: '340px',
-    maxHeight: '340px',
-    overflowY: 'auto',
-    border: '1px silver solid',
-    borderRadius: '4px',
-  },
-  divTagsListe: {
-    float: 'right',
-    width: '20%',
-    minHeight: '400px',
-    height: '100%',
-  },
-  divTagsListeDetail: {
-    width: '100%',
-    height: '100%',
-    minHeight: '340px',
-    maxHeight: '340px',
-    overflowY: 'auto',
-    border: '1px silver solid',
-    borderRadius: '4px',
-  },
-  divDocuments: {
-    marginTop: '20px',
-    width: '100%',
-    minHeight: '400px',
-  },
-  divDocumentsTitle: {
-    fontSize: '15px',
-    textTransform: 'uppercase',
-    fontWeight: '800',
+const styles = (theme) => ({
+  header: {
+    height: 50,
   },
   search: {
     float: 'right',
   },
+  tags: {
+    float: 'left',
+    margin: '-5px 0 0 20px',
+    display: 'flex',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(0.5),
+    },
+  },
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 330,
+  },
+  drawerPaper: {
+    width: 300,
+  },
+  drawerContainer: {
+    padding: 15,
+  },
   empty: {
-    marginTop: 40,
+    marginTop: 30,
     fontSize: '18px',
     fontWeight: 500,
     textAlign: 'center',
   },
-};
+  paper: {
+    padding: 20,
+    marginBottom: 40,
+  },
+  appBar: {
+    width: '100%',
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  container: {
+    padding: '20px 320px 0 20px',
+  },
+  logo: {
+    width: '40px',
+    cursor: 'pointer',
+  },
+  title: {
+    fontSize: 25,
+    marginLeft: 20,
+  },
+  toolbar: theme.mixins.toolbar,
+  documents: {
+    color: '#ffffff',
+    position: 'absolute',
+    top: 8,
+    right: 70,
+  },
+});
 
 i18nRegister({
   fr: {
@@ -330,210 +280,169 @@ class DocumentGallery extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div style={styles.container}>
-        <div style={styles.columnLeft}> &nbsp; </div>
-        <div style={styles.columnRight}>
-          <div style={styles.search}>
-            <SearchField
-              name="keyword"
-              fullWidth={true}
-              type="text"
-              hintText="Search"
-              onChange={this.handleSearchDocument.bind(this)}
-              styletype={Constants.FIELD_TYPE_RIGHT}
-            />
-          </div>
-          <div className="clearfix" />
-        </div>
-        <div className="clearfix" />
-        <div style={styles.searchDivTitle}>
-          <T>Search by</T>
-        </div>
-        <div style={styles.searchDiv}>
-          <div style={styles.searchDivTag}>
-            <T>Tag :</T>
-          </div>
-          <div style={styles.searchDivTagDetail}>
-            {this.state.listeTagAddToFilter.length === 0
-            && this.state.listeTagExerciseAddToFilter.length === 0 ? (
-              <T>
-                No added tags, select a tag from the list on the right to add it
-                as a filter.
-              </T>
-              ) : (
-                ''
+      <div>
+        <Toolbar />
+        <div className={classes.container}>
+          <div className={classes.header}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              <T>Documents gallery</T>
+            </Typography>
+            <div className={classes.tags}>
+              {R.values(this.state.listeTagExerciseAddToFilter).map(
+                (exercise) => (
+                  <Chip
+                    key={exercise.exercise_id}
+                    className={classes.tag}
+                    variant="outlined"
+                    color="primary"
+                    label={exercise.exercise_name}
+                    onDelete={this.removeTagExerciseToFilter.bind(
+                      this,
+                      exercise,
+                    )}
+                  />
+                ),
               )}
-            {R.values(this.state.listeTagExerciseAddToFilter).map(
-              (exercise) => (
-                <TagAddToFilter
-                  key={exercise.exercise_id}
-                  value={exercise.exercise_name}
-                  onRequestDelete={this.removeTagExerciseToFilter.bind(
-                    this,
-                    exercise,
-                  )}
-                />
-              ),
-            )}
-            {R.values(this.state.listeTagAddToFilter).map((tag) => (
-              <TagAddToFilter
-                key={tag.tag_id}
-                value={tag.tag_name}
-                onRequestDelete={this.removeTagToFilter.bind(this, tag)}
-              />
-            ))}
-            <div className="clearfix" />
-            {this.state.listeTagAddToFilter.length !== 0
-            || this.state.listeTagExerciseAddToFilter.length !== 0 ? (
-              <div style={styles.searchDivTagLibelle}>
-                <T>List of documents including the following tags : </T>
-                {R.values(this.state.listeTagExerciseAddToFilter).map(
-                  (exercise) => `${exercise.exercise_name}, `,
-                )}
-                {R.values(this.state.listeTagAddToFilter).map(
-                  (tag) => `${tag.tag_name}, `,
-                )}
-              </div>
-              ) : (
-                ''
-              )}
-          </div>
-        </div>
-        <div className="clearfix" />
-        <div style={styles.divDocuments}>
-          <div style={styles.divDocumentsListe}>
-            <div style={styles.divDocumentsTitle}>
-              <T>List of Documents</T>
-            </div>
-            <div style={styles.divDocumentsListeDetail}>
-              {this.props.documents.length === 0 ? (
-                <div style={styles.empty}>
-                  <T>No Document available</T>
-                </div>
-              ) : (
-                ''
-              )}
-              <Table selectable={false} style={{ marginTop: '5px' }}>
-                <TableHead adjustForCheckbox={false} displaySelectAll={false}>
-                  <TableRow>
-                    <TableCell style={{ width: '100px' }}> &nbsp; </TableCell>
-                    <TableCell>
-                      <T>Name</T>
-                    </TableCell>
-                    <TableCell>
-                      <T>Description</T>
-                    </TableCell>
-                    <TableCell>
-                      <T>Tags</T>
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody displayRowCheckbox={false}>
-                  {this.props.documents.map((document) => {
-                    const listeTagAddToFilter = [
-                      ...this.state.listeTagAddToFilter,
-                    ];
-                    const listeTagExerciseAddToFilter = [
-                      ...this.state.listeTagExerciseAddToFilter,
-                    ];
-                    const toDisplay = this.checkIfDocumentIsDisplay(
-                      document,
-                      listeTagAddToFilter,
-                      listeTagExerciseAddToFilter,
-                      this.state.searchTerm,
-                    );
-                    return toDisplay === true ? (
-                      <TableRow>
-                        <TableCell style={{ width: '100px' }}>
-                          <input
-                            type="radio"
-                            name="radio_select_document"
-                            onClick={this.handleFileSelector.bind(
-                              this,
-                              document,
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell>{document.document_name}</TableCell>
-                        <TableCell
-                          style={{
-                            wordWrap: 'break-word',
-                            whiteSpace: 'normal',
-                          }}
-                        >
-                          {document.document_description}
-                        </TableCell>
-                        <TableCell>
-                          {document.document_liste_tags.map((tag) => (
-                            <TagSmallListe
-                              key={tag.tag_id}
-                              value={tag.tag_name}
-                            />
-                          ))}
-                          {document.document_liste_tags_exercise.map(
-                            (exercise) => (
-                              <TagSmallExerciseListe
-                                key={exercise.exercise_id}
-                                value={exercise.exercise_name}
-                              />
-                            ),
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      ''
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-            <Button
-              label="Add new document"
-              primary={true}
-              onClick={this.openFileDialog.bind(this)}
-            />
-          </div>
-          <div style={styles.divTagsListe}>
-            <div style={styles.divDocumentsTitle}>
-              <T>Liste des tags</T>
-            </div>
-            <div style={styles.divTagsListeDetail}>
-              {this.props.tags.length === 0 && this.props.exercises === 0 ? (
-                <div style={styles.empty}>
-                  <T>Aucun TAG de disponible.</T>
-                </div>
-              ) : (
-                ''
-              )}
-              {this.props.tags.map((tag) => (
-                <TagListe
+              {R.values(this.state.listeTagAddToFilter).map((tag) => (
+                <Chip
                   key={tag.tag_id}
-                  value={tag.tag_name}
-                  onClick={this.addAvailableTagToFilter.bind(this, tag)}
+                  className={classes.tag}
+                  variant="outlined"
+                  color="primary"
+                  label={tag.tag_name}
+                  onDelete={this.removeTagToFilter.bind(this, tag)}
                 />
               ))}
+            </div>
+            <div className={classes.search}>
+              <SearchField onChange={this.handleSearchDocument.bind(this)} />
+            </div>
+            <div className="clearfix" />
+          </div>
+          {this.props.documents.length === 0 && (
+            <div className={classes.empty}>
+              <T>No document available.</T>
+            </div>
+          )}
+          <List>
+            {this.props.documents.map((document) => {
+              const listeTagAddToFilter = [...this.state.listeTagAddToFilter];
+              const listeTagExerciseAddToFilter = [
+                ...this.state.listeTagExerciseAddToFilter,
+              ];
+              const toDisplay = this.checkIfDocumentIsDisplay(
+                document,
+                listeTagAddToFilter,
+                listeTagExerciseAddToFilter,
+                this.state.searchTerm,
+              );
+              return (
+                toDisplay === true && (
+                  <ListItem
+                    divider={true}
+                    key={document.document_id}
+                    button={true}
+                    onClick={this.handleFileSelector.bind(this, document)}
+                  >
+                    <ListItemIcon>
+                      <InsertDriveFileOutlined color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={document.document_name}
+                      secondary={
+                        document.document_description ? (
+                          document.document_description
+                        ) : (
+                          <T>No description</T>
+                        )
+                      }
+                    />
+                    <div style={{ marginRight: 15 }}>
+                      {document.document_liste_tags.map((tag) => (
+                        <Chip
+                          variant="outlined"
+                          color="primary"
+                          key={tag.tag_id}
+                          label={tag.tag_name}
+                          style={{ marginRight: 15 }}
+                        />
+                      ))}
+                      {document.document_liste_tags_exercise.map((exercise) => (
+                        <Chip
+                          variant="outlined"
+                          color="primary"
+                          key={exercise.exercise_id}
+                          label={exercise.exercise_name}
+                          style={{ marginRight: 15 }}
+                        />
+                      ))}
+                    </div>
+                  </ListItem>
+                )
+              );
+            })}
+          </List>
+          <Fab
+            onClick={this.openFileDialog.bind(this)}
+            color="secondary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+          <Drawer
+            variant="permanent"
+            classes={{ paper: classes.drawerPaper }}
+            anchor="right"
+          >
+            <Toolbar />
+            <Typography
+              variant="h5"
+              style={{ margin: '15px 0 0 15px', float: 'left' }}
+            >
+              <T>Tags</T>
+            </Typography>
+            <List>
+              {this.props.tags.map((tag) => (
+                <ListItem
+                  key={tag.tag_id}
+                  button={true}
+                  divider={true}
+                  onClick={this.addAvailableTagToFilter.bind(this, tag)}
+                >
+                  <ListItemIcon>
+                    <LabelOutlined />
+                  </ListItemIcon>
+                  <ListItemText primary={tag.tag_name} />
+                </ListItem>
+              ))}
               {this.props.exercises.map((exercise) => (
-                <TagExerciseListe
+                <ListItem
                   key={exercise.exercise_id}
-                  value={exercise.exercise_name}
+                  button={true}
+                  divider={true}
                   onClick={this.addAvailableTagExerciseToFilter.bind(
                     this,
                     exercise,
                   )}
-                />
+                >
+                  <ListItemIcon>
+                    <LabelOutlined />
+                  </ListItemIcon>
+                  <ListItemText primary={exercise.exercise_name} />
+                </ListItem>
               ))}
-            </div>
-          </div>
+            </List>
+          </Drawer>
+          <input
+            type="file"
+            ref="fileUpload"
+            style={{ display: 'none' }}
+            onChange={this.handleFileChange.bind(this)}
+          />
         </div>
-        {/* eslint-disable */}
-        <input
-          type="file"
-          ref="fileUpload"
-          style={{ display: "none" }}
-          onChange={this.handleFileChange.bind(this)}
-        />
-        {/* eslint-enable */}
       </div>
     );
   }
@@ -578,12 +487,15 @@ const select = (state) => ({
   tags: sortTags(R.values(state.referential.entities.tag)),
 });
 
-export default connect(select, {
-  fetchTags,
-  fetchExercises,
-  searchDocument,
-  getDocument,
-  getDocumentTags,
-  getDocumentTagsExercise,
-  addDocument,
-})(DocumentGallery);
+export default R.compose(
+  connect(select, {
+    fetchTags,
+    fetchExercises,
+    searchDocument,
+    getDocument,
+    getDocumentTags,
+    getDocumentTagsExercise,
+    addDocument,
+  }),
+  withStyles(styles),
+)(DocumentGallery);

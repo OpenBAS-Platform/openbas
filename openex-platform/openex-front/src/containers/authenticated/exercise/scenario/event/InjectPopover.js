@@ -143,7 +143,6 @@ class InjectPopover extends Component {
 
   onContentSubmit(data) {
     const { injectData } = this.state;
-    console.log(data);
     // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
     injectData.inject_content = JSON.stringify(data);
@@ -156,11 +155,10 @@ class InjectPopover extends Component {
     });
   }
 
-  onContentAttachmentDelete(name, event) {
-    event.stopPropagation();
+  onContentAttachmentDelete(name) {
     this.setState({
       injectAttachments: R.filter(
-        (a) => a.file_name !== name,
+        (a) => a.document_name !== name,
         this.state.injectAttachments,
       ),
     });
@@ -507,14 +505,6 @@ class InjectPopover extends Component {
       this.props.inject,
     );
     const { userCanUpdate } = this.props;
-    const resultActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseResult.bind(this)}
-      />,
-    ];
     const initPipe = R.pipe(
       R.assoc(
         'inject_date_only',
@@ -807,13 +797,13 @@ class InjectPopover extends Component {
         </Dialog>
         <Dialog
           TransitionComponent={Transition}
-          title="Inject test result"
-          modal={false}
           open={this.state.openResult}
           onClose={this.handleCloseResult.bind(this)}
-          actions={resultActions}
         >
-          <div>
+          <DialogTitle>
+            <T>Inject test result</T>
+          </DialogTitle>
+          <DialogContent>
             <div>
               <strong>
                 {this.state.injectResult ? this.state.injectResult.status : ''}
@@ -825,7 +815,15 @@ class InjectPopover extends Component {
                   <div key={Math.random()}>{line}</div>
               ))
               : ''}
-          </div>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseResult.bind(this)}
+            >
+              <T>Close</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
