@@ -26,6 +26,11 @@ security:
       stateless: true
       security: false
 
+    parameters:
+      pattern: ^/api/parameters
+      stateless: true
+      security: false
+
     api:
       pattern: ^/api
       stateless: true

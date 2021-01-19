@@ -19,6 +19,12 @@ class ParameterController extends AbstractController
      */
     public function getParametersAction(Request $request)
     {
-        return ["test" => "test"];
+        return [
+            "parameters_id" => "global",
+            "auth_local_enable" => $this->getParameter('auth_local_enable'),
+            "auth_openid_enable" => $this->getParameter('auth_openid_enable'),
+            "auth_kerberos_enable" => $this->getParameter('auth_kerberos_enable'),
+            "auth_openid_label" => $this->getParameter('auth_openid_label')
+        ];
     }
 }

@@ -73,7 +73,7 @@ class AuthController extends AbstractController
 
     private function noKerberos()
     {
-        return View::create(['message' => 'Kerberos is not detected'], Response::HTTP_BAD_REQUEST);
+        return View::create(['message' => 'Kerberos is not detected']);
     }
 
     /**

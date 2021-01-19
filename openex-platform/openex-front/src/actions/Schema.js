@@ -54,6 +54,14 @@ export const injectStatus = new schema.Entity(
 );
 export const arrayOfInjectStatuses = new schema.Array(injectStatus);
 
+export const parameters = new schema.Entity(
+  'parameters',
+  {},
+  {
+    idAttribute: 'parameters_id',
+  },
+);
+
 export const token = new schema.Entity(
   'tokens',
   {},
