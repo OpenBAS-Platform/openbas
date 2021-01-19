@@ -13,6 +13,7 @@ import { GroupOutlined } from '@material-ui/icons';
 import { green, red } from '@material-ui/core/colors';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
+import { injectIntl } from 'react-intl';
 import { selectSubaudience } from '../../../../../actions/Subaudience';
 import SubaudiencePopover from './SubaudiencePopover';
 import CreateSubaudience from './CreateSubaudience';
@@ -69,40 +70,48 @@ class SubaudienceNav extends Component {
           </div>
         )}
         <List>
-          {this.props.subaudiences.map((subaudience) => (
-            <ListItem
-              key={subaudience.subaudience_id}
-              selected={
-                this.props.selectedSubaudience === subaudience.subaudience_id
-              }
-              button={true}
-              divider={true}
-              onClick={this.handleChangeAudience.bind(
-                this,
-                subaudience.subaudience_id,
-              )}
-            >
-              <ListItemIcon
-                className={
-                  subaudience.subaudience_enabled
-                    ? classes.enabled
-                    : classes.disabled
+          {this.props.subaudiences.map((subaudience) => {
+            const playersText = `${
+              subaudience.subaudience_users.length
+            } ${this.props.intl.formatMessage({ id: 'players' })}`;
+            return (
+              <ListItem
+                key={subaudience.subaudience_id}
+                selected={
+                  this.props.selectedSubaudience === subaudience.subaudience_id
                 }
+                button={true}
+                divider={true}
+                onClick={this.handleChangeAudience.bind(
+                  this,
+                  subaudience.subaudience_id,
+                )}
               >
-                <GroupOutlined />
-              </ListItemIcon>
-              <ListItemText primary={subaudience.subaudience_name} />
-              <ListItemSecondaryAction>
-                <SubaudiencePopover
-                  exerciseId={exerciseId}
-                  audienceId={audienceId}
-                  audience={audience}
-                  subaudience={subaudience}
-                  subaudiences={subaudiences}
+                <ListItemIcon
+                  className={
+                    subaudience.subaudience_enabled
+                      ? classes.enabled
+                      : classes.disabled
+                  }
+                >
+                  <GroupOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  primary={subaudience.subaudience_name}
+                  secondary={playersText}
                 />
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
+                <ListItemSecondaryAction>
+                  <SubaudiencePopover
+                    exerciseId={exerciseId}
+                    audienceId={audienceId}
+                    audience={audience}
+                    subaudience={subaudience}
+                    subaudiences={subaudiences}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
         </List>
       </Drawer>
     );
@@ -123,4 +132,5 @@ export default R.compose(
     selectSubaudience,
   }),
   withStyles(styles),
+  injectIntl,
 )(SubaudienceNav);

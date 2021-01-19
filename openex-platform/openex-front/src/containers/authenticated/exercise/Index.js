@@ -29,6 +29,7 @@ import {
   EventOutlined,
 } from '@material-ui/icons';
 import Collapse from '@material-ui/core/Collapse';
+import { green, red } from '@material-ui/core/colors';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import { dateFormat, timeDiff } from '../../../utils/Time';
@@ -81,6 +82,12 @@ const styles = (theme) => ({
   },
   nested2: {
     paddingLeft: theme.spacing(8),
+  },
+  enabled: {
+    color: green[500],
+  },
+  disabled: {
+    color: red[500],
   },
 });
 
@@ -331,7 +338,13 @@ class IndexExercise extends Component {
                     button={true}
                     divider={true}
                   >
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className={
+                        audience.audience_enabled
+                          ? classes.enabled
+                          : classes.disabled
+                      }
+                    >
                       <GroupOutlined />
                     </ListItemIcon>
                     <ListItemText
@@ -381,7 +394,13 @@ class IndexExercise extends Component {
                           audience,
                         )}
                       >
-                        <ListItemIcon>
+                        <ListItemIcon
+                          className={
+                            audience.audience_enabled
+                              ? classes.enabled
+                              : classes.disabled
+                          }
+                        >
                           <GroupOutlined />
                         </ListItemIcon>
                         <ListItemText
@@ -484,6 +503,7 @@ class IndexExercise extends Component {
                 const injectTitle = R.propOr('-', 'inject_title', inject);
                 const injectType = R.propOr('-', 'inject_type', inject);
                 const injectDate = R.propOr(undefined, 'inject_date', inject);
+                const injectEnabled = R.propOr(false, 'inject_enabled', inject);
                 return (
                   <ListItem
                     key={injectId}
@@ -492,7 +512,13 @@ class IndexExercise extends Component {
                     onClick={this.handleOpenViewInject.bind(this, inject)}
                     className={classes.nested2}
                   >
-                    <ListItemIcon>{this.selectIcon(injectType)}</ListItemIcon>
+                    <ListItemIcon
+                      className={
+                        injectEnabled ? classes.enabled : classes.disabled
+                      }
+                    >
+                      {this.selectIcon(injectType)}
+                    </ListItemIcon>
                     <ListItemText
                       primary={injectTitle}
                       secondary={dateFormat(injectDate)}
@@ -610,6 +636,11 @@ class IndexExercise extends Component {
                 );
                 const audienceName = R.propOr('-', 'audience_name', audience);
                 const audienceUsers = R.propOr([], 'audience_users', audience);
+                const audienceEnabled = R.propOr(
+                  false,
+                  'audience_enabled',
+                  audience,
+                );
                 const playersText = `${
                   audienceUsers.length
                 } ${this.props.intl.formatMessage({ id: 'players' })}`;
@@ -620,7 +651,11 @@ class IndexExercise extends Component {
                     button={true}
                     divider={true}
                   >
-                    <ListItemIcon>
+                    <ListItemIcon
+                      className={
+                        audienceEnabled ? classes.enabled : classes.disabled
+                      }
+                    >
                       <GroupOutlined />
                     </ListItemIcon>
                     <ListItemText
@@ -788,4 +823,5 @@ export default R.compose(
     downloadFile,
   }),
   withStyles(styles),
-)(injectIntl(IndexExercise));
+  injectIntl,
+)(IndexExercise);
