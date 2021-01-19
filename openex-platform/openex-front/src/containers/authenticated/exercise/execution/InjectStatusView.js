@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import Theme from '../../../../components/Theme';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import { dateFormat, convertToCountdown } from '../../../../utils/Time';
@@ -20,10 +19,6 @@ i18nRegister({
 });
 
 const styles = {
-  container: {
-    color: Theme.palette.textColor,
-    padding: '20px 0px 10px 0px',
-  },
   title: {
     float: 'left',
     fontSize: '24px',
@@ -58,7 +53,7 @@ class InjectStatusView extends Component {
     const time = convertToCountdown(injectStatus.status_execution);
 
     return (
-      <div style={styles.container}>
+      <div>
         <div style={styles.title}>
           <T>{injectStatus.status_name}</T> ({time})
         </div>

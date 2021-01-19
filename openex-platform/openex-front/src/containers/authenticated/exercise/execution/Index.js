@@ -5,17 +5,31 @@ import { interval } from 'rxjs';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
-import { dateFormat, FIVE_SECONDS, timeDiff } from '../../../../utils/Time';
-import { i18nRegister } from '../../../../utils/Messages';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { withStyles } from '@material-ui/core/styles';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import {
+  EmailOutlined,
+  InputOutlined,
+  SmsOutlined,
+  ScheduleOutlined,
+  CancelOutlined,
+  DoneAllOutlined,
+} from '@material-ui/icons';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import { equalsSelector } from '../../../../utils/Selectors';
-import Theme from '../../../../components/Theme';
+import { i18nRegister } from '../../../../utils/Messages';
+import { dateFormat, FIVE_SECONDS, timeDiff } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { List } from '../../../../components/List';
-import { MainListItem } from '../../../../components/list/ListItem';
-import { Icon } from '../../../../components/Icon';
-import { LinearProgress } from '../../../../components/LinearProgress';
-import { CircularSpinner } from '../../../../components/Spinner';
 import Countdown from '../../../../components/Countdown';
 import { fetchGroups } from '../../../../actions/Group';
 import { fetchAudiences } from '../../../../actions/Audience';
@@ -44,24 +58,7 @@ i18nRegister({
   },
 });
 
-const styles = {
-  container: {
-    textAlign: 'center',
-  },
-  columnLeft: {
-    float: 'left',
-    width: '49%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  columnRight: {
-    float: 'right',
-    width: '49%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
+const styles = () => ({
   title: {
     float: 'left',
     fontSize: '13px',
@@ -98,7 +95,7 @@ const styles = {
     float: 'right',
     padding: '5px 30px 0 0',
   },
-};
+});
 
 class IndexExecution extends Component {
   constructor(props) {
@@ -126,40 +123,16 @@ class IndexExecution extends Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  selectIcon(type, color) {
+  selectIcon(type) {
     switch (type) {
       case 'openex_email':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_CONTENT_MAIL}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <EmailOutlined />;
       case 'openex_ovh_sms':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_NOTIFICATION_SMS}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <SmsOutlined />;
       case 'openex_manual':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_ACTION_INPUT}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <InputOutlined />;
       default:
-        return (
-          <Icon
-            name={Constants.ICON_NAME_CONTENT_MAIL}
-            type={Constants.ICON_TYPE_MAINLIST}
-            color={color}
-          />
-        );
+        return <InputOutlined />;
     }
   }
 
@@ -167,46 +140,16 @@ class IndexExecution extends Component {
   selectStatus(status) {
     switch (status) {
       case 'SCHEDULED':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_ACTION_SCHEDULE}
-            color={Theme.palette.primary1Color}
-          />
-        );
+        return <ScheduleOutlined />;
       case 'RUNNING':
-        return (
-          <CircularSpinner size={20} color={Theme.palette.primary1Color} />
-        );
+        return <CircularProgress size={20} color="primary" />;
       case 'FINISHED':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_ACTION_DONE_ALL}
-            color={Theme.palette.primary1Color}
-          />
-        );
+        return <DoneAllOutlined />;
       case 'CANCELED':
-        return (
-          <Icon
-            name={Constants.ICON_NAME_NAVIGATION_CANCEL}
-            color={Theme.palette.primary1Color}
-          />
-        );
+        return <CancelOutlined />;
       default:
-        return (
-          <Icon
-            name={Constants.ICON_NAME_ACTION_SCHEDULE}
-            color={Theme.palette.primary1Color}
-          />
-        );
+        return <ScheduleOutlined />;
     }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  switchColor(disabled) {
-    if (disabled) {
-      return Theme.palette.disabledColor;
-    }
-    return Theme.palette.textColor;
   }
 
   handleOpenView(inject) {
@@ -230,51 +173,34 @@ class IndexExecution extends Component {
   }
 
   render() {
-    const viewActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseView.bind(this)}
-      />,
-    ];
-    const statusActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseStatus.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     const exerciseStatus = R.propOr(
       'SCHEDULED',
       'exercise_status',
       this.props.exercise,
     );
-    const countdown = this.props.nextInject ? (
+    const countdown = this.props.nextInject && (
       <Countdown targetDate={this.props.nextInject} />
-    ) : (
-      ''
     );
+    const totalInjects = this.props.injectsPending.length + this.props.injectsProcessed.length;
+    const processedInjects = this.props.injectsProcessed.length;
+    const percent = Math.round((processedInjects * 100) / totalInjects);
     return (
-      <div style={styles.container}>
-        <div style={styles.title}>
+      <div className={classes.container}>
+        <Typography variant="h5" style={{ float: 'left' }}>
           <T>Execution</T>
-        </div>
-        {this.props.userCanUpdate ? (
+        </Typography>
+        {this.props.userCanUpdate && (
           <ExercisePopover
             exerciseId={this.props.exerciseId}
             exercise={this.props.exercise}
           />
-        ) : (
-          ''
         )}
-        <div style={styles.status}>
+        <div className={classes.status}>
           <T>{exerciseStatus}</T>
         </div>
         <div className="clearfix" />
-        <div style={styles.subtitle}>
+        <div className={classes.subtitle}>
           {dateFormat(
             R.propOr(undefined, 'exercise_start_date', this.props.exercise),
           )}
@@ -283,199 +209,190 @@ class IndexExecution extends Component {
             R.propOr(undefined, 'exercise_end_date', this.props.exercise),
           )}
         </div>
-        <div style={styles.state}>{this.selectStatus(exerciseStatus)}</div>
+        <div className={classes.state}>{this.selectStatus(exerciseStatus)}</div>
         <div className="clearfix" />
         <br />
         <LinearProgress
-          mode={
+          variant={
             this.props.injectsProcessed.length === 0
             && exerciseStatus === 'RUNNING'
               ? 'indeterminate'
               : 'determinate'
           }
-          min={0}
-          max={
-            this.props.injectsPending.length
-            + this.props.injectsProcessed.length
-          }
-          value={this.props.injectsProcessed.length}
+          value={percent}
         />
-        <br />
-        <div style={styles.columnLeft}>
-          <div style={styles.title}>
-            <T>Pending injects</T> {countdown}
-          </div>
-          <div className="clearfix" />
-          <List>
-            {this.props.injectsPending.length === 0 ? (
-              <div style={styles.empty}>
+        <Grid container={true} spacing={3} style={{ marginTop: 20 }}>
+          <Grid item={true} xs={6}>
+            <Typography variant="h6" style={{ float: 'left' }}>
+              <T>Pending injects</T> {countdown}
+            </Typography>
+            <div className="clearfix" />
+            {this.props.injectsPending.length === 0 && (
+              <div className={classes.empty}>
                 <T>You do not have any pending injects in this exercise.</T>
               </div>
-            ) : (
-              ''
             )}
-            {R.take(30, this.props.injectsPending).map((inject) => {
-              const injectId = R.propOr(Math.random(), 'inject_id', inject);
-              const injectTitle = R.propOr('-', 'inject_title', inject);
-              const injectDate = R.prop('inject_date', inject);
-              const injectType = R.propOr('-', 'inject_type', inject);
-              const injectAudiences = R.propOr([], 'inject_audiences', inject);
-              const injectSubaudiences = R.propOr(
-                [],
-                'inject_subaudiences',
-                inject,
-              );
-              const injectEnabled = R.propOr(true, 'inject_enabled', inject);
-              const injectNotSupported = !R.propOr(
-                false,
-                injectType,
-                this.props.inject_types,
-              );
-              const injectInProgress = R.path(['inject_status', 'status_name'], inject) === 'PENDING';
-              const injectIcon = injectInProgress ? (
-                <CircularSpinner
-                  size={20}
-                  type={Constants.SPINNER_TYPE_INJECT}
-                  color={Theme.palette.primary1Color}
+            <List>
+              {R.take(30, this.props.injectsPending).map((inject) => {
+                const injectId = R.propOr(Math.random(), 'inject_id', inject);
+                const injectTitle = R.propOr('-', 'inject_title', inject);
+                const injectDate = R.prop('inject_date', inject);
+                const injectType = R.propOr('-', 'inject_type', inject);
+                const injectAudiences = R.propOr(
+                  [],
+                  'inject_audiences',
+                  inject,
+                );
+                const injectSubaudiences = R.propOr(
+                  [],
+                  'inject_subaudiences',
+                  inject,
+                );
+                const injectInProgress = R.path(['inject_status', 'status_name'], inject)
+                  === 'PENDING';
+                const injectIcon = injectInProgress ? (
+                  <CircularProgress size={20} color="primary" />
+                ) : (
+                  this.selectIcon(injectType)
+                );
+                return (
+                  <ListItem
+                    key={injectId}
+                    onClick={this.handleOpenView.bind(this, inject)}
+                    divider={true}
+                    button={true}
+                  >
+                    <ListItemIcon>{injectIcon}</ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.inject_title}>
+                            {injectTitle}
+                          </div>
+                          <div className={classes.inject_date}>
+                            {dateFormat(injectDate)}
+                          </div>
+                          <div className="clearfix" />
+                        </div>
+                      }
+                    />
+                    {!injectInProgress && this.props.userCanUpdate && (
+                      <ListItemSecondaryAction>
+                        <InjectPopover
+                          exerciseId={this.props.exerciseId}
+                          eventId={inject.inject_event}
+                          incidentId={inject.inject_incident.incident_id}
+                          inject={inject}
+                          injectAudiencesIds={injectAudiences.map(
+                            (a) => a.audience_id,
+                          )}
+                          injectSubaudiencesIds={injectSubaudiences.map(
+                            (a) => a.subaudience_id,
+                          )}
+                          audiences={this.props.audiences}
+                          subaudiences={R.values(this.props.subaudiences)}
+                          inject_types={this.props.inject_types}
+                          location="run"
+                        />
+                      </ListItemSecondaryAction>
+                    )}
+                  </ListItem>
+                );
+              })}
+            </List>
+            <Dialog
+              open={this.state.openView}
+              onClose={this.handleCloseView.bind(this)}
+            >
+              <DialogTitle>
+                {R.propOr('-', 'inject_title', this.state.currentInject)}
+              </DialogTitle>
+              <DialogContent>
+                <InjectView
+                  downloadAttachment={this.downloadAttachment.bind(this)}
+                  inject={this.state.currentInject}
+                  audiences={this.props.audiences}
+                  subaudiences={this.props.subaudiences}
                 />
-              ) : (
-                this.selectIcon(
-                  injectType,
-                  this.switchColor(
-                    !injectEnabled
-                      || injectNotSupported
-                      || exerciseStatus === 'CANCELED',
-                  ),
-                )
-              );
-              return (
-                <MainListItem
-                  key={injectId}
-                  onClick={this.handleOpenView.bind(this, inject)}
-                  primaryText={
-                    <div>
-                      <div style={styles.inject_title}>
-                        <span
-                          style={{
-                            color: this.switchColor(
-                              !injectEnabled
-                                || injectNotSupported
-                                || exerciseStatus === 'CANCELED',
-                            ),
-                          }}
-                        >
-                          {injectTitle}
-                        </span>
-                      </div>
-                      <div style={styles.inject_date}>
-                        <span
-                          style={{
-                            color: this.switchColor(
-                              !injectEnabled
-                                || injectNotSupported
-                                || exerciseStatus === 'CANCELED',
-                            ),
-                          }}
-                        >
-                          {dateFormat(injectDate)}
-                        </span>
-                      </div>
-                      <div className="clearfix" />
-                    </div>
-                  }
-                  leftIcon={injectIcon}
-                  rightIconButton={
-                    !injectInProgress && this.props.userCanUpdate ? (
-                      <InjectPopover
-                        type={Constants.INJECT_EXEC}
-                        exerciseId={this.props.exerciseId}
-                        eventId={inject.inject_event}
-                        incidentId={inject.inject_incident.incident_id}
-                        inject={inject}
-                        injectAudiencesIds={injectAudiences.map(
-                          (a) => a.audience_id,
-                        )}
-                        injectSubaudiencesIds={injectSubaudiences.map(
-                          (a) => a.subaudience_id,
-                        )}
-                        audiences={this.props.audiences}
-                        subaudiences={R.values(this.props.subaudiences)}
-                        inject_types={this.props.inject_types}
-                        location="run"
-                      />
-                    ) : null
-                  }
-                />
-              );
-            })}
-          </List>
-          <Dialog
-            title={R.propOr('-', 'inject_title', this.state.currentInject)}
-            modal={false}
-            open={this.state.openView}
-            autoScrollBodyContent={true}
-            onClose={this.handleCloseView.bind(this)}
-            actions={viewActions}
-          >
-            <InjectView
-              downloadAttachment={this.downloadAttachment.bind(this)}
-              inject={this.state.currentInject}
-              audiences={this.props.audiences}
-              subaudiences={this.props.subaudiences}
-            />
-          </Dialog>
-        </div>
-        <div style={styles.columnRight}>
-          <div style={styles.title}>
-            <T>Processed injects</T>
-          </div>
-          <div className="clearfix"></div>
-          <List>
-            {this.props.injectsProcessed.length === 0 ? (
-              <div style={styles.empty}>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseView.bind(this)}
+                >
+                  <T>Close</T>
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Grid>
+          <Grid item={true} xs={6}>
+            <Typography variant="h6" style={{ float: 'left' }}>
+              <T>Processed injects</T>
+            </Typography>
+            <div className="clearfix" />
+            {this.props.injectsProcessed.length === 0 && (
+              <div className={classes.empty}>
                 <T>You do not have any processed injects in this exercise.</T>
               </div>
-            ) : (
-              ''
             )}
-            {R.take(30, this.props.injectsProcessed).map((inject) => {
-              let color = '#4CAF50';
-              if (inject.inject_status.status_name === 'ERROR') {
-                color = '#F44336';
-              } else if (inject.inject_status.status_name === 'PARTIAL') {
-                color = '#FF5722';
-              }
-              return (
-                <MainListItem
-                  key={inject.inject_id}
-                  onClick={this.handleOpenStatus.bind(this, inject)}
-                  primaryText={
-                    <div>
-                      <div style={styles.inject_title}>
-                        {inject.inject_title}
-                      </div>
-                      <div style={styles.inject_date}>
-                        {dateFormat(inject.inject_date)}
-                      </div>
-                      <div className="clearfix" />
-                    </div>
-                  }
-                  leftIcon={this.selectIcon(inject.inject_type, color)}
-                />
-              );
-            })}
-          </List>
-          <Dialog
-            title="Status"
-            modal={false}
-            open={this.state.openStatus}
-            autoScrollBodyContent={true}
-            onClose={this.handleCloseStatus.bind(this)}
-            actions={statusActions}
-          >
-            <InjectStatusView inject={this.state.currentStatus} />
-          </Dialog>
-        </div>
+            <List>
+              {R.take(30, this.props.injectsProcessed).map((inject) => {
+                let color = '#4CAF50';
+                if (inject.inject_status.status_name === 'ERROR') {
+                  color = '#F44336';
+                } else if (inject.inject_status.status_name === 'PARTIAL') {
+                  color = '#FF5722';
+                }
+                return (
+                  <ListItem
+                    key={inject.inject_id}
+                    divider={true}
+                    button={true}
+                    onClick={this.handleOpenStatus.bind(this, inject)}
+                  >
+                    <ListItemIcon style={{ color }}>
+                      {this.selectIcon(inject.inject_type)}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div className={classes.inject_title}>
+                            {inject.inject_title}
+                          </div>
+                          <div className={classes.inject_date}>
+                            {dateFormat(inject.inject_date)}
+                          </div>
+                          <div className="clearfix" />
+                        </div>
+                      }
+                    />
+                  </ListItem>
+                );
+              })}
+            </List>
+            <Dialog
+              open={this.state.openStatus}
+              onClose={this.handleCloseStatus.bind(this)}
+              fullWidth={true}
+              maxWidth="md"
+            >
+              <DialogTitle>
+                <T>Status</T>
+              </DialogTitle>
+              <DialogContent>
+                <InjectStatusView inject={this.state.currentStatus} />
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseStatus.bind(this)}
+                >
+                  <T>Close</T>
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Grid>
+        </Grid>
       </div>
     );
   }
@@ -585,7 +502,7 @@ const checkUserCanUpdate = (state, ownProps) => {
 
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
-  exerciseId: (state, ownProps) => ownProps.exerciseId,
+  exerciseId: (state, ownProps) => ownProps.id,
   exercise: exerciseSelector,
   injectsPending: filterInjectsPending,
   nextInject: nextInjectToExecute,
@@ -596,11 +513,14 @@ const select = () => equalsSelector({
   inject_types: (state) => state.referential.entities.inject_types,
 });
 
-export default connect(select, {
-  fetchGroups,
-  fetchAudiences,
-  fetchSubaudiences,
-  fetchAllInjects,
-  fetchInjectTypes,
-  downloadFile,
-})(IndexExecution);
+export default R.compose(
+  connect(select, {
+    fetchGroups,
+    fetchAudiences,
+    fetchSubaudiences,
+    fetchAllInjects,
+    fetchInjectTypes,
+    downloadFile,
+  }),
+  withStyles(styles),
+)(IndexExecution);

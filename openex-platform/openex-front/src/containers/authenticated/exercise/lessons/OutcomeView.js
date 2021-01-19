@@ -27,7 +27,6 @@ class OutcomeView extends Component {
       ['incident_outcome', 'outcome_comment'],
       this.props.incident,
     );
-
     return (
       <div style={styles.container}>
         <div style={styles.title}>{outcomeResult}</div>

@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import { Route, Switch, withRouter } from 'react-router';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
+import Chip from '@material-ui/core/Chip';
 import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import { DescriptionOutlined } from '@material-ui/icons';
@@ -15,6 +16,7 @@ import {
 } from '../../../actions/Application';
 import LeftBar from './nav/LeftBar';
 import { fetchExercise } from '../../../actions/Exercise';
+import { T } from '../../../components/I18n';
 import IndexExercise from './Index';
 import IndexExerciseExecution from './execution/Index';
 import IndexExerciseLessons from './lessons/Index';
@@ -47,6 +49,10 @@ const styles = (theme) => ({
     fontSize: 25,
     marginLeft: 20,
   },
+  status: {
+    fontSize: 25,
+    marginLeft: 20,
+  },
   toolbar: theme.mixins.toolbar,
   documents: {
     color: '#ffffff',
@@ -71,6 +77,15 @@ class RootExercise extends Component {
 
   render() {
     const { classes, id, exercise } = this.props;
+    const status = R.propOr('SCHEDULED', 'exercise_status', exercise);
+    let color = '#009688';
+    if (status === 'FINISHED') {
+      color = '#388e3c';
+    } else if (status === 'RUNNING') {
+      color = '#ff5722';
+    } else if (status === 'CANCELED') {
+      color = '#607d8b';
+    }
     return (
       <div>
         <LeftBar
@@ -93,6 +108,13 @@ class RootExercise extends Component {
             <div className={classes.title}>
               {R.propOr('', 'exercise_name', exercise)}
             </div>
+            <Chip
+              style={{ marginLeft: 20, backgroundColor: color, color: '#ffffff' }}
+              variant="outlined"
+              label={
+                <T>{R.propOr('SCHEDULED', 'exercise_status', exercise)}</T>
+              }
+            />
             <IconButton
               component={Link}
               to="/private/documents"

@@ -3,30 +3,31 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Icon } from '../../../../components/Icon';
-import {
-  MenuItemButton,
-  MenuItemLink,
-} from '../../../../components/menu/MenuItem';
-/* eslint-disable */
-import { updateExercise } from "../../../../actions/Exercise";
-import { addDryrun } from "../../../../actions/Dryrun";
-import { redirectToDryrun } from "../../../../actions/Application";
-/* eslint-enable */
+import { updateExercise } from '../../../../actions/Exercise';
+import { addDryrun } from '../../../../actions/Dryrun';
+import { redirectToDryrun } from '../../../../actions/Application';
 import DryrunForm from '../check/dryrun/DryrunForm';
+import { submitForm } from '../../../../utils/Action';
 
-const style = {
-  float: 'left',
-  marginTop: '-14px',
-};
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 i18nRegister({
   fr: {
@@ -57,7 +58,6 @@ class ExercisePopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation();
     this.setState({ anchorEl: event.currentTarget });
   }
 
@@ -112,11 +112,8 @@ class ExercisePopover extends Component {
     });
   }
 
-  submitFormDryrun() {
-    this.refs.dryrunForm.submit();
-  }
-
   render() {
+    const { classes } = this.props;
     const exerciseDisabled = R.propOr(
       false,
       'exercise_canceled',
@@ -127,122 +124,117 @@ class ExercisePopover extends Component {
       'user_can_update',
       this.props.exercise,
     );
-
-    const disableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDisable.bind(this)}
-      />,
-      exerciseIsUpdatable ? (
-        <Button
-          key="disable"
-          label="Disable"
-          primary={true}
-          onClick={this.submitDisable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const enableActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEnable.bind(this)}
-      />,
-      exerciseIsUpdatable ? (
-        <Button
-          key="enable"
-          label="Enable"
-          primary={true}
-          onClick={this.submitEnable.bind(this)}
-        />
-      ) : (
-        ''
-      ),
-    ];
-    const dryrunActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseDryrun.bind(this)}
-      />,
-      <Button
-        key="launch"
-        label="Launch"
-        primary={true}
-        onClick={this.submitFormDryrun.bind(this)}
-      />,
-    ];
-
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </IconButton>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onClose={this.handlePopoverClose.bind(this)}
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Launch a dryrun"
-              onClick={this.handleOpenDryrun.bind(this)}
-            />
-            {/* eslint-disable-next-line no-nested-ternary */}
-            {exerciseIsUpdatable ? (
-              exerciseDisabled ? (
-                <MenuItemButton
-                  label="Enable"
-                  onClick={this.handleOpenEnable.bind(this)}
-                />
-              ) : (
-                <MenuItemButton
-                  label="Disable"
-                  onClick={this.handleOpenDisable.bind(this)}
-                />
-              )
-            ) : (
-              ''
-            )}
-          </Menu>
-        </Popover>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.handleOpenDryrun.bind(this)}>
+            <T>Launch a dryrun</T>
+          </MenuItem>
+          {exerciseDisabled ? (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={!exerciseIsUpdatable}
+            >
+              <T>Enable</T>
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={!exerciseIsUpdatable}
+            >
+              <T>Disable</T>
+            </MenuItem>
+          )}
+        </Menu>
         <Dialog
-          title="Confirmation"
-          modal={false}
           open={this.state.openDisable}
           onClose={this.handleCloseDisable.bind(this)}
-          actions={disableActions}
+          TransitionComponent={Transition}
         >
-          <T>Do you want to disable this exercise?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to disable this exercise?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              <T>Disable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Confirmation"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openEnable}
           onClose={this.handleCloseEnable.bind(this)}
-          actions={enableActions}
         >
-          <T>Do you want to enable this exercise?</T>
+          <DialogContent>
+            <DialogContentText>
+              <T>Do you want to enable this exercise?</T>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              <T>Enable</T>
+            </Button>
+          </DialogActions>
         </Dialog>
         <Dialog
-          title="Launch a dryrun"
-          modal={false}
           open={this.state.openDryrun}
+          TransitionComponent={Transition}
           onClose={this.handleCloseDryrun.bind(this)}
-          actions={dryrunActions}
         >
-          {/* eslint-disable */}
-          <DryrunForm
-            ref="dryrunForm"
-            onSubmit={this.onSubmitDryrun.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Launch a dryrun</T>
+          </DialogTitle>
+          <DialogContent>
+            <DryrunForm onSubmit={this.onSubmitDryrun.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseDryrun.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('dryrunForm')}
+            >
+              <T>Launch</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -257,6 +249,7 @@ ExercisePopover.propTypes = {
   redirectToDryrun: PropTypes.func,
 };
 
-export default connect(null, { updateExercise, addDryrun, redirectToDryrun })(
-  ExercisePopover,
-);
+export default R.compose(
+  connect(null, { updateExercise, addDryrun, redirectToDryrun }),
+  withStyles(styles),
+)(ExercisePopover);

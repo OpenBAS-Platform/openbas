@@ -3,28 +3,31 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Slide from '@material-ui/core/Slide';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Icon } from '../../../../components/Icon';
-import { MenuItemLink } from '../../../../components/menu/MenuItem';
 import { updateOutcome } from '../../../../actions/Outcome';
 import OutcomeForm from './OutcomeForm';
-
-const style = {
-  position: 'absolute',
-  top: '7px',
-  right: 0,
-};
+import { T } from '../../../../components/I18n';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
     'Update the outcome': 'Modifier le résultat',
   },
 });
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class IncidentPopover extends Component {
   constructor(props) {
@@ -36,11 +39,7 @@ class IncidentPopover extends Component {
   }
 
   handlePopoverOpen(event) {
-    event.stopPropagation();
-    this.setState({
-      openPopover: true,
-      anchorEl: event.currentTarget,
-    });
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handlePopoverClose() {
@@ -57,35 +56,18 @@ class IncidentPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateOutcome(
-      this.props.exerciseId,
-      this.props.incident.incident_event.event_id,
-      this.props.incident.incident_id,
-      this.props.incident.incident_outcome.outcome_id,
-      data,
-    );
-  }
-
-  submitFormEdit() {
-    this.refs.outcomeForm.submit();
+    return this.props
+      .updateOutcome(
+        this.props.exerciseId,
+        this.props.incident.incident_event.event_id,
+        this.props.incident.incident_id,
+        this.props.incident.incident_outcome.outcome_id,
+        data,
+      )
+      .then(() => this.handleCloseEdit());
   }
 
   render() {
-    const editActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseEdit.bind(this)}
-      />,
-      <Button
-        key="update"
-        label="Update"
-        primary={true}
-        onClick={this.submitFormEdit.bind(this)}
-      />,
-    ];
-
     const initialValues = R.pick(
       ['outcome_result', 'outcome_comment'],
       this.props.incident.incident_outcome,
@@ -96,46 +78,58 @@ class IncidentPopover extends Component {
       this.props.incident,
     );
     return (
-      <div style={style}>
+      <div>
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
-          type={Constants.BUTTON_TYPE_MAINLIST2}
+          aria-haspopup="true"
         >
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
+          <MoreVert />
         </IconButton>
-
-        {incidentIsUpdatable ? (
-          <Popover
-            open={this.state.openPopover}
-            anchorEl={this.state.anchorEl}
-            onClose={this.handlePopoverClose.bind(this)}
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={!incidentIsUpdatable}
           >
-            <Menu multiple={false}>
-              <MenuItemLink
-                label="Edit"
-                onClick={this.handleOpenEdit.bind(this)}
-              />
-            </Menu>
-          </Popover>
-        ) : (
-          ''
-        )}
-
+            <T>Edit</T>
+          </MenuItem>
+        </Menu>
         <Dialog
-          title="Update the outcome"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
-          actions={editActions}
+          fullWidth={true}
+          maxWidth="md"
         >
-          {/* eslint-disable */}
-          <OutcomeForm
-            ref="outcomeForm"
-            initialValues={initialValues}
-            onSubmit={this.onSubmitEdit.bind(this)}
-            onSubmitSuccess={this.handleCloseEdit.bind(this)}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Update the outcome</T>
+          </DialogTitle>
+          <DialogContent>
+            <OutcomeForm
+              initialValues={initialValues}
+              onSubmit={this.onSubmitEdit.bind(this)}
+              onSubmitSuccess={this.handleCloseEdit.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseEdit.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('outcomeForm')}
+            >
+              <T>Update</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

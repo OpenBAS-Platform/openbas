@@ -36,23 +36,6 @@ i18nRegister({
 });
 
 const styles = () => ({
-  container: {
-    textAlign: 'center',
-  },
-  columnLeft: {
-    float: 'left',
-    width: '48%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  columnRight: {
-    float: 'right',
-    width: '48%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
   headtitle: {
     fontWeight: '600',
     fontSize: '18px',
@@ -294,7 +277,6 @@ const select = (state, ownProps) => {
     exerciseId,
   );
   const userCanUpdate = checkUserCanUpdate(state, ownProps);
-
   return {
     exerciseId,
     userCanUpdate,

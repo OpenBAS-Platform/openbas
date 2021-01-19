@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
+import { interval } from 'rxjs';
 import { injectIntl } from 'react-intl';
 import countdown from 'countdown';
 import { T } from './I18n';
-import { dateFromNow, now, parse } from '../utils/Time';
-import * as Constants from '../constants/ComponentTypes';
+import {
+  dateFromNow, now, ONE_SECOND, parse,
+} from '../utils/Time';
 import { i18nRegister } from '../utils/Messages';
+
+const interval$ = interval(ONE_SECOND);
 
 i18nRegister({
   fr: {
@@ -14,13 +18,6 @@ i18nRegister({
     'in progress': 'en cours',
   },
 });
-
-const styles = {
-  [Constants.COUNTDOWN_TITLE]: {
-    float: 'left',
-    margin: '0px 0px 0px 0px',
-  },
-};
 
 class Countdown extends Component {
   translate(text) {
@@ -34,19 +31,25 @@ class Countdown extends Component {
     countdown.setLabels(options, options, ', ', ', ', this.translate('now'));
   }
 
+  componentDidMount() {
+    this.subscription = interval$.subscribe(() => {
+      this.setState({ startDate: now() });
+    });
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+  }
+
   render() {
     if (now().isAfter(parse(this.props.targetDate))) {
       return (
-        <span style={styles[this.props.type]}>
+        <span>
           (<T>in progress</T>)
         </span>
       );
     }
-    return (
-      <span style={styles[this.props.type]}>
-        ({dateFromNow(this.props.targetDate)})
-      </span>
-    );
+    return <span>({dateFromNow(this.props.targetDate)})</span>;
   }
 }
 

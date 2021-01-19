@@ -1,22 +1,35 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Slide from '@material-ui/core/Slide';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { Popover } from '../../../../components/Popover';
-import { Menu } from '../../../../components/Menu';
-import { Icon } from '../../../../components/Icon';
-import { MenuItemLink } from '../../../../components/menu/MenuItem';
 import { addLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
+import { T } from '../../../../components/I18n';
+import { submitForm } from '../../../../utils/Action';
 
-const style = {
-  float: 'left',
-  marginTop: '-14px',
-};
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 i18nRegister({
   fr: {
@@ -55,58 +68,59 @@ class LogsPopover extends Component {
   }
 
   onSubmitCreate(data) {
-    return this.props.addLog(this.props.exerciseId, data);
-  }
-
-  submitFormCreate() {
-    this.refs.logForm.submit();
+    return this.props
+      .addLog(this.props.exerciseId, data)
+      .then(() => this.handleCloseCreate());
   }
 
   render() {
-    const createActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCloseCreate.bind(this)}
-      />,
-      <Button
-        key="create"
-        label="Create"
-        primary={true}
-        onClick={this.submitFormCreate.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </IconButton>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onClose={this.handlePopoverClose.bind(this)}
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Add an entry"
-              onClick={this.handleOpenCreate.bind(this)}
-            />
-          </Menu>
-        </Popover>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.handleOpenCreate.bind(this)}>
+            <T>Add an entry</T>
+          </MenuItem>
+        </Menu>
         <Dialog
-          title="Add an entry"
-          modal={false}
+          TransitionComponent={Transition}
           open={this.state.openCreate}
           onClose={this.handleCloseCreate.bind(this)}
-          actions={createActions}
+          fullWidth={true}
+          maxWidth="md"
         >
-          <LogForm
-            ref="logForm"
-            onSubmit={this.onSubmitCreate.bind(this)}
-            onSubmitSuccess={this.handleCloseCreate.bind(this)}
-          />
+          <DialogTitle>
+            <T>Add an entry</T>
+          </DialogTitle>
+          <DialogContent>
+            <LogForm onSubmit={this.onSubmitCreate.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCloseCreate.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => submitForm('logForm')}
+            >
+              <T>Create</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -118,4 +132,7 @@ LogsPopover.propTypes = {
   addLog: PropTypes.func,
 };
 
-export default connect(null, { addLog })(LogsPopover);
+export default R.compose(
+  connect(null, { addLog }),
+  withStyles(styles),
+)(LogsPopover);

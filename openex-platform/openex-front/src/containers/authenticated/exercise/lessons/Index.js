@@ -5,14 +5,22 @@ import * as R from 'ramda';
 import { interval } from 'rxjs';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { LayersOutlined, DescriptionOutlined } from '@material-ui/icons';
 import { dateFormat, FIVE_SECONDS } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import * as Constants from '../../../../constants/ComponentTypes';
-import { List } from '../../../../components/List';
-import { MainListItem } from '../../../../components/list/ListItem';
-import { Icon } from '../../../../components/Icon';
-import { LinearProgress } from '../../../../components/LinearProgress';
 import { fetchIncidents } from '../../../../actions/Incident';
 import { fetchLogs } from '../../../../actions/Log';
 import { fetchGroups } from '../../../../actions/Group';
@@ -39,24 +47,7 @@ i18nRegister({
   },
 });
 
-const styles = {
-  container: {
-    textAlign: 'center',
-  },
-  columnLeft: {
-    float: 'left',
-    width: '48%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
-  columnRight: {
-    float: 'right',
-    width: '48%',
-    margin: 0,
-    padding: 0,
-    textAlign: 'left',
-  },
+const styles = () => ({
   headtitle: {
     fontWeight: '600',
     fontSize: '18px',
@@ -81,11 +72,9 @@ const styles = {
     padding: '5px 0px 0px 0px',
   },
   incident_result: {
-    position: 'absolute',
     width: '140px',
-    right: '45px',
-    top: '30px',
     fontSize: '14px',
+    marginRight: 50,
   },
   log_date: {
     position: 'absolute',
@@ -98,7 +87,7 @@ const styles = {
     padding: '0px 35px 0px 0px',
     textAlign: 'justify',
   },
-};
+});
 
 class IndexExerciseLessons extends Component {
   constructor(props) {
@@ -140,152 +129,149 @@ class IndexExerciseLessons extends Component {
   }
 
   render() {
-    const outcomeActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseOutcome.bind(this)}
-      />,
-    ];
-    const logActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleCloseLog.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
-      <div style={styles.container}>
-        <div style={styles.columnLeft}>
-          <div style={styles.title}>
-            <T>Incidents outcomes</T>
-          </div>
-          <div className="clearfix" />
-          {this.props.incidents.length === 0 ? (
-            <div style={styles.empty}>
-              <T>You do not have any incidents in this exercise.</T>
-            </div>
-          ) : (
-            ''
-          )}
-          <List>
-            {this.props.incidents.map((incident) => (
-              <MainListItem
-                key={incident.incident_id}
-                onClick={this.handleOpenOutcome.bind(this, incident)}
-                rightIconButton={
-                  <IncidentPopover
-                    exerciseId={this.props.exerciseId}
-                    incident={incident}
+      <div className={classes.container}>
+        <Grid container={true} spacing={3}>
+          <Grid item={true} xs={6}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              <T>Incidents outcomes</T>
+            </Typography>
+            <div className="clearfix" style={{ marginBottom: 3 }} />
+            {this.props.incidents.length === 0 && (
+              <div className={classes.empty}>
+                <T>You do not have any incidents in this exercise.</T>
+              </div>
+            )}
+            <List>
+              {this.props.incidents.map((incident) => (
+                <ListItem
+                  key={incident.incident_id}
+                  button={true}
+                  divider={true}
+                  onClick={this.handleOpenOutcome.bind(this, incident)}
+                >
+                  <ListItemIcon>
+                    <LayersOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <div>
+                        <div className={classes.log_title}>
+                          {incident.incident_title}
+                        </div>
+                        <div className="clearfix" />
+                      </div>
+                    }
+                    secondary={
+                      <div className={classes.log_content}>
+                        {incident.incident_outcome.outcome_comment === null ? (
+                          <i>
+                            <T>No comment for this incident.</T>
+                          </i>
+                        ) : (
+                          <i>{incident.incident_outcome.outcome_comment}</i>
+                        )}
+                      </div>
+                    }
                   />
-                }
-                primaryText={
-                  <div>
-                    <div style={styles.log_title}>
-                      {incident.incident_title}
-                    </div>
-                    <div style={styles.incident_result}>
-                      <LinearProgress
-                        mode="determinate"
-                        min={0}
-                        max={100}
-                        value={incident.incident_outcome.outcome_result}
-                      />
-                    </div>
-                    <div className="clearfix" />
+                  <div className={classes.incident_result}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={incident.incident_outcome.outcome_result}
+                    />
                   </div>
-                }
-                secondaryText={
-                  <div style={styles.log_content}>
-                    {incident.incident_outcome.outcome_comment === null ? (
-                      <i>
-                        <T>No comment for this incident.</T>
-                      </i>
-                    ) : (
-                      <i>{incident.incident_outcome.outcome_comment}</i>
-                    )}
-                  </div>
-                }
-                leftIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_MAPS_LAYERS}
-                    type={Constants.ICON_TYPE_MAINLIST2}
+                  <ListItemSecondaryAction>
+                    <IncidentPopover
+                      exerciseId={this.props.exerciseId}
+                      incident={incident}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+            <Dialog
+              open={this.state.openOutcome}
+              onClose={this.handleCloseOutcome.bind(this)}
+              fullWidth={true}
+              maxWidth="md"
+            >
+              <DialogTitle>
+                <T>Outcome view</T>
+              </DialogTitle>
+              <DialogContent>
+                <OutcomeView incident={this.state.currentIncident} />
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseOutcome.bind(this)}
+                >
+                  <T>Close</T>
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Grid>
+          <Grid item={true} xs={6}>
+            <Typography variant="h5" style={{ float: 'left' }}>
+              <T>Exercise log</T>
+            </Typography>
+            {this.props.userCanUpdate && (
+              <LogsPopover exerciseId={this.props.exerciseId} />
+            )}
+            <div className="clearfix" />
+            {this.props.logs.length === 0 && (
+              <div className={classes.empty}>
+                <T>You do not have any entries in the exercise log.</T>
+              </div>
+            )}
+            <List>
+              {this.props.logs.map((log) => (
+                <ListItem
+                  key={log.log_id}
+                  onClick={this.handleOpenLog.bind(this, log)}
+                  divider={true}
+                  button={true}
+                >
+                  <ListItemIcon>
+                    <DescriptionOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={log.log_title}
+                    secondary={log.log_content}
                   />
-                }
-              />
-            ))}
-          </List>
-          <Dialog
-            title="Outcome view"
-            modal={false}
-            open={this.state.openOutcome}
-            autoScrollBodyContent={true}
-            onClose={this.handleCloseOutcome.bind(this)}
-            actions={outcomeActions}
-          >
-            <OutcomeView incident={this.state.currentIncident} />
-          </Dialog>
-        </div>
-        <div style={styles.columnRight}>
-          <div style={styles.title}>
-            <T>Exercise log</T>
-          </div>
-          {this.props.userCanUpdate ? (
-            <LogsPopover exerciseId={this.props.exerciseId} />
-          ) : (
-            ''
-          )}
-          <div className="clearfix" />
-          {this.props.logs.length === 0 ? (
-            <div style={styles.empty}>
-              <T>You do not have any entries in the exercise log.</T>
-            </div>
-          ) : (
-            ''
-          )}
-          <List>
-            {this.props.logs.map((log) => (
-              <MainListItem
-                key={log.log_id}
-                onClick={this.handleOpenLog.bind(this, log)}
-                rightIconButton={
-                  <LogPopover exerciseId={this.props.exerciseId} log={log} />
-                }
-                primaryText={
-                  <div>
-                    <div style={styles.log_title}>{log.log_title}</div>
-                    <div style={styles.log_date}>
-                      {dateFormat(log.log_date)}
-                    </div>
-                    <div className="clearfix" />
+                  <div className={classes.log_date}>
+                    {dateFormat(log.log_date)}
                   </div>
-                }
-                secondaryText={
-                  <div style={styles.log_content}>{log.log_content}</div>
-                }
-                leftIcon={
-                  <Icon
-                    name={Constants.ICON_NAME_ACTION_DESCRIPTION}
-                    type={Constants.ICON_TYPE_MAINLIST2}
-                  />
-                }
-              />
-            ))}
-          </List>
-          <Dialog
-            title="Log view"
-            modal={false}
-            open={this.state.openLog}
-            autoScrollBodyContent={true}
-            onClose={this.handleCloseLog.bind(this)}
-            actions={logActions}
-          >
-            <LogView log={this.state.currentLog} />
-          </Dialog>
-        </div>
+                  <ListItemSecondaryAction>
+                    <LogPopover exerciseId={this.props.exerciseId} log={log} />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+            <Dialog
+              open={this.state.openLog}
+              onClose={this.handleCloseLog.bind(this)}
+              fullWidth={true}
+              maxWidth="md"
+            >
+              <DialogTitle>
+                <T>Log view</T>
+              </DialogTitle>
+              <DialogContent>
+                <LogView log={this.state.currentLog} />
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  variant="outlined"
+                  onClick={this.handleCloseLog.bind(this)}
+                >
+                  <T>Close</T>
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Grid>
+        </Grid>
       </div>
     );
   }
@@ -363,15 +349,18 @@ const checkUserCanUpdate = (state, ownProps) => {
 
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
-  exerciseId: (state, ownProps) => ownProps.exerciseId,
+  exerciseId: (state, ownProps) => ownProps.id,
   logs: filterLogs,
   userCanUpdate: checkUserCanUpdate,
   incidents: filterIncidents,
   exercise_status: exerciseStatusSelector,
 });
 
-export default connect(select, {
-  fetchGroups,
-  fetchLogs,
-  fetchIncidents,
-})(IndexExerciseLessons);
+export default R.compose(
+  connect(select, {
+    fetchGroups,
+    fetchLogs,
+    fetchIncidents,
+  }),
+  withStyles(styles),
+)(IndexExerciseLessons);

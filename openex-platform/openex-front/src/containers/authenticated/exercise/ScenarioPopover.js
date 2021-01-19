@@ -5,39 +5,41 @@ import * as R from 'ramda';
 import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Slide from '@material-ui/core/Slide';
 import Timeline from '../../../components/Timeline';
 import { timeDiff } from '../../../utils/Time';
 import { i18nRegister } from '../../../utils/Messages';
-import * as Constants from '../../../constants/ComponentTypes';
-import { Popover } from '../../../components/Popover';
-import { Menu } from '../../../components/Menu';
-import { Icon } from '../../../components/Icon';
-import { MenuItemLink } from '../../../components/menu/MenuItem';
 import {
+  changeDurationExercise,
   downloadExportInjects,
   shiftAllInjects,
   simulateChangeDurationExercise,
-  changeDurationExercise,
 } from '../../../actions/Inject';
 import ShiftForm from './ShiftForm';
 import InjectTable from '../../../components/InjectTable';
 import { T } from '../../../components/I18n';
 import { fetchExercise } from '../../../actions/Exercise';
 import {
-  START_TIME_OF_DAY,
   END_TIME_OF_DAY,
+  START_TIME_OF_DAY,
 } from '../../../constants/ComponentTypes';
-import Theme from '../../../components/Theme';
 import { redirectToHome } from '../../../actions/Application';
+import { submitForm } from '../../../utils/Action';
 
-const style = {
-  float: 'left',
-  marginTop: '-14px',
-};
-
-const styles = {
+const styles = (theme) => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
   hidden: {
     display: 'none',
   },
@@ -48,7 +50,7 @@ const styles = {
     marginTop: '10px',
     padding: '10px',
     border: '1px solid',
-    borderColor: Theme.palette.borderColor,
+    borderColor: theme.palette.borderColor,
     borderRadius: '5px',
     fontSize: '14px',
   },
@@ -68,7 +70,7 @@ const styles = {
   useCloseHoursText: {
     marginTop: '10px',
     marginLeft: '25px',
-    color: Theme.palette.primary2Color,
+    color: theme.palette.secondary.main,
     fontStyle: 'italic',
     fontSize: '12px',
   },
@@ -104,7 +106,7 @@ const styles = {
       margin: '0px 15px',
     },
   },
-};
+});
 
 i18nRegister({
   fr: {
@@ -139,6 +141,11 @@ i18nRegister({
     'Exercise estimated duration: ': "Durée estimée de l'exercice : ",
   },
 });
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 class ScenarioPopover extends Component {
   constructor(props) {
@@ -302,19 +309,16 @@ class ScenarioPopover extends Component {
   }
 
   onSubmitShift(data) {
-    const firstInjectDate = R.pipe(
+    // eslint-disable-next-line no-param-reassign
+    data.old_date = R.pipe(
       R.values,
       R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
       R.head,
       R.prop('inject_date'),
     )(this.props.injects);
-    // eslint-disable-next-line no-param-reassign
-    data.old_date = firstInjectDate;
-    return this.props.shiftAllInjects(this.props.exerciseId, data);
-  }
-
-  submitFormShift() {
-    this.refs.shiftForm.submit();
+    return this.props
+      .shiftAllInjects(this.props.exerciseId, data)
+      .then(() => this.handleCloseShift());
   }
 
   submitFormResumeChangeDuration() {
@@ -379,7 +383,6 @@ class ScenarioPopover extends Component {
                 return injectA.ts < injectB.ts ? -1 : 1;
               });
             });
-
             this.setState({
               exerciseEndDateSimulate,
               exerciseDurationSimulate,
@@ -397,138 +400,109 @@ class ScenarioPopover extends Component {
   }
 
   render() {
-    const shiftActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCancelShift.bind(this)}
-      />,
-      <Button
-        key="shift"
-        label="Shift"
-        primary={true}
-        onClick={this.submitFormShift.bind(this)}
-      />,
-    ];
-    const changeActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCancelChangeDuration.bind(this)}
-      />,
-      <Button
-        key="change"
-        label="Simulate"
-        primary={true}
-        onClick={this.submitFormChangeDuration.bind(this)}
-      />,
-    ];
-    const resumeChangeDurationActions = [
-      <Button
-        key="cancel"
-        label="Cancel"
-        primary={true}
-        onClick={this.handleCancelResumeChangeDuration.bind(this)}
-      />,
-      <Button
-        key="change"
-        label="Modify"
-        primary={true}
-        onClick={this.submitFormResumeChangeDuration.bind(this)}
-      />,
-    ];
-    const abstractShiftActions = [
-      <Button
-        key="close"
-        label="Close"
-        primary={true}
-        onClick={this.handleAbstractCloseShift.bind(this)}
-      />,
-    ];
-
+    const { classes } = this.props;
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+        >
+          <MoreVert />
         </IconButton>
-        <Popover
-          open={this.state.openPopover}
+        <Menu
           anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
           onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Export injects to XLS"
-              onClick={this.handleDownloadInjects.bind(this)}
-            />
-            {this.props.userCanUpdate ? (
-              <MenuItemLink
-                label="Shift all injects"
-                onClick={this.handleOpenShift.bind(this)}
-              />
-            ) : (
-              ''
-            )}
-            {this.props.userCanUpdate ? (
-              <MenuItemLink
-                label="Change the duration of the exercise"
-                onClick={this.handleOpenChangeDuration.bind(this)}
-              />
-            ) : (
-              ''
-            )}
-          </Menu>
-        </Popover>
-
+          <MenuItem onClick={this.handleDownloadInjects.bind(this)}>
+            <T>Export injects to XLS</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenShift.bind(this)}
+            disabled={!this.props.userCanUpdate}
+          >
+            <T>Shift all injects</T>
+          </MenuItem>
+          <MenuItem
+            onClick={this.handleOpenChangeDuration.bind(this)}
+            disabled={!this.props.userCanUpdate}
+          >
+            <T>Change the duration of the exercise</T>
+          </MenuItem>
+        </Menu>
         <Dialog
-          title="Shift all injects"
-          modal={false}
           open={this.state.openShift}
+          TransitionComponent={Transition}
+          maxWidth="md"
+          fullWidth={true}
           onClose={this.handleCancelShift.bind(this)}
-          actions={shiftActions}
         >
-          {/* eslint-disable */}
-          <ShiftForm
-            ref="shiftForm"
-            onSubmitSuccess={this.handleCloseShift.bind(this)}
-            onSubmit={this.onSubmitShift.bind(this)}
-            injects={this.props.injects}
-          />
-          {/* eslint-enable */}
+          <DialogTitle>
+            <T>Shift all injects</T>
+          </DialogTitle>
+          <DialogContent>
+            <ShiftForm
+              onSubmit={this.onSubmitShift.bind(this)}
+              injects={this.props.injects}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCancelShift.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => submitForm('shiftForm')}
+            >
+              <T>Shift</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
         <Dialog
-          title="Abstract shift all injects"
-          modal={true}
           open={this.state.openAbstractShift}
+          TransitionComponent={Transition}
           onClose={this.handleAbstractCloseShift.bind(this)}
-          actions={abstractShiftActions}
         >
-          <InjectTable injects={this.props.injects} />
+          <DialogTitle>
+            <T>Abstract shift all injects</T>
+          </DialogTitle>
+          <DialogContent>
+            <InjectTable injects={this.props.injects} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleAbstractCloseShift.bind(this)}
+            >
+              <T>Close</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
         <Dialog
-          title="Simulation of the modification of the exercise"
-          modal={true}
           open={this.state.openResumeChangeDuration}
+          TransitionComponent={Transition}
+          maxWidth="md"
+          fullWidth={true}
           onClose={this.handleCancelResumeChangeDuration.bind(this)}
-          autoScrollBodyContent={true}
-          actions={resumeChangeDurationActions}
         >
-          <div>
-            {this.state.checkContinuousDays === false ? (
-              <div style={styles.showWarningSimulate}>
+          <DialogTitle>
+            <T>Simulation of the modification of the exercise</T>
+          </DialogTitle>
+          <DialogContent>
+            {this.state.checkContinuousDays === false && (
+              <div className={classes.showWarningSimulate}>
                 {/* eslint-disable-next-line react/no-unescaped-entities */}
                 Attention, dans le cadre d'une journée discontinue toute
                 {/* eslint-disable-next-line react/no-unescaped-entities */}
                 modification d'exercice est irréversible.
               </div>
-            ) : (
-              ''
             )}
-            <div style={styles.divSimulateExerciseResume}>
+            <div className={classes.divSimulateExerciseResume}>
               <T>Exercise estimated end: </T>
               {`${new Date(
                 this.state.exerciseEndDateSimulate,
@@ -537,199 +511,221 @@ class ScenarioPopover extends Component {
               ).toLocaleTimeString('fr-FR')}`}
             </div>
 
-            <div style={styles.divSimulateExerciseResume}>
+            <div className={classes.divSimulateExerciseResume}>
               <T>Exercise estimated duration: </T>
               {this.state.exerciseDurationSimulate}
               &nbsp;
               <T>hours</T>
             </div>
-
-            {Array.isArray(this.state.new_injects) ? (
+            {Array.isArray(this.state.new_injects) && (
               <Timeline items={this.state.new_injects} />
-            ) : (
-              ''
             )}
-          </div>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCancelResumeChangeDuration.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitFormResumeChangeDuration.bind(this)}
+            >
+              <T>Modify</T>
+            </Button>
+          </DialogActions>
         </Dialog>
-
         <Dialog
-          title="Change the duration of the exercise"
-          modal={true}
           open={this.state.openChangeDuration}
           onClose={this.handleCancelChangeDuration.bind(this)}
-          actions={changeActions}
-          autoScrollBodyContent={true}
+          TransitionComponent={Transition}
+          maxWidth="md"
+          fullWidth={true}
         >
-          <InjectTable injects={this.props.injects} />
-
-          <div>
-            <div style={styles.changeDuration.line}>
-              <div style={styles.changeDuration.label}>
-                <p>
-                  <T>First inject: </T>
-                </p>
-              </div>
-              <div style={styles.changeDuration.input}>
-                {`${new Date(this.getFirstInjectDate()).toLocaleDateString(
-                  'fr-FR',
-                )} ${new Date(this.getFirstInjectDate()).toLocaleTimeString(
-                  'fr-FR',
-                )}`}
-              </div>
-            </div>
-
-            <div style={styles.changeDuration.line}>
-              <div style={styles.changeDuration.label}>
-                <p>
-                  <T>Last inject: </T>
-                </p>
-              </div>
-              <div style={styles.changeDuration.input}>
-                {`${new Date(this.getLastInjectDate()).toLocaleDateString(
-                  'fr-FR',
-                )} ${new Date(this.getLastInjectDate()).toLocaleTimeString(
-                  'fr-FR',
-                )}`}
-              </div>
-            </div>
-
-            <div style={styles.changeDuration.line}>
-              <div style={styles.changeDuration.label}>
-                <p>
-                  <T>Current exercise duration: </T>
-                </p>
-              </div>
-              <div style={styles.changeDuration.inputHour}>
-                {/* eslint-disable */}
-                <TextField
-                  id="duration"
-                  ref="duration"
-                  name="duration"
-                  fullWidth={true}
-                  value={this.state.duration}
-                  type="text"
-                  disabled={true}
-                />
-                {/* eslint-enable */}
-              </div>
-              <div style={styles.changeDuration.unitHour}>
-                <p>
-                  <T>hours</T>
-                </p>
-              </div>
-            </div>
-
-            <div style={styles.changeDuration.line}>
-              <div style={styles.changeDuration.label}>
-                <p>
-                  <T>Exercise wanted duration: </T>
-                </p>
-              </div>
-              <div style={styles.changeDuration.inputHour}>
-                {/* eslint-disable */}
-                <TextField
-                  id="duration_desired"
-                  ref="duration_desired"
-                  name="duration_desired"
-                  fullWidth={true}
-                  value={this.state.duration_desired}
-                  onChange={this.handleChangeDurationDesired}
-                  type="number"
-                  disabled={false}
-                />
-                {/* eslint-enable */}
-              </div>
-              <div style={styles.changeDuration.unitHour}>
-                <p>
-                  <T>hours</T>
-                </p>
-              </div>
-            </div>
-
-            <div style={styles.checkbox}>
-              {/* eslint-disable */}
-              <Checkbox
-                ref="checkContinuousDays"
-                name="checkContinuousDays"
-                defaultChecked={this.state.checkContinuousDays}
-                onCheck={this.handleChangeCheckContinuousDays}
-                label={<T>Allow move inject outside of working hours.</T>}
-                labelPosition="right"
-              />
-              {/* eslint-enable */}
-            </div>
-
-            <div style={{ display: this.state.showDiscontinue }}>
-              <div style={styles.showDiscontinueDiv}>
-                <div style={styles.changeDuration.line}>
-                  <div style={styles.changeDuration.label}>
-                    <p>
-                      <T>start time of the day: </T>
-                    </p>
-                  </div>
-                  <div style={styles.changeDuration.inputHour}>
-                    {/* eslint-disable */}
-                    <TextField
-                      id="start_time_day"
-                      ref="start_time_day"
-                      name="start_time_day"
-                      fullWidth={true}
-                      value={this.state.start_time_of_day}
-                      type="number"
-                      disabled={false}
-                      onChange={this.handleChangeStartTimeDay}
-                    />
-                    {/* eslint-disable */}
-                  </div>
-                  <div style={styles.changeDuration.unitHour}>
-                    <p>
-                      <T>hour</T>
-                    </p>
-                  </div>
+          <DialogTitle>
+            <T>Change the duration of the exercise</T>
+          </DialogTitle>
+          <DialogContent>
+            <InjectTable injects={this.props.injects} />
+            <div>
+              <div className={classes.changeDuration.line}>
+                <div className={classes.changeDuration.label}>
+                  <p>
+                    <T>First inject: </T>
+                  </p>
                 </div>
-                <div style={styles.changeDuration.line}>
-                  <div style={styles.changeDuration.label}>
-                    <p>
-                      <T>end time of the day: </T>
-                    </p>
-                  </div>
-                  <div style={styles.changeDuration.inputHour}>
-                    <TextField
-                      id="end_time_day"
-                      ref="end_time_day"
-                      name="end_time_day"
-                      fullWidth={true}
-                      type="number"
-                      value={this.state.end_time_of_day}
-                      disabled={false}
-                      onChange={this.handleChangeEndTimeDay}
-                    />
-                  </div>
-                  <div style={styles.changeDuration.unitHour}>
-                    <p>
-                      <T>hour</T>
-                    </p>
-                  </div>
+                <div className={classes.changeDuration.input}>
+                  {`${new Date(this.getFirstInjectDate()).toLocaleDateString(
+                    'fr-FR',
+                  )} ${new Date(this.getFirstInjectDate()).toLocaleTimeString(
+                    'fr-FR',
+                  )}`}
                 </div>
-                <div style={styles.useCloseHoursCheckbox}>
-                  <Checkbox
-                    ref="useCloseHours"
-                    name="useCloseHours"
-                    defaultChecked={this.state.useCloseHours}
-                    onCheck={this.handleChangeCheckUseCloseHours}
-                    label={<T>Count closing hours in continuity of injects</T>}
-                    labelPosition="right"
+              </div>
+              <div className={classes.changeDuration.line}>
+                <div className={classes.changeDuration.label}>
+                  <p>
+                    <T>Last inject: </T>
+                  </p>
+                </div>
+                <div className={classes.changeDuration.input}>
+                  {`${new Date(this.getLastInjectDate()).toLocaleDateString(
+                    'fr-FR',
+                  )} ${new Date(this.getLastInjectDate()).toLocaleTimeString(
+                    'fr-FR',
+                  )}`}
+                </div>
+              </div>
+              <div className={classes.changeDuration.line}>
+                <div className={classes.changeDuration.label}>
+                  <p>
+                    <T>Current exercise duration: </T>
+                  </p>
+                </div>
+                <div className={classes.changeDuration.inputHour}>
+                  {/* eslint-disable */}
+                  <TextField
+                    id="duration"
+                    ref="duration"
+                    name="duration"
+                    fullWidth={true}
+                    value={this.state.duration}
+                    type="text"
+                    disabled={true}
                   />
-                  <div style={styles.useCloseHoursText}>
-                    <T>
-                      If checked, the start time of the day will announce the
-                      first day of exercise.
-                    </T>
+                  {/* eslint-enable */}
+                </div>
+                <div className={classes.changeDuration.unitHour}>
+                  <p>
+                    <T>hours</T>
+                  </p>
+                </div>
+              </div>
+              <div className={classes.changeDuration.line}>
+                <div className={classes.changeDuration.label}>
+                  <p>
+                    <T>Exercise wanted duration: </T>
+                  </p>
+                </div>
+                <div className={classes.changeDuration.inputHour}>
+                  {/* eslint-disable */}
+                  <TextField
+                    id="duration_desired"
+                    ref="duration_desired"
+                    name="duration_desired"
+                    fullWidth={true}
+                    value={this.state.duration_desired}
+                    onChange={this.handleChangeDurationDesired}
+                    type="number"
+                    disabled={false}
+                  />
+                  {/* eslint-enable */}
+                </div>
+                <div className={classes.changeDuration.unitHour}>
+                  <p>
+                    <T>hours</T>
+                  </p>
+                </div>
+              </div>
+              <div className={classes.checkbox}>
+                <Checkbox
+                  ref="checkContinuousDays"
+                  name="checkContinuousDays"
+                  defaultChecked={this.state.checkContinuousDays}
+                  onCheck={this.handleChangeCheckContinuousDays}
+                  label={<T>Allow move inject outside of working hours.</T>}
+                  labelPosition="right"
+                />
+              </div>
+              <div style={{ display: this.state.showDiscontinue }}>
+                <div className={classes.showDiscontinueDiv}>
+                  <div className={classes.changeDuration.line}>
+                    <div className={classes.changeDuration.label}>
+                      <p>
+                        <T>start time of the day: </T>
+                      </p>
+                    </div>
+                    <div className={classes.changeDuration.inputHour}>
+                      <TextField
+                        id="start_time_day"
+                        ref="start_time_day"
+                        name="start_time_day"
+                        fullWidth={true}
+                        value={this.state.start_time_of_day}
+                        type="number"
+                        disabled={false}
+                        onChange={this.handleChangeStartTimeDay}
+                      />
+                    </div>
+                    <div className={classes.changeDuration.unitHour}>
+                      <p>
+                        <T>hour</T>
+                      </p>
+                    </div>
+                  </div>
+                  <div className={classes.changeDuration.line}>
+                    <div className={classes.changeDuration.label}>
+                      <p>
+                        <T>end time of the day: </T>
+                      </p>
+                    </div>
+                    <div className={classes.changeDuration.inputHour}>
+                      <TextField
+                        id="end_time_day"
+                        ref="end_time_day"
+                        name="end_time_day"
+                        fullWidth={true}
+                        type="number"
+                        value={this.state.end_time_of_day}
+                        disabled={false}
+                        onChange={this.handleChangeEndTimeDay}
+                      />
+                    </div>
+                    <div className={classes.changeDuration.unitHour}>
+                      <p>
+                        <T>hour</T>
+                      </p>
+                    </div>
+                  </div>
+                  <div className={classes.useCloseHoursCheckbox}>
+                    <Checkbox
+                      ref="useCloseHours"
+                      name="useCloseHours"
+                      defaultChecked={this.state.useCloseHours}
+                      onCheck={this.handleChangeCheckUseCloseHours}
+                      label={
+                        <T>Count closing hours in continuity of injects</T>
+                      }
+                      labelPosition="right"
+                    />
+                    <div className={classes.useCloseHoursText}>
+                      <T>
+                        If checked, the start time of the day will announce the
+                        first day of exercise.
+                      </T>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={this.handleCancelChangeDuration.bind(this)}
+            >
+              <T>Cancel</T>
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={this.submitFormChangeDuration.bind(this)}
+            >
+              <T>Simulate</T>
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -753,11 +749,14 @@ const select = (state) => ({
   exercise: state.referential.entities.exercises,
 });
 
-export default connect(select, {
-  downloadExportInjects,
-  shiftAllInjects,
-  simulateChangeDurationExercise,
-  redirectToHome,
-  changeDurationExercise,
-  fetchExercise,
-})(ScenarioPopover);
+export default R.compose(
+  connect(select, {
+    downloadExportInjects,
+    shiftAllInjects,
+    simulateChangeDurationExercise,
+    redirectToHome,
+    changeDurationExercise,
+    fetchExercise,
+  }),
+  withStyles(styles),
+)(ScenarioPopover);

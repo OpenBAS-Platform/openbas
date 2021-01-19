@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import { GroupOutlined } from '@material-ui/icons';
 import Theme from '../../../../../components/Theme';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
-import * as Constants from '../../../../../constants/ComponentTypes';
-import { MainSmallListItem } from '../../../../../components/list/ListItem';
-import { List } from '../../../../../components/List';
-import { Icon } from '../../../../../components/Icon';
 
 i18nRegister({
   fr: {
@@ -30,12 +31,11 @@ i18nRegister({
 
 const styles = {
   container: {
-    color: Theme.palette.textColor,
     padding: '10px 0px 10px 0px',
   },
   audiences: {},
   link: {
-    color: Theme.palette.accent1Color,
+    color: Theme.palette.secondary.main,
     cursor: 'pointer',
   },
 };
@@ -63,10 +63,8 @@ class InjectView extends Component {
       R.toPairs(),
       R.map((d) => ({ key: R.head(d), value: R.last(d) })),
     )(injectContent);
-
     const displayedAsText = ['sender', 'subject', 'body', 'message', 'content'];
     const displayedAsList = ['attachments'];
-
     return (
       <div style={styles.container}>
         <div>
@@ -110,7 +108,7 @@ class InjectView extends Component {
                         documentId,
                         documentName,
                       )}
-                    ></div>
+                    />
                   );
                 })}
                 <br />
@@ -137,14 +135,14 @@ class InjectView extends Component {
                 const audienceName = R.propOr('-', 'audience_name', audience);
 
                 return (
-                  <MainSmallListItem
-                    key={audienceId}
-                    leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />}
-                    primaryText={audienceName}
-                  />
+                  <ListItem key={audienceId} divider={true}>
+                    <ListItemIcon>
+                      <GroupOutlined />
+                    </ListItemIcon>
+                    <ListItemText primary={audienceName} />
+                  </ListItem>
                 );
               })}
-
               {this.props.inject.inject_subaudiences.map((data) => {
                 const subaudience = R.find(
                   (a) => a.subaudience_id === data.subaudience_id,
@@ -166,11 +164,12 @@ class InjectView extends Component {
                 );
                 const finalSubaudienceName = `[${audienceName}] ${subaudienceName}`;
                 return (
-                  <MainSmallListItem
-                    key={subaudienceId}
-                    leftIcon={<Icon name={Constants.ICON_NAME_SOCIAL_GROUP} />}
-                    primaryText={finalSubaudienceName}
-                  />
+                  <ListItem key={subaudienceId} divider={true}>
+                    <ListItemIcon>
+                      <GroupOutlined />
+                    </ListItemIcon>
+                    <ListItemText primary={finalSubaudienceName} />
+                  </ListItem>
                 );
               })}
             </List>

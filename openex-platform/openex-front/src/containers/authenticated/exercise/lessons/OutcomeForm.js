@@ -35,7 +35,7 @@ class OutcomeForm extends Component {
         validate={validate}
       >
         {({ handleSubmit }) => (
-          <form id="outcomForm" onSubmit={handleSubmit}>
+          <form id="outcomeForm" onSubmit={handleSubmit}>
             <TextField
               name="outcome_comment"
               fullWidth={true}
@@ -48,7 +48,7 @@ class OutcomeForm extends Component {
             <span style={{ fontSize: '13px' }}>
               <T>Players response evaluation</T>
             </span>
-            <SliderField name="outcome_result" min={0} max={100} step={1} />
+            <SliderField name="outcome_result" step={1} />
           </form>
         )}
       </Form>

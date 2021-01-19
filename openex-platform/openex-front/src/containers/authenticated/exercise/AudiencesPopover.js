@@ -1,19 +1,22 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import * as R from 'ramda';
 import IconButton from '@material-ui/core/IconButton';
-import { i18nRegister } from '../../../utils/Messages';
-import * as Constants from '../../../constants/ComponentTypes';
-import { Popover } from '../../../components/Popover';
-import { Menu } from '../../../components/Menu';
-import { Icon } from '../../../components/Icon';
-import { MenuItemLink } from '../../../components/menu/MenuItem';
+import { withStyles } from '@material-ui/core/styles';
+import { MoreVert } from '@material-ui/icons';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { downloadExportAudiences } from '../../../actions/Audience';
+import { i18nRegister } from '../../../utils/Messages';
+import { T } from '../../../components/I18n';
 
-const style = {
-  float: 'left',
-  marginTop: '-14px',
-};
+const styles = () => ({
+  container: {
+    float: 'left',
+    marginTop: -8,
+  },
+});
 
 i18nRegister({
   fr: {
@@ -42,23 +45,25 @@ class AudiencesPopover extends Component {
   }
 
   render() {
+    const { classes } = this.props;
     return (
-      <div style={style}>
-        <IconButton onClick={this.handlePopoverOpen.bind(this)}>
-          <Icon name={Constants.ICON_NAME_NAVIGATION_MORE_VERT} />
-        </IconButton>
-        <Popover
-          open={this.state.openPopover}
-          anchorEl={this.state.anchorEl}
-          onClose={this.handlePopoverClose.bind(this)}
+      <div className={classes.container}>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
         >
-          <Menu multiple={false}>
-            <MenuItemLink
-              label="Export audiences to XLS"
-              onClick={this.handleDownloadAudiences.bind(this)}
-            />
-          </Menu>
-        </Popover>
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+          style={{ marginTop: 50 }}
+        >
+          <MenuItem onClick={this.handleDownloadAudiences.bind(this)}>
+            <T>Export audiences to XLS</T>
+          </MenuItem>
+        </Menu>
       </div>
     );
   }
@@ -69,4 +74,7 @@ AudiencesPopover.propTypes = {
   downloadExportAudiences: PropTypes.func,
 };
 
-export default connect(null, { downloadExportAudiences })(AudiencesPopover);
+export default R.compose(
+  connect(null, { downloadExportAudiences }),
+  withStyles(styles),
+)(AudiencesPopover);

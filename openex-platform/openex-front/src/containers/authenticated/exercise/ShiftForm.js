@@ -107,7 +107,6 @@ class ShiftForm extends Component {
     const { target } = event;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const { name } = target;
-
     this.setState({
       [name]: value,
     });
@@ -120,7 +119,6 @@ class ShiftForm extends Component {
     )(this.props.injects);
   }
 
-  /* eslint-disable react/no-string-refs */
   render() {
     const { onSubmit, initialValues } = this.props;
     return (
@@ -132,40 +130,35 @@ class ShiftForm extends Component {
         {({ handleSubmit }) => (
           <form id="shiftForm" onSubmit={handleSubmit}>
             <InjectTable injects={this.props.injects} />
-
             <div style={styles.shiftInjectsBy}>
               <T>shiftInjectsBy</T>
             </div>
-
             <div style={styles.shiftDateForm.shiftDateLine}>
               <div style={styles.shiftDateForm.inputDay}>
                 <TextField
-                  ref="shiftDay"
                   name="shift_day"
                   fullWidth={true}
                   type="number"
                   label="shiftDay"
-                  onChange={this.handleChange}
+                  onChange={this.handleChange.bind(this)}
                 />
               </div>
               <div style={styles.shiftDateForm.inputHour}>
                 <TextField
-                  ref="shiftHour"
                   name="shift_hour"
                   fullWidth={true}
                   type="number"
                   label="shiftHour"
-                  onChange={this.handleChange}
+                  onChange={this.handleChange.bind(this)}
                 />
               </div>
               <div style={styles.shiftDateForm.inputMinute}>
                 <TextField
-                  ref="shiftMinute"
                   name="shift_minute"
                   fullWidth={true}
                   type="number"
                   label="shiftMinute"
-                  onChange={this.handleChange}
+                  onChange={this.handleChange.bind(this)}
                 />
               </div>
             </div>
