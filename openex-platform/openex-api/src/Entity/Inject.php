@@ -163,12 +163,12 @@ class Inject extends BaseEntity
      */
     public function getInjectDate()
     {
-        return $this->inject_date;
+        return $this->inject_date->setTimeZone(new \DateTimeZone('UTC'));
     }
 
     public function setInjectDate($date)
     {
-        $this->inject_date = $date;
+        $this->inject_date = $date->setTimeZone(new \DateTimeZone('UTC'));
         return $this;
     }
 

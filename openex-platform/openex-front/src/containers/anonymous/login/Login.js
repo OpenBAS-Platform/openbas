@@ -41,12 +41,11 @@ const styles = (theme) => ({
     },
   },
   login: {
-    border: '1px solid #ddd',
     borderRadius: '10px',
     paddingBottom: '15px',
   },
   logo: {
-    width: 150,
+    width: 300,
     margin: '0px 0px 20px 0px',
   },
   subtitle: {
@@ -72,28 +71,44 @@ const Login = (props) => {
     props.fetchParameters();
     props.checkKerberos();
   }, []);
-  const onSubmit = (data) => this.props.askToken(data.username, data.password);
-  const loginHeight = props.parameters.auth_openid_enable ? 350 : 200;
-  const marginTop = dimension.height / 2 - loginHeight / 2 - 120;
+  const onSubmit = (data) => props.askToken(data.username, data.password);
+  let loginHeight = 260;
+  if (
+    props.parameters.auth_openid_enable
+    && props.parameters.auth_local_enable
+  ) {
+    loginHeight = 350;
+  } else if (props.parameters.auth_openid_enable) {
+    loginHeight = 150;
+  }
+  const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
   return (
-    <div className={props.classes.container} style={{ marginTop, height: loginHeight }}>
+    <div className={props.classes.container} style={{ marginTop }}>
       <img
         src="images/logo_openex.png"
         alt="logo"
         className={props.classes.logo}
       />
-      <div className={props.classes.login}>
-        <AppBar
-          color="primary"
-          position="relative"
-          className={props.classes.appBar}
-        >
-          <Toolbar>
-            <div className={props.classes.subtitle}>{<T>Login</T>}</div>
-          </Toolbar>
-        </AppBar>
+      <div
+        className={props.classes.login}
+        style={{
+          height: loginHeight,
+          border: props.parameters.auth_local_enable ? '1px solid #ddd' : 0,
+        }}
+      >
         {props.parameters.auth_local_enable && (
-          <LoginForm onSubmit={onSubmit} />
+          <div>
+            <AppBar
+              color="primary"
+              position="relative"
+              className={props.classes.appBar}
+            >
+              <Toolbar>
+                <div className={props.classes.subtitle}>{<T>Login</T>}</div>
+              </Toolbar>
+            </AppBar>
+            <LoginForm onSubmit={onSubmit} />
+          </div>
         )}
         {props.parameters.auth_openid_enable && (
           <Button

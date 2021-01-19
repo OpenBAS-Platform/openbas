@@ -14,6 +14,7 @@ use App\Entity\InjectStatus;
 use App\Entity\Subaudience;
 use App\Entity\User;
 use DateTime;
+use DateTimeZone;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -87,9 +88,9 @@ class InjectController extends BaseController
         $em = $this->getDoctrine()->getManager();
 
         $injects = array();
-        $dateStart = new DateTime();
+        $dateStart = new DateTime('now', new DateTimeZone('UTC'));
         $dateStart->modify('-60 minutes');
-        $dateEnd = new DateTime();
+        $dateEnd = new DateTime('now', new DateTimeZone('UTC'));
 
         $exercises = $em->getRepository('App:Exercise')->findBy(['exercise_canceled' => 0]);
         /* @var $exercises Exercise[] */

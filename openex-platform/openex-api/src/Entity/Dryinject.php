@@ -84,12 +84,12 @@ class Dryinject extends BaseEntity
 
     public function getDryinjectDate()
     {
-        return $this->dryinject_date;
+        return $this->dryinject_date->setTimeZone(new \DateTimeZone('UTC'));
     }
 
     public function setDryinjectDate($date)
     {
-        $this->dryinject_date = $date;
+        $this->dryinject_date = $date->setTimeZone(new \DateTimeZone('UTC'));
         return $this;
     }
 
