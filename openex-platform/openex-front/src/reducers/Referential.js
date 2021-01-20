@@ -36,10 +36,6 @@ export const entitiesInitializer = Immutable({
 
 const referential = (state = Immutable({}), action) => {
   switch (action.type) {
-    case Constants.IDENTITY_LOGIN_SUCCESS: {
-      return entitiesInitializer;
-    }
-
     case Constants.DATA_FETCH_SUCCESS: {
       return state.merge(action.payload.without('result'), { deep: true });
     }

@@ -231,4 +231,17 @@ class UserController extends BaseController
             return $form;
         }
     }
+
+    /**
+     * @OA\Property(
+     *    description="Read me",
+     * )
+     *
+     * @Rest\View(serializerGroups={"user"})
+     * @Rest\Get("/api/me")
+     */
+    public function getUserMeAction(Request $request)
+    {
+        return $this->get('security.token_storage')->getToken()->getUser();
+    }
 }

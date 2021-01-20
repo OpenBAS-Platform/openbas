@@ -5,24 +5,17 @@ import * as Constants from '../constants/ActionTypes';
 const app = (state = Immutable({}), action) => {
   switch (action.type) {
     case Constants.IDENTITY_LOGIN_SUCCESS: {
-      const token = action.payload.entities.tokens[action.payload.result];
-      const {
-        user_lang: userLang,
-        user_admin: userAdmin,
-      } = action.payload.entities.users[token.token_user];
-      const logged = {
-        token: token.token_id,
-        auth: token.token_value,
-        user: token.token_user,
-        lang: userLang,
-        admin: userAdmin,
-      };
-      localStorage.setItem('logged', JSON.stringify(logged));
-      return state.set('logged', logged);
+      return state.set('logged', action.payload);
+    }
+
+    case Constants.DATA_FETCH_ERROR: {
+      if (action.payload === 401) { // If unauthorized, force logout
+        return state.set('logged', null);
+      }
+      return state;
     }
 
     case Constants.IDENTITY_LOGOUT_SUCCESS: {
-      localStorage.removeItem('logged');
       return state.set('logged', null);
     }
 
@@ -35,7 +28,6 @@ const app = (state = Immutable({}), action) => {
         action.payload.result
       ];
       const logged = R.assoc('lang', userLang, state.logged);
-      localStorage.setItem('logged', JSON.stringify(logged));
       return state.set('logged', logged);
     }
 

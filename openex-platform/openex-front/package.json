@@ -18,6 +18,7 @@
     "file-saver": "^2.0.2",
     "final-form": "^4.20.1",
     "history": "^4.10.1",
+    "http-proxy-middleware": "^1.0.6",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
     "normalizr": "^3.6.1",
@@ -61,7 +62,6 @@
     "lint": "eslint .",
     "test": "react-scripts test --coverage --watchAll=false"
   },
-  "proxy": "http://127.0.0.1:8001/",
   "eslintConfig": {
     "extends": "react-app"
   },

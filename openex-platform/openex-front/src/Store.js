@@ -10,7 +10,7 @@ import { entitiesInitializer } from './reducers/Referential';
 // Default application state
 const initialState = {
   app: Immutable({
-    logged: JSON.parse(localStorage.getItem('logged')),
+    logged: {},
     worker: { status: 'RUNNING' },
   }),
   screen: Immutable({

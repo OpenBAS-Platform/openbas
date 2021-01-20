@@ -85,7 +85,7 @@ const Login = (props) => {
   return (
     <div className={props.classes.container} style={{ marginTop }}>
       <img
-        src="images/logo_openex.png"
+        src="/images/logo_openex.png"
         alt="logo"
         className={props.classes.logo}
       />

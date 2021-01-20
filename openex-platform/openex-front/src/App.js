@@ -83,14 +83,11 @@ class App extends Component {
         <ConnectedIntl store={store}>
           <Provider store={store}>
             <ConnectedRouter history={history}>
-              <Switch>
-                <Redirect exact from="/" to="/private" />
-                <Route
-                  path="/private"
-                  component={UserIsAuthenticated(RootAuthenticated)}
-                />
-                <Route path="/" component={RootAnonymous} />
-              </Switch>
+                <Switch>
+                  <Redirect exact from="/" to="/private" />
+                  <Route path="/private" component={RootAuthenticated} />
+                  <Route path="/" component={RootAnonymous} />
+                </Switch>
             </ConnectedRouter>
           </Provider>
         </ConnectedIntl>

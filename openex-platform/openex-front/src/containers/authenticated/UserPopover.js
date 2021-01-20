@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { AccountCircleOutlined } from '@material-ui/icons';
-import { logout, fetchToken } from '../../actions/Application';
+import { logout } from '../../actions/Application';
 import { i18nRegister } from '../../utils/Messages';
 import { T } from '../../components/I18n';
 
@@ -33,10 +33,6 @@ class UserPopover extends Component {
   constructor(props) {
     super(props);
     this.state = { open: false };
-  }
-
-  componentDidMount() {
-    this.props.fetchToken();
   }
 
   handleOpen(event) {
@@ -102,7 +98,6 @@ UserPopover.propTypes = {
   userGravatar: PropTypes.string,
   userAdmin: PropTypes.bool,
   logout: PropTypes.func,
-  fetchToken: PropTypes.func,
   children: PropTypes.node,
 };
 
@@ -118,6 +113,6 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchToken, logout }),
+  connect(select, { logout }),
   withStyles(styles),
 )(UserPopover);

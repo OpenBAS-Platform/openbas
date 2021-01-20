@@ -2,49 +2,42 @@ import { push } from 'connected-react-router';
 import { FORM_ERROR } from 'final-form';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-import { postReferential, getReferential } from '../utils/Action';
+import { postReferential, getReferential, simpleCall } from '../utils/Action';
 
 export const fetchParameters = () => (dispatch) => getReferential(schema.parameters, '/api/parameters')(dispatch);
 
 export const askToken = (username, password) => (dispatch) => {
   const data = { login: username, password };
-  return postReferential(
-    schema.token,
-    '/api/auth',
-    data,
-  )(dispatch).then((finalData) => {
-    // eslint-disable-next-line no-underscore-dangle
+  const ref = postReferential(schema.user, '/api/auth', data)(dispatch);
+  // eslint-disable-next-line arrow-body-style
+  return ref.then((finalData) => {
+    return dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: finalData });
+  }).catch((finalData) => {
     if (finalData[FORM_ERROR]) {
       return finalData;
     }
-    return dispatch({
-      type: Constants.IDENTITY_LOGIN_SUCCESS,
-      payload: finalData,
-    });
+    throw finalData;
   });
 };
 
 export const checkKerberos = () => (dispatch) => getReferential(
   schema.token,
   '/api/auth/kerberos',
-)(dispatch)
-  .then((data) => {
-    dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data });
-  })
-  .catch(() => {
-    dispatch({
-      type: Constants.IDENTITY_LOGIN_FAILED,
-      payload: { status: 'ERROR' },
-    });
+)(dispatch).catch(() => {
+  dispatch({
+    type: Constants.IDENTITY_LOGIN_FAILED,
+    payload: { status: 'ERROR' },
   });
+});
 
-export const fetchToken = () => (dispatch, getState) => getReferential(
-  schema.token,
-  `/api/tokens/${getState().app.logged.token}`,
-)(dispatch);
+export const fetchMe = () => (dispatch) => {
+  const ref = getReferential(schema.user, '/api/me')(dispatch);
+  return ref.then((data) => dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: data }));
+};
 
 export const logout = () => (dispatch) => {
-  dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS });
+  const ref = simpleCall('/api/logout');
+  return ref.then(() => dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS }));
 };
 
 export const toggleLeftUnfolding = () => (dispatch) => {
@@ -61,10 +54,6 @@ export const savedDismiss = () => (dispatch) => {
 
 export const redirectToHome = () => (dispatch) => {
   dispatch(push('/'));
-};
-
-export const redirectToAdmin = () => (dispatch) => {
-  dispatch(push('/private/admin'));
 };
 
 export const redirectToExercise = (exerciseId) => (dispatch) => {
