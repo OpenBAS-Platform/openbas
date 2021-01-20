@@ -223,6 +223,11 @@ class Index extends Component {
   }
 
   render() {
+    const exerciseIsUpdatable = R.propOr(
+      true,
+      'user_can_update',
+      this.props.exercise,
+    );
     const exerciseIsDeletable = R.propOr(
       true,
       'user_can_delete',
@@ -244,6 +249,8 @@ class Index extends Component {
         'exercise_message_footer',
         'exercise_mail_expediteur',
         'exercise_animation_group',
+        'exercise_latitude',
+        'exercise_longitude',
       ]),
     );
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
@@ -251,7 +258,7 @@ class Index extends Component {
     const { typesToExport } = this.state;
     return (
       <div style={{ width: 800, margin: '0 auto' }}>
-        {this.props.userCanUpdate && (
+        {exerciseIsUpdatable && (
           <Paper elevation={4} className={classes.paper}>
             <Typography variant="h5" style={{ marginBottom: 20 }}>
               Information
@@ -274,7 +281,7 @@ class Index extends Component {
             </Button>
           </Paper>
         )}
-        {this.props.userCanUpdate && (
+        {exerciseIsUpdatable && (
           <Paper elevation={4} className={classes.paper}>
             <Typography variant="h5" style={{ marginBottom: 20 }}>
               <T>Messages template</T>
@@ -308,7 +315,7 @@ class Index extends Component {
           )}
           <br />
           <br />
-          {this.props.userCanUpdate && (
+          {exerciseIsUpdatable && (
             <div>
               <Button
                 variant="outlined"
@@ -519,7 +526,7 @@ class Index extends Component {
             </DialogActions>
           </Dialog>
         </Paper>
-        {this.props.userCanUpdate && (
+        {exerciseIsDeletable && (
           <Paper elevation={4} className={classes.paper}>
             <Typography variant="h5" style={{ marginBottom: 20 }}>
               <T>Delete</T>
@@ -531,15 +538,13 @@ class Index extends Component {
                 We do not recommend you do this.
               </T>
             </Typography>
-            {exerciseIsDeletable && (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={this.handleOpenDelete.bind(this)}
-              >
-                <T>Delete</T>
-              </Button>
-            )}
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleOpenDelete.bind(this)}
+            >
+              <T>Delete</T>
+            </Button>
             <Dialog
               open={this.state.openDelete}
               TransitionComponent={Transition}
@@ -557,15 +562,13 @@ class Index extends Component {
                 >
                   <T>Cancel</T>
                 </Button>
-                {exerciseIsDeletable && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={this.submitDelete.bind(this)}
-                  >
-                    <T>Delete</T>
-                  </Button>
-                )}
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={this.submitDelete.bind(this)}
+                >
+                  <T>Delete</T>
+                </Button>
               </DialogActions>
             </Dialog>
           </Paper>

@@ -30,6 +30,10 @@ App\Entity\Exercise:
       groups: [ 'exercise' ]
     exercise_mail_expediteur:
       groups: [ 'exercise' ]
+    exercise_latitude:
+      groups: [ 'exercise' ]
+    exercise_longitude:
+      groups: [ 'exercise' ]
     user_can_update:
       groups: [ 'exercise' ]
     user_can_delete:

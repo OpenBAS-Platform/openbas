@@ -43,9 +43,9 @@ class Event extends BaseEntity
      */
     protected $event_image;
     /**
-     * @ORM\Column(type="smallint", nullable=true)
+     * @ORM\Column(type="smallint", options={"default": 0})
      */
-    protected $event_order = 0;
+    protected $event_order;
     /**
      * @ORM\ManyToMany(targetEntity="User", inversedBy="userPlanificateurEvents")
      * @ORM\JoinTable(name="planificateurs_events",

@@ -293,7 +293,7 @@ const filterLogs = (state, ownProps) => {
   const logsFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.log_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.log_date < b.log_date),
+    R.sortWith([R.descend(R.prop('log_date'))]),
   );
   return logsFilterAndSorting(logs);
 };
@@ -304,7 +304,7 @@ const filterIncidents = (state, ownProps) => {
   const incidentsFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.incident_exercise === exerciseId),
-    R.sort((a, b) => a.incident_title.localeCompare(b.incident_title)),
+    R.sortWith([R.ascend(R.prop('incident_order'))]),
   );
   return incidentsFilterAndSorting(incidents);
 };

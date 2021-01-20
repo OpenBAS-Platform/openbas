@@ -112,6 +112,8 @@ class UserPopover extends Component {
         'user_phone2',
         'user_phone3',
         'user_pgp_key',
+        'user_latitude',
+        'user_longitude',
       ]),
     )(this.props.user);
 

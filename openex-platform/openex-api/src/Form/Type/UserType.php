@@ -25,6 +25,8 @@ class UserType extends AbstractType
         $builder->add('user_lang');
         $builder->add('user_admin');
         $builder->add('user_planificateur');
+        $builder->add('user_latitude');
+        $builder->add('user_longitude');
     }
 
     public function configureOptions(OptionsResolver $resolver)

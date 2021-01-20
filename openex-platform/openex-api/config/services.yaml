@@ -5,9 +5,10 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
   locale: 'en'
+  cookie_secure: '%env(bool:COOKIE_SECURE)%'
   player_url: '%env(PLAYER_URL)%'
   admin_token: '%env(ADMIN_TOKEN)%'
-  mail_sender: no-reply@openex.io
+  map_tile_server: '%env(MAP_TILE_SERVER)%'
   auth_local_enable: '%env(bool:AUTH_LOCAL_ENABLE)%'
   auth_openid_enable: '%env(bool:AUTH_OPENID_ENABLE)%'
   auth_openid_label: '%env(AUTH_OPENID_LABEL)%'

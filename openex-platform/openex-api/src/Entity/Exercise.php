@@ -40,6 +40,14 @@ class Exercise extends BaseEntity
      */
     protected $exercise_end_date;
     /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    protected $exercise_latitude;
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    protected $exercise_longitude;
+    /**
      * @ORM\Column(type="text")
      */
     protected $exercise_mail_expediteur = "planners@openex.io";
@@ -200,6 +208,28 @@ class Exercise extends BaseEntity
     public function setExerciseEndDate($endDate)
     {
         $this->exercise_end_date = $endDate;
+        return $this;
+    }
+
+    public function getExerciseLatitude()
+    {
+        return $this->exercise_latitude;
+    }
+
+    public function setExerciseLatitude($latitude)
+    {
+        $this->exercise_latitude = $latitude;
+        return $this;
+    }
+
+    public function getExerciseLongitude()
+    {
+        return $this->exercise_longitude;
+    }
+
+    public function setExerciseLongitude($longitude)
+    {
+        $this->exercise_longitude = $longitude;
         return $this;
     }
 

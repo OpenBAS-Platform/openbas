@@ -22,6 +22,8 @@ class InjectType extends AbstractType
         $builder->add('inject_subaudiences');
         $builder->add('inject_type');
         $builder->add('inject_enabled');
+        $builder->add('inject_latitude');
+        $builder->add('inject_longitude');
         $builder->add('inject_all_audiences');
     }
 

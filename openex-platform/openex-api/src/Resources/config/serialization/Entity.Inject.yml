@@ -16,6 +16,10 @@ App\Entity\Inject:
       groups: [ 'inject' ]
     inject_enabled:
       groups: [ 'inject' ]
+    inject_latitude:
+      groups: [ 'inject' ]
+    inject_longitude:
+      groups: [ 'inject' ]
     inject_incident:
       groups: [ 'inject' ]
     inject_audiences:

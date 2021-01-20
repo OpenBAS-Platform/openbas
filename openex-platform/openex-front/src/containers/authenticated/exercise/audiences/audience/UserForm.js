@@ -81,6 +81,18 @@ class UserForm extends Component {
               style={{ marginTop: 20 }}
             />
             <TextField
+              name="user_latitude"
+              fullWidth={true}
+              label={<T>Latitude</T>}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
+              name="user_longitude"
+              fullWidth={true}
+              label={<T>Longitude</T>}
+              style={{ marginTop: 20 }}
+            />
+            <TextField
               name="user_pgp_key"
               fullWidth={true}
               multiline={true}

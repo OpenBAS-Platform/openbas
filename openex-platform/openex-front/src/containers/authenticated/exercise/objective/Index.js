@@ -273,7 +273,7 @@ const filterObjectives = (objectives, exerciseId) => {
   const objectivesFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.objective_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.objective_priority > b.objective_priority),
+    R.sortWith([R.ascend(R.prop('objective_priority'))]),
   );
   return objectivesFilterAndSorting(objectives);
 };
@@ -281,7 +281,7 @@ const filterObjectives = (objectives, exerciseId) => {
 const filterSubobjectives = (subobjectives) => {
   const subobjectivesSorting = R.pipe(
     R.values,
-    R.sort((a, b) => a.subobjective_priority > b.subobjective_priority),
+    R.sortWith([R.ascend(R.prop('subobjective_priority'))]),
     R.indexBy(R.prop('subobjective_id')),
   );
   return subobjectivesSorting(subobjectives);

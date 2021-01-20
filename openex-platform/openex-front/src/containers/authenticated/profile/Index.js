@@ -123,7 +123,7 @@ class Index extends Component {
               to="/private/documents"
               className={classes.documents}
             >
-              <DescriptionOutlined fontSize="medium" />
+              <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />
           </Toolbar>
@@ -135,13 +135,11 @@ class Index extends Component {
               <Typography variant="h5" style={{ marginBottom: 20 }}>
                 <T>Profile</T>
               </Typography>
-              {informationValues && (
-                <UserForm
-                  organizations={this.props.organizations}
-                  onSubmit={this.onUpdate.bind(this)}
-                  initialValues={informationValues}
-                />
-              )}
+              <UserForm
+                organizations={this.props.organizations}
+                onSubmit={this.onUpdate.bind(this)}
+                initialValues={informationValues}
+              />
               <br />
               <Button
                 variant="outlined"

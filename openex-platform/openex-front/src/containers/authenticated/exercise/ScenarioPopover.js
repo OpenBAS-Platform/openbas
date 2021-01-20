@@ -739,14 +739,14 @@ ScenarioPopover.propTypes = {
   changeDurationExercise: PropTypes.func,
   simulateChangeDurationExercise: PropTypes.func,
   injects: PropTypes.object,
-  exercises: PropTypes.array,
+  exercises: PropTypes.object,
   fetchExercise: PropTypes.func,
   userCanUpdate: PropTypes.bool,
   redirectToHome: PropTypes.func,
 };
 
 const select = (state) => ({
-  exercise: state.referential.entities.exercises,
+  exercises: state.referential.entities.exercises,
 });
 
 export default R.compose(

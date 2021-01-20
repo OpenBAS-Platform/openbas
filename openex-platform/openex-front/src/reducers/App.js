@@ -5,11 +5,18 @@ import * as Constants from '../constants/ActionTypes';
 const app = (state = Immutable({}), action) => {
   switch (action.type) {
     case Constants.IDENTITY_LOGIN_SUCCESS: {
-      return state.set('logged', action.payload);
+      const user = action.payload.entities.users[action.payload.result];
+      const logged = {
+        user: user.user_id,
+        lang: user.user_lang,
+        admin: user.user_admin,
+      };
+      return state.set('logged', logged);
     }
 
     case Constants.DATA_FETCH_ERROR: {
-      if (action.payload === 401) { // If unauthorized, force logout
+      if (action.payload.status === 401) {
+        // If unauthorized, force logout
         return state.set('logged', null);
       }
       return state;

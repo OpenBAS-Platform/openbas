@@ -1,5 +1,7 @@
 import Immutable from 'seamless-immutable';
+import { FORM_ERROR } from 'final-form';
 import FileSaver from 'file-saver';
+import * as R from 'ramda';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../Network';
 
@@ -7,6 +9,25 @@ export const submitForm = (formId) => {
   document
     .getElementById(formId)
     .dispatchEvent(new Event('submit', { cancelable: true }));
+};
+
+const buildError = (data) => {
+  const errorsExtractor = R.pipe(
+    R.pathOr({}, ['errors', 'children']),
+    R.toPairs(),
+    R.map((elem) => {
+      const extractErrorsPipe = R.pipe(
+        R.tail(),
+        R.head(),
+        R.propOr([], 'errors'),
+        R.head(),
+      );
+      return [R.head(elem), extractErrorsPipe(elem)];
+    }),
+    R.fromPairs(),
+    R.set(R.lensProp(FORM_ERROR), data.message),
+  );
+  return errorsExtractor(data);
 };
 
 export const fileSave = (uri, filename) => () => api()
@@ -46,7 +67,7 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
-      throw error;
+      return buildError(error);
     });
 };
 
@@ -60,7 +81,7 @@ export const postReferential = (schema, uri, data) => (dispatch) => {
     })
     .catch((error) => {
       dispatch({ type: Constants.DATA_FETCH_ERROR, payload: error });
-      throw error;
+      return buildError(error);
     });
 };
 

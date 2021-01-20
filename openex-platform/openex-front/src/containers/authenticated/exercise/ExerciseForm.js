@@ -118,6 +118,22 @@ class ExerciseForm extends Component {
                   style={{ marginTop: 20 }}
                 />
               )}
+              {edit && (
+                <TextField
+                  name="exercise_latitude"
+                  fullWidth={true}
+                  label={<T>Latitude</T>}
+                  style={{ marginTop: 20 }}
+                />
+              )}
+              {edit && (
+                <TextField
+                  name="exercise_longitude"
+                  fullWidth={true}
+                  label={<T>Longitude</T>}
+                  style={{ marginTop: 20 }}
+                />
+              )}
             </MuiPickersUtilsProvider>
           </form>
         )}

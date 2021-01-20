@@ -481,7 +481,7 @@ class Index extends Component {
               to="/private/documents"
               className={classes.documents}
             >
-              <DescriptionOutlined fontSize="medium" />
+              <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />
           </Toolbar>
@@ -589,6 +589,7 @@ class Index extends Component {
                         handleDeleteDocument={this.handleDeleteDocument.bind(
                           this,
                         )}
+                        userCanUpdate={this.props.userCanUpdate}
                       />
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -667,113 +668,107 @@ class Index extends Component {
             style={{ display: 'none' }}
             onChange={this.handleFileChange.bind(this)}
           />
-          {this.props.userCanUpdate && (
-            <Dialog
-              open={this.state.openEditDocument}
-              TransitionComponent={Transition}
-              onClose={this.handleCloseEditDocument.bind(this)}
-            >
-              <DialogTitle>
-                <T>Edit document</T>
-              </DialogTitle>
-              <DialogContent>
-                <DocumentForm
-                  initialValues={this.state.selectedDocument}
-                  onSubmit={this.onSubmitDocument.bind(this)}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleCloseEditDocument.bind(this)}
-                >
-                  <T>Cancel</T>
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={() => submitForm('documentForm')}
-                >
-                  <T>Update</T>
-                </Button>
-              </DialogActions>
-            </Dialog>
-          )}
-          {this.props.userCanUpdate && (
-            <Dialog
-              open={this.state.openConfirmDeleteTag}
-              TransitionComponent={Transition}
-              onClose={this.handleCloseConfirmDeleteTag.bind(this)}
-            >
-              <DialogContent>
-                <DialogContentText>
-                  <T>Are you sure you want to delete this tag?</T>
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleCloseConfirmDeleteTag.bind(this)}
-                >
-                  <T>Cancel</T>
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={this.handleSubmitConfirmDeleteTag.bind(this)}
-                >
-                  <T>Delete</T>
-                </Button>
-              </DialogActions>
-            </Dialog>
-          )}
-          {this.props.userCanUpdate && (
-            <Dialog
-              open={this.state.openEditDocumentTag}
-              TransitionComponent={Transition}
-              maxWidth="md"
-              fullWidth={true}
-              onClose={this.handleCloseEditDocumentTag.bind(this)}
-            >
-              <DialogTitle>
-                <T>Update tags of a document</T>
-              </DialogTitle>
-              <DialogContent>
-                <DocumentTags
-                  document_id={this.state.selectedDocument}
-                  handleAddDocumentTag={this.handleAddDocumentTag.bind(this)}
-                  handleRemoveDocumentTag={this.handleRemoveDocumentTag.bind(
-                    this,
-                  )}
-                  document_tags={this.state.documentsTags}
-                  handleAddDocumentTagExercise={this.handleAddDocumentTagExercise.bind(
-                    this,
-                  )}
-                  handleRemoveDocumentTagExercise={this.handleRemoveDocumentTagExercise.bind(
-                    this,
-                  )}
-                  document_tags_exercise={this.state.documentsTagsExercise}
-                  availables_tags={this.props.tags}
-                  availables_exercises_tags={this.props.exercises}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleCloseEditDocumentTag.bind(this)}
-                >
-                  <T>Cancel</T>
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={this.submitEditDocumentTag.bind(this)}
-                >
-                  <T>Update</T>
-                </Button>
-              </DialogActions>
-            </Dialog>
-          )}
+          <Dialog
+            open={this.state.openEditDocument}
+            TransitionComponent={Transition}
+            onClose={this.handleCloseEditDocument.bind(this)}
+          >
+            <DialogTitle>
+              <T>Edit document</T>
+            </DialogTitle>
+            <DialogContent>
+              <DocumentForm
+                initialValues={this.state.selectedDocument}
+                onSubmit={this.onSubmitDocument.bind(this)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseEditDocument.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => submitForm('documentForm')}
+              >
+                <T>Update</T>
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={this.state.openConfirmDeleteTag}
+            TransitionComponent={Transition}
+            onClose={this.handleCloseConfirmDeleteTag.bind(this)}
+          >
+            <DialogContent>
+              <DialogContentText>
+                <T>Are you sure you want to delete this tag?</T>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseConfirmDeleteTag.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.handleSubmitConfirmDeleteTag.bind(this)}
+              >
+                <T>Delete</T>
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog
+            open={this.state.openEditDocumentTag}
+            TransitionComponent={Transition}
+            maxWidth="md"
+            fullWidth={true}
+            onClose={this.handleCloseEditDocumentTag.bind(this)}
+          >
+            <DialogTitle>
+              <T>Update tags of a document</T>
+            </DialogTitle>
+            <DialogContent>
+              <DocumentTags
+                document_id={this.state.selectedDocument}
+                handleAddDocumentTag={this.handleAddDocumentTag.bind(this)}
+                handleRemoveDocumentTag={this.handleRemoveDocumentTag.bind(
+                  this,
+                )}
+                document_tags={this.state.documentsTags}
+                handleAddDocumentTagExercise={this.handleAddDocumentTagExercise.bind(
+                  this,
+                )}
+                handleRemoveDocumentTagExercise={this.handleRemoveDocumentTagExercise.bind(
+                  this,
+                )}
+                document_tags_exercise={this.state.documentsTagsExercise}
+                availables_tags={this.props.tags}
+                availables_exercises_tags={this.props.exercises}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="outlined"
+                onClick={this.handleCloseEditDocumentTag.bind(this)}
+              >
+                <T>Cancel</T>
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={this.submitEditDocumentTag.bind(this)}
+              >
+                <T>Update</T>
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
       </div>
     );

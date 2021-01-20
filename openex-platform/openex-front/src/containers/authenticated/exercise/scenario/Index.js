@@ -95,7 +95,7 @@ const filteredEvents = (events, exerciseId) => {
   const eventsFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.event_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.event_order > b.event_order),
+    R.sortWith([R.ascend(R.prop('event_order'))]),
   );
   return eventsFilterAndSorting(events);
 };

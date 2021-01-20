@@ -93,6 +93,12 @@ div.line .active ~ li::before {
   background: #ff4081;
 }
 
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+}
+
 div.clearfix {
   clear: both;
 }

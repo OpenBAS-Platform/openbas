@@ -49,6 +49,7 @@ class EventForm extends Component {
             <TextField
               name="event_order"
               fullWidth={true}
+              type="number"
               label={<T>Order</T>}
               style={{ marginTop: 20 }}
             />

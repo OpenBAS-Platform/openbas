@@ -11,12 +11,13 @@ export const askToken = (username, password) => (dispatch) => {
   const ref = postReferential(schema.user, '/api/auth', data)(dispatch);
   // eslint-disable-next-line arrow-body-style
   return ref.then((finalData) => {
-    return dispatch({ type: Constants.IDENTITY_LOGIN_SUCCESS, payload: finalData });
-  }).catch((finalData) => {
     if (finalData[FORM_ERROR]) {
       return finalData;
     }
-    throw finalData;
+    return dispatch({
+      type: Constants.IDENTITY_LOGIN_SUCCESS,
+      payload: finalData,
+    });
   });
 };
 

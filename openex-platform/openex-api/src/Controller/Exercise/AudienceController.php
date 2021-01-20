@@ -45,7 +45,7 @@ class AudienceController extends BaseController
         foreach ($audiences as &$audience) {
             $audience->computeUsersNumber();
             $audience->setUserCanUpdate($this->hasGranted(self::UPDATE, $audience));
-            $audience->setUserCanDelete($this->hasGranted(self::UPDATE, $audience));
+            $audience->setUserCanDelete($this->hasGranted(self::DELETE, $audience));
         }
 
         return $audiences;

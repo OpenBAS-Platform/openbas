@@ -56,6 +56,14 @@ class User extends BaseEntity implements UserInterface
      */
     protected $user_pgp_key;
     /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    protected $user_latitude;
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    protected $user_longitude;
+    /**
      * @ORM\Column(type="string", nullable=true)
      */
     protected $user_password;
@@ -517,5 +525,25 @@ class User extends BaseEntity implements UserInterface
     public function eraseCredentials()
     {
         $this->user_plain_password = null;
+    }
+
+    public function getUserLatitude()
+    {
+        return $this->user_latitude;
+    }
+
+    public function setUserLatitude($user_latitude): void
+    {
+        $this->user_latitude = $user_latitude;
+    }
+
+    public function getUserLongitude()
+    {
+        return $this->user_longitude;
+    }
+
+    public function setUserLongitude($user_longitude): void
+    {
+        $this->user_longitude = $user_longitude;
     }
 }

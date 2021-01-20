@@ -21,6 +21,7 @@ class ParameterController extends AbstractController
     {
         return [
             "parameters_id" => "global",
+            "map_tile_server" => $this->getParameter('map_tile_server'),
             "auth_local_enable" => $this->getParameter('auth_local_enable'),
             "auth_openid_enable" => $this->getParameter('auth_openid_enable'),
             "auth_kerberos_enable" => $this->getParameter('auth_kerberos_enable'),

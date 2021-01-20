@@ -42,6 +42,14 @@ class Inject extends BaseEntity
      */
     protected $inject_type;
     /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    protected $inject_latitude;
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    protected $inject_longitude;
+    /**
      * @ORM\ManyToMany(targetEntity="Audience", inversedBy="audience_injects")
      * @ORM\JoinTable(name="injects_audiences",
      *     joinColumns={@ORM\JoinColumn(name="inject_id", referencedColumnName="inject_id", onDelete="CASCADE")},
@@ -163,12 +171,12 @@ class Inject extends BaseEntity
      */
     public function getInjectDate()
     {
-        return $this->inject_date->setTimeZone(new \DateTimeZone('UTC'));
+        return $this->inject_date;
     }
 
     public function setInjectDate($date)
     {
-        $this->inject_date = $date->setTimeZone(new \DateTimeZone('UTC'));
+        $this->inject_date = $date;
         return $this;
     }
 
@@ -432,5 +440,25 @@ class Inject extends BaseEntity
         }
 
         $this->inject_users_number = count($usersWithoutDuplicates);
+    }
+
+    public function getInjectLatitude()
+    {
+        return $this->inject_latitude;
+    }
+
+    public function setInjectLatitude($inject_latitude): void
+    {
+        $this->inject_latitude = $inject_latitude;
+    }
+
+    public function getInjectLongitude()
+    {
+        return $this->inject_longitude;
+    }
+
+    public function setInjectLongitude($inject_longitude): void
+    {
+        $this->inject_longitude = $inject_longitude;
     }
 }

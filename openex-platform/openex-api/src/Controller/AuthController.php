@@ -41,7 +41,7 @@ class AuthController extends AbstractController
             // ->withDomain('.example.com')
             ->withSameSite(null)
             ->withHttpOnly(true)
-            ->withSecure(false);
+            ->withSecure($this->getParameter('cookie_secure'));
         // Redirect to /private
         $response->headers->setCookie($cookie);
     }
@@ -93,7 +93,9 @@ class AuthController extends AbstractController
             $em->flush();
         }
         // Create and setup the cookie
-        $response = new JsonResponse($user);
+        $serializer = $this->container->get('serializer');
+        $userSerialized = $serializer->serialize($user, 'json',  ['groups' => 'user']);
+        $response = new Response($userSerialized);
         $this->setupCookie($token, $response);
         return $response;
     }
@@ -118,7 +120,6 @@ class AuthController extends AbstractController
         }
 
         $user = $em->getRepository('App:User')->findOneBy(['user_login' => $credentials->getLogin()]);
-
         if (!$user) {
             return $this->invalidCredentials();
         }
@@ -138,7 +139,9 @@ class AuthController extends AbstractController
         $em->persist($token);
         $em->flush();
         // Create and setup the cookie
-        $response = new JsonResponse($user);
+        $serializer = $this->container->get('serializer');
+        $userSerialized = $serializer->serialize($user, 'json',  ['groups' => 'user']);
+        $response = new Response($userSerialized);
         $this->setupCookie($token, $response);
         return $response;
     }

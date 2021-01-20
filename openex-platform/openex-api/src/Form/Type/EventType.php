@@ -3,6 +3,7 @@
 namespace App\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,7 +13,7 @@ class EventType extends AbstractType
     {
         $builder->add('event_title');
         $builder->add('event_description');
-        $builder->add('event_order');
+        $builder->add('event_order', IntegerType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver)

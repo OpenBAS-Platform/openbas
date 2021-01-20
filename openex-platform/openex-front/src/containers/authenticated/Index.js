@@ -83,7 +83,7 @@ class IndexAuthenticated extends Component {
               to="/private/documents"
               className={classes.documents}
             >
-              <DescriptionOutlined fontSize="medium" />
+              <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />
           </Toolbar>

@@ -29,6 +29,8 @@ class UserView extends Component {
     const userGravatar = R.propOr('', 'user_gravatar', this.props.user);
     const userPhone = R.propOr('', 'user_phone', this.props.user);
     const userPhone2 = R.propOr('', 'user_phone2', this.props.user);
+    const userLatitude = R.propOr('', 'user_latitude', this.props.user);
+    const userLongitude = R.propOr('', 'user_longitude', this.props.user);
     const userPgpKey = R.propOr(false, 'user_pgp_key', this.props.user);
     const userOrganization = R.propOr(
       {},
@@ -51,8 +53,10 @@ class UserView extends Component {
             <strong>{userEmail}</strong>
           </div>
           <div>{organizationName}</div>
-          <div>{userPhone2}</div>
           <div>{userPhone}</div>
+          <div>{userPhone2}</div>
+          <div>Latitude: {userLatitude}</div>
+          <div>Longitude: {userLongitude}</div>
           <div>{userPgpKey ? <T>PGP Key is set</T> : ''}</div>
         </div>
       </div>

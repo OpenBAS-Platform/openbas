@@ -210,14 +210,7 @@ class Index extends Component {
     const injects = R.pipe(
       R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
       R.filter(filterByKeyword),
-      R.sort((a, b) => {
-        // TODO replace with sortWith after Ramdajs new release
-        const fieldA = R.toLower(R.propOr('', this.state.sortBy, a).toString());
-        const fieldB = R.toLower(R.propOr('', this.state.sortBy, b).toString());
-        return this.state.orderAsc
-          ? this.ascend(fieldA, fieldB)
-          : this.descend(fieldA, fieldB);
-      }),
+      R.sortWith([R.ascend(R.prop('inject_date'))]),
     )(incident.incident_injects);
     const eventIsUpdatable = R.propOr(
       true,
@@ -446,7 +439,7 @@ const filterAudiences = (audiences, exerciseId) => {
   const audiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
+    R.sortWith([R.ascend(R.prop('audience_name'))]),
   );
   return audiencesFilterAndSorting(audiences);
 };
@@ -455,7 +448,7 @@ const filterSubaudiences = (subaudiences, exerciseId) => {
   const subaudiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.subaudience_exercise === exerciseId),
-    R.sort((a, b) => a.subaudience_name.localeCompare(b.subaudience_name)),
+    R.sortWith([R.ascend(R.prop('subaudience_name'))]),
   );
   return subaudiencesFilterAndSorting(subaudiences);
 };
@@ -464,7 +457,7 @@ const filterSubobjectives = (subobjectives, exerciseId) => {
   const subobjectivesFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.subobjective_exercise === exerciseId),
-    R.sort((a, b) => a.subobjective_title.localeCompare(b.subobjective_title)),
+    R.sortWith([R.ascend(R.prop('subobjective_priority'))]),
   );
   return subobjectivesFilterAndSorting(subobjectives);
 };
@@ -473,7 +466,7 @@ const filterIncidents = (incidents, eventId) => {
   const incidentsFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.incident_event.event_id === eventId),
-    R.sort((a, b) => a.incident_order > b.incident_order),
+    R.sortWith([R.ascend(R.prop('incident_order'))]),
   );
   return incidentsFilterAndSorting(incidents);
 };

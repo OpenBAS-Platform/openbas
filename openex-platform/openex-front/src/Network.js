@@ -9,7 +9,7 @@ export const api = (schema) => {
   const instance = axios.create({
     headers: { responseType: 'json' },
   });
-    // Intercept to apply schema and test unauthorized users
+  // Intercept to apply schema and test unauthorized users
   instance.interceptors.response.use(
     (response) => {
       if (schema) {
@@ -33,7 +33,8 @@ export const api = (schema) => {
         err.config.__isRetryRequest = true;
         return axios(err.config);
       }
-      return Promise.reject(res.status);
+      // eslint-disable-next-line prefer-promise-reject-errors
+      return Promise.reject({ status: res.status, ...res.data });
     },
   );
   return instance;

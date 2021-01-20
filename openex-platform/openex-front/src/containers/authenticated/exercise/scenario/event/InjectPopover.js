@@ -548,29 +548,27 @@ class InjectPopover extends Component {
         >
           <MenuItem
             onClick={this.handleOpenEdit.bind(this)}
-            disabled={
-              !userCanUpdate || injectNotSupported || !injectIsUpdatable
-            }
+            disabled={injectNotSupported || !injectIsUpdatable}
           >
             <T>Edit</T>
           </MenuItem>
           <MenuItem
             onClick={this.handleOpenCopy.bind(this)}
-            disabled={injectNotSupported || this.props.location === 'run'}
+            disabled={!userCanUpdate || injectNotSupported || this.props.location === 'run'}
           >
             <T>Copy</T>
           </MenuItem>
           {injectEnabled ? (
             <MenuItem
               onClick={this.handleOpenDisable.bind(this)}
-              disabled={injectNotSupported}
+              disabled={injectNotSupported || !injectIsUpdatable}
             >
               <T>Disable</T>
             </MenuItem>
           ) : (
             <MenuItem
               onClick={this.handleOpenEnable.bind(this)}
-              disabled={injectNotSupported}
+              disabled={injectNotSupported || !injectIsUpdatable}
             >
               <T>Enable</T>
             </MenuItem>

@@ -61,9 +61,9 @@ class Incident extends BaseEntity
      */
     protected $incident_injects;
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", options={"default": 0})
      */
-    protected $incident_order = 0;
+    protected $incident_order;
     protected $incident_exercise;
 
     public function __construct()

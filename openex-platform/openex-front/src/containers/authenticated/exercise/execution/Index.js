@@ -28,7 +28,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { equalsSelector } from '../../../../utils/Selectors';
 import { i18nRegister } from '../../../../utils/Messages';
-import { dateFormat, FIVE_SECONDS, timeDiff } from '../../../../utils/Time';
+import { dateFormat, FIVE_SECONDS } from '../../../../utils/Time';
 import { T } from '../../../../components/I18n';
 import Countdown from '../../../../components/Countdown';
 import { fetchGroups } from '../../../../actions/Group';
@@ -427,7 +427,7 @@ const filterInjectsPending = (state, ownProps) => {
       const isPendingInject = statusName === null || statusName === 'PENDING';
       return identifiedInject && isPendingInject;
     }),
-    R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
+    R.sortWith([R.ascend(R.prop('inject_date'))]),
   );
   return injectsFilterAndSorting(injects);
 };
@@ -449,7 +449,7 @@ const filterInjectsProcessed = (state, ownProps) => {
           || n.inject_status.status_name === 'ERROR'
           || n.inject_status.status_name === 'PARTIAL'),
     ),
-    R.sort((a, b) => timeDiff(b.inject_date, a.inject_date)),
+    R.sortWith([R.descend(R.prop('inject_date'))]),
   );
   return injectsFilterAndSorting(injects);
 };
@@ -460,7 +460,7 @@ const filterAudiences = (state, ownProps) => {
   const audiencesFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
+    R.sortWith([R.ascend(R.prop('audience_name'))]),
   );
   return audiencesFilterAndSorting(audiences);
 };

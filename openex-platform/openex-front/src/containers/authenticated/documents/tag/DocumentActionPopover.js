@@ -112,16 +112,25 @@ class DocumentActionPopover extends Component {
           onClose={this.handlePopoverClose.bind(this)}
           style={{ marginTop: 50 }}
         >
-          <MenuItem onClick={this.editDocument.bind(this)}>
+          <MenuItem
+            onClick={this.editDocument.bind(this)}
+            disabled={!this.props.userCanUpdate}
+          >
             <T>Edit</T>
           </MenuItem>
           <MenuItem onClick={this.viewDocument.bind(this)}>
             <T>Download</T>
           </MenuItem>
-          <MenuItem onClick={this.editDocumentTag.bind(this)}>
+          <MenuItem
+            onClick={this.editDocumentTag.bind(this)}
+            disabled={!this.props.userCanUpdate}
+          >
             <T>List of tags</T>
           </MenuItem>
-          <MenuItem onClick={this.handleOpenConfirmDelete.bind(this)}>
+          <MenuItem
+            onClick={this.handleOpenConfirmDelete.bind(this)}
+            disabled={!this.props.userCanUpdate}
+          >
             <T>Delete</T>
           </MenuItem>
         </Menu>
@@ -165,6 +174,7 @@ DocumentActionPopover.propTypes = {
   handleViewDocument: PropTypes.func,
   handleEditDocumentTag: PropTypes.func,
   handleDeleteDocument: PropTypes.func,
+  userCanUpdate: PropTypes.bool,
 };
 
 const select = (state) => ({

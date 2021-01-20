@@ -29,6 +29,8 @@ class ExerciseType extends AbstractType
         $builder->add('exercise_message_footer');
         $builder->add('exercise_animation_group');
         $builder->add('exercise_type');
+        $builder->add('exercise_latitude');
+        $builder->add('exercise_longitude');
     }
 
     public function configureOptions(OptionsResolver $resolver)

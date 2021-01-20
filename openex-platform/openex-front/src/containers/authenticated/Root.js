@@ -9,7 +9,11 @@ import { withRouter } from 'react-router-dom';
 import { connectedRouterRedirect } from 'redux-auth-wrapper/history4/redirect';
 import { T } from '../../components/I18n';
 import { i18nRegister } from '../../utils/Messages';
-import { fetchMe, savedDismiss } from '../../actions/Application';
+import {
+  fetchMe,
+  fetchParameters,
+  savedDismiss,
+} from '../../actions/Application';
 import IndexAuthenticated from './Index';
 import IndexProfile from './profile/Index';
 import IndexDocuments from './documents/Index';
@@ -34,40 +38,41 @@ const UserIsAdmin = connectedRouterRedirect({
 const RootAuthenticated = (props) => {
   useEffect(() => {
     props.fetchMe();
+    props.fetchParameters();
   }, []);
   if (R.isEmpty(props.logged)) {
-    return <div>LOADING</div>;
+    return <div> &nbsp; </div>;
   }
   if (!props.logged) {
     return <Login />;
   }
   return (
     <div>
-        <Snackbar
-            open={props.savedPopupOpen}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            autoHideDuration={1000}
-            onClose={props.savedDismiss.bind(this)}
+      <Snackbar
+        open={props.savedPopupOpen}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        autoHideDuration={1000}
+        onClose={props.savedDismiss.bind(this)}
+      >
+        <Alert
+          severity="info"
+          elevation={6}
+          onClose={props.savedDismiss.bind(this)}
         >
-            <Alert
-                severity="info"
-                elevation={6}
-                onClose={props.savedDismiss.bind(this)}
-            >
-                <T>The operation has been done</T>
-            </Alert>
-        </Snackbar>
-        <Switch>
-            <Route exact path="/private" component={IndexAuthenticated}/>
-            <Route exact path="/private/profile" component={IndexProfile}/>
-            <Route exact path="/private/documents" component={IndexDocuments}/>
-            <Route path="/private/exercise/:exerciseId" component={RootExercise}/>
-            <Route path="/private/admin" component={UserIsAdmin(RootAdmin)}/>
-            <Route component={NotFound}/>
-        </Switch>
+          <T>The operation has been done</T>
+        </Alert>
+      </Snackbar>
+      <Switch>
+        <Route exact path="/private" component={IndexAuthenticated} />
+        <Route exact path="/private/profile" component={IndexProfile} />
+        <Route exact path="/private/documents" component={IndexDocuments} />
+        <Route path="/private/exercise/:exerciseId" component={RootExercise} />
+        <Route path="/private/admin" component={UserIsAdmin(RootAdmin)} />
+        <Route component={NotFound} />
+      </Switch>
     </div>
   );
 };
@@ -76,6 +81,7 @@ RootAuthenticated.propTypes = {
   children: PropTypes.node,
   savedPopupOpen: PropTypes.bool,
   fetchMe: PropTypes.func,
+  fetchParameters: PropTypes.func,
   savedDismiss: PropTypes.func,
 };
 
@@ -86,5 +92,5 @@ const select = (state) => ({
 
 export default R.compose(
   withRouter,
-  connect(select, { fetchMe, savedDismiss }),
+  connect(select, { fetchMe, savedDismiss, fetchParameters }),
 )(RootAuthenticated);
