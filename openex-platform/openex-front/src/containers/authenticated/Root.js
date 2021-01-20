@@ -55,13 +55,9 @@ const RootAuthenticated = (props) => {
           horizontal: 'right',
         }}
         autoHideDuration={1000}
-        onClose={props.savedDismiss.bind(this)}
+        onClose={props.savedDismiss}
       >
-        <Alert
-          severity="info"
-          elevation={6}
-          onClose={props.savedDismiss.bind(this)}
-        >
+        <Alert severity="info" elevation={6} onClose={props.savedDismiss}>
           <T>The operation has been done</T>
         </Alert>
       </Snackbar>

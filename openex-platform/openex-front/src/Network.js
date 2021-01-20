@@ -14,9 +14,7 @@ export const api = (schema) => {
     (response) => {
       if (schema) {
         const toImmutable = response.config.responseType === undefined; //= == json
-        const dataNormalize = schema
-          ? normalize(response.data, schema)
-          : response.data;
+        const dataNormalize = normalize(response.data, schema);
         debug('api', {
           from: response.request.responseURL,
           data: { raw: response.data, normalize: dataNormalize },

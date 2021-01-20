@@ -19,13 +19,10 @@ if (process.env.NODE_ENV === 'development') {
   // eslint-disable-next-line no-console
   const originalConsoleError = console.error;
   // eslint-disable-next-line no-console
-  if (console.error === originalConsoleError) {
-    // eslint-disable-next-line no-console
-    console.error = (...args) => {
-      if (args && args[0].indexOf('[React Intl]') === 0) return;
-      originalConsoleError.call(console, ...args);
-    };
-  }
+  console.error = (...args) => {
+    if (args && args[0].indexOf('[React Intl]') === 0) return;
+    originalConsoleError.call(console, ...args);
+  };
 }
 
 // region authentication
@@ -83,11 +80,11 @@ class App extends Component {
         <ConnectedIntl store={store}>
           <Provider store={store}>
             <ConnectedRouter history={history}>
-                <Switch>
-                  <Redirect exact from="/" to="/private" />
-                  <Route path="/private" component={RootAuthenticated} />
-                  <Route path="/" component={RootAnonymous} />
-                </Switch>
+              <Switch>
+                <Redirect exact from="/" to="/private" />
+                <Route path="/private" component={RootAuthenticated} />
+                <Route path="/" component={RootAnonymous} />
+              </Switch>
             </ConnectedRouter>
           </Provider>
         </ConnectedIntl>

@@ -144,7 +144,7 @@ class DocumentTags extends Component {
           <div className={classes.divTitle}>Available Tags</div>
           <div className={classes.ssDivDroite}>
             {this.props.availables_tags.length === 0
-              && this.props.availables_exercises_tags === 0 && (
+              && this.props.availables_exercises_tags.length === 0 && (
                 <div className={classes.empty}>
                   <T>No Tag available</T>
                 </div>
