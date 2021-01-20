@@ -16,7 +16,7 @@ class GroupController extends BaseController
 {
 
     /**
-     * @OA\Get(
+     * @OA\Response(
      *    response=200,
      *    description="List groups involved in an exercise"
      * )
