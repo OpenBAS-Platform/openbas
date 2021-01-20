@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 class SubobjectiveController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List subobjectives of an exercise"
      * )
      *

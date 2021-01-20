@@ -24,7 +24,8 @@ use ZipArchive;
 class ExerciseController extends BaseController
 {
     /**
-     * @OA\Property(description="List exercises")
+     * @OA\Response(
+     *    response=200,description="List exercises")
      *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/api/exercises")
@@ -76,7 +77,8 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Read an exercise")
+     * @OA\Response(
+     *    response=200,description="Read an exercise")
      *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/api/exercises/{exercise_id}")
@@ -126,7 +128,8 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create an exercise")
+     * @OA\Response(
+     *    response=200,description="Create an exercise")
      * @OA\Parameter(in={"class"=ExerciseType::class, "name"=""})
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"exercise"})
@@ -162,7 +165,8 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Delete an exercise")
+     * @OA\Response(
+     *    response=200,description="Delete an exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"exercise"})
      * @Rest\Delete("/api/exercises/{exercise_id}")
@@ -183,7 +187,8 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Copy one audience to an exercise")
+     * @OA\Response(
+     *    response=200,description="Copy one audience to an exercise")
      *
      * @Rest\View(serializerGroups={"audience"})
      * @Rest\Put("/api/exercises/{exercise_id}/copy-audience/{audience_id}")
@@ -224,7 +229,8 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update an exercise")
+     * @OA\Response(
+     *    response=200,description="Update an exercise")
      * @OA\Parameter(in={"class"=ExerciseType::class, "name"=""})
      *
      * @Rest\View(serializerGroups={"exercise"})
@@ -278,7 +284,8 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Export inject to EML files")
+     * @OA\Response(
+     *    response=200,description="Export inject to EML files")
      * @OA\Parameter(in={"class"=ExerciseType::class, "name"=""})
      *
      * @Rest\View(serializerGroups={"exercise"})

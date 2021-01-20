@@ -14,7 +14,8 @@ class ChangeDurationController extends BaseController
 {
 
     /**
-     * @OA\Property(description="Change duration of the exercise")
+     * @OA\Response(
+     *    response=200,description="Change duration of the exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Post("/api/exercises/{exercise_id}/injects/changeDuration")
@@ -365,7 +366,8 @@ class ChangeDurationController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Change duration of the exercise")
+     * @OA\Response(
+     *    response=200,description="Change duration of the exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Post("/exercises/{exercise_id}/injects/simulate/changeDuration")

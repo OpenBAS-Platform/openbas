@@ -15,7 +15,8 @@ class InjectTypeController extends AbstractController
     public static $INJECT_TYPE_MANUAL = 'openex_manual';
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List inject types"
      * )
      *

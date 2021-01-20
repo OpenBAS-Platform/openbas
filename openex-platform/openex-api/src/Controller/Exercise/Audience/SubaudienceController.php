@@ -16,7 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 class SubaudienceController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List subaudiences of an audience"
      * )
      *
@@ -57,7 +58,8 @@ class SubaudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Create a subaudience")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"subaudience"})
@@ -91,7 +93,8 @@ class SubaudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a subaudience"
      * )
      *
@@ -128,7 +131,8 @@ class SubaudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Update a subaudience")
      *
      * @Rest\View(serializerGroups={"subaudience"})

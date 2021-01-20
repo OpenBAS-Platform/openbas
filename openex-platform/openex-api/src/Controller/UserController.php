@@ -18,7 +18,8 @@ class UserController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List users planificateurs"
      * )
      *
@@ -33,7 +34,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List users"
      * )
      *
@@ -72,7 +74,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read a user"
      * )
      *
@@ -102,7 +105,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Create a user"
      * )
      *
@@ -152,7 +156,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a user"
      * )
      *
@@ -176,7 +181,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Update a user"
      * )
      *
@@ -233,7 +239,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read me",
      * )
      *

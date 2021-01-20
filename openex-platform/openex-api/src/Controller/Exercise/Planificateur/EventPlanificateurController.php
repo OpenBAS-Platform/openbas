@@ -12,7 +12,8 @@ class EventPlanificateurController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Update list user planificateur for an audience"
      * )
      *
@@ -43,7 +44,8 @@ class EventPlanificateurController extends BaseController
 
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List user planificateur for an event"
      * )
      *

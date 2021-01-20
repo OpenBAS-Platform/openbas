@@ -15,7 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 class ObjectiveController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List objectives"
      * )
      *
@@ -51,7 +52,8 @@ class ObjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read an objective"
      * )
      *
@@ -89,7 +91,8 @@ class ObjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create an objective")
+     * @OA\Response(
+     *    response=200,description="Create an objective")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"objective"})
      * @Rest\Post("/api/exercises/{exercise_id}/objectives")
@@ -121,7 +124,8 @@ class ObjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete an objective"
      * )
      *
@@ -152,7 +156,8 @@ class ObjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update an objective")
+     * @OA\Response(
+     *    response=200,description="Update an objective")
      *
      * @Rest\View(serializerGroups={"objective"})
      * @Rest\Put("/api/exercises/{exercise_id}/objectives/{objective_id}")

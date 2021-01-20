@@ -17,7 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 class IncidentController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List incidents of an event"
      * )
      *
@@ -64,7 +65,8 @@ class IncidentController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read an incident"
      * )
      *
@@ -109,7 +111,8 @@ class IncidentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create an incident")
+     * @OA\Response(
+     *    response=200,description="Create an incident")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"incident"})
      * @Rest\Post("/api/exercises/{exercise_id}/events/{event_id}/incidents")
@@ -156,7 +159,8 @@ class IncidentController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete an incident"
      * )
      *
@@ -194,7 +198,8 @@ class IncidentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update an incident")
+     * @OA\Response(
+     *    response=200,description="Update an incident")
      *
      * @Rest\View(serializerGroups={"incident"})
      * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}")

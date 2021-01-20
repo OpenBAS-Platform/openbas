@@ -26,7 +26,8 @@ use function json_encode;
 class InjectController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List injects for the worker"
      * )
      * @Rest\View(serializerGroups={"inject"})
@@ -73,7 +74,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List injects for the worker"
      * )
      *
@@ -290,7 +292,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Update the status of an inject",
      * )
      * @Rest\View(serializerGroups={"injectStatus"})
@@ -324,7 +327,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Update the status of an dryinject",
      * )
      * @Rest\View(serializerGroups={"dryinjectStatus"})

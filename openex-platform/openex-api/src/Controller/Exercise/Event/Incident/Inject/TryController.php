@@ -17,7 +17,8 @@ class TryController extends AbstractController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Try an inject"
      * )
      *

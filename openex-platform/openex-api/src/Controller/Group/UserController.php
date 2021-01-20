@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 class UserController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List users of a group"
      * )
      *
@@ -42,7 +43,8 @@ class UserController extends AbstractController
     }
 
     /**
-     * @OA\Property(description="Add a user to a group")
+     * @OA\Response(
+     *    response=200,description="Add a user to a group")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
      * @Rest\Post("/api/groups/{group_id}/users")
@@ -79,7 +81,8 @@ class UserController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Remove a user from a group",
      * )
      *

@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 class ComcheckStatusController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List statuses of a comcheck"
      * )
      *

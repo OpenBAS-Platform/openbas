@@ -17,7 +17,8 @@ class SubobjectiveController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List subobjectives of an objective"
      * )
      *
@@ -66,7 +67,8 @@ class SubobjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create a subobjective")
+     * @OA\Response(
+     *    response=200,description="Create a subobjective")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"subobjective"})
      * @Rest\Post("/api/exercises/{exercise_id}/objectives/{objective_id}/subobjectives")
@@ -105,7 +107,8 @@ class SubobjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a subobjective"
      * )
      *
@@ -148,7 +151,8 @@ class SubobjectiveController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update a subobjective")
+     * @OA\Response(
+     *    response=200,description="Update a subobjective")
      *
      * @Rest\View(serializerGroups={"subobjective"})
      * @Rest\Put("/api/exercises/{exercise_id}/objectives/{objective_id}/subobjectives/{subobjective_id}")

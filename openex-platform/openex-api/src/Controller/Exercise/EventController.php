@@ -23,7 +23,8 @@ class EventController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List events of an exercise"
      * )
      *
@@ -58,7 +59,8 @@ class EventController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read an event"
      * )
      *
@@ -95,7 +97,8 @@ class EventController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create an event")
+     * @OA\Response(
+     *    response=200,description="Create an event")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"event"})
      * @Rest\Post("/api/exercises/{exercise_id}/events")
@@ -130,7 +133,8 @@ class EventController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete an event"
      * )
      *
@@ -161,7 +165,8 @@ class EventController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update an event")
+     * @OA\Response(
+     *    response=200,description="Update an event")
      *
      * @Rest\View(serializerGroups={"event"})
      * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}")
@@ -199,7 +204,8 @@ class EventController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Import incidents and injects"
      * )
      *

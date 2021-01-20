@@ -11,7 +11,8 @@ use Symfony\Component\HttpFoundation\Response;
 class WorkerStatusController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Get the worker status"
      * )
      * @Rest\Get("/api/worker_status")

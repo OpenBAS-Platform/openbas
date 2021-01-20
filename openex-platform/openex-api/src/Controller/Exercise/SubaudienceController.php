@@ -15,7 +15,8 @@ class SubaudienceController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List subaudiences of an exercise"
      * )
      *

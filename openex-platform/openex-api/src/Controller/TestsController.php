@@ -308,7 +308,8 @@ class TestsController extends BaseController
     private $typeStrategic;
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete tests Users",
      * )
      *
@@ -366,7 +367,8 @@ class TestsController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Create an exercise test",
      * )
      *

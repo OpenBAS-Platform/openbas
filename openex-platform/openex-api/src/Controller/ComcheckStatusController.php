@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 class ComcheckStatusController extends AbstractFOSRestController
 {
     /**
-     * @OA\Property(description="Update the status of a comcheck user")
+     * @OA\Response(
+     *    response=200,description="Update the status of a comcheck user")
      * @Rest\View(serializerGroups={"comcheckStatus"})
      * @Rest\Get("/api/comcheck/{comcheckstatus_id}")
      */

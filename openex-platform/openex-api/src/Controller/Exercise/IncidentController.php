@@ -15,7 +15,8 @@ class IncidentController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List incidents of an exercise"
      * )
      *

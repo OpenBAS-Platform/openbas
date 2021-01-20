@@ -33,7 +33,8 @@ class ImportExerciseController extends AbstractController
 {
 
     /**
-     * @OA\Property(description="Import an exercise")
+     * @OA\Response(
+     *    response=200,description="Import an exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Get("/api/exercises/import/check/exercise/{file_id}")
@@ -192,7 +193,8 @@ class ImportExerciseController extends AbstractController
     }
 
     /**
-     * @OA\Property(description="Import an exercise")
+     * @OA\Response(
+     *    response=200,description="Import an exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Post("/api/exercises/import")

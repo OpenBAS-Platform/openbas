@@ -16,7 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 class InjectController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List injects of an event"
      * )
      *

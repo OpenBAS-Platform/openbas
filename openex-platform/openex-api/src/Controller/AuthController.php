@@ -9,6 +9,7 @@ use App\Form\Type\CredentialsType;
 use DateTime;
 use Drenso\OidcBundle\OidcClient;
 use FOS\RestBundle\View\View;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -47,7 +48,13 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @Route("/api/logout", name="auth_logout")
+     *
+     * @OA\Response(
+     *    response=200,
+     *    description="Logout (delete the cookie)"
+     * )
+     *
+     * @Route("/api/logout", name="auth_logout", methods={"GET"})
      */
     public function logoutAction(Request $request) {
         $response = new Response();
@@ -56,7 +63,7 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @Route("/api/auth/kerberos", name="connect_kerberos")
+     * @Route("/api/auth/kerberos", name="connect_kerberos", methods={"GET"})
      */
     public function getAuthKerberosTokenAction(Request $request)
     {
@@ -105,7 +112,7 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @Route("/api/auth", name="connect_local")
+     * @Route("/api/auth", name="connect_local", methods={"POST"})
      */
     public function postAuthAction(Request $request)
     {
@@ -151,7 +158,7 @@ class AuthController extends AbstractController
     }
 
     /**
-     * @Route("/connect/oidc", name="connect_oidc")
+     * @Route("/connect/oidc", name="connect_oidc", methods={"GET"})
      */
     public function connect(SessionInterface $session, OidcClient $oidc)
     {
@@ -161,7 +168,7 @@ class AuthController extends AbstractController
         return $oidc->generateAuthorizationRedirect();
     }
     /**
-     * @Route("/connect/oidc/check", name="connect_oidc_check")
+     * @Route("/connect/oidc/check", name="connect_oidc_check", methods={"GET"})
      */
     public function check(Request $request, OidcClient $oidc)
     {

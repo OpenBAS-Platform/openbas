@@ -16,7 +16,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class GrantController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List grants of a group"
      * )
      *
@@ -49,7 +50,8 @@ class GrantController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Add a grant to a group")
+     * @OA\Response(
+     *    response=200,description="Add a grant to a group")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"grant"})
      * @Rest\Post("/api/groups/{group_id}/grants")

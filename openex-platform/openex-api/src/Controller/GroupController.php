@@ -16,7 +16,8 @@ class GroupController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List groups"
      * )
      *
@@ -41,7 +42,8 @@ class GroupController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read a group"
      * )
      *
@@ -70,7 +72,8 @@ class GroupController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create a group")
+     * @OA\Response(
+     *    response=200,description="Create a group")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"group"})
      * @Rest\Post("/api/groups")
@@ -92,7 +95,8 @@ class GroupController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a group"
      * )
      *
@@ -113,7 +117,8 @@ class GroupController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update a group")
+     * @OA\Response(
+     *    response=200,description="Update a group")
      *
      * @Rest\View(serializerGroups={"group"})
      * @Rest\Put("/api/groups/{group_id}")

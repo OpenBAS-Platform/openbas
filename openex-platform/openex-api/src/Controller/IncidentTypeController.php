@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 class IncidentTypeController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List incident types"
      * )
      * @Rest\View(serializerGroups={"IncidentType"})

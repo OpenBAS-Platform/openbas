@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 class DryinjectController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List dryinjects of a dryrun"
      * )
      *

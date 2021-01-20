@@ -21,7 +21,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class UserController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List users of a subaudience"
      * )
      *
@@ -81,7 +82,8 @@ class UserController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List users of a subaudience (xls)"
      * )
      *

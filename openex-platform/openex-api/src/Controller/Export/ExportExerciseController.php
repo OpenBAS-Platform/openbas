@@ -21,7 +21,8 @@ class ExportExerciseController extends AbstractController
 {
 
     /**
-     * @OA\Property(description="Export an exercise")
+     * @OA\Response(
+     *    response=200,description="Export an exercise")
      *
      * @Rest\View(serializerGroups={"exercise"})
      * @Rest\Get("/api/exercises/{exercise_id}/export")

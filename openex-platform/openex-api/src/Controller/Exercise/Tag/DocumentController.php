@@ -15,7 +15,8 @@ class DocumentController extends BaseController
 {
 
     /**
-     * @OA\Property(description="Download a file")
+     * @OA\Response(
+     *    response=200,description="Download a file")
      *
      * @Rest\Get("/api/document/download/{document_id}")
      */
@@ -44,7 +45,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Get Document Tags by ID")
+     * @OA\Response(
+     *    response=200,description="Get Document Tags by ID")
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"tag"})
      * @Rest\Get("/api/document/{document_id}/tags")
@@ -65,7 +67,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Get Document Tags 'exercise' by ID")
+     * @OA\Response(
+     *    response=200,description="Get Document Tags 'exercise' by ID")
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"exercise"})
      * @Rest\Get("/api/document/{document_id}/tags/exercise")
@@ -81,7 +84,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Get Document by ID")
+     * @OA\Response(
+     *    response=200,description="Get Document by ID")
      *
      * @Rest\View(statusCode=Response::HTTP_OK, serializerGroups={"document"})
      * @Rest\Get("/api/document/{document_id}")
@@ -97,7 +101,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Edit Document Tags")
+     * @OA\Response(
+     *    response=200,description="Edit Document Tags")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
      * @Rest\Post("/api/document/{document_id}/save/tags")
@@ -125,7 +130,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Edit Document Tags Exercise")
+     * @OA\Response(
+     *    response=200,description="Edit Document Tags Exercise")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
      * @Rest\Post("/api/document/{document_id}/save/tags/exercise")
@@ -153,7 +159,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create a new document")
+     * @OA\Response(
+     *    response=200,description="Create a new document")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
      * @Rest\Post("/api/document")
@@ -185,7 +192,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Edit a Document")
+     * @OA\Response(
+     *    response=200,description="Edit a Document")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"document"})
      * @Rest\Post("/api/document/save/{document_id}")
@@ -213,7 +221,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a document"
      * )
      *
@@ -234,7 +243,8 @@ class DocumentController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Get List of document"
      * )
      *

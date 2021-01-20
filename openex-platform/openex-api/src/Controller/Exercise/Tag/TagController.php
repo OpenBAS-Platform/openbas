@@ -14,7 +14,8 @@ class TagController extends BaseController
 {
 
     /**
-     * @OA\Property(description="Create a new tag")
+     * @OA\Response(
+     *    response=200,description="Create a new tag")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"tag"})
      * @Rest\Post("/api/tag")
@@ -36,7 +37,8 @@ class TagController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Edit a Tag")
+     * @OA\Response(
+     *    response=200,description="Edit a Tag")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"tag"})
      * @Rest\Post("/api/tag/{tag_id}")
@@ -46,7 +48,8 @@ class TagController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a tag"
      * )
      *
@@ -72,7 +75,8 @@ class TagController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Get List of Tags"
      * )
      *

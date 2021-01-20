@@ -18,7 +18,8 @@ class ComcheckController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List comchecks of an exercise"
      * )
      *
@@ -54,7 +55,8 @@ class ComcheckController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read a comcheck"
      * )
      *
@@ -93,7 +95,8 @@ class ComcheckController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create a comcheck")
+     * @OA\Response(
+     *    response=200,description="Create a comcheck")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"comcheck"})
      * @Rest\Post("/api/exercises/{exercise_id}/comchecks")
@@ -171,7 +174,8 @@ class ComcheckController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a comcheck"
      * )
      *

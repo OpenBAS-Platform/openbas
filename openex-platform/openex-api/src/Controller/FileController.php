@@ -17,7 +17,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class FileController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List files"
      * )
      *
@@ -31,7 +32,8 @@ class FileController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Download a file"
      * )
      *
@@ -76,7 +78,8 @@ class FileController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Upload a file"
      * )
      *
@@ -107,7 +110,8 @@ class FileController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a file"
      * )
      *
@@ -135,7 +139,8 @@ class FileController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Get all sheets name for an import file"
      * )
      *

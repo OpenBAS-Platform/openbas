@@ -16,7 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 class LogController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List logs"
      * )
      *
@@ -51,7 +52,8 @@ class LogController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read a log"
      * )
      *
@@ -87,7 +89,8 @@ class LogController extends AbstractController
     }
 
     /**
-     * @OA\Property(description="Create a log")
+     * @OA\Response(
+     *    response=200,description="Create a log")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"log"})
      * @Rest\Post("/api/exercises/{exercise_id}/logs")
@@ -122,7 +125,8 @@ class LogController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a log"
      * )
      *
@@ -153,7 +157,8 @@ class LogController extends AbstractController
     }
 
     /**
-     * @OA\Property(description="Update a log")
+     * @OA\Response(
+     *    response=200,description="Update a log")
      *
      * @Rest\View(serializerGroups={"log"})
      * @Rest\Put("/api/exercises/{exercise_id}/logs/{log_id}")

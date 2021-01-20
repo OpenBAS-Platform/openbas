@@ -26,7 +26,8 @@ class TokenController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Get a Kerberos token",
      * )
      * @Rest\View(serializerGroups={"token"})
@@ -76,7 +77,8 @@ class TokenController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Create a token"
      * )
      *
@@ -125,7 +127,8 @@ class TokenController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a token",
      * )
      *
@@ -149,7 +152,8 @@ class TokenController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read a token",
      * )
      *

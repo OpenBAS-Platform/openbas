@@ -17,7 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 class OutcomeController extends AbstractController
 {
     /**
-     * @OA\Property(description="Update an outcome")
+     * @OA\Response(
+     *    response=200,description="Update an outcome")
      *
      * @Rest\View(serializerGroups={"incident"})
      * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/outcome/{outcome_id}")

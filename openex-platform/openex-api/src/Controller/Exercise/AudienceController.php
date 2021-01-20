@@ -21,7 +21,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AudienceController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List audiences of an exercise"
      * )
      *
@@ -57,7 +58,8 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List users of audiences (xls)"
      * )
      *
@@ -151,7 +153,8 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read an audience"
      * )
      *
@@ -189,7 +192,8 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create an audience")
+     * @OA\Response(
+     *    response=200,description="Create an audience")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"audience"})
      * @Rest\Post("/api/exercises/{exercise_id}/audiences")
@@ -223,7 +227,8 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete an audience"
      * )
      *
@@ -254,7 +259,8 @@ class AudienceController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update an audience")
+     * @OA\Response(
+     *    response=200,description="Update an audience")
      *
      * @Rest\View(serializerGroups={"audience"})
      * @Rest\Put("/api/exercises/{exercise_id}/audiences/{audience_id}")

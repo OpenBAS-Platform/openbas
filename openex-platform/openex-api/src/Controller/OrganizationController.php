@@ -15,7 +15,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class OrganizationController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List organizations"
      * )
      *
@@ -32,7 +33,8 @@ class OrganizationController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read an organization"
      * )
      *
@@ -58,7 +60,8 @@ class OrganizationController extends AbstractController
     }
 
     /**
-     * @OA\Property(description="Create an organization")
+     * @OA\Response(
+     *    response=200,description="Create an organization")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"organization"})
      * @Rest\Post("/api/organizations")
@@ -79,7 +82,8 @@ class OrganizationController extends AbstractController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete an organization"
      * )
      *
@@ -103,7 +107,8 @@ class OrganizationController extends AbstractController
     }
 
     /**
-     * @OA\Property(description="Update an organization")
+     * @OA\Response(
+     *    response=200,description="Update an organization")
      *
      * @Rest\View(serializerGroups={"organization"})
      * @Rest\Put("/api/organizations/{organization_id}")

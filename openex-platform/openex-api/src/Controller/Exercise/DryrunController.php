@@ -26,7 +26,8 @@ class DryrunController extends BaseController
 {
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List dryruns of an exercise"
      * )
      *
@@ -64,7 +65,8 @@ class DryrunController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Read a dryrun"
      * )
      *
@@ -103,7 +105,8 @@ class DryrunController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create a dryrun")
+     * @OA\Response(
+     *    response=200,description="Create a dryrun")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"dryrun"})
      * @Rest\Post("/api/exercises/{exercise_id}/dryruns")
@@ -222,7 +225,8 @@ class DryrunController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete a dryrun"
      * )
      *

@@ -20,7 +20,8 @@ use function is_array;
 class StatisticController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Get all statistics for an exercise"
      * )
      *

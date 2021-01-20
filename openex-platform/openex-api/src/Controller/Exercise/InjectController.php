@@ -23,7 +23,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class InjectController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List injects of an exercise"
      * )
      *
@@ -78,7 +79,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List injects of an exercise (xls)"
      * )
      *
@@ -185,7 +187,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Shift injects of an exercise",
      * )
      *

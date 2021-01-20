@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 class InjectStatusController extends AbstractController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List inject statuses"
      * )
      * @Rest\View(serializerGroups={"injectStatus"})

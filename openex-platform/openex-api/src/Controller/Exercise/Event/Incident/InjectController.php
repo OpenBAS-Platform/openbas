@@ -19,7 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 class InjectController extends BaseController
 {
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="List injects of an incident"
      * )
      *
@@ -85,7 +86,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Create an inject")
+     * @OA\Response(
+     *    response=200,description="Create an inject")
      *
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"inject"})
      * @Rest\Post("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects")
@@ -190,7 +192,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(
+     * @OA\Response(
+     *    response=200,
      *    description="Delete an inject"
      * )
      *
@@ -242,7 +245,8 @@ class InjectController extends BaseController
     }
 
     /**
-     * @OA\Property(description="Update an inject")
+     * @OA\Response(
+     *    response=200,description="Update an inject")
      *
      * @Rest\View(serializerGroups={"inject"})
      * @Rest\Put("/api/exercises/{exercise_id}/events/{event_id}/incidents/{incident_id}/injects/{inject_id}")
