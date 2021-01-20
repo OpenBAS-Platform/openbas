@@ -1,6 +1,4 @@
 import Immutable from 'seamless-immutable';
-import * as R from 'ramda';
-import { FORM_ERROR } from 'final-form';
 import FileSaver from 'file-saver';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../Network';
