@@ -6,6 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import AppBar from '@material-ui/core/AppBar';
 import * as R from 'ramda';
 import Button from '@material-ui/core/Button';
+import { VpnKeyOutlined } from '@material-ui/icons';
 import {
   askToken,
   checkKerberos,
@@ -119,6 +120,7 @@ const Login = (props) => {
             size="small"
             style={{ marginTop: 20 }}
             className={props.classes.button}
+            startIcon={<VpnKeyOutlined />}
           >
             {props.parameters.auth_openid_label.length > 0 ? (
               props.parameters.auth_openid_label
