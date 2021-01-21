@@ -15,7 +15,7 @@
 
 OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises. OpenEx is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and an UX oriented frontend.
 
-![Screenshot](https://www.openex.io/wp-content/uploads/2016/12/screenshot.png "Screenshot")
+![Screenshot](https://www.openex.io/wp-content/uploads/2021/01/screenshot.png "Screenshot")
 
 ## Objective
 
@@ -35,9 +35,9 @@ The releases are available on the [Github releases page](https://github.com/Open
 
 All you need to install the OpenEx platform can be found in the [official documentation](https://www.notion.so/luatix/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). For installation, you can:
 
-* [Deploy the VM template](https://www.notion.so/luatix/Virtual-machine-template-1789b4442b414dbf87f748db51c85aa5) (recommended)
-* [Use Docker](https://www.notion.so/luatix/Using-Docker-03d5c0592b9d4547800cc9f4ff7be2b8) (recommended)
-* [Install manually](https://www.notion.so/luatix/Manual-deployment-b911beba44234f179841582ab3894bb1)
+* [Deploy the VM template](https://www.notion.so/luatix/Virtual-machine-template-7a01e6731c13453ab0547e88a6967119)
+* [Use Docker](https://www.notion.so/luatix/Using-Docker-99d79e4abaa6401d9aa68a8064aaee78) (recommended)
+* [Install manually](https://www.notion.so/luatix/Manual-deployment-eaacdd186f884d2f90af4ba5cdd15847)
 
 ## Luatix's members
 
@@ -71,7 +71,7 @@ To help you get you familiar with our contribution process, we have a list of [b
 
 ### Development
 
-If you want to actively help OpenEx, we created a [dedicated documentation](https://www.notion.so/luatix/Environment-setup-606996f36d904fcf8d434c6d0eae4a00) about the deployment of a development environement and how to start the source code modification.
+If you want to actively help OpenEx, we created a [dedicated documentation](https://www.notion.so/luatix/Environment-setup-7b7754139072490aa9cb01f798ba8d5b) about the deployment of a development environement and how to start the source code modification.
 
 ## Community
 
