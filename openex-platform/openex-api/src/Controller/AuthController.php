@@ -131,20 +131,22 @@ class AuthController extends AbstractController
             return $this->invalidCredentials();
         }
         $user->setUserGravatar();
-
         $isPasswordValid = $this->passwordEncoder->isPasswordValid($user, $credentials->getPassword());
-
         if (!$isPasswordValid) {
             return $this->invalidCredentials();
         }
 
-        $token = new Token();
-        $token->setTokenValue(base64_encode(random_bytes(50)));
-        $token->setTokenCreatedAt(new DateTime('now'));
-        $token->setTokenUser($user);
-
-        $em->persist($token);
-        $em->flush();
+        $tokens = $user->getUserTokens();
+        if( count($tokens) > 0 ) {
+            $token = $tokens[0];
+        } else {
+            $token = new Token();
+            $token->setTokenValue(base64_encode(random_bytes(50)));
+            $token->setTokenCreatedAt(new DateTime('now'));
+            $token->setTokenUser($user);
+            $em->persist($token);
+            $em->flush();
+        }
         // Create and setup the cookie
         $serializer = $this->container->get('serializer');
         $userSerialized = $serializer->serialize($user, 'json',  ['groups' => 'user']);

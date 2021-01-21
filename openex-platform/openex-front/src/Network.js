@@ -25,14 +25,23 @@ export const api = (schema) => {
     },
     (err) => {
       const res = err.response;
-      // eslint-disable-next-line no-underscore-dangle
-      if (res.status === 503 && err.config && !err.config.__isRetryRequest) {
+      if (
+        res
+        && res.status === 503
+        && err.config
+        // eslint-disable-next-line no-underscore-dangle
+        && !err.config.__isRetryRequest
+      ) {
         // eslint-disable-next-line no-param-reassign,no-underscore-dangle
         err.config.__isRetryRequest = true;
         return axios(err.config);
       }
+      if (res) {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return Promise.reject({ status: res.status, ...res.data });
+      }
       // eslint-disable-next-line prefer-promise-reject-errors
-      return Promise.reject({ status: res.status, ...res.data });
+      return Promise.reject(false);
     },
   );
   return instance;

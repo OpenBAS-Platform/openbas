@@ -1,9 +1,9 @@
 App\Entity\Token:
   attributes:
     token_id:
-      groups: [ 'token' ]
+      groups: [ 'token', 'user' ]
     token_value:
-      groups: [ 'token' ]
+      groups: [ 'token', 'user' ]
     token_created_at:
       groups: [ 'token' ]
     token_user:

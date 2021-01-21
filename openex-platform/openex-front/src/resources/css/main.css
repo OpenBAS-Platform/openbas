@@ -99,6 +99,28 @@ div.line .active ~ li::before {
   border-radius: 6px;
 }
 
+pre {
+  padding: 10px;
+  font-family: Consolas, monaco, monospace;
+  font-size: 12px;
+  background: rgba(64, 193, 255, 0.2);
+  border-radius: 5px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  font-weight: 400;
+}
+
+code {
+  font-family: Consolas, monaco, monospace;
+  padding: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  background: rgba(64, 193, 255, 0.2);
+}
+
 div.clearfix {
   clear: both;
 }

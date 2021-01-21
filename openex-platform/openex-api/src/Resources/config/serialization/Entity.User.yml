@@ -38,6 +38,8 @@ App\Entity\User:
       groups: [ 'user', 'token' ]
     user_longitude:
       groups: [ 'user', 'token' ]
+    user_tokens:
+      groups: [ 'user' ]
     user_groups:
       groups: [ 'user' ]
     user_can_update:

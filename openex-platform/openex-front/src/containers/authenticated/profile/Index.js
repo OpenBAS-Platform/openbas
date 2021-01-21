@@ -29,6 +29,11 @@ i18nRegister({
     Profile: 'Profil',
     Password: 'Mot de passe',
     Information: 'Informations',
+    'API access': "Accès à l'API",
+    'API documentation': "Documentation de l'API",
+    'The OpenEX API relies on the REST standard, using HTTP verbs. The token must be passed into the HTTP header':
+      "L'API OpenEx repose sur le standard REST, utilisant les verbes HTTP. Le token doit être passé dans le header HTTP",
+    Example: 'Exemple',
   },
 });
 
@@ -178,6 +183,45 @@ class Index extends Component {
                 onClick={() => submitForm('passwordForm')}
               >
                 <T>Update</T>
+              </Button>
+            </Paper>
+            <Paper elevation={4} className={classes.paper}>
+              <Typography variant="h5" style={{ marginBottom: 20 }}>
+                <T>API access</T>
+              </Typography>
+              <Typography variant="body1">
+                <T>
+                  The OpenEX API relies on the REST standard, using HTTP verbs.
+                  The token must be passed into the HTTP header
+                </T>{' '}
+                <strong>X-Authorization-Token</strong>.
+                <Typography
+                  variant="h6"
+                  gutterBottom={true}
+                  style={{ marginTop: 20 }}
+                >
+                  <T>Token key</T>
+                </Typography>
+                <pre>{R.head(this.props.user.user_tokens).token_value}</pre>
+                <Typography variant="h6" gutterBottom={true}>
+                  <T>Example</T>
+                </Typography>
+                <pre>
+                  GET /api/exercises
+                  <br />
+                  Content-Type: application/json
+                  <br />
+                  X-Authorization-Token:{' '}
+                  {R.head(this.props.user.user_tokens).token_value}
+                </pre>
+              </Typography>
+              <Button
+                variant="contained"
+                color="secondary"
+                component="a"
+                href="/api/doc"
+              >
+                <T>API documentation</T>
               </Button>
             </Paper>
           </div>

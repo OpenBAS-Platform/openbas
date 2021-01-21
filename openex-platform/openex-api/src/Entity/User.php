@@ -125,6 +125,12 @@ class User extends BaseEntity implements UserInterface
      * @ORM\Column(type="string", nullable=true)
      */
     protected $user_lang;
+    /**
+     * @ORM\OneToMany(targetEntity="Token", mappedBy="token_user")
+     * @var Token[]
+     */
+    protected $user_tokens;
+
     protected $user_gravatar;
     protected $user_subaudience;
 
@@ -467,6 +473,17 @@ class User extends BaseEntity implements UserInterface
     public function setUserSubaudience($subaudience)
     {
         $this->user_subaudience = $subaudience;
+        return $this;
+    }
+
+    public function getUserTokens()
+    {
+        return $this->user_tokens;
+    }
+
+    public function setUserTokens($tokens)
+    {
+        $this->user_tokens = $tokens;
         return $this;
     }
 
