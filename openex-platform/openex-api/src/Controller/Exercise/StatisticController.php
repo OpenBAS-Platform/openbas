@@ -477,8 +477,8 @@ class StatisticController extends BaseController
                 ->andWhere('inject.inject_enabled = true')
                 ->andWhere('inject.inject_date BETWEEN :start AND :end')
                 ->setParameter('exercise', $exercise->getExerciseId())
-                ->setParameter('start', $startInject)
-                ->setParameter('end', $endInject)
+                ->setParameter('start', $startInject->format('c'))
+                ->setParameter('end', $endInject->format('c'))
                 ->getQuery()
                 ->getResult();
 
