@@ -113,8 +113,8 @@ class InjectController extends BaseController
                         ->andWhere('i.inject_date BETWEEN :start AND :end')
                         ->orderBy('i.inject_date', 'ASC')
                         ->setParameter('incident', $incident->getIncidentId())
-                        ->setParameter('start', $dateStart)
-                        ->setParameter('end', $dateEnd)
+                        ->setParameter('start', $dateStart->format('c'))
+                        ->setParameter('end', $dateEnd->format('c'))
                         ->getQuery()
                         ->getResult();
                     // enrich injects
@@ -188,14 +188,13 @@ class InjectController extends BaseController
             ->andWhere('i.dryinject_type != \'other\'')
             ->andWhere('i.dryinject_date BETWEEN :start AND :end')
             ->orderBy('i.dryinject_date', 'ASC')
-            ->setParameter('start', $dateStart)
-            ->setParameter('end', $dateEnd)
+            ->setParameter('start', $dateStart->format('c'))
+            ->setParameter('end', $dateEnd->format('c'))
             ->getQuery()
             ->getResult();
 
         foreach ($dryinjects as $dryinject) {
             /* @var $dryinject Dryinject */
-
             if ($dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup() != null) {
                 foreach ($dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user) {
                     $output[] = $this->getDryInjectData($request, $dryinject, $user);

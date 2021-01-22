@@ -136,7 +136,7 @@ class ComcheckController extends BaseController
             $link = $request->getSchemeAndHttpHost() . '/comcheck/' . '${user_comcheck_id}';
             $data = array();
             $data['data'] = array();
-            $data['data']['sender'] = $this->getParameter('mail_sender');
+            $data['data']['sender'] = $exercise->getExerciseMailExpediteur();
             $data['data']['subject'] = '[' . strtoupper($exercise->getExerciseName()) . '] ' . $comcheck->getComcheckSubject();
             $data['data']['body'] = $comcheck->getComcheckMessage() . '<br /><br /><a href="' . $link . '">' . $link . '</a><br /><br />' . $comcheck->getComcheckFooter();
             $data['data']['users'] = array();
