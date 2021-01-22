@@ -200,15 +200,11 @@ class InjectController extends BaseController
         if (!$request->request->get('shift_day') && !$request->request->get('shift_hour') && !$request->request->get('shift_minute')) {
             return View::create(['message' => 'Missing day/hour/minute value'], Response::HTTP_BAD_REQUEST);
         }
-
         /* Shift inject with interval */
         $old_date = new DateTime($request->request->get('old_date'));
-
-
         $value_days = intval($request->request->get('shift_day'));
         $value_hours = intval($request->request->get('shift_hour'));
         $value_minutes = intval($request->request->get('shift_minute'));
-
         $string_modify = '';
         if ($value_days) {
             $string_modify .= sprintf("%+d", $value_days) . 'days';
@@ -219,7 +215,6 @@ class InjectController extends BaseController
         if ($value_minutes) {
             $string_modify .= sprintf("%+d", $value_minutes) . 'minutes';
         }
-
         $new_date_with_shift = new DateTime($request->request->get('old_date'));
         $new_date_with_shift->modify($string_modify);
 
