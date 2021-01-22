@@ -46,6 +46,7 @@ public class HttpCaller {
 
     public void executionReport(Execution execution, String callbackUrl) throws Exception {
         String reportData = mapper.writeValueAsString(execution);
+        System.out.println("Callback to " + callbackUrl);
         HttpRequest httpRequest = HttpRequest.newBuilder().version(HttpClient.Version.HTTP_1_1)
                 .uri(new URI(callbackUrl))
                 .header(AUTHORIZATION, config.getToken())
