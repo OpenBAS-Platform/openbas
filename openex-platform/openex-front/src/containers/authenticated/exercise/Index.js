@@ -290,7 +290,7 @@ class IndexExercise extends Component {
                       </ListItemIcon>
                       <ListItemText
                         primary={objective.objective_title}
-                        secondar={objective.objective_description}
+                        secondary={objective.objective_description}
                       />
                     </ListItem>
                   ))}
