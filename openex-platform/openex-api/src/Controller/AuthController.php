@@ -81,7 +81,7 @@ class AuthController extends AbstractController
             $user->setUserEmail($apacheAuthUser);
             $user->setUserFirstname($apacheAuthUser);
             $user->setUserLastname('Doe');
-            $user->setUserAdmin(false);
+            $user->setUserAdmin($this->getParameter('auth_is_default_admin'));
             $user->setUserStatus(1);
             $user->setUserLang('auto');
             $em->persist($user);
@@ -194,7 +194,7 @@ class AuthController extends AbstractController
             $user->setUserEmail($email);
             $user->setUserFirstname($given_name);
             $user->setUserLastname($family_name);
-            $user->setUserAdmin(false);
+            $user->setUserAdmin($this->getParameter('auth_is_default_admin'));
             $user->setUserStatus(1);
             $user->setUserLang('auto');
             $em->persist($user);

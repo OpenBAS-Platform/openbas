@@ -16,6 +16,7 @@ parameters:
   auth_openid_client_id: '%env(AUTH_OPENID_CLIENT_ID)%'
   auth_openid_client_secret: '%env(AUTH_OPENID_CLIENT_SECRET)%'
   auth_kerberos_enable: '%env(bool:AUTH_KERBEROS_ENABLE)%'
+  auth_is_default_admin: '%env(bool:AUTH_IS_DEFAULT_ADMIN)%'
 
 services:
   _defaults:
