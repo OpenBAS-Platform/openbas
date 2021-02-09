@@ -61,6 +61,7 @@ class UserForm extends Component {
               label={<T>Organization</T>}
               options={options}
               style={{ marginTop: 20 }}
+              freeSolo={true}
             />
             <TextField
               name="user_phone2"
