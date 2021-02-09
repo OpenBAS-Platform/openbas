@@ -80,11 +80,11 @@ class CreateExercise extends Component {
             <ExerciseForm onSubmit={this.onSubmit.bind(this)} />
           </DialogContent>
           <DialogActions>
-            <Button variant="contained" onClick={this.handleClose.bind(this)}>
+            <Button variant="outlined" onClick={this.handleClose.bind(this)}>
               <T>Cancel</T>
             </Button>
             <Button
-              variant="contained"
+              variant="outlined"
               color="secondary"
               onClick={() => submitForm('exerciseForm')}
             >

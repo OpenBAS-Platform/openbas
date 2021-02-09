@@ -18,9 +18,9 @@ class ProfileForm extends Component {
   render() {
     const { onSubmit, initialValues } = this.props;
     return (
-      <Form id="profileForm" onSubmit={onSubmit} initialValues={initialValues}>
+      <Form onSubmit={onSubmit} initialValues={initialValues}>
         {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
+          <form id="profileForm" onSubmit={handleSubmit}>
             <TextField
               name="user_phone2"
               fullWidth={true}
