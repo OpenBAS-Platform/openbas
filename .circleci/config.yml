@@ -129,6 +129,39 @@ jobs:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
 
+  deploy_preprod1:
+    working_directory: ~/openex
+    docker:
+      - image: chialab/php:7.4
+    steps:
+      - attach_workspace:
+          at: ~/
+      - add_ssh_keys
+      - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
+      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
+      - run: mkdir deploy
+      - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
+      - run:
+          working_directory: ~/openex/deploy
+          command: git clone ssh://openex-V30PHgjf@openex.io:/~/openex-V30PHgjf.git .
+      - run:
+          working_directory: ~/openex/deploy
+          command: git submodule init && git submodule update --remote          
+      - run:
+          working_directory: ~/openex/deploy
+          command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master         
+      - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
+      - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
+      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
+      - run: mv ./deploy/openex-player/target/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/target/
+      - run:
+          working_directory: ~/openex/deploy
+          command: git add --force -A
+      - run:
+          working_directory: ~/openex/deploy
+          command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+          
   docker_build:
     working_directory: ~/openex
     docker:
@@ -217,6 +250,13 @@ workflows:
             branches:
               only:
                 - master
+      - deploy_preprod1:
+          requires:
+            - build_player
+          filters:
+            branches:
+              only:
+                - master                
       - docker_build_rolling:
           requires:
             - build_player
