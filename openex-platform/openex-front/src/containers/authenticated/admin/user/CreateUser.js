@@ -52,7 +52,9 @@ class CreateUser extends Component {
   }
 
   onSubmitCreate(data) {
-    return this.props.addUser(data).then(() => this.handleCloseCreate());
+    return this.props
+      .addUser(data)
+      .then((result) => (result.result ? this.handleCloseCreate() : result));
   }
 
   render() {
