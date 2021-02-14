@@ -472,17 +472,11 @@ class ExerciseController extends BaseController
     }
 
     /**
-     * Get real base folder where files are stored
-     *
-     * @return string real base folder
+     * Get Project File Path
      **/
     private function getProjectFilePath()
     {
-        return join([
-            $this->get('kernel')->getProjectDir(),
-            'var',
-            'files'
-        ], DIRECTORY_SEPARATOR);
+        return $this->getParameter('kernel.project_dir') . '/var/files';
     }
 
     /**
