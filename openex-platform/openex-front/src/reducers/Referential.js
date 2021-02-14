@@ -37,6 +37,8 @@ export const entitiesInitializer = Immutable({
 const referential = (state = Immutable({}), action) => {
   switch (action.type) {
     case Constants.DATA_FETCH_SUCCESS: {
+      // eslint-disable-next-line no-console
+      console.log(action.payload);
       return state.merge(action.payload.without('result'), { deep: true });
     }
 
