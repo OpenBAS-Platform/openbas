@@ -38,10 +38,6 @@ services:
     resource: '../src/*'
     exclude: '../src/{Entity,Form,Migrations,Resources,Kernel.php}'
 
-  openex_mailer:
-    class: App\Service\OpenexMailerService
-    arguments: [ "@mailer", "@templating", "@translator.default" ]
-
   token_user_provider:
     class: App\Security\TokenUserProvider
     arguments: [ "@doctrine.orm.entity_manager" ]
