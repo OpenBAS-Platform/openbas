@@ -36,16 +36,20 @@ class EventController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
+
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
+
         $this->denyAccessUnlessGranted('select', $exercise);
+
         $events = $em->getRepository('App:Event')->findBy(['event_exercise' => $exercise]);
         /* @var $events Event[] */
         foreach ($events as &$event) {
             $event->setUserCanUpdate($this->hasGranted(self::UPDATE, $event));
             $event->setUserCanDelete($this->hasGranted(self::DELETE, $event));
         }
+
         return $events;
     }
 
@@ -68,14 +72,19 @@ class EventController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
+
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
+
         $this->denyAccessUnlessGranted('select', $exercise);
+
         /* @var $event Event */
         $event = $em->getRepository('App:Event')->find($request->get('event_id'));
         $event->setUserCanUpdate($this->hasGranted(self::UPDATE, $event));
         $event->setUserCanDelete($this->hasGranted(self::DELETE, $event));
+
+
         if (empty($event) || $event->getEventExercise() !== $exercise) {
             return $this->eventNotFound();
         }
@@ -99,13 +108,17 @@ class EventController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
+
         if (empty($exercise)) {
             return $this->exerciseNotFound();
         }
+
         $this->denyAccessUnlessGranted('update', $exercise);
+
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
         $form->submit($request->request->all());
+
         if ($form->isValid()) {
             $file = $em->getRepository('App:File')->findOneBy(['file_name' => 'Event default']);
             $event->setEventExercise($exercise);
