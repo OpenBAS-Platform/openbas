@@ -1,4 +1,4 @@
-import Immutable from 'seamless-immutable';
+import Immutable, { isImmutable } from 'seamless-immutable';
 import * as Constants from '../constants/ActionTypes';
 
 export const entitiesInitializer = Immutable({
@@ -37,18 +37,17 @@ export const entitiesInitializer = Immutable({
 const referential = (state = Immutable({}), action) => {
   switch (action.type) {
     case Constants.DATA_FETCH_SUCCESS: {
-      // eslint-disable-next-line no-console
-      console.log(action.payload);
-      return state.merge(action.payload.without('result'), { deep: true });
+      if (isImmutable(action.payload)) {
+        return state.merge(action.payload.without('result'), { deep: true });
+      }
+      return state;
     }
-
     case Constants.DATA_DELETE_SUCCESS: {
       return state.setIn(
         ['entities', action.payload.type],
         state.entities[action.payload.type].without(action.payload.id),
       );
     }
-
     default: {
       return state;
     }
