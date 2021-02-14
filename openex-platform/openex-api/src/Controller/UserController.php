@@ -227,6 +227,10 @@ class UserController extends BaseController
                 $user->setUserAdmin(0);
             }
 
+            if( !empty($user->getUserEmail()) ) {
+                $user->setUserLogin($user->getUserEmail());
+            }
+
             $em->persist($user);
             $em->flush();
             $em->clear();
