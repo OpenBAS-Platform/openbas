@@ -304,7 +304,8 @@ class ExerciseController extends BaseController
             return $this->exerciseNotFound();
         }
 
-        $zipTempFile = 'openex_export_messages_eml_' . md5(uniqid() . date('Y-m-d H:i:s:u')) . '.zip';
+        $zipTempFileName = 'openex_export_messages_eml_' . md5(uniqid() . date('Y-m-d H:i:s:u')) . '.zip';
+        $zipTempFile = $this->getProjectFilePath() . DIRECTORY_SEPARATOR . $zipTempFileName;
         $zipEngine = new ZipArchive();
         $zipEngine->open($zipTempFile, ZipArchive::CREATE);
 
@@ -332,18 +333,14 @@ class ExerciseController extends BaseController
         $fsEngine = new FileSystem();
         if ($fsEngine->exists($zipTempFile)) {
             $response = new Response(file_get_contents($zipTempFile));
-
             $disposition = $response->headers->makeDisposition(
                 ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-                $zipTempFile
+                $zipTempFileName
             );
-
             $response->headers->set('Content-Type', 'application/zip');
             $response->headers->set('Content-Length', filesize($zipTempFile));
             $response->headers->set('Content-Disposition', $disposition);
-
             unlink($zipTempFile);
-
             return $response;
         }
 
