@@ -427,6 +427,7 @@ class InjectPopover extends Component {
         this.props.inject.inject_id,
       )
       .then((payload) => {
+        // eslint-disable-next-line no-console
         console.log(payload);
         this.setState({ injectResult: payload.result, openResult: true });
       });
