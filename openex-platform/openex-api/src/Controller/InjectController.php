@@ -235,9 +235,9 @@ class InjectController extends BaseController
     public function getPersonalInjectContent($content, $user)
     {
         $searchArray = [
-            '{{PRENOM}}',
-            '{{NOM}}',
-            '{{ORGANISATION}}'
+            '{{FIRSTNAME}}',
+            '{{LASTNAME}}',
+            '{{ORGANIZATION}}'
         ];
         $replaceArray = [
             $user->getUserFirstname(),

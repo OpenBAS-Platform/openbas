@@ -142,7 +142,6 @@ class IncidentController extends BaseController
 
         if ($form->isValid()) {
             $incident->setIncidentEvent($event);
-            $incident->setIncidentOrder(0);
             $em->persist($incident);
             $em->flush();
 

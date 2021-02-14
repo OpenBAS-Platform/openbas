@@ -427,6 +427,7 @@ class InjectPopover extends Component {
         this.props.inject.inject_id,
       )
       .then((payload) => {
+        console.log(payload);
         this.setState({ injectResult: payload.result, openResult: true });
       });
     this.handleCloseTry();
@@ -804,7 +805,7 @@ class InjectPopover extends Component {
           <DialogContent>
             <div>
               <strong>
-                {this.state.injectResult ? this.state.injectResult.status : ''}
+                <T>{this.state.injectResult ? this.state.injectResult.status : 'Unknown'}</T>
               </strong>
             </div>
             <br />
