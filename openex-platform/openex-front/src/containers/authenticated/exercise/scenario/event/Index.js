@@ -376,6 +376,7 @@ class Index extends Component {
             incident_types={this.props.incident_types}
             can_create={eventIsUpdatable && this.props.userCanUpdate}
             selectedIncident={R.propOr(null, 'incident_id', incident)}
+            subobjectives={this.props.subobjectives}
           />
           <div style={{ float: 'left', display: 'flex' }}>
             <EventOutlined fontSize="large" style={{ marginRight: 10 }} />

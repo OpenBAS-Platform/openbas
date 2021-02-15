@@ -83,7 +83,7 @@ class IncidentSubobjectives extends Component {
           onChange={this.handleSearchSubobjectives.bind(this)}
           fullWidth={true}
         />
-        <div>
+        <div style={{ marginTop: 15 }}>
           {this.state.subobjectivesIds.map((subobjectiveId) => {
             const subobjective = R.find(
               (a) => a.subobjective_id === subobjectiveId,
