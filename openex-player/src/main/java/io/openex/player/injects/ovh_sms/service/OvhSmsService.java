@@ -38,7 +38,7 @@ public class OvhSmsService {
         Template template = new Template("sms", new StringReader(message), new Configuration(Configuration.VERSION_2_3_30));
         String smsMessage = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
 
-        URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs/");
+        URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs");
         String isoMessage = new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
         OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(user.getPhone()), isoMessage);
         String smsBody = mapper.writeValueAsString(ovhSmsMessage);

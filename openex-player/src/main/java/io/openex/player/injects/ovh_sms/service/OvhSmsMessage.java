@@ -4,7 +4,7 @@ import java.util.List;
 
 public class OvhSmsMessage {
 
-	private String charset = "UTF_8";
+	private String charset = "UTF-8";
 
 	private final List<String> receivers;
 
