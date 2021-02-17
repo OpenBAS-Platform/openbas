@@ -17,6 +17,7 @@ import { T } from '../../components/I18n';
 import { i18nRegister } from '../../utils/Messages';
 import CreateExercise from './exercise/CreateExercise';
 import UserPopover from './UserPopover';
+import ImportExercise from './exercise/ImportExercise';
 
 i18nRegister({
   fr: {
@@ -85,6 +86,7 @@ class IndexAuthenticated extends Component {
             >
               <DescriptionOutlined fontSize="default" />
             </IconButton>
+            <ImportExercise />
             <UserPopover />
           </Toolbar>
         </AppBar>

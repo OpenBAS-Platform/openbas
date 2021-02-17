@@ -48,7 +48,7 @@ class ImportExerciseController extends AbstractController
             if (empty($file)) {
                 return $this->fileNotFound();
             }
-            $fileAddress = $this->get('kernel')->getProjectDir() . "/var/files/" . $file->getFilePath();
+            $fileAddress = $this->getProjectFilePath() . DIRECTORY_SEPARATOR . $file->getFilePath();
         } else {
             $fileAddress = $request->get('import_path');
         }
@@ -69,6 +69,14 @@ class ImportExerciseController extends AbstractController
             }
         }
         return array('exercise_exist' => false);
+    }
+
+    /**
+     * Get Project File Path
+     **/
+    private function getProjectFilePath()
+    {
+        return $this->getParameter('kernel.project_dir') . '/var/files';
     }
 
     /**
@@ -216,7 +224,7 @@ class ImportExerciseController extends AbstractController
             if (empty($file)) {
                 return $this->fileNotFound();
             }
-            $fileAddress = $this->get('kernel')->getProjectDir() . "/var/files/" . $file->getFilePath();
+            $fileAddress = $this->getProjectFilePath() . DIRECTORY_SEPARATOR . $file->getFilePath();
         } else {
             $fileAddress = $request->get('import_path');
         }
