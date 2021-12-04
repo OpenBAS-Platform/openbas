@@ -26,11 +26,13 @@ import static java.util.Collections.singletonList;
 public class OvhSmsService {
 
     private static final String METHOD = "POST";
-
-    @Autowired
+    private final ObjectMapper mapper = new ObjectMapper();
     private OvhSmsConfig config;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    public void setConfig(OvhSmsConfig config) {
+        this.config = config;
+    }
 
     public String sendSms(User user, String message) throws Exception {
         System.out.println("Sending sms to " + user.getEmail() + " - " + user.getPhone());

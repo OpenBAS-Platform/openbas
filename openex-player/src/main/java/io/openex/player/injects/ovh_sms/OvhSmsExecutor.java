@@ -15,8 +15,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class OvhSmsExecutor implements Executor<OvhSmsInject> {
 
-    @Autowired
     private OvhSmsService smsService;
+
+    @Autowired
+    public void setSmsService(OvhSmsService smsService) {
+        this.smsService = smsService;
+    }
 
     @Override
     public void process(OvhSmsInject inject, Execution execution) {

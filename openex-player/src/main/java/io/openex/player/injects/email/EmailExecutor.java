@@ -12,12 +12,19 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Component
 public class EmailExecutor implements Executor<EmailInject> {
 
+    private static final Logger LOGGER = Logger.getLogger(EmailExecutor.class.getName());
+    private EmailService emailService;
+
     @Autowired
-    private EmailService eMailService;
+    public void setEmailService(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @Override
     public void process(EmailInject inject, Execution execution) throws Exception {
@@ -25,18 +32,18 @@ public class EmailExecutor implements Executor<EmailInject> {
         String body = inject.getBody();
         String replyTo = inject.getReplyTo();
         // Resolve the attachments only one
-        List<EmailAttachment> attachments = inject.getAttachments() != null ? eMailService.resolveAttachments(inject.getAttachments()) : new ArrayList<>();
+        List<EmailAttachment> attachments = inject.getAttachments() != null ? //
+                emailService.resolveAttachments(execution, inject.getAttachments()) : new ArrayList<>();
         List<User> users = inject.getUsers();
         int numberOfExpected = users.size();
         AtomicInteger errors = new AtomicInteger(0);
         users.stream().parallel().forEach(user -> {
             String email = user.getEmail();
             try {
-                eMailService.sendEmail(user, replyTo, subject, body, attachments);
+                emailService.sendEmail(user, replyTo, subject, body, attachments);
                 execution.addMessage("Mail sent to " + email);
             } catch (Exception e) {
-                // TODO ADD AN ERROR LOGGER
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 errors.incrementAndGet();
                 execution.addMessage(e.getMessage());
             }

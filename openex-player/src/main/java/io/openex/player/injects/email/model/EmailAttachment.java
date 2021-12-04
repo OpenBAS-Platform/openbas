@@ -1,8 +1,5 @@
 package io.openex.player.injects.email.model;
 
-/**
- * Created by Julien on 23/12/2016.
- */
 public class EmailAttachment {
 
     private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";

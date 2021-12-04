@@ -6,6 +6,7 @@ import io.openex.player.config.OpenExConfig;
 import io.openex.player.injects.email.model.EmailAttachment;
 import io.openex.player.injects.email.model.EmailInjectAttachment;
 import io.openex.player.model.audience.User;
+import io.openex.player.model.execution.Execution;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,32 +26,55 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static io.openex.player.utils.HttpCaller.AUTHORIZATION;
 
 @Component
 public class EmailService {
 
-    @Autowired
+    private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
+    private final int DOWNLOAD_TIMEOUT = 2000;
+
     private JavaMailSender emailSender;
-
-    @Autowired
     private EmailPgp emailPgp;
-
-    @Autowired
     private OpenExConfig config;
 
-    public List<EmailAttachment> resolveAttachments(List<EmailInjectAttachment> attachments) throws Exception {
+    @Autowired
+    public void setEmailSender(JavaMailSender emailSender) {
+        this.emailSender = emailSender;
+    }
+
+    @Autowired
+    public void setEmailPgp(EmailPgp emailPgp) {
+        this.emailPgp = emailPgp;
+    }
+
+    @Autowired
+    public void setConfig(OpenExConfig config) {
+        this.config = config;
+    }
+
+    public List<EmailAttachment> resolveAttachments(Execution execution, List<EmailInjectAttachment> attachments) throws Exception {
         List<EmailAttachment> resolved = new ArrayList<>();
         for (EmailInjectAttachment attachment : attachments) {
             String file_id = attachment.getId();
             String file_name = attachment.getName();
             String attachmentUri = config.getApi() + config.getAttachmentUri();
             URL attachmentURL = new URL(attachmentUri + "/" + file_id);
-            HttpURLConnection urlConnection = (HttpURLConnection) attachmentURL.openConnection();
-            urlConnection.setRequestProperty(AUTHORIZATION, config.getToken());
-            byte[] content = IOUtils.toByteArray(urlConnection.getInputStream());
-            resolved.add(new EmailAttachment(file_name, content, urlConnection.getContentType()));
+            try {
+                HttpURLConnection urlConnection = (HttpURLConnection) attachmentURL.openConnection();
+                urlConnection.setRequestProperty(AUTHORIZATION, config.getToken());
+                urlConnection.setConnectTimeout(DOWNLOAD_TIMEOUT);
+                urlConnection.setReadTimeout(DOWNLOAD_TIMEOUT);
+                byte[] content = IOUtils.toByteArray(urlConnection.getInputStream());
+                resolved.add(new EmailAttachment(file_name, content, urlConnection.getContentType()));
+            } catch (Exception e) {
+                // Can't fetch the attachments, ignore
+                execution.addMessage("Error getting content for " + file_name);
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
         }
         return resolved;
     }

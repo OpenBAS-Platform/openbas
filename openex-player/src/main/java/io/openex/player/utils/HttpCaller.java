@@ -20,19 +20,25 @@ import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Component
 public class HttpCaller {
+    private static final Logger LOGGER = Logger.getLogger(HttpCaller.class.getName());
     public static final String AUTHORIZATION = "X-Authorization-Token";
 
+    private List<Contract> contracts;
     private final OpenExConfig config;
     private final HttpRequest injectsRequest;
     private final ObjectMapper mapper = new ObjectMapper();
     private final HttpClient client = HttpClient.newHttpClient();
 
     @Autowired
-    private List<Contract> contracts;
+    public void setContracts(List<Contract> contracts) {
+        this.contracts = contracts;
+    }
 
     @Autowired
     public HttpCaller(OpenExConfig config) throws URISyntaxException {
@@ -68,8 +74,7 @@ public class HttpCaller {
                 InjectBase injectData = mapper.readValue(injectContext.getData(), contract.dataClass());
                 execution.setInject(injectData);
             } catch (JsonProcessingException e) {
-                // TODO ADD ERROR LOGGER
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
             return execution;
         }).collect(Collectors.toList());

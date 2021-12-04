@@ -67,20 +67,4 @@ public class EmailInjectAttachment {
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
-
-    /*
-    "document_id": "f37ec410-29dd-406c-98b6-3c96d1f0b48e",
-    "document_name": "3.json",
-    "document_description": null,
-    "document_type": "txt",
-    "document_path": "feefa634668d06e7a5581e1150e89bcc.txt",
-    "document_liste_tags": [],
-    "document_liste_tags_exercise": [],
-    "file_id": "f37ec410-29dd-406c-98b6-3c96d1f0b48e",
-    "file_name": "3.json",
-    "file_description": null,
-    "file_type": "txt",
-    "file_path": "feefa634668d06e7a5581e1150e89bcc.txt",
-    "file_liste_tags": []
-     */
 }

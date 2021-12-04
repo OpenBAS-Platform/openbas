@@ -1,4 +1,4 @@
-FROM maven:3.6.3-openjdk-15
+FROM maven:3.8.4-openjdk-17
 
 # Copy the worker
 COPY . /opt/openex-player

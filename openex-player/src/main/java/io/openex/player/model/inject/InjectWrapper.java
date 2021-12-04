@@ -1,6 +1,7 @@
 package io.openex.player.model.inject;
 
 public class InjectWrapper {
+
     private InjectContext context;
     private InjectBase inject;
 

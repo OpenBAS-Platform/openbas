@@ -12,8 +12,12 @@ import static io.openex.player.contract.ContractType.Textarea;
 @Component
 public class OvhSmsContract extends Contract {
 
-    @Autowired
     private OvhSmsConfig config;
+
+    @Autowired
+    public void setConfig(OvhSmsConfig config) {
+        this.config = config;
+    }
 
     @Override
     public boolean expose() {

@@ -19,12 +19,18 @@ import java.util.stream.Collectors;
 public class RestHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
-
-    @Autowired
     private List<Contract> contracts;
+    private ApplicationContext context;
 
     @Autowired
-    private ApplicationContext context;
+    public void setContracts(List<Contract> contracts) {
+        this.contracts = contracts;
+    }
+
+    @Autowired
+    public void setContext(ApplicationContext context) {
+        this.context = context;
+    }
 
     @GetMapping("/contracts")
     public List<RestContract> getContracts() {

@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OvhSmsInject extends InjectBase {
+
     private String message;
 
     @Override
