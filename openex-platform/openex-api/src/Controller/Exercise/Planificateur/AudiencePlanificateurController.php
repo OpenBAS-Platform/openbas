@@ -3,15 +3,25 @@
 namespace App\Controller\Exercise\Planificateur;
 
 use App\Controller\Base\BaseController;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AudiencePlanificateurController extends BaseController
 {
+    private ManagerRegistry $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -23,7 +33,7 @@ class AudiencePlanificateurController extends BaseController
      */
     public function updatePlanificateurUserForAudienceAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine>getManager();
         $audience = $em->getRepository('App:Audience')->FindOneBy(array('audience_id' => $request->get('audience_id')));
         if ($audience) {
             foreach ($request->get('planificateurs') as $planificateur) {
@@ -60,7 +70,7 @@ class AudiencePlanificateurController extends BaseController
     public function getPlanificateurUserForAudienceAction(Request $request)
     {
         $listPlanificateur = array();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine>getManager();
         $planificateurs = $em->getRepository('App:User')->FindBy(array('user_planificateur' => true));
         $audience = $em->getRepository('App:Audience')->FindOneBy(array('audience_id' => $request->get('audience_id')));
         if ($audience) {

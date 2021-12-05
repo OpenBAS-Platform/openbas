@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -9,6 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 class IncidentTypeController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
     /**
      * @OA\Response(
      *    response=200,
@@ -19,7 +27,7 @@ class IncidentTypeController extends AbstractController
      */
     public function getIncidentTypesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $types = $em->getRepository('App:IncidentType')->findAll();
 
         return $types;

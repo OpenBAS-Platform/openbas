@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -11,12 +12,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @ORM\Entity()
  * @ORM\Table(name="users", uniqueConstraints={@ORM\UniqueConstraint(name="users_email_unique",columns={"user_email"})})
  */
-class User extends BaseEntity implements UserInterface
+class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator("doctrine.uuid_generator")
      */
     protected $user_id;
     /**
@@ -534,11 +536,6 @@ class User extends BaseEntity implements UserInterface
         return $this->user_email;
     }
 
-    public function getPassword()
-    {
-        return $this->user_password;
-    }
-
     public function eraseCredentials()
     {
         $this->user_plain_password = null;
@@ -562,5 +559,15 @@ class User extends BaseEntity implements UserInterface
     public function setUserLongitude($user_longitude): void
     {
         $this->user_longitude = $user_longitude;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->user_password;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->getUserLogin();
     }
 }

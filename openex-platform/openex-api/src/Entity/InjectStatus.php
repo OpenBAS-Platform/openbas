@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
  * @ORM\Entity()
  * @ORM\Table(name="injects_statuses")
@@ -13,7 +14,8 @@ class InjectStatus
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator("doctrine.uuid_generator")
      */
     protected $status_id;
 

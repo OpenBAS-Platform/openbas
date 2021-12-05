@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\Tests\StringableObject;
+
 
 /**
  * @ORM\Entity()
@@ -14,7 +14,8 @@ class File
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator("doctrine.uuid_generator")
      */
     protected $file_id;
 

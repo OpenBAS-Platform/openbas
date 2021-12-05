@@ -6,17 +6,29 @@ use App\Controller\Base\BaseController;
 use App\Entity\Organization;
 use App\Entity\User;
 use App\Form\Type\UserType;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -28,7 +40,7 @@ class UserController extends BaseController
      */
     public function getPlanificateursAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $planificateurs = $em->getRepository('App:User')->FindBy(array('user_planificateur' => true));
         return $planificateurs;
     }
@@ -44,7 +56,7 @@ class UserController extends BaseController
      */
     public function getUsersAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
 
         $users = array();
         if (!$request->get('keyword')) {
@@ -84,7 +96,7 @@ class UserController extends BaseController
      */
     public function getUserAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
         /* @var $user User */
 
@@ -113,9 +125,9 @@ class UserController extends BaseController
      * @Rest\View(statusCode=Response::HTTP_CREATED, serializerGroups={"user"})
      * @Rest\Post("/api/users")
      */
-    public function postUsersAction(Request $request, UserPasswordEncoderInterface $encoder)
+    public function postUsersAction(Request $request, UserPasswordHasherInterface $encoder)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
 
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -132,15 +144,15 @@ class UserController extends BaseController
             $user->setUserOrganization($organization);
 
             if (!empty($user->getUserPlainPassword())) {
-                $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
+                $encoded = $encoder->hashPassword($user, $user->getUserPlainPassword());
                 $user->setUserPassword($encoded);
             }
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->doctrine->getManager();
             if ($user->getUserAdmin() === null) {
                 $user->setUserAdmin(false);
             }
-            if ($user->getUserAdmin() == true && !$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
+            if ($user->getUserAdmin() == true && !$this->tokenStorage->getToken()->getUser()->isAdmin()) {
                 throw new AccessDeniedHttpException("Access Denied.");
             }
 
@@ -166,11 +178,11 @@ class UserController extends BaseController
      */
     public function removeUserAction(Request $request)
     {
-        if (!$this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
+        if (!$this->tokenStorage->getToken()->getUser()->isAdmin()) {
             throw new AccessDeniedHttpException("Access Denied.");
         }
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
         /* @var $user User */
 
@@ -189,9 +201,9 @@ class UserController extends BaseController
      * @Rest\View(serializerGroups={"user"})
      * @Rest\Put("/api/users/{user_id}")
      */
-    public function updateUserAction(Request $request,  UserPasswordEncoderInterface $encoder)
+    public function updateUserAction(Request $request,  UserPasswordHasherInterface $encoder)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $user = $em->getRepository('App:User')->find($request->get('user_id'));
         /* @var $user User */
 
@@ -212,12 +224,12 @@ class UserController extends BaseController
         }
 
         $userAdmin = $user->getUserAdmin();
-        $isAdmin = $this->get('security.token_storage')->getToken()->getUser()->isAdmin();
+        $isAdmin = $this->tokenStorage->getToken()->getUser()->isAdmin();
         $form = $this->createForm(UserType::class, $user);
         $form->submit($request->request->all(), false);
         if ($form->isValid()) {
             if (!empty($user->getUserPlainPassword())) {
-                $encoded = $encoder->encodePassword($user, $user->getUserPlainPassword());
+                $encoded = $encoder->hashPassword($user, $user->getUserPlainPassword());
                 $user->setUserPassword($encoded);
             }
 
@@ -253,6 +265,6 @@ class UserController extends BaseController
      */
     public function getUserMeAction(Request $request)
     {
-        return $this->get('security.token_storage')->getToken()->getUser();
+        return $this->tokenStorage->getToken()->getUser();
     }
 }

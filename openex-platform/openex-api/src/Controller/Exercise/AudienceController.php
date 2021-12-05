@@ -7,6 +7,7 @@ use App\Entity\Audience;
 use App\Entity\Exercise;
 use App\Form\Type\AudienceType;
 use App\Utils\Transform;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -17,9 +18,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AudienceController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -31,7 +41,7 @@ class AudienceController extends BaseController
      */
     public function getExercisesAudiencesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -67,7 +77,7 @@ class AudienceController extends BaseController
      */
     public function getExercisesUsersXlsxAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -163,7 +173,7 @@ class AudienceController extends BaseController
      */
     public function getExercisesAudienceAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -200,7 +210,7 @@ class AudienceController extends BaseController
      */
     public function postExercisesAudiencesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -237,7 +247,7 @@ class AudienceController extends BaseController
      */
     public function removeExercisesAudienceAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -267,8 +277,8 @@ class AudienceController extends BaseController
      */
     public function updateExercisesAudienceAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $em2 = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
+        $em2 = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 

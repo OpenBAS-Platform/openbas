@@ -10,6 +10,7 @@ use DateTime;
 use Drenso\OidcBundle\OidcClient;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,17 +18,19 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Security;
 
 class AuthController extends AbstractController
 {
-    private $passwordEncoder;
+    private UserPasswordHasherInterface $passwordEncoder;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserPasswordHasherInterface $passwordEncoder, ManagerRegistry $doctrine)
     {
         $this->passwordEncoder = $passwordEncoder;
+        $this->doctrine = $doctrine;
     }
 
     private function setupCookie($token, $response) {
@@ -67,7 +70,7 @@ class AuthController extends AbstractController
      */
     public function getAuthKerberosTokenAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $apacheAuthUser = $request->server->get('REMOTE_USER');
 
         if ($apacheAuthUser === null) {
@@ -116,7 +119,7 @@ class AuthController extends AbstractController
      */
     public function postAuthAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $credentials = new Credentials();
         $form = $this->createForm(CredentialsType::class, $credentials);
 
@@ -174,7 +177,7 @@ class AuthController extends AbstractController
      */
     public function check(Request $request, OidcClient $oidc)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         if (($authData = $oidc->authenticate($request)) === NULL) {
             return new JsonResponse('ERROR');
         }

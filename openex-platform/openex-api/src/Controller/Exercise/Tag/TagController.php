@@ -5,14 +5,24 @@ namespace App\Controller\Exercise\Tag;
 use App\Controller\Base\BaseController;
 use App\Entity\Tag;
 use App\Form\Type\TagType;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TagController extends BaseController
 {
+    private ManagerRegistry $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,description="Create a new tag")
@@ -22,7 +32,7 @@ class TagController extends BaseController
      */
     public function postCreateTagAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
 
         $tag = new Tag();
         $form = $this->createForm(TagType::class, $tag);
@@ -58,7 +68,7 @@ class TagController extends BaseController
      */
     public function deleteTagAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $tag = $em->getRepository('App:Tag')->find($request->get('tag_id'));
 
         if (empty($tag)) {
@@ -85,7 +95,7 @@ class TagController extends BaseController
      */
     public function getTagAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $tags = $em->getRepository('App:Tag')->findAll();
         return $tags;
     }

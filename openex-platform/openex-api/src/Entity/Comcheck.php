@@ -6,6 +6,7 @@ use App\Entity\Base\BaseEntity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
  * @ORM\Entity()
  * @ORM\Table(name="comchecks")
@@ -15,7 +16,8 @@ class Comcheck extends BaseEntity
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator("doctrine.uuid_generator")
      */
     protected $comcheck_id;
     /**

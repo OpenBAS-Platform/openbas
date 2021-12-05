@@ -8,17 +8,28 @@ use App\Entity\Event;
 use App\Entity\Exercise;
 use App\Entity\Incident;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use PHPExcel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use function is_array;
 
 class StatisticController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -32,7 +43,7 @@ class StatisticController extends BaseController
     {
         $exerciseId = $request->get('exercise_id');
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $oExercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $oExercise Exercise */
 
@@ -68,7 +79,7 @@ class StatisticController extends BaseController
      */
     private function getAllInjectsCount($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -147,7 +158,7 @@ class StatisticController extends BaseController
      */
     private function getAllPlayersFromExercise($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -192,7 +203,7 @@ class StatisticController extends BaseController
      */
     private function getOrganizationsCount($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
 
         $users = $this->getAllPlayersFromExercise($exerciseId);
         $organizations = [];
@@ -212,7 +223,7 @@ class StatisticController extends BaseController
      */
     private function getInjectsFrequency($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -239,7 +250,7 @@ class StatisticController extends BaseController
      */
     private function getExerciseDateTimeBoundaries($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -272,7 +283,7 @@ class StatisticController extends BaseController
      */
     private function getAllInjects($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 
@@ -375,7 +386,7 @@ class StatisticController extends BaseController
      */
     private function getInjectsCountsPerIncident($exerciseId)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $oExercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $oExercise Exercise */
 
@@ -419,7 +430,7 @@ class StatisticController extends BaseController
      */
     private function getInjectsCountsPerInterval($exerciseId, $interval)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($exerciseId);
         /* @var $exercise Exercise */
 

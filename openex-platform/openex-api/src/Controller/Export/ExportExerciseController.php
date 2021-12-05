@@ -5,6 +5,7 @@ namespace App\Controller\Export;
 use App\Constant\ExerciseConstantClass;
 use App\Entity\File;
 use App\Utils\Transform;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use OpenApi\Annotations as OA;
 use PHPExcel;
@@ -19,6 +20,12 @@ use function json_encode;
 
 class ExportExerciseController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
 
     /**
      * @OA\Response(
@@ -64,7 +71,7 @@ class ExportExerciseController extends AbstractController
             $exportTypes['export_exercise']['export'] = '1';
         }
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         $xlsExport = new Spreadsheet();
 

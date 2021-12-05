@@ -4,11 +4,19 @@ namespace App\Controller\Base;
 
 use App\Entity\Event;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BaseController extends AbstractFOSRestController
 {
     const UPDATE = 'update';
     const DELETE = 'delete';
+
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage)
+    {
+        $this->tokenStorage = $tokenStorage;
+    }
 
     /**
      * Check if user as grant to access to an object
@@ -18,7 +26,7 @@ class BaseController extends AbstractFOSRestController
      */
     protected function hasGranted($attributes, $object = null)
     {
-        $User = $this->get('security.token_storage')->getToken()->getUser();
+        $User = $this->tokenStorage->getToken()->getUser();
         if ($User->isAdmin()) {
             return true;
         }

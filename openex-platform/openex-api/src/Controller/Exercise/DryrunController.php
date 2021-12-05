@@ -15,16 +15,25 @@ use App\Form\Type\DryrunType;
 use DateInterval;
 use DateTime;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class DryrunController extends BaseController
 {
+    private ManagerRegistry $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
     /**
      * @OA\Response(
      *    response=200,
@@ -36,7 +45,7 @@ class DryrunController extends BaseController
      */
     public function getExercisesDryrunsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -75,7 +84,7 @@ class DryrunController extends BaseController
      */
     public function getExerciseDryrunAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -113,7 +122,7 @@ class DryrunController extends BaseController
      */
     public function postExercisesDryrunsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -235,7 +244,7 @@ class DryrunController extends BaseController
      */
     public function removeExercisesDryrunAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 

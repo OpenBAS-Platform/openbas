@@ -11,17 +11,32 @@ use App\Entity\InjectStatus;
 use App\Entity\Outcome;
 use App\Form\Type\EventType;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use PHPExcel_IOFactory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class EventController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+    private KernelInterface $kernel;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage, KernelInterface $kernel)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+        $this->kernel = $kernel;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -33,7 +48,7 @@ class EventController extends BaseController
      */
     public function getExercisesEventsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -69,7 +84,7 @@ class EventController extends BaseController
      */
     public function getExerciseEventAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -105,7 +120,7 @@ class EventController extends BaseController
      */
     public function postExercisesEventsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -142,7 +157,7 @@ class EventController extends BaseController
      */
     public function removeExercisesEventAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -172,7 +187,7 @@ class EventController extends BaseController
      */
     public function updateExercisesEventAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -213,7 +228,7 @@ class EventController extends BaseController
      */
     public function importExerciseEventAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 
@@ -237,16 +252,16 @@ class EventController extends BaseController
             foreach ($_FILES as $f) {
                 $uploadedFile = new UploadedFile($f['tmp_name'], $f['name']);
                 $filePath = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
-                $uploadedFile->move($this->get('kernel')->getRootDir() . '/files', $filePath);
+                $uploadedFile->move($this->kernel->getProjectDir() . '/files', $filePath);
                 break;
             }
         }
 
         $incidentType = $em->getRepository('App:IncidentType')->findOneBy(['type_name' => 'STRATEGIC']);
-        $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+        $connectedUser = $this->tokenStorage->getToken()->getUser();
 
         $objReader = PHPExcel_IOFactory::createReader('Excel2007');
-        $objPHPExcel = $objReader->load($this->get('kernel')->getRootDir() . '/files/' . $filePath);
+        $objPHPExcel = $objReader->load($this->kernel->getProjectDir() . '/files/' . $filePath);
 
         foreach ($objPHPExcel->getWorksheetIterator() as $worksheet) {
             $incident = new Incident();

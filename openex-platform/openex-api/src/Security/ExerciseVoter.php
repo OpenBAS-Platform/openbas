@@ -14,20 +14,20 @@ class ExerciseVoter extends Voter
     const UPDATE = 'update';
     const DELETE = 'delete';
 
-    protected function supports($attribute, $exercise)
+    protected function supports(string $attribute, $subject): bool
     {
         if (!in_array($attribute, array(self::SELECT, self::UPDATE, self::DELETE))) {
             return false;
         }
 
-        if (!$exercise instanceof Exercise) {
+        if (!$subject instanceof Exercise) {
             return false;
         }
 
         return true;
     }
 
-    protected function voteOnAttribute($attribute, $exercise, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
@@ -41,17 +41,17 @@ class ExerciseVoter extends Voter
 
         switch ($attribute) {
             case self::SELECT:
-                return $this->canSelect($exercise, $user);
+                return $this->canSelect($subject, $user);
             case self::UPDATE:
-                return $this->canUpdate($exercise, $user);
+                return $this->canUpdate($subject, $user);
             case self::DELETE:
-                return $this->canDelete($exercise, $user);
+                return $this->canDelete($subject, $user);
         }
 
         throw new LogicException('This code should not be reached!');
     }
 
-    private function canSelect(Exercise $exercise, User $user)
+    private function canSelect(Exercise $exercise, User $user): bool
     {
         if (in_array($this->findGrant($exercise, $user), array('ADMIN', 'PLANNER', 'PLAYER', 'OBSERVER'))) {
             return true;

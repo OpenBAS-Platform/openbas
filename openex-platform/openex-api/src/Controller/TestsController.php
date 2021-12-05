@@ -20,12 +20,16 @@ use App\Entity\Subaudience;
 use App\Entity\Subobjective;
 use App\Entity\User;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TestsController extends BaseController
 {
@@ -307,6 +311,18 @@ class TestsController extends BaseController
     private $typeOperational;
     private $typeStrategic;
 
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+    private UserPasswordHasherInterface $userPasswordHasher;
+
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage, UserPasswordHasherInterface $userPasswordHasher)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+        $this->userPasswordHasher = $userPasswordHasher;
+        parent::__construct($tokenStorage);
+    }
+
     /**
      * @OA\Response(
      *    response=200,
@@ -319,7 +335,7 @@ class TestsController extends BaseController
     public function deleteTestsUsersAction(Request $request)
     {
         try {
-            $this->em = $this->getDoctrine()->getManager();
+            $this->em = $this->doctrine->getManager();
 
             foreach (self::CST_AUDIENCES as $audience) {
                 foreach ($audience['SUB_AUDIENCES'] as $subAudience) {
@@ -378,8 +394,8 @@ class TestsController extends BaseController
     public function createTestsExerciseAction(Request $request)
     {
         try {
-            $this->em = $this->getDoctrine()->getManager();
-            $this->user = $this->get('security.token_storage')->getToken()->getUser();
+            $this->em = $this->doctrine->getManager();
+            $this->user = $this->tokenStorage->getToken()->getUser();
             $this->mail_test = 'admin@openex.io';
 
             $this->typeTechnical = $this->createIncidentType('TECHNICAL');
@@ -582,8 +598,7 @@ class TestsController extends BaseController
             $user->setUserStatus(1);
             $user->setUserLang('auto');
             $user->setUserOrganization($this->createOrganization($user_data['USER_ORGANIZATION']));
-            $encoder = $this->get('security.password_encoder');
-            $encoded = $encoder->encodePassword($user, $user_data['USER_PASSWORD']);
+            $encoded = $this->userPasswordHasher->hashPassword($user, $user_data['USER_PASSWORD']);
             $user->setUserPassword($encoded);
             $this->em->persist($user);
             $this->em->flush();

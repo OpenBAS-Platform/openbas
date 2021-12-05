@@ -8,13 +8,13 @@ use App\Entity\Organization;
 use App\Entity\Token;
 use App\Entity\User;
 use DateTime;
+use Doctrine\DBAL\Driver\Exception;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class InitDatabaseCommand extends Command
 {
@@ -23,7 +23,7 @@ class InitDatabaseCommand extends Command
     private $encoder;
     private $params;
 
-    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, ParameterBagInterface $params)
+    public function __construct(EntityManagerInterface $em, UserPasswordHasherInterface $encoder, ParameterBagInterface $params)
     {
         parent::__construct();
         $this->em = $em;
@@ -58,7 +58,7 @@ class InitDatabaseCommand extends Command
         $sql = 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"';
         $stmt = $conn->prepare($sql);
         try {
-            $stmt->execute();
+            $stmt->executeStatement();
             $output->writeln('Creating extensions');
         } catch (Exception $exception) {
             $output->writeln('Error creating extension');
@@ -134,7 +134,7 @@ class InitDatabaseCommand extends Command
         $user->setUserStatus(1);
         $user->setUserLang('auto');
         $user->setUserOrganization($organization);
-        $encoded = $this->encoder->encodePassword($user, $password);
+        $encoded = $this->encoder->hashPassword($user, $password);
         $user->setUserPassword($encoded);
         $this->em->persist($user);
         $this->em->flush();

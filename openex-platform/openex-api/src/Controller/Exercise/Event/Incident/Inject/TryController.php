@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\Exercise;
 use App\Entity\Incident;
 use App\Entity\Inject;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -15,6 +16,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TryController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
 
     /**
      * @OA\Response(
@@ -27,7 +34,7 @@ class TryController extends AbstractController
      */
     public function postExercisesEventsIncidentsInjectsTriesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 

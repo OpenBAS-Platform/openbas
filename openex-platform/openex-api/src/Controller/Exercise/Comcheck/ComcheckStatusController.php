@@ -4,6 +4,7 @@ namespace App\Controller\Exercise\Comcheck;
 
 use App\Entity\Comcheck;
 use App\Entity\Exercise;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -13,6 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ComcheckStatusController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -24,7 +32,7 @@ class ComcheckStatusController extends AbstractController
      */
     public function getExercisesComchecksStatusesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         /* @var $exercise Exercise */
 

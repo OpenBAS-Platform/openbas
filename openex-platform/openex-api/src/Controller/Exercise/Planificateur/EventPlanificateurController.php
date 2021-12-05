@@ -3,14 +3,24 @@
 namespace App\Controller\Exercise\Planificateur;
 
 use App\Controller\Base\BaseController;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class EventPlanificateurController extends BaseController
 {
+    private ManagerRegistry $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -22,7 +32,7 @@ class EventPlanificateurController extends BaseController
      */
     public function updatePlanificateurUserForEventAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $event = $em->getRepository('App:Event')->FindOneBy(array('event_id' => $request->get('event_id')));
         if ($event) {
             foreach ($request->get('planificateurs') as $planificateur) {
@@ -55,7 +65,7 @@ class EventPlanificateurController extends BaseController
     public function getPlanificateurUserForEventAction(Request $request)
     {
         $listPlanificateur = array();
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $planificateurs = $em->getRepository('App:User')->FindBy(array('user_planificateur' => true));
         $event = $em->getRepository('App:Event')->FindOneBy(array('event_id' => $request->get('event_id')));
         if ($event) {

@@ -6,15 +6,28 @@ use App\Controller\Base\BaseController;
 use App\Entity\Grant;
 use App\Entity\Group;
 use App\Form\Type\GrantType;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class GrantController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -26,7 +39,7 @@ class GrantController extends BaseController
      */
     public function getGroupsGrantsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -58,8 +71,8 @@ class GrantController extends BaseController
      */
     public function postGroupsGrantsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $em = $this->doctrine->getManager();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user->isAdmin()) {
             throw new AccessDeniedHttpException();
@@ -92,8 +105,8 @@ class GrantController extends BaseController
      */
     public function removeGroupsGrantAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $em = $this->doctrine->getManager();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user->isAdmin()) {
             throw new AccessDeniedHttpException();

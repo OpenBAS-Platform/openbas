@@ -8,16 +8,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class TokenAuthenticator extends AbstractGuardAuthenticator
+class TokenAuthenticator extends AbstractAuthenticator
 {
-    const TOKEN_VALIDITY_DURATION = 31536000; // 3600 * 24 * 365
-    protected $httpUtils;
-    protected $em;
+    protected HttpUtils $httpUtils;
+    protected EntityManager $em;
 
     public function __construct(HttpUtils $httpUtils, EntityManager $em)
     {
@@ -25,57 +26,36 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
         $this->em = $em;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        $data = [
-            'message' => 'Authentication Required'
-        ];
-        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
-    }
-
-    public function supports(Request $request)
+    public function supports(Request $request): ?bool
     {
         return $request->headers->has('X-Authorization-Token') || $request->cookies->has('openex_token');
     }
 
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): Passport
     {
         $header = $request->headers->get('X-Authorization-Token');
         $cookie = json_decode($request->cookies->get('openex_token'));
-        return $header !== null ? $header : $cookie->token_value;
-    }
-
-    public function getUser($credentials, UserProviderInterface $userProvider)
-    {
-        if ($credentials && strlen($credentials) > 0) {
-            $token = $this->em->getRepository('App:Token')->findOneBy(['token_value' => $credentials]);
-            if( $token ) {
-                return $token->getTokenUser();
-            }
+        $tokenValue = $header !== null ? $header : $cookie->token_value;
+        if (null === $tokenValue) {
+            // The token header was empty, authentication fails with HTTP Status
+            // Code 401 "Unauthorized"
+            throw new CustomUserMessageAuthenticationException('No API token provided');
         }
-        return null;
+        $userLoader = function($token) {
+            $token = $this->em->getRepository('App:Token')->findOneBy(['token_value' => $token]);
+            return $token->getTokenUser();
+        };
+        return new SelfValidatingPassport(new UserBadge($tokenValue, $userLoader));
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        return true;
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
-    {
-        $data = [
-            'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
-        ];
+        $data = ['message' => strtr($exception->getMessageKey(), $exception->getMessageData())];
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return null;
-    }
-
-    public function supportsRememberMe()
-    {
-        return false;
     }
 }

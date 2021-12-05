@@ -43,16 +43,6 @@ services:
     arguments: [ "@doctrine.orm.entity_manager" ]
     public: false
 
-  token_repository:
-    class: Doctrine\ORM\EntityManager
-    factory: [ "@doctrine.orm.entity_manager", "getRepository" ]
-    arguments: [ "App:Token" ]
-
-  user_repository:
-    class: Doctrine\ORM\EntityManager
-    factory: [ "@doctrine.orm.entity_manager", "getRepository" ]
-    arguments: [ "App:User" ]
-
   token_authenticator:
     class: App\Security\TokenAuthenticator
     arguments: [ "@security.http_utils", "@doctrine.orm.entity_manager" ]

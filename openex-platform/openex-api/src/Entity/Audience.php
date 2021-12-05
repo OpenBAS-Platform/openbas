@@ -6,6 +6,7 @@ use App\Entity\Base\BaseEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+
 /**
  * @ORM\Entity()
  * @ORM\Table(name="audiences")
@@ -15,7 +16,8 @@ class Audience extends BaseEntity
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator("doctrine.uuid_generator")
      */
     protected $audience_id;
     /**

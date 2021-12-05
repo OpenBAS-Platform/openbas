@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ComcheckStatus;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
@@ -13,6 +14,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ComcheckStatusController extends AbstractFOSRestController
 {
+
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
     /**
      * @OA\Response(
      *    response=200,description="Update the status of a comcheck user")
@@ -21,7 +30,7 @@ class ComcheckStatusController extends AbstractFOSRestController
      */
     public function updateComcheckStatusAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $status = $em->getRepository('App:ComcheckStatus')->find($request->get('comcheckstatus_id'));
         /* @var $status ComcheckStatus */
 

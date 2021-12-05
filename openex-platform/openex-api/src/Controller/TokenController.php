@@ -7,6 +7,7 @@ use App\Entity\Token;
 use App\Entity\User;
 use App\Form\Type\CredentialsType;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -14,15 +15,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TokenController extends AbstractController
 {
-    private $passwordEncoder;
+    private ManagerRegistry $doctrine;
+    private UserPasswordHasherInterface $passwordEncoder;
+    private TokenStorageInterface $tokenStorage;
 
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(TokenStorageInterface $tokenStorage, UserPasswordHasherInterface $passwordEncoder, ManagerRegistry $doctrine)
     {
         $this->passwordEncoder = $passwordEncoder;
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -35,7 +41,7 @@ class TokenController extends AbstractController
      */
     public function getKerberosTokenAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $apacheAuthUser = $request->server->get('REMOTE_USER');
 
         if ($apacheAuthUser === null) {
@@ -87,7 +93,7 @@ class TokenController extends AbstractController
      */
     public function postTokensAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $credentials = new Credentials();
         $form = $this->createForm(CredentialsType::class, $credentials);
 
@@ -137,11 +143,11 @@ class TokenController extends AbstractController
      */
     public function removeTokenAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $token = $em->getRepository('App:Token')->find($request->get('token_id'));
         /* @var $token Token */
 
-        $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+        $connectedUser = $this->tokenStorage->getToken()->getUser();
 
         if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId() || $connectedUser->isAdmin()) {
             $em->remove($token);
@@ -162,11 +168,11 @@ class TokenController extends AbstractController
      */
     public function getTokenAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $token = $em->getRepository('App:Token')->find($request->get('token_id'));
         /* @var $token Token */
 
-        $connectedUser = $this->get('security.token_storage')->getToken()->getUser();
+        $connectedUser = $this->tokenStorage->getToken()->getUser();
 
         if ($token && $token->getTokenUser()->getUserId() === $connectedUser->getUserId() || $connectedUser->isAdmin()) {
             $token->setTokenUser($token->getTokenUser()->setUserGravatar());

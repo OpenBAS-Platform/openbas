@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use function json_decode;
 use function json_encode;
 
+
 /**
  * @ORM\Entity()
  * @ORM\Table(name="injects")
@@ -18,7 +19,8 @@ class Inject extends BaseEntity
     /**
      * @ORM\Id
      * @ORM\Column(type="string")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\GeneratedValue(strategy="CUSTOM")
+     * @ORM\CustomIdGenerator("doctrine.uuid_generator")
      */
     protected $inject_id;
     /**

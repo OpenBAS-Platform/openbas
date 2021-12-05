@@ -4,6 +4,7 @@ namespace App\Controller\Group;
 
 use App\Entity\Group;
 use App\Entity\User;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -13,6 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+    
     /**
      * @OA\Response(
      *    response=200,
@@ -24,7 +32,7 @@ class UserController extends AbstractController
      */
     public function getGroupsUsersAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -51,7 +59,7 @@ class UserController extends AbstractController
      */
     public function postGroupsUsersAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -91,7 +99,7 @@ class UserController extends AbstractController
      */
     public function removeGroupsUserAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 

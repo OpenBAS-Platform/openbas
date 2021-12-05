@@ -6,14 +6,26 @@ use App\Controller\Base\BaseController;
 use App\Entity\Grant;
 use App\Entity\Group;
 use App\Form\Type\GroupType;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class GroupController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+        parent::__construct($tokenStorage);
+    }
 
     /**
      * @OA\Response(
@@ -26,11 +38,11 @@ class GroupController extends BaseController
      */
     public function getGroupsAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        if ($this->get('security.token_storage')->getToken()->getUser()->isAdmin()) {
+        $em = $this->doctrine->getManager();
+        if ($this->tokenStorage->getToken()->getUser()->isAdmin()) {
             $groups = $em->getRepository('App:Group')->findAll();
         } else {
-            $grants = $this->get('security.token_storage')->getToken()->getUser()->getUserGrants();
+            $grants = $this->tokenStorage->getToken()->getUser()->getUserGrants();
             /* @var $grants Grant[] */
             $groups = [];
             foreach ($grants as $grant) {
@@ -52,7 +64,7 @@ class GroupController extends BaseController
      */
     public function getGroupAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -85,7 +97,7 @@ class GroupController extends BaseController
         $form->submit($request->request->all());
 
         if ($form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->doctrine->getManager();
             $em->persist($group);
             $em->flush();
             return $group;
@@ -105,7 +117,7 @@ class GroupController extends BaseController
      */
     public function removeGroupAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 
@@ -125,7 +137,7 @@ class GroupController extends BaseController
      */
     public function updateGroupAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $group = $em->getRepository('App:Group')->find($request->get('group_id'));
         /* @var $group Group */
 

@@ -1,6 +1,7 @@
 security:
+  enable_authenticator_manager: true
   # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-  encoders:
+  password_hashers:
     App\Entity\User:
       algorithm: 'auto'
   providers:
@@ -35,11 +36,9 @@ security:
       pattern: ^/api
       stateless: true
       security: true
-      guard:
-        authenticators:
-          - token_authenticator
+      custom_authenticators:
+        - token_authenticator
       provider: token_user_provider
-      anonymous: ~
 
     frontend:
       pattern: ^/

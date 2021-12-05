@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\File;
 use App\Entity\User;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
@@ -13,9 +14,19 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class FileController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
      * @OA\Response(
      *    response=200,
@@ -27,7 +38,7 @@ class FileController extends AbstractController
      */
     public function getFilesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         return $em->getRepository('App:File')->findBy(array(), array('file_id' => 'DESC'));
     }
 
@@ -41,7 +52,7 @@ class FileController extends AbstractController
      */
     public function getFileAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $file = $em->getRepository('App:File')->find($request->get('file_id'));
         /* @var $file File */
 
@@ -88,7 +99,7 @@ class FileController extends AbstractController
      */
     public function postFilesAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         if (count($_FILES) == 0) {
             return View::create(['message' => 'No file uploaded'], Response::HTTP_BAD_REQUEST);
         } else {
@@ -120,9 +131,9 @@ class FileController extends AbstractController
      */
     public function removeFileAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         /** @var User $user */
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user->isAdmin()) {
             throw new AccessDeniedHttpException();
@@ -151,7 +162,7 @@ class FileController extends AbstractController
     {
         $reader = new Xlsx();
         $listTypeSheet = ['exercise', 'audience', 'objective', 'scenarios', 'incidents', 'injects'];
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $file = $em->getRepository('App:File')->find($request->get('file_id'));
 
         if (empty($file)) {

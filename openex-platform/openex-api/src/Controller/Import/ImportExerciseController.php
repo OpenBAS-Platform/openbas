@@ -16,13 +16,14 @@ use App\Entity\Subaudience;
 use App\Entity\Subobjective;
 use App\Entity\User;
 use DateTime;
-use Doctrine\DBAL\DBALException;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use OpenApi\Annotations as OA;
 use PHPExcel;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use stdClass;
+use Doctrine\DBAL\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,13 @@ use function json_decode;
 
 class ImportExerciseController extends AbstractController
 {
+    private ManagerRegistry $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+    
     /**
      * @OA\Response(
      *    response=200,description="Import an exercise")
@@ -41,7 +48,7 @@ class ImportExerciseController extends AbstractController
      */
     public function checkIfExerciseNameExistAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $reader = new Xlsx();
         if ($request->get('file_id') !== null) {
             $file = $em->getRepository('App:File')->find($request->get('file_id'));
@@ -217,7 +224,7 @@ class ImportExerciseController extends AbstractController
             ExerciseConstantClass::CST_INCIDENTS => 'import_incidents',
             ExerciseConstantClass::CST_INJECTS => 'import_injects'];
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
 
         if ($request->get('file') !== null) {
             $file = $em->getRepository('App:File')->find($request->get('file'));
@@ -332,7 +339,7 @@ class ImportExerciseController extends AbstractController
             $em->persist($exercise);
             $em->flush($exercise);
             return $this->returnSuccess($exercise);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour de l\'exercice');
         }
     }
@@ -352,10 +359,11 @@ class ImportExerciseController extends AbstractController
 
     /**
      * Return Error Message
-     * @param DBALException $ex
+     * @param Exception $ex
+     * @param null $errorMessage
      * @return stdClass
      */
-    private function returnException(DBALException $ex, $errorMessage = null)
+    private function returnException(Exception $ex, $errorMessage = null)
     {
         $returnObject = new stdClass();
         $returnObject->success = false;
@@ -395,7 +403,7 @@ class ImportExerciseController extends AbstractController
                 if ($result->success) {
                     $subAudience = $result->return;
                 } else {
-                    return $this->returnErrorMessage($return->errorMessage, $return->errorDetailMessage);
+                    return $this->returnErrorMessage($result->errorMessage, $result->errorDetailMessage);
                 }
                 if ($data[ExerciseConstantClass::CST_USER_LOGIN] !== null) {
                     $result = $this->createOrUpdateUser($em, $data, $subAudience, $forceCreate);
@@ -430,7 +438,7 @@ class ImportExerciseController extends AbstractController
             $em->persist($audience);
             $em->flush($audience);
             return $this->returnSuccess($audience);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des audiences');
         }
     }
@@ -464,7 +472,7 @@ class ImportExerciseController extends AbstractController
             $em->persist($subAudience);
             $em->flush($subAudience);
             return $this->returnSuccess($subAudience);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des sous-audiences');
         }
     }
@@ -509,7 +517,7 @@ class ImportExerciseController extends AbstractController
                 $em->flush($subAudience);
             }
             return $this->returnSuccess($user);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des utilisateurs');
         }
     }
@@ -531,7 +539,7 @@ class ImportExerciseController extends AbstractController
             $em->persist($organization);
             $em->flush($organization);
             return $this->returnSuccess($organization);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des organisations');
         }
     }
@@ -584,7 +592,7 @@ class ImportExerciseController extends AbstractController
             $em->persist($objective);
             $em->flush($objective);
             return $this->returnSuccess($objective);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des objectifs');
         }
     }
@@ -609,7 +617,7 @@ class ImportExerciseController extends AbstractController
             $em->persist($subObjective);
             $em->flush($subObjective);
             return $this->returnSuccess($subObjective);
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des sous objectifs');
         }
     }
@@ -636,7 +644,7 @@ class ImportExerciseController extends AbstractController
                 }
             }
             return $this->returnSuccess();
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des scénarios');
         }
     }
@@ -680,7 +688,7 @@ class ImportExerciseController extends AbstractController
                 }
             }
             return $this->returnSuccess();
-        } catch (DBALException $ex) {
+        } catch (Exception $ex) {
             return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des incidents');
         }
     }
@@ -726,7 +734,7 @@ class ImportExerciseController extends AbstractController
                     $inject->setInjectEnabled($data[ExerciseConstantClass::CST_INJECT_ENABLED]);
                     $em->persist($inject);
                     $em->flush($inject);
-                } catch (DBALException $ex) {
+                } catch (Exception $ex) {
                     return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des injections');
                 }
 
@@ -743,7 +751,7 @@ class ImportExerciseController extends AbstractController
                     $injectStatus->setStatusInject($inject);
                     $em->persist($injectStatus);
                     $em->flush($injectStatus);
-                } catch (DBALException $ex) {
+                } catch (Exception $ex) {
                     return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des statuts des injections');
                 }
 
@@ -778,7 +786,7 @@ class ImportExerciseController extends AbstractController
                             $em->persist($inject);
                             $em->flush($inject);
                         }
-                    } catch (DBALException $ex) {
+                    } catch (Exception $ex) {
                         return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des liens injection - audience');
                     }
                 }
@@ -794,7 +802,7 @@ class ImportExerciseController extends AbstractController
                             $em->persist($inject);
                             $em->flush($inject);
                         }
-                    } catch (DBALException $ex) {
+                    } catch (Exception $ex) {
                         return $this->returnException($ex, 'Une erreur est survenue lors de la mise à jour des liens injection - sous-audience');
                     }
                 }

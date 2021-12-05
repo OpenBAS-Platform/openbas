@@ -4,15 +4,25 @@ namespace App\Controller\Exercise\ChangeDuration;
 
 use App\Controller\Base\BaseController;
 use DateTime;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ChangeDurationController extends BaseController
 {
+    private ManagerRegistry $doctrine;
 
+    public function __construct(ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage)
+    {
+        $this->doctrine = $doctrine;
+        parent::__construct($tokenStorage);
+    }
+    
     /**
      * @OA\Response(
      *    response=200,description="Change duration of the exercise")
@@ -22,7 +32,7 @@ class ChangeDurationController extends BaseController
      */
     public function changeDurationExerciseAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $repositoryInject = $em->getRepository('App:Inject');
         $repositoryExercise = $em->getRepository('App:Exercise');
 
@@ -182,7 +192,7 @@ class ChangeDurationController extends BaseController
      */
     private function getFirstInjectDateTime($exercise)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $repositoryEvent = $em->getRepository('App:Event');
         $repositoryIncident = $em->getRepository('App:Incident');
         $repositoryInject = $em->getRepository('App:Inject');
@@ -214,7 +224,7 @@ class ChangeDurationController extends BaseController
      */
     private function getLastInjectDateTime($exercise)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $repositoryEvent = $em->getRepository('App:Event');
         $repositoryIncident = $em->getRepository('App:Incident');
         $repositoryInject = $em->getRepository('App:Inject');
@@ -259,7 +269,7 @@ class ChangeDurationController extends BaseController
      */
     private function getInjectDecalage($exercise, $wantedDuration)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $repositoryEvent = $em->getRepository('App:Event');
         $repositoryIncident = $em->getRepository('App:Incident');
         $repositoryInject = $em->getRepository('App:Inject');
@@ -374,7 +384,7 @@ class ChangeDurationController extends BaseController
      */
     public function simulateChangeDurationExerciseAction(Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $exercise = $em->getRepository('App:Exercise')->find($request->get('exercise_id'));
         if (empty($exercise)) {
             return $this->exerciseNotFound();
@@ -398,7 +408,7 @@ class ChangeDurationController extends BaseController
      */
     private function orderInjectsForDisplay($request, $injects, $exercise)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->doctrine->getManager();
         $repositoryEvent = $em->getRepository('App:Event');
         $repositoryIncident = $em->getRepository('App:Incident');
 

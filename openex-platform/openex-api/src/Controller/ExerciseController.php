@@ -10,8 +10,10 @@ use App\Entity\Grant;
 use App\Entity\Incident;
 use App\Entity\Subaudience;
 use App\Form\Type\ExerciseType;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use PHPExcel;
 use Symfony\Component\Filesystem\Filesystem;
@@ -19,10 +21,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use ZipArchive;
 
 class ExerciseController extends BaseController
 {
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+        $this->tokenStorage = $tokenStorage;
+        parent::__construct($tokenStorage);
+    }
+
     /**
      * @OA\Response(
      *    response=200,description="List exercises")
@@ -32,13 +45,13 @@ class ExerciseController extends BaseController
      */
     public function getExercisesAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
         $repositoryInject = $entityManager->getRepository('App:Inject');
 
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if ($user->isAdmin()) {
             $exercises = $repositoryExercise->findAll();
@@ -85,7 +98,7 @@ class ExerciseController extends BaseController
      */
     public function getExerciseAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -137,10 +150,10 @@ class ExerciseController extends BaseController
      */
     public function postExercisesAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryFile = $entityManager->getRepository('App:File');
 
-        $user = $this->get('security.token_storage')->getToken()->getUser();
+        $user = $this->tokenStorage->getToken()->getUser();
 
         if (!$user->isAdmin()) {
             throw new AccessDeniedHttpException();
@@ -173,7 +186,7 @@ class ExerciseController extends BaseController
      */
     public function removeExerciseAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
 
         $exercise = $repositoryExercise->find($request->get('exercise_id'));
@@ -195,7 +208,7 @@ class ExerciseController extends BaseController
      */
     public function copyAudienceToExerciseAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryAudience = $entityManager->getRepository('App:Audience');
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
 
@@ -238,7 +251,7 @@ class ExerciseController extends BaseController
      */
     public function updateExerciseAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -293,7 +306,7 @@ class ExerciseController extends BaseController
      */
     public function exportExerciseEMLAction(Request $request)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryExercise = $entityManager->getRepository('App:Exercise');
         $repositoryEvent = $entityManager->getRepository('App:Event');
         $repositoryIncident = $entityManager->getRepository('App:Incident');
@@ -359,7 +372,7 @@ class ExerciseController extends BaseController
      */
     private function getMailContent($inject, $user)
     {
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->doctrine->getManager();
         $repositoryDocument = $entityManager->getRepository('App:Document');
 
         $mailContent = [];

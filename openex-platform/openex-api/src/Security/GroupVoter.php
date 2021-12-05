@@ -15,7 +15,7 @@ class GroupVoter extends Voter
     const UPDATE = 'update';
     const DELETE = 'delete';
 
-    protected function supports($attribute, $group)
+    protected function supports($attribute, $group): bool
     {
         if (!in_array($attribute, array(self::SELECT, self::UPDATE, self::DELETE))) {
             return false;
@@ -28,7 +28,7 @@ class GroupVoter extends Voter
         return true;
     }
 
-    protected function voteOnAttribute($attribute, $group, TokenInterface $token)
+    protected function voteOnAttribute($attribute, $group, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
