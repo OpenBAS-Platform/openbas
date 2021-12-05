@@ -23,7 +23,7 @@ jobs:
   build_player:
     working_directory: ~/openex
     docker:
-      - image: maven:3.6.3-openjdk-15
+      - image: maven:3.8.4-openjdk-17
     steps:
       - attach_workspace:
           at: ~/
