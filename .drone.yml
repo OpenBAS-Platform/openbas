@@ -21,7 +21,7 @@ steps:
   - php composer.phar install --no-progress --no-interaction
   - php bin/console doctrine:schema:create --env=test
   - php bin/console app:db-init --env=test
-  - php bin/phpunit
+  - php ./vendor/bin/phpunit
 
 - name: frontend-tests
   image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
