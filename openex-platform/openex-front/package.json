@@ -29,7 +29,7 @@
     "react-addons-shallow-compare": "^15.6.2",
     "react-chartjs-2": "^2.11.1",
     "react-dom": "^16.13.1",
-    "react-final-form": "^6.5.2",
+    "react-final-form": "^6.5.7",
     "react-intl": "^5.10.1",
     "react-leaflet": "^2.7.0",
     "react-redux": "^7.2.2",
