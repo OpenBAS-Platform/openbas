@@ -39,7 +39,7 @@
     "redux-auth-wrapper": "^3.0.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
-    "reselect": "^4.0.0",
+    "reselect": "^4.1.2",
     "rxjs": "^6.6.3",
     "seamless-immutable": "^7.1.4",
     "typeface-roboto": "^1.1.13"
