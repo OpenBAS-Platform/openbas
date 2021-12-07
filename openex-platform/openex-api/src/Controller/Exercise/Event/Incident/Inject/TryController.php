@@ -90,6 +90,7 @@ class TryController extends AbstractController
                 $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
                 $userData['user_organization'] = array();
                 $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                $userData['user_audiences'] = ["Direct test"];
                 $data['data']['users'][] = $userData;
             }
             $url = $this->getParameter('player_url') . '/player/' . $data['type'];

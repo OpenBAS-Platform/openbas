@@ -34,10 +34,10 @@ class BaseEntity
 
     /**
      * Set User Can Update Object
-     * @param type $boolean
+     * @param bool $boolean
      * @return $this
      */
-    public function setUserCanUpdate($boolean)
+    public function setUserCanUpdate(bool $boolean)
     {
         $this->UserCanUpdate = $boolean;
         return $this;
@@ -54,10 +54,10 @@ class BaseEntity
 
     /**
      * Set User Can Delete Object
-     * @param type $boolean
+     * @param bool $boolean
      * @return $this
      */
-    public function setUserCanDelete($boolean)
+    public function setUserCanDelete(bool $boolean)
     {
         $this->UserCanDelete = $boolean;
         return $this;

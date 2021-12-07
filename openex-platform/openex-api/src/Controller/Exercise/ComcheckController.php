@@ -169,6 +169,7 @@ class ComcheckController extends BaseController
                 $userData['user_phone3'] = $user->getUserPhone3();
                 $userData['user_organization'] = array();
                 $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+                $userData['user_audiences'] = ["Communication check"];
                 $data['data']['users'][] = $userData;
                 $data["data"]["replyto"] = $exercise->getExerciseMailExpediteur();
             }

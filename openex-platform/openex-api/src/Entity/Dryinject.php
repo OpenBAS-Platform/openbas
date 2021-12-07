@@ -56,6 +56,11 @@ class Dryinject extends BaseEntity
         return $this->dryinject_id;
     }
 
+    public function getInjectId()
+    {
+        return $this->getDryinjectId();
+    }
+
     public function setDryinjectId($id)
     {
         $this->dryinject_id = $id;

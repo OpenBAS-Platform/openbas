@@ -18,7 +18,6 @@ use DateTimeZone;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use JetBrains\PhpStorm\Pure;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,23 +50,19 @@ class InjectController extends BaseController
         if (!$this->tokenStorage->getToken()->getUser()->isAdmin()) {
             throw new AccessDeniedHttpException("Access Denied.");
         }
-
         $em = $this->doctrine->getManager();
-        $exercises = $em->getRepository('App:Exercise')->findAll();
         /* @var $exercises Exercise[] */
-
+        $exercises = $em->getRepository('App:Exercise')->findAll();
         $injects = array();
         foreach ($exercises as $exercise) {
             $events = $em->getRepository('App:Event')->findBy(['event_exercise' => $exercise]);
             /* @var $events Event[] */
-
             foreach ($events as $event) {
                 $incidents = $em->getRepository('App:Incident')->findBy(['incident_event' => $event]);
                 /* @var $incidents Incident[] */
-
                 foreach ($incidents as $incident) {
                     $incidentInjects = $em->getRepository('App:Inject')->findBy(['inject_incident' => $incident]);
-                    foreach ($incidentInjects as &$incidentInject) {
+                    foreach ($incidentInjects as $incidentInject) {
                         $incidentInject->setInjectEvent($event->getEventId());
                         $incidentInject->setInjectExercise($exercise->getExerciseId());
                         $incidentInject->setUserCanUpdate($this->hasGranted(self::UPDATE, $exercise));
@@ -77,13 +72,31 @@ class InjectController extends BaseController
                 }
             }
         }
-
-        foreach ($injects as &$inject) {
+        foreach ($injects as $inject) {
             $inject->sanitizeUser();
             $inject->computeUsersNumber();
         }
-
         return $injects;
+    }
+
+    function addInject(&$injectMap, $request, $subAudience, $user, $inject, $dryRun = false) {
+        $injectId = $inject->getInjectId();
+        if (array_key_exists($injectId, $injectMap)) {
+            $existingInject = &$injectMap[$injectId];
+            $userIds = array_map(function($u) { return $u["user_id"]; }, $existingInject['data']['users']);
+            $userIndex = array_search($user->getUserId(), $userIds);
+            if ($userIndex !== false) {
+                $currentAudiences = $existingInject['data']['users'][$userIndex]['user_audiences'];
+                $complete = array_merge($currentAudiences, [$subAudience]);
+                $existingInject['data']['users'][$userIndex]['user_audiences'] = $complete;
+            } else {
+                $existingInject['data']['users'][] = $this->getUserData($user, $subAudience);
+            }
+        } else if ($dryRun) {
+            $injectMap[$injectId] = $this->getDryInjectData($request, $inject, $user, $subAudience);
+        } else {
+            $injectMap[$injectId] = $this->getInjectData($request, $inject, $user, $subAudience);
+        }
     }
 
     /**
@@ -131,7 +144,7 @@ class InjectController extends BaseController
                         ->getQuery()
                         ->getResult();
                     // enrich injects
-                    foreach ($incidentInjects as &$incidentInject) {
+                    foreach ($incidentInjects as $incidentInject) {
                         /* @var $incidentInject Inject */
                         $incidentInject->setInjectExercise($exercise);
                         $incidentInject->setInjectHeader($exercise->getExerciseMessageHeader());
@@ -146,14 +159,17 @@ class InjectController extends BaseController
         foreach ($injects as $inject) {
             // list all audiences
             if ($inject->getInjectAllAudiences() == true) {
+                /* @var $audience Audience */
                 foreach ($inject->getInjectExercise()->getExerciseAudiences() as $audience) {
                     if ($audience->getAudienceEnabled() == true) {
                         // list subaudiences of the audience
+                        /* @var $subaudience Subaudience */
                         foreach ($audience->getAudienceSubaudiences() as $subaudience) {
                             if ($subaudience->getSubaudienceEnabled() == true) {
+                                $subAudienceName = $subaudience->getSubaudienceName();
                                 // list all users of the subaudience
                                 foreach ($subaudience->getSubaudienceUsers() as $user) {
-                                    $output[] = $this->getInjectData($request, $inject, $user);
+                                    $this->addInject($output, $request, $subAudienceName, $user, $inject);
                                 }
                             }
                         }
@@ -166,9 +182,10 @@ class InjectController extends BaseController
                         // list subaudiences of the audience
                         foreach ($audience->getAudienceSubaudiences() as $subaudience) {
                             if ($subaudience->getSubaudienceEnabled() == true) {
+                                $subAudienceName = $subaudience->getSubaudienceName();
                                 // list all users of the subaudience
                                 foreach ($subaudience->getSubaudienceUsers() as $user) {
-                                    $output[] = $this->getInjectData($request, $inject, $user);
+                                    $this->addInject($output, $request, $subAudienceName, $user, $inject);
                                 }
                             }
                         }
@@ -181,15 +198,16 @@ class InjectController extends BaseController
                 /* @var $subaudience Subaudience */
                 if ($subaudience->getSubaudienceEnabled() == true) {
                     // list all users of the subaudience
+                    $subAudienceName = $subaudience->getSubaudienceName();
                     foreach ($subaudience->getSubaudienceUsers() as $user) {
-                        $output[] = $this->getInjectData($request, $inject, $user);
+                        $this->addInject($output, $request, $subAudienceName, $user, $inject);
                     }
                 }
             }
 
             if ($inject->getInjectExercise()->getExerciseAnimationGroup() != null) {
                 foreach ($inject->getInjectExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user) {
-                    $output[] = $this->getInjectData($request, $inject, $user);
+                    $this->addInject($output, $request, "Animation Group", $user, $inject);
                 }
             }
         }
@@ -210,12 +228,11 @@ class InjectController extends BaseController
             /* @var $dryinject Dryinject */
             if ($dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup() != null) {
                 foreach ($dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseAnimationGroup()->getGroupUsers() as $user) {
-                    $output[] = $this->getDryInjectData($request, $dryinject, $user);
+                    $this->addInject($output, $request, "Animation Group (Dry run)", $user, $dryinject, true);
                 }
             }
         }
-
-        return new Response(json_encode($output));
+        return new Response(json_encode(array_values($output)));
     }
 
     /**
@@ -224,41 +241,20 @@ class InjectController extends BaseController
      * @param Inject $inject
      * @param User $user
      */
-    public function getInjectData($request, $inject, $user)
+    public function getInjectData($request, $inject, $user, $audience)
     {
         $data = array();
         $data['id'] = $inject->getInjectId();
         $data['type'] = $inject->getInjectType();
         $data['callback_url'] = $request->getSchemeAndHttpHost() . '/api/injects/' . $inject->getInjectId() . '/status';
-        $data['data'] = $this->getPersonalInjectContent(json_decode($inject->getInjectContent(), true), $user);
+        $data['data'] = json_decode($inject->getInjectContent(), true);
         $data['data']['content_header'] = $inject->getInjectHeader();
         $data['data']['content_footer'] = $inject->getInjectFooter();
-        $data['data']['users'] = array();
-        $data['data']['users'][] = $this->getUserData($user);
+        $data['data']['users'] = array($this->getUserData($user, $audience));
         $data['data']['replyto'] = $inject->getInjectIncident()->getIncidentEvent()->getEventExercise()->getExerciseMailExpediteur();
         return $data;
     }
 
-    /**
-     * Personnalisation du contenu de l'inject
-     * @param mixed $content
-     * @param User $user
-     * @return mixed
-     */
-    public function getPersonalInjectContent($content, $user)
-    {
-        $searchArray = [
-            '{{FIRSTNAME}}',
-            '{{LASTNAME}}',
-            '{{ORGANIZATION}}'
-        ];
-        $replaceArray = [
-            $user->getUserFirstname(),
-            $user->getUserLastname(),
-            $user->getUserOrganization()->getOrganizationName()
-        ];
-        return str_replace($searchArray, $replaceArray, $content);
-    }
 
     /**
      * Get DryInject Data
@@ -267,17 +263,16 @@ class InjectController extends BaseController
      * @param User $user
      * @return mixed
      */
-    public function getDryInjectData($request, $dryinject, $user)
+    public function getDryInjectData($request, $dryinject, $user, $audience)
     {
         $data = array();
         $data['id'] = $dryinject->getDryinjectId();
         $data['type'] = $dryinject->getDryinjectType();
         $data['callback_url'] = $request->getSchemeAndHttpHost() . '/api/dryinjects/' . $dryinject->getDryinjectId() . '/status';
-        $data['data'] = $this->getPersonalInjectContent(json_decode($dryinject->getDryinjectContent(), true), $user);
+        $data['data'] = json_decode($dryinject->getDryinjectContent(), true);
         $data['data']['content_header'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageHeader();
         $data['data']['content_footer'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMessageFooter();
-        $data['data']['users'] = array();
-        $data['data']['users'][] = $this->getUserData($user);
+        $data['data']['users'] = array($this->getUserData($user, $audience));
         $data['data']['replyto'] = $dryinject->getDryinjectDryrun()->getDryrunExercise()->getExerciseMailExpediteur();
         return $data;
     }
@@ -287,9 +282,10 @@ class InjectController extends BaseController
      * @param User $user
      * @return mixed
      */
-    public function getUserData($user)
+    public function getUserData($user, $audience)
     {
         $userData = array();
+        $userData['user_id'] = $user->getUserId();
         $userData['user_firstname'] = $user->getUserFirstname();
         $userData['user_lastname'] = $user->getUserLastname();
         $userData['user_email'] = $user->getUserEmail();
@@ -300,6 +296,7 @@ class InjectController extends BaseController
         $userData['user_pgp_key'] = base64_encode($user->getUserPgpKey());
         $userData['user_organization'] = array();
         $userData['user_organization']['organization_name'] = $user->getUserOrganization()->getOrganizationName();
+        $userData['user_audiences'] = [$audience];
         return $userData;
     }
 

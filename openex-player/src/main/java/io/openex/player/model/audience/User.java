@@ -3,8 +3,10 @@ package io.openex.player.model.audience;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.Arrays.asList;
+import static java.util.List.of;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
@@ -16,13 +18,24 @@ public class User {
     private String pgpKey;
     private String comcheckId;
     private Organization organization;
+    private List<String> audiences = new ArrayList<>();
 
+    private Map<String, Object> addMarker(List<String> keys, Object value) {
+        Map<String, Object> map = new HashMap<>();
+        for (String key : keys) {
+            map.put(key.toUpperCase(), value);
+            map.put(key.toLowerCase(), value);
+        }
+        return map;
+    }
     public Map<String, Object> toMarkerMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("NOM", firstname);
-        map.put("PRENOM", lastname);
-        map.put("ORGANISATION", organization != null ? organization.getName() : "");
-        map.put("user_comcheck_id", comcheckId);
+        map.putAll(addMarker(asList("NOM", "FIRSTNAME"), firstname));
+        map.putAll(addMarker(asList("PRENOM", "LASTNAME"), lastname));
+        String organizationName = organization != null ? organization.getName() : "";
+        map.putAll(addMarker(asList("ORGANISATION", "ORGANIZATION"), organizationName));
+        map.putAll(addMarker(of("USER_COMCHECK_ID"), comcheckId));
+        map.putAll(addMarker(of("AUDIENCES"), String.join(", ", audiences)));
         return map;
     }
 
@@ -80,5 +93,13 @@ public class User {
     }
     public void setComcheckId(String comcheckId) {
         this.comcheckId = comcheckId;
+    }
+
+    @JsonProperty("user_audiences")
+    public List<String> getAudiences() {
+        return audiences;
+    }
+    public void setAudiences(List<String> audiences) {
+        this.audiences = audiences;
     }
 }

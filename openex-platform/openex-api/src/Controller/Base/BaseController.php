@@ -2,6 +2,8 @@
 
 namespace App\Controller\Base;
 
+use App\Entity\Audience;
+use App\Entity\Subaudience;
 use App\Entity\Event;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,17 +22,17 @@ class BaseController extends AbstractFOSRestController
 
     /**
      * Check if user as grant to access to an object
-     * @param type $attributes can be 'select'|'update'|'delete'
-     * @param type $object The object
+     * @param String $attributes can be 'select'|'update'|'delete'
+     * @param mixed $object The object
      * @return boolean
      */
-    protected function hasGranted($attributes, $object = null)
+    protected function hasGranted(String $attributes, mixed $object = null): bool
     {
         $User = $this->tokenStorage->getToken()->getUser();
         if ($User->isAdmin()) {
             return true;
         }
-        if ($object instanceof App\Entity\Audience) {
+        if ($object instanceof Audience) {
             if (count($object->getAudiencePlanificateurUsers()) > 0) {
                 return $object->isPlanificateurUser($User);
             } else {
@@ -42,9 +44,9 @@ class BaseController extends AbstractFOSRestController
             } else {
                 return true;
             }
-        } elseif ($object instanceof App\Entity\Subaudience) {
+        } elseif ($object instanceof Subaudience) {
             $audience = $object->getSubaudienceAudience();
-            if (count($audience->getPlanificateurUsers()) > 0) {
+            if (count($audience->getAudiencePlanificateurUsers()) > 0) {
                 return $audience->isPlanificateurUser($User);
             } else {
                 return true;

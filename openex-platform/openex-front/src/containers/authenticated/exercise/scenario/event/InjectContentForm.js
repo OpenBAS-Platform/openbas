@@ -168,17 +168,21 @@ class InjectContentForm extends Component {
                     <div key={field.name} style={{ marginTop: 20 }}>
                       <EnrichedTextField name={field.name} label={field.name} />
                       <div className={classes.variables}>
-                        <T>The available variables are:</T>
+                        <T>The available variables are: </T>
                         <kbd>
-                          {'{{'}FIRSTNAME{'}}'}
+                          {'${'}FIRSTNAME{'}'}
                         </kbd>
                         ,{' '}
                         <kbd>
-                          {'{{'}LASTNAME{'}}'}
-                        </kbd>{' '}
-                        et{' '}
+                          {'${'}LASTNAME{'}'}
+                        </kbd>
+                        ,{' '}
                         <kbd>
-                          {'{{'}ORGANIZATION{'}}'}
+                          {'${'}ORGANIZATION{'}'}
+                        </kbd>
+                        {' '}et{' '}
+                        <kbd>
+                          {'${'}AUDIENCES{'}'}
                         </kbd>
                         .
                       </div>
