@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.openex.database.model.Inject;
 import io.openex.model.ContentBase;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public abstract class InjectCreateInput<T extends ContentBase> {
     private Date date;
 
     @JsonProperty("inject_audiences")
-    private List<String> audiences;
+    private List<String> audiences = new ArrayList<>();
 
     @JsonProperty("inject_all_audiences")
     private boolean allAudiences = false;

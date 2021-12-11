@@ -30,19 +30,8 @@ const styles = {
 };
 
 class DryinjectView extends Component {
-  // eslint-disable-next-line class-methods-use-this
-  readJSON(str) {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return null;
-    }
-  }
-
   render() {
-    const dryinjectContent = this.readJSON(
-      R.propOr(null, 'dryinject_content', this.props.dryinject),
-    );
+    const dryinjectContent = R.propOr(null, 'dryinject_content', this.props.dryinject);
     const dryinjectDescription = R.propOr(
       '',
       'dryinject_description',

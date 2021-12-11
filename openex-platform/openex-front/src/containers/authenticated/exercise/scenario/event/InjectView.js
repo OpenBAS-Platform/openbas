@@ -41,19 +41,8 @@ const styles = {
 };
 
 class InjectView extends Component {
-  // eslint-disable-next-line class-methods-use-this
-  readJSON(str) {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return null;
-    }
-  }
-
   render() {
-    const injectContent = this.readJSON(
-      R.propOr(null, 'inject_content', this.props.inject),
-    );
+    const injectContent = R.propOr(null, 'inject_content', this.props.inject);
     const injectDescription = R.propOr(
       '',
       'inject_description',

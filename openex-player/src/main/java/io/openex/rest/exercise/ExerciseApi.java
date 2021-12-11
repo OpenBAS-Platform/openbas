@@ -25,7 +25,7 @@ import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 @RestController
 @RolesAllowed(ROLE_USER)
 public class ExerciseApi extends RestBehavior {
-    // Repositories
+    // region repositories
     private FileRepository fileRepository;
     private ExerciseRepository exerciseRepository;
     private ObjectiveRepository objectiveRepository;
@@ -40,8 +40,11 @@ public class ExerciseApi extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private GroupRepository groupRepository;
     private IncidentTypeRepository incidentTypeRepository;
-    // Services
+    // endregion
+
+    // region services
     private DryrunService dryrunService;
+    // endregion
 
     // region setters
     @Autowired
@@ -176,9 +179,13 @@ public class ExerciseApi extends RestBehavior {
         return incidentRepository.findAll(IncidentSpecification.fromExercise(exerciseId));
     }
 
+    @GetMapping("/api/exercises/{exerciseId}/events/{eventId}/incidents/{incidentId}")
+    public Incident incident(@PathVariable String incidentId) {
+        return incidentRepository.findById(incidentId).orElseThrow();
+    }
+
     @PostMapping("/api/exercises/{exerciseId}/events/{eventId}/incidents")
-    public Incident createIncident(@PathVariable String exerciseId, @PathVariable String eventId,
-                                   @Valid @RequestBody IncidentCreateInput createIncidentInput) {
+    public Incident createIncident(@PathVariable String eventId, @Valid @RequestBody IncidentCreateInput createIncidentInput) {
         Event exerciseEvent = eventRepository.findById(eventId).orElseThrow();
         Incident incident = new Incident();
         incident.setUpdateAttributes(createIncidentInput);
@@ -202,7 +209,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/events/{eventId}/incidents/{incidentId}/injects")
-    public Inject createInject(@PathVariable String incidentId, @Valid @RequestBody InjectCreateInput<?> createInjectInput) {
+    public Inject<?> createInject(@PathVariable String incidentId, @Valid @RequestBody InjectCreateInput<?> createInjectInput) {
         Incident incident = incidentRepository.findById(incidentId).orElseThrow();
         Inject<?> inject = createInjectInput.toInject();
         inject.setUser(currentUser());
@@ -214,6 +221,11 @@ public class ExerciseApi extends RestBehavior {
         List<Audience> audiences = fromIterable(audienceRepository.findAllById(createInjectInput.getAudiences()));
         inject.setAudiences(audiences);
         return injectRepository.save(inject);
+    }
+
+    @DeleteMapping("/api/exercises/{exerciseId}/events/{eventId}/incidents/{incidentId}/injects/{injectId}")
+    public void deleteInject(@PathVariable String injectId) {
+        injectRepository.deleteById(injectId);
     }
     // endregion
 

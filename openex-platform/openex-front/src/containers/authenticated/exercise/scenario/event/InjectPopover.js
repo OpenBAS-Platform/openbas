@@ -88,18 +88,9 @@ class InjectPopover extends Component {
       injectAttachments: R.propOr(
         [],
         'attachments',
-        this.readJSON(R.propOr(null, 'inject_content', this.props.inject)),
+        R.propOr(null, 'inject_content', this.props.inject),
       ),
     };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  readJSON(str) {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return null;
-    }
   }
 
   handlePopoverOpen(event) {
@@ -456,7 +447,7 @@ class InjectPopover extends Component {
       case 1:
         return (
           <InjectContentForm
-            initialValues={this.readJSON(initialValues.inject_content)}
+            initialValues={initialValues.inject_content}
             types={this.state.inject_types}
             type={
               this.state.type ? this.state.type : this.props.inject.inject_type
