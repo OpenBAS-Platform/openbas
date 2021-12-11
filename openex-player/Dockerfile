@@ -1,13 +1,13 @@
 FROM maven:3.6.3-openjdk-17
 
 # Copy the worker
-COPY . /opt/openex-player
+COPY . /opt/openex-api
 
 # Build
-RUN cd /opt/openex-player && mvn install
+RUN cd /opt/openex-api && mvn install -DskipTests
 
 # Copy configuration
-RUN cd /opt/openex-player && cp src/main/resources/application.properties target/
+RUN cd /opt/openex-api && cp src/main/resources/application.properties target/
 
 # Expose and entrypoint
 COPY entrypoint.sh /

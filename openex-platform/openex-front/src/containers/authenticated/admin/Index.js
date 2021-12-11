@@ -53,7 +53,7 @@ class Index extends Component {
       <div className={classes.container}>
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={4}>
-            <div className={classes.number}>{stats.exercises_count}</div>
+            <div className={classes.number}>{stats?.exercises_count}</div>
             <div className={classes.icon}>
               <RowingOutlined fontSize="large" color="primary" />
             </div>
@@ -62,7 +62,7 @@ class Index extends Component {
             </div>
           </Grid>
           <Grid item={true} xs={4}>
-            <div className={classes.number}>{stats.users_count}</div>
+            <div className={classes.number}>{stats?.users_count}</div>
             <div className={classes.icon}>
               <GroupOutlined fontSize="large" color="primary" />
             </div>
@@ -71,7 +71,7 @@ class Index extends Component {
             </div>
           </Grid>
           <Grid item={true} xs={4}>
-            <div className={classes.number}>{stats.injects_count}</div>
+            <div className={classes.number}>{stats?.injects_count}</div>
             <div className={classes.icon}>
               <CallToActionOutlined fontSize="large" color="primary" />
             </div>

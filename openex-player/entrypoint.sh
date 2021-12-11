@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Go to the right directory
-cd /opt/openex-player/target
+cd /opt/openex-api/target
 
 # Launch the worker
-java -jar player-2.0.0.jar
+java -jar openex-api-3.0.0.jar

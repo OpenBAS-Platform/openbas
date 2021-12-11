@@ -145,7 +145,7 @@ class InjectPopover extends Component {
     const { injectData } = this.state;
     // eslint-disable-next-line no-param-reassign
     data.attachments = this.state.injectAttachments;
-    injectData.inject_content = JSON.stringify(data);
+    injectData.inject_content = data;
     this.setState({ injectData }, () => this.selectAudiences());
   }
 

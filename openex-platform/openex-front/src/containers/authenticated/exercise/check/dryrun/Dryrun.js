@@ -386,9 +386,9 @@ const filterDryinjectsPending = (dryinjects, dryrunId) => {
   const dryinjectsFilterAndSorting = R.pipe(
     R.values,
     R.filter((n) => {
-      const statusName = n.dryinject_status.status_name;
+      const statusName = n.dryinject_status?.status_name;
       const identifiedInject = n.dryinject_dryrun === dryrunId;
-      const isPendingInject = statusName === null || statusName === 'PENDING';
+      const isPendingInject = statusName === undefined || statusName === 'PENDING';
       return identifiedInject && isPendingInject;
     }),
     R.sort((a, b) => timeDiff(a.dryinject_date, b.dryinject_date)),
@@ -401,9 +401,9 @@ const filterDryinjectsProcessed = (dryinjects, dryrunId) => {
     R.values,
     R.filter(
       (n) => n.dryinject_dryrun === dryrunId
-        && (n.dryinject_status.status_name === 'SUCCESS'
-          || n.dryinject_status.status_name === 'PARTIAL'
-          || n.dryinject_status.status_name === 'ERROR'),
+        && (n.dryinject_status?.status_name === 'SUCCESS'
+          || n.dryinject_status?.status_name === 'PARTIAL'
+          || n.dryinject_status?.status_name === 'ERROR'),
     ),
     R.sort((a, b) => timeDiff(b.dryinject_date, a.dryinject_date)),
   );
