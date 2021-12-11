@@ -379,7 +379,7 @@ class InjectPopover extends Component {
     this.props
       .addInject(
         this.props.exerciseId,
-        incident.incident_event.event_id,
+        incident.incident_event,
         data.incident_id,
         newInject,
       )
@@ -387,19 +387,19 @@ class InjectPopover extends Component {
         this.props
           .fetchIncident(
             this.props.exerciseId,
-            incident.incident_event.event_id,
+            incident.incident_event,
             data.incident_id,
           )
           .then(() => {
             this.props.redirectToEvent(
               this.props.exerciseId,
-              incident.incident_event.event_id,
+              incident.incident_event,
             );
           });
       });
     this.props.selectIncident(
       this.props.exerciseId,
-      incident.incident_event.event_id,
+      incident.incident_event,
       data.incident_id,
     );
     this.handleCloseCopy();

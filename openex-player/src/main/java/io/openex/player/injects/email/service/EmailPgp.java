@@ -1,6 +1,6 @@
 package io.openex.player.injects.email.service;
 
-import io.openex.player.model.audience.User;
+import io.openex.player.model.database.User;
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.bcpg.CompressionAlgorithmTags;
 import org.bouncycastle.openpgp.*;

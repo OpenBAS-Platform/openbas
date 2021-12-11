@@ -140,7 +140,7 @@ class Index extends Component {
                 <ListItemSecondaryAction>
                   <GroupPopover
                     group={group}
-                    groupUsersIds={group.group_users.map((u) => u.user_id)}
+                    groupUsersIds={group.group_users}
                     organizations={this.props.organizations}
                     users={this.props.users}
                     exercises={this.props.exercises}

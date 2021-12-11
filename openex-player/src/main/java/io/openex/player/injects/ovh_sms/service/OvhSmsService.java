@@ -1,48 +1,50 @@
 package io.openex.player.injects.ovh_sms.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+import io.openex.player.helper.InjectHelper;
 import io.openex.player.injects.ovh_sms.config.OvhSmsConfig;
-import io.openex.player.model.audience.User;
+import io.openex.player.model.execution.UserInjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Date;
-import java.util.Map;
 
 import static java.util.Collections.singletonList;
 
 @Component
 public class OvhSmsService {
 
+    @Resource
+    private ObjectMapper mapper;
     private static final String METHOD = "POST";
-    private final ObjectMapper mapper = new ObjectMapper();
     private OvhSmsConfig config;
+    private InjectHelper injectHelper;
+
+    @Autowired
+    public void setInjectHelper(InjectHelper injectHelper) {
+        this.injectHelper = injectHelper;
+    }
 
     @Autowired
     public void setConfig(OvhSmsConfig config) {
         this.config = config;
     }
 
-    public String sendSms(User user, String message) throws Exception {
-        System.out.println("Sending sms to " + user.getEmail() + " - " + user.getPhone());
-        Map<String, Object> model = user.toMarkerMap();
-        Template template = new Template("sms", new StringReader(message), new Configuration(Configuration.VERSION_2_3_30));
-        String smsMessage = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
-
+    public String sendSms(UserInjectContext context, String phone, String message) throws Exception {
+        String userEmail = context.getUser().getEmail();
+        System.out.println("Sending sms to " + userEmail + " - " + phone);
+        String smsMessage = injectHelper.buildContextualContent(message, context);
         URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs");
         String isoMessage = new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
-        OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(user.getPhone()), isoMessage);
+        OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(phone), isoMessage);
         String smsBody = mapper.writeValueAsString(ovhSmsMessage);
 
         long Timestamp = new Date().getTime() / 1000;

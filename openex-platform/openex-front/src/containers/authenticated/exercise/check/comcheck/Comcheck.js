@@ -153,7 +153,7 @@ class Comcheck extends Component {
 
   // TODO MOVE THAT TO UTILS
   buildUserModel(status) {
-    const userId = R.pathOr(Math.random(), ['status_user', 'user_id'], status);
+    const userId = R.pathOr(Math.random(), ['status_user'], status);
     const user = R.propOr({}, userId, this.props.users);
     const userOrganization = R.propOr(
       {},
@@ -272,7 +272,7 @@ Comcheck.propTypes = {
 const filterComcheckStatuses = (statuses, comcheckId) => {
   const statusesFilter = R.pipe(
     R.values,
-    R.filter((n) => n.status_comcheck.comcheck_id === comcheckId),
+    R.filter((n) => n.status_comcheck === comcheckId),
   );
   return statusesFilter(statuses);
 };

@@ -393,7 +393,7 @@ IndexAudience.propTypes = {
 const filterAudiences = (audiences, exerciseId) => {
   const audiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.audience_exercise === exerciseId),
     R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
   );
   return audiencesFilterAndSorting(audiences);
@@ -437,7 +437,7 @@ const checkUserCanUpdate = (state, ownProps) => {
           && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && user.user_id === userId) {
+            if (user === userId) {
               userCanUpdate = true;
             }
           });

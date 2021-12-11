@@ -407,11 +407,11 @@ class GroupPopover extends Component {
               <TableBody displayRowCheckbox={false}>
                 {R.values(this.props.exercises).map((exercise) => {
                   const grantPlanner = R.find(
-                    (g) => g.grant_exercise.exercise_id === exercise.exercise_id
+                    (g) => g.grant_exercise === exercise.exercise_id
                       && g.grant_name === 'PLANNER',
                   )(this.props.group.group_grants);
                   const grantObserver = R.find(
-                    (g) => g.grant_exercise.exercise_id === exercise.exercise_id
+                    (g) => g.grant_exercise === exercise.exercise_id
                       && g.grant_name === 'OBSERVER',
                   )(this.props.group.group_grants);
                   const grantPlannerId = R.propOr(

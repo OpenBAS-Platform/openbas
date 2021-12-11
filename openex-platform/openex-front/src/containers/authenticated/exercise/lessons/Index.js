@@ -165,12 +165,12 @@ class IndexExerciseLessons extends Component {
                     }
                     secondary={
                       <div className={classes.log_content}>
-                        {incident.incident_outcome.outcome_comment === null ? (
+                        {incident.incident_outcome?.outcome_comment === null ? (
                           <i>
                             <T>No comment for this incident.</T>
                           </i>
                         ) : (
-                          <i>{incident.incident_outcome.outcome_comment}</i>
+                          <i>{incident.incident_outcome?.outcome_comment}</i>
                         )}
                       </div>
                     }
@@ -178,7 +178,7 @@ class IndexExerciseLessons extends Component {
                   <div className={classes.incident_result}>
                     <LinearProgress
                       variant="determinate"
-                      value={incident.incident_outcome.outcome_result}
+                      value={incident.incident_outcome?.outcome_result}
                     />
                   </div>
                   <ListItemSecondaryAction>
@@ -292,7 +292,7 @@ const filterLogs = (state, ownProps) => {
   const { logs } = state.referential.entities;
   const logsFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.log_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.log_exercise === exerciseId),
     R.sortWith([R.descend(R.prop('log_date'))]),
   );
   return logsFilterAndSorting(logs);
@@ -335,7 +335,7 @@ const checkUserCanUpdate = (state, ownProps) => {
           && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && user.user_id === userId) {
+            if (user === userId) {
               userCanUpdate = true;
             }
           });

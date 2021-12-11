@@ -8,7 +8,7 @@ export const fetchParameters = () => (dispatch) => getReferential(schema.paramet
 
 export const askToken = (username, password) => (dispatch) => {
   const data = { login: username, password };
-  const ref = postReferential(schema.user, '/api/auth', data)(dispatch);
+  const ref = postReferential(schema.user, '/api/login', data)(dispatch);
   // eslint-disable-next-line arrow-body-style
   return ref.then((finalData) => {
     if (finalData[FORM_ERROR]) {
@@ -85,4 +85,9 @@ export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
 
 export const redirectToDryrun = (exerciseId, dryrunId) => (dispatch) => {
   dispatch(push(`/private/exercise/${exerciseId}/checks/dryrun/${dryrunId}`));
+};
+
+export const fetchStatistics = () => (dispatch) => {
+  const uri = '/api/statistics';
+  return getReferential(schema.statistics, uri)(dispatch);
 };

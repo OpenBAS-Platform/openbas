@@ -2,8 +2,9 @@ package io.openex.player.injects.ovh_sms;
 
 import io.openex.player.contract.ContractDef;
 import io.openex.player.injects.ovh_sms.config.OvhSmsConfig;
+import io.openex.player.injects.ovh_sms.model.OvhSmsContent;
+import io.openex.player.model.ContentBase;
 import io.openex.player.model.Contract;
-import io.openex.player.model.inject.InjectBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,9 @@ public class OvhSmsContract extends Contract {
     }
 
     @Override
-    public String id() { return "openex_ovh_sms"; }
+    public String id() {
+        return "openex_ovh_sms";
+    }
 
     @Override
     public ContractDef definition() {
@@ -33,7 +36,7 @@ public class OvhSmsContract extends Contract {
     }
 
     @Override
-    public Class<? extends InjectBase> dataClass() {
-        return OvhSmsInject.class;
+    public Class<? extends ContentBase> dataClass() {
+        return OvhSmsContent.class;
     }
 }

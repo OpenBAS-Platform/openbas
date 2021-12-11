@@ -237,7 +237,7 @@ class Index extends Component {
     const initPipe = R.pipe(
       R.assoc(
         'exercise_animation_group',
-        R.path(['exercise', 'exercise_animation_group', 'group_id'], this.props),
+        R.path(['exercise', 'exercise_animation_group'], this.props),
       ),
       R.pick([
         'exercise_name',
@@ -615,7 +615,7 @@ const checkUserCanUpdate = (state, ownProps) => {
           && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && user.user_id === userId) {
+            if (user === userId) {
               userCanUpdate = true;
             }
           });

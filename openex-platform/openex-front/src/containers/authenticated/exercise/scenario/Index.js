@@ -94,7 +94,7 @@ IndexScenario.propTypes = {
 const filteredEvents = (events, exerciseId) => {
   const eventsFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.event_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.event_exercise === exerciseId),
     R.sortWith([R.ascend(R.prop('event_order'))]),
   );
   return eventsFilterAndSorting(events);
@@ -118,7 +118,7 @@ const checkUserCanUpdate = (state, ownProps) => {
           && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && user.user_id === userId) {
+            if (user && user === userId) {
               userCanUpdate = true;
             }
           });

@@ -8,14 +8,19 @@ const onError = function (err, req, res) {
 module.exports = function (app) {
   app.use(
     createProxyMiddleware("/api", {
-      target: "http://localhost:8001",
+      target: "http://localhost:8081",
       ws: true,
       onError,
     })
   );
   app.use(
-    createProxyMiddleware("/connect", {
-      target: "http://localhost:8001",
+    createProxyMiddleware("/login", {
+      target: "http://localhost:8081",
+      onError,
+    })
+  );  app.use(
+    createProxyMiddleware("/oauth2", {
+      target: "http://localhost:8081",
       onError,
     })
   );

@@ -1,8 +1,9 @@
 package io.openex.player.injects.email;
 
 import io.openex.player.contract.ContractDef;
+import io.openex.player.injects.email.model.EmailContent;
+import io.openex.player.model.ContentBase;
 import io.openex.player.model.Contract;
-import io.openex.player.model.inject.InjectBase;
 import org.springframework.stereotype.Component;
 
 import static io.openex.player.contract.ContractCardinality.Multiple;
@@ -12,7 +13,9 @@ import static io.openex.player.contract.ContractType.*;
 public class EmailContract extends Contract {
 
     @Override
-    public boolean expose() { return true; }
+    public boolean expose() {
+        return true;
+    }
 
     @Override
     public String id() {
@@ -29,7 +32,7 @@ public class EmailContract extends Contract {
     }
 
     @Override
-    public Class<? extends InjectBase> dataClass() {
-        return EmailInject.class;
+    public Class<? extends ContentBase> dataClass() {
+        return EmailContent.class;
     }
 }

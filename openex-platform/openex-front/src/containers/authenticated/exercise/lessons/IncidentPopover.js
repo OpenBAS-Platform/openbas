@@ -59,7 +59,7 @@ class IncidentPopover extends Component {
     return this.props
       .updateOutcome(
         this.props.exerciseId,
-        this.props.incident.incident_event.event_id,
+        this.props.incident.incident_event,
         this.props.incident.incident_id,
         this.props.incident.incident_outcome.outcome_id,
         data,
@@ -70,7 +70,7 @@ class IncidentPopover extends Component {
   render() {
     const initialValues = R.pick(
       ['outcome_result', 'outcome_comment'],
-      this.props.incident.incident_outcome,
+      this.props.incident.incident_outcome || {},
     );
     const incidentIsUpdatable = R.propOr(
       false,

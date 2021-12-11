@@ -14,13 +14,12 @@ public class Execution {
         this.startTime = new Date().getTime();
     }
 
-    public List<String> addMessage(String mess) {
+    public void addMessage(String mess) {
         message.add(mess);
-        return message;
     }
 
-    public long getExecution() {
-        return new Date().getTime() - this.startTime;
+    public Integer getExecution() {
+        return (int) (new Date().getTime() - this.startTime);
     }
 
     public ExecutionStatus getStatus() {

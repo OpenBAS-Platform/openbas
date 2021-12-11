@@ -11,9 +11,7 @@ import {
 import Grid from '@material-ui/core/Grid';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
-import { fetchExercises } from '../../../actions/Exercise';
-import { fetchUsers } from '../../../actions/User';
-import { fetchGlobalInjects } from '../../../actions/Inject';
+import { fetchStatistics } from '../../../actions/Application';
 
 i18nRegister({
   fr: {
@@ -45,18 +43,17 @@ const styles = (theme) => ({
 
 class Index extends Component {
   componentDidMount() {
-    this.props.fetchExercises();
-    this.props.fetchUsers();
-    this.props.fetchGlobalInjects();
+    this.props.fetchStatistics();
   }
 
   render() {
     const { classes } = this.props;
+    const stats = this.props.statistics && this.props.statistics.openex;
     return (
       <div className={classes.container}>
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={4}>
-            <div className={classes.number}>{this.props.exercises.length}</div>
+            <div className={classes.number}>{stats.exercises_count}</div>
             <div className={classes.icon}>
               <RowingOutlined fontSize="large" color="primary" />
             </div>
@@ -65,7 +62,7 @@ class Index extends Component {
             </div>
           </Grid>
           <Grid item={true} xs={4}>
-            <div className={classes.number}>{this.props.users.length}</div>
+            <div className={classes.number}>{stats.users_count}</div>
             <div className={classes.icon}>
               <GroupOutlined fontSize="large" color="primary" />
             </div>
@@ -74,7 +71,7 @@ class Index extends Component {
             </div>
           </Grid>
           <Grid item={true} xs={4}>
-            <div className={classes.number}>{this.props.injects.length}</div>
+            <div className={classes.number}>{stats.injects_count}</div>
             <div className={classes.icon}>
               <CallToActionOutlined fontSize="large" color="primary" />
             </div>
@@ -89,25 +86,17 @@ class Index extends Component {
 }
 
 Index.propTypes = {
-  exercises: PropTypes.array,
-  users: PropTypes.array,
-  injects: PropTypes.array,
-  fetchExercises: PropTypes.func,
-  fetchUsers: PropTypes.func,
-  fetchGlobalInjects: PropTypes.func,
+  statistics: PropTypes.element,
+  fetchStatistics: PropTypes.func,
 };
 
 const select = (state) => ({
-  exercises: R.values(state.referential.entities.exercises),
-  users: R.values(state.referential.entities.users),
-  injects: R.values(state.referential.entities.injects),
+  statistics: state.referential.entities.statistics,
 });
 
 export default R.compose(
   connect(select, {
-    fetchExercises,
-    fetchUsers,
-    fetchGlobalInjects,
+    fetchStatistics,
   }),
   withStyles(styles),
 )(Index);

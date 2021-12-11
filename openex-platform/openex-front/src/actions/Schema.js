@@ -177,6 +177,12 @@ export const inject = new schema.Entity(
 );
 export const arrayOfInjects = new schema.Array(inject);
 
+export const statistics = new schema.Entity(
+  'statistics',
+  {},
+  { idAttribute: 'platform_id' },
+);
+
 export const log = new schema.Entity('logs', {}, { idAttribute: 'log_id' });
 export const arrayOfLogs = new schema.Array(log);
 

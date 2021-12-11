@@ -2,7 +2,7 @@
 {
   "extends": ["airbnb-base", "plugin:react/recommended"],
   "parserOptions": {
-    "ecmaVersion": 2019
+    "ecmaVersion": 2020
   },
   "env": {
     "browser": true,

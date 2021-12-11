@@ -22,8 +22,6 @@ export const downloadExportInjects = (exerciseId) => (dispatch) => fileSave(
   'injects.xlsx',
 )(dispatch);
 
-export const fetchGlobalInjects = () => (dispatch) => getReferential(schema.arrayOfInjects, '/api/injects_all')(dispatch);
-
 export const updateInject = (
   exerciseId,
   eventId,

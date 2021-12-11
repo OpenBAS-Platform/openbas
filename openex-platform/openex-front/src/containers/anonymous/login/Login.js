@@ -114,7 +114,7 @@ const Login = (props) => {
         {props.parameters.auth_openid_enable && (
           <Button
             component="a"
-            href="/connect/oidc"
+            href="/oauth2/authorization/citeum"
             variant="contained"
             color="primary"
             size="small"

@@ -87,9 +87,7 @@ class IncidentNav extends Component {
                   eventId={eventId}
                   incident={incident}
                   subobjectives={this.props.subobjectives}
-                  incidentSubobjectivesIds={incident.incident_subobjectives.map(
-                    (i) => i.subobjective_id,
-                  )}
+                  incidentSubobjectivesIds={incident.incident_subobjectives}
                   incident_types={this.props.incident_types}
                 />
               </ListItemSecondaryAction>

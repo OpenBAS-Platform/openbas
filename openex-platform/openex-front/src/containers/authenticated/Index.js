@@ -107,11 +107,7 @@ class IndexAuthenticated extends Component {
                 exercise.exercise_end_date,
                 'MMM D, YYYY',
               );
-              const fileId = R.pathOr(
-                null,
-                ['exercise_image', 'file_id'],
-                exercise,
-              );
+              const fileId = exercise.exercise_image;
               return (
                 <Exercise
                   key={exercise.exercise_id}

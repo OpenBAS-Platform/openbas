@@ -113,16 +113,11 @@ class IndexObjective extends Component {
         <List>
           {objectives.map((objective) => {
             const nestedItems = objective.objective_subobjectives.map(
-              (data) => {
+              (subobjectiveId) => {
                 const subobjective = R.propOr(
                   {},
-                  data.subobjective_id,
+                  subobjectiveId,
                   this.props.subobjectives,
-                );
-                const subobjectiveId = R.propOr(
-                  data.subobjective_id,
-                  'subobjective_id',
-                  subobjective,
                 );
                 const subobjectiveTitle = R.propOr(
                   '-',
@@ -272,7 +267,7 @@ IndexObjective.propTypes = {
 const filterObjectives = (objectives, exerciseId) => {
   const objectivesFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.objective_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.objective_exercise === exerciseId),
     R.sortWith([R.ascend(R.prop('objective_priority'))]),
   );
   return objectivesFilterAndSorting(objectives);
@@ -305,7 +300,7 @@ const checkUserCanUpdate = (state, ownProps) => {
           && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && user.user_id === userId) {
+            if (user === userId) {
               userCanUpdate = true;
             }
           });

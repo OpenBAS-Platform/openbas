@@ -376,7 +376,7 @@ IndexExerciseDryrun.propTypes = {
 const filterAudiences = (audiences, exerciseId) => {
   const audiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.audience_exercise === exerciseId),
     R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
   );
   return audiencesFilterAndSorting(audiences);
@@ -387,7 +387,7 @@ const filterDryinjectsPending = (dryinjects, dryrunId) => {
     R.values,
     R.filter((n) => {
       const statusName = n.dryinject_status.status_name;
-      const identifiedInject = n.dryinject_dryrun.dryrun_id === dryrunId;
+      const identifiedInject = n.dryinject_dryrun === dryrunId;
       const isPendingInject = statusName === null || statusName === 'PENDING';
       return identifiedInject && isPendingInject;
     }),
@@ -400,7 +400,7 @@ const filterDryinjectsProcessed = (dryinjects, dryrunId) => {
   const dryinjectsFilterAndSorting = R.pipe(
     R.values,
     R.filter(
-      (n) => n.dryinject_dryrun.dryrun_id === dryrunId
+      (n) => n.dryinject_dryrun === dryrunId
         && (n.dryinject_status.status_name === 'SUCCESS'
           || n.dryinject_status.status_name === 'PARTIAL'
           || n.dryinject_status.status_name === 'ERROR'),

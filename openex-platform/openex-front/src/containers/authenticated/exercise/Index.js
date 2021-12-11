@@ -770,7 +770,7 @@ IndexExercise.propTypes = {
 const filterObjectives = (objectives, exerciseId) => {
   const objectivesFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.objective_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.objective_exercise === exerciseId),
     R.sortWith([R.ascend(R.prop('objective_priority'))]),
   );
   return objectivesFilterAndSorting(objectives);
@@ -779,7 +779,7 @@ const filterObjectives = (objectives, exerciseId) => {
 const filterAudiences = (audiences, exerciseId) => {
   const audiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.audience_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.audience_exercise === exerciseId),
     R.sortWith([R.ascend(R.prop('audience_name'))]),
   );
   return audiencesFilterAndSorting(audiences);
@@ -788,7 +788,7 @@ const filterAudiences = (audiences, exerciseId) => {
 const filterEvents = (events, exerciseId) => {
   const eventsFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.event_exercise.exercise_id === exerciseId),
+    R.filter((n) => n.event_exercise === exerciseId),
     R.sortWith([R.ascend(R.prop('event_order'))]),
   );
   return eventsFilterAndSorting(events);
@@ -843,7 +843,7 @@ const select = (state, ownProps) => {
           && grant.grant_name === 'PLANNER'
         ) {
           group.group_users.forEach((user) => {
-            if (user && user.user_id === userId) {
+            if (user === userId) {
               userCanUpdate = true;
             }
           });
