@@ -75,9 +75,8 @@ class ExercisePopover extends Component {
   }
 
   submitDisable() {
-    this.props.updateExercise(this.props.exerciseId, {
-      exercise_canceled: true,
-    });
+    const data = { exercise_canceled: true };
+    this.props.updateExercise(this.props.exerciseId, 'activation', data);
     this.handleCloseDisable();
   }
 
@@ -91,9 +90,8 @@ class ExercisePopover extends Component {
   }
 
   submitEnable() {
-    this.props.updateExercise(this.props.exerciseId, {
-      exercise_canceled: false,
-    });
+    const data = { exercise_canceled: false };
+    this.props.updateExercise(this.props.exerciseId, 'activation', data);
     this.handleCloseEnable();
   }
 

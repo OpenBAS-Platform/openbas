@@ -2,6 +2,7 @@ package io.openex.rest.file;
 
 import io.openex.database.model.File;
 import io.openex.database.repository.FileRepository;
+import io.openex.database.specification.FileSpecification;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class FileApi extends RestBehavior {
 
     @GetMapping("/api/files")
     public List<File> files() {
-        return fileRepository.findAll(null, Sort.by(Sort.Direction.DESC, "id"));
+        return fileRepository.findAll(FileSpecification.onlyMinio(), Sort.by(Sort.Direction.DESC, "id"));
     }
 
     @DeleteMapping("/api/files/{fileId}")

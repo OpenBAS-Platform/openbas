@@ -299,20 +299,28 @@ public class ExerciseApi extends RestBehavior {
     // region exercises
     @RolesAllowed(ROLE_PLANIFICATEUR)
     @PostMapping("/api/exercises")
-    public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput exerciseInput) {
+    public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         Exercise exercise = new Exercise();
-        exercise.setUpdateAttributes(exerciseInput);
+        exercise.setUpdateAttributes(input);
         exercise.setOwner(currentUser());
-        exercise.setFile(fileRepository.findByName("Exercise default").orElse(null));
+        exercise.setImage(fileRepository.findByName("Exercise default").orElse(null));
         return exerciseRepository.save(exercise);
     }
 
     @RolesAllowed(ROLE_PLANIFICATEUR)
-    @PutMapping("/api/exercises/{exerciseId}")
-    public Exercise updateExercise(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInput exerciseInput) {
+    @PutMapping("/api/exercises/{exerciseId}/information")
+    public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInformationInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        exercise.setUpdateAttributes(exerciseInput);
-        exercise.setAnimationGroup(updateRelationResolver(exerciseInput.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));
+        exercise.setUpdateAttributes(input);
+        exercise.setAnimationGroup(updateRelationResolver(input.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));
+        return exerciseRepository.save(exercise);
+    }
+
+    @RolesAllowed(ROLE_PLANIFICATEUR)
+    @PutMapping("/api/exercises/{exerciseId}/image")
+    public Exercise updateExerciseImage(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateImageInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setImage(fileRepository.findById(input.getImageId()).orElse(null));
         return exerciseRepository.save(exercise);
     }
 

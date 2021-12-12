@@ -65,7 +65,7 @@ public class Exercise implements Base {
     @JoinColumn(name = "exercise_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_image")
-    private File file;
+    private File image;
 
     @OneToOne
     @JoinColumn(name = "exercise_animation_group")
@@ -224,12 +224,12 @@ public class Exercise implements Base {
         this.owner = owner;
     }
 
-    public File getFile() {
-        return file;
+    public File getImage() {
+        return image;
     }
 
-    public void setFile(File file) {
-        this.file = file;
+    public void setImage(File file) {
+        this.image = file;
     }
 
     public List<Grant> getGrants() {

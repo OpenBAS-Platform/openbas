@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
-public class ExerciseUpdateInput {
+public class ExerciseUpdateInformationInput {
 
     @JsonProperty("exercise_name")
     private String name;

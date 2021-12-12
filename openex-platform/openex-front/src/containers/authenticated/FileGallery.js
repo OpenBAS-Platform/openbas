@@ -126,10 +126,10 @@ class FileGallery extends Component {
                       </div>
                     }
                   />
-                  {type === 'png'
-                  || type === 'jpg'
-                  || type === 'jpeg'
-                  || type === 'gif' ? (
+                  {type === 'image/png'
+                  || type === 'image/jpg'
+                  || type === 'image/jpeg'
+                  || type === 'image/gif' ? (
                     <Image
                       image_id={file.file_id}
                       alt="Gallery"

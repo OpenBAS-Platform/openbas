@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -11,15 +12,19 @@ public class File implements Base {
     @Column(name = "file_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @JsonProperty("file_id")
     private String id;
 
     @Column(name = "file_name")
+    @JsonProperty("file_name")
     private String name;
 
     @Column(name = "file_path")
+    @JsonProperty("file_path")
     private String path;
 
     @Column(name = "file_type")
+    @JsonProperty("file_type")
     private String type;
 
     public String getId() {

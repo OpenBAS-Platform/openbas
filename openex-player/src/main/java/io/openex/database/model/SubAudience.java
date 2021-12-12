@@ -39,13 +39,22 @@ public class SubAudience implements Base {
             joinColumns = @JoinColumn(name = "subaudience_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("subaudience_users")
     private List<User> users = new ArrayList<>();
 
     // region transient
     @JsonProperty("subaudience_exercise")
-    public String getExercice() {
+    public String getExercise() {
         return getAudience().getExercise().getId();
     }
+
+    // @JsonProperty("subaudience_injects")
+    // public List<Inject<?>> getInjects() {
+    //     return getAudience().getExercise().getEvents().stream()
+    //             .flatMap(event -> event.getIncidents().stream())
+    //             .flatMap(incident -> incident.getInjects().stream())
+    //             .toList();
+    // }
     // endregion
 
     public String getId() {

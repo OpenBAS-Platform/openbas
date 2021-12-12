@@ -220,8 +220,7 @@ class IndexExercise extends Component {
     const exerciseUsers = R.uniq(
       this.props.exerciseSubaudiences
         .map((subaudience) => subaudience.subaudience_users)
-        .flat()
-        .map((user) => user.user_id),
+        .flat(),
     )
       .map((uid) => this.props.users[uid])
       .filter((n) => !R.isNil(n));
@@ -486,7 +485,7 @@ class IndexExercise extends Component {
                 const incidents = R.pipe(
                   R.map((data) => R.pathOr(
                     { incident_title: '' },
-                    ['incidents', data.incident_id],
+                    ['incidents', data],
                     this.props,
                   )),
                   R.sort((a, b) => a.incident_order > b.incident_order),

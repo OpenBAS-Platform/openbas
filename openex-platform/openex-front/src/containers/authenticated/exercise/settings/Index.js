@@ -148,7 +148,7 @@ class Index extends Component {
       R.assoc('exercise_start_date', dateToISO(data.exercise_start_date)),
       R.assoc('exercise_end_date', dateToISO(data.exercise_end_date)),
     )(data);
-    return this.props.updateExercise(this.props.id, newData);
+    return this.props.updateExercise(this.props.id, 'information', newData);
   }
 
   submitExportEml() {
@@ -218,7 +218,7 @@ class Index extends Component {
 
   handleImageSelection(file) {
     const data = { exercise_image: file.file_id };
-    this.props.updateExercise(this.props.id, data);
+    this.props.updateExercise(this.props.id, 'image', data);
     this.handleCloseGallery();
   }
 
@@ -254,7 +254,7 @@ class Index extends Component {
       ]),
     );
     const informationValues = exercise !== undefined ? initPipe(exercise) : undefined;
-    const imageId = R.pathOr(null, ['exercise_image', 'file_id'], exercise);
+    const imageId = R.pathOr(null, ['exercise_image'], exercise);
     const { typesToExport } = this.state;
     return (
       <div style={{ width: 800, margin: '0 auto' }}>
