@@ -23,7 +23,7 @@ import static java.util.Optional.ofNullable;
 import static org.springframework.util.StringUtils.hasLength;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserRepository userRepository;
     private UserService userService;
@@ -51,7 +51,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.antMatchers("/api/parameters").permitAll()
                 /**/.antMatchers("/api/login").permitAll()
                 /**/.antMatchers("/login/**").permitAll()
-                /**/.antMatchers("/api/**").authenticated();
+                /**/.antMatchers("/api/**").authenticated()
+                .and()
+                .logout();
         // Rewrite 403 code to 401
         http.exceptionHandling().authenticationEntryPoint((request, response, authException)
                 -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));
@@ -74,7 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 String firstName = user.getAttribute("given_name");
                 String lastName = user.getAttribute("family_name");
                 Optional<User> optionalUser = userRepository.findByEmail(email);
-                return optionalUser.orElseGet(() -> userService.createUser(email, name, firstName, lastName));
+                return optionalUser.orElseGet(() ->
+                        userService.createUser(email, name, firstName, lastName));
             }
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("invalid_token", "User conversion fail", "")

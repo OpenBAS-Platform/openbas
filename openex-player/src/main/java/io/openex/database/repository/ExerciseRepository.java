@@ -14,7 +14,9 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String> {
 
     Optional<Exercise> findById(String id);
 
-    @Query("select distinct e from Exercise e join e.grants as grant join grant.group.users as user " +
+    @Query("select distinct e from Exercise e " +
+            "join e.grants as grant " +
+            "join grant.group.users as user " +
             "where user.id = :userId")
     List<Exercise> findAllGranted(@Param("userId") String userId);
 }

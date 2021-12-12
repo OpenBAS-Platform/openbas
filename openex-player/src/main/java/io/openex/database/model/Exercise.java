@@ -126,6 +126,22 @@ public class Exercise implements Base {
         }
         return STATUS.FINISHED.name();
     }
+
+    private List<User> getUsersByType(String type) {
+        List<Grant> grants = getGrants();
+        return grants.stream()
+                .filter(grant -> grant.getName().equals(type))
+                .map(Grant::getGroup)
+                .flatMap(group -> group.getUsers().stream()).toList();
+    }
+    @JsonIgnore
+    public List<User> getPlanners() {
+        return getUsersByType(Grant.GRANT_TYPE.PLANNER.name());
+    }
+    @JsonIgnore
+    public List<User> getObservers() {
+        return getUsersByType(Grant.GRANT_TYPE.OBSERVER.name());
+    }
     // endregion
 
     public String getId() {

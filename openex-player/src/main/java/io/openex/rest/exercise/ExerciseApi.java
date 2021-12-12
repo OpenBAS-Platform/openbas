@@ -9,6 +9,7 @@ import io.openex.rest.inject.form.InjectCreateInput;
 import io.openex.service.DryrunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -18,8 +19,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
-import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
-import static io.openex.database.model.User.ROLE_USER;
+import static io.openex.database.model.User.*;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 
 @RestController
@@ -307,8 +307,8 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @RolesAllowed(ROLE_PLANIFICATEUR)
     @PutMapping("/api/exercises/{exerciseId}/information")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInformationInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
@@ -316,8 +316,8 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @RolesAllowed(ROLE_PLANIFICATEUR)
     @PutMapping("/api/exercises/{exerciseId}/image")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseImage(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateImageInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setImage(fileRepository.findById(input.getImageId()).orElse(null));
@@ -325,20 +325,23 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public void deleteExercise(@PathVariable String exerciseId) {
         exerciseRepository.deleteById(exerciseId);
     }
 
+    @GetMapping("/api/exercises/{exerciseId}")
+    @PostAuthorize("hasRole('" + ROLE_ADMIN + "') OR isExerciseObserver(#exerciseId)")
+    public Exercise exercise(@PathVariable String exerciseId) {
+        return exerciseRepository.findById(exerciseId).orElseThrow();
+    }
+    
     @GetMapping("/api/exercises")
+    // @PostAuthorize - Exercises are filtered by query
     public Iterable<Exercise> exercises() {
         return currentUser().isAdmin() ?
                 exerciseRepository.findAll() :
                 exerciseRepository.findAllGranted(currentUser().getId());
-    }
-
-    @GetMapping("/api/exercises/{exercise}")
-    public Exercise exercise(@PathVariable String exercise) {
-        return exerciseRepository.findById(exercise).orElseThrow();
     }
     // endregion
 }
