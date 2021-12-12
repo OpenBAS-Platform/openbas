@@ -53,7 +53,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.antMatchers("/login/**").permitAll()
                 /**/.antMatchers("/api/**").authenticated()
                 .and()
-                .logout();
+                .logout()
+                /**/.logoutSuccessUrl("/");
         // Rewrite 403 code to 401
         http.exceptionHandling().authenticationEntryPoint((request, response, authException)
                 -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));

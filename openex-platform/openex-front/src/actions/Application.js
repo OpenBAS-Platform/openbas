@@ -37,7 +37,7 @@ export const fetchMe = () => (dispatch) => {
 };
 
 export const logout = () => (dispatch) => {
-  const ref = simpleCall('/api/logout');
+  const ref = simpleCall('/logout');
   return ref.then(() => dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS }));
 };
 

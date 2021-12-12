@@ -325,10 +325,8 @@ class Index extends Component {
   }
 
   handleAddDocumentTag(tag) {
-    console.log('handleAddDocumentTag');
     const documentsTags = [...this.state.documentsTags];
     documentsTags.push(tag.tag_id);
-    console.log('documentsTags', documentsTags);
     this.setState({ documentsTags });
   }
 
