@@ -17,7 +17,6 @@ public class App {
         - Exercise export in Excel
         - Create an exercise test (Is Fake data provisioning?)
         - Copy one audience to an exercise
-        - Inject a manual contract (InjectTypeController.php)
         - Complete exercise statistics
         - Change the duration of an exercise (ScenarioPopover.js)
         - Various CRUD API.

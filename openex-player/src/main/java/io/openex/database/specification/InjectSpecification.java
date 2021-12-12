@@ -1,27 +1,12 @@
 package io.openex.database.specification;
 
 import io.openex.database.model.Inject;
+import io.openex.injects.manual.ManualContract;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.JoinType;
 
-
 public class InjectSpecification {
-
-    /*
-    $exercises = $em->getRepository('App:Exercise')->findBy(['exercise_canceled' => 0]);
-    ->leftJoin('i.inject_status', 's')
-    ->where('s.status_inject = i.inject_id')
-    ->andWhere('s.status_name is NULL')
-    ->andWhere('i.inject_enabled = true')
-    ->andWhere('i.inject_type != \'manual\'')
-    ->andWhere('i.inject_incident = :incident')
-    ->andWhere('i.inject_date BETWEEN :start AND :end')
-    ->orderBy('i.inject_date', 'ASC')
-    ->setParameter('incident', $incident->getIncidentId())
-    ->setParameter('start', $dateStart->format('c'))
-    ->setParameter('end', $dateEnd->format('c'))
-     */
 
     public static Specification<Inject<?>> fromActiveExercise() {
         return (root, query, cb) -> cb.equal(root.get("incident")
@@ -38,7 +23,7 @@ public class InjectSpecification {
     }
 
     public static Specification<Inject<?>> notManual() {
-        return (root, query, cb) -> cb.notEqual(root.get("type"), "manual");
+        return (root, query, cb) -> cb.notEqual(root.get("type"), ManualContract.NAME);
     }
 
     public static Specification<Inject<?>> notExecuted() {
