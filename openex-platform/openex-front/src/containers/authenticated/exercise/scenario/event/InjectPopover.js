@@ -410,15 +410,9 @@ class InjectPopover extends Component {
   }
 
   submitTry() {
-    this.props
-      .tryInject(
-        this.props.exerciseId,
-        this.props.eventId,
-        this.props.incidentId,
-        this.props.inject.inject_id,
-      )
+    this.props.tryInject(this.props.inject.inject_id)
       .then((payload) => {
-        this.setState({ injectResult: payload.result, openResult: true });
+        this.setState({ injectResult: payload, openResult: true });
       });
     this.handleCloseTry();
   }

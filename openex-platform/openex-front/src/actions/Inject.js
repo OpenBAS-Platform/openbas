@@ -47,11 +47,11 @@ export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (
   return delReferential(uri, 'injects', injectId)(dispatch);
 };
 
-export const tryInject = (exerciseId, eventId, incidentId, injectId) => (
+export const tryInject = (injectId) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects/${injectId}/try`;
-  return postReferential(null, uri, null)(dispatch);
+  const uri = `/api/injects/try/${injectId}`;
+  return getReferential(null, uri, null)(dispatch);
 };
 
 export const shiftAllInjects = (exerciseId, data) => (dispatch) => {
