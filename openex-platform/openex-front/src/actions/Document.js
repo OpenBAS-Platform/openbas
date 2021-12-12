@@ -3,48 +3,38 @@ import {
   getReferential,
   postReferential,
   delReferential,
-  fileSave,
+  fileSave, putReferential,
 } from '../utils/Action';
 
 export const addDocument = (data) => (dispatch) => {
-  const uri = '/api/document';
+  const uri = '/api/documents';
   return postReferential(schema.document, uri, data)(dispatch);
 };
 
 export const searchDocument = (data) => (dispatch) => {
-  const uri = '/api/document/search';
-  return postReferential(schema.arrayOfDocument, uri, data)(dispatch);
+  const uri = '/api/documents';
+  return getReferential(schema.arrayOfDocument, uri, data)(dispatch);
 };
 
 export const saveDocument = (documentId, data) => (dispatch) => {
-  const uri = `/api/document/save/${documentId}`;
-  return postReferential(schema.document, uri, data)(dispatch);
+  const uri = `/api/documents/${documentId}`;
+  return putReferential(schema.document, uri, data)(dispatch);
 };
 
 export const getDocument = (documentId) => (dispatch) => getReferential(schema.document, `/api/document/${documentId}`)(dispatch);
 
 export const getDocumentTags = (documentId) => (dispatch) => getReferential(
   schema.arrayOfTags,
-  `/api/document/${documentId}/tags`,
-)(dispatch);
-
-export const getDocumentTagsExercise = (documentId) => (dispatch) => getReferential(
-  schema.arrayOfExercises,
-  `/api/document/${documentId}/tags/exercise`,
+  `/api/documents/${documentId}/tags`,
 )(dispatch);
 
 export const editDocumentTags = (documentId, data) => (dispatch) => {
-  const uri = `/api/document/${documentId}/save/tags`;
-  return postReferential(schema.document, uri, data)(dispatch);
-};
-
-export const editDocumentTagsExercise = (documentId, data) => (dispatch) => {
-  const uri = `/api/document/${documentId}/save/tags/exercise`;
-  return postReferential(schema.document, uri, data)(dispatch);
+  const uri = `/api/documents/${documentId}/tags`;
+  return putReferential(schema.document, uri, data)(dispatch);
 };
 
 export const deleteDocument = (documentId) => (dispatch) => {
-  const uri = `/api/document/${documentId}`;
+  const uri = `/api/documents/${documentId}`;
   return delReferential(uri, 'document', documentId)(dispatch);
 };
 

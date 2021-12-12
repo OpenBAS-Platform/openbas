@@ -1,5 +1,7 @@
 package io.openex.injects.email.service;
 
+import io.openex.database.model.Document;
+import io.openex.database.repository.DocumentRepository;
 import io.openex.helper.InjectHelper;
 import io.openex.injects.email.model.EmailAttachment;
 import io.openex.injects.email.model.EmailInjectAttachment;
@@ -30,15 +32,15 @@ import java.util.logging.Logger;
 public class EmailService {
 
     private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
+    private DocumentRepository documentRepository;
     private InjectHelper injectHelper;
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
-    private FileRepository fileRepository;
     private FileService fileService;
 
     @Autowired
-    public void setFileRepository(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
+    public void setDocumentRepository(DocumentRepository documentRepository) {
+        this.documentRepository = documentRepository;
     }
 
     @Autowired
@@ -66,10 +68,10 @@ public class EmailService {
         for (EmailInjectAttachment attachment : attachments) {
             String fileName = attachment.getName();
             try {
-                File file = fileRepository.findById(attachment.getId()).orElseThrow();
-                InputStreamResource fileInputStream = fileService.getFile(file.getName());
+                Document doc = documentRepository.findById(attachment.getId()).orElseThrow();
+                InputStreamResource fileInputStream = fileService.getFile(doc.getName());
                 byte[] content = IOUtils.toByteArray(fileInputStream.getInputStream());
-                resolved.add(new EmailAttachment(fileName, content, file.getType()));
+                resolved.add(new EmailAttachment(fileName, content, doc.getType()));
             } catch (Exception e) {
                 // Can't fetch the attachments, ignore
                 execution.addMessage("Error getting content for " + fileName);

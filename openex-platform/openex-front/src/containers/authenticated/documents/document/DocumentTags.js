@@ -80,10 +80,6 @@ class DocumentTags extends Component {
     return this.props.handleRemoveDocumentTagExercise(exercise);
   }
 
-  addDocumentTagExercise(exercise) {
-    return this.props.handleAddDocumentTagExercise(exercise);
-  }
-
   render() {
     const { classes } = this.props;
     return (
@@ -165,27 +161,6 @@ class DocumentTags extends Component {
                     color="primary"
                     label={tag.tag_name}
                     onClick={this.addDocumentTag.bind(this, tag)}
-                  />
-                );
-              }
-              return '';
-            })}
-            {this.props.availables_exercises_tags.map((exercise) => {
-              let exist = false;
-              this.props.document_tags_exercise.forEach((documentTags) => {
-                if (documentTags === exercise.exercise_id) {
-                  exist = true;
-                }
-              });
-              if (exist === false) {
-                return (
-                  <Chip
-                    key={exercise.exercise_id}
-                    className={classes.tag}
-                    variant="outlined"
-                    color="primary"
-                    label={exercise.exercise_name}
-                    onClick={this.addDocumentTagExercise.bind(this, exercise)}
                   />
                 );
               }

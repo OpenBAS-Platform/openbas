@@ -41,10 +41,8 @@ import {
   deleteDocument,
   downloadDocument,
   editDocumentTags,
-  editDocumentTagsExercise,
   getDocument,
   getDocumentTags,
-  getDocumentTagsExercise,
   saveDocument,
   searchDocument,
 } from '../../../actions/Document';
@@ -223,29 +221,6 @@ class Index extends Component {
     }
   }
 
-  addAvailableTagExerciseToFilter(exercise) {
-    const listeTagExerciseAddToFilter = [
-      ...this.state.listeTagExerciseAddToFilter,
-    ];
-    let allreadyExist = false;
-    listeTagExerciseAddToFilter.forEach((element) => {
-      if (element.exercise_id === exercise.exercise_id) {
-        allreadyExist = true;
-      }
-    });
-    if (allreadyExist === false) {
-      listeTagExerciseAddToFilter.push({
-        exercise_id: exercise.exercise_id,
-        exercise_name: exercise.exercise_name,
-      });
-      this.setState({
-        listeTagExerciseAddToFilter,
-      });
-    } else {
-      this.removeTagExerciseToFilter(exercise);
-    }
-  }
-
   removeTagToFilter(tag) {
     const listeTagAddToFilter = [...this.state.listeTagAddToFilter];
     const newListeTagAddToFilter = [];
@@ -312,21 +287,7 @@ class Index extends Component {
       selectedDocument: documentId,
     });
     this.props.getDocumentTags(documentId).then((tags) => {
-      this.setState(
-        {
-          documentsTags: tags.result,
-        },
-        () => {
-          this.props
-            .getDocumentTagsExercise(documentId)
-            .then((tagsExercise) => {
-              this.setState({
-                documentsTagsExercise: tagsExercise.result,
-                openEditDocumentTag: true,
-              });
-            });
-        },
-      );
+      this.setState({ documentsTags: tags.result, openEditDocumentTag: true });
     });
   }
 
@@ -354,11 +315,6 @@ class Index extends Component {
       .editDocumentTags(this.state.selectedDocument, {
         tags: this.state.documentsTags,
       })
-      .then(() => {
-        this.props.editDocumentTagsExercise(this.state.selectedDocument, {
-          tags: this.state.documentsTagsExercise,
-        });
-      })
       .then(() => this.props.searchDocument(this.state.searchTerm));
   }
 
@@ -369,11 +325,11 @@ class Index extends Component {
   }
 
   handleAddDocumentTag(tag) {
+    console.log('handleAddDocumentTag');
     const documentsTags = [...this.state.documentsTags];
     documentsTags.push(tag.tag_id);
-    this.setState({
-      documentsTags,
-    });
+    console.log('documentsTags', documentsTags);
+    this.setState({ documentsTags });
   }
 
   handleAddDocumentTagExercise(exercise) {
@@ -567,15 +523,6 @@ class Index extends Component {
                           style={{ marginRight: 15 }}
                         />
                       ))}
-                      {document.document_liste_tags_exercise.map((exercise) => (
-                        <Chip
-                          variant="outlined"
-                          color="primary"
-                          key={exercise.exercise_id}
-                          label={exercise.exercise_name}
-                          style={{ marginRight: 15 }}
-                        />
-                      ))}
                     </div>
                     <ListItemSecondaryAction>
                       <DocumentActionPopover
@@ -642,22 +589,6 @@ class Index extends Component {
                       <DeleteOutlined />
                     </IconButton>
                   </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-              {this.props.exercises.map((exercise) => (
-                <ListItem
-                  key={exercise.exercise_id}
-                  button={true}
-                  divider={true}
-                  onClick={this.addAvailableTagExerciseToFilter.bind(
-                    this,
-                    exercise,
-                  )}
-                >
-                  <ListItemIcon>
-                    <LabelOutlined />
-                  </ListItemIcon>
-                  <ListItemText primary={exercise.exercise_name} />
                 </ListItem>
               ))}
             </List>
@@ -805,9 +736,7 @@ Index.propTypes = {
   searchDocument: PropTypes.func,
   getDocument: PropTypes.func,
   getDocumentTags: PropTypes.func,
-  getDocumentTagsExercise: PropTypes.func,
   editDocumentTags: PropTypes.func,
-  editDocumentTagsExercise: PropTypes.func,
   fetchExercises: PropTypes.func,
   deleteDocument: PropTypes.func,
   deleteTag: PropTypes.func,
@@ -835,11 +764,9 @@ export default R.compose(
     saveDocument,
     getDocument,
     getDocumentTags,
-    getDocumentTagsExercise,
     deleteTag,
     editDocumentTags,
     downloadDocument,
-    editDocumentTagsExercise,
     deleteDocument,
   }),
   withStyles(styles),

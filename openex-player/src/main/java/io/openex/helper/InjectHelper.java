@@ -19,6 +19,7 @@ import javax.transaction.Transactional;
 import java.io.StringReader;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,9 +57,12 @@ public class InjectHelper {
         Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
         Stream<UserInjectContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
                 .flatMap(audience -> audience.getSubAudiences().stream())
-                .flatMap(subAudience -> subAudience.getUsers().stream().map(user -> new UserInjectContext(exercise, user, subAudience.getName())));
+                .flatMap(subAudience -> subAudience.getUsers().stream()
+                        .map(user -> new UserInjectContext(exercise, user, subAudience.getName())));
         // Create stream from animation group
-        Stream<UserInjectContext> animationUserStream = exercise.getAnimationGroup().getUsers().stream()
+        Group animationGroup = exercise.getAnimationGroup();
+        List<User> animationUsers = animationGroup != null ? animationGroup.getUsers() : new ArrayList<>();
+        Stream<UserInjectContext> animationUserStream = animationUsers.stream()
                 .map(user -> new UserInjectContext(exercise, user, "Animation Group"));
         // Build result
         Stream<UserInjectContext> usersStream = Stream.concat(injectUserStream, animationUserStream);

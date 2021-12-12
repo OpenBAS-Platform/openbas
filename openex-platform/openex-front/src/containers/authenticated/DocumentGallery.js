@@ -23,7 +23,6 @@ import {
   searchDocument,
   getDocument,
   getDocumentTags,
-  getDocumentTagsExercise,
 } from '../../actions/Document';
 import { fetchTags } from '../../actions/Tag';
 import { SearchField } from '../../components/SearchField';
@@ -369,15 +368,6 @@ class DocumentGallery extends Component {
                           style={{ marginRight: 15 }}
                         />
                       ))}
-                      {document.document_liste_tags_exercise.map((exercise) => (
-                        <Chip
-                          variant="outlined"
-                          color="primary"
-                          key={exercise.exercise_id}
-                          label={exercise.exercise_name}
-                          style={{ marginRight: 15 }}
-                        />
-                      ))}
                     </div>
                   </ListItem>
                 )
@@ -475,7 +465,6 @@ DocumentGallery.propTypes = {
   searchDocument: PropTypes.func,
   getDocument: PropTypes.func,
   getDocumentTags: PropTypes.func,
-  getDocumentTagsExercise: PropTypes.func,
   fetchExercises: PropTypes.func,
   fileSelector: PropTypes.func,
   addDocument: PropTypes.func,
@@ -494,7 +483,6 @@ export default R.compose(
     searchDocument,
     getDocument,
     getDocumentTags,
-    getDocumentTagsExercise,
     addDocument,
   }),
   withStyles(styles),

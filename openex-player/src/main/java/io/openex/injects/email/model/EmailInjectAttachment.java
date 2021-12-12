@@ -2,19 +2,32 @@ package io.openex.injects.email.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.model.Tag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EmailInjectAttachment {
-    private String id;
-    private String name;
-    private String description;
-    private String type;
-    private String path;
-    private List<String> tags;
 
-    @JsonProperty("file_id")
+    @JsonProperty("document_id")
+    private String id;
+
+    @JsonProperty("document_name")
+    private String name;
+
+    @JsonProperty("document_description")
+    private String description;
+
+    @JsonProperty("document_type")
+    private String type;
+
+    @JsonProperty("document_path")
+    private String path;
+
+    @JsonProperty("document_liste_tags")
+    private List<Tag> tags = new ArrayList<>();
+
     public String getId() {
         return id;
     }
@@ -23,7 +36,6 @@ public class EmailInjectAttachment {
         this.id = id;
     }
 
-    @JsonProperty("file_name")
     public String getName() {
         return name;
     }
@@ -32,7 +44,6 @@ public class EmailInjectAttachment {
         this.name = name;
     }
 
-    @JsonProperty("file_description")
     public String getDescription() {
         return description;
     }
@@ -41,7 +52,6 @@ public class EmailInjectAttachment {
         this.description = description;
     }
 
-    @JsonProperty("file_type")
     public String getType() {
         return type;
     }
@@ -50,7 +60,6 @@ public class EmailInjectAttachment {
         this.type = type;
     }
 
-    @JsonProperty("file_path")
     public String getPath() {
         return path;
     }
@@ -59,12 +68,11 @@ public class EmailInjectAttachment {
         this.path = path;
     }
 
-    @JsonProperty("file_liste_tags")
-    public List<String> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 }

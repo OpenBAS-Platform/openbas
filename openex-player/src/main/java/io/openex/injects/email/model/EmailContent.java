@@ -1,5 +1,6 @@
 package io.openex.injects.email.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.model.ContentBase;
 import org.springframework.util.StringUtils;
 
@@ -13,8 +14,13 @@ public class EmailContent implements ContentBase {
     private static final String START_DIV = "<div>";
     private static final String END_DIV = "</div>";
 
-    private String subject;
+    @JsonProperty("body")
     private String body;
+
+    @JsonProperty("subject")
+    private String subject;
+
+    @JsonProperty("attachments")
     private List<EmailInjectAttachment> attachments = new ArrayList<>();
 
     public EmailContent() {
