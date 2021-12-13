@@ -202,8 +202,6 @@ class InjectPopover extends Component {
     );
     this.props.updateInject(
       this.props.exerciseId,
-      this.props.eventId,
-      this.props.incidentId,
       this.props.inject.inject_id,
       data,
     );
@@ -263,8 +261,6 @@ class InjectPopover extends Component {
   submitDisable() {
     this.props.updateInject(
       this.props.exerciseId,
-      this.props.eventId,
-      this.props.incidentId,
       this.props.inject.inject_id,
       { inject_enabled: false },
     );
@@ -287,8 +283,6 @@ class InjectPopover extends Component {
   submitEnable() {
     this.props.updateInject(
       this.props.exerciseId,
-      this.props.eventId,
-      this.props.incidentId,
       this.props.inject.inject_id,
       { inject_enabled: true },
     );

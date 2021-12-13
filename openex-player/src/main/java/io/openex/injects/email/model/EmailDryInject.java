@@ -29,7 +29,7 @@ public class EmailDryInject extends DryInject<EmailContent> {
     }
 
     @Override
-    public Class<? extends Executor<?>> executor() {
+    public Class<? extends Executor<EmailContent>> executor() {
         return EmailExecutor.class;
     }
 }

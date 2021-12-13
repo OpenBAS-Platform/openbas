@@ -1,13 +1,12 @@
 package io.openex.database.model;
 
-import io.openex.model.ContentBase;
 import io.openex.model.Executor;
 
 import javax.persistence.Transient;
 import java.util.Date;
 import java.util.List;
 
-public interface Injection<T extends ContentBase> {
+public interface Injection<T> {
     String getId();
 
     Exercise getExercise();
@@ -16,7 +15,7 @@ public interface Injection<T extends ContentBase> {
 
     T getContent();
 
-    Class<? extends Executor<? extends ContentBase>> executor();
+    Class<? extends Executor<T>> executor();
 
     @Transient
     default String getHeader() {
@@ -26,11 +25,6 @@ public interface Injection<T extends ContentBase> {
     @Transient
     default String getFooter() {
         return getExercise().getFooter();
-    }
-
-    @Transient
-    default String getMessage() {
-        return getContent().buildMessage(getFooter(), getHeader());
     }
 
     String getType();

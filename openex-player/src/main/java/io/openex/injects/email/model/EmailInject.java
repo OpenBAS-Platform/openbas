@@ -27,12 +27,13 @@ public class EmailInject extends Inject<EmailContent> {
         return content;
     }
 
+    @Override
     public void setContent(EmailContent content) {
         this.content = content;
     }
 
     @Override
-    public Class<? extends Executor<?>> executor() {
+    public Class<? extends Executor<EmailContent>> executor() {
         return EmailExecutor.class;
     }
 

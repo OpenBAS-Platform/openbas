@@ -1,6 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.Inject;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface InjectRepository extends CrudRepository<Inject<?>, String>, JpaSpecificationExecutor<Inject<?>> {
+public interface InjectRepository<T> extends CrudRepository<Inject<T>, String>, JpaSpecificationExecutor<Inject<T>> {
 
-    Optional<Inject<?>> findById(String id);
+    @NotNull
+    Optional<Inject<T>> findById(@NotNull String id);
 }

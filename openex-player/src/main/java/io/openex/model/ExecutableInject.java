@@ -4,7 +4,7 @@ import io.openex.database.model.Injection;
 
 import java.util.List;
 
-public class ExecutableInject<T extends ContentBase> {
+public class ExecutableInject<T> {
     private Injection<T> inject;
     private List<UserInjectContext> users;
     private boolean dryRun;
@@ -15,11 +15,11 @@ public class ExecutableInject<T extends ContentBase> {
         this.users = users;
     }
 
-    public static <T extends ContentBase> ExecutableInject<T > prodRun(Injection<T> inject, List<UserInjectContext> users) {
+    public static <T> ExecutableInject<T > prodRun(Injection<T> inject, List<UserInjectContext> users) {
         return new ExecutableInject<>(false, inject, users);
     }
 
-    public static <T extends ContentBase> ExecutableInject<T > dryRun(Injection<T> inject, List<UserInjectContext> users) {
+    public static <T> ExecutableInject<T > dryRun(Injection<T> inject, List<UserInjectContext> users) {
         return new ExecutableInject<>(true, inject, users);
     }
 

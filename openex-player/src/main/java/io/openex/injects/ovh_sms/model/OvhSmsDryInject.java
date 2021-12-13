@@ -27,7 +27,7 @@ public class OvhSmsDryInject extends DryInject<OvhSmsContent> {
     }
 
     @Override
-    public Class<? extends Executor<?>> executor() {
+    public Class<? extends Executor<OvhSmsContent>> executor() {
         return OvhSmsExecutor.class;
     }
 }

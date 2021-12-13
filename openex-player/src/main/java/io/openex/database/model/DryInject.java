@@ -3,7 +3,6 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
-import io.openex.model.ContentBase;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -15,7 +14,7 @@ import java.util.List;
 @Table(name = "dryinjects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dryinject_type")
-public abstract class DryInject<T extends ContentBase> implements Base, Injection<T> {
+public abstract class DryInject<T> implements Base, Injection<T> {
 
     @Id
     @Column(name = "dryinject_id")
@@ -93,8 +92,6 @@ public abstract class DryInject<T extends ContentBase> implements Base, Injectio
     public void setTitle(String title) {
         this.title = title;
     }
-
-    public abstract void setContent(T content);
 
     @Override
     @JsonProperty("dryinject_exercise")

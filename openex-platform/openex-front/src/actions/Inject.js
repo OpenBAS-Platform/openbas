@@ -22,14 +22,8 @@ export const downloadExportInjects = (exerciseId) => (dispatch) => fileSave(
   'injects.xlsx',
 )(dispatch);
 
-export const updateInject = (
-  exerciseId,
-  eventId,
-  incidentId,
-  injectId,
-  data,
-) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects/${injectId}`;
+export const updateInject = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/injects/${exerciseId}/${injectId}`;
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 

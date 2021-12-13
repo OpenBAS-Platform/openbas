@@ -36,7 +36,7 @@ public class EmailExecutor implements Executor<EmailContent> {
         Injection<EmailContent> inject = injection.getInject();
         EmailContent content = inject.getContent();
         String subject = content.getSubject();
-        String message = inject.getMessage();
+        String message = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
         // Resolve the attachments only once
         List<EmailAttachment> attachments = emailService.resolveAttachments(execution, content.getAttachments());
         List<UserInjectContext> users = injection.getUsers();

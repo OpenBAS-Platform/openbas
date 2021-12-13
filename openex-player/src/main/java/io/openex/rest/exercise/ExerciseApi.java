@@ -5,7 +5,7 @@ import io.openex.database.repository.*;
 import io.openex.database.specification.*;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.inject.form.InjectCreateInput;
+import io.openex.rest.inject.form.InjectInput;
 import io.openex.service.DryrunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,7 +24,7 @@ import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 
 @RestController
 @RolesAllowed(ROLE_USER)
-public class ExerciseApi extends RestBehavior {
+public class ExerciseApi<T> extends RestBehavior {
     // region repositories
     private FileRepository fileRepository;
     private ExerciseRepository exerciseRepository;
@@ -34,7 +34,7 @@ public class ExerciseApi extends RestBehavior {
     private SubAudienceRepository subAudienceRepository;
     private EventRepository eventRepository;
     private IncidentRepository incidentRepository;
-    private InjectRepository injectRepository;
+    private InjectRepository<T> injectRepository;
     private ExerciseLogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
@@ -43,12 +43,12 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region services
-    private DryrunService dryrunService;
+    private DryrunService<T> dryrunService;
     // endregion
 
     // region setters
     @Autowired
-    public void setDryrunService(DryrunService dryrunService) {
+    public void setDryrunService(DryrunService<T> dryrunService) {
         this.dryrunService = dryrunService;
     }
 
@@ -78,7 +78,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
+    public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
     }
 
@@ -197,29 +197,27 @@ public class ExerciseApi extends RestBehavior {
 
     // region injects
     @GetMapping("/api/exercises/{exerciseId}/injects")
-    public Iterable<Inject<?>> exerciseInjects(@PathVariable String exerciseId) {
+    public Iterable<Inject<T>> exerciseInjects(@PathVariable String exerciseId) {
         return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId));
     }
 
     @GetMapping("/api/exercises/{exerciseId}/events/{eventId}/injects")
-    public Iterable<Inject<?>> eventInjects(@PathVariable String exerciseId, @PathVariable String eventId) {
-        Specification<Inject<?>> filters = InjectSpecification.fromEvent(eventId)
-                .and(InjectSpecification.fromExercise(exerciseId));
+    public Iterable<Inject<T>> eventInjects(@PathVariable String exerciseId, @PathVariable String eventId) {
+        Specification<Inject<T>> filters = InjectSpecification.fromEvent(eventId);
         return injectRepository.findAll(filters);
     }
 
     @PostMapping("/api/exercises/{exerciseId}/events/{eventId}/incidents/{incidentId}/injects")
-    public Inject<?> createInject(@PathVariable String incidentId, @Valid @RequestBody InjectCreateInput<?> createInjectInput) {
+    public Inject<T> createInject(@PathVariable String incidentId, @Valid @RequestBody InjectInput<T> createInjectInput) {
         Incident incident = incidentRepository.findById(incidentId).orElseThrow();
-        Inject<?> inject = createInjectInput.toInject();
+        Inject<T> inject = createInjectInput.toInject();
         inject.setUser(currentUser());
         inject.setIncident(incident);
         Instant from = incident.getEvent().getExercise().getStart().toInstant();
         Instant to = createInjectInput.getDate().toInstant();
         long duration = Duration.between(from, to).getSeconds();
         inject.setDependsDuration(duration);
-        List<Audience> audiences = fromIterable(audienceRepository.findAllById(createInjectInput.getAudiences()));
-        inject.setAudiences(audiences);
+        inject.setAudiences(fromIterable(audienceRepository.findAllById(createInjectInput.getAudiences())));
         return injectRepository.save(inject);
     }
 
@@ -307,6 +305,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/information")
     @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInformationInput input) {
@@ -316,6 +315,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/image")
     @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseImage(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateImageInput input) {
@@ -324,18 +324,20 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @DeleteMapping("/api/exercises/{exerciseId}")
     @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public void deleteExercise(@PathVariable String exerciseId) {
         exerciseRepository.deleteById(exerciseId);
     }
 
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @GetMapping("/api/exercises/{exerciseId}")
     @PostAuthorize("hasRole('" + ROLE_ADMIN + "') OR isExerciseObserver(#exerciseId)")
     public Exercise exercise(@PathVariable String exerciseId) {
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }
-    
+
     @GetMapping("/api/exercises")
     // @PostAuthorize - Exercises are filtered by query
     public Iterable<Exercise> exercises() {

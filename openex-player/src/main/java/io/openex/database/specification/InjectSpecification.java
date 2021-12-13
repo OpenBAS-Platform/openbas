@@ -8,29 +8,29 @@ import javax.persistence.criteria.JoinType;
 
 public class InjectSpecification {
 
-    public static Specification<Inject<?>> fromActiveExercise() {
-        return (root, query, cb) -> cb.equal(root.get("incident")
-                .get("event").get("exercise").get("canceled"), false);
-    }
-
-    public static Specification<Inject<?>> fromExercise(String exerciseId) {
+    public static <T> Specification<Inject<T>> fromExercise(String exerciseId) {
         return (root, query, cb) -> cb.equal(root.get("incident")
                 .get("event").get("exercise").get("id"), exerciseId);
     }
 
-    public static Specification<Inject<?>> fromEvent(String eventId) {
+    public static <T> Specification<Inject<T>> fromEvent(String eventId) {
         return (root, query, cb) -> cb.equal(root.get("incident").get("event").get("id"), eventId);
     }
 
-    public static Specification<Inject<?>> notManual() {
-        return (root, query, cb) -> cb.notEqual(root.get("type"), ManualContract.NAME);
+    public static <T> Specification<Inject<T>> executable() {
+        return (root, query, cb) -> cb.and(
+                cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
+                cb.equal(root.get("enabled"), true), // isEnable
+                cb.equal(root.get("incident").get("event").get("exercise").get("canceled"), false), // fromActiveExercise
+                cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
+        );
     }
 
-    public static Specification<Inject<?>> notExecuted() {
-        return (root, query, cb) -> cb.isNull(root.join("status", JoinType.LEFT).get("name"));
-    }
-
-    public static Specification<Inject<?>> isEnable() {
-        return (root, query, cb) -> cb.equal(root.get("enabled"), true);
+    public static <T> Specification<Inject<T>> forDryrun(String exerciseId) {
+        return (root, query, cb) -> cb.and(
+                cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
+                cb.equal(root.get("enabled"), true), // isEnable
+                cb.equal(root.get("incident").get("event").get("exercise").get("id"), exerciseId) // fromActiveExercise
+        );
     }
 }

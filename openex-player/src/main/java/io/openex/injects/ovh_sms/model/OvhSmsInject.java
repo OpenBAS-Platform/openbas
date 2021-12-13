@@ -27,12 +27,13 @@ public class OvhSmsInject extends Inject<OvhSmsContent> {
         return content;
     }
 
+    @Override
     public void setContent(OvhSmsContent content) {
         this.content = content;
     }
 
     @Override
-    public Class<? extends Executor<?>> executor() {
+    public Class<? extends Executor<OvhSmsContent>> executor() {
         return OvhSmsExecutor.class;
     }
 

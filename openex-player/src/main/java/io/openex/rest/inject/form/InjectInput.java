@@ -3,14 +3,13 @@ package io.openex.rest.inject.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import io.openex.database.model.Inject;
-import io.openex.model.ContentBase;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "inject_type")
-public abstract class InjectCreateInput<T extends ContentBase> {
+public abstract class InjectInput<T> {
 
     @JsonProperty("inject_title")
     private String title;

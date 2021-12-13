@@ -1,34 +1,31 @@
 package io.openex.service;
 
-import io.openex.config.OpenExConfig;
-import io.openex.database.model.*;
-import io.openex.database.repository.*;
+import io.openex.database.model.DryInject;
+import io.openex.database.model.Dryrun;
+import io.openex.database.model.Exercise;
+import io.openex.database.model.Inject;
+import io.openex.database.repository.DryInjectRepository;
+import io.openex.database.repository.DryRunRepository;
+import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.InjectSpecification;
-import io.openex.model.ExecutableInject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.Nullable;
 import javax.transaction.Transactional;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 @Component
-public class DryrunService {
+public class DryrunService<T> {
 
     private DryRunRepository dryRunRepository;
-    private InjectRepository injectRepository;
-    private DryInjectRepository dryInjectRepository;
+    private InjectRepository<T> injectRepository;
+    private DryInjectRepository<T> dryInjectRepository;
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
+    public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
     }
 
@@ -38,11 +35,11 @@ public class DryrunService {
     }
 
     @Autowired
-    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
+    public void setDryInjectRepository(DryInjectRepository<T> dryInjectRepository) {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    private List<? extends DryInject<?>> toDryInjects(List<Inject<?>> injects, Dryrun dryrun, int speed) {
+    private List<? extends DryInject<T>> toDryInjects(List<Inject<T>> injects, Dryrun dryrun, int speed) {
         Date now = new Date();
         return injects.stream().map(inject -> inject.toDryInject(dryrun, now, speed)).toList();
     }
@@ -57,13 +54,11 @@ public class DryrunService {
 
     @Transactional
     public Dryrun provisionDryrun(Exercise exercise, int speed) {
-        Specification<Inject<?>> injectFilters = InjectSpecification.notManual()
-                .and(InjectSpecification.fromExercise(exercise.getId()))
-                .and(InjectSpecification.isEnable());
-        List<Inject<?>> injects = injectRepository.findAll(injectFilters);
+        Specification<Inject<T>> injectFilters = InjectSpecification.forDryrun(exercise.getId());
+        List<Inject<T>> injects = injectRepository.findAll(injectFilters);
         Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
         Dryrun dryrun = createDryRun(exercise, speed);
-        List<? extends DryInject<?>> dryInjects = toDryInjects(injects, dryrun, speed);
+        List<? extends DryInject<T>> dryInjects = toDryInjects(injects, dryrun, speed);
         // Create the dryrun and associated injects
         dryInjectRepository.saveAll(dryInjects);
         return dryrun;

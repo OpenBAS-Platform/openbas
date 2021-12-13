@@ -28,13 +28,14 @@ import java.util.stream.StreamSupport;
 import static io.openex.model.ExecutableInject.dryRun;
 import static io.openex.model.ExecutableInject.prodRun;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Stream.concat;
 
 @Component
-public class InjectHelper {
+public class InjectHelper<T> {
 
     private AudienceRepository audienceRepository;
-    private InjectRepository injectRepository;
-    private DryInjectRepository dryInjectRepository;
+    private InjectRepository<T> injectRepository;
+    private DryInjectRepository<T> dryInjectRepository;
 
     @Autowired
     public void setAudienceRepository(AudienceRepository audienceRepository) {
@@ -42,16 +43,16 @@ public class InjectHelper {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
+    public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
     }
 
     @Autowired
-    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
+    public void setDryInjectRepository(DryInjectRepository<T> dryInjectRepository) {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    public List<UserInjectContext> buildUsersFromInject(Injection<?> inject) {
+    public List<UserInjectContext> buildUsersFromInject(Injection<T> inject) {
         Exercise exercise = inject.getExercise();
         // Create stream from inject audiences
         Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
@@ -65,7 +66,7 @@ public class InjectHelper {
         Stream<UserInjectContext> animationUserStream = animationUsers.stream()
                 .map(user -> new UserInjectContext(exercise, user, "Animation Group"));
         // Build result
-        Stream<UserInjectContext> usersStream = Stream.concat(injectUserStream, animationUserStream);
+        Stream<UserInjectContext> usersStream = concat(injectUserStream, animationUserStream);
         return usersStream
                 .collect(groupingBy(UserInjectContext::getUser)).entrySet().stream()
                 .map(entry -> new UserInjectContext(exercise, entry.getKey(),
@@ -81,24 +82,18 @@ public class InjectHelper {
     }
 
     @Transactional
-    public List<ExecutableInject<?>> getInjectsToRun() {
+    public List<ExecutableInject<T>> getInjectsToRun() {
         // region injects
-        Specification<Inject<?>> injectFilters = InjectSpecification.notManual()
-                .and(InjectSpecification.fromActiveExercise())
-                .and(InjectSpecification.isEnable())
-                .and(InjectSpecification.notExecuted());
-        Stream<ExecutableInject<?>> injects = injectRepository.findAll(injectFilters)
+        Stream<ExecutableInject<T>> injects = injectRepository.findAll(InjectSpecification.executable())
                 .stream().filter(this::isInInjectableRange)
                 .map(inject -> prodRun(inject, buildUsersFromInject(inject)));
         // endregion
         // region dry injects
-        Specification<DryInject<?>> dryFilters = DryInjectSpecification.notManual()
-                .and(DryInjectSpecification.notExecuted());
-        Stream<ExecutableInject<?>> dryInjects = dryInjectRepository.findAll(dryFilters)
+        Stream<ExecutableInject<T>> dryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable())
                 .stream().filter(this::isInInjectableRange)
                 .map(inject -> dryRun(inject, buildUsersFromInject(inject)));
         // endregion
-        return Stream.concat(injects, dryInjects).collect(Collectors.toList());
+        return concat(injects, dryInjects).collect(Collectors.toList());
     }
 
     public String buildContextualContent(String content, UserInjectContext context) throws Exception {

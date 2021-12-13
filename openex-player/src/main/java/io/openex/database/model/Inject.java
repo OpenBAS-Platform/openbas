@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
-import io.openex.model.ContentBase;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -19,7 +18,7 @@ import static java.util.Optional.ofNullable;
 @Table(name = "injects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "inject_type")
-public abstract class Inject<T extends ContentBase> implements Base, Injection<T> {
+public abstract class Inject<T> implements Base, Injection<T> {
 
     public enum STATUS {
         SUCCESS
@@ -237,6 +236,8 @@ public abstract class Inject<T extends ContentBase> implements Base, Injection<T
     public void setDependsDuration(Long dependsDuration) {
         this.dependsDuration = dependsDuration;
     }
+
+    public abstract void setContent(T content);
 
     @JsonIgnore
     public abstract DryInject<T> toDryInject(Dryrun run, Date from, int speed);

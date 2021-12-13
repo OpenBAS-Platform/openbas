@@ -31,7 +31,7 @@ public class OvhSmsExecutor implements Executor<OvhSmsContent> {
     @Override
     public void process(ExecutableInject<OvhSmsContent> injection, Execution execution) {
         Injection<OvhSmsContent> inject = injection.getInject();
-        String message = inject.getMessage();
+        String message = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
         List<UserInjectContext> users = injection.getUsers();
         int numberOfExpected = users.size();
         AtomicInteger errors = new AtomicInteger(0);

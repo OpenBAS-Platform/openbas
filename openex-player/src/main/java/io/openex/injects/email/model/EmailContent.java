@@ -1,13 +1,12 @@
 package io.openex.injects.email.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.model.ContentBase;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmailContent implements ContentBase {
+public class EmailContent {
 
     private static final String HEADER_DIV = "<div style=\"text-align: center; margin-bottom: 10px;\">";
     private static final String FOOTER_DIV = "<div style=\"text-align: center; margin-top: 10px;\">";

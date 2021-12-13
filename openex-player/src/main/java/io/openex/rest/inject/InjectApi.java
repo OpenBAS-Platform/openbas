@@ -1,22 +1,27 @@
 package io.openex.rest.inject;
 
-import io.openex.database.model.Inject;
-import io.openex.helper.InjectHelper;
-import io.openex.model.ContentBase;
 import io.openex.contract.Contract;
-import io.openex.model.Executor;
+import io.openex.database.model.Exercise;
+import io.openex.database.model.Inject;
 import io.openex.database.model.InjectTypes;
+import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.ExerciseRepository;
+import io.openex.database.repository.InjectRepository;
+import io.openex.helper.InjectHelper;
 import io.openex.model.ExecutableInject;
 import io.openex.model.Execution;
-import io.openex.database.repository.InjectRepository;
+import io.openex.model.Executor;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.inject.form.InjectInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,12 +32,24 @@ import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
 
 @RestController
-public class InjectApi extends RestBehavior {
+public class InjectApi<T> extends RestBehavior {
 
-    private InjectRepository injectRepository;
-    private InjectHelper injectHelper;
+    private InjectRepository<T> injectRepository;
+    private ExerciseRepository exerciseRepository;
+    private AudienceRepository audienceRepository;
+    private InjectHelper<T> injectHelper;
     private ApplicationContext context;
     private List<Contract> contracts;
+
+    @Autowired
+    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
+
+    @Autowired
+    public void setAudienceRepository(AudienceRepository audienceRepository) {
+        this.audienceRepository = audienceRepository;
+    }
 
     @Autowired
     public void setContracts(List<Contract> contracts) {
@@ -40,12 +57,12 @@ public class InjectApi extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
+    public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
     }
 
     @Autowired
-    public void setInjectHelper(InjectHelper injectHelper) {
+    public void setInjectHelper(InjectHelper<T> injectHelper) {
         this.injectHelper = injectHelper;
     }
 
@@ -63,17 +80,34 @@ public class InjectApi extends RestBehavior {
     @RolesAllowed({ROLE_PLANIFICATEUR})
     @GetMapping("/api/injects/try/{injectId}")
     public Execution execute(@PathVariable String injectId) {
-        Optional<Inject<?>> injectOptional = injectRepository.findById(injectId);
+        Optional<Inject<T>> injectOptional = injectRepository.findById(injectId);
         if (injectOptional.isEmpty()) {
             Execution execution = new Execution();
             execution.setStatus(ERROR);
             execution.setMessage(of("Inject to try not found"));
             return execution;
         }
-        Inject<?> inject = injectOptional.get();
-        ExecutableInject<?> injection = prodRun(inject, injectHelper.buildUsersFromInject(inject));
-        Class<? extends Executor<?>> executorClass = inject.executor();
-        Executor<? extends ContentBase> executor = context.getBean(executorClass);
+        Inject<T> inject = injectOptional.get();
+        ExecutableInject<T> injection = prodRun(inject, injectHelper.buildUsersFromInject(inject));
+        Class<? extends Executor<T>> executorClass = inject.executor();
+        Executor<?> executor = context.getBean(executorClass);
         return executor.execute(injection);
+    }
+
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
+    @PutMapping("/api/injects/{exerciseId}/{injectId}")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    public Inject<T> updateInject(@PathVariable String exerciseId,
+                                  @PathVariable String injectId, @Valid @RequestBody InjectInput<T> input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+        inject.setUpdateAttributes(input);
+        inject.setContent(input.getContent());
+        Instant from = exercise.getStart().toInstant();
+        Instant to = input.getDate().toInstant();
+        long duration = Duration.between(from, to).getSeconds();
+        inject.setDependsDuration(duration);
+        inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+        return injectRepository.save(inject);
     }
 }

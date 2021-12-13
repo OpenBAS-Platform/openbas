@@ -12,6 +12,7 @@ import io.openex.model.Execution;
 import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ExerciseRepository;
+import io.openex.model.UserInjectContext;
 import io.openex.rest.comcheck.form.ComcheckInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.List;
 
 import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
 import static io.openex.model.ExecutableInject.prodRun;
 import static java.util.List.of;
 
 @RestController
-public class ComcheckApi extends RestBehavior {
+public class ComcheckApi<T> extends RestBehavior {
 
     private final static String RC = "<br /><br />";
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
     private AudienceRepository audienceRepository;
     private ExerciseRepository exerciseRepository;
-    private InjectHelper injectHelper;
 
     @Autowired
     public void setContext(ApplicationContext context) {
@@ -58,11 +59,6 @@ public class ComcheckApi extends RestBehavior {
         this.exerciseRepository = exerciseRepository;
     }
 
-    @Autowired
-    public void setInjectHelper(InjectHelper injectHelper) {
-        this.injectHelper = injectHelper;
-    }
-
     @RolesAllowed(ROLE_PLANIFICATEUR)
     @PostMapping("/api/comcheck")
     public Execution communicationCheck(@Valid @RequestBody ComcheckInput comCheck) {
@@ -70,9 +66,9 @@ public class ComcheckApi extends RestBehavior {
         Comcheck check = new Comcheck();
         check.setStart(new Date());
         check.setEnd(comCheck.getEnd());
-        Exercise exercise = exerciseRepository.findById(comCheck.getExerciseId()).get();
+        Exercise exercise = exerciseRepository.findById(comCheck.getExerciseId()).orElseThrow();
         check.setExercise(exercise);
-        Audience audience = audienceRepository.findById(comCheck.getTargetAudienceId()).get();
+        Audience audience = audienceRepository.findById(comCheck.getTargetAudienceId()).orElseThrow();
         check.setAudience(audience);
         Comcheck save = comcheckRepository.save(check);
         // 02. Send email to appropriate audience
@@ -84,8 +80,10 @@ public class ComcheckApi extends RestBehavior {
         EmailInject emailInject = new EmailInject();
         emailInject.setContent(content);
         emailInject.setAudiences(of(audience));
-        ExecutableInject<EmailContent> injection = //
-                prodRun(emailInject, injectHelper.buildUsersFromInject(emailInject));
+        List<UserInjectContext> userInjectContexts = audience.getUsers().stream()
+                .map(user -> new UserInjectContext(exercise, user, audience.getName()))
+                .toList();
+        ExecutableInject<EmailContent> injection = prodRun(emailInject, userInjectContexts);
         return emailExecutor.execute(injection);
     }
 }

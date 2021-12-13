@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
@@ -42,10 +43,17 @@ public class Audience implements Base {
 
     @JsonProperty("audience_users_number")
     public long getUsersNumber() {
+        return getUsers().size();
+    }
+
+    // region transient
+    @JsonIgnore
+    public List<User> getUsers() {
         return getSubAudiences().stream()
                 .flatMap(subAudience -> subAudience.getUsers().stream())
-                .distinct().count();
+                .distinct().toList();
     }
+    // endregion
 
     public String getId() {
         return id;

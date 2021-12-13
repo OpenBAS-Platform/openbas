@@ -1,6 +1,6 @@
 package io.openex.model;
 
-public interface Executor<T extends ContentBase> {
+public interface Executor<T> {
     void process(ExecutableInject<T> inject, Execution execution) throws Exception;
 
     @SuppressWarnings("unchecked")
