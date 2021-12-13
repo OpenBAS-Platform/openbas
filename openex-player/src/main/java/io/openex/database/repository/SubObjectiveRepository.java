@@ -1,6 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.SubObjective;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -13,5 +14,6 @@ public interface SubObjectiveRepository extends CrudRepository<SubObjective, Str
 
     List<SubObjective> findByTitle(String title);
 
-    Optional<SubObjective> findById(String id);
+    @NotNull
+    Optional<SubObjective> findById(@NotNull String id);
 }

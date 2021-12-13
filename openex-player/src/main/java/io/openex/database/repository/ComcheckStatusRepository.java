@@ -1,6 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.ComcheckStatus;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -10,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ComcheckStatusRepository extends CrudRepository<ComcheckStatus, String>, JpaSpecificationExecutor<ComcheckStatus> {
 
-    Optional<ComcheckStatus> findById(String id);
+    @NotNull
+    Optional<ComcheckStatus> findById(@NotNull String id);
 }

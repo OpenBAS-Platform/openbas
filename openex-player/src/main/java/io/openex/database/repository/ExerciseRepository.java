@@ -1,6 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.Exercise;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,8 @@ import java.util.Optional;
 @Repository
 public interface ExerciseRepository extends CrudRepository<Exercise, String> {
 
-    Optional<Exercise> findById(String id);
+    @NotNull
+    Optional<Exercise> findById(@NotNull String id);
 
     @Query("select distinct e from Exercise e " +
             "join e.grants as grant " +
