@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class StatisticApi extends RestBehavior {
+public class StatisticApi<T>  extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private UserRepository userRepository;
-    private InjectRepository injectRepository;
+    private InjectRepository<T> injectRepository;
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -30,7 +30,7 @@ public class StatisticApi extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
+    public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
     }
 

@@ -11,11 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
-
-import java.util.List;
 import java.util.Spliterator;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
 import static io.openex.database.model.User.ROLE_USER;

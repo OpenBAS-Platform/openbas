@@ -16,9 +16,6 @@ public class PlatformStatistic {
     @JsonProperty("injects_count")
     private long injectsCount;
 
-    public PlatformStatistic() {
-    }
-
     public PlatformStatistic(long exercisesCount, long usersCount, long injectsCount) {
         this.exercisesCount = exercisesCount;
         this.usersCount = usersCount;

@@ -17,91 +17,67 @@ import java.util.List;
 @Table(name = "exercises")
 public class Exercise implements Base {
 
-    private enum STATUS {
-        CANCELED,
-        SCHEDULED,
-        RUNNING,
-        FINISHED
-    }
-
     @Id
     @Column(name = "exercise_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @JsonProperty("exercise_id")
     private String id;
-
     @Column(name = "exercise_name")
     @JsonProperty("exercise_name")
     private String name;
-
     @Column(name = "exercise_description")
     @JsonProperty("exercise_description")
     private String description;
-
     @Column(name = "exercise_subtitle")
     @JsonProperty("exercise_subtitle")
     private String subtitle;
-
     @Column(name = "exercise_start_date")
     @JsonProperty("exercise_start_date")
     private Date start;
-
     @Column(name = "exercise_end_date")
     @JsonProperty("exercise_end_date")
     private Date end;
-
     @Column(name = "exercise_canceled")
     @JsonProperty("exercise_canceled")
     private boolean canceled = false;
-
     @ManyToOne
     @JoinColumn(name = "exercise_owner")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_owner")
     private User owner;
-
     @ManyToOne
     @JoinColumn(name = "exercise_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_image")
     private File image;
-
     @OneToOne
     @JoinColumn(name = "exercise_animation_group")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_animation_group")
     private Group animationGroup;
-
     @Column(name = "exercise_message_header")
     @JsonProperty("exercise_message_header")
     private String header = "EXERCISE - EXERCISE - EXERCISE";
-
     @Column(name = "exercise_message_footer")
     @JsonProperty("exercise_message_footer")
     private String footer = "EXERCISE - EXERCISE - EXERCISE";
-
     @Column(name = "exercise_mail_expediteur")
     @JsonProperty("exercise_mail_expediteur")
     private String replyTo = "planners@openex.io";
-
     @Column(name = "exercise_type")
     @JsonProperty("exercise_type")
     private String type = "standard";
-
     @Column(name = "exercise_latitude")
     @JsonProperty("exercise_latitude")
     private Double latitude;
-
     @Column(name = "exercise_longitude")
     @JsonProperty("exercise_longitude")
     private Double longitude;
-
     @OneToMany(mappedBy = "exercise")
     @Fetch(value = FetchMode.SUBSELECT)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
-
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Event> events = new ArrayList<>();
@@ -134,19 +110,21 @@ public class Exercise implements Base {
                 .map(Grant::getGroup)
                 .flatMap(group -> group.getUsers().stream()).toList();
     }
+
     @JsonIgnore
     public List<User> getPlanners() {
         return getUsersByType(Grant.GRANT_TYPE.PLANNER.name());
     }
+
     @JsonIgnore
     public List<User> getObservers() {
         return getUsersByType(Grant.GRANT_TYPE.OBSERVER.name());
     }
-    // endregion
 
     public String getId() {
         return id;
     }
+    // endregion
 
     public void setId(String id) {
         this.id = id;
@@ -286,5 +264,12 @@ public class Exercise implements Base {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    private enum STATUS {
+        CANCELED,
+        SCHEDULED,
+        RUNNING,
+        FINISHED
     }
 }

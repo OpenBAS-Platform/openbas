@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 
 @Component
-@ConfigurationProperties(prefix="ovh.sms")
+@ConfigurationProperties(prefix = "ovh.sms")
 public class OvhSmsConfig {
 
     @NotNull

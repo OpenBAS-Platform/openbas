@@ -62,13 +62,12 @@ public class UserService {
         return passwordEncoder.matches(password, user.getPassword());
     }
 
-    public Token createUserToken(User user) {
+    public void createUserToken(User user) {
         Token token = new Token();
         token.setUser(user);
         token.setCreated(new Date());
         token.setValue(UUID.randomUUID().toString());
         tokenRepository.save(token);
-        return token;
     }
 
     public User createUser(String email, String name, String firstName, String lastName) {

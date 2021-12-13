@@ -8,8 +8,7 @@ public interface Base {
     String getId();
 
     @Transient
-    default Base setUpdateAttributes(Object input) {
+    default void setUpdateAttributes(Object input) {
         BeanUtils.copyProperties(input, this);
-        return this;
     }
 }

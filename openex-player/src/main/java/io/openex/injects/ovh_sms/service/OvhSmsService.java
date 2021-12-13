@@ -1,7 +1,7 @@
 package io.openex.injects.ovh_sms.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openex.helper.InjectHelper;
+import io.openex.helper.TemplateHelper;
 import io.openex.injects.ovh_sms.config.OvhSmsConfig;
 import io.openex.model.UserInjectContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,15 +22,26 @@ import static java.util.Collections.singletonList;
 @Component
 public class OvhSmsService {
 
+    private static final String METHOD = "POST";
     @Resource
     private ObjectMapper mapper;
-    private static final String METHOD = "POST";
     private OvhSmsConfig config;
-    private InjectHelper injectHelper;
 
-    @Autowired
-    public void setInjectHelper(InjectHelper injectHelper) {
-        this.injectHelper = injectHelper;
+    @SuppressWarnings({"StringBufferMayBeStringBuilder", "ForLoopReplaceableByForEach", "ConstantConditions"})
+    private static String convertToHex(byte[] data) {
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < data.length; i++) {
+            int halfbyte = (data[i] >>> 4) & 0x0F;
+            int two_halfs = 0;
+            do {
+                if ((0 <= halfbyte) && (halfbyte <= 9))
+                    buf.append((char) ('0' + halfbyte));
+                else
+                    buf.append((char) ('a' + (halfbyte - 10)));
+                halfbyte = data[i] & 0x0F;
+            } while (two_halfs++ < 1);
+        }
+        return buf.toString();
     }
 
     @Autowired
@@ -41,7 +52,7 @@ public class OvhSmsService {
     public String sendSms(UserInjectContext context, String phone, String message) throws Exception {
         String userEmail = context.getUser().getEmail();
         System.out.println("Sending sms to " + userEmail + " - " + phone);
-        String smsMessage = injectHelper.buildContextualContent(message, context);
+        String smsMessage = TemplateHelper.buildContextualContent(message, context);
         URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs");
         String isoMessage = new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
         OvhSmsMessage ovhSmsMessage = new OvhSmsMessage(singletonList(phone), isoMessage);
@@ -86,23 +97,6 @@ public class OvhSmsService {
             throw new Exception(ovhResponse);
         }
         return ovhResponse;
-    }
-
-    @SuppressWarnings({"StringBufferMayBeStringBuilder", "ForLoopReplaceableByForEach"})
-    private static String convertToHex(byte[] data) {
-        StringBuffer buf = new StringBuffer();
-        for (int i = 0; i < data.length; i++) {
-            int halfbyte = (data[i] >>> 4) & 0x0F;
-            int two_halfs = 0;
-            do {
-                if ((0 <= halfbyte) && (halfbyte <= 9))
-                    buf.append((char) ('0' + halfbyte));
-                else
-                    buf.append((char) ('a' + (halfbyte - 10)));
-                halfbyte = data[i] & 0x0F;
-            } while (two_halfs++ < 1);
-        }
-        return buf.toString();
     }
 
     @SuppressWarnings("UnusedAssignment")

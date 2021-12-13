@@ -1,7 +1,7 @@
 package io.openex.injects.email;
 
-import io.openex.contract.ContractDef;
 import io.openex.contract.Contract;
+import io.openex.contract.ContractDef;
 import org.springframework.stereotype.Component;
 
 import static io.openex.contract.ContractCardinality.Multiple;

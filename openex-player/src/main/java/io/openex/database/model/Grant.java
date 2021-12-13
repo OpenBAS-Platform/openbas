@@ -11,28 +11,20 @@ import javax.persistence.*;
 @Table(name = "grants")
 public class Grant implements Base {
 
-    public enum GRANT_TYPE {
-        OBSERVER,
-        PLANNER
-    }
-
     @Id
     @Column(name = "grant_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @JsonProperty("grant_id")
     private String id;
-
     @Column(name = "grant_name")
     @JsonProperty("grant_name")
     private String name;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grant_group")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("grant_group")
     private Group group;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grant_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -69,5 +61,10 @@ public class Grant implements Base {
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
+    }
+
+    public enum GRANT_TYPE {
+        OBSERVER,
+        PLANNER
     }
 }

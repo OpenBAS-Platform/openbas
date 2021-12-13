@@ -47,8 +47,7 @@ public class Comcheck implements Base {
     // region transient
     @JsonProperty("comcheck_finished")
     public boolean isFinished() {
-        Date now = new Date();
-        return now.after(getEnd());
+        return new Date().after(getEnd()) || comcheckStatus.stream().allMatch(ComcheckStatus::isState);
     }
     // endregion
 

@@ -6,25 +6,27 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
+import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+
 public class ExerciseCreateInput {
 
-    @NotBlank(message = "This value should not be blank.")
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_name")
     private String name;
 
-    @NotBlank(message = "This value should not be blank.")
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_description")
     private String description;
 
-    @NotBlank(message = "This value should not be blank.")
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 
-    @NotNull(message = "This value should not be blank.")
+    @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_start_date")
     private Date start;
 
-    @NotNull(message = "This value should not be blank.")
+    @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_end_date")
     private Date end;
 

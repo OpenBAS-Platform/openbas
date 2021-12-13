@@ -1,36 +1,42 @@
 package io.openex.database.model;
 
+import io.openex.model.Execution;
 import io.openex.model.Executor;
 
 import javax.persistence.Transient;
 import java.util.Date;
 import java.util.List;
 
-public interface Injection<T> {
-    String getId();
+import static java.util.Optional.ofNullable;
 
-    Exercise getExercise();
+public abstract class Injection<T> {
+    public abstract String getId();
 
-    Date getDate();
+    public abstract Exercise getExercise();
 
-    T getContent();
+    public abstract Date getDate();
 
-    Class<? extends Executor<T>> executor();
+    public abstract T getContent();
+
+    public abstract Class<? extends Executor<T>> executor();
 
     @Transient
-    default String getHeader() {
-        return getExercise().getHeader();
+    public String getHeader() {
+        return ofNullable(getExercise()).map(Exercise::getHeader).orElse("");
     }
 
     @Transient
-    default String getFooter() {
-        return getExercise().getFooter();
+    public String getFooter() {
+        return ofNullable(getExercise()).map(Exercise::getFooter).orElse("");
     }
 
-    String getType();
+    public abstract String getType();
 
-    List<Audience> getAudiences();
+    public abstract List<Audience> getAudiences();
 
     @Transient
-    boolean isGlobalInject();
+    public abstract boolean isGlobalInject();
+
+    @Transient
+    public abstract void report(Execution execution);
 }

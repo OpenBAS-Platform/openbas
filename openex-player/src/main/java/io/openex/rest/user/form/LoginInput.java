@@ -2,12 +2,14 @@ package io.openex.rest.user.form;
 
 import javax.validation.constraints.NotBlank;
 
+import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+
 public class LoginInput {
 
-    @NotBlank(message = "This value should not be blank.")
+    @NotBlank(message = MANDATORY_MESSAGE)
     private String login;
 
-    @NotBlank(message = "This value should not be blank.")
+    @NotBlank(message = MANDATORY_MESSAGE)
     private String password;
 
     public String getLogin() {

@@ -48,23 +48,23 @@ public class ExerciseSecurityExpressionRoot extends SecurityExpressionRoot imple
     }
 
     @Override
-    public Object getReturnObject() {
-        return this.returnObject;
-    }
-
-    @Override
-    public Object getThis() {
-        return this;
-    }
-
-    @Override
     public void setFilterObject(Object obj) {
         this.filterObject = obj;
     }
 
     @Override
+    public Object getReturnObject() {
+        return this.returnObject;
+    }
+
+    @Override
     public void setReturnObject(Object obj) {
         this.returnObject = obj;
+    }
+
+    @Override
+    public Object getThis() {
+        return this;
     }
     // endregion
 }

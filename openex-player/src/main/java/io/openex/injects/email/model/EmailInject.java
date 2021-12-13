@@ -3,8 +3,8 @@ package io.openex.injects.email.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.DryInject;
 import io.openex.database.model.Dryrun;
-import io.openex.injects.email.EmailExecutor;
 import io.openex.database.model.Inject;
+import io.openex.injects.email.EmailExecutor;
 import io.openex.injects.email.converter.EmailContentConverter;
 import io.openex.model.Executor;
 

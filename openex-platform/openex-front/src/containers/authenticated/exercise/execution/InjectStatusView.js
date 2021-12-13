@@ -36,20 +36,9 @@ const styles = {
 };
 
 class InjectStatusView extends Component {
-  // eslint-disable-next-line class-methods-use-this
-  readJSON(str) {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return null;
-    }
-  }
-
   render() {
     const injectStatus = R.propOr('-', 'inject_status', this.props.inject);
-    const injectMessageLines = this.readJSON(
-      R.propOr(null, 'status_message', injectStatus),
-    );
+    const injectMessageLines = R.propOr([], 'messages', injectStatus?.status_message);
     const time = convertToCountdown(injectStatus.status_execution);
 
     return (

@@ -3,8 +3,10 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.repository.InjectReportingRepository;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import io.openex.model.Execution;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -18,11 +20,7 @@ import static java.util.Optional.ofNullable;
 @Table(name = "injects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "inject_type")
-public abstract class Inject<T> implements Base, Injection<T> {
-
-    public enum STATUS {
-        SUCCESS
-    }
+public abstract class Inject<T> extends Injection<T> implements Base {
 
     @Id
     @Column(name = "inject_id")
@@ -30,61 +28,48 @@ public abstract class Inject<T> implements Base, Injection<T> {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @JsonProperty("inject_id")
     private String id;
-
     @Column(name = "inject_title")
     @JsonProperty("inject_title")
     private String title;
-
     @Column(name = "inject_description")
     @JsonProperty("inject_description")
     private String description;
-
     @Column(name = "inject_latitude")
     @JsonProperty("inject_latitude")
     private Double latitude;
-
     @Column(name = "inject_longitude")
     @JsonProperty("inject_longitude")
     private Double longitude;
-
     @Column(name = "inject_enabled")
     @JsonProperty("inject_enabled")
     private boolean enabled = true;
-
     @Column(name = "inject_type", insertable = false, updatable = false)
     @JsonProperty("inject_type")
     private String type;
-
     @Column(name = "inject_all_audiences")
     @JsonProperty("inject_all_audiences")
     private boolean allAudiences;
-
     @ManyToOne
     @JoinColumn(name = "inject_incident")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_incident")
     private Incident incident;
-
     @ManyToOne
     @JoinColumn(name = "inject_depends_from_another")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_depends_on")
     private Inject<?> dependsOn;
-
     @Column(name = "inject_depends_duration")
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JoinColumn(name = "inject_user")
     @JsonProperty("inject_user")
     private User user;
-
     @OneToOne(mappedBy = "inject")
     @JsonProperty("inject_status")
     private InjectStatus status;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "injects_audiences",
             joinColumns = @JoinColumn(name = "inject_id"),
@@ -92,6 +77,12 @@ public abstract class Inject<T> implements Base, Injection<T> {
     @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("inject_audiences")
     private List<Audience> audiences = new ArrayList<>();
+    @Deprecated
+    @Column(name = "inject_date")
+    @JsonProperty("inject_date")
+    private Date date;
+    @Transient
+    private InjectReportingRepository<T> statusRepository;
 
     // region transient
     @JsonProperty("inject_users_number")
@@ -102,22 +93,17 @@ public abstract class Inject<T> implements Base, Injection<T> {
                 .reduce(Long::sum).orElse(0L);
     }
 
-    @Deprecated
-    @Column(name = "inject_date")
-    @JsonProperty("inject_date")
-    private Date date;
-
-    @Deprecated
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     @JsonProperty("inject_date")
     public Date getDate() {
         Inject<?> dependsOnInject = getDependsOn();
         long duration = ofNullable(getDependsDuration()).orElse(0L);
         Date start = dependsOnInject == null ? getExercise().getStart() : dependsOnInject.getDate();
         return Date.from(start.toInstant().plusSeconds(duration));
+    }
+
+    @Deprecated
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     @JsonIgnore
@@ -127,11 +113,22 @@ public abstract class Inject<T> implements Base, Injection<T> {
         Date start = dependsOnInject == null ? beginFrom : dependsOnInject.getDate();
         return Date.from(start.toInstant().plusSeconds(duration));
     }
-    // endregion
+
+    @JsonIgnore
+    public Inject<T> setStatusRepository(InjectReportingRepository<T> statusRepository) {
+        this.statusRepository = statusRepository;
+        return this;
+    }
+
+    @Override
+    public void report(Execution execution) {
+        statusRepository.executionSave(execution, this);
+    }
 
     public String getId() {
         return id;
     }
+    // endregion
 
     public void setId(String id) {
         this.id = id;
@@ -175,10 +172,6 @@ public abstract class Inject<T> implements Base, Injection<T> {
 
     public void setAllAudiences(boolean allAudiences) {
         this.allAudiences = allAudiences;
-    }
-
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
     }
 
     public String getTitle() {
@@ -246,7 +239,7 @@ public abstract class Inject<T> implements Base, Injection<T> {
     @JsonProperty("inject_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
     public Exercise getExercise() {
-        return getIncident().getEvent().getExercise();
+        return ofNullable(getIncident()).map(Incident::getEvent).map(Event::getExercise).orElse(null);
     }
 
     @Override
@@ -255,8 +248,16 @@ public abstract class Inject<T> implements Base, Injection<T> {
         return audiences;
     }
 
+    public void setAudiences(List<Audience> audiences) {
+        this.audiences = audiences;
+    }
+
     @Override
     public boolean isGlobalInject() {
         return isAllAudiences();
+    }
+
+    public enum STATUS {
+        SUCCESS
     }
 }

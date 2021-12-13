@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.converter.StatusReportingConverter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -22,8 +23,9 @@ public class DryInjectStatus implements Base {
     private String name;
 
     @Column(name = "status_message")
+    @Convert(converter = StatusReportingConverter.class)
     @JsonProperty("status_message")
-    private String message;
+    private StatusReporting reporting;
 
     @Column(name = "status_date")
     @JsonProperty("status_date")
@@ -54,12 +56,12 @@ public class DryInjectStatus implements Base {
         this.name = name;
     }
 
-    public String getMessage() {
-        return message;
+    public StatusReporting getReporting() {
+        return reporting;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setReporting(StatusReporting reporting) {
+        this.reporting = reporting;
     }
 
     public Date getDate() {

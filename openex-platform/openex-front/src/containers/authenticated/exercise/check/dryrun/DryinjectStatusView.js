@@ -41,24 +41,13 @@ const styles = {
 };
 
 class DryinjectStatusView extends Component {
-  // eslint-disable-next-line class-methods-use-this
-  readJSON(str) {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return null;
-    }
-  }
-
   render() {
     const dryinjectStatus = R.propOr(
       '-',
       'dryinject_status',
       this.props.dryinject,
     );
-    const dryinjectMessageLines = this.readJSON(
-      R.propOr(null, 'status_message', dryinjectStatus),
-    );
+    const dryinjectMessageLines = R.propOr([], 'messages', dryinjectStatus?.status_message);
     const time = convertToCountdown(dryinjectStatus.status_execution);
 
     return (

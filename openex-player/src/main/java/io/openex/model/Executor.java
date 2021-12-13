@@ -1,13 +1,12 @@
 package io.openex.model;
 
 public interface Executor<T> {
-    void process(ExecutableInject<T> inject, Execution execution) throws Exception;
+    void process(ExecutableInject<T> inject, Execution execution);
 
-    @SuppressWarnings("unchecked")
-    default Execution execute(ExecutableInject<?> inject) {
+    default Execution execute(ExecutableInject<T> inject) {
         Execution execution = new Execution();
         try {
-            process((ExecutableInject<T>)inject, execution);
+            process(inject, execution);
         } catch (Exception e) {
             execution.setStatus(ExecutionStatus.ERROR);
             execution.addMessage(e.getMessage());

@@ -1,35 +1,36 @@
 package io.openex.rest.comcheck.form;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
+import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+
 public class ComcheckInput {
 
-    @NotBlank(message = "This value should not be blank.")
-    private String exerciseId;
+    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("comcheck_audience")
+    private String audienceId;
 
-    @NotBlank(message = "This value should not be blank.")
-    private String targetAudienceId;
-
+    @JsonProperty("comcheck_end_date")
     private Date end;
+
+    @JsonProperty("comcheck_subject")
     private String subject;
+
+    @JsonProperty("comcheck_message")
     private String message;
+
+    @JsonProperty("comcheck_footer")
     private String signature;
 
-    public String getExerciseId() {
-        return exerciseId;
+    public String getAudienceId() {
+        return audienceId;
     }
 
-    public void setExerciseId(String exerciseId) {
-        this.exerciseId = exerciseId;
-    }
-
-    public String getTargetAudienceId() {
-        return targetAudienceId;
-    }
-
-    public void setTargetAudienceId(String targetAudienceId) {
-        this.targetAudienceId = targetAudienceId;
+    public void setAudienceId(String audienceId) {
+        this.audienceId = audienceId;
     }
 
     public Date getEnd() {

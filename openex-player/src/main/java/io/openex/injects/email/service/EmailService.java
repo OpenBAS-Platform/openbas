@@ -2,13 +2,11 @@ package io.openex.injects.email.service;
 
 import io.openex.database.model.Document;
 import io.openex.database.repository.DocumentRepository;
-import io.openex.helper.InjectHelper;
+import io.openex.helper.TemplateHelper;
 import io.openex.injects.email.model.EmailAttachment;
 import io.openex.injects.email.model.EmailInjectAttachment;
-import io.openex.database.model.File;
 import io.openex.model.Execution;
 import io.openex.model.UserInjectContext;
-import io.openex.database.repository.FileRepository;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,6 @@ public class EmailService {
 
     private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
     private DocumentRepository documentRepository;
-    private InjectHelper injectHelper;
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
     private FileService fileService;
@@ -48,10 +45,6 @@ public class EmailService {
         this.fileService = fileService;
     }
 
-    @Autowired
-    public void setInjectHelper(InjectHelper injectHelper) {
-        this.injectHelper = injectHelper;
-    }
 
     @Autowired
     public void setEmailSender(JavaMailSender emailSender) {
@@ -63,7 +56,7 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
-    public List<EmailAttachment> resolveAttachments(Execution execution, List<EmailInjectAttachment> attachments) throws Exception {
+    public List<EmailAttachment> resolveAttachments(Execution execution, List<EmailInjectAttachment> attachments) {
         List<EmailAttachment> resolved = new ArrayList<>();
         for (EmailInjectAttachment attachment : attachments) {
             String fileName = attachment.getName();
@@ -84,7 +77,7 @@ public class EmailService {
     public void sendEmail(UserInjectContext context, String from, String subject, String message, List<EmailAttachment> attachments) throws Exception {
         String email = context.getUser().getEmail();
         System.out.println("Sending mail to " + email);
-        String body = injectHelper.buildContextualContent(message, context);
+        String body = TemplateHelper.buildContextualContent(message, context);
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
         mimeMessage.setSubject(subject);
@@ -97,9 +90,9 @@ public class EmailService {
         // Add Attachments
         for (EmailAttachment attachment : attachments) {
             MimeBodyPart aBodyPart = new MimeBodyPart();
-            aBodyPart.setFileName(attachment.getName());
-            aBodyPart.setHeader("Content-Type", attachment.getContentType());
-            ByteArrayDataSource bds = new ByteArrayDataSource(attachment.getData(), attachment.getContentType());
+            aBodyPart.setFileName(attachment.name());
+            aBodyPart.setHeader("Content-Type", attachment.contentType());
+            ByteArrayDataSource bds = new ByteArrayDataSource(attachment.data(), attachment.contentType());
             aBodyPart.setDataHandler(new DataHandler(bds));
             mailMultipart.addBodyPart(aBodyPart);
         }

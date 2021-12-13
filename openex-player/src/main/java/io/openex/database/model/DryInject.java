@@ -2,7 +2,10 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.repository.DryInjectReportingRepository;
 import io.openex.helper.MonoModelDeserializer;
+import io.openex.model.Execution;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -14,7 +17,7 @@ import java.util.List;
 @Table(name = "dryinjects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dryinject_type")
-public abstract class DryInject<T> implements Base, Injection<T> {
+public abstract class DryInject<T> extends Injection<T> implements Base {
 
     @Id
     @Column(name = "dryinject_id")
@@ -44,6 +47,22 @@ public abstract class DryInject<T> implements Base, Injection<T> {
     @OneToOne(mappedBy = "dryInject")
     @JsonProperty("dryinject_status")
     private DryInjectStatus status;
+
+    // region transient
+    @Transient
+    private DryInjectReportingRepository<T> statusRepository;
+
+    @JsonIgnore
+    public DryInject<T> setStatusRepository(DryInjectReportingRepository<T> statusRepository) {
+        this.statusRepository = statusRepository;
+        return this;
+    }
+
+    @Override
+    public void report(Execution execution) {
+        statusRepository.executionSave(execution, this);
+    }
+    // endregion
 
     public String getId() {
         return id;

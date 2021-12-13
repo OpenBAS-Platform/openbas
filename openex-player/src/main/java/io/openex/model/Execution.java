@@ -1,13 +1,15 @@
 package io.openex.model;
 
+import io.openex.database.model.StatusReporting;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Execution {
-    private ExecutionStatus status;
     private final long startTime;
-    private List<String> message = new ArrayList<>();
+    private ExecutionStatus status;
+    private List<String> messages = new ArrayList<>();
 
     public Execution() {
         this.status = ExecutionStatus.SUCCESS;
@@ -15,7 +17,7 @@ public class Execution {
     }
 
     public void addMessage(String mess) {
-        message.add(mess);
+        messages.add(mess);
     }
 
     public Integer getExecution() {
@@ -30,11 +32,11 @@ public class Execution {
         this.status = status;
     }
 
-    public List<String> getMessage() {
-        return message;
+    public StatusReporting getReporting() {
+        return new StatusReporting(messages);
     }
 
-    public void setMessage(List<String> message) {
-        this.message = message;
+    public void setMessage(List<String> messages) {
+        this.messages = messages;
     }
 }

@@ -15,6 +15,9 @@ public class OpenExConfig {
     @JsonProperty("application_name")
     private String name = "OpenEX";
 
+    @JsonProperty("application_base_url")
+    private String baseUrl;
+
     @JsonProperty("application_version")
     private String version;
 
@@ -56,6 +59,14 @@ public class OpenExConfig {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBaseUrl() {
+        return baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl;
+    }
+
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
 
     public String getVersion() {

@@ -7,7 +7,7 @@ import static io.openex.contract.ContractType.Text;
 
 public class ContractDef {
 
-    private List<ContractField> fields = new ArrayList<>();
+    private final List<ContractField> fields = new ArrayList<>();
 
     private ContractDef() {
         //private constructor
@@ -18,27 +18,17 @@ public class ContractDef {
     }
 
     public ContractDef mandatory(String field) {
-        fields.add(new ContractField(field, Text));
-        return this;
-    }
-
-    public ContractDef optional(String field) {
-        fields.add(new ContractField(field, Text, false));
+        fields.add(new ContractField(field, Text, true));
         return this;
     }
 
     public ContractDef mandatory(String field, ContractType type) {
-        fields.add(new ContractField(field, type));
+        fields.add(new ContractField(field, type, true));
         return this;
     }
 
     public ContractDef optional(String field, ContractType type) {
         fields.add(new ContractField(field, type, false));
-        return this;
-    }
-
-    public ContractDef mandatory(String field, ContractType type, ContractCardinality cardinality) {
-        fields.add(new ContractField(field, type, cardinality));
         return this;
     }
 

@@ -1,8 +1,8 @@
 package io.openex.injects.ovh_sms;
 
+import io.openex.contract.Contract;
 import io.openex.contract.ContractDef;
 import io.openex.injects.ovh_sms.config.OvhSmsConfig;
-import io.openex.contract.Contract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

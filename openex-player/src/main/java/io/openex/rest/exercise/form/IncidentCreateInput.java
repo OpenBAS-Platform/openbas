@@ -2,20 +2,29 @@ package io.openex.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotBlank;
+
+import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+
 public class IncidentCreateInput {
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("incident_title")
     private String title;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("incident_story")
     private String story;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("incident_type")
     private String type;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("incident_order")
     private Short order;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("incident_weight")
     private Integer weight;
 

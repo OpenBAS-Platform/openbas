@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static io.openex.model.ExecutableInject.prodRun;
 import static java.util.stream.StreamSupport.stream;
 
 @RestController
@@ -33,7 +32,7 @@ public class DebugApi<T> extends RestBehavior {
     @GetMapping("/injects")
     public List<ExecutableInject<T>> injects() {
         Stream<ExecutableInject<T>> injects = stream(injectRepository.findAll().spliterator(), false)
-                .map(inject -> prodRun(inject, injectHelper.buildUsersFromInject(inject)));
+                .map(inject -> new ExecutableInject<>(inject, injectHelper.buildUsersFromInject(inject)));
         return injects.toList();
     }
 }

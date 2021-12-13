@@ -402,7 +402,7 @@ const filterAudiences = (audiences, exerciseId) => {
 const filterSubaudiences = (subaudiences, audienceId) => {
   const subaudiencesFilterAndSorting = R.pipe(
     R.values,
-    R.filter((n) => n.subaudience_audience.audience_id === audienceId),
+    R.filter((n) => n.subaudience_audience === audienceId),
     R.sort((a, b) => a.subaudience_name.localeCompare(b.subaudience_name)),
   );
   return subaudiencesFilterAndSorting(subaudiences);

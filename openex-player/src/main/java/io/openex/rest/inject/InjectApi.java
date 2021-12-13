@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
-import static io.openex.model.ExecutableInject.prodRun;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
 
@@ -88,9 +87,9 @@ public class InjectApi<T> extends RestBehavior {
             return execution;
         }
         Inject<T> inject = injectOptional.get();
-        ExecutableInject<T> injection = prodRun(inject, injectHelper.buildUsersFromInject(inject));
+        ExecutableInject<T> injection = new ExecutableInject<>(inject, injectHelper.buildUsersFromInject(inject));
         Class<? extends Executor<T>> executorClass = inject.executor();
-        Executor<?> executor = context.getBean(executorClass);
+        Executor<T> executor = context.getBean(executorClass);
         return executor.execute(injection);
     }
 

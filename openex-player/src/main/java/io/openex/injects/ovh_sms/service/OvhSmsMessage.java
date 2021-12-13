@@ -4,76 +4,77 @@ import java.util.List;
 
 public class OvhSmsMessage {
 
-	private String charset = "UTF-8";
+    private final List<String> receivers;
+    private final String message;
+    private String charset = "UTF-8";
+    private String coding = "8bit";
 
-	private final List<String> receivers;
+    private String priority = "high";
 
-	private final String message;
+    private String sender = "OpenEx";
 
-	private String coding = "8bit";
+    private boolean senderForResponse = false;
 
-	private String priority = "high";
+    private boolean noStopClause = true;
 
-	private String sender = "OpenEx";
+    public OvhSmsMessage(List<String> receivers, String message) {
+        this.receivers = receivers;
+        this.message = message;
+    }
 
-	private boolean senderForResponse = false;
+    public String getMessage() {
+        return message;
+    }
 
-	private boolean noStopClause = true;
+    public String getCharset() {
+        return charset;
+    }
 
-	public OvhSmsMessage(List<String> receivers, String message) {
-		this.receivers = receivers;
-		this.message = message;
-	}
+    public void setCharset(String charset) {
+        this.charset = charset;
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public List<String> getReceivers() {
+        return receivers;
+    }
 
-	public String getCharset() {
-		return charset;
-	}
+    public String getCoding() {
+        return coding;
+    }
 
-	public void setCharset(String charset) {
-		this.charset = charset;
-	}
+    public void setCoding(String coding) {
+        this.coding = coding;
+    }
 
-	public List<String> getReceivers() {
-		return receivers;
-	}
+    public String getPriority() {
+        return priority;
+    }
 
-	public String getCoding() {
-		return coding;
-	}
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
 
-	public void setCoding(String coding) {
-		this.coding = coding;
-	}
+    public String getSender() {
+        return sender;
+    }
 
-	public String getPriority() { return priority; }
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
 
-	public void setPriority(String priority) { this.priority = priority; }
+    public boolean isSenderForResponse() {
+        return senderForResponse;
+    }
 
-	public String getSender() {
-		return sender;
-	}
+    public void setSenderForResponse(boolean senderForResponse) {
+        this.senderForResponse = senderForResponse;
+    }
 
-	public void setSender(String sender) {
-		this.sender = sender;
-	}
+    public boolean isNoStopClause() {
+        return noStopClause;
+    }
 
-	public boolean isSenderForResponse() {
-		return senderForResponse;
-	}
-
-	public void setSenderForResponse(boolean senderForResponse) {
-		this.senderForResponse = senderForResponse;
-	}
-
-	public boolean isNoStopClause() {
-		return noStopClause;
-	}
-
-	public void setNoStopClause(boolean noStopClause) {
-		this.noStopClause = noStopClause;
-	}
+    public void setNoStopClause(boolean noStopClause) {
+        this.noStopClause = noStopClause;
+    }
 }

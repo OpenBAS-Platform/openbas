@@ -69,7 +69,7 @@ public class Incident implements Base {
 
     // region transient
     @JsonProperty("incident_exercise")
-    public String exerciseId() {
+    public String getExerciseId() {
         return getEvent().getExercise().getId();
     }
     // endregion
