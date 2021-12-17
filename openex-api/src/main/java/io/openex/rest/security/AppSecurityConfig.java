@@ -1,5 +1,6 @@
 package io.openex.rest.security;
 
+import io.openex.config.OpenExConfig;
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
 import io.openex.service.UserService;
@@ -27,6 +28,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserRepository userRepository;
     private UserService userService;
+    private OpenExConfig openExConfig;
+
+    @Autowired
+    public void setOpenExConfig(OpenExConfig openExConfig) {
+        this.openExConfig = openExConfig;
+    }
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -44,9 +51,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .formLogin().disable()
                 .logout().disable()
-                //.and()
-                .oauth2Login()
-                .and()
                 .authorizeRequests()
                 /**/.antMatchers("/static/**").permitAll()
                 /**/.antMatchers("/api/parameters").permitAll()
@@ -57,6 +61,11 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 /**/.logoutSuccessUrl("/");
+
+        if (openExConfig.isAuthOpenidEnable()) {
+            http.oauth2Login();
+        }
+
         // Rewrite 403 code to 401
         http.exceptionHandling().authenticationEntryPoint((request, response, authException)
                 -> response.setStatus(HttpStatus.UNAUTHORIZED.value()));

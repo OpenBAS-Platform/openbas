@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppConfig {
 
-    public final static String MANDATORY_MESSAGE ="This value should not be blank.";
+    public final static String MANDATORY_MESSAGE = "This value should not be blank.";
 
     @Bean
     ObjectMapper openexJsonMapper() {
