@@ -10,17 +10,17 @@ jobs:
           command: apt-get update --allow-insecure-repositories --allow-unauthenticated && apt-get install -y build-essential
       - checkout
       - run: 
-          working_directory: ~/openex/openex-platform/openex-front
+          working_directory: ~/openex/openex-front
           command: yarn install
       - run:
-          working_directory: ~/openex/openex-platform/openex-front
+          working_directory: ~/openex/openex-front
           command: yarn build
       - persist_to_workspace:
           root: ~/
           paths:
             - openex
 
-  build_player:
+  build_api:
     working_directory: ~/openex
     docker:
       - image: maven:3.8.4-openjdk-17
@@ -28,8 +28,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: 
-          working_directory: ~/openex/openex-player
-          command: mvn install
+          working_directory: ~/openex/openex-api
+          command: mvn install -DskipTests
       - persist_to_workspace:
           root: ~/
           paths:
@@ -38,24 +38,19 @@ jobs:
   package_rolling:
     working_directory: ~/openex
     docker:
-      - image: chialab/php:7.4
+      - image: maven:3.8.4-openjdk-17
     steps:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run:
-          working_directory: ~/openex/openex-platform/openex-api
-          command: php composer.phar install --no-progress --no-interaction
+          working_directory: ~/openex/openex-api
+          command: mvn install -DskipTests
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run: git remote add openex ssh://git-9qdBths0@openex.io:/~/git-9qdBths0.git && git push --force openex master
       - run: mkdir release
-      - run: cp -a ./openex-platform/openex-api release/openex
-      - run: cp -a ./openex-platform/openex-front/build/index.html release/openex/templates/views/Default/index.html.twig
-      - run: cp -a ./openex-platform/openex-front/build/static release/openex/public/
-      - run: rm -Rf release/openex/public/images && cp -a ./openex-platform/openex-front/build/images release/openex/public/
-      - run: cp -a ./openex-platform/openex-front/build/ckeditor release/openex/public/
-      - run: mkdir release/openex/player && cp -a ./openex-player/target/player-2.1.0.jar release/openex/player/ && cp -a ./openex-player/src/main/resources/application.properties release/openex/player/
+      - run: cp -a ./openex-api/target/openex-api-3.0.0.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
       - run:
           working_directory: ~/openex/release
           command: tar -zcvf "openex-$(date '+%Y%m%d').tar.gz" openex
@@ -66,7 +61,7 @@ jobs:
   deploy_demo:
     working_directory: ~/openex
     docker:
-      - image: chialab/php:7.4
+      - image: maven:3.8.4-openjdk-17
     steps:
       - attach_workspace:
           at: ~/
@@ -84,11 +79,7 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master         
-      - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
-      - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
-      - run: mv ./deploy/openex-player/target/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/target/
+      - run: mv ./deploy/openex-api/target/application.properties /tmp/ && rsync -av --delete ./openex-api/target ./deploy/openex-api/ && mv /tmp/application.properties ./deploy/openex-api/target/
       - run:
           working_directory: ~/openex/deploy
           command: git add --force -A
@@ -99,7 +90,7 @@ jobs:
   deploy_reference:
     working_directory: ~/openex
     docker:
-      - image: chialab/php:7.4
+      - image: maven:3.8.4-openjdk-17
     steps:
       - attach_workspace:
           at: ~/
@@ -117,11 +108,7 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master         
-      - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
-      - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
-      - run: mv ./deploy/openex-player/target/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/target/
+      - run: mv ./deploy/openex-api/target/application.properties /tmp/ && rsync -av --delete ./openex-api/target ./deploy/openex-api/ && mv /tmp/application.properties ./deploy/openex-api/target/
       - run:
           working_directory: ~/openex/deploy
           command: git add --force -A
@@ -132,7 +119,7 @@ jobs:
   deploy_preprod1:
     working_directory: ~/openex
     docker:
-      - image: chialab/php:7.4
+      - image: maven:3.8.4-openjdk-17
     steps:
       - attach_workspace:
           at: ~/
@@ -150,11 +137,7 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git remote add ci ~/openex && git pull --no-edit -s recursive -X theirs ci master         
-      - run: cp -a ./openex-platform/openex-front/build/index.html ./deploy/openex-platform/openex-api/templates/views/Default/index.html.twig
-      - run: rsync -av --delete ./openex-platform/openex-front/build/static ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-platform/openex-front/build/images ./deploy/openex-platform/openex-api/public/
-      - run: rsync -av --delete ./openex-platform/openex-front/build/ckeditor ./deploy/openex-platform/openex-api/public/
-      - run: mv ./deploy/openex-player/target/application.properties /tmp/ && rsync -av --delete ./openex-player/target ./deploy/openex-player/ && mv /tmp/application.properties ./deploy/openex-player/target/
+      - run: mv ./deploy/openex-api/target/application.properties /tmp/ && rsync -av --delete ./openex-api/target ./deploy/openex-api/ && mv /tmp/application.properties ./deploy/openex-api/target/
       - run:
           working_directory: ~/openex/deploy
           command: git add --force -A
@@ -170,18 +153,10 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker
-      - run: cp -a ./openex-platform/openex-front/build/index.html ./openex-platform/openex-api/templates/views/Default/index.html.twig
-      - run: cp -a ./openex-platform/openex-front/build/static ./openex-platform/openex-api/public/
-      - run: cp -a ./openex-platform/openex-front/build/images ./openex-platform/openex-api/public/
-      - run: cp -a ./openex-platform/openex-front/build/ckeditor ./openex-platform/openex-api/public/
       - run:
-          working_directory: ~/openex/openex-platform
+          working_directory: ~/openex
           name: Build Docker image openexhq/platform
           command: docker build -t openexhq/platform:${CIRCLE_TAG} .
-      - run:
-          working_directory: ~/openex/openex-player
-          name: Build Docker image openexhq/player
-          command: docker build -t openexhq/player:${CIRCLE_TAG} .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |
@@ -197,18 +172,10 @@ jobs:
       - attach_workspace:
           at: ~/
       - setup_remote_docker
-      - run: cp -a ./openex-platform/openex-front/build/index.html ./openex-platform/openex-api/templates/views/Default/index.html.twig
-      - run: cp -a ./openex-platform/openex-front/build/static ./openex-platform/openex-api/public/
-      - run: cp -a ./openex-platform/openex-front/build/images ./openex-platform/openex-api/public/
-      - run: cp -a ./openex-platform/openex-front/build/ckeditor ./openex-platform/openex-api/public/
       - run:
-          working_directory: ~/openex/openex-platform
+          working_directory: ~/openex
           name: Build Docker image openexhq/platform
           command: docker build -t openexhq/platform:rolling .
-      - run:
-          working_directory: ~/openex/openex-player
-          name: Build Docker image openexhq/player
-          command: docker build -t openexhq/player:rolling .
       - run:
           name: Publish Docker Image to Docker Hub
           command: |

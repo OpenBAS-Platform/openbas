@@ -9,24 +9,15 @@ steps:
   - PGPASSWORD=openex psql --host=pgsql --port=5432 --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
 
 - name: api-tests
-  image: chialab/php:7.4
-  environment:
-    APP_ENV: test
-    APP_SECRET: bfa014e0-e02e-4aa6-a42b-603b19dcf159
-    DATABASE_URL: pgsql://openex:openex@pgsql:5432/openex
-    MAILER_URL: null://localhost
-    PLAYER_URL: http://player:8080
+  image:  maven:3.8.4-openjdk-17
   commands:
-  - cd openex-platform/openex-api
-  - php composer.phar install --no-progress --no-interaction
-  - php bin/console doctrine:schema:create --env=test
-  - php bin/console app:db-init --env=test
-  - php ./vendor/bin/phpunit
+  - cd openex-api
+  - mvn install -DskipTests
 
 - name: frontend-tests
   image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
   commands: 
-  - cd openex-platform/openex-front
+  - cd openex-front
   - yarn install
   - yarn build
   - yarn test
