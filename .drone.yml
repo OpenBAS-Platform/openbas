@@ -16,7 +16,7 @@ steps:
     OPENEX_AUTH-OPENID_ENABLE: false
   commands:
   - cd openex-api
-  - mvn install
+  - mvn test
 
 - name: frontend-tests
   image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
