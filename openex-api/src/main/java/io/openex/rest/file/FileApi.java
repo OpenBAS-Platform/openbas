@@ -67,12 +67,16 @@ public class FileApi extends RestBehavior {
 
     @GetMapping("/api/files/{fileId}")
     public ResponseEntity<InputStreamResource> read(@PathVariable String fileId) throws Exception {
-        File file = fileRepository.findById(fileId).orElseThrow();
-        InputStreamResource inputStream = fileService.getFile(file.getName());
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(inputStream);
+        try {
+            File file = fileRepository.findById(fileId).orElseThrow();
+            InputStreamResource inputStream = fileService.getFile(file.getName());
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(inputStream);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/api/files")
