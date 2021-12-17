@@ -14,6 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.UUID;
 
+import static io.openex.config.AppConfig.*;
+
 
 @Component
 public class V1__Init extends BaseJavaMigration {
@@ -74,8 +76,8 @@ public class V1__Init extends BaseJavaMigration {
         createAdminUser(connection);
         createAdminToken(connection);
         // Incidents
-        createIncidentType(connection, "9ebb419a-5f7d-440c-a84c-6b7132712564", "TECHNICAL");
-        createIncidentType(connection, "f324c240-93ec-4092-9c24-32c59920f59e", "OPERATIONAL");
-        createIncidentType(connection, "98bd973d-a121-40ed-a946-8d5408cb21da", "STRATEGIC");
+        createIncidentType(connection, TECHNICAL_INCIDENT_TYPE, "TECHNICAL");
+        createIncidentType(connection, OPERATIONAL_INCIDENT_TYPE, "OPERATIONAL");
+        createIncidentType(connection, STRATEGIC_INCIDENT_TYPE, "STRATEGIC");
     }
 }
