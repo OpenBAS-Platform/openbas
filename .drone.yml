@@ -12,8 +12,6 @@ steps:
     MINIO_PORT: 9000
     MINIO_ACCESS-KEY: minioadmin
     MINIO_ACCESS-SECRET: minioadmin
-    SPRING_MAIL_HOST: smtp.gmail.com
-    OPENEX_AUTH-OPENID_ENABLE: false
   commands:
   - cd openex-api
   - mvn test
