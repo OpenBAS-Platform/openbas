@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static io.openex.database.model.Grant.GRANT_TYPE.OBSERVER;
+import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
+import static java.util.Arrays.stream;
+
 @Entity
 @Table(name = "exercises")
 public class Exercise implements Base {
@@ -103,22 +107,22 @@ public class Exercise implements Base {
         return STATUS.FINISHED.name();
     }
 
-    private List<User> getUsersByType(String type) {
+    private List<User> getUsersByType(String... types) {
         List<Grant> grants = getGrants();
         return grants.stream()
-                .filter(grant -> grant.getName().equals(type))
+                .filter(grant -> stream(types).anyMatch(s -> grant.getName().equals(s)))
                 .map(Grant::getGroup)
                 .flatMap(group -> group.getUsers().stream()).toList();
     }
 
     @JsonIgnore
     public List<User> getPlanners() {
-        return getUsersByType(Grant.GRANT_TYPE.PLANNER.name());
+        return getUsersByType(PLANNER.name());
     }
 
     @JsonIgnore
     public List<User> getObservers() {
-        return getUsersByType(Grant.GRANT_TYPE.OBSERVER.name());
+        return getUsersByType(PLANNER.name(), OBSERVER.name());
     }
 
     public String getId() {
