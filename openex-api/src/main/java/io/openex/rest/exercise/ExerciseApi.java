@@ -126,8 +126,7 @@ public class ExerciseApi<T> extends RestBehavior {
     // region objectives
     @GetMapping("/api/exercises/{exerciseId}/objectives")
     public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
-        return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId)
-                .and(ObjectiveSpecification.withExercise()));
+        return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
     }
 
     @PostMapping("/api/exercises/{exerciseId}/objectives")
