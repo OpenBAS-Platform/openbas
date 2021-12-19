@@ -100,7 +100,7 @@ jobs:
   deploy_demo:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.4-openjdk-17-slim
     steps:
       - attach_workspace:
           at: ~/
@@ -129,7 +129,7 @@ jobs:
   deploy_reference:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.4-openjdk-17-slim
     steps:
       - attach_workspace:
           at: ~/
@@ -158,7 +158,7 @@ jobs:
   deploy_lab:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.4-openjdk-17-slim
     steps:
       - attach_workspace:
           at: ~/
@@ -187,7 +187,7 @@ jobs:
   deploy_testing:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.4-openjdk-17-slim
     steps:
       - attach_workspace:
           at: ~/
