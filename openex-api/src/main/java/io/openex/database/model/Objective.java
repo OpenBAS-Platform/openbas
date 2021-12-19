@@ -1,9 +1,9 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -20,7 +20,7 @@ public class Objective implements Base {
     @JsonProperty("objective_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "objective_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("objective_exercise")
@@ -38,9 +38,8 @@ public class Objective implements Base {
     @JsonProperty("objective_priority")
     private Short priority;
 
-    @OneToMany(mappedBy = "objective")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("objective_subobjectives")
+    @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<SubObjective> subObjectives = new ArrayList<>();
 
     public String getId() {

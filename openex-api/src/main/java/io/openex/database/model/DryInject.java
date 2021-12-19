@@ -38,13 +38,13 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
     @JsonProperty("dryinject_date")
     private Date date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dryinject_dryrun")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("dryinject_dryrun")
     private Dryrun run;
 
-    @OneToOne(mappedBy = "dryInject")
+    @OneToOne(mappedBy = "dryInject", fetch = FetchType.EAGER)
     @JsonProperty("dryinject_status")
     private DryInjectStatus status;
 

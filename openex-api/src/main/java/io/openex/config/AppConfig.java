@@ -4,11 +4,19 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import io.openex.database.model.User;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
+@EnableAsync
 public class AppConfig {
+
+    public static User currentUser() {
+        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 
     // Validations
     public final static String MANDATORY_MESSAGE = "This value should not be blank.";

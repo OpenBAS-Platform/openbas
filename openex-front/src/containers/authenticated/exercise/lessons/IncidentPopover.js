@@ -17,6 +17,7 @@ import { updateOutcome } from '../../../../actions/Outcome';
 import OutcomeForm from './OutcomeForm';
 import { T } from '../../../../components/I18n';
 import { submitForm } from '../../../../utils/Action';
+import { equalsSelector } from '../../../../utils/Selectors';
 
 i18nRegister({
   fr: {
@@ -72,11 +73,7 @@ class IncidentPopover extends Component {
       ['outcome_result', 'outcome_comment'],
       this.props.incident.incident_outcome || {},
     );
-    const incidentIsUpdatable = R.propOr(
-      false,
-      'user_can_update',
-      this.props.incident,
-    );
+    const incidentIsUpdatable = this.props.exercise?.user_can_update;
     return (
       <div>
         <IconButton
@@ -142,4 +139,8 @@ IncidentPopover.propTypes = {
   updateOutcome: PropTypes.func,
 };
 
-export default connect(null, { updateOutcome })(IncidentPopover);
+const select = () => equalsSelector({
+  exercise: (state, ownProps) => state.referential.entities.exercises[ownProps.exerciseId],
+});
+
+export default connect(select, { updateOutcome })(IncidentPopover);

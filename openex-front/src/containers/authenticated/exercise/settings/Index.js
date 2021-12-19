@@ -593,37 +593,7 @@ Index.propTypes = {
   fetchGroups: PropTypes.func,
   groups: PropTypes.array,
   addFile: PropTypes.func,
-  userCanUpdate: PropTypes.bool,
   getImportFileSheetsName: PropTypes.func,
-};
-
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-  return userCanUpdate;
 };
 
 const select = (state, ownProps) => {
@@ -633,7 +603,6 @@ const select = (state, ownProps) => {
     id: exerciseId,
     exercise,
     groups: R.values(state.referential.entities.groups),
-    userCanUpdate: checkUserCanUpdate(state, ownProps),
     initialEmailExpediteur: R.prop('exercise_mail_expediteur', exercise),
   };
 };

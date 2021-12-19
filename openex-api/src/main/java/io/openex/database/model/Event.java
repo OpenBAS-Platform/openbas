@@ -1,9 +1,11 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -26,7 +28,7 @@ public class Event implements Base {
     @JsonProperty("event_exercise")
     private Exercise exercise;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("event_image")
@@ -44,9 +46,9 @@ public class Event implements Base {
     @JsonProperty("event_order")
     private Short order;
 
-    @OneToMany(mappedBy = "event")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("event_incidents")
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
     private List<Incident> incidents = new ArrayList<>();
 
     public String getId() {

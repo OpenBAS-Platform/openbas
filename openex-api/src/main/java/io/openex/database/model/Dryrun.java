@@ -33,13 +33,13 @@ public class Dryrun implements Base {
     @JsonProperty("dryrun_status")
     private boolean status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dryrun_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("dryrun_exercise")
     private Exercise exercise;
 
-    @OneToMany(mappedBy = "run")
+    @OneToMany(mappedBy = "run", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<DryInject<?>> injects = new ArrayList<>();
 

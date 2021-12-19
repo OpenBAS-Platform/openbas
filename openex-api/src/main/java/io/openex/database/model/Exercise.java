@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
 import static java.util.Arrays.stream;
@@ -21,70 +22,100 @@ import static java.util.Arrays.stream;
 @Table(name = "exercises")
 public class Exercise implements Base {
 
+    private enum STATUS {
+        CANCELED,
+        SCHEDULED,
+        RUNNING,
+        FINISHED
+    }
+
     @Id
     @Column(name = "exercise_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @JsonProperty("exercise_id")
     private String id;
+
     @Column(name = "exercise_name")
     @JsonProperty("exercise_name")
     private String name;
+
     @Column(name = "exercise_description")
     @JsonProperty("exercise_description")
     private String description;
+
     @Column(name = "exercise_subtitle")
     @JsonProperty("exercise_subtitle")
     private String subtitle;
+
     @Column(name = "exercise_start_date")
     @JsonProperty("exercise_start_date")
     private Date start;
+
     @Column(name = "exercise_end_date")
     @JsonProperty("exercise_end_date")
     private Date end;
+
     @Column(name = "exercise_canceled")
     @JsonProperty("exercise_canceled")
     private boolean canceled = false;
+
     @ManyToOne
     @JoinColumn(name = "exercise_owner")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_owner")
     private User owner;
+
     @ManyToOne
     @JoinColumn(name = "exercise_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_image")
     private File image;
+
     @OneToOne
     @JoinColumn(name = "exercise_animation_group")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_animation_group")
     private Group animationGroup;
+
     @Column(name = "exercise_message_header")
     @JsonProperty("exercise_message_header")
     private String header = "EXERCISE - EXERCISE - EXERCISE";
+
     @Column(name = "exercise_message_footer")
     @JsonProperty("exercise_message_footer")
     private String footer = "EXERCISE - EXERCISE - EXERCISE";
+
     @Column(name = "exercise_mail_expediteur")
     @JsonProperty("exercise_mail_expediteur")
     private String replyTo = "planners@openex.io";
+
     @Column(name = "exercise_type")
     @JsonProperty("exercise_type")
     private String type = "standard";
+
     @Column(name = "exercise_latitude")
     @JsonProperty("exercise_latitude")
     private Double latitude;
+
     @Column(name = "exercise_longitude")
     @JsonProperty("exercise_longitude")
     private Double longitude;
-    @OneToMany(mappedBy = "exercise")
-    @Fetch(value = FetchMode.SUBSELECT)
+
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
+
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
     private List<Event> events = new ArrayList<>();
+
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
+    private List<Objective> objectives = new ArrayList<>();
 
     // region transient
     @JsonProperty("exercise_status")
@@ -125,10 +156,21 @@ public class Exercise implements Base {
         return getUsersByType(PLANNER.name(), OBSERVER.name());
     }
 
+    @JsonProperty("user_can_update")
+    public boolean isUserCanUpdate() {
+        User user = currentUser();
+        return user.isAdmin() || getPlanners().stream().anyMatch(u -> u.getId().equals(user.getId()));
+    }
+
+    @JsonProperty("user_can_delete")
+    public boolean isUserCanDelete() {
+        return currentUser().isAdmin();
+    }
+    // endregion
+
     public String getId() {
         return id;
     }
-    // endregion
 
     public void setId(String id) {
         this.id = id;
@@ -262,18 +304,19 @@ public class Exercise implements Base {
         this.events = events;
     }
 
+    public List<Objective> getObjectives() {
+        return objectives;
+    }
+
+    public void setObjectives(List<Objective> objectives) {
+        this.objectives = objectives;
+    }
+
     public String getType() {
         return type;
     }
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    private enum STATUS {
-        CANCELED,
-        SCHEDULED,
-        RUNNING,
-        FINISHED
     }
 }

@@ -52,7 +52,7 @@ class AudienceView extends Component {
         <List>
           {subaudiences.map((subaudience) => {
             const nestedItems = subaudience.subaudience_users.map((data) => {
-              const user = R.propOr({}, data.user_id, this.props.users);
+              const user = R.propOr({}, data, this.props.users);
               const userId = R.propOr(data.user_id, 'user_id', user);
               const userFirstname = R.propOr('-', 'user_firstname', user);
               const userLastname = R.propOr('-', 'user_lastname', user);

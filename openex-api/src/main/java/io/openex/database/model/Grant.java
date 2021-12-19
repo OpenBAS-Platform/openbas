@@ -17,15 +17,18 @@ public class Grant implements Base {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @JsonProperty("grant_id")
     private String id;
+
     @Column(name = "grant_name")
     @JsonProperty("grant_name")
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "grant_group")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("grant_group")
     private Group group;
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "grant_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("grant_exercise")

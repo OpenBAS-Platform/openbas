@@ -17,33 +17,23 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import {
-  EmailOutlined,
-  InputOutlined,
-  SmsOutlined,
   CenterFocusStrongOutlined,
-  KeyboardArrowDownOutlined,
-  GroupOutlined,
+  EmailOutlined,
+  EventOutlined,
   ExpandLess,
   ExpandMore,
+  GroupOutlined,
+  InputOutlined,
+  KeyboardArrowDownOutlined,
   LayersOutlined,
-  EventOutlined,
+  SmsOutlined,
 } from '@material-ui/icons';
 import Collapse from '@material-ui/core/Collapse';
 import { green, red } from '@material-ui/core/colors';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
-import { dateFormat, timeDiff } from '../../../utils/Time';
-import { fetchObjectives } from '../../../actions/Objective';
-import { fetchSubobjectives } from '../../../actions/Subobjective';
-import { fetchAudiences } from '../../../actions/Audience';
-import { fetchSubaudiences } from '../../../actions/Subaudience';
-import { fetchEvents } from '../../../actions/Event';
-import { fetchIncidents, fetchIncidentTypes } from '../../../actions/Incident';
+import { dateFormat } from '../../../utils/Time';
 import { downloadFile } from '../../../actions/File';
-import { fetchAllInjects } from '../../../actions/Inject';
-import { fetchExercise } from '../../../actions/Exercise';
-import { fetchGroups } from '../../../actions/Group';
-import { fetchUsers } from '../../../actions/User';
 import InjectView from './scenario/event/InjectView';
 import AudienceView from './audiences/audience/AudienceView';
 import ObjectiveView from './objective/ObjectiveView';
@@ -51,6 +41,7 @@ import AudiencePopover from './AudiencePopover';
 import AudiencesPopover from './AudiencesPopover';
 import ScenarioPopover from './ScenarioPopover';
 import MiniMap from './MiniMap';
+import { storeBrowser } from '../../../actions/Schema';
 
 i18nRegister({
   fr: {
@@ -111,20 +102,6 @@ class IndexExercise extends Component {
       currentInjectAudiences: [],
       openInjectAudiences: false,
     };
-  }
-
-  componentDidMount() {
-    this.props.fetchIncidentTypes();
-    this.props.fetchUsers();
-    this.props.fetchGroups();
-    this.props.fetchObjectives(this.props.exerciseId);
-    this.props.fetchSubobjectives(this.props.exerciseId);
-    this.props.fetchAudiences(this.props.exerciseId);
-    this.props.fetchSubaudiences(this.props.exerciseId);
-    this.props.fetchEvents(this.props.exerciseId);
-    this.props.fetchIncidents(this.props.exerciseId);
-    this.props.fetchAllInjects(this.props.exerciseId);
-    this.props.fetchExercise(this.props.exerciseId);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -217,13 +194,9 @@ class IndexExercise extends Component {
 
   render() {
     const { classes } = this.props;
-    const exerciseUsers = R.uniq(
-      this.props.exerciseSubaudiences
-        .map((subaudience) => subaudience.subaudience_users)
-        .flat(),
-    )
-      .map((uid) => this.props.users[uid])
-      .filter((n) => !R.isNil(n));
+    const exerciseUsers = this.props.exercise.getUsers();
+    const exerciseObjectives = this.props.exercise.getObjectives();
+    const subaudiences = this.props.exercise.getSubAudiences();
     return (
       <div>
         <Grid container spacing={3}>
@@ -232,13 +205,13 @@ class IndexExercise extends Component {
               <T>Main objectives</T>
             </Typography>
             <div className="clearfix" style={{ marginBottom: 8 }} />
-            {this.props.objectives.length === 0 && (
+            {exerciseObjectives.length === 0 && (
               <div className={classes.empty}>
                 <T>You do not have any objectives in this exercise.</T>
               </div>
             )}
             <List>
-              {R.take(3, this.props.objectives).map((objective) => (
+              {R.take(3, exerciseObjectives).map((objective) => (
                 <ListItem
                   key={objective.objective_id}
                   divider={true}
@@ -255,7 +228,7 @@ class IndexExercise extends Component {
                 </ListItem>
               ))}
             </List>
-            {this.props.objectives.length > 3 && (
+            {exerciseObjectives > 3 && (
               <div
                 onClick={this.handleOpenObjectives.bind(this)}
                 className={classes.expand}
@@ -274,7 +247,7 @@ class IndexExercise extends Component {
               </DialogTitle>
               <DialogContent>
                 <List>
-                  {this.props.objectives.map((objective) => (
+                  {exerciseObjectives.map((objective) => (
                     <ListItem
                       key={objective.objective_id}
                       divider={true}
@@ -450,7 +423,7 @@ class IndexExercise extends Component {
               <DialogContent>
                 <AudienceView
                   audience={this.state.currentAudience}
-                  subaudiences={this.props.subaudiences}
+                  subaudiences={subaudiences}
                 />
               </DialogContent>
               <DialogActions>
@@ -469,10 +442,10 @@ class IndexExercise extends Component {
             </Typography>
             <ScenarioPopover
               exerciseId={this.props.exerciseId}
-              injects={this.props.injects}
-              exerciseStartDate={this.props.exerciseStartDate}
-              exerciseEndDate={this.props.exerciseEndDate}
-              userCanUpdate={this.props.userCanUpdate}
+              injects={this.props.exercise?.getInjects()}
+              exerciseStartDate={this.props.exercise?.exercise_start_date}
+              exerciseEndDate={this.props.exercise?.exercise_end_date}
+              userCanUpdate={this.props.exercise?.user_can_update}
             />
             <div className="clearfix" />
             {this.props.events.length === 0 && (
@@ -482,57 +455,18 @@ class IndexExercise extends Component {
             )}
             <List>
               {this.props.events.map((event) => {
-                const incidents = R.pipe(
-                  R.map((data) => R.pathOr(
-                    { incident_title: '' },
-                    ['incidents', data],
-                    this.props,
-                  )),
-                  R.sort((a, b) => a.incident_order > b.incident_order),
-                )(event.event_incidents);
+                const incidents = event.getIncidents();
                 const nestedItems = incidents.map((incident) => {
-                  const incidentId = R.propOr(
-                    Math.random(),
-                    'incident_id',
-                    incident,
-                  );
-                  const incidentTitle = R.propOr(
-                    '-',
-                    'incident_title',
-                    incident,
-                  );
-                  const incidentStory = R.propOr(
-                    '-',
-                    'incident_story',
-                    incident,
-                  );
-                  const incidentInjects = R.propOr(
-                    [],
-                    'incident_injects',
-                    incident,
-                  );
-                  const injects = R.pipe(
-                    R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
-                    R.sort((a, b) => timeDiff(a.inject_date, b.inject_date)),
-                  )(incidentInjects);
-                  const nestedItems2 = injects.map((inject) => {
-                    const injectId = R.propOr(
-                      Math.random(),
-                      'inject_id',
-                      inject,
-                    );
+                  const incidentId = incident?.incident_id || Math.random();
+                  const incidentTitle = incident?.incident_title || '-';
+                  const incidentStory = incident?.incident_story || '-';
+                  const incidentInjects = incident.getInjects();
+                  const nestedItems2 = incidentInjects.map((inject) => {
+                    const injectId = R.propOr(Math.random(), 'inject_id', inject);
                     const injectTitle = R.propOr('-', 'inject_title', inject);
                     const injectType = R.propOr('-', 'inject_type', inject);
-                    const injectDate = R.propOr(
-                      undefined,
-                      'inject_date',
-                      inject,
-                    );
-                    const injectEnabled = R.propOr(
-                      false,
-                      'inject_enabled',
-                      inject,
-                    );
+                    const injectDate = R.propOr(undefined, 'inject_date', inject);
+                    const injectEnabled = R.propOr(false, 'inject_enabled', inject);
                     return (
                       <ListItem
                         key={injectId}
@@ -641,7 +575,7 @@ class IndexExercise extends Component {
                     : [48.8566969, 2.3514616]
                 }
                 users={exerciseUsers}
-                injects={this.props.exerciseInjects}
+                injects={this.props.exercise.getInjects()}
               />
             )}
           </Grid>
@@ -660,7 +594,7 @@ class IndexExercise extends Component {
               downloadAttachment={this.downloadAttachment.bind(this)}
               inject={this.state.currentInject}
               audiences={this.props.audiences}
-              subaudiences={R.values(this.props.subaudiences)}
+              subaudiences={subaudiences}
             />
           </DialogContent>
           <DialogActions>
@@ -742,155 +676,31 @@ class IndexExercise extends Component {
 IndexExercise.propTypes = {
   exerciseId: PropTypes.string,
   objectives: PropTypes.array,
-  subobjectives: PropTypes.object,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.object,
   events: PropTypes.array,
   incidents: PropTypes.object,
-  incident_types: PropTypes.object,
-  injects: PropTypes.object,
   exercise: PropTypes.object,
-  fetchGroups: PropTypes.func,
-  fetchObjectives: PropTypes.func,
-  fetchSubobjectives: PropTypes.func,
-  fetchAudiences: PropTypes.func,
-  fetchSubaudiences: PropTypes.func,
-  fetchEvents: PropTypes.func,
-  fetchIncidents: PropTypes.func,
-  fetchAllInjects: PropTypes.func,
-  fetchExercise: PropTypes.func,
-  fetchIncidentTypes: PropTypes.func,
   intl: PropTypes.object,
   downloadFile: PropTypes.func,
-  exerciseSubaudiences: PropTypes.array,
   exerciseInjects: PropTypes.array,
-};
-
-const filterObjectives = (objectives, exerciseId) => {
-  const objectivesFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.objective_exercise === exerciseId),
-    R.sortWith([R.ascend(R.prop('objective_priority'))]),
-  );
-  return objectivesFilterAndSorting(objectives);
-};
-
-const filterAudiences = (audiences, exerciseId) => {
-  const audiencesFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.audience_exercise === exerciseId),
-    R.sortWith([R.ascend(R.prop('audience_name'))]),
-  );
-  return audiencesFilterAndSorting(audiences);
-};
-
-const filterEvents = (events, exerciseId) => {
-  const eventsFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.event_exercise === exerciseId),
-    R.sortWith([R.ascend(R.prop('event_order'))]),
-  );
-  return eventsFilterAndSorting(events);
-};
-
-const getExerciseStartDate = (exercises) => {
-  const exercise = R.pipe(R.values)(exercises);
-  if (exercise.length > 0) {
-    return exercise[0].exercise_start_date;
-  }
-  return null;
-};
-
-const getExerciseEndDate = (exercises) => {
-  const exercise = R.pipe(R.values)(exercises);
-  if (exercise.length > 0) {
-    return exercise[0].exercise_end_date;
-  }
-  return null;
 };
 
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
-  const objectives = filterObjectives(
-    state.referential.entities.objectives,
-    exerciseId,
-  );
-  const audiences = filterAudiences(
-    state.referential.entities.audiences,
-    exerciseId,
-  );
-  const events = filterEvents(state.referential.entities.events, exerciseId);
-  const exerciseStartDate = getExerciseStartDate(
-    state.referential.entities.exercises,
-  );
-  const exerciseEndDate = getExerciseEndDate(
-    state.referential.entities.exercises,
-  );
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-  const exerciseInjects = R.filter(
-    (n) => n.inject_exercise === exerciseId,
-    R.values(state.referential.entities.injects),
-  );
-  const exerciseSubaudiences = R.filter(
-    (n) => n.subaudience_exercise === exerciseId,
-    R.values(state.referential.entities.subaudiences),
-  );
+  const browser = storeBrowser(state);
+  const exercise = browser.getExercise(exerciseId);
+  const events = exercise.getEvents();
+  const audiences = exercise.getAudiences();
   return {
     exerciseId,
-    userCanUpdate,
-    objectives,
-    subobjectives: state.referential.entities.subobjectives,
+    exercise,
     audiences,
-    subaudiences: state.referential.entities.subaudiences,
     events,
-    incidents: state.referential.entities.incidents,
-    incident_types: state.referential.entities.incident_types,
-    injects: state.referential.entities.injects,
-    exercise: R.prop(exerciseId, state.referential.entities.exercises),
-    exerciseStartDate,
-    exerciseEndDate,
-    exerciseInjects,
-    exerciseSubaudiences,
-    users: state.referential.entities.users,
   };
 };
 
 export default R.compose(
   connect(select, {
-    fetchObjectives,
-    fetchSubobjectives,
-    fetchAudiences,
-    fetchSubaudiences,
-    fetchEvents,
-    fetchIncidents,
-    fetchIncidentTypes,
-    fetchAllInjects,
-    fetchExercise,
-    fetchGroups,
-    fetchUsers,
     downloadFile,
   }),
   withStyles(styles),

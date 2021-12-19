@@ -64,6 +64,7 @@ class IndexAudiences extends Component {
   render() {
     const { classes, audiences } = this.props;
     const { searchTerm } = this.state;
+    const userCanUpdate = this.props.exercise?.user_can_update;
     const filterByKeyword = (n) => searchTerm === ''
       || n.audience_name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1;
     const filteredAudiences = R.filter(filterByKeyword, audiences);
@@ -113,7 +114,7 @@ class IndexAudiences extends Component {
             </ListItem>
           ))}
         </List>
-        {this.props.userCanUpdate && (
+        {userCanUpdate && (
           <CreateAudience exerciseId={this.props.exerciseId} />
         )}
       </div>
@@ -126,7 +127,6 @@ IndexAudiences.propTypes = {
   audiences: PropTypes.array,
   fetchGroups: PropTypes.func,
   fetchAudiences: PropTypes.func.isRequired,
-  userCanUpdate: PropTypes.bool,
 };
 
 const filteredAudiences = (audiences, exerciseId) => {
@@ -138,46 +138,14 @@ const filteredAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences);
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-  return userCanUpdate;
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
-  const audiences = filteredAudiences(
-    state.referential.entities.audiences,
-    exerciseId,
-  );
-  const userCanUpdate = checkUserCanUpdate(state, ownProps);
+  const exercise = state.referential.entities.exercises[ownProps.id];
+  const audiences = filteredAudiences(state.referential.entities.audiences, exerciseId);
   return {
     exerciseId,
+    exercise,
     audiences,
-    userCanUpdate,
   };
 };
 

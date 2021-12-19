@@ -220,7 +220,7 @@ class IndexAudience extends Component {
       || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const users = R.pipe(
-      R.map((data) => R.pathOr({}, ['users', data.user_id], this.props)),
+      R.map((userId) => this.props.users[userId]),
       R.filter(filterByKeyword),
       R.sort((a, b) => {
         // TODO replace with sortWith after Ramdajs new release
@@ -381,7 +381,6 @@ IndexAudience.propTypes = {
   subaudience: PropTypes.object,
   subaudiences: PropTypes.array,
   comchecks: PropTypes.array,
-  userCanUpdate: PropTypes.bool,
   fetchUsers: PropTypes.func,
   fetchGroups: PropTypes.func,
   fetchAudiences: PropTypes.func,
@@ -419,52 +418,13 @@ const filterComchecks = (comchecks, audienceId) => {
   return comchecksFilterAndSorting(comchecks);
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-
-  return userCanUpdate;
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId, audienceId } = ownProps;
+  const exercise = R.prop(exerciseId, state.referential.entities.exercises);
   const audience = R.prop(audienceId, state.referential.entities.audiences);
-  const audiences = filterAudiences(
-    state.referential.entities.audiences,
-    exerciseId,
-  );
-  const subaudiences = filterSubaudiences(
-    state.referential.entities.subaudiences,
-    audienceId,
-  );
-  const comchecks = filterComchecks(
-    state.referential.entities.comchecks,
-    audienceId,
-  );
-  const userCanUpdate = checkUserCanUpdate(state, ownProps);
+  const audiences = filterAudiences(state.referential.entities.audiences, exerciseId);
+  const subaudiences = filterSubaudiences(state.referential.entities.subaudiences, audienceId);
+  const comchecks = filterComchecks(state.referential.entities.comchecks, audienceId);
   const stateCurrentSubaudience = R.path(
     ['exercise', exerciseId, 'audience', audienceId, 'current_subaudience'],
     state.screen,
@@ -476,8 +436,8 @@ const select = (state, ownProps) => {
     ? R.find((a) => a.subaudience_id === subaudienceId)(subaudiences)
     : undefined;
   return {
-    userCanUpdate,
     exerciseId,
+    exercise,
     audienceId,
     audience,
     audiences,

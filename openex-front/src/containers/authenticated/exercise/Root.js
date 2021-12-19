@@ -32,6 +32,15 @@ import IndexExerciseStatistics from './statistics/Index';
 import IndexExerciseSettings from './settings/Index';
 import UserPopover from '../UserPopover';
 import NotFound from '../../anonymous/NotFound';
+import { fetchObjectives } from '../../../actions/Objective';
+import { fetchSubobjectives } from '../../../actions/Subobjective';
+import { fetchAudiences } from '../../../actions/Audience';
+import { fetchSubaudiences } from '../../../actions/Subaudience';
+import { fetchEvents } from '../../../actions/Event';
+import { fetchIncidents, fetchIncidentTypes } from '../../../actions/Incident';
+import { fetchAllInjects } from '../../../actions/Inject';
+import { fetchGroups } from '../../../actions/Group';
+import { fetchUsers } from '../../../actions/User';
 
 const styles = (theme) => ({
   appBar: {
@@ -65,6 +74,16 @@ const styles = (theme) => ({
 class RootExercise extends Component {
   componentDidMount() {
     this.props.fetchExercise(this.props.id);
+    this.props.fetchIncidentTypes();
+    this.props.fetchUsers();
+    this.props.fetchGroups();
+    this.props.fetchObjectives(this.props.id);
+    this.props.fetchSubobjectives(this.props.id);
+    this.props.fetchAudiences(this.props.id);
+    this.props.fetchSubaudiences(this.props.id);
+    this.props.fetchEvents(this.props.id);
+    this.props.fetchIncidents(this.props.id);
+    this.props.fetchAllInjects(this.props.id);
   }
 
   redirectToExercise() {
@@ -235,7 +254,17 @@ export default R.compose(
   connect(select, {
     redirectToExercise,
     redirectToHome,
+    fetchObjectives,
+    fetchSubobjectives,
+    fetchAudiences,
+    fetchSubaudiences,
+    fetchEvents,
+    fetchIncidents,
+    fetchIncidentTypes,
+    fetchAllInjects,
     fetchExercise,
+    fetchGroups,
+    fetchUsers,
   }),
   withStyles(styles),
 )(RootExercise);

@@ -30,15 +30,15 @@ public class Audience implements Base {
     @JsonProperty("audience_enabled")
     private boolean enabled;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "audience_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("audience_exercise")
     private Exercise exercise;
 
-    @OneToMany(mappedBy = "audience", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "audience", fetch = FetchType.LAZY)
     @Fetch(value = FetchMode.SUBSELECT)
-    @JsonProperty("audience_subaudiences")
+    @JsonIgnore
     private List<SubAudience> subAudiences = new ArrayList<>();
 
     @JsonProperty("audience_users_number")

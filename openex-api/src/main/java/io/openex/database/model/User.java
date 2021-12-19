@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.CryptoHelper;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -101,9 +99,8 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_groups")
     private List<Group> groups = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    @JsonProperty("user_tokens")
-    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Token> tokens = new ArrayList<>();
 
     @Column(name = "user_latitude")

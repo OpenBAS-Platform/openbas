@@ -40,7 +40,7 @@ public class Comcheck implements Base {
     @JsonProperty("comcheck_audience")
     private Audience audience;
 
-    @OneToMany(mappedBy = "comcheck")
+    @OneToMany(mappedBy = "comcheck", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
 

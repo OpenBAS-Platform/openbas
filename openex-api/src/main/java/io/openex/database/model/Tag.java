@@ -1,7 +1,10 @@
 package io.openex.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -26,7 +29,9 @@ public class Tag implements Base {
     @JoinTable(name = "documents_tags",
             joinColumns = @JoinColumn(name = "tag_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id"))
-    @JsonIgnore
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("tags_documents")
+    @Fetch(FetchMode.SUBSELECT)
     private List<Document> documents = new ArrayList<>();
 
     @Override

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -40,6 +42,7 @@ public class SubAudience implements Base {
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("subaudience_users")
+    @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
     // region transient
@@ -47,15 +50,6 @@ public class SubAudience implements Base {
     public String getExercise() {
         return getAudience().getExercise().getId();
     }
-
-    // @JsonProperty("subaudience_injects")
-    // public List<Inject<?>> getInjects() {
-    //     return getAudience().getExercise().getEvents().stream()
-    //             .flatMap(event -> event.getIncidents().stream())
-    //             .flatMap(incident -> incident.getInjects().stream())
-    //             .toList();
-    // }
-    // endregion
 
     public String getId() {
         return id;

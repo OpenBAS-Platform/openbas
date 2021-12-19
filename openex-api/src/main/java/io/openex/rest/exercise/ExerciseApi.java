@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
+import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.*;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 

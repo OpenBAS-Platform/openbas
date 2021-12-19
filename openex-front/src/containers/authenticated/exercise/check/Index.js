@@ -79,6 +79,7 @@ class IndexExcerciseDryrun extends Component {
 
   render() {
     const { classes } = this.props;
+    const userCanUpdate = this.props.exercise?.user_can_update;
     return (
       <div className={classes.container}>
         <Grid container={true} spacing={3}>
@@ -86,7 +87,7 @@ class IndexExcerciseDryrun extends Component {
             <Typography variant="h5" style={{ float: 'left' }}>
               <T>Dryruns</T>
             </Typography>
-            {this.props.userCanUpdate && (
+            {userCanUpdate && (
               <DryrunsPopover exerciseId={this.props.exerciseId} />
             )}
             <div className="clearfix" />
@@ -132,7 +133,7 @@ class IndexExcerciseDryrun extends Component {
             <Typography variant="h5" style={{ float: 'left' }}>
               <T>Comchecks</T>
             </Typography>
-            {this.props.userCanUpdate && (
+            {userCanUpdate && (
               <ComchecksPopover
                 exerciseId={this.props.exerciseId}
                 audiences={this.props.audiences}
@@ -198,7 +199,6 @@ class IndexExcerciseDryrun extends Component {
 
 IndexExcerciseDryrun.propTypes = {
   exerciseId: PropTypes.string,
-  userCanUpdate: PropTypes.bool,
   audiences: PropTypes.array,
   dryruns: PropTypes.array,
   comchecks: PropTypes.array,
@@ -235,51 +235,15 @@ const filterAudiences = (audiences, exerciseId) => {
   return audiencesFilterAndSorting(audiences);
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-
-  return userCanUpdate;
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
+  const exercise = state.referential.entities.exercises[exerciseId];
   const dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId);
-  const comchecks = filterComchecks(
-    state.referential.entities.comchecks,
-    exerciseId,
-  );
-  const audiences = filterAudiences(
-    state.referential.entities.audiences,
-    exerciseId,
-  );
-  const userCanUpdate = checkUserCanUpdate(state, ownProps);
+  const comchecks = filterComchecks(state.referential.entities.comchecks, exerciseId);
+  const audiences = filterAudiences(state.referential.entities.audiences, exerciseId);
   return {
     exerciseId,
-    userCanUpdate,
+    exercise,
     audiences,
     dryruns,
     comchecks,

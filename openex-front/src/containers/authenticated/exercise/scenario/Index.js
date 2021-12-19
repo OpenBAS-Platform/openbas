@@ -42,6 +42,7 @@ class IndexScenario extends Component {
 
   render() {
     const { classes } = this.props;
+    const userCanUpdate = this.props.exercise?.user_can_update;
     return (
       <div className={classes.container}>
         <Typography variant="h5" style={{ float: 'left' }}>
@@ -75,7 +76,7 @@ class IndexScenario extends Component {
             </ListItem>
           ))}
         </List>
-        {this.props.userCanUpdate && (
+        {userCanUpdate && (
           <CreateEvent exerciseId={this.props.exerciseId} />
         )}
       </div>
@@ -88,7 +89,6 @@ IndexScenario.propTypes = {
   events: PropTypes.array,
   fetchGroups: PropTypes.func,
   fetchEvents: PropTypes.func.isRequired,
-  userCanUpdate: PropTypes.bool,
 };
 
 const filteredEvents = (events, exerciseId) => {
@@ -100,44 +100,14 @@ const filteredEvents = (events, exerciseId) => {
   return eventsFilterAndSorting(events);
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user && user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-
-  return userCanUpdate;
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const events = filteredEvents(state.referential.entities.events, exerciseId);
-  const userCanUpdate = checkUserCanUpdate(state, ownProps);
+  const exercise = R.prop(exerciseId, state.referential.entities.exercises);
   return {
     exerciseId,
+    exercise,
     events,
-    userCanUpdate,
   };
 };
 

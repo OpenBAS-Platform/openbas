@@ -174,11 +174,8 @@ class IndexExecution extends Component {
 
   render() {
     const { classes } = this.props;
-    const exerciseStatus = R.propOr(
-      'SCHEDULED',
-      'exercise_status',
-      this.props.exercise,
-    );
+    const exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise);
+    const userCanUpdate = this.props.exercise?.user_can_update;
     const countdown = this.props.nextInject && (
       <Countdown targetDate={this.props.nextInject} />
     );
@@ -190,7 +187,7 @@ class IndexExecution extends Component {
         <Typography variant="h5" style={{ float: 'left' }}>
           <T>Execution</T>
         </Typography>
-        {this.props.userCanUpdate && (
+        {userCanUpdate && (
           <ExercisePopover
             exerciseId={this.props.exerciseId}
             exercise={this.props.exercise}
@@ -276,7 +273,7 @@ class IndexExecution extends Component {
                         </div>
                       }
                     />
-                    {!injectInProgress && this.props.userCanUpdate && (
+                    {!injectInProgress && userCanUpdate && (
                       <ListItemSecondaryAction>
                         <InjectPopover
                           exerciseId={this.props.exerciseId}
@@ -412,7 +409,6 @@ IndexExecution.propTypes = {
   fetchAudiences: PropTypes.func,
   fetchSubaudiences: PropTypes.func,
   fetchInjectTypes: PropTypes.func,
-  userCanUpdate: PropTypes.bool,
   downloadFile: PropTypes.func,
 };
 
@@ -470,36 +466,6 @@ const exerciseSelector = (state, ownProps) => {
   return R.prop(exerciseId, state.referential.entities.exercises);
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-
-  return userCanUpdate;
-};
-
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
   exerciseId: (state, ownProps) => ownProps.id,
@@ -509,7 +475,6 @@ const select = () => equalsSelector({
   injectsProcessed: filterInjectsProcessed,
   audiences: filterAudiences,
   subaudiences: (state) => R.values(state.referential.entities.subaudiences),
-  userCanUpdate: checkUserCanUpdate,
   inject_types: (state) => state.referential.entities.inject_types,
 });
 

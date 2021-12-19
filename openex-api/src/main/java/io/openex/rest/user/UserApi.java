@@ -20,6 +20,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.Optional;
 
+import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 
 @RestController

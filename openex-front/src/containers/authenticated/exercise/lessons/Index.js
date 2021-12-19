@@ -130,6 +130,7 @@ class IndexExerciseLessons extends Component {
 
   render() {
     const { classes } = this.props;
+    const userCanUpdate = this.props.exercise?.user_can_update;
     return (
       <div className={classes.container}>
         <Grid container={true} spacing={3}>
@@ -216,7 +217,7 @@ class IndexExerciseLessons extends Component {
             <Typography variant="h5" style={{ float: 'left' }}>
               <T>Exercise log</T>
             </Typography>
-            {this.props.userCanUpdate && (
+            {userCanUpdate && (
               <LogsPopover exerciseId={this.props.exerciseId} />
             )}
             <div className="clearfix" />
@@ -281,7 +282,6 @@ IndexExerciseLessons.propTypes = {
   exerciseId: PropTypes.string,
   logs: PropTypes.array,
   incidents: PropTypes.array,
-  userCanUpdate: PropTypes.bool,
   fetchGroups: PropTypes.func,
   fetchLogs: PropTypes.func,
   fetchIncidents: PropTypes.func,
@@ -317,41 +317,11 @@ const exerciseStatusSelector = (state, ownProps) => {
   );
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-
-  return userCanUpdate;
-};
-
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
   exerciseId: (state, ownProps) => ownProps.id,
+  exercise: (state, ownProps) => state.referential.entities.exercises[ownProps.id],
   logs: filterLogs,
-  userCanUpdate: checkUserCanUpdate,
   incidents: filterIncidents,
   exercise_status: exerciseStatusSelector,
 });

@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { normalize } from 'normalizr';
 import Immutable from 'seamless-immutable';
-import { debug } from './utils/Messages';
+// import { debug } from './utils/Messages';
 
 // eslint-disable-next-line import/prefer-default-export
 export const api = (schema) => {
@@ -15,10 +15,10 @@ export const api = (schema) => {
       if (schema) {
         const toImmutable = response.config.responseType === undefined; //= == json
         const dataNormalize = normalize(response.data, schema);
-        debug('api', {
-          from: response.request.responseURL,
-          data: { raw: response.data, normalize: dataNormalize },
-        });
+        // debug('api', {
+        //   from: response.request.responseURL,
+        //   data: { raw: response.data, normalize: dataNormalize },
+        // });
         response.data = toImmutable ? Immutable(dataNormalize) : dataNormalize;
       }
       return response;

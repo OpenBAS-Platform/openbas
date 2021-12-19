@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
@@ -22,7 +23,7 @@ public class Incident implements Base {
     @JsonProperty("incident_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "incident_type")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("incident_type")
@@ -51,20 +52,21 @@ public class Incident implements Base {
     private Short order;
 
     @OneToMany(mappedBy = "incident", fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
-    @JsonProperty("incident_injects")
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
     private List<Inject<?>> injects = new ArrayList<>();
 
-    @OneToOne(mappedBy = "incident")
+    @OneToOne(mappedBy = "incident", fetch = FetchType.EAGER)
     @JsonProperty("incident_outcome")
     private Outcome outcome;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "incidents_subobjectives",
             joinColumns = @JoinColumn(name = "incident_id"),
             inverseJoinColumns = @JoinColumn(name = "subobjective_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("incident_subobjectives")
+    @Fetch(FetchMode.SUBSELECT)
     private List<SubObjective> subObjectives = new ArrayList<>();
 
     // region transient

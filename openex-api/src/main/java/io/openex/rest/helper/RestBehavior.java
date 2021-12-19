@@ -1,9 +1,7 @@
 package io.openex.rest.helper;
 
-import io.openex.database.model.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,10 +38,6 @@ public class RestBehavior {
         Map<String, String> errors = new HashMap<>();
         errors.put("Access is denied", "ACCESS_DENIED");
         return errors;
-    }
-
-    protected User currentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     protected <T> List<T> fromIterable(Iterable<T> results) {

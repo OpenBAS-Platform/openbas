@@ -99,6 +99,7 @@ class IndexObjective extends Component {
   render() {
     const { classes } = this.props;
     const { exerciseId, objectives } = this.props;
+    const userCanUpdate = this.props.exercise?.user_can_update;
     return (
       <div className={classes.container}>
         <Typography variant="h5" style={{ float: 'left' }}>
@@ -112,31 +113,16 @@ class IndexObjective extends Component {
         )}
         <List>
           {objectives.map((objective) => {
-            const nestedItems = objective.objective_subobjectives.map(
-              (subobjectiveId) => {
-                const subobjective = R.propOr(
-                  {},
-                  subobjectiveId,
-                  this.props.subobjectives,
-                );
-                const subobjectiveTitle = R.propOr(
-                  '-',
-                  'subobjective_title',
-                  subobjective,
-                );
-                const subobjectiveDescription = R.propOr(
-                  '-',
-                  'subobjective_description',
-                  subobjective,
-                );
-                const subobjectivePriority = R.propOr(
-                  '-',
-                  'subobjective_priority',
-                  subobjective,
-                );
+            const subobjectives = R.values(this.props.subobjectives)
+              .filter((sub) => sub.subobjective_objective === objective.objective_id);
+            const nestedItems = subobjectives.map(
+              (subobjective) => {
+                const subobjectiveTitle = R.propOr('-', 'subobjective_title', subobjective);
+                const subobjectiveDescription = R.propOr('-', 'subobjective_description', subobjective);
+                const subobjectivePriority = R.propOr('-', 'subobjective_priority', subobjective);
                 return (
                   <ListItem
-                    key={subobjectiveId}
+                    key={subobjective.subobjective_id}
                     onClick={this.handleOpenSubobjective.bind(
                       this,
                       subobjective,
@@ -155,7 +141,7 @@ class IndexObjective extends Component {
                     <div className={classes.priority}>
                       {objective.objective_priority}.{subobjectivePriority}
                     </div>
-                    {this.props.userCanUpdate && (
+                    {userCanUpdate && (
                       <ListItemSecondaryAction>
                         <SubobjectivePopover
                           exerciseId={exerciseId}
@@ -185,7 +171,7 @@ class IndexObjective extends Component {
                   <div className={classes.priority}>
                     {objective.objective_priority}
                   </div>
-                  {this.props.userCanUpdate && (
+                  {userCanUpdate && (
                     <ListItemSecondaryAction>
                       <ObjectivePopover
                         exerciseId={exerciseId}
@@ -247,7 +233,7 @@ class IndexObjective extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        {this.props.userCanUpdate && (
+        {userCanUpdate && (
           <CreateObjective exerciseId={exerciseId} />
         )}
       </div>
@@ -261,7 +247,6 @@ IndexObjective.propTypes = {
   subobjectives: PropTypes.object,
   fetchObjectives: PropTypes.func.isRequired,
   fetchSubobjectives: PropTypes.func.isRequired,
-  userCanUpdate: PropTypes.bool,
 };
 
 const filterObjectives = (objectives, exerciseId) => {
@@ -282,52 +267,16 @@ const filterSubobjectives = (subobjectives) => {
   return subobjectivesSorting(subobjectives);
 };
 
-const checkUserCanUpdate = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  const userId = R.path(['logged', 'user'], state.app);
-  let userCanUpdate = R.path(
-    [userId, 'user_admin'],
-    state.referential.entities.users,
-  );
-  if (!userCanUpdate) {
-    const groupValues = R.values(state.referential.entities.groups);
-    groupValues.forEach((group) => {
-      group.group_grants.forEach((grant) => {
-        if (
-          grant
-          && grant.grant_exercise
-          && grant.grant_exercise.exercise_id === exerciseId
-          && grant.grant_name === 'PLANNER'
-        ) {
-          group.group_users.forEach((user) => {
-            if (user === userId) {
-              userCanUpdate = true;
-            }
-          });
-        }
-      });
-    });
-  }
-
-  return userCanUpdate;
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
-  const objectives = filterObjectives(
-    state.referential.entities.objectives,
-    exerciseId,
-  );
-  const subobjectives = filterSubobjectives(
-    state.referential.entities.subobjectives,
-  );
-  const userCanUpdate = checkUserCanUpdate(state, ownProps);
-
+  const exercise = state.referential.entities.exercises[ownProps.id];
+  const objectives = filterObjectives(state.referential.entities.objectives, exerciseId);
+  const subobjectives = filterSubobjectives(state.referential.entities.subobjectives);
   return {
     exerciseId,
+    exercise,
     objectives,
     subobjectives,
-    userCanUpdate,
   };
 };
 
