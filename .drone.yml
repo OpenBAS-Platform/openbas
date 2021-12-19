@@ -3,7 +3,7 @@ name: openex-tests
 
 steps:
 - name: api-tests
-  image:  maven:3.8.4-openjdk-17
+  image: maven:3.8.4-openjdk-17
   environment:
     SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
     SPRING_DATASOURCE_USERNAME: openex
