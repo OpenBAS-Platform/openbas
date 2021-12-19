@@ -60,10 +60,10 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     private boolean allAudiences;
 
     @ManyToOne
-    @JoinColumn(name = "inject_incident")
+    @JoinColumn(name = "inject_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("inject_incident")
-    private Incident incident;
+    @JsonProperty("inject_exercise")
+    private Exercise exercise;
 
     @ManyToOne
     @JoinColumn(name = "inject_depends_from_another")
@@ -168,12 +168,13 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.type = type;
     }
 
-    public Incident getIncident() {
-        return incident;
+    @Override
+    public Exercise getExercise() {
+        return exercise;
     }
 
-    public void setIncident(Incident incident) {
-        this.incident = incident;
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
     }
 
     public InjectStatus getStatus() {
@@ -252,13 +253,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     @JsonIgnore
     public abstract DryInject<T> toDryInject(Dryrun run, Date from, int speed);
-
-    @Override
-    @JsonProperty("inject_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    public Exercise getExercise() {
-        return ofNullable(getIncident()).map(Incident::getEvent).map(Event::getExercise).orElse(null);
-    }
 
     @Override
     @JsonProperty("inject_audiences")

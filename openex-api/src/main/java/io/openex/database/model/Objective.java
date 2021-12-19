@@ -1,14 +1,11 @@
 package io.openex.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "objectives")
@@ -37,10 +34,6 @@ public class Objective implements Base {
     @Column(name = "objective_priority")
     @JsonProperty("objective_priority")
     private Short priority;
-
-    @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<SubObjective> subObjectives = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -80,13 +73,5 @@ public class Objective implements Base {
 
     public void setPriority(Short priority) {
         this.priority = priority;
-    }
-
-    public List<SubObjective> getSubObjectives() {
-        return subObjectives;
-    }
-
-    public void setSubObjectives(List<SubObjective> subObjectives) {
-        this.subObjectives = subObjectives;
     }
 }

@@ -60,9 +60,8 @@ public class InjectHelper<T> {
         // Create stream from inject audiences
         Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
         Stream<UserInjectContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
-                .flatMap(audience -> audience.getSubAudiences().stream())
-                .flatMap(subAudience -> subAudience.getUsers().stream()
-                        .map(user -> new UserInjectContext(exercise, user, subAudience.getName())));
+                .flatMap(audience -> audience.getUsers().stream()
+                        .map(user -> new UserInjectContext(exercise, user, audience.getName())));
         // Create stream from animation group
         Group animationGroup = exercise.getAnimationGroup();
         List<User> animationUsers = animationGroup != null ? animationGroup.getUsers() : new ArrayList<>();

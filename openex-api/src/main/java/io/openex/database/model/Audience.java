@@ -1,9 +1,9 @@
 package io.openex.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -36,24 +36,19 @@ public class Audience implements Base {
     @JsonProperty("audience_exercise")
     private Exercise exercise;
 
-    @OneToMany(mappedBy = "audience", fetch = FetchType.LAZY)
-    @Fetch(value = FetchMode.SUBSELECT)
-    @JsonIgnore
-    private List<SubAudience> subAudiences = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_audiences",
+            joinColumns = @JoinColumn(name = "audience_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("subaudience_users")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<User> users = new ArrayList<>();
 
     @JsonProperty("audience_users_number")
     public long getUsersNumber() {
         return getUsers().size();
     }
-
-    // region transient
-    @JsonIgnore
-    public List<User> getUsers() {
-        return getSubAudiences().stream()
-                .flatMap(subAudience -> subAudience.getUsers().stream())
-                .distinct().toList();
-    }
-    // endregion
 
     public String getId() {
         return id;
@@ -79,19 +74,19 @@ public class Audience implements Base {
         this.enabled = enabled;
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
     public Exercise getExercise() {
         return exercise;
     }
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
-    }
-
-    public List<SubAudience> getSubAudiences() {
-        return subAudiences;
-    }
-
-    public void setSubAudiences(List<SubAudience> subAudiences) {
-        this.subAudiences = subAudiences;
     }
 }

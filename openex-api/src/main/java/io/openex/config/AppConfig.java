@@ -21,11 +21,6 @@ public class AppConfig {
     // Validations
     public final static String MANDATORY_MESSAGE = "This value should not be blank.";
 
-    // Default values
-    public final static String TECHNICAL_INCIDENT_TYPE = "9ebb419a-5f7d-440c-a84c-6b7132712564";
-    public final static String OPERATIONAL_INCIDENT_TYPE = "f324c240-93ec-4092-9c24-32c59920f59e";
-    public final static String STRATEGIC_INCIDENT_TYPE = "98bd973d-a121-40ed-a946-8d5408cb21da";
-
     @Bean
     ObjectMapper openexJsonMapper() {
         ObjectMapper mapper = new ObjectMapper();

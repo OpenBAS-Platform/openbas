@@ -9,19 +9,14 @@ import javax.persistence.criteria.JoinType;
 public class InjectSpecification {
 
     public static <T> Specification<Inject<T>> fromExercise(String exerciseId) {
-        return (root, query, cb) -> cb.equal(root.get("incident")
-                .get("event").get("exercise").get("id"), exerciseId);
-    }
-
-    public static <T> Specification<Inject<T>> fromEvent(String eventId) {
-        return (root, query, cb) -> cb.equal(root.get("incident").get("event").get("id"), eventId);
+        return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
     }
 
     public static <T> Specification<Inject<T>> executable() {
         return (root, query, cb) -> cb.and(
                 cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable
-                cb.equal(root.get("incident").get("event").get("exercise").get("canceled"), false), // fromActiveExercise
+                cb.equal(root.get("exercise").get("canceled"), false), // fromActiveExercise
                 cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
         );
     }
@@ -30,7 +25,7 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.and(
                 cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable
-                cb.equal(root.get("incident").get("event").get("exercise").get("id"), exerciseId) // fromActiveExercise
+                cb.equal(root.get("exercise").get("id"), exerciseId) // fromActiveExercise
         );
     }
 }

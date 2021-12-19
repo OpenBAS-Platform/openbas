@@ -1,8 +1,6 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -36,14 +34,6 @@ public class Document implements Base {
     @Column(name = "document_type")
     @JsonProperty("document_type")
     private String type;
-
-    @OneToOne
-    @JoinTable(name = "documents_exercises",
-            joinColumns = @JoinColumn(name = "document_id"),
-            inverseJoinColumns = @JoinColumn(name = "exercise_id"))
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("document_exercise")
-    private Exercise exercise;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "documents_tags",
@@ -91,14 +81,6 @@ public class Document implements Base {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Exercise getExercise() {
-        return exercise;
-    }
-
-    public void setExercise(Exercise exercise) {
-        this.exercise = exercise;
     }
 
     public List<Tag> getTags() {

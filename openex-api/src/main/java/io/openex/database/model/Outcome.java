@@ -18,10 +18,10 @@ public class Outcome implements Base {
     private String id;
 
     @OneToOne
-    @JoinColumn(name = "outcome_incident")
+    @JoinColumn(name = "outcome_inject")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("outcome_incident")
-    private Incident incident;
+    private Inject<?> inject;
 
     @Column(name = "outcome_comment")
     @JsonProperty("outcome_comment")
@@ -40,12 +40,12 @@ public class Outcome implements Base {
         this.id = id;
     }
 
-    public Incident getIncident() {
-        return incident;
+    public Inject<?> getInject() {
+        return inject;
     }
 
-    public void setIncident(Incident incident) {
-        this.incident = incident;
+    public void setInject(Inject<?> inject) {
+        this.inject = inject;
     }
 
     public String getComment() {

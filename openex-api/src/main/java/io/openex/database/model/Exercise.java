@@ -70,7 +70,7 @@ public class Exercise implements Base {
     @JoinColumn(name = "exercise_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_image")
-    private File image;
+    private Document image;
 
     @OneToOne
     @JoinColumn(name = "exercise_animation_group")
@@ -110,7 +110,7 @@ public class Exercise implements Base {
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
-    private List<Event> events = new ArrayList<>();
+    private List<Inject<?>> injects = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @Fetch(FetchMode.SUBSELECT)
@@ -124,10 +124,7 @@ public class Exercise implements Base {
             return STATUS.CANCELED.name();
         }
         Date now = new Date();
-        List<Inject<?>> injects = getEvents().stream()
-                .flatMap(event -> event.getIncidents().stream())
-                .flatMap(incident -> incident.getInjects().stream())
-                .filter(inject -> inject.getStatus() == null).toList();
+        List<Inject<?>> injects = getInjects().stream().filter(inject -> inject.getStatus() == null).toList();
         long totalPastCount = injects.stream().filter(inject -> inject.getDate().before(now)).count();
         long totalFutureCount = injects.stream().filter(inject -> inject.getDate().after(now)).count();
         if (totalPastCount == 0 && totalFutureCount > 0) {
@@ -264,12 +261,20 @@ public class Exercise implements Base {
         this.owner = owner;
     }
 
-    public File getImage() {
+    public Document getImage() {
         return image;
     }
 
-    public void setImage(File file) {
-        this.image = file;
+    public void setImage(Document image) {
+        this.image = image;
+    }
+
+    public List<Inject<?>> getInjects() {
+        return injects;
+    }
+
+    public void setInjects(List<Inject<?>> injects) {
+        this.injects = injects;
     }
 
     public List<Grant> getGrants() {
@@ -294,14 +299,6 @@ public class Exercise implements Base {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
-    }
-
-    public List<Event> getEvents() {
-        return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
     }
 
     public List<Objective> getObjectives() {
