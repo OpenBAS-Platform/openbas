@@ -2,31 +2,24 @@ kind: pipeline
 name: openex-tests
 
 steps:
-- name: init-service
-  image: postgres:13-alpine
-  commands:
-  - sleep 30
-  - PGPASSWORD=openex psql --host=pgsql --port=5432 --username=openex --dbname=openex -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'
-
 - name: api-tests
-  image: chialab/php:7.4
+  image:  maven:3.8.4-openjdk-17
   environment:
-    APP_ENV: test
-    APP_SECRET: bfa014e0-e02e-4aa6-a42b-603b19dcf159
-    DATABASE_URL: pgsql://openex:openex@pgsql:5432/openex
-    MAILER_URL: null://localhost
-    PLAYER_URL: http://player:8080
+    SPRING_DATASOURCE_URL: jdbc:postgresql://pgsql:5432/openex
+    SPRING_DATASOURCE_USERNAME: openex
+    SPRING_DATASOURCE_PASSWORD: openex
+    MINIO_ENDPOINT: minio
+    MINIO_PORT: 9000
+    MINIO_ACCESS-KEY: minioadmin
+    MINIO_ACCESS-SECRET: minioadmin
   commands:
-  - cd openex-platform/openex-api
-  - php composer.phar install --no-progress --no-interaction
-  - php bin/console doctrine:schema:create --env=test
-  - php bin/console app:db-init --env=test
-  - php ./vendor/bin/phpunit
+  - cd openex-api
+  - mvn test
 
 - name: frontend-tests
   image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
   commands: 
-  - cd openex-platform/openex-front
+  - cd openex-front
   - yarn install
   - yarn build
   - yarn test
@@ -64,3 +57,9 @@ services:
     POSTGRES_USER: openex
     POSTGRES_PASSWORD: openex
     POSTGRES_DB: openex
+- name: minio
+  image: minio/minio:RELEASE.2021-11-09T03-21-45Z
+  environment:
+    MINIO_ROOT_USER: minioadmin
+    MINIO_ROOT_PASSWORD: minioadmin
+  command: [ server, /data ]

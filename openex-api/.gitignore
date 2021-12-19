@@ -1,0 +1,5 @@
+.idea
+target
+logs
+src/main/resources/localhost.p12
+src/main/resources/build/*

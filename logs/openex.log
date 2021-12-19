@@ -1,4 +1,0 @@
-2021-12-05 03:15:39.155  INFO 127824 --- [restartedMain] io.openex.player.PlayerApplication       : Starting PlayerApplication using Java 17.0.1 on ALIENWARE-JULIEN with PID 127824 (C:\Users\richa\Documents\Projects\openex\openex-player\target\classes started by richa in C:\Users\richa\Documents\Projects\openex)
-2021-12-05 03:15:39.155 DEBUG 127824 --- [restartedMain] io.openex.player.PlayerApplication       : Running with Spring Boot v2.6.1, Spring v5.3.13
-2021-12-05 03:15:39.156  INFO 127824 --- [restartedMain] io.openex.player.PlayerApplication       : The following profiles are active: dev
-2021-12-05 03:15:40.400  INFO 127824 --- [restartedMain] io.openex.player.PlayerApplication       : Started PlayerApplication in 1.519 seconds (JVM running for 2.043)
