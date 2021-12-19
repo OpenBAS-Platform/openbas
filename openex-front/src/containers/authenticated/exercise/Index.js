@@ -692,10 +692,7 @@ const select = (state, ownProps) => {
   const events = exercise.getEvents();
   const audiences = exercise.getAudiences();
   return {
-    exerciseId,
-    exercise,
-    audiences,
-    events,
+    exerciseId, exercise, audiences, events,
   };
 };
 

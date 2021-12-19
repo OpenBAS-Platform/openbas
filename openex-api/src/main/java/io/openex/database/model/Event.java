@@ -22,7 +22,7 @@ public class Event implements Base {
     @JsonProperty("event_id")
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "event_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("event_exercise")

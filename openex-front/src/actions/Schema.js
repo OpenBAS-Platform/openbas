@@ -97,9 +97,7 @@ export const outcome = new schema.Entity('outcomes', {}, { idAttribute: 'outcome
 export const arrayOfOutcomes = new schema.Array(outcome);
 
 token.define({ token_user: user });
-
 user.define({ user_organization: organization });
-
 incident.define({ incident_type: incidentType });
 
 export const storeBrowser = (state) => ({
@@ -125,39 +123,46 @@ export const storeBrowser = (state) => ({
       },
     };
   },
-  _buildExercise(ex) {
+  _buildExercise(id, ex) {
     const browser = this;
     return {
       ...ex,
+      exercise_id: id,
       getInjects: (sortBy = 'inject_date') => {
         const all = R.values(state.referential.entities.injects);
-        const injects = R.filter((n) => n.inject_exercise === ex.exercise_id, all);
+        const injects = R.filter((n) => n.inject_exercise === id, all);
         return R.sortWith([R.ascend(R.prop(sortBy))])(injects);
       },
       getObjectives: (sortBy = 'objective_priority') => {
         const all = R.values(state.referential.entities.objectives);
-        const objectives = R.filter((n) => n.objective_exercise === ex.exercise_id, all);
+        const objectives = R.filter((n) => n.objective_exercise === id, all);
         return R.sortWith([R.ascend(R.prop(sortBy))])(objectives);
       },
       getAudiences: (sortBy = 'audience_name') => {
         const all = R.values(state.referential.entities.audiences);
-        const audiences = R.filter((n) => n.audience_exercise === ex.exercise_id, all);
+        const audiences = R.filter((n) => n.audience_exercise === id, all);
         return R.sortWith([R.ascend(R.prop(sortBy))])(audiences);
       },
       getSubAudiences: (sortBy = 'subaudience_name') => {
         const all = R.values(state.referential.entities.subaudiences);
-        const subaudiences = R.filter((n) => n.subaudience_exercise === ex.exercise_id, all);
+        const subaudiences = R.filter((n) => n.subaudience_exercise === id, all);
         return R.sortWith([R.ascend(R.prop(sortBy))])(subaudiences);
       },
       getEvents: (sortBy = 'event_order') => {
         const all = R.values(state.referential.entities.events);
-        const events = R.filter((n) => n.event_exercise === ex.exercise_id, all)
+        const events = R.filter((n) => n.event_exercise === id, all)
           .map((e) => browser._buildEvent(e));
         return R.sortWith([R.ascend(R.prop(sortBy))])(events);
       },
+      getIncidents: (sortBy = 'incident_order') => {
+        const all = R.values(state.referential.entities.incidents);
+        const incidents = R.filter((n) => n.incident_exercise === id, all)
+          .map((e) => browser._buildIncident(e));
+        return R.sortWith([R.ascend(R.prop(sortBy))])(incidents);
+      },
       getUsers: () => {
         const allSub = R.values(state.referential.entities.subaudiences);
-        return R.filter((n) => n.subaudience_exercise === ex.exercise_id, allSub)
+        return R.filter((n) => n.subaudience_exercise === id, allSub)
           .map((s) => s.subaudience_users)
           .flat().map((userId) => state.referential.entities.users[userId]);
       },
@@ -169,6 +174,6 @@ export const storeBrowser = (state) => ({
   },
   getExercise(id) {
     const ex = state.referential.entities.exercises[id];
-    return this._buildExercise(ex);
+    return this._buildExercise(id, ex);
   },
 });

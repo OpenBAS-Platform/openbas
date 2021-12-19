@@ -46,6 +46,7 @@ import EventPopover from './EventPopover';
 import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';
 import InjectView from './InjectView';
+import { storeBrowser } from '../../../../../actions/Schema';
 
 i18nRegister({
   fr: {
@@ -204,19 +205,14 @@ class Index extends Component {
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || n.inject_content.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const injects = R.pipe(
-      R.map((data) => R.pathOr({}, ['injects', data.inject_id], this.props)),
-      R.filter(filterByKeyword),
-      R.sortWith([R.ascend(R.prop('inject_date'))]),
-    )(incident.incident_injects);
+      || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || JSON.stringify(n.inject_content).toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const injects = incident.getInjects().filter((i) => filterByKeyword(i));
     const eventIsUpdatable = R.propOr(true, 'user_can_update', this.props.event);
     const userCanUpdate = this.props.exercise?.user_can_update;
     return (
       <div>
-        {incident.incident_injects.length === 0 && (
+        {injects.length === 0 && (
           <div className={classes.empty}>
             <T>This incident is empty.</T>
           </div>
@@ -358,7 +354,6 @@ class Index extends Component {
       incident,
       incidents,
     } = this.props;
-    const eventIsUpdatable = R.propOr(true, 'user_can_update', this.props.event);
     const userCanUpdate = this.props.exercise?.user_can_update;
     if (event) {
       return (
@@ -368,7 +363,7 @@ class Index extends Component {
             eventId={eventId}
             incidents={incidents}
             incident_types={this.props.incident_types}
-            can_create={eventIsUpdatable && userCanUpdate}
+            can_create={userCanUpdate}
             selectedIncident={R.propOr(null, 'incident_id', incident)}
             subobjectives={this.props.subobjectives}
           />
@@ -429,24 +424,6 @@ Index.propTypes = {
   downloadFile: PropTypes.func,
 };
 
-const filterAudiences = (audiences, exerciseId) => {
-  const audiencesFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.audience_exercise === exerciseId),
-    R.sortWith([R.ascend(R.prop('audience_name'))]),
-  );
-  return audiencesFilterAndSorting(audiences);
-};
-
-const filterSubaudiences = (subaudiences, exerciseId) => {
-  const subaudiencesFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.subaudience_exercise === exerciseId),
-    R.sortWith([R.ascend(R.prop('subaudience_name'))]),
-  );
-  return subaudiencesFilterAndSorting(subaudiences);
-};
-
 const filterSubobjectives = (subobjectives, exerciseId) => {
   const subobjectivesFilterAndSorting = R.pipe(
     R.values,
@@ -456,23 +433,15 @@ const filterSubobjectives = (subobjectives, exerciseId) => {
   return subobjectivesFilterAndSorting(subobjectives);
 };
 
-const filterIncidents = (incidents, eventId) => {
-  const incidentsFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.incident_event === eventId),
-    R.sortWith([R.ascend(R.prop('incident_order'))]),
-  );
-  return incidentsFilterAndSorting(incidents);
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId, eventId } = ownProps;
-  const exercise = R.prop(exerciseId, state.referential.entities.exercises);
-  const audiences = filterAudiences(state.referential.entities.audiences, exerciseId);
-  const subaudiences = filterSubaudiences(state.referential.entities.subaudiences, exerciseId);
+  const browser = storeBrowser(state);
+  const exercise = browser.getExercise(exerciseId);
+  const audiences = exercise.getAudiences();
+  const subaudiences = exercise.getSubAudiences();
   const subobjectives = filterSubobjectives(state.referential.entities.subobjectives, exerciseId);
-  const event = R.prop(eventId, state.referential.entities.events);
-  const incidents = filterIncidents(state.referential.entities.incidents, eventId);
+  const event = exercise.getEvents();
+  const incidents = exercise.getIncidents();
   // region get default incident
   const stateCurrentIncident = R.path(['exercise', exerciseId, 'event', eventId, 'current_incident'], state.screen);
   const incidentId = stateCurrentIncident === undefined && incidents.length > 0
