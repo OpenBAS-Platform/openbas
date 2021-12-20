@@ -22,7 +22,7 @@ public class V1__Init extends BaseJavaMigration {
     private static final String ADMIN_TOKEN_UUID = "0d17ce9a-f3a8-4c6d-9721-c98dc3dc023f";
     private static final String ADMIN_PASSWORD = "admin";
 
-    private void createAdminUser(Connection connection) throws Exception {
+    private boolean createAdminUser(Connection connection) throws Exception {
         Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();
         String password = passwordEncoder.encode(ADMIN_PASSWORD);
         PreparedStatement statement = connection.prepareStatement(
@@ -39,7 +39,7 @@ public class V1__Init extends BaseJavaMigration {
         statement.setInt(7, 1);
         statement.setBoolean(8, true);
         statement.setBoolean(9, true);
-        statement.execute();
+        return statement.execute();
     }
 
     private void createAdminToken(Connection connection) throws Exception {
@@ -53,15 +53,6 @@ public class V1__Init extends BaseJavaMigration {
         statement.execute();
     }
 
-    private void createIncidentType(Connection connection, String id, String name) throws Exception {
-        PreparedStatement statement = connection.prepareStatement(
-                "INSERT INTO incident_types (type_id, type_name) " +
-                        "VALUES (?, ?) ON CONFLICT DO NOTHING");
-        statement.setString(1, id);
-        statement.setString(2, name);
-        statement.execute();
-    }
-
     @Override
     public void migrate(Context context) throws Exception {
         Connection connection = context.getConnection();
@@ -72,12 +63,9 @@ public class V1__Init extends BaseJavaMigration {
         String schemaQuery = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         schemaStatement.execute(schemaQuery);
         // Create the default values (admin user, ...)
-        try {
-            createAdminUser(connection);
+        boolean isUserCreated = createAdminUser(connection);
+        if (isUserCreated) {
             createAdminToken(connection);
-        } catch (Exception e) {
-            // If failed, migration of an existing schema
-            // Do not need to do anything, admin user already exist.
         }
     }
 }
