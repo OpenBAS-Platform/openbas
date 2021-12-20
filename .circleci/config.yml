@@ -80,7 +80,7 @@ jobs:
   package_rolling_musl:
     working_directory: ~/openex_musl
     docker:
-      - image: maven:3.8.4-eclipse-temurin-17-alpine
+      - image: maven:3.8.4-openjdk-17
     steps:
       - attach_workspace:
           at: ~/
