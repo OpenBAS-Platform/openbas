@@ -85,6 +85,10 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonProperty("inject_status")
     private InjectStatus status;
 
+    @OneToOne(mappedBy = "inject", fetch = FetchType.EAGER)
+    @JsonProperty("inject_outcome")
+    private Outcome outcome;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "injects_audiences",
             joinColumns = @JoinColumn(name = "inject_id"),
@@ -142,11 +146,11 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     public void report(Execution execution) {
         statusRepository.executionSave(execution, this);
     }
+    // endregion
 
     public String getId() {
         return id;
     }
-    // endregion
 
     public void setId(String id) {
         this.id = id;
@@ -166,6 +170,14 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Outcome getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(Outcome outcome) {
+        this.outcome = outcome;
     }
 
     @Override
