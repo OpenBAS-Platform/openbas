@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 @EnableAsync
 public class AppConfig {
 
+    // Validations
+    public final static String MANDATORY_MESSAGE = "This value should not be blank.";
+
     public static User currentUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-    // Validations
-    public final static String MANDATORY_MESSAGE = "This value should not be blank.";
 
     @Bean
     ObjectMapper openexJsonMapper() {
