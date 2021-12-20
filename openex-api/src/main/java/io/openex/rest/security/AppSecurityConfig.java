@@ -52,8 +52,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.disable()
                 .formLogin()
                 /**/.disable()
-                .logout()
-                /**/.disable()
                 .authorizeRequests()
                 /**/.antMatchers("/api/parameters").permitAll()
                 /**/.antMatchers("/api/comcheck").permitAll()
@@ -61,6 +59,8 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.antMatchers("/api/**").authenticated()
                 .and()
                 .logout()
+                /**/.invalidateHttpSession(true)
+                /**/.deleteCookies("JSESSIONID", openExConfig.getCookieName())
                 /**/.logoutSuccessUrl("/");
 
         if (openExConfig.isAuthOpenidEnable()) {
