@@ -72,7 +72,12 @@ public class V1__Init extends BaseJavaMigration {
         String schemaQuery = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         schemaStatement.execute(schemaQuery);
         // Create the default values (admin user, ...)
-        createAdminUser(connection);
-        createAdminToken(connection);
+        try {
+            createAdminUser(connection);
+            createAdminToken(connection);
+        } catch (Exception e) {
+            // If failed, migration of an existing schema
+            // Do not need to do anything, admin user already exist.
+        }
     }
 }
