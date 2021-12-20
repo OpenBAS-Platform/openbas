@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -124,16 +122,13 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
-    public Inject<T> createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput<T> createInjectInput) {
+    public Inject<T> createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput<T> input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        Inject<T> inject = createInjectInput.toInject();
+        Inject<T> inject = input.toInject();
         inject.setUser(currentUser());
         inject.setExercise(exercise);
-        Instant from = exercise.getStart().toInstant();
-        Instant to = createInjectInput.getDate().toInstant();
-        long duration = Duration.between(from, to).getSeconds();
-        inject.setDependsDuration(duration);
-        inject.setAudiences(fromIterable(audienceRepository.findAllById(createInjectInput.getAudiences())));
+        inject.setDependsDuration(computeExerciseDuration(exercise, input.getDate()));
+        inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         return injectRepository.save(inject);
     }
 

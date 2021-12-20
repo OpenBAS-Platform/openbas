@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -102,10 +100,7 @@ public class InjectApi<T> extends RestBehavior {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setUpdateAttributes(input);
         inject.setContent(input.getContent());
-        Instant from = exercise.getStart().toInstant();
-        Instant to = input.getDate().toInstant();
-        long duration = Duration.between(from, to).getSeconds();
-        inject.setDependsDuration(duration);
+        inject.setDependsDuration(computeExerciseDuration(exercise, input.getDate()));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         return injectRepository.save(inject);
     }
