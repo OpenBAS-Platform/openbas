@@ -2,12 +2,12 @@ package io.openex.migration;
 
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -67,8 +67,9 @@ public class V1__Init extends BaseJavaMigration {
         Connection connection = context.getConnection();
         Statement schemaStatement = connection.createStatement();
         // Table not exists, must initialize the schema
-        File file = ResourceUtils.getFile("classpath:application.sql");
-        String schemaQuery = Files.readString(file.toPath());
+        ClassPathResource classPathResource = new ClassPathResource("application.sql");
+        InputStream inputStream = classPathResource.getInputStream();
+        String schemaQuery = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         schemaStatement.execute(schemaQuery);
         // Create the default values (admin user, ...)
         createAdminUser(connection);
