@@ -12,7 +12,7 @@ public class V2_2__Simplify_model extends BaseJavaMigration {
     @Override
     public void migrate(Context context) throws Exception {
         Statement select = context.getConnection().createStatement();
-
+        select.execute("DROP TABLE IF EXISTS doctrine_migration_versions;");
         // 01. Outcome - clean the table, redirect to inject
         //noinspection SqlWithoutWhere
         select.execute("DELETE FROM outcomes;");
