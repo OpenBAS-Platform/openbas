@@ -68,7 +68,7 @@ jobs:
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run: git remote add openex ssh://git-9qdBths0@openex.io:/~/git-9qdBths0.git && git push --force openex master
-      - run: mkdir release
+      - run: mkdir -p release/openex
       - run: cp -a ./openex-api/target/openex-api.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
       - run:
           working_directory: ~/openex/release
@@ -88,7 +88,7 @@ jobs:
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run: git remote add openex ssh://git-9qdBths0@openex.io:/~/git-9qdBths0.git && git push --force openex master
-      - run: mkdir release
+      - run: mkdir -p release/openex
       - run: cp -a ./openex-api/target/openex-api.jar release/openex/ && cp -a ./openex-api/src/main/resources/application.properties release/openex/
       - run:
           working_directory: ~/openex_musl/release
@@ -105,8 +105,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
+      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync openssh-client git
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
       - run: mkdir deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run:
@@ -134,8 +134,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
+      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync openssh-client git
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
       - run: mkdir deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run:
@@ -163,8 +163,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
+      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync openssh-client git
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
       - run: mkdir deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run:
@@ -192,8 +192,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - add_ssh_keys
+      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync openssh-client git
       - run: ssh-keyscan -H openex.io >> ~/.ssh/known_hosts
-      - run: DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y rsync
       - run: mkdir deploy
       - run: git config --global user.email "ci@openex.io" && git config --global user.name "OpenEx CircleCI"
       - run:
