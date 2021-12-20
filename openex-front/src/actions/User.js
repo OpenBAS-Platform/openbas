@@ -26,4 +26,10 @@ export const updateUser = (userId, data) => (dispatch) => putReferential(
   });
 });
 
+export const updateMePassword = (password) => (dispatch) => putReferential(
+  schema.user, '/api/me/password', { user_plain_password: password },
+)(dispatch);
+
+export const meTokens = () => (dispatch) => getReferential(schema.arrayOfTokens, '/api/me/tokens')(dispatch);
+
 export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);

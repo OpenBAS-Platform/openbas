@@ -3,6 +3,7 @@ package io.openex.rest.user;
 import io.openex.config.OpenExConfig;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
+import io.openex.database.repository.TokenRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.LoginInput;
@@ -16,18 +17,26 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
+import static io.openex.database.specification.TokenSpecification.fromUser;
 
 @RestController
 public class UserApi extends RestBehavior {
 
     private UserRepository userRepository;
+    private TokenRepository tokenRepository;
     private UserService userService;
     private OpenExConfig openExConfig;
+
+    @Autowired
+    public void setTokenRepository(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     @Autowired
     public void setUserService(UserService userService) {
@@ -42,12 +51,6 @@ public class UserApi extends RestBehavior {
     @Autowired
     public void setOpenExConfig(OpenExConfig openExConfig) {
         this.openExConfig = openExConfig;
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @GetMapping("/api/me")
-    public User me() {
-        return userRepository.findById(currentUser().getId()).orElseThrow();
     }
 
     @RolesAllowed(ROLE_USER)
@@ -84,17 +87,34 @@ public class UserApi extends RestBehavior {
         throw new AccessDeniedException("Invalid credentials");
     }
 
-    @RolesAllowed(ROLE_USER)
+    @RolesAllowed(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}/password")
     public User changePassword(@PathVariable String userId, @Valid @RequestBody PasswordInput input) {
-        // None admin user can only change its personal password.
-        User currentUser = currentUser();
-        if (!currentUser.isAdmin() && !currentUser.getId().equals(userId)) {
-            throw new AccessDeniedException("Your are not allowed to do this");
-        }
-        // Resolve the user and change his password
         User user = userRepository.findById(userId).orElseThrow();
         user.setPassword(userService.encodeUserPassword(input.getPassword()));
         return userRepository.save(user);
     }
+
+    // region me
+    @RolesAllowed(ROLE_USER)
+    @GetMapping("/api/me")
+    public User me() {
+        return userRepository.findById(currentUser().getId()).orElseThrow();
+    }
+
+    @RolesAllowed(ROLE_USER)
+    @GetMapping("/api/me/tokens")
+    public List<Token> tokens() {
+        return tokenRepository.findAll(fromUser(currentUser().getId()));
+    }
+
+    @RolesAllowed(ROLE_USER)
+    @PutMapping("/api/me/password")
+    public User changeMyPassword(@Valid @RequestBody PasswordInput input) {
+        User currentUser = currentUser();
+        User user = userRepository.findById(currentUser.getId()).orElseThrow();
+        user.setPassword(userService.encodeUserPassword(input.getPassword()));
+        return userRepository.save(user);
+    }
+    // endregion
 }

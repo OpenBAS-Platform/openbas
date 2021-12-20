@@ -12,7 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { Link } from 'react-router-dom';
 import { DescriptionOutlined } from '@material-ui/icons';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { updateUser, updateUserPassword } from '../../../actions/User';
+import { updateUser, updateMePassword, meTokens } from '../../../actions/User';
 import { i18nRegister } from '../../../utils/Messages';
 import { T } from '../../../components/I18n';
 import UserForm from './UserForm';
@@ -20,6 +20,7 @@ import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
 import UserPopover from '../UserPopover';
 import { submitForm } from '../../../utils/Action';
+import { storeBrowser } from '../../../actions/Schema';
 
 i18nRegister({
   fr: {
@@ -69,6 +70,7 @@ const styles = (theme) => ({
 class Index extends Component {
   componentDidMount() {
     this.props.fetchOrganizations();
+    this.props.meTokens();
   }
 
   onUpdate(data) {
@@ -76,7 +78,7 @@ class Index extends Component {
   }
 
   onUpdatePassword(data) {
-    return this.props.updateUserPassword(this.props.user.user_id, data.user_plain_password);
+    return this.props.updateMePassword(data.user_plain_password);
   }
 
   redirectToHome() {
@@ -110,6 +112,8 @@ class Index extends Component {
       ]),
     );
     const informationValues = this.props.user !== undefined ? initPipe(this.props.user) : undefined;
+    const userTokens = this.props.user.getTokens();
+    const userToken = userTokens.length > 0 ? R.head(userTokens) : undefined;
     return (
       <div>
         <AppBar position="fixed" className={classes.appBar}>
@@ -200,7 +204,7 @@ class Index extends Component {
                 >
                   <T>Token key</T>
                 </Typography>
-                <pre>{R.head(this.props.user.user_tokens).token_value}</pre>
+                <pre>{userToken?.token_value}</pre>
                 <Typography variant="h6" gutterBottom={true}>
                   <T>Example</T>
                 </Typography>
@@ -210,7 +214,7 @@ class Index extends Component {
                   Content-Type: application/json
                   <br />
                   X-Authorization-Token:{' '}
-                  {R.head(this.props.user.user_tokens).token_value}
+                  {userToken?.token_value}
                 </pre>
               </Typography>
               <Button
@@ -238,14 +242,16 @@ Index.propTypes = {
 };
 
 const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
+  const browser = storeBrowser(state);
   return {
-    user: R.prop(userId, state.referential.entities.users),
+    user: browser.getMe(),
     organizations: state.referential.entities.organizations,
   };
 };
 
 export default R.compose(
-  connect(select, { fetchOrganizations, updateUser, updateUserPassword }),
+  connect(select, {
+    fetchOrganizations, meTokens, updateUser, updateMePassword,
+  }),
   withStyles(styles),
 )(Index);

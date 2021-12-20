@@ -101,6 +101,15 @@ user.define({ user_organization: organization });
 incident.define({ incident_type: incidentType });
 
 export const storeBrowser = (state) => ({
+  _buildUser(usr) {
+    return {
+      ...usr,
+      getTokens: () => {
+        const all = R.values(state.referential.entities.tokens);
+        return R.filter((n) => n.token_user === usr.user_id, all);
+      },
+    };
+  },
   _buildIncident(inc) {
     return {
       ...inc,
@@ -175,5 +184,9 @@ export const storeBrowser = (state) => ({
   getExercise(id) {
     const ex = state.referential.entities.exercises[id];
     return this._buildExercise(id, ex);
+  },
+  getMe() {
+    const userId = R.path(['logged', 'user'], state.app);
+    return this._buildUser(state.referential.entities.users[userId]);
   },
 });
