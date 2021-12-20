@@ -40,6 +40,7 @@ jobs:
           root: ~/
           paths:
             - openex
+            - openex_docker
 
   build_platform_musl:
     working_directory: ~/openex_musl
