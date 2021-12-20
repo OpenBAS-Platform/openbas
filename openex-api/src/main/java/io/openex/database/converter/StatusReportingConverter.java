@@ -27,6 +27,9 @@ public class StatusReportingConverter implements AttributeConverter<StatusReport
 
     @Override
     public StatusReporting convertToEntityAttribute(String dbData) {
+        if (dbData == null) {
+            return null;
+        }
         try {
             return mapper.readValue(dbData, StatusReporting.class);
         } catch (IOException ex) {
