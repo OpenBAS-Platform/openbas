@@ -62,6 +62,10 @@ public class UserService {
         return passwordEncoder.matches(password, user.getPassword());
     }
 
+    public String encodeUserPassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
     public void createUserToken(User user) {
         Token token = new Token();
         token.setUser(user);

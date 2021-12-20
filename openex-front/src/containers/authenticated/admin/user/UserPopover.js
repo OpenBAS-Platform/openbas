@@ -15,7 +15,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
-import { updateUser, deleteUser } from '../../../../actions/User';
+import { updateUser, deleteUser, updateUserPassword } from '../../../../actions/User';
 import UserForm from './UserForm';
 import UserPasswordForm from './UserPasswordForm';
 import { submitForm } from '../../../../utils/Action';
@@ -89,9 +89,7 @@ class UserPopover extends Component {
 
   onSubmitEditPassword(data) {
     return this.props
-      .updateUser(this.props.user.user_id, {
-        user_plain_password: data.user_plain_password,
-      })
+      .updateUserPassword(this.props.user.user_id, data.user_plain_password)
       .then(() => this.handleCloseEditPassword());
   }
 
@@ -260,9 +258,10 @@ const select = (state) => ({
 UserPopover.propTypes = {
   user: PropTypes.object,
   updateUser: PropTypes.func,
+  updateUserPassword: PropTypes.func,
   deleteUser: PropTypes.func,
   organizations: PropTypes.object,
   children: PropTypes.node,
 };
 
-export default connect(select, { updateUser, deleteUser })(UserPopover);
+export default connect(select, { updateUser, updateUserPassword, deleteUser })(UserPopover);

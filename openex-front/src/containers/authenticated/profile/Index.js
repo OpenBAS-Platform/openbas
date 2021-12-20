@@ -12,7 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { Link } from 'react-router-dom';
 import { DescriptionOutlined } from '@material-ui/icons';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { updateUser } from '../../../actions/User';
+import { updateUser, updateUserPassword } from '../../../actions/User';
 import { i18nRegister } from '../../../utils/Messages';
 import { T } from '../../../components/I18n';
 import UserForm from './UserForm';
@@ -76,9 +76,7 @@ class Index extends Component {
   }
 
   onUpdatePassword(data) {
-    return this.props.updateUser(this.props.user.user_id, {
-      user_plain_password: data.user_plain_password,
-    });
+    return this.props.updateUserPassword(this.props.user.user_id, data.user_plain_password);
   }
 
   redirectToHome() {
@@ -236,6 +234,7 @@ Index.propTypes = {
   organizations: PropTypes.object,
   fetchOrganizations: PropTypes.func,
   updateUser: PropTypes.func,
+  updateUserPassword: PropTypes.func,
 };
 
 const select = (state) => {
@@ -247,6 +246,6 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchOrganizations, updateUser }),
+  connect(select, { fetchOrganizations, updateUser, updateUserPassword }),
   withStyles(styles),
 )(Index);
