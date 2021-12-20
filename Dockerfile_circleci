@@ -4,7 +4,6 @@ FROM maven:3.8.4-openjdk-17 AS api-builder
 
 WORKDIR /opt/openex-build/openex-api
 COPY openex-api /opt/openex-build/openex-api
-RUN mvn install -DskipTests
 
 FROM openjdk:17-slim AS app
 
