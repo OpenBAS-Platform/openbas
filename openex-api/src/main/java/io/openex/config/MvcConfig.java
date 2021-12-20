@@ -1,9 +1,13 @@
 package io.openex.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -33,11 +37,26 @@ class ReactIndexResourceResolver extends AbstractResourceResolver {
     }
 }
 
-@Component
+@Configuration
 @EnableWebMvc
 public class MvcConfig implements WebMvcConfigurer {
 
     private final static int CACHE_PERIOD = 3600;
+
+    @javax.annotation.Resource
+    private ObjectMapper objectMapper;
+
+    @Bean
+    public MappingJackson2HttpMessageConverter customJackson2HttpMessageConverter() {
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        return jsonConverter;
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
+        messageConverters.add(customJackson2HttpMessageConverter());
+    }
 
     private void addPathStaticResolver(ResourceHandlerRegistry registry, String pattern, String location) {
         registry

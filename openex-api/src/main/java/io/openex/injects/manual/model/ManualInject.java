@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.DryInject;
 import io.openex.database.model.Dryrun;
 import io.openex.database.model.Inject;
+import io.openex.injects.manual.ManualExecutor;
 import io.openex.injects.manual.converter.ManualContentConverter;
 import io.openex.model.Executor;
 
@@ -33,7 +34,7 @@ public class ManualInject extends Inject<ManualContent> {
 
     @Override
     public Class<? extends Executor<ManualContent>> executor() {
-        throw new UnsupportedOperationException("Manual inject cannot be executed");
+        return ManualExecutor.class;
     }
 
     @Override

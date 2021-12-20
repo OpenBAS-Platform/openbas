@@ -88,5 +88,16 @@ public abstract class InjectInput<T> {
         this.allAudiences = allAudiences;
     }
 
-    public abstract Inject<T> toInject();
+    public abstract Inject<T> injectInstance();
+
+    public Inject<T> toInject() {
+        Inject<T> inject = injectInstance();
+        inject.setTitle(getTitle());
+        inject.setDescription(getDescription());
+        inject.setDate(getDate());
+        inject.setType(getType());
+        inject.setContent(getContent());
+        inject.setAllAudiences(getAllAudiences());
+        return inject;
+    }
 }
