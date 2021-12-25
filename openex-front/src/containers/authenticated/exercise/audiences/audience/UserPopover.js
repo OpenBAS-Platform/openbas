@@ -75,7 +75,8 @@ class UserPopover extends Component {
 
   submitDelete() {
     const userIds = this.props.audience.audience_users.filter((a) => a !== this.props.user.user_id);
-    this.props.updateAudienceUsers(this.props.audience.audience_id, { audience_users: userIds });
+    this.props.updateAudienceUsers(this.props.exerciseId,
+      this.props.audience.audience_id, { audience_users: userIds });
     this.handleCloseDelete();
   }
 
