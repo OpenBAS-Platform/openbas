@@ -22,7 +22,7 @@ import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { fetchUsers } from '../../../../../actions/User';
 import CreateUser from './CreateUser';
-import { updateAudienceUsers } from '../../../../../actions/Subaudience';
+import { updateAudienceUsers } from '../../../../../actions/Audience';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />

@@ -33,7 +33,6 @@ import { T } from '../../../../components/I18n';
 import Countdown from '../../../../components/Countdown';
 import { fetchGroups } from '../../../../actions/Group';
 import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchSubaudiences } from '../../../../actions/Subaudience';
 import { fetchAllInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { downloadFile } from '../../../../actions/File';
 import ExercisePopover from './ExercisePopover';
@@ -111,7 +110,6 @@ class IndexExecution extends Component {
   componentDidMount() {
     this.props.fetchGroups();
     this.props.fetchAudiences(this.props.exerciseId);
-    this.props.fetchSubaudiences(this.props.exerciseId);
     this.props.fetchInjectTypes();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchAllInjects(this.props.exerciseId, true);
@@ -407,7 +405,6 @@ IndexExecution.propTypes = {
   fetchGroups: PropTypes.func,
   fetchAllInjects: PropTypes.func,
   fetchAudiences: PropTypes.func,
-  fetchSubaudiences: PropTypes.func,
   fetchInjectTypes: PropTypes.func,
   downloadFile: PropTypes.func,
 };
@@ -482,7 +479,6 @@ export default R.compose(
   connect(select, {
     fetchGroups,
     fetchAudiences,
-    fetchSubaudiences,
     fetchAllInjects,
     fetchInjectTypes,
     downloadFile,

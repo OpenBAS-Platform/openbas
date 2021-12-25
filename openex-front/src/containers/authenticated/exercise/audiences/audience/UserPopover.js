@@ -16,7 +16,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { updateUser } from '../../../../../actions/User';
-import { updateAudienceUsers } from '../../../../../actions/Subaudience';
+import { updateAudienceUsers } from '../../../../../actions/Audience';
 import UserForm from './UserForm';
 import { submitForm } from '../../../../../utils/Action';
 

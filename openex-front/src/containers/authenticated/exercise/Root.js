@@ -35,7 +35,6 @@ import NotFound from '../../anonymous/NotFound';
 import { fetchObjectives } from '../../../actions/Objective';
 import { fetchSubobjectives } from '../../../actions/Subobjective';
 import { fetchAudiences } from '../../../actions/Audience';
-import { fetchSubaudiences } from '../../../actions/Subaudience';
 import { fetchEvents } from '../../../actions/Event';
 import { fetchIncidents, fetchIncidentTypes } from '../../../actions/Incident';
 import { fetchAllInjects } from '../../../actions/Inject';
@@ -80,7 +79,6 @@ class RootExercise extends Component {
     this.props.fetchObjectives(this.props.id);
     this.props.fetchSubobjectives(this.props.id);
     this.props.fetchAudiences(this.props.id);
-    this.props.fetchSubaudiences(this.props.id);
     this.props.fetchEvents(this.props.id);
     this.props.fetchIncidents(this.props.id);
     this.props.fetchAllInjects(this.props.id);
@@ -257,7 +255,6 @@ export default R.compose(
     fetchObjectives,
     fetchSubobjectives,
     fetchAudiences,
-    fetchSubaudiences,
     fetchEvents,
     fetchIncidents,
     fetchIncidentTypes,

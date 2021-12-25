@@ -26,7 +26,6 @@ import { i18nRegister } from '../../../../../utils/Messages';
 import { T } from '../../../../../components/I18n';
 import { SearchField } from '../../../../../components/SearchField';
 import { fetchAudiences } from '../../../../../actions/Audience';
-import { fetchSubaudiences } from '../../../../../actions/Subaudience';
 import { fetchSubobjectives } from '../../../../../actions/Subobjective';
 import { downloadFile } from '../../../../../actions/File';
 import { fetchEvents } from '../../../../../actions/Event';
@@ -126,7 +125,6 @@ class Index extends Component {
   componentDidMount() {
     this.props.fetchSubobjectives(this.props.exerciseId);
     this.props.fetchAudiences(this.props.exerciseId);
-    this.props.fetchSubaudiences(this.props.exerciseId);
     this.props.fetchEvents(this.props.exerciseId);
     this.props.fetchIncidentTypes();
     this.props.fetchIncidents(this.props.exerciseId);
@@ -412,7 +410,6 @@ Index.propTypes = {
   subobjectives: PropTypes.array,
   allIncidents: PropTypes.array,
   fetchAudiences: PropTypes.func,
-  fetchSubaudiences: PropTypes.func,
   fetchSubobjectives: PropTypes.func,
   fetchEvents: PropTypes.func,
   fetchIncidentTypes: PropTypes.func,
@@ -469,7 +466,6 @@ const select = (state, ownProps) => {
 export default R.compose(
   connect(select, {
     fetchAudiences,
-    fetchSubaudiences,
     fetchSubobjectives,
     fetchEvents,
     fetchIncidentTypes,
