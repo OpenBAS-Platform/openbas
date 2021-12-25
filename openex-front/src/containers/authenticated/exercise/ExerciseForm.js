@@ -30,8 +30,6 @@ const validate = (values) => {
     'exercise_name',
     'exercise_subtitle',
     'exercise_description',
-    'exercise_start_date',
-    'exercise_end_date',
   ];
   requiredFields.forEach((field) => {
     if (!values[field]) {

@@ -48,6 +48,19 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
     @JsonProperty("dryinject_status")
     private DryInjectStatus status;
 
+    @Override
+    @JsonProperty("dryinject_exercise")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    public Exercise getExercise() {
+        return getRun().getExercise();
+    }
+
+    @Override
+    @JsonProperty("dryinject_audiences")
+    public List<Audience> getAudiences() {
+        return new ArrayList<>();
+    }
+
     // region transient
     @Transient
     private DryInjectReportingRepository<T> statusRepository;
@@ -110,19 +123,6 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    @Override
-    @JsonProperty("dryinject_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    public Exercise getExercise() {
-        return getRun().getExercise();
-    }
-
-    @Override
-    @JsonProperty("dryinject_audiences")
-    public List<Audience> getAudiences() {
-        return new ArrayList<>();
     }
 
     @Override

@@ -16,14 +16,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
 import { updateUser } from '../../../../../actions/User';
-import { updateSubaudience } from '../../../../../actions/Subaudience';
+import { updateAudienceUsers } from '../../../../../actions/Subaudience';
 import UserForm from './UserForm';
 import { submitForm } from '../../../../../utils/Action';
 
 i18nRegister({
   fr: {
-    'Do you want to remove the user from this sub-audience?':
-      "Souhaitez-vous supprimer l'utilisateur de cette sous-audience ?",
+    'Do you want to remove the user from this audience?':
+      "Souhaitez-vous supprimer l'utilisateur de cette audience ?",
     'Update the user': "Modifier l'utilisateur",
     'Update the profile': "Modifier le profil de l'utilisateur",
     Profile: 'Profil',
@@ -74,17 +74,8 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    const userIds = R.pipe(
-      R.values,
-      R.filter((a) => a.user_id !== this.props.user.user_id),
-      R.map((u) => u.user_id),
-    )(this.props.subaudience.subaudience_users);
-    this.props.updateSubaudience(
-      this.props.exerciseId,
-      this.props.audience.audience_id,
-      this.props.subaudience.subaudience_id,
-      { subaudience_users: userIds },
-    );
+    const userIds = this.props.audience.audience_users.filter((a) => a !== this.props.user.user_id);
+    this.props.updateAudienceUsers(this.props.audience.audience_id, { audience_users: userIds });
     this.handleCloseDelete();
   }
 
@@ -151,7 +142,7 @@ class UserPopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              <T>Do you want to remove the user from this sub-audience?</T>
+              <T>Do you want to remove the user from this audience?</T>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -214,7 +205,7 @@ UserPopover.propTypes = {
   exerciseId: PropTypes.string,
   user: PropTypes.object,
   updateUser: PropTypes.func,
-  updateSubaudience: PropTypes.func,
+  updateAudienceUsers: PropTypes.func,
   audience: PropTypes.object,
   subaudience: PropTypes.object,
   organizations: PropTypes.object,
@@ -223,5 +214,5 @@ UserPopover.propTypes = {
 
 export default connect(select, {
   updateUser,
-  updateSubaudience,
+  updateAudienceUsers,
 })(UserPopover);

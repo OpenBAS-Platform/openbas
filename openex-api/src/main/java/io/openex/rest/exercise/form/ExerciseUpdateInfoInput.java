@@ -2,16 +2,22 @@ package io.openex.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
-public class ExerciseUpdateInformationInput {
+import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
+public class ExerciseUpdateInfoInput {
+
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_name")
     private String name;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_description")
     private String description;
 
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 

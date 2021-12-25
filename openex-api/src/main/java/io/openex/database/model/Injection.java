@@ -18,7 +18,13 @@ public abstract class Injection<T> {
 
     public abstract T getContent();
 
+    public abstract void setContent(T content);
+
     public abstract Class<? extends Executor<T>> executor();
+
+    public abstract String getType();
+
+    public abstract List<Audience> getAudiences();
 
     @Transient
     public String getHeader() {
@@ -29,10 +35,6 @@ public abstract class Injection<T> {
     public String getFooter() {
         return ofNullable(getExercise()).map(Exercise::getFooter).orElse("");
     }
-
-    public abstract String getType();
-
-    public abstract List<Audience> getAudiences();
 
     @Transient
     public abstract boolean isGlobalInject();

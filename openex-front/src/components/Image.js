@@ -69,9 +69,11 @@ class ReactImage extends Component {
     // eslint-disable-next-line no-underscore-dangle
     const _this = this;
     const urlCreator = window.URL || window.webkitURL;
-    this.props
-      .dataFile(imageId)
-      .then((response) => _this.setState({ imgData: urlCreator.createObjectURL(response.data) }));
+    if (imageId) {
+      this.props
+        .dataFile(imageId)
+        .then((response) => _this.setState({ imgData: urlCreator.createObjectURL(response.data) }));
+    }
   }
 
   componentDidMount() {

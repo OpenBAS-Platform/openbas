@@ -20,9 +20,9 @@ import { withStyles } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import { T } from '../../../../../components/I18n';
 import { i18nRegister } from '../../../../../utils/Messages';
-import { updateSubaudience } from '../../../../../actions/Subaudience';
 import { fetchUsers } from '../../../../../actions/User';
 import CreateUser from './CreateUser';
+import { updateAudienceUsers } from '../../../../../actions/Subaudience';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -33,7 +33,7 @@ const styles = () => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 330,
+    right: 30,
   },
   name: {
     float: 'left',
@@ -89,7 +89,7 @@ class AddUsers extends Component {
 
   addUser(user) {
     if (
-      !this.props.subaudienceUsersIds.includes(user.user_id)
+      !this.props.audienceUsersIds.includes(user.user_id)
       && !this.state.users.includes(user)
     ) {
       this.setState({
@@ -105,16 +105,11 @@ class AddUsers extends Component {
   }
 
   submitAddUsers() {
-    const usersList = R.pipe(
+    const userIds = R.pipe(
       R.map((u) => u.user_id),
-      R.concat(this.props.subaudienceUsersIds),
+      R.concat(this.props.audienceUsersIds),
     )(this.state.users);
-    this.props.updateSubaudience(
-      this.props.exerciseId,
-      this.props.audienceId,
-      this.props.subaudienceId,
-      { subaudience_users: usersList },
-    );
+    this.props.updateAudienceUsers(this.props.audienceId, { audience_users: userIds });
     this.handleCloseAddUsers();
   }
 
@@ -172,7 +167,7 @@ class AddUsers extends Component {
                   (u) => u.user_id === user.user_id,
                   this.state.users,
                 ) !== undefined
-                  || this.props.subaudienceUsersIds.includes(user.user_id);
+                  || this.props.audienceUsersIds.includes(user.user_id);
                 const userOrganization = R.propOr(
                   {},
                   user.user_organization,
@@ -235,12 +230,11 @@ class AddUsers extends Component {
 AddUsers.propTypes = {
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
-  subaudienceId: PropTypes.string,
   fetchUsers: PropTypes.func,
-  updateSubaudience: PropTypes.func,
+  updateAudienceUsers: PropTypes.func,
   users: PropTypes.object,
   organizations: PropTypes.object,
-  subaudienceUsersIds: PropTypes.array,
+  audienceUsersIds: PropTypes.array,
 };
 
 const select = (state) => ({
@@ -251,7 +245,7 @@ const select = (state) => ({
 export default R.compose(
   connect(select, {
     fetchUsers,
-    updateSubaudience,
+    updateAudienceUsers,
   }),
   withStyles(styles),
 )(AddUsers);

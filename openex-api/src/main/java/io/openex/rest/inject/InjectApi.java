@@ -1,11 +1,9 @@
 package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
-import io.openex.database.model.Exercise;
 import io.openex.database.model.Inject;
 import io.openex.database.model.InjectTypes;
 import io.openex.database.repository.AudienceRepository;
-import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.helper.InjectHelper;
 import io.openex.model.ExecutableInject;
@@ -25,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
+import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
 
@@ -32,16 +31,10 @@ import static java.util.List.of;
 public class InjectApi<T> extends RestBehavior {
 
     private InjectRepository<T> injectRepository;
-    private ExerciseRepository exerciseRepository;
     private AudienceRepository audienceRepository;
     private InjectHelper<T> injectHelper;
     private ApplicationContext context;
     private List<Contract> contracts;
-
-    @Autowired
-    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
-        this.exerciseRepository = exerciseRepository;
-    }
 
     @Autowired
     public void setAudienceRepository(AudienceRepository audienceRepository) {
@@ -96,11 +89,11 @@ public class InjectApi<T> extends RestBehavior {
     @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
     public Inject<T> updateInject(@PathVariable String exerciseId,
                                   @PathVariable String injectId, @Valid @RequestBody InjectInput<T> input) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setUpdateAttributes(input);
         inject.setContent(input.getContent());
-        inject.setDependsDuration(computeExerciseDuration(exercise, input.getDate()));
+        // Set dependencies
+        inject.setDependsOn(updateRelationResolver(input.getDependsOn(), inject.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         return injectRepository.save(inject);
     }

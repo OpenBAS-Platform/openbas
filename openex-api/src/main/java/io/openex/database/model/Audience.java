@@ -41,7 +41,7 @@ public class Audience implements Base {
             joinColumns = @JoinColumn(name = "audience_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("subaudience_users")
+    @JsonProperty("audience_users")
     @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 

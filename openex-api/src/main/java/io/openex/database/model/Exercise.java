@@ -8,6 +8,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
+import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -237,7 +238,7 @@ public class Exercise implements Base {
         this.subtitle = subtitle;
     }
 
-    public Date getStart() {
+    public @Nullable Date getStart() {
         return start;
     }
 
@@ -245,7 +246,7 @@ public class Exercise implements Base {
         this.start = start;
     }
 
-    public Date getEnd() {
+    public @Nullable Date getEnd() {
         return end;
     }
 

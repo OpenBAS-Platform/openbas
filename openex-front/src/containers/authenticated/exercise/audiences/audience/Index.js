@@ -24,15 +24,14 @@ import { fetchGroups } from '../../../../../actions/Group';
 import { fetchUsers } from '../../../../../actions/User';
 import { fetchOrganizations } from '../../../../../actions/Organization';
 import { fetchAudiences } from '../../../../../actions/Audience';
-import { fetchSubaudiences } from '../../../../../actions/Subaudience';
 import { fetchComchecks } from '../../../../../actions/Comcheck';
 import Theme from '../../../../../components/Theme';
 import { SearchField } from '../../../../../components/SearchField';
-import SubaudienceNav from './SubaudienceNav';
 import AudiencePopover from './AudiencePopover';
 import AddUsers from './AddUsers';
 import UserPopover from './UserPopover';
 import UserView from './UserView';
+import { storeBrowser } from '../../../../../actions/Schema';
 
 i18nRegister({
   fr: {
@@ -50,9 +49,6 @@ i18nRegister({
 });
 
 const styles = () => ({
-  container: {
-    paddingRight: '300px',
-  },
   toolbar: {
     position: 'fixed',
     top: 0,
@@ -152,7 +148,6 @@ class IndexAudience extends Component {
 
   componentDidMount() {
     this.props.fetchAudiences(this.props.exerciseId);
-    this.props.fetchSubaudiences(this.props.exerciseId);
     this.props.fetchGroups();
     this.props.fetchUsers();
     this.props.fetchOrganizations();
@@ -201,19 +196,13 @@ class IndexAudience extends Component {
     });
   }
 
-  renderSubaudience() {
+  renderUsers() {
     const {
       classes,
       exerciseId,
       audienceId,
       audience,
-      subaudience,
     } = this.props;
-    const subaudienceIsUpdatable = R.propOr(
-      true,
-      'user_can_update',
-      subaudience,
-    );
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
@@ -230,12 +219,12 @@ class IndexAudience extends Component {
           ? this.ascend(fieldA, fieldB)
           : this.descend(fieldA, fieldB);
       }),
-    )(subaudience.subaudience_users);
+    )(audience.audience_users);
     return (
       <div>
-        {subaudience.subaudience_users.length === 0 && (
+        {audience.audience_users.length === 0 && (
           <div className={classes.empty}>
-            <T>This sub-audience is empty.</T>
+            <T>This audience is empty.</T>
           </div>
         )}
         <List>
@@ -245,16 +234,8 @@ class IndexAudience extends Component {
             const userLastname = R.propOr('-', 'user_lastname', user);
             const userEmail = R.propOr('-', 'user_email', user);
             const userGravatar = R.propOr('', 'user_gravatar', user);
-            const userOrganization = R.propOr(
-              {},
-              user.user_organization,
-              this.props.organizations,
-            );
-            const organizationName = R.propOr(
-              '-',
-              'organization_name',
-              userOrganization,
-            );
+            const userOrganization = this.props.organizations[user?.user_organization] ?? {};
+            const organizationName = userOrganization?.organization_name ?? '-';
             return (
               <ListItem
                 key={userId}
@@ -274,7 +255,6 @@ class IndexAudience extends Component {
                   <UserPopover
                     exerciseId={exerciseId}
                     audience={audience}
-                    subaudience={subaudience}
                     user={user}
                   />
                 </ListItemSecondaryAction>
@@ -304,14 +284,11 @@ class IndexAudience extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        {subaudienceIsUpdatable && (
+        {this.props.exercise?.user_can_update && (
           <AddUsers
             exerciseId={exerciseId}
             audienceId={audienceId}
-            subaudienceId={subaudience.subaudience_id}
-            subaudienceUsersIds={subaudience.subaudience_users.map(
-              (u) => u.user_id,
-            )}
+            audienceUsersIds={audience.audience_users}
           />
         )}
       </div>
@@ -324,19 +301,10 @@ class IndexAudience extends Component {
       exerciseId,
       audienceId,
       audience,
-      subaudience,
-      subaudiences,
     } = this.props;
     if (audience) {
       return (
         <div className={classes.container}>
-          <SubaudienceNav
-            exerciseId={exerciseId}
-            audienceId={audienceId}
-            audience={audience}
-            subaudiences={subaudiences}
-            selectedSubaudience={R.propOr(null, 'subaudience_id', subaudience)}
-          />
           <div style={{ float: 'left', display: 'flex' }}>
             <GroupOutlined
               fontSize="large"
@@ -357,13 +325,7 @@ class IndexAudience extends Component {
             <SearchField onChange={this.handleSearchUsers.bind(this)} />
           </div>
           <div className="clearfix" />
-          {subaudience ? (
-            this.renderSubaudience()
-          ) : (
-            <div className={classes.empty}>
-              <T>This audience is empty.</T>
-            </div>
-          )}
+          { this.renderUsers() }
         </div>
       );
     }
@@ -384,27 +346,8 @@ IndexAudience.propTypes = {
   fetchUsers: PropTypes.func,
   fetchGroups: PropTypes.func,
   fetchAudiences: PropTypes.func,
-  fetchSubaudiences: PropTypes.func,
   fetchOrganizations: PropTypes.func,
   fetchComchecks: PropTypes.func,
-};
-
-const filterAudiences = (audiences, exerciseId) => {
-  const audiencesFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.audience_exercise === exerciseId),
-    R.sort((a, b) => a.audience_name.localeCompare(b.audience_name)),
-  );
-  return audiencesFilterAndSorting(audiences);
-};
-
-const filterSubaudiences = (subaudiences, audienceId) => {
-  const subaudiencesFilterAndSorting = R.pipe(
-    R.values,
-    R.filter((n) => n.subaudience_audience === audienceId),
-    R.sort((a, b) => a.subaudience_name.localeCompare(b.subaudience_name)),
-  );
-  return subaudiencesFilterAndSorting(subaudiences);
 };
 
 const filterComchecks = (comchecks, audienceId) => {
@@ -420,29 +363,17 @@ const filterComchecks = (comchecks, audienceId) => {
 
 const select = (state, ownProps) => {
   const { id: exerciseId, audienceId } = ownProps;
-  const exercise = R.prop(exerciseId, state.referential.entities.exercises);
+  const browser = storeBrowser(state);
+  const exercise = browser.getExercise(exerciseId);
   const audience = R.prop(audienceId, state.referential.entities.audiences);
-  const audiences = filterAudiences(state.referential.entities.audiences, exerciseId);
-  const subaudiences = filterSubaudiences(state.referential.entities.subaudiences, audienceId);
+  const audiences = exercise.getAudiences();
   const comchecks = filterComchecks(state.referential.entities.comchecks, audienceId);
-  const stateCurrentSubaudience = R.path(
-    ['exercise', exerciseId, 'audience', audienceId, 'current_subaudience'],
-    state.screen,
-  );
-  const subaudienceId = stateCurrentSubaudience === undefined && subaudiences.length > 0
-    ? R.head(subaudiences).subaudience_id
-    : stateCurrentSubaudience;
-  const subaudience = subaudienceId
-    ? R.find((a) => a.subaudience_id === subaudienceId)(subaudiences)
-    : undefined;
   return {
     exerciseId,
     exercise,
     audienceId,
     audience,
     audiences,
-    subaudience,
-    subaudiences,
     comchecks,
     users: state.referential.entities.users,
     organizations: state.referential.entities.organizations,
@@ -454,7 +385,6 @@ export default R.compose(
     fetchGroups,
     fetchUsers,
     fetchAudiences,
-    fetchSubaudiences,
     fetchOrganizations,
     fetchComchecks,
   }),

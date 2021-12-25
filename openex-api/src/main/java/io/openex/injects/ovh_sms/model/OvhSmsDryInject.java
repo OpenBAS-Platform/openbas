@@ -18,10 +18,12 @@ public class OvhSmsDryInject extends DryInject<OvhSmsContent> {
     @Convert(converter = OvhSmsContentConverter.class)
     private OvhSmsContent content;
 
+    @Override
     public OvhSmsContent getContent() {
         return content;
     }
 
+    @Override
     public void setContent(OvhSmsContent content) {
         this.content = content;
     }

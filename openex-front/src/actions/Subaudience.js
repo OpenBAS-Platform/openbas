@@ -36,6 +36,11 @@ export const addSubaudience = (exerciseId, audienceId, data) => (dispatch) => {
   return postReferential(schema.subaudience, uri, data)(dispatch);
 };
 
+export const updateAudienceUsers = (audienceId, data) => (dispatch) => {
+  const uri = `/api/audiences/${audienceId}/users`;
+  return putReferential(schema.audience, uri, data)(dispatch);
+};
+
 export const deleteSubaudience = (exerciseId, audienceId, subaudienceId) => (
   dispatch,
 ) => {

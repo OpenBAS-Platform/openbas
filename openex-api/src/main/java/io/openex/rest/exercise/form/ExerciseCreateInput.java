@@ -3,7 +3,6 @@ package io.openex.rest.exercise.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
@@ -22,11 +21,9 @@ public class ExerciseCreateInput {
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 
-    @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_start_date")
     private Date start;
 
-    @NotNull(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_end_date")
     private Date end;
 

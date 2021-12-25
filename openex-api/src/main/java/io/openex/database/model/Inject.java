@@ -24,6 +24,10 @@ import static java.util.Optional.ofNullable;
 @DiscriminatorColumn(name = "inject_type")
 public abstract class Inject<T> extends Injection<T> implements Base {
 
+    public enum STATUS {
+        SUCCESS
+    }
+
     @Id
     @Column(name = "inject_id")
     @GeneratedValue(generator = "UUID")
@@ -98,11 +102,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
 
-    @Deprecated
-    @Column(name = "inject_date")
-    @JsonProperty("inject_date")
-    private Date date;
-
     @Transient
     private InjectReportingRepository<T> statusRepository;
 
@@ -115,25 +114,19 @@ public abstract class Inject<T> extends Injection<T> implements Base {
                 .reduce(Long::sum).orElse(0L);
     }
 
-    @JsonProperty("inject_date")
-    public Date getDate() {
-        Inject<?> dependsOnInject = getDependsOn();
-        long duration = ofNullable(getDependsDuration()).orElse(0L);
-        Date start = dependsOnInject == null ? getExercise().getStart() : dependsOnInject.getDate();
-        return Date.from(start.toInstant().plusSeconds(duration));
-    }
-
-    @Deprecated
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     @JsonIgnore
-    public Date accelerateDate(Date beginFrom, int speed) {
+    private Date computeInjectDate(int speed) {
         Inject<?> dependsOnInject = getDependsOn();
         long duration = ofNullable(getDependsDuration()).orElse(0L) / speed;
-        Date start = dependsOnInject == null ? beginFrom : dependsOnInject.getDate();
+        Date dependingStart = dependsOnInject == null
+                ? getExercise().getStart() : dependsOnInject.computeInjectDate(speed);
+        Date start = ofNullable(dependingStart).orElse(new Date());
         return Date.from(start.toInstant().plusSeconds(duration));
+    }
+
+    @JsonProperty("inject_date")
+    public Date getDate() {
+        return computeInjectDate(1);
     }
 
     @JsonIgnore
@@ -261,10 +254,19 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.dependsDuration = dependsDuration;
     }
 
-    public abstract void setContent(T content);
+    @JsonIgnore
+    protected abstract DryInject<T> toDry();
 
     @JsonIgnore
-    public abstract DryInject<T> toDryInject(Dryrun run, Date from, int speed);
+    public DryInject<T> toDryInject(Dryrun run, int speed) {
+        DryInject<T> dryInject = toDry();
+        dryInject.setTitle(getTitle());
+        dryInject.setType(getType());
+        dryInject.setContent(getContent());
+        dryInject.setRun(run);
+        dryInject.setDate(computeInjectDate(speed));
+        return dryInject;
+    }
 
     @Override
     @JsonProperty("inject_audiences")
@@ -279,9 +281,5 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @Override
     public boolean isGlobalInject() {
         return isAllAudiences();
-    }
-
-    public enum STATUS {
-        SUCCESS
     }
 }

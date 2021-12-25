@@ -2,7 +2,6 @@ package io.openex.injects.manual.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.DryInject;
-import io.openex.database.model.Dryrun;
 import io.openex.database.model.Inject;
 import io.openex.injects.manual.ManualExecutor;
 import io.openex.injects.manual.converter.ManualContentConverter;
@@ -12,7 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import java.util.Date;
 
 @Entity
 @DiscriminatorValue("openex_manual")
@@ -23,6 +21,7 @@ public class ManualInject extends Inject<ManualContent> {
     @JsonProperty("inject_content")
     private ManualContent content;
 
+    @Override
     public ManualContent getContent() {
         return content;
     }
@@ -38,7 +37,7 @@ public class ManualInject extends Inject<ManualContent> {
     }
 
     @Override
-    public DryInject<ManualContent> toDryInject(Dryrun run, Date from, int speed) {
+    public DryInject<ManualContent> toDry() {
         throw new UnsupportedOperationException("Manual inject cannot be converted to dryinject");
     }
 }

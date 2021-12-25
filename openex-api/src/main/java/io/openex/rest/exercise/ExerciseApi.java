@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.*;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
+import static java.time.Instant.now;
 
 @RestController
 @RolesAllowed(ROLE_USER)
@@ -27,7 +29,6 @@ public class ExerciseApi<T> extends RestBehavior {
     // region repositories
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
-    private ObjectiveRepository objectiveRepository;
     private AudienceRepository audienceRepository;
     private InjectRepository<T> injectRepository;
     private ExerciseLogRepository exerciseLogRepository;
@@ -82,36 +83,8 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @Autowired
-    public void setObjectiveRepository(ObjectiveRepository objectiveRepository) {
-        this.objectiveRepository = objectiveRepository;
-    }
-
-    @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
-    }
-    // endregion
-
-    // region objectives
-    @GetMapping("/api/exercises/{exerciseId}/objectives")
-    public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
-        return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
-    }
-
-    @PostMapping("/api/exercises/{exerciseId}/objectives")
-    public Objective createObjective(@PathVariable String exerciseId, @Valid @RequestBody ObjectiveCreateInput createObjectiveInput) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        Objective objective = new Objective();
-        objective.setUpdateAttributes(createObjectiveInput);
-        objective.setExercise(exercise);
-        return objectiveRepository.save(objective);
-    }
-    // endregion
-
-    // region audiences
-    @GetMapping("/api/exercises/{exerciseId}/audiences")
-    public Iterable<Audience> getAudiences(@PathVariable String exerciseId) {
-        return audienceRepository.findAll(AudienceSpecification.fromExercise(exerciseId));
     }
     // endregion
 
@@ -124,10 +97,12 @@ public class ExerciseApi<T> extends RestBehavior {
     @PostMapping("/api/exercises/{exerciseId}/injects")
     public Inject<T> createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput<T> input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        // Get common attributes
         Inject<T> inject = input.toInject();
+        // Set dependencies
         inject.setUser(currentUser());
         inject.setExercise(exercise);
-        inject.setDependsDuration(computeExerciseDuration(exercise, input.getDate()));
+        inject.setDependsOn(injectRepository.findById(input.getDependsOn()).orElse(null));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         return injectRepository.save(inject);
     }
@@ -163,9 +138,9 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/dryruns")
-    public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryRunCreateInput createRunInput) {
+    public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryRunCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        return dryrunService.provisionDryrun(exercise, createRunInput.getSpeed());
+        return dryrunService.provisionDryrun(exercise, input.getSpeed());
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
@@ -216,9 +191,18 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
+    @PutMapping("/api/exercises/{exerciseId}/start")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    public Exercise startExercise(@PathVariable String exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setStart(Date.from(now().plus(10, ChronoUnit.SECONDS))); // Start in 10 sec
+        return exerciseRepository.save(exercise);
+    }
+
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/information")
     @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInformationInput input) {
+    public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInfoInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
         exercise.setAnimationGroup(updateRelationResolver(input.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));

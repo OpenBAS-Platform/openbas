@@ -40,8 +40,9 @@ public class DryrunService<T> {
     }
 
     private List<? extends DryInject<T>> toDryInjects(List<Inject<T>> injects, Dryrun dryrun, int speed) {
-        Date now = new Date();
-        return injects.stream().map(inject -> inject.toDryInject(dryrun, now, speed)).toList();
+        return injects.stream()
+                .map(inject -> inject.toDryInject(dryrun, speed))
+                .toList();
     }
 
     private Dryrun createDryRun(Exercise exercise, int speed) {
@@ -59,7 +60,6 @@ public class DryrunService<T> {
         Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
         Dryrun dryrun = createDryRun(exercise, speed);
         List<? extends DryInject<T>> dryInjects = toDryInjects(injects, dryrun, speed);
-        // Create the dryrun and associated injects
         dryInjectRepository.saveAll(dryInjects);
         return dryrun;
     }
