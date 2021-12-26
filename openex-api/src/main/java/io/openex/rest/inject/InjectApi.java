@@ -96,11 +96,11 @@ public class InjectApi<T> extends RestBehavior {
         return executor.execute(injection);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Inject<T> updateInject(@PathVariable String exerciseId,
-                                  @PathVariable String injectId, @Valid @RequestBody InjectInput<T> input) {
+                                  @PathVariable String injectId,
+                                  @Valid @RequestBody InjectInput<T> input) {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setUpdateAttributes(input);
         inject.setContent(input.getContent());
@@ -116,7 +116,8 @@ public class InjectApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
-    public Inject<T> createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput<T> input) {
+    public Inject<T> createInject(@PathVariable String exerciseId,
+                                  @Valid @RequestBody InjectInput<T> input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Get common attributes
         Inject<T> inject = input.toInject();
@@ -130,17 +131,16 @@ public class InjectApi<T> extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteInject(@PathVariable String injectId) {
         injectRepository.deleteById(injectId);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
-    public Inject<T> updateInjectActivation(@PathVariable String injectId, @Valid @RequestBody InjectUpdateActivationInput input) {
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject<T> updateInjectActivation(@PathVariable String injectId,
+                                            @Valid @RequestBody InjectUpdateActivationInput input) {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());
         return injectRepository.save(inject);

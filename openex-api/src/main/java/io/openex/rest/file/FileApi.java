@@ -54,7 +54,8 @@ public class FileApi extends RestBehavior {
 
     @GetMapping("/api/documents")
     public List<Document> documents() {
-        return documentRepository.findAll(DocumentSpecification.onlyMinio(), Sort.by(Sort.Direction.DESC, "id"));
+        Sort sorting = Sort.by(Sort.Direction.DESC, "id");
+        return documentRepository.findAll(DocumentSpecification.onlyMinio(), sorting);
     }
 
     @GetMapping("/api/documents/{documentId}/tags")
@@ -64,14 +65,16 @@ public class FileApi extends RestBehavior {
     }
 
     @PutMapping("/api/documents/{documentId}/tags")
-    public Document documentTags(@PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
+    public Document documentTags(@PathVariable String documentId,
+                                 @RequestBody DocumentTagUpdateInput input) {
         Document document = documentRepository.findById(documentId).orElseThrow();
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
     }
 
     @PutMapping("/api/documents/{documentId}")
-    public Document updateDocumentInformation(@PathVariable String documentId, @Valid @RequestBody DocumentUpdateInput input) {
+    public Document updateDocumentInformation(@PathVariable String documentId,
+                                              @Valid @RequestBody DocumentUpdateInput input) {
         Document document = documentRepository.findById(documentId).orElseThrow();
         document.setUpdateAttributes(input);
         return documentRepository.save(document);

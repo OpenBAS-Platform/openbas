@@ -6,9 +6,13 @@ import io.openex.database.repository.ExerciseRepository;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
 import java.util.Optional;
+
+import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.database.model.User.ROLE_PLANER;
 
 public class ExerciseSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
@@ -24,6 +28,11 @@ public class ExerciseSecurityExpressionRoot extends SecurityExpressionRoot imple
     @SuppressWarnings("unused")
     public boolean isExercisePlanner(String exerciseId) {
         User principal = (User) this.getPrincipal();
+        boolean hasBypass = principal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .anyMatch(s -> s.equals(ROLE_PLANER) || s.equals(ROLE_ADMIN));
+        if (hasBypass) {
+            return true;
+        }
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<User> planners = exercise.getPlanners();
         Optional<User> planner = planners.stream()
@@ -34,6 +43,11 @@ public class ExerciseSecurityExpressionRoot extends SecurityExpressionRoot imple
     @SuppressWarnings("unused")
     public boolean isExerciseObserver(String exerciseId) {
         User principal = (User) this.getPrincipal();
+        boolean hasBypass = principal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .anyMatch(s -> s.equals(ROLE_ADMIN));
+        if (hasBypass) {
+            return true;
+        }
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<User> planners = exercise.getObservers();
         Optional<User> planner = planners.stream()

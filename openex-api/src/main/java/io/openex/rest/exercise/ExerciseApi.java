@@ -2,7 +2,9 @@ package io.openex.rest.exercise;
 
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
-import io.openex.database.specification.*;
+import io.openex.database.specification.ComcheckSpecification;
+import io.openex.database.specification.DryRunSpecification;
+import io.openex.database.specification.ExerciseLogSpecification;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
@@ -18,10 +20,10 @@ import java.util.Date;
 import java.util.List;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.database.model.User.*;
+import static io.openex.database.model.User.ROLE_PLANER;
+import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static java.time.Instant.now;
-import static org.springframework.util.StringUtils.hasLength;
 
 @RestController
 @RolesAllowed(ROLE_USER)
@@ -83,7 +85,8 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/logs")
-    public ExerciseLog createLog(@PathVariable String exerciseId, @Valid @RequestBody LogCreateInput createLogInput) {
+    public ExerciseLog createLog(@PathVariable String exerciseId,
+                                 @Valid @RequestBody LogCreateInput createLogInput) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         ExerciseLog log = new ExerciseLog();
         log.setUpdateAttributes(createLogInput);
@@ -101,13 +104,15 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/dryruns")
-    public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryRunCreateInput input) {
+    public Dryrun createDryrun(@PathVariable String exerciseId,
+                               @Valid @RequestBody DryRunCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         return dryrunService.provisionDryrun(exercise, input.getSpeed());
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
-    public Dryrun dryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
+    public Dryrun dryrun(@PathVariable String exerciseId,
+                         @PathVariable String dryrunId) {
         Specification<Dryrun> filters = DryRunSpecification
                 .fromExercise(exerciseId).and(DryRunSpecification.id(dryrunId));
         return dryRunRepository.findOne(filters).orElseThrow();
@@ -119,7 +124,8 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
-    public List<DryInject<?>> dryrunInjects(@PathVariable String exerciseId, @PathVariable String dryrunId) {
+    public List<DryInject<?>> dryrunInjects(@PathVariable String exerciseId,
+                                            @PathVariable String dryrunId) {
         return dryrun(exerciseId, dryrunId).getInjects();
     }
     // endregion
@@ -131,14 +137,16 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exercise}/comchecks/{comcheck}")
-    public Comcheck comcheck(@PathVariable String exercise, @PathVariable String comcheck) {
+    public Comcheck comcheck(@PathVariable String exercise,
+                             @PathVariable String comcheck) {
         Specification<Comcheck> filters = ComcheckSpecification
                 .fromExercise(exercise).and(ComcheckSpecification.id(comcheck));
         return comcheckRepository.findOne(filters).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exercise}/comchecks/{comcheck}/statuses")
-    public List<ComcheckStatus> comcheckStatuses(@PathVariable String exercise, @PathVariable String comcheck) {
+    public List<ComcheckStatus> comcheckStatuses(@PathVariable String exercise,
+                                                 @PathVariable String comcheck) {
         return comcheck(exercise, comcheck).getComcheckStatus();
     }
     // endregion
@@ -153,44 +161,41 @@ public class ExerciseApi<T> extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/start")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise startExercise(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setStart(Date.from(now().plus(10, ChronoUnit.SECONDS))); // Start in 10 sec
         return exerciseRepository.save(exercise);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/information")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInfoInput input) {
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise updateExerciseInformation(@PathVariable String exerciseId,
+                                              @Valid @RequestBody ExerciseUpdateInfoInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
         exercise.setAnimationGroup(updateRelationResolver(input.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));
         return exerciseRepository.save(exercise);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/image")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseImage(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateImageInput input) {
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise updateExerciseImage(@PathVariable String exerciseId,
+                                        @Valid @RequestBody ExerciseUpdateImageInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setImage(documentRepository.findById(input.getImageId()).orElse(null));
         return exerciseRepository.save(exercise);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @DeleteMapping("/api/exercises/{exerciseId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteExercise(@PathVariable String exerciseId) {
         exerciseRepository.deleteById(exerciseId);
     }
 
-    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @GetMapping("/api/exercises/{exerciseId}")
-    @PostAuthorize("hasRole('" + ROLE_ADMIN + "') OR isExerciseObserver(#exerciseId)")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
     public Exercise exercise(@PathVariable String exerciseId) {
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }

@@ -89,7 +89,8 @@ public class UserApi extends RestBehavior {
 
     @RolesAllowed(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}/password")
-    public User changePassword(@PathVariable String userId, @Valid @RequestBody PasswordInput input) {
+    public User changePassword(@PathVariable String userId,
+                               @Valid @RequestBody PasswordInput input) {
         User user = userRepository.findById(userId).orElseThrow();
         user.setPassword(userService.encodeUserPassword(input.getPassword()));
         return userRepository.save(user);

@@ -76,7 +76,8 @@ public class ComcheckApi extends RestBehavior {
 
     @RolesAllowed(ROLE_PLANER)
     @PostMapping("/api/exercises/{exerciseId}/comchecks")
-    public Comcheck communicationCheck(@PathVariable String exerciseId, @Valid @RequestBody ComcheckInput comCheck) {
+    public Comcheck communicationCheck(@PathVariable String exerciseId,
+                                       @Valid @RequestBody ComcheckInput comCheck) {
         // 01. Create the comcheck and get the ID
         Comcheck check = new Comcheck();
         check.setStart(new Date());

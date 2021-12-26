@@ -8,6 +8,7 @@ import io.openex.database.specification.ObjectiveSpecification;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.objective.form.ObjectiveCreateInput;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -38,7 +39,9 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/objectives")
-    public Objective createObjective(@PathVariable String exerciseId, @Valid @RequestBody ObjectiveCreateInput input) {
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Objective createObjective(@PathVariable String exerciseId,
+                                     @Valid @RequestBody ObjectiveCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Objective objective = new Objective();
         objective.setUpdateAttributes(input);

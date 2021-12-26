@@ -42,7 +42,8 @@ public class GroupApi extends RestBehavior {
 
     @RolesAllowed(ROLE_PLANER)
     @PutMapping("/api/groups/{groupId}")
-    public Group updateExercise(@PathVariable String groupId, @Valid @RequestBody GroupUpdateInput groupInput) {
+    public Group updateExercise(@PathVariable String groupId,
+                                @Valid @RequestBody GroupUpdateInput groupInput) {
         Group group = groupRepository.findById(groupId).orElseThrow();
         Spliterator<User> userSpliterator = userRepository.findAllById(groupInput.getUserIds()).spliterator();
         group.setUsers(stream(userSpliterator, false).collect(Collectors.toList()));
