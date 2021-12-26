@@ -167,7 +167,6 @@ class IndexExerciseDryrun extends Component {
 
   render() {
     const { classes } = this.props;
-    const dryrunId = R.propOr('', 'dryrun_id', this.props.dryrun);
     const dryrunDate = R.propOr('', 'dryrun_date', this.props.dryrun);
     const dryrunFinished = R.propOr(
       false,

@@ -239,11 +239,6 @@ class IndexExecution extends Component {
                   'inject_audiences',
                   inject,
                 );
-                const injectSubaudiences = R.propOr(
-                  [],
-                  'inject_subaudiences',
-                  inject,
-                );
                 const injectInProgress = R.path(['inject_status', 'status_name'], inject)
                   === 'PENDING';
                 const injectIcon = injectInProgress ? (
@@ -404,7 +399,6 @@ IndexExecution.propTypes = {
 
 const filterInjectsPending = (state, { id }) => {
   const injects = storeBrowser(state).getExercise(id).getInjects();
-  console.log(injects);
   const injectsFilterAndSorting = R.pipe(
     R.filter((n) => {
       const statusName = n.inject_status?.status_name;
