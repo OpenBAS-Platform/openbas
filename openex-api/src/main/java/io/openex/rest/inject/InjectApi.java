@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
+import static io.openex.database.model.User.ROLE_PLANER;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
@@ -79,7 +79,7 @@ public class InjectApi<T> extends RestBehavior {
                 .map(Contract::toRest).collect(Collectors.toList());
     }
 
-    @RolesAllowed({ROLE_PLANIFICATEUR})
+    @RolesAllowed({ROLE_PLANER})
     @GetMapping("/api/injects/try/{injectId}")
     public Execution execute(@PathVariable String injectId) {
         Optional<Inject<T>> injectOptional = injectRepository.findById(injectId);
@@ -98,7 +98,7 @@ public class InjectApi<T> extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Inject<T> updateInject(@PathVariable String exerciseId,
                                   @PathVariable String injectId, @Valid @RequestBody InjectInput<T> input) {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
@@ -132,14 +132,14 @@ public class InjectApi<T> extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public void deleteInject(@PathVariable String injectId) {
         injectRepository.deleteById(injectId);
     }
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Inject<T> updateInjectActivation(@PathVariable String injectId, @Valid @RequestBody InjectUpdateActivationInput input) {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());

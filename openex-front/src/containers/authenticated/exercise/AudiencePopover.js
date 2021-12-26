@@ -14,7 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Slide from '@material-ui/core/Slide';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
-import { updateAudience } from '../../../actions/Audience';
+import { updateAudience, updateAudienceActivation } from '../../../actions/Audience';
 
 i18nRegister({
   fr: {
@@ -60,7 +60,7 @@ class AudiencePopover extends Component {
   }
 
   submitDisable() {
-    this.props.updateAudience(
+    this.props.updateAudienceActivation(
       this.props.exerciseId,
       this.props.audience.audience_id,
       { audience_enabled: false },
@@ -78,7 +78,7 @@ class AudiencePopover extends Component {
   }
 
   submitEnable() {
-    this.props.updateAudience(
+    this.props.updateAudienceActivation(
       this.props.exerciseId,
       this.props.audience.audience_id,
       { audience_enabled: true },
@@ -188,6 +188,7 @@ AudiencePopover.propTypes = {
   exerciseId: PropTypes.string,
   audience: PropTypes.object,
   updateAudience: PropTypes.func,
+  updateAudienceActivation: PropTypes.func,
 };
 
-export default connect(null, { updateAudience })(AudiencePopover);
+export default connect(null, { updateAudience, updateAudienceActivation })(AudiencePopover);

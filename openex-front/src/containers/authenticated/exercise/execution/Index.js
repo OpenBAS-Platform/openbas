@@ -239,8 +239,7 @@ class IndexExecution extends Component {
                   'inject_audiences',
                   inject,
                 );
-                const injectInProgress = R.path(['inject_status', 'status_name'], inject)
-                  === 'PENDING';
+                const injectInProgress = R.path(['inject_status', 'status_name'], inject) === 'PENDING';
                 const injectIcon = injectInProgress ? (
                   <CircularProgress size={20} color="primary" />
                 ) : (

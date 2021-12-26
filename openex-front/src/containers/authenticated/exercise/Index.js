@@ -19,27 +19,19 @@ import { withStyles } from '@material-ui/core/styles';
 import {
   CenterFocusStrongOutlined,
   EmailOutlined,
-  EventOutlined,
-  ExpandLess,
-  ExpandMore,
   GroupOutlined,
   InputOutlined,
   KeyboardArrowDownOutlined,
-  LayersOutlined,
   SmsOutlined,
 } from '@material-ui/icons';
-import Collapse from '@material-ui/core/Collapse';
 import { green, red } from '@material-ui/core/colors';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
-import { dateFormat } from '../../../utils/Time';
 import { downloadFile } from '../../../actions/File';
 import InjectView from './scenario/InjectView';
-import AudienceView from './audiences/audience/AudienceView';
 import ObjectiveView from './objective/ObjectiveView';
 import AudiencePopover from './AudiencePopover';
 import AudiencesPopover from './AudiencesPopover';
-import ScenarioPopover from './ScenarioPopover';
 import MiniMap from './MiniMap';
 import { storeBrowser } from '../../../actions/Schema';
 
@@ -53,8 +45,6 @@ i18nRegister({
     'You do not have any audiences in this exercise.':
       "Vous n'avez aucune audience dans cet exercice.",
     Scenario: 'Scénario',
-    'You do not have any events in this exercise.':
-      "Vous n'avez aucun événement dans cet exercice.",
     'Inject view': "Vue de l'injection",
     'Incident view': "Vue de l'incident",
     'Objective view': "Vue de l'objectif",
@@ -89,7 +79,6 @@ class IndexExercise extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      eventsOpened: {},
       incidentsOpened: {},
       openViewInject: false,
       currentInject: {},
@@ -116,12 +105,6 @@ class IndexExercise extends Component {
       default:
         return <InputOutlined />;
     }
-  }
-
-  handleToggleEvent(eventId) {
-    const { eventsOpened } = this.state;
-    eventsOpened[eventId] = eventsOpened[eventId] !== null ? !eventsOpened[eventId] : true;
-    this.setState({ eventsOpened });
   }
 
   handleCloseViewEvent() {
@@ -196,7 +179,6 @@ class IndexExercise extends Component {
     const { classes } = this.props;
     const exerciseUsers = this.props.exercise.getUsers();
     const exerciseObjectives = this.props.exercise.getObjectives();
-    const subaudiences = this.props.exercise.getSubAudiences();
     return (
       <div>
         <Grid container spacing={3}>
@@ -411,154 +393,8 @@ class IndexExercise extends Component {
                 </Button>
               </DialogActions>
             </Dialog>
-            <Dialog
-              open={this.state.openViewAudience}
-              onClose={this.handleCloseViewAudience.bind(this)}
-              maxWidth="md"
-              fullWidth={true}
-            >
-              <DialogTitle>
-                {R.propOr('-', 'audience_name', this.state.currentAudience)}
-              </DialogTitle>
-              <DialogContent>
-                <AudienceView
-                  audience={this.state.currentAudience}
-                  subaudiences={subaudiences}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="outlined"
-                  onClick={this.handleCloseViewAudience.bind(this)}
-                >
-                  <T>Close</T>
-                </Button>
-              </DialogActions>
-            </Dialog>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="h5" style={{ float: 'left' }}>
-              <T>Scenario</T>
-            </Typography>
-            <ScenarioPopover
-              exerciseId={this.props.exerciseId}
-              injects={this.props.exercise?.getInjects()}
-              exerciseStartDate={this.props.exercise?.exercise_start_date}
-              exerciseEndDate={this.props.exercise?.exercise_end_date}
-              userCanUpdate={this.props.exercise?.user_can_update}
-            />
-            <div className="clearfix" />
-            {this.props.events.length === 0 && (
-              <div className={classes.empty}>
-                <T>You do not have any events in this exercise.</T>
-              </div>
-            )}
-            <List>
-              {this.props.events.map((event) => {
-                const incidents = event.getIncidents();
-                const nestedItems = incidents.map((incident) => {
-                  const incidentId = incident?.incident_id || Math.random();
-                  const incidentTitle = incident?.incident_title || '-';
-                  const incidentStory = incident?.incident_story || '-';
-                  const incidentInjects = incident.getInjects();
-                  const nestedItems2 = incidentInjects.map((inject) => {
-                    const injectId = R.propOr(Math.random(), 'inject_id', inject);
-                    const injectTitle = R.propOr('-', 'inject_title', inject);
-                    const injectType = R.propOr('-', 'inject_type', inject);
-                    const injectDate = R.propOr(undefined, 'inject_date', inject);
-                    const injectEnabled = R.propOr(false, 'inject_enabled', inject);
-                    return (
-                      <ListItem
-                        key={injectId}
-                        button={true}
-                        divider={true}
-                        onClick={this.handleOpenViewInject.bind(this, inject)}
-                        className={classes.nested2}
-                      >
-                        <ListItemIcon
-                          className={
-                            injectEnabled ? classes.enabled : classes.disabled
-                          }
-                        >
-                          {this.selectIcon(injectType)}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={injectTitle}
-                          secondary={dateFormat(injectDate)}
-                        />
-                      </ListItem>
-                    );
-                  });
-                  return (
-                    <div key={incidentId}>
-                      <ListItem
-                        divider={true}
-                        button={true}
-                        onClick={this.handleToggleIncident.bind(
-                          this,
-                          incident.incident_id,
-                        )}
-                        className={classes.nested}
-                      >
-                        <ListItemIcon>
-                          <LayersOutlined />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={incidentTitle}
-                          secondary={incidentStory}
-                        />
-                        {this.state.incidentsOpened[incident.incident_id]
-                        === true ? (
-                          <ExpandLess />
-                          ) : (
-                          <ExpandMore />
-                          )}
-                      </ListItem>
-                      <Collapse
-                        in={
-                          this.state.incidentsOpened[incident.incident_id]
-                          === true
-                        }
-                      >
-                        <List>{nestedItems2}</List>
-                      </Collapse>
-                    </div>
-                  );
-                });
-                return (
-                  <div key={event.event_id}>
-                    <ListItem
-                      divider={true}
-                      button={true}
-                      onClick={this.handleToggleEvent.bind(
-                        this,
-                        event.event_id,
-                      )}
-                    >
-                      <ListItemIcon>
-                        <EventOutlined />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={event.event_title}
-                        secondary={event.event_description}
-                      />
-                      {this.state.eventsOpened[event.event_id] === true ? (
-                        <ExpandLess />
-                      ) : (
-                        <ExpandMore />
-                      )}
-                    </ListItem>
-                    <Collapse
-                      in={this.state.eventsOpened[event.event_id] === true}
-                    >
-                      <List>{nestedItems}</List>
-                    </Collapse>
-                  </div>
-                );
-              })}
-            </List>
-          </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <Typography variant="h5">
               <T>Map of players and injects</T>
             </Typography>
@@ -594,7 +430,6 @@ class IndexExercise extends Component {
               downloadAttachment={this.downloadAttachment.bind(this)}
               inject={this.state.currentInject}
               audiences={this.props.audiences}
-              subaudiences={subaudiences}
             />
           </DialogContent>
           <DialogActions>
@@ -677,8 +512,6 @@ IndexExercise.propTypes = {
   exerciseId: PropTypes.string,
   objectives: PropTypes.array,
   audiences: PropTypes.array,
-  events: PropTypes.array,
-  incidents: PropTypes.object,
   exercise: PropTypes.object,
   intl: PropTypes.object,
   downloadFile: PropTypes.func,
@@ -689,17 +522,12 @@ const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const browser = storeBrowser(state);
   const exercise = browser.getExercise(exerciseId);
-  const events = exercise.getEvents();
   const audiences = exercise.getAudiences();
-  return {
-    exerciseId, exercise, audiences, events,
-  };
+  return { exerciseId, exercise, audiences };
 };
 
 export default R.compose(
-  connect(select, {
-    downloadFile,
-  }),
+  connect(select, { downloadFile }),
   withStyles(styles),
   injectIntl,
 )(IndexExercise);

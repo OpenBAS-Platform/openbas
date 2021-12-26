@@ -5,12 +5,10 @@ import io.openex.database.repository.*;
 import io.openex.database.specification.*;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.inject.form.InjectInput;
 import io.openex.service.DryrunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -146,7 +144,7 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region exercises
-    @RolesAllowed(ROLE_PLANIFICATEUR)
+    @RolesAllowed(ROLE_PLANER)
     @PostMapping("/api/exercises")
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         Exercise exercise = new Exercise();
@@ -157,7 +155,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/start")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Exercise startExercise(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setStart(Date.from(now().plus(10, ChronoUnit.SECONDS))); // Start in 10 sec
@@ -166,7 +164,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/information")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInfoInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
@@ -176,7 +174,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/image")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseImage(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateImageInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setImage(documentRepository.findById(input.getImageId()).orElse(null));
@@ -185,7 +183,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @DeleteMapping("/api/exercises/{exerciseId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public void deleteExercise(@PathVariable String exerciseId) {
         exerciseRepository.deleteById(exerciseId);
     }

@@ -32,6 +32,11 @@ export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
   return putReferential(schema.audience, uri, data)(dispatch);
 };
 
+export const updateAudienceActivation = (exerciseId, audienceId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/activation`;
+  return putReferential(schema.audience, uri, data)(dispatch);
+};
+
 export const updateAudienceUsers = (exerciseId, audienceId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/users`;
   return putReferential(schema.audience, uri, data)(dispatch);

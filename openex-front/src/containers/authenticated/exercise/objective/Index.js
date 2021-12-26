@@ -13,22 +13,15 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogActions from '@material-ui/core/DialogActions';
 import { withStyles } from '@material-ui/core/styles';
-import {
-  CenterFocusStrongOutlined,
-  CenterFocusWeakOutlined,
-} from '@material-ui/icons';
-import Collapse from '@material-ui/core/Collapse';
+import { CenterFocusStrongOutlined } from '@material-ui/icons';
 import Typography from '@material-ui/core/Typography';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 import { fetchObjectives } from '../../../../actions/Objective';
-import { fetchSubobjectives } from '../../../../actions/Subobjective';
 import { fetchGroups } from '../../../../actions/Group';
 import ObjectivePopover from './ObjectivePopover';
-import SubobjectivePopover from './SubobjectivePopover';
 import CreateObjective from './CreateObjective';
 import ObjectiveView from './ObjectiveView';
-import SubobjectiveView from './SubobjectiveView';
 
 i18nRegister({
   fr: {
@@ -36,7 +29,6 @@ i18nRegister({
     'You do not have any objectives in this exercise.':
       "Vous n'avez aucun objectif dans cet exercice.",
     'Objective view': "Vue de l'objectif",
-    'Subobjective view': 'Vue du sous-objectif',
   },
 });
 
@@ -66,14 +58,11 @@ class IndexObjective extends Component {
     this.state = {
       openObjective: false,
       currentObjective: {},
-      openSubobjective: false,
-      currentSubobjective: {},
     };
   }
 
   componentDidMount() {
     this.props.fetchObjectives(this.props.exerciseId);
-    this.props.fetchSubobjectives(this.props.exerciseId);
     this.props.fetchGroups();
   }
 
@@ -83,17 +72,6 @@ class IndexObjective extends Component {
 
   handleCloseObjective() {
     this.setState({ openObjective: false });
-  }
-
-  handleOpenSubobjective(subobjective) {
-    this.setState({
-      currentSubobjective: subobjective,
-      openSubobjective: true,
-    });
-  }
-
-  handleCloseSubobjective() {
-    this.setState({ openSubobjective: false });
   }
 
   render() {
@@ -112,49 +90,7 @@ class IndexObjective extends Component {
           </div>
         )}
         <List>
-          {objectives.map((objective) => {
-            const subobjectives = R.values(this.props.subobjectives)
-              .filter((sub) => sub.subobjective_objective === objective.objective_id);
-            const nestedItems = subobjectives.map(
-              (subobjective) => {
-                const subobjectiveTitle = R.propOr('-', 'subobjective_title', subobjective);
-                const subobjectiveDescription = R.propOr('-', 'subobjective_description', subobjective);
-                const subobjectivePriority = R.propOr('-', 'subobjective_priority', subobjective);
-                return (
-                  <ListItem
-                    key={subobjective.subobjective_id}
-                    onClick={this.handleOpenSubobjective.bind(
-                      this,
-                      subobjective,
-                    )}
-                    button={true}
-                    divider={true}
-                    className={classes.nested}
-                  >
-                    <ListItemIcon>
-                      <CenterFocusWeakOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={subobjectiveTitle}
-                      secondary={subobjectiveDescription}
-                    />
-                    <div className={classes.priority}>
-                      {objective.objective_priority}.{subobjectivePriority}
-                    </div>
-                    {userCanUpdate && (
-                      <ListItemSecondaryAction>
-                        <SubobjectivePopover
-                          exerciseId={exerciseId}
-                          objectiveId={objective.objective_id}
-                          subobjective={subobjective}
-                        />
-                      </ListItemSecondaryAction>
-                    )}
-                  </ListItem>
-                );
-              },
-            );
-            return (
+          {objectives.map((objective) => (
               <div key={objective.objective_id}>
                 <ListItem
                   onClick={this.handleOpenObjective.bind(this, objective)}
@@ -180,12 +116,8 @@ class IndexObjective extends Component {
                     </ListItemSecondaryAction>
                   )}
                 </ListItem>
-                <Collapse in={true}>
-                  <List>{nestedItems}</List>
-                </Collapse>
               </div>
-            );
-          })}
+          ))}
         </List>
         <Dialog
           open={this.state.openObjective}
@@ -208,31 +140,6 @@ class IndexObjective extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          open={this.state.openSubobjective}
-          onClose={this.handleCloseSubobjective.bind(this)}
-          fullWidth={true}
-          maxWidth="xs"
-        >
-          <DialogTitle>
-            {R.propOr(
-              '-',
-              'subobjective_title',
-              this.state.currentSubobjective,
-            )}
-          </DialogTitle>
-          <DialogContent>
-            <SubobjectiveView subobjective={this.state.currentSubobjective} />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="outlined"
-              onClick={this.handleCloseSubobjective.bind(this)}
-            >
-              <T>Close</T>
-            </Button>
-          </DialogActions>
-        </Dialog>
         {userCanUpdate && (
           <CreateObjective exerciseId={exerciseId} />
         )}
@@ -244,9 +151,7 @@ class IndexObjective extends Component {
 IndexObjective.propTypes = {
   exerciseId: PropTypes.string,
   objectives: PropTypes.array,
-  subobjectives: PropTypes.object,
   fetchObjectives: PropTypes.func.isRequired,
-  fetchSubobjectives: PropTypes.func.isRequired,
 };
 
 const filterObjectives = (objectives, exerciseId) => {
@@ -258,33 +163,14 @@ const filterObjectives = (objectives, exerciseId) => {
   return objectivesFilterAndSorting(objectives);
 };
 
-const filterSubobjectives = (subobjectives) => {
-  const subobjectivesSorting = R.pipe(
-    R.values,
-    R.sortWith([R.ascend(R.prop('subobjective_priority'))]),
-    R.indexBy(R.prop('subobjective_id')),
-  );
-  return subobjectivesSorting(subobjectives);
-};
-
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const exercise = state.referential.entities.exercises[ownProps.id];
   const objectives = filterObjectives(state.referential.entities.objectives, exerciseId);
-  const subobjectives = filterSubobjectives(state.referential.entities.subobjectives);
-  return {
-    exerciseId,
-    exercise,
-    objectives,
-    subobjectives,
-  };
+  return { exerciseId, exercise, objectives };
 };
 
 export default R.compose(
-  connect(select, {
-    fetchObjectives,
-    fetchSubobjectives,
-    fetchGroups,
-  }),
+  connect(select, { fetchObjectives, fetchGroups }),
   withStyles(styles),
 )(IndexObjective);

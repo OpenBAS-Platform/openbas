@@ -7,6 +7,7 @@ import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.database.specification.AudienceSpecification;
+import io.openex.rest.audience.form.AudienceUpdateActivationInput;
 import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.audience.form.CreateAudienceInput;
 import io.openex.rest.helper.RestBehavior;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
-import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
+import static io.openex.database.model.User.ROLE_PLANER;
 import static io.openex.database.model.User.ROLE_USER;
 
 @RestController
@@ -50,7 +51,7 @@ public class AudienceApi extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PostMapping("/api/exercises/{exerciseId}/audiences")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Audience createAudience(@PathVariable String exerciseId, @Valid @RequestBody CreateAudienceInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Audience audience = new Audience();
@@ -61,18 +62,27 @@ public class AudienceApi extends RestBehavior {
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @DeleteMapping("/api/exercises/{exerciseId}/audiences/{audienceId}")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public void deleteAudience(@PathVariable String audienceId) {
         audienceRepository.deleteById(audienceId);
     }
 
     @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
     @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/users")
-    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
     public Audience updateAudienceUsers(@PathVariable String audienceId, @Valid @RequestBody UpdateUsersAudienceInput input) {
         Audience audience = audienceRepository.findById(audienceId).orElseThrow();
         Iterable<User> audienceUsers = userRepository.findAllById(input.getUserIds());
         audience.setUsers(fromIterable(audienceUsers));
+        return audienceRepository.save(audience);
+    }
+
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
+    @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/activation")
+    @PostAuthorize("hasRole('" + ROLE_PLANER + "') OR isExercisePlanner(#exerciseId)")
+    public Audience updateAudienceActivation(@PathVariable String audienceId, @Valid @RequestBody AudienceUpdateActivationInput input) {
+        Audience audience = audienceRepository.findById(audienceId).orElseThrow();
+        audience.setEnabled(input.isEnabled());
         return audienceRepository.save(audience);
     }
 }

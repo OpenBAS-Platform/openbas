@@ -58,9 +58,6 @@ export const arrayOfExercises = new schema.Array(exercise);
 export const objective = new schema.Entity('objectives', {}, { idAttribute: 'objective_id' });
 export const arrayOfObjectives = new schema.Array(objective);
 
-export const subobjective = new schema.Entity('subobjectives', {}, { idAttribute: 'subobjective_id' });
-export const arrayOfSubobjectives = new schema.Array(subobjective);
-
 export const comcheck = new schema.Entity('comchecks', {}, { idAttribute: 'comcheck_id' });
 export const arrayOfComchecks = new schema.Array(comcheck);
 
@@ -76,14 +73,8 @@ export const arrayOfDryinjects = new schema.Array(dryinject);
 export const audience = new schema.Entity('audiences', {}, { idAttribute: 'audience_id' });
 export const arrayOfAudiences = new schema.Array(audience);
 
-export const subaudience = new schema.Entity('subaudiences', {}, { idAttribute: 'subaudience_id' });
-export const arrayOfSubaudiences = new schema.Array(subaudience);
-
 export const event = new schema.Entity('events', {}, { idAttribute: 'event_id' });
 export const arrayOfEvents = new schema.Array(event);
-
-export const incident = new schema.Entity('incidents', {}, { idAttribute: 'incident_id' });
-export const arrayOfIncidents = new schema.Array(incident);
 
 export const inject = new schema.Entity('injects', {}, { idAttribute: 'inject_id' });
 export const arrayOfInjects = new schema.Array(inject);
@@ -93,12 +84,8 @@ export const statistics = new schema.Entity('statistics', {}, { idAttribute: 'pl
 export const log = new schema.Entity('logs', {}, { idAttribute: 'log_id' });
 export const arrayOfLogs = new schema.Array(log);
 
-export const outcome = new schema.Entity('outcomes', {}, { idAttribute: 'outcome_id' });
-export const arrayOfOutcomes = new schema.Array(outcome);
-
 token.define({ token_user: user });
 user.define({ user_organization: organization });
-incident.define({ incident_type: incidentType });
 
 export const storeBrowser = (state) => ({
   _buildUser(usr) {
@@ -110,25 +97,14 @@ export const storeBrowser = (state) => ({
       },
     };
   },
-  _buildIncident(inc) {
-    return {
-      ...inc,
-      getType: () => state.referential.entities.incidents_types[inc.incident_type],
-      getInjects: (sortBy = 'inject_date') => {
-        const all = R.values(state.referential.entities.injects);
-        const injects = R.filter((n) => n.inject_incident === inc.incident_id, all);
-        return R.sortWith([R.ascend(R.prop(sortBy))])(injects);
-      },
-    };
-  },
-  _buildEvent(ev) {
+  _buildAudience(aud) {
     const browser = this;
     return {
-      ...ev,
-      getIncidents: () => {
-        const all = R.values(state.referential.entities.incidents);
-        return all.filter((i) => i.incident_event === ev.event_id)
-          .map((inc) => browser._buildIncident(inc));
+      ...aud,
+      getUsers: () => {
+        const all = R.values(state.referential.entities.users);
+        return R.filter((n) => aud.audience_users.includes(n.user_id), all)
+          .map((u) => browser._buildUser(u));
       },
     };
   },
@@ -137,43 +113,24 @@ export const storeBrowser = (state) => ({
     return {
       ...ex,
       exercise_id: id,
-      getInjects: (sortBy = 'inject_date') => {
+      getInjects(sortBy = 'inject_date') {
         const all = R.values(state.referential.entities.injects);
         const injects = R.filter((n) => n.inject_exercise === id, all);
         return R.sortWith([R.ascend(R.prop(sortBy))])(injects);
       },
-      getObjectives: (sortBy = 'objective_priority') => {
+      getObjectives(sortBy = 'objective_priority') {
         const all = R.values(state.referential.entities.objectives);
         const objectives = R.filter((n) => n.objective_exercise === id, all);
         return R.sortWith([R.ascend(R.prop(sortBy))])(objectives);
       },
-      getAudiences: (sortBy = 'audience_name') => {
+      getAudiences(sortBy = 'audience_name') {
         const all = R.values(state.referential.entities.audiences);
-        const audiences = R.filter((n) => n.audience_exercise === id, all);
+        const audiences = R.filter((n) => n.audience_exercise === id, all)
+          .map((a) => browser._buildAudience(a));
         return R.sortWith([R.ascend(R.prop(sortBy))])(audiences);
       },
-      getSubAudiences: (sortBy = 'subaudience_name') => {
-        const all = R.values(state.referential.entities.subaudiences);
-        const subaudiences = R.filter((n) => n.subaudience_exercise === id, all);
-        return R.sortWith([R.ascend(R.prop(sortBy))])(subaudiences);
-      },
-      getEvents: (sortBy = 'event_order') => {
-        const all = R.values(state.referential.entities.events);
-        const events = R.filter((n) => n.event_exercise === id, all)
-          .map((e) => browser._buildEvent(e));
-        return R.sortWith([R.ascend(R.prop(sortBy))])(events);
-      },
-      getIncidents: (sortBy = 'incident_order') => {
-        const all = R.values(state.referential.entities.incidents);
-        const incidents = R.filter((n) => n.incident_exercise === id, all)
-          .map((e) => browser._buildIncident(e));
-        return R.sortWith([R.ascend(R.prop(sortBy))])(incidents);
-      },
-      getUsers: () => {
-        const allSub = R.values(state.referential.entities.subaudiences);
-        return R.filter((n) => n.subaudience_exercise === id, allSub)
-          .map((s) => s.subaudience_users)
-          .flat().map((userId) => state.referential.entities.users[userId]);
+      getUsers() {
+        return this.getAudiences().map((a) => a.getUsers()).flat();
       },
     };
   },

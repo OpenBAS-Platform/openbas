@@ -20,7 +20,7 @@ public class User implements Base, OAuth2User {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
-    public static final String ROLE_PLANIFICATEUR = "ROLE_PLANIFICATEUR";
+    public static final String ROLE_PLANER = "ROLE_PLANIFICATEUR";
 
     @Id
     @Column(name = "user_id")
@@ -304,7 +304,7 @@ public class User implements Base, OAuth2User {
             roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
         }
         if (isAdmin() || isPlanificateur()) {
-            roles.add(new SimpleGrantedAuthority(ROLE_PLANIFICATEUR));
+            roles.add(new SimpleGrantedAuthority(ROLE_PLANER));
         }
         return roles;
     }

@@ -69,10 +69,6 @@ export const redirectToAudiences = (exerciseId) => (dispatch) => {
   dispatch(push(`/private/exercise/${exerciseId}/audiences`));
 };
 
-export const redirectToEvent = (exerciseId, eventId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/scenario/${eventId}`));
-};
-
 export const redirectToChecks = (exerciseId) => (dispatch) => {
   dispatch(push(`/private/exercise/${exerciseId}/checks`));
 };

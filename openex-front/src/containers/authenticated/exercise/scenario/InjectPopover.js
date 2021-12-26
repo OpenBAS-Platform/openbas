@@ -19,7 +19,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';
 import { downloadFile } from '../../../../actions/File';
-import { redirectToEvent } from '../../../../actions/Application';
 import {
   addInject,
   updateInject,
@@ -189,9 +188,7 @@ class InjectPopover extends Component {
   }
 
   onInjectTypeChange(event, index, value) {
-    this.setState({
-      type: value,
-    });
+    this.setState({ type: value });
   }
 
   handleOpenDelete() {
@@ -667,14 +664,12 @@ InjectPopover.propTypes = {
   fetchInjectTypesExerciseSimple: PropTypes.func,
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
-  eventId: PropTypes.string,
   inject: PropTypes.object,
   injectAudiencesIds: PropTypes.array,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   tryInject: PropTypes.func,
-  redirectToEvent: PropTypes.func,
   injectDone: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node,
@@ -692,7 +687,6 @@ export default connect(null, {
   deleteInject,
   injectDone,
   tryInject,
-  redirectToEvent,
   downloadFile,
   fetchInjectTypesExerciseSimple,
 })(InjectPopover);

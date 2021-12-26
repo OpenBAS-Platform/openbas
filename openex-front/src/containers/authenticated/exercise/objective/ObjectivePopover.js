@@ -20,9 +20,7 @@ import {
   updateObjective,
   deleteObjective,
 } from '../../../../actions/Objective';
-import { addSubobjective } from '../../../../actions/Subobjective';
 import ObjectiveForm from './ObjectiveForm';
-import SubobjectiveForm from './SubobjectiveForm';
 import { submitForm } from '../../../../utils/Action';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -220,34 +218,6 @@ class ObjectivePopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          open={this.state.openCreateSubobjective}
-          TransitionComponent={Transition}
-          onClose={this.handleCloseCreateSubobjective.bind(this)}
-        >
-          <DialogTitle>
-            <T>Create a new subobjective</T>
-          </DialogTitle>
-          <DialogContent>
-            <SubobjectiveForm
-              onSubmit={this.onSubmitCreateSubobjective.bind(this)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="outlined"
-              onClick={this.handleCloseCreateSubobjective.bind(this)}
-            >
-              <T>Cancel</T>
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => submitForm('subobjectiveForm')}
-            >
-              <T>Create</T>
-            </Button>
-          </DialogActions>
-        </Dialog>
       </div>
     );
   }
@@ -258,7 +228,6 @@ ObjectivePopover.propTypes = {
   fetchObjective: PropTypes.func,
   updateObjective: PropTypes.func,
   deleteObjective: PropTypes.func,
-  addSubobjective: PropTypes.func,
   objective: PropTypes.object,
   children: PropTypes.node,
 };
@@ -267,5 +236,4 @@ export default connect(null, {
   fetchObjective,
   updateObjective,
   deleteObjective,
-  addSubobjective,
 })(ObjectivePopover);

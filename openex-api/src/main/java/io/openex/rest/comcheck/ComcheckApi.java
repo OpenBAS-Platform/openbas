@@ -22,7 +22,7 @@ import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
-import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
+import static io.openex.database.model.User.ROLE_PLANER;
 import static java.util.List.of;
 import static java.util.stream.StreamSupport.stream;
 
@@ -74,7 +74,7 @@ public class ComcheckApi extends RestBehavior {
         return comcheckStatusRepository.save(comcheckStatus);
     }
 
-    @RolesAllowed(ROLE_PLANIFICATEUR)
+    @RolesAllowed(ROLE_PLANER)
     @PostMapping("/api/exercises/{exerciseId}/comchecks")
     public Comcheck communicationCheck(@PathVariable String exerciseId, @Valid @RequestBody ComcheckInput comCheck) {
         // 01. Create the comcheck and get the ID

@@ -40,7 +40,6 @@ import { storeBrowser } from '../../../../actions/Schema';
 
 i18nRegister({
   fr: {
-    'This event is empty.': 'Cet événement est vide.',
     'This incident is empty.': 'Cet incident est vide.',
     Title: 'Titre',
     Date: 'Date',
@@ -133,7 +132,6 @@ class Index extends Component {
   }
 
   reloadEvent() {
-    this.props.fetchIncidents(this.props.exerciseId);
     this.props.fetchInjects(this.props.exerciseId);
   }
 
@@ -180,17 +178,14 @@ class Index extends Component {
     return this.props.downloadFile(fileId, fileName);
   }
 
-  renderInjects(rawInjects) {
-    const {
-      classes, exerciseId, eventId,
-    } = this.props;
+  renderInjects(exercise, rawInjects) {
+    const { classes, exerciseId } = this.props;
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || JSON.stringify(n.inject_content).toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const injects = rawInjects.filter((i) => filterByKeyword(i));
-    const eventIsUpdatable = R.propOr(true, 'user_can_update', this.props.event);
     const userCanUpdate = this.props.exercise?.user_can_update;
     return (
       <div>
@@ -201,28 +196,17 @@ class Index extends Component {
         )}
         <List>
           {injects.map((inject) => {
-            // Setup variables
-            const injectId = R.propOr(Math.random(), 'inject_id', inject);
-            const injectTitle = R.propOr('-', 'inject_title', inject);
-            const injectDescription = R.propOr(
-              '-',
-              'inject_description',
-              inject,
-            );
-            const injectDate = R.prop('inject_date', inject);
-            const injectType = R.propOr('-', 'inject_type', inject);
-            const injectAudiences = R.propOr([], 'inject_audiences', inject);
-            const injectUsersNumber = R.propOr(
-              '-',
-              'inject_users_number',
-              inject,
-            );
-            const injectEnabled = R.propOr(true, 'inject_enabled', inject);
-            const injectTypeInHere = R.propOr(
-              false,
-              injectType,
-              this.props.inject_types,
-            );
+            const injectId = inject?.inject_id ?? Math.random();
+            const injectTitle = inject?.inject_title ?? '-';
+            const injectDescription = inject?.inject_description ?? '-';
+            const injectDate = inject?.inject_date;
+            const injectType = inject?.inject_type ?? '-';
+            const injectAudiences = inject?.inject_audiences ?? [];
+            const injectUsersNumber = inject?.inject_users_number ?? '-';
+            const impactedUsers = inject.inject_all_audiences
+              ? exercise.getUsers().length : injectUsersNumber;
+            const injectEnabled = inject?.inject_enabled ?? true;
+            const injectTypeInHere = this.props.inject_types[injectType] ?? false;
             const injectDisabled = !injectTypeInHere;
             // Return the dom
             return (
@@ -250,7 +234,7 @@ class Index extends Component {
                     {dateFormat(injectDate)}
                   </div>
                   <div className={classes.inject_audiences}>
-                    {injectUsersNumber.toString()} <T>players</T>
+                    {impactedUsers.toString()} <T>players</T>
                   </div>
                   <div className="clearfix" />
                 </div>
@@ -258,7 +242,6 @@ class Index extends Component {
                   <InjectPopover
                     type={Constants.INJECT_SCENARIO}
                     exerciseId={exerciseId}
-                    eventId={eventId}
                     inject={inject}
                     injectAudiencesIds={injectAudiences}
                     audiences={this.props.audiences}
@@ -298,7 +281,7 @@ class Index extends Component {
             </DialogActions>
           </DialogActions>
         </Dialog>
-        {eventIsUpdatable && userCanUpdate && (
+        {userCanUpdate && (
           <CreateInject
             exerciseId={exerciseId}
             inject_types={this.props.inject_types}
@@ -311,9 +294,8 @@ class Index extends Component {
   }
 
   render() {
-    const { classes, event, injects } = this.props;
-    if (event) {
-      return (
+    const { classes, exercise, injects } = this.props;
+    return (
         <div className={classes.container}>
           <div>
             <Typography variant="h5" style={{ float: 'left' }}>
@@ -325,11 +307,9 @@ class Index extends Component {
             <div className="clearfix" />
           </div>
           <div className="clearfix" />
-          {this.renderInjects(injects)}
+          {this.renderInjects(exercise, injects)}
         </div>
-      );
-    }
-    return <div className={classes.container}> &nbsp; </div>;
+    );
   }
 }
 
@@ -355,13 +335,11 @@ const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const exercise = browser.getExercise(exerciseId);
   const audiences = exercise.getAudiences();
-  const event = exercise.getEvents();
   const injects = exercise.getInjects();
   // endregion
   return {
     exerciseId,
     exercise,
-    event,
     audiences,
     injects,
     inject_types: state.referential.entities.inject_types,

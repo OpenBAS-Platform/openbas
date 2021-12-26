@@ -14,7 +14,7 @@ import javax.validation.Valid;
 import java.util.Spliterator;
 import java.util.stream.Collectors;
 
-import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
+import static io.openex.database.model.User.ROLE_PLANER;
 import static io.openex.database.model.User.ROLE_USER;
 import static java.util.stream.StreamSupport.stream;
 
@@ -40,7 +40,7 @@ public class GroupApi extends RestBehavior {
         return groupRepository.findAll();
     }
 
-    @RolesAllowed(ROLE_PLANIFICATEUR)
+    @RolesAllowed(ROLE_PLANER)
     @PutMapping("/api/groups/{groupId}")
     public Group updateExercise(@PathVariable String groupId, @Valid @RequestBody GroupUpdateInput groupInput) {
         Group group = groupRepository.findById(groupId).orElseThrow();

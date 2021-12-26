@@ -28,7 +28,7 @@ public class Audience implements Base {
 
     @Column(name = "audience_enabled")
     @JsonProperty("audience_enabled")
-    private boolean enabled;
+    private boolean enabled = true;
 
     @ManyToOne
     @JoinColumn(name = "audience_exercise")

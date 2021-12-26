@@ -30,6 +30,7 @@ import {
 import { addComcheck } from '../../../../../actions/Comcheck';
 import {
   updateAudience,
+  updateAudienceActivation,
   downloadExportAudience,
   deleteAudience,
   copyAudienceToExercise,
@@ -206,7 +207,7 @@ class AudiencePopover extends Component {
   }
 
   submitDisable() {
-    this.props.updateAudience(
+    this.props.updateAudienceActivation(
       this.props.exerciseId,
       this.props.audience.audience_id,
       { audience_enabled: false },
@@ -224,7 +225,7 @@ class AudiencePopover extends Component {
   }
 
   submitEnable() {
-    this.props.updateAudience(
+    this.props.updateAudienceActivation(
       this.props.exerciseId,
       this.props.audience.audience_id,
       { audience_enabled: true },
@@ -586,6 +587,7 @@ AudiencePopover.propTypes = {
   exerciseId: PropTypes.string,
   deleteAudience: PropTypes.func,
   updateAudience: PropTypes.func,
+  updateAudienceActivation: PropTypes.func,
   copyAudienceToExercise: PropTypes.func,
   downloadExportAudience: PropTypes.func,
   redirectToAudiences: PropTypes.func,
@@ -607,6 +609,7 @@ export default R.compose(
     updatePlanificateurUserForAudience,
     fetchExercises,
     updateAudience,
+    updateAudienceActivation,
     copyAudienceToExercise,
     downloadExportAudience,
     deleteAudience,

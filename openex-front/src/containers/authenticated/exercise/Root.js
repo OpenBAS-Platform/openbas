@@ -33,7 +33,6 @@ import IndexExerciseSettings from './settings/Index';
 import UserPopover from '../UserPopover';
 import NotFound from '../../anonymous/NotFound';
 import { fetchObjectives } from '../../../actions/Objective';
-import { fetchSubobjectives } from '../../../actions/Subobjective';
 import { fetchAudiences } from '../../../actions/Audience';
 import { fetchExerciseInjects } from '../../../actions/Inject';
 import { fetchGroups } from '../../../actions/Group';
@@ -247,7 +246,6 @@ export default R.compose(
     redirectToExercise,
     redirectToHome,
     fetchObjectives,
-    fetchSubobjectives,
     fetchAudiences,
     fetchExerciseInjects,
     fetchExercise,
