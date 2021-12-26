@@ -21,32 +21,6 @@ const screen = (state = Immutable({}), action) => {
       return state.set('saved', false);
     }
 
-    case Constants.APPLICATION_SELECT_SUBAUDIENCE: {
-      return state.setIn(
-        [
-          'exercise',
-          action.payload.exercise_id,
-          'audience',
-          action.payload.audience_id,
-          'current_subaudience',
-        ],
-        action.payload.subaudience_id,
-      );
-    }
-
-    case Constants.APPLICATION_SELECT_INCIDENT: {
-      return state.setIn(
-        [
-          'exercise',
-          action.payload.exercise_id,
-          'event',
-          action.payload.event_id,
-          'current_incident',
-        ],
-        action.payload.incident_id,
-      );
-    }
-
     case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_UNFOLDING: {
       return state.setIn(
         ['navbar_left_unfolding'],

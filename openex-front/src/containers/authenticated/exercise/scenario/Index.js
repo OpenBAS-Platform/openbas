@@ -40,11 +40,9 @@ import { storeBrowser } from '../../../../actions/Schema';
 
 i18nRegister({
   fr: {
-    'This incident is empty.': 'Cet incident est vide.',
     Title: 'Titre',
     Date: 'Date',
     Author: 'Auteur',
-    'linked subobjective(s)': 'sous-objectif(s) lié(s)',
   },
 });
 
@@ -60,10 +58,6 @@ const styles = () => ({
     float: 'left',
     fontSize: '13px',
     textTransform: 'uppercase',
-  },
-  subobjectives: {
-    float: 'left',
-    fontSize: '12px',
   },
   empty: {
     marginTop: 30,
@@ -267,7 +261,6 @@ class Index extends Component {
               downloadAttachment={this.downloadAttachment.bind(this)}
               inject={this.state.currentInject}
               audiences={this.props.audiences}
-              subaudiences={this.props.subaudiences}
             />
           </DialogContent>
           <DialogActions>
@@ -286,7 +279,6 @@ class Index extends Component {
             exerciseId={exerciseId}
             inject_types={this.props.inject_types}
             audiences={this.props.audiences}
-            subaudiences={this.props.subaudiences}
           />
         )}
       </div>

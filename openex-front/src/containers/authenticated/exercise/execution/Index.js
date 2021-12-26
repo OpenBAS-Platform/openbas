@@ -294,7 +294,6 @@ class IndexExecution extends Component {
                   downloadAttachment={this.downloadAttachment.bind(this)}
                   inject={this.state.currentInject}
                   audiences={this.props.audiences}
-                  subaudiences={this.props.subaudiences}
                 />
               </DialogContent>
               <DialogActions>
@@ -384,7 +383,6 @@ IndexExecution.propTypes = {
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.array,
   inject_types: PropTypes.object,
   injectsPending: PropTypes.array,
   injectsProcessed: PropTypes.array,

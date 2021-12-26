@@ -265,7 +265,6 @@ class CreateInject extends Component {
 CreateInject.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.array,
   inject_types: PropTypes.object,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,

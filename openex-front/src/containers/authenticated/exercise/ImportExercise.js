@@ -92,7 +92,6 @@ class CreateExercise extends Component {
     super(props);
     this.state = {
       openAudience: false,
-      openSubaudience: false,
       openAddUsers: false,
       openInject: false,
       searchTerm: '',
@@ -102,12 +101,10 @@ class CreateExercise extends Component {
       exerciseNameExist: false,
       exerciseData: null,
       audienceData: null,
-      subaudienceData: null,
       eventData: null,
       incidentData: null,
       usersData: null,
       incidentType: null,
-      subaudienceUsersIds: [],
       file: {
         file_id: '0',
       },
@@ -332,18 +329,6 @@ class CreateExercise extends Component {
     });
   }
 
-  onGlobalSubmit(data) {
-    // eslint-disable-next-line no-param-reassign
-    data.inject_date = this.convertDateInject(
-      `${data.inject_date_only} ${data.inject_time}`,
-    );
-    // eslint-disable-next-line no-param-reassign
-    delete data.inject_date_only;
-    // eslint-disable-next-line no-param-reassign
-    delete data.inject_time;
-    this.setState({ injectData: data });
-  }
-
   // eslint-disable-next-line consistent-return,class-methods-use-this
   convertDateInject(dateToConvert) {
     const regexDateFr = RegExp(
@@ -369,12 +354,6 @@ class CreateExercise extends Component {
     }
   }
 
-  onContentAttachmentAdd(file) {
-    this.setState({
-      injectAttachments: R.append(file, this.state.injectAttachments),
-    });
-  }
-
   onContentAttachmentDelete(name, event) {
     event.stopPropagation();
     this.setState({
@@ -385,26 +364,6 @@ class CreateExercise extends Component {
     });
   }
 
-  onContentSubmit(data) {
-    const { injectData } = this.state;
-    // eslint-disable-next-line no-param-reassign
-    data.attachments = this.state.injectAttachments;
-    injectData.inject_content = data;
-    this.setState({ injectData });
-  }
-
-  onAudiencesChange(data) {
-    const { injectData } = this.state;
-    injectData.inject_audiences = data;
-    this.setState({ injectData });
-  }
-
-  onSubaudiencesChange(data) {
-    const { injectData } = this.state;
-    injectData.inject_subaudiences = data;
-    this.setState({ injectData });
-  }
-
   handleNext() {
     if (this.state.stepIndex === 0) {
       // eslint-disable-next-line react/no-string-refs
@@ -413,10 +372,6 @@ class CreateExercise extends Component {
       // eslint-disable-next-line react/no-string-refs
       this.refs.contentForm.getWrappedInstance().submit();
     }
-  }
-
-  onInjectTypeChange(event, index, value) {
-    this.setState({ type: value });
   }
 
   selectContent() {
@@ -598,8 +553,6 @@ CreateExercise.propTypes = {
   addAudience: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchAudience: PropTypes.func,
-  addSubaudience: PropTypes.func,
-  fetchSubaudiences: PropTypes.func,
   addEvent: PropTypes.func,
   addIncident: PropTypes.func,
   addInject: PropTypes.func,

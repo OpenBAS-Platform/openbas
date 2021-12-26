@@ -31,8 +31,6 @@ Transition.displayName = 'TransitionSlide';
 i18nRegister({
   fr: {
     'Update the objective': "Modifier l'objectif",
-    'Create a new subobjective': 'Créer un nouveau sous-objectif',
-    'Add a subobjective': 'Ajouter un sous-objectif',
     'Do you want to delete this objective?':
       'Souhaitez-vous supprimer cet objectif ?',
   },
@@ -41,12 +39,7 @@ i18nRegister({
 class ObjectivePopover extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      openDelete: false,
-      openEdit: false,
-      openCreateSubobjective: false,
-      anchorEl: null,
-    };
+    this.state = { openDelete: false, openEdit: false, anchorEl: null };
   }
 
   handlePopoverOpen(event) {
@@ -86,36 +79,8 @@ class ObjectivePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteObjective(
-      this.props.exerciseId,
-      this.props.objective.objective_id,
-    );
+    this.props.deleteObjective(this.props.exerciseId, this.props.objective.objective_id);
     this.handleCloseDelete();
-  }
-
-  handleOpenCreateSubobjective() {
-    this.setState({ openCreateSubobjective: true });
-    this.handlePopoverClose();
-  }
-
-  handleCloseCreateSubobjective() {
-    this.setState({ openCreateSubobjective: false });
-  }
-
-  onSubmitCreateSubobjective(data) {
-    return this.props
-      .addSubobjective(
-        this.props.exerciseId,
-        this.props.objective.objective_id,
-        data,
-      )
-      .then(() => {
-        this.props.fetchObjective(
-          this.props.exerciseId,
-          this.props.objective.objective_id,
-        );
-      })
-      .then(() => this.handleCloseCreateSubobjective());
   }
 
   render() {
@@ -147,9 +112,6 @@ class ObjectivePopover extends Component {
           onClose={this.handlePopoverClose.bind(this)}
           style={{ marginTop: 50 }}
         >
-          <MenuItem onClick={this.handleOpenCreateSubobjective.bind(this)}>
-            <T>Add a subobjective</T>
-          </MenuItem>
           <MenuItem
             onClick={this.handleOpenEdit.bind(this)}
             disabled={!objectiveIsUpdatable}

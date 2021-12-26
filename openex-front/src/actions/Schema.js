@@ -24,9 +24,6 @@ export const changeDuration = new schema.Object('change_duration');
 export const tag = new schema.Entity('tag', {}, { idAttribute: 'tag_id' });
 export const arrayOfTags = new schema.Array(tag);
 
-export const incidentType = new schema.Entity('incident_types', {}, { idAttribute: 'type_id' });
-export const arrayOfIncidentTypes = new schema.Array(incidentType);
-
 export const injectType = new schema.Entity('inject_types', {}, { idAttribute: 'type' });
 export const arrayOfInjectTypes = new schema.Array(injectType);
 

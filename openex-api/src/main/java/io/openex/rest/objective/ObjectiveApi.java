@@ -48,4 +48,10 @@ public class ObjectiveApi extends RestBehavior {
         objective.setExercise(exercise);
         return objectiveRepository.save(objective);
     }
+
+    @DeleteMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteObjective(@PathVariable String objectiveId) {
+        objectiveRepository.deleteById(objectiveId);
+    }
 }

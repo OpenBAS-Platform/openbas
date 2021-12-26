@@ -340,8 +340,6 @@ IndexAudience.propTypes = {
   organizations: PropTypes.object,
   audience: PropTypes.object,
   audiences: PropTypes.array,
-  subaudience: PropTypes.object,
-  subaudiences: PropTypes.array,
   comchecks: PropTypes.array,
   fetchUsers: PropTypes.func,
   fetchGroups: PropTypes.func,

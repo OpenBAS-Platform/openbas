@@ -208,7 +208,6 @@ UserPopover.propTypes = {
   updateUser: PropTypes.func,
   updateAudienceUsers: PropTypes.func,
   audience: PropTypes.object,
-  subaudience: PropTypes.object,
   organizations: PropTypes.object,
   children: PropTypes.node,
 };
