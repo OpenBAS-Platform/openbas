@@ -17,12 +17,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import {
-  EmailOutlined,
-  InputOutlined,
-  SmsOutlined,
-  ScheduleOutlined,
   CancelOutlined,
   DoneAllOutlined,
+  EmailOutlined,
+  InputOutlined,
+  ScheduleOutlined,
+  SmsOutlined,
 } from '@material-ui/icons';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -33,12 +33,13 @@ import { T } from '../../../../components/I18n';
 import Countdown from '../../../../components/Countdown';
 import { fetchGroups } from '../../../../actions/Group';
 import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchAllInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { downloadFile } from '../../../../actions/File';
 import ExercisePopover from './ExercisePopover';
 import InjectPopover from '../scenario/InjectPopover';
 import InjectView from '../scenario/InjectView';
 import InjectStatusView from './InjectStatusView';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -112,7 +113,7 @@ class IndexExecution extends Component {
     this.props.fetchAudiences(this.props.exerciseId);
     this.props.fetchInjectTypes();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchAllInjects(this.props.exerciseId, true);
+      this.props.fetchExerciseInjects(this.props.exerciseId, true);
     });
   }
 
@@ -275,17 +276,9 @@ class IndexExecution extends Component {
                       <ListItemSecondaryAction>
                         <InjectPopover
                           exerciseId={this.props.exerciseId}
-                          eventId={inject.inject_event}
-                          incidentId={inject.inject_incident.incident_id}
                           inject={inject}
-                          injectAudiencesIds={injectAudiences.map(
-                            (a) => a.audience_id,
-                          )}
-                          injectSubaudiencesIds={injectSubaudiences.map(
-                            (a) => a.subaudience_id,
-                          )}
+                          injectAudiencesIds={injectAudiences}
                           audiences={this.props.audiences}
-                          subaudiences={R.values(this.props.subaudiences)}
                           inject_types={this.props.inject_types}
                           location="run"
                         />
@@ -403,33 +396,36 @@ IndexExecution.propTypes = {
   injectsProcessed: PropTypes.array,
   nextInject: PropTypes.string,
   fetchGroups: PropTypes.func,
-  fetchAllInjects: PropTypes.func,
+  fetchExerciseInjects: PropTypes.func,
   fetchAudiences: PropTypes.func,
   fetchInjectTypes: PropTypes.func,
   downloadFile: PropTypes.func,
 };
 
-const filterInjectsPending = (state, ownProps) => {
-  const { injects } = state.referential.entities;
-  const { id: exerciseId } = ownProps;
+const filterInjectsPending = (state, { id }) => {
+  const injects = storeBrowser(state).getExercise(id).getInjects();
+  console.log(injects);
   const injectsFilterAndSorting = R.pipe(
-    R.values,
     R.filter((n) => {
-      const statusName = n.inject_status.status_name;
-      const identifiedInject = n.inject_exercise === exerciseId;
-      const isPendingInject = statusName === null || statusName === 'PENDING';
-      return identifiedInject && isPendingInject;
+      const statusName = n.inject_status?.status_name;
+      return statusName === undefined || statusName === 'PENDING';
     }),
     R.sortWith([R.ascend(R.prop('inject_date'))]),
   );
   return injectsFilterAndSorting(injects);
 };
 
-const nextInjectToExecute = (state, ownProps) => R.pipe(
-  R.filter((n) => n.inject_enabled),
-  R.head(),
-  R.propOr(undefined, 'inject_date'),
-)(filterInjectsPending(state, ownProps));
+const nextInjectToExecute = (state, ownProps) => {
+  const exercise = storeBrowser(state).getExercise(ownProps.id);
+  if (exercise.start_date === undefined) {
+    return undefined;
+  }
+  return R.pipe(
+    R.filter((n) => n.inject_enabled),
+    R.head(),
+    R.propOr(undefined, 'inject_date'),
+  )(filterInjectsPending(state, ownProps));
+};
 
 const filterInjectsProcessed = (state, ownProps) => {
   const { injects } = state.referential.entities;
@@ -438,9 +434,9 @@ const filterInjectsProcessed = (state, ownProps) => {
     R.values,
     R.filter(
       (n) => n.inject_exercise === exerciseId
-        && (n.inject_status.status_name === 'SUCCESS'
-          || n.inject_status.status_name === 'ERROR'
-          || n.inject_status.status_name === 'PARTIAL'),
+        && (n.inject_status?.status_name === 'SUCCESS'
+          || n.inject_status?.status_name === 'ERROR'
+          || n.inject_status?.status_name === 'PARTIAL'),
     ),
     R.sortWith([R.descend(R.prop('inject_date'))]),
   );
@@ -458,20 +454,14 @@ const filterAudiences = (state, ownProps) => {
   return audiencesFilterAndSorting(audiences);
 };
 
-const exerciseSelector = (state, ownProps) => {
-  const { id: exerciseId } = ownProps;
-  return R.prop(exerciseId, state.referential.entities.exercises);
-};
-
 const select = () => equalsSelector({
   // Prevent view to refresh is nothing as changed (Using reselect)
   exerciseId: (state, ownProps) => ownProps.id,
-  exercise: exerciseSelector,
+  exercise: (state, { id }) => storeBrowser(state).getExercise(id),
   injectsPending: filterInjectsPending,
   nextInject: nextInjectToExecute,
   injectsProcessed: filterInjectsProcessed,
   audiences: filterAudiences,
-  subaudiences: (state) => R.values(state.referential.entities.subaudiences),
   inject_types: (state) => state.referential.entities.inject_types,
 });
 
@@ -479,7 +469,7 @@ export default R.compose(
   connect(select, {
     fetchGroups,
     fetchAudiences,
-    fetchAllInjects,
+    fetchExerciseInjects,
     fetchInjectTypes,
     downloadFile,
   }),

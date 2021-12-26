@@ -98,7 +98,7 @@ class ExerciseForm extends Component {
                   ))}
                 </Select>
               )}
-              {!edit && (
+              {edit && (
                 <DateTimePicker
                   name="exercise_start_date"
                   fullWidth={true}
@@ -107,7 +107,7 @@ class ExerciseForm extends Component {
                   style={{ marginTop: 20 }}
                 />
               )}
-              {!edit && (
+              {edit && (
                 <DateTimePicker
                   name="exercise_end_date"
                   fullWidth={true}

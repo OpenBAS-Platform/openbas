@@ -143,10 +143,12 @@ class Index extends Component {
   }
 
   onUpdate(data) {
+    const start = data.exercise_start_date !== null ? dateToISO(data.exercise_start_date) : null;
+    const end = data.exercise_end_date !== null ? dateToISO(data.exercise_end_date) : null;
     const newData = R.pipe(
       // Need to convert date to ISO format with timezone
-      R.assoc('exercise_start_date', dateToISO(data.exercise_start_date)),
-      R.assoc('exercise_end_date', dateToISO(data.exercise_end_date)),
+      R.assoc('exercise_start_date', start),
+      R.assoc('exercise_end_date', end),
     )(data);
     return this.props.updateExercise(this.props.id, 'information', newData);
   }

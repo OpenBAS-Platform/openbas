@@ -1,6 +1,5 @@
 package io.openex.database.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MultiModelDeserializer;
@@ -26,8 +25,8 @@ public class Group implements Base {
     @JsonProperty("group_name")
     private String name;
 
-    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+    @JsonProperty("group_grants")
     private List<Grant> grants = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)

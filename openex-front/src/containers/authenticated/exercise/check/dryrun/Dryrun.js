@@ -194,7 +194,7 @@ class IndexExerciseDryrun extends Component {
           dryrun={this.props.dryrun}
           listenDeletionCall={this.cancelStreamEvent}
         />
-        <div className={classes.audience}>{dryrunId}</div>
+        <div className={classes.audience}>&nbsp;</div>
         <div className="clearfix" />
         <div className={classes.subtitle}>{dateFormat(dryrunDate)}</div>
         <div className={classes.state}>
