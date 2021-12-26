@@ -386,7 +386,6 @@ class InjectPopover extends Component {
       'user_can_delete',
       this.props.inject,
     );
-    const { userCanUpdate } = this.props;
     const initPipe = R.pipe(
       R.pick([
         'inject_title',
