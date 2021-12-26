@@ -43,11 +43,7 @@ const styles = {
 class InjectView extends Component {
   render() {
     const injectContent = R.propOr(null, 'inject_content', this.props.inject);
-    const injectDescription = R.propOr(
-      '',
-      'inject_description',
-      this.props.inject,
-    );
+    const injectDescription = this.props.inject?.inject_description ?? '';
     const injectFields = R.pipe(
       R.toPairs(),
       R.map((d) => ({ key: R.head(d), value: R.last(d) })),
@@ -116,9 +112,9 @@ class InjectView extends Component {
             </div>
           ) : (
             <List>
-              {this.props.inject.inject_audiences.map((data) => {
+              {this.props.inject.inject_audiences.map((id) => {
                 const audience = R.find(
-                  (a) => a.audience_id === data.audience_id,
+                  (a) => a.audience_id === id,
                 )(this.props.audiences);
                 const audienceId = R.propOr('-', 'audience_id', audience);
                 const audienceName = R.propOr('-', 'audience_name', audience);
@@ -132,35 +128,6 @@ class InjectView extends Component {
                   </ListItem>
                 );
               })}
-              {this.props.inject.inject_subaudiences.map((data) => {
-                const subaudience = R.find(
-                  (a) => a.subaudience_id === data.subaudience_id,
-                )(this.props.subaudiences);
-                const subaudienceId = R.propOr(
-                  data.subaudience_id,
-                  'subaudience_id',
-                  subaudience,
-                );
-                const audience = R.find(
-                  (a) => a.audience_id
-                    === subaudience.subaudience_audience.audience_id,
-                )(this.props.audiences);
-                const audienceName = R.propOr('-', 'audience_name', audience);
-                const subaudienceName = R.propOr(
-                  '-',
-                  'subaudience_name',
-                  subaudience,
-                );
-                const finalSubaudienceName = `[${audienceName}] ${subaudienceName}`;
-                return (
-                  <ListItem key={subaudienceId} divider={true}>
-                    <ListItemIcon>
-                      <GroupOutlined />
-                    </ListItemIcon>
-                    <ListItemText primary={finalSubaudienceName} />
-                  </ListItem>
-                );
-              })}
             </List>
           )}
         </div>
@@ -171,7 +138,6 @@ class InjectView extends Component {
 
 InjectView.propTypes = {
   inject: PropTypes.object,
-  subaudiences: PropTypes.array,
   audiences: PropTypes.array,
   downloadAttachment: PropTypes.func,
 };

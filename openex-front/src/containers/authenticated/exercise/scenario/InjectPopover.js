@@ -32,7 +32,6 @@ import {
 import InjectForm from './InjectForm';
 import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
-import CopyForm from './CopyForm';
 import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
@@ -57,7 +56,6 @@ i18nRegister({
       'Souhaitez-vous marquer cette injection comme réalisée ?',
     'Inject test result': "Résultat du test d'inject",
     Close: 'Fermer',
-    'Copy this inject': 'Copier cette injection',
   },
 });
 
@@ -75,7 +73,6 @@ class InjectPopover extends Component {
       openDisable: false,
       openEnable: false,
       openDone: false,
-      openCopy: false,
       openTry: false,
       openResult: false,
       type: undefined,
@@ -283,23 +280,6 @@ class InjectPopover extends Component {
     });
   }
 
-  handleOpenCopy() {
-    this.setState({
-      openCopy: true,
-    });
-    this.handlePopoverClose();
-  }
-
-  handleCloseCopy() {
-    this.setState({
-      openCopy: false,
-    });
-  }
-
-  submitFormCopy() {
-    this.refs.copyForm.submit();
-  }
-
   handleOpenDone() {
     this.setState({
       openDone: true,
@@ -316,59 +296,6 @@ class InjectPopover extends Component {
   submitDone() {
     this.props.injectDone(this.props.inject.inject_id);
     this.handleCloseDone();
-  }
-
-  onCopySubmit() {
-    /* const incident = R.find((i) => i.incident_id === data.incident_id)(
-      this.props.incidents,
-    );
-    const audiencesList = R.map(
-      (a) => a.audience_id,
-      this.props.inject.inject_audiences,
-    );
-    const subaudiencesList = R.map(
-      (a) => a.audience_id,
-      this.props.inject.inject_subaudiences,
-    );
-    const newInject = R.pipe(
-      R.dissoc('inject_id'),
-      R.dissoc('inject_event'),
-      R.dissoc('inject_exercise'),
-      R.dissoc('inject_incident'),
-      R.dissoc('inject_status'),
-      R.dissoc('inject_user'),
-      R.dissoc('inject_users_number'),
-      R.assoc('inject_title', `${this.props.inject.inject_title} (copy)`),
-      R.assoc('inject_audiences', audiencesList),
-      R.assoc('inject_subaudiences', subaudiencesList),
-    )(this.props.inject);
-    this.props
-      .addInject(
-        this.props.exerciseId,
-        incident.incident_event,
-        data.incident_id,
-        newInject,
-      )
-      .then(() => {
-        this.props
-          .fetchIncident(
-            this.props.exerciseId,
-            incident.incident_event,
-            data.incident_id,
-          )
-          .then(() => {
-            this.props.redirectToEvent(
-              this.props.exerciseId,
-              incident.incident_event,
-            );
-          });
-      });
-    this.props.selectIncident(
-      this.props.exerciseId,
-      incident.incident_event,
-      data.incident_id,
-    ); */
-    this.handleCloseCopy();
   }
 
   handleOpenTry() {
@@ -496,12 +423,6 @@ class InjectPopover extends Component {
             disabled={injectNotSupported || !injectIsUpdatable}
           >
             <T>Edit</T>
-          </MenuItem>
-          <MenuItem
-            onClick={this.handleOpenCopy.bind(this)}
-            disabled={!userCanUpdate || injectNotSupported || this.props.location === 'run'}
-          >
-            <T>Copy</T>
           </MenuItem>
           {injectEnabled ? (
             <MenuItem
@@ -682,36 +603,6 @@ class InjectPopover extends Component {
               onClick={this.submitDone.bind(this)}
             >
               <T>Done</T>
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
-          open={this.state.openCopy}
-          onClose={this.handleCloseCopy.bind(this)}
-        >
-          <DialogTitle>
-            <T>Copy this inject</T>
-          </DialogTitle>
-          <DialogContent>
-            <CopyForm
-              incidents={this.props.incidents}
-              onSubmit={this.onCopySubmit.bind(this)}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="outlined"
-              onClick={this.handleCloseCopy.bind(this)}
-            >
-              <T>Cancel</T>
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => submitForm('copyForm')}
-            >
-              <T>Copy</T>
             </Button>
           </DialogActions>
         </Dialog>
