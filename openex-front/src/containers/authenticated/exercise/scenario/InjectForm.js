@@ -5,11 +5,10 @@ import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import { TextField } from '../../../../../components/TextField';
-import { Select } from '../../../../../components/Select';
-import { DateTimePicker } from '../../../../../components/DateTimePicker';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { T } from '../../../../../components/I18n';
+import { TextField } from '../../../../components/TextField';
+import { Select } from '../../../../components/Select';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
 
 i18nRegister({
   fr: {
@@ -33,7 +32,7 @@ const validate = (values) => {
   const requiredFields = [
     'inject_title',
     'inject_description',
-    'inject_date',
+    'inject_depends_duration',
     'inject_type',
   ];
   requiredFields.forEach((field) => {
@@ -57,12 +56,12 @@ class InjectForm extends Component {
           <form id="injectForm" onSubmit={handleSubmit}>
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <TextField name="inject_title" fullWidth={true} label="Title" />
-              <DateTimePicker
-                name="inject_date"
-                fullWidth={true}
-                label={<T>Inject date</T>}
-                autoOk={true}
-                style={{ marginTop: 20 }}
+              <TextField
+                  name="inject_depends_duration"
+                  label={<T>Inject delay</T>}
+                  fullWidth={true}
+                  type="number"
+                  style={{ marginTop: 20 }}
               />
               <TextField
                 name="inject_description"

@@ -602,7 +602,6 @@ CreateExercise.propTypes = {
   fetchSubaudiences: PropTypes.func,
   addEvent: PropTypes.func,
   addIncident: PropTypes.func,
-  fetchIncidentTypes: PropTypes.func,
   addInject: PropTypes.func,
   fetchInjectTypesExerciseSimple: PropTypes.func,
   addFile: PropTypes.func,

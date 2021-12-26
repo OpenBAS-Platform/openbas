@@ -36,8 +36,8 @@ import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchAllInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { downloadFile } from '../../../../actions/File';
 import ExercisePopover from './ExercisePopover';
-import InjectPopover from '../scenario/event/InjectPopover';
-import InjectView from '../scenario/event/InjectView';
+import InjectPopover from '../scenario/InjectPopover';
+import InjectView from '../scenario/InjectView';
 import InjectStatusView from './InjectStatusView';
 
 const interval$ = interval(FIVE_SECONDS);

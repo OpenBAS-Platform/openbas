@@ -24,8 +24,8 @@ import IndexExerciseChecks from './check/Index';
 import RootExerciseDryrun from './check/dryrun/Root';
 import RootExerciseComcheck from './check/comcheck/Root';
 import IndexExerciseObjectives from './objective/Index';
-import IndexExerciseScenario from './scenario/Index';
-import RootExerciseScenarioEvent from './scenario/event/Root';
+import IndexExerciseEvent from './scenario/Index';
+import RootExerciseScenarioEvent from './scenario/Root';
 import IndexExerciseAudiences from './audiences/Index';
 import RootExerciseAudiencesAudience from './audiences/audience/Root';
 import IndexExerciseStatistics from './statistics/Index';
@@ -35,8 +35,6 @@ import NotFound from '../../anonymous/NotFound';
 import { fetchObjectives } from '../../../actions/Objective';
 import { fetchSubobjectives } from '../../../actions/Subobjective';
 import { fetchAudiences } from '../../../actions/Audience';
-import { fetchEvents } from '../../../actions/Event';
-import { fetchIncidents, fetchIncidentTypes } from '../../../actions/Incident';
 import { fetchAllInjects } from '../../../actions/Inject';
 import { fetchGroups } from '../../../actions/Group';
 import { fetchUsers } from '../../../actions/User';
@@ -73,14 +71,10 @@ const styles = (theme) => ({
 class RootExercise extends Component {
   componentDidMount() {
     this.props.fetchExercise(this.props.id);
-    this.props.fetchIncidentTypes();
     this.props.fetchUsers();
     this.props.fetchGroups();
     this.props.fetchObjectives(this.props.id);
-    this.props.fetchSubobjectives(this.props.id);
     this.props.fetchAudiences(this.props.id);
-    this.props.fetchEvents(this.props.id);
-    this.props.fetchIncidents(this.props.id);
     this.props.fetchAllInjects(this.props.id);
   }
 
@@ -183,7 +177,7 @@ class RootExercise extends Component {
             <Route
               exact
               path="/private/exercise/:exerciseId/scenario"
-              component={() => <IndexExerciseScenario id={id} />}
+              component={() => <IndexExerciseEvent id={id} />}
             />
             <Route
               exact
@@ -255,9 +249,6 @@ export default R.compose(
     fetchObjectives,
     fetchSubobjectives,
     fetchAudiences,
-    fetchEvents,
-    fetchIncidents,
-    fetchIncidentTypes,
     fetchAllInjects,
     fetchExercise,
     fetchGroups,

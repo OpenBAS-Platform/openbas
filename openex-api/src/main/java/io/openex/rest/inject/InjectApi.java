@@ -1,16 +1,20 @@
 package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
+import io.openex.database.model.Exercise;
 import io.openex.database.model.Inject;
 import io.openex.database.model.InjectTypes;
 import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
+import io.openex.database.specification.InjectSpecification;
 import io.openex.helper.InjectHelper;
 import io.openex.model.ExecutableInject;
 import io.openex.model.Execution;
 import io.openex.model.Executor;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.InjectInput;
+import io.openex.rest.inject.form.InjectUpdateActivationInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -22,19 +26,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_PLANIFICATEUR;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
+import static org.springframework.util.StringUtils.hasLength;
 
 @RestController
 public class InjectApi<T> extends RestBehavior {
 
+    private ExerciseRepository exerciseRepository;
     private InjectRepository<T> injectRepository;
     private AudienceRepository audienceRepository;
     private InjectHelper<T> injectHelper;
     private ApplicationContext context;
     private List<Contract> contracts;
+
+    @Autowired
+    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
 
     @Autowired
     public void setAudienceRepository(AudienceRepository audienceRepository) {
@@ -95,6 +107,42 @@ public class InjectApi<T> extends RestBehavior {
         // Set dependencies
         inject.setDependsOn(updateRelationResolver(input.getDependsOn(), inject.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+        return injectRepository.save(inject);
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/injects")
+    public Iterable<Inject<T>> exerciseInjects(@PathVariable String exerciseId) {
+        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId));
+    }
+
+    @PostMapping("/api/exercises/{exerciseId}/injects")
+    public Inject<T> createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput<T> input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        // Get common attributes
+        Inject<T> inject = input.toInject();
+        // Set dependencies
+        inject.setUser(currentUser());
+        inject.setExercise(exercise);
+        if (hasLength(input.getDependsOn())) {
+            inject.setDependsOn(injectRepository.findById(input.getDependsOn()).orElse(null));
+        }
+        inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+        return injectRepository.save(inject);
+    }
+
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
+    @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    public void deleteInject(@PathVariable String injectId) {
+        injectRepository.deleteById(injectId);
+    }
+
+    @SuppressWarnings({"ELValidationInJSP", "SpringElInspection"})
+    @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
+    @PostAuthorize("hasRole('" + ROLE_PLANIFICATEUR + "') OR isExercisePlanner(#exerciseId)")
+    public Inject<T> updateInjectActivation(@PathVariable String injectId, @Valid @RequestBody InjectUpdateActivationInput input) {
+        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+        inject.setEnabled(input.isEnabled());
         return injectRepository.save(inject);
     }
 }

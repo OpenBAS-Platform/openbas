@@ -8,13 +8,12 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Collapse from '@material-ui/core/Collapse';
 import { GroupOutlined } from '@material-ui/icons';
 import * as R from 'ramda';
 import { withStyles } from '@material-ui/core/styles';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { T } from '../../../../../components/I18n';
-import { SearchField } from '../../../../../components/SearchField';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
+import { SearchField } from '../../../../components/SearchField';
 
 const styles = (theme) => ({
   nested: {
@@ -40,16 +39,13 @@ class InjectAudiences extends Component {
     super(props);
     this.state = {
       audiencesIds: this.props.injectAudiencesIds,
-      subaudiencesIds: this.props.injectSubaudiencesIds,
       searchTerm: '',
-      selectAll: this.props.selectAll,
+      selectAll: props.inject?.inject_all_audiences,
     };
   }
 
   componentDidMount() {
-    if (this.state.audiencesIds.length === this.props.audiences.length) {
-      this.setState({ selectAll: true });
-    }
+    this.setState({ selectAll: this.props.inject?.inject_all_audience });
   }
 
   handleSearchAudiences(event) {
@@ -73,37 +69,13 @@ class InjectAudiences extends Component {
     this.submitAudiences(audiencesIds);
   }
 
-  addSubaudience(subaudienceId) {
-    if (!this.state.subaudiencesIds.includes(subaudienceId)) {
-      const subaudiencesIds = R.append(
-        subaudienceId,
-        this.state.subaudiencesIds,
-      );
-      this.setState({ subaudiencesIds });
-      this.submitSubaudiences(subaudiencesIds);
-    }
-  }
-
-  removeSubaudience(subaudienceId) {
-    const subaudiencesIds = R.filter(
-      (a) => a !== subaudienceId,
-      this.state.subaudiencesIds,
-    );
-    this.setState({ subaudiencesIds });
-    this.submitSubaudiences(subaudiencesIds);
-  }
-
   toggleAll(event) {
-    this.setState({ selectAll: event.target.checked });
+    this.setState({ selectAll: event.target.checked, audiencesIds: [] });
     this.submitSelectAll(event.target.checked);
   }
 
   submitAudiences(audiencesIds) {
     this.props.onChangeAudiences(audiencesIds);
-  }
-
-  submitSubaudiences(subaudiencesIds) {
-    this.props.onChangeSubaudiences(subaudiencesIds);
   }
 
   submitSelectAll(selectAll) {
@@ -162,36 +134,6 @@ class InjectAudiences extends Component {
                 />
               );
             })}
-            {this.state.subaudiencesIds.map((subaudienceId) => {
-              const subaudience = R.find(
-                (a) => a.subaudience_id === subaudienceId,
-              )(this.props.subaudiences);
-              const audience = R.find(
-                (a) => a.audience_id === subaudience.subaudience_audience.audience_id,
-              )(this.props.audiences);
-              const audienceName = R.propOr('-', 'audience_name', audience);
-              const subaudienceName = R.propOr(
-                '-',
-                'subaudience_name',
-                subaudience,
-              );
-              const disabled = this.state.selectAll
-                || R.find(
-                  (audienceId) => audienceId === subaudience.subaudience_audience.audience_id,
-                  this.state.audiencesIds,
-                ) !== undefined;
-              if (!disabled) {
-                return (
-                  <Chip
-                    key={subaudienceId}
-                    onDelete={this.removeSubaudience.bind(this, subaudienceId)}
-                    icon={<GroupOutlined />}
-                    label={`[${audienceName}] ${subaudienceName}`}
-                  />
-                );
-              }
-              return <div key={subaudienceId}> &nbsp; </div>;
-            })}
             <div className="clearfix" />
           </div>
           <div>
@@ -207,44 +149,6 @@ class InjectAudiences extends Component {
                     (audienceId) => audienceId === audience.audience_id,
                     this.state.audiencesIds,
                   ) !== undefined;
-                const nestedItems = !disabled
-                  && audience.audience_subaudiences.map((data) => {
-                    const subaaudienceDisabled = R.find(
-                      (subaudienceId) => subaudienceId === data.subaudience_id,
-                      this.state.subaudiencesIds,
-                    ) !== undefined;
-                    const subaudience = R.find(
-                      (a) => a.subaudience_id === data.subaudience_id,
-                    )(this.props.subaudiences);
-                    const subaudienceId = R.propOr(
-                      data.subaudience_id,
-                      'subaudience_id',
-                      subaudience,
-                    );
-                    const subaudienceName = R.propOr(
-                      '-',
-                      'subaudience_name',
-                      subaudience,
-                    );
-                    return (
-                      <ListItem
-                        key={subaudienceId}
-                        disabled={subaaudienceDisabled}
-                        onClick={this.addSubaudience.bind(
-                          this,
-                          subaudience.subaudience_id,
-                        )}
-                        button={true}
-                        divider={true}
-                        className={classes.nested}
-                      >
-                        <ListItemIcon>
-                          <GroupOutlined />
-                        </ListItemIcon>
-                        <ListItemText primary={subaudienceName} />
-                      </ListItem>
-                    );
-                  });
                 return (
                   <div key={audience.audience_id}>
                     <ListItem
@@ -261,9 +165,6 @@ class InjectAudiences extends Component {
                       </ListItemIcon>
                       <ListItemText primary={audience.audience_name} />
                     </ListItem>
-                    <Collapse in={true}>
-                      <List>{nestedItems}</List>
-                    </Collapse>
                   </div>
                 );
               })}
@@ -277,16 +178,12 @@ class InjectAudiences extends Component {
 
 InjectAudiences.propTypes = {
   exerciseId: PropTypes.string,
-  eventId: PropTypes.string,
-  incidentId: PropTypes.string,
   onChangeAudiences: PropTypes.func,
-  onChangeSubaudiences: PropTypes.func,
   onChangeSelectAll: PropTypes.func,
   injectAudiencesIds: PropTypes.array,
-  injectSubaudiencesIds: PropTypes.array,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.array,
   selectAll: PropTypes.bool,
+  inject: PropTypes.object,
 };
 
 export default withStyles(styles)(InjectAudiences);

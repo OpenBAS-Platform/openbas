@@ -3,8 +3,8 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import MenuItem from '@material-ui/core/MenuItem';
-import { Select } from '../../../../../components/Select';
-import { i18nRegister } from '../../../../../utils/Messages';
+import { Select } from '../../../../components/Select';
+import { i18nRegister } from '../../../../utils/Messages';
 
 i18nRegister({
   fr: {

@@ -14,19 +14,18 @@ import StepLabel from '@material-ui/core/StepLabel';
 import { withStyles } from '@material-ui/core/styles';
 import Slide from '@material-ui/core/Slide';
 import { Add } from '@material-ui/icons';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { T } from '../../../../../components/I18n';
-import { fetchIncident } from '../../../../../actions/Incident';
-import { downloadFile } from '../../../../../actions/File';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
+import { downloadFile } from '../../../../actions/File';
 import {
   addInject,
   updateInject,
   deleteInject,
-} from '../../../../../actions/Inject';
+} from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
-import { submitForm } from '../../../../../utils/Action';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -45,7 +44,7 @@ const styles = () => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 330,
+    right: 30,
   },
 });
 
@@ -111,12 +110,6 @@ class CreateInject extends Component {
     this.setState({ injectData });
   }
 
-  onSubaudiencesChange(data) {
-    const { injectData } = this.state;
-    injectData.inject_subaudiences = data;
-    this.setState({ injectData });
-  }
-
   onSelectAllAudiences(value) {
     const { injectData } = this.state;
     injectData.inject_all_audiences = value;
@@ -144,16 +137,12 @@ class CreateInject extends Component {
     this.props
       .addInject(
         this.props.exerciseId,
-        this.props.eventId,
-        this.props.incidentId,
         data,
       )
       .then(() => {
-        this.props.fetchIncident(
-          this.props.exerciseId,
-          this.props.eventId,
-          this.props.incidentId,
-        );
+        // this.props.fetchIncident(
+        //   this.props.exerciseId,
+        // );
       });
     this.handleClose();
   }
@@ -202,15 +191,10 @@ class CreateInject extends Component {
         return (
           <InjectAudiences
             exerciseId={this.props.exerciseId}
-            eventId={this.props.eventId}
-            incidentId={this.props.incidentId}
             onChangeAudiences={this.onAudiencesChange.bind(this)}
-            onChangeSubaudiences={this.onSubaudiencesChange.bind(this)}
             onChangeSelectAll={this.onSelectAllAudiences.bind(this)}
             audiences={this.props.audiences}
-            subaudiences={this.props.subaudiences}
             injectAudiencesIds={[]}
-            injectSubaudiencesIds={[]}
             selectAll={false}
           />
         );
@@ -282,10 +266,7 @@ CreateInject.propTypes = {
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
   subaudiences: PropTypes.array,
-  eventId: PropTypes.string,
-  incidentId: PropTypes.string,
   inject_types: PropTypes.object,
-  fetchIncident: PropTypes.func,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
@@ -294,7 +275,6 @@ CreateInject.propTypes = {
 
 export default R.compose(
   connect(null, {
-    fetchIncident,
     addInject,
     updateInject,
     deleteInject,

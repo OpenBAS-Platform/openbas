@@ -10,6 +10,7 @@ import io.openex.service.DryrunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -22,6 +23,7 @@ import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.*;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static java.time.Instant.now;
+import static org.springframework.util.StringUtils.hasLength;
 
 @RestController
 @RolesAllowed(ROLE_USER)
@@ -29,8 +31,6 @@ public class ExerciseApi<T> extends RestBehavior {
     // region repositories
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
-    private AudienceRepository audienceRepository;
-    private InjectRepository<T> injectRepository;
     private ExerciseLogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
@@ -73,43 +73,8 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
-        this.injectRepository = injectRepository;
-    }
-
-    @Autowired
-    public void setAudienceRepository(AudienceRepository audienceRepository) {
-        this.audienceRepository = audienceRepository;
-    }
-
-    @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
-    }
-    // endregion
-
-    // region injects
-    @GetMapping("/api/exercises/{exerciseId}/injects")
-    public Iterable<Inject<T>> exerciseInjects(@PathVariable String exerciseId) {
-        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId));
-    }
-
-    @PostMapping("/api/exercises/{exerciseId}/injects")
-    public Inject<T> createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput<T> input) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        // Get common attributes
-        Inject<T> inject = input.toInject();
-        // Set dependencies
-        inject.setUser(currentUser());
-        inject.setExercise(exercise);
-        inject.setDependsOn(injectRepository.findById(input.getDependsOn()).orElse(null));
-        inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
-        return injectRepository.save(inject);
-    }
-
-    @DeleteMapping("/api/exercises/{exerciseId}/events/{eventId}/incidents/{incidentId}/injects/{injectId}")
-    public void deleteInject(@PathVariable String injectId) {
-        injectRepository.deleteById(injectId);
     }
     // endregion
 

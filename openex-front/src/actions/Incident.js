@@ -50,5 +50,3 @@ export const selectIncident = (exercieId, eventId, incidentId) => (
     },
   });
 };
-
-export const fetchIncidentTypes = () => (dispatch) => getReferential(schema.arrayOfIncidentTypes, '/api/incident_types')(dispatch);

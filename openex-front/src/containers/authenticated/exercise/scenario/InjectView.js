@@ -6,9 +6,9 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { GroupOutlined } from '@material-ui/icons';
-import Theme from '../../../../../components/Theme';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { T } from '../../../../../components/I18n';
+import Theme from '../../../../components/Theme';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
 
 i18nRegister({
   fr: {

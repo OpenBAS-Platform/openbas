@@ -7,8 +7,8 @@ import {
   delReferential,
 } from '../utils/Action';
 
-export const fetchInjects = (exerciseId, eventId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/events/${eventId}/injects`;
+export const fetchInjects = (exerciseId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
@@ -27,17 +27,22 @@ export const updateInject = (exerciseId, injectId, data) => (dispatch) => {
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const addInject = (exerciseId, eventId, incidentId, data) => (
+export const updateInjectActivation = (exerciseId, injectId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/activation`;
+  return putReferential(schema.inject, uri, data)(dispatch);
+};
+
+export const addInject = (exerciseId, data) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects`;
+  const uri = `/api/exercises/${exerciseId}/injects`;
   return postReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const deleteInject = (exerciseId, eventId, incidentId, injectId) => (
+export const deleteInject = (exerciseId, injectId) => (
   dispatch,
 ) => {
-  const uri = `/api/exercises/${exerciseId}/events/${eventId}/incidents/${incidentId}/injects/${injectId}`;
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
 };
 

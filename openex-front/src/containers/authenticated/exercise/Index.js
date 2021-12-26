@@ -34,7 +34,7 @@ import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import { dateFormat } from '../../../utils/Time';
 import { downloadFile } from '../../../actions/File';
-import InjectView from './scenario/event/InjectView';
+import InjectView from './scenario/InjectView';
 import AudienceView from './audiences/audience/AudienceView';
 import ObjectiveView from './objective/ObjectiveView';
 import AudiencePopover from './AudiencePopover';

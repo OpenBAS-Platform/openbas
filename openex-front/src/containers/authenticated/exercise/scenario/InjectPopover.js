@@ -16,12 +16,10 @@ import StepLabel from '@material-ui/core/StepLabel';
 import { MoreVert } from '@material-ui/icons';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import { i18nRegister } from '../../../../../utils/Messages';
-import { T } from '../../../../../components/I18n';
-import { dayFormat, timeFormat, dateToISO } from '../../../../../utils/Time';
-import { fetchIncident, selectIncident } from '../../../../../actions/Incident';
-import { downloadFile } from '../../../../../actions/File';
-import { redirectToEvent } from '../../../../../actions/Application';
+import { i18nRegister } from '../../../../utils/Messages';
+import { T } from '../../../../components/I18n';
+import { downloadFile } from '../../../../actions/File';
+import { redirectToEvent } from '../../../../actions/Application';
 import {
   addInject,
   updateInject,
@@ -29,12 +27,13 @@ import {
   tryInject,
   injectDone,
   fetchInjectTypesExerciseSimple,
-} from '../../../../../actions/Inject';
+  updateInjectActivation,
+} from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import InjectContentForm from './InjectContentForm';
 import InjectAudiences from './InjectAudiences';
 import CopyForm from './CopyForm';
-import { submitForm } from '../../../../../utils/Action';
+import { submitForm } from '../../../../utils/Action';
 
 i18nRegister({
   fr: {
@@ -82,7 +81,7 @@ class InjectPopover extends Component {
       type: undefined,
       stepIndex: 0,
       finished: false,
-      injectData: null,
+      injectData: props.inject,
       injectResult: false,
       inject_types: {},
       injectAttachments: R.propOr(
@@ -129,7 +128,8 @@ class InjectPopover extends Component {
   }
 
   onGlobalSubmit(data) {
-    this.setState({ injectData: data }, () => this.selectContent());
+    const injectData = { ...this.state.injectData, ...data };
+    this.setState({ injectData }, () => this.selectContent());
   }
 
   onContentSubmit(data) {
@@ -158,25 +158,13 @@ class InjectPopover extends Component {
   onAudiencesChange(data) {
     const { injectData } = this.state;
     injectData.inject_audiences = data;
-    this.setState({
-      injectData,
-    });
-  }
-
-  onSubaudiencesChange(data) {
-    const { injectData } = this.state;
-    injectData.inject_subaudiences = data;
-    this.setState({
-      injectData,
-    });
+    this.setState({ injectData });
   }
 
   onSelectAllAudiences(value) {
     const { injectData } = this.state;
     injectData.inject_all_audiences = value;
-    this.setState({
-      injectData,
-    });
+    this.setState({ injectData });
   }
 
   submitFormEdit() {
@@ -195,15 +183,10 @@ class InjectPopover extends Component {
   }
 
   updateInject() {
-    const data = R.assoc(
-      'inject_date',
-      dateToISO(this.state.injectData.inject_date),
-      this.state.injectData,
-    );
     this.props.updateInject(
       this.props.exerciseId,
       this.props.inject.inject_id,
-      data,
+      this.state.injectData,
     );
     this.handleCloseEdit();
   }
@@ -231,16 +214,14 @@ class InjectPopover extends Component {
     this.props
       .deleteInject(
         this.props.exerciseId,
-        this.props.eventId,
-        this.props.incidentId,
         this.props.inject.inject_id,
       )
       .then(() => {
-        this.props.fetchIncident(
-          this.props.exerciseId,
-          this.props.eventId,
-          this.props.incidentId,
-        );
+        // this.props.fetchIncident(
+        //   this.props.exerciseId,
+        //   this.props.eventId,
+        //   this.props.incidentId,
+        // );
       });
     this.handleCloseDelete();
   }
@@ -259,7 +240,7 @@ class InjectPopover extends Component {
   }
 
   submitDisable() {
-    this.props.updateInject(
+    this.props.updateInjectActivation(
       this.props.exerciseId,
       this.props.inject.inject_id,
       { inject_enabled: false },
@@ -281,7 +262,7 @@ class InjectPopover extends Component {
   }
 
   submitEnable() {
-    this.props.updateInject(
+    this.props.updateInjectActivation(
       this.props.exerciseId,
       this.props.inject.inject_id,
       { inject_enabled: true },
@@ -337,8 +318,8 @@ class InjectPopover extends Component {
     this.handleCloseDone();
   }
 
-  onCopySubmit(data) {
-    const incident = R.find((i) => i.incident_id === data.incident_id)(
+  onCopySubmit() {
+    /* const incident = R.find((i) => i.incident_id === data.incident_id)(
       this.props.incidents,
     );
     const audiencesList = R.map(
@@ -386,7 +367,7 @@ class InjectPopover extends Component {
       this.props.exerciseId,
       incident.incident_event,
       data.incident_id,
-    );
+    ); */
     this.handleCloseCopy();
   }
 
@@ -454,16 +435,11 @@ class InjectPopover extends Component {
         return (
           <InjectAudiences
             exerciseId={this.props.exerciseId}
-            eventId={this.props.eventId}
-            incidentId={this.props.incidentId}
             onChangeAudiences={this.onAudiencesChange.bind(this)}
-            onChangeSubaudiences={this.onSubaudiencesChange.bind(this)}
             onChangeSelectAll={this.onSelectAllAudiences.bind(this)}
-            injectId={this.props.inject.inject_id}
+            inject={this.props.inject}
             injectAudiencesIds={this.props.injectAudiencesIds}
-            injectSubaudiencesIds={this.props.injectSubaudiencesIds}
             audiences={this.props.audiences}
-            subaudiences={this.props.subaudiences}
             selectAll={this.props.inject.inject_all_audiences}
           />
         );
@@ -485,22 +461,12 @@ class InjectPopover extends Component {
     );
     const { userCanUpdate } = this.props;
     const initPipe = R.pipe(
-      R.assoc(
-        'inject_date_only',
-        dayFormat(R.path(['inject', 'inject_date'], this.props)),
-      ),
-      R.assoc(
-        'inject_time',
-        timeFormat(R.path(['inject', 'inject_date'], this.props)),
-      ),
       R.pick([
         'inject_title',
         'inject_description',
         'inject_content',
-        'inject_date_only',
-        'inject_time',
+        'inject_depends_duration',
         'inject_type',
-        'inject_date',
       ]),
     );
     const initialValues = this.props.inject !== undefined ? initPipe(this.props.inject) : undefined;
@@ -811,39 +777,32 @@ InjectPopover.propTypes = {
   fetchInjectTypesExerciseSimple: PropTypes.func,
   exerciseId: PropTypes.string,
   audiences: PropTypes.array,
-  subaudiences: PropTypes.array,
   eventId: PropTypes.string,
-  incidentId: PropTypes.string,
   inject: PropTypes.object,
   injectAudiencesIds: PropTypes.array,
-  injectSubaudiencesIds: PropTypes.array,
-  fetchIncident: PropTypes.func,
   addInject: PropTypes.func,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   tryInject: PropTypes.func,
   redirectToEvent: PropTypes.func,
-  selectIncident: PropTypes.func,
   injectDone: PropTypes.func,
   inject_types: PropTypes.object,
   children: PropTypes.node,
   initialAttachments: PropTypes.array,
   type: PropTypes.string,
-  incidents: PropTypes.array,
   location: PropTypes.string,
   downloadFile: PropTypes.func,
   userCanUpdate: PropTypes.bool,
 };
 
 export default connect(null, {
-  fetchIncident,
   addInject,
   updateInject,
+  updateInjectActivation,
   deleteInject,
   injectDone,
   tryInject,
   redirectToEvent,
-  selectIncident,
   downloadFile,
   fetchInjectTypesExerciseSimple,
 })(InjectPopover);

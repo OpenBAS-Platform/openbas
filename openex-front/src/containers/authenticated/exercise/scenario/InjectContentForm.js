@@ -13,12 +13,12 @@ import Chip from '@material-ui/core/Chip';
 import { AttachmentOutlined, CloseOutlined } from '@material-ui/icons';
 import Slide from '@material-ui/core/Slide';
 import { withStyles } from '@material-ui/core/styles';
-import { EnrichedTextField } from '../../../../../components/EnrichedTextField';
-import { TextField } from '../../../../../components/TextField';
-import { T } from '../../../../../components/I18n';
-import { i18nRegister } from '../../../../../utils/Messages';
-import DocumentGallery from '../../../DocumentGallery';
-import { Switch } from '../../../../../components/Switch';
+import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import { TextField } from '../../../../components/TextField';
+import { T } from '../../../../components/I18n';
+import { i18nRegister } from '../../../../utils/Messages';
+import DocumentGallery from '../../DocumentGallery';
+import { Switch } from '../../../../components/Switch';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
