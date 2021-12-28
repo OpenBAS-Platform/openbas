@@ -17,7 +17,7 @@ steps:
   - mvn test
 
 - name: frontend-tests
-  image: nikolaik/python-nodejs:python3.8-nodejs12-alpine
+  image: nikolaik/python-nodejs:python3.8-nodejs14-alpine
   commands: 
   - cd openex-front
   - yarn install

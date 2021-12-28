@@ -4,7 +4,7 @@ jobs:
   build_frontend:
     working_directory: ~/openex
     docker:
-      - image: nikolaik/python-nodejs:python3.9-nodejs12
+      - image: nikolaik/python-nodejs:python3.9-nodejs14
     steps:
       - run:
           command: apt-get update --allow-insecure-repositories --allow-unauthenticated && apt-get install -y build-essential

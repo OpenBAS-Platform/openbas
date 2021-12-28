@@ -54,7 +54,7 @@
     "redux-logger": "3.0.6"
   },
   "engines": {
-    "node": ">= 12.* < 17.0.0"
+    "node": ">= 14.* < 17.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
