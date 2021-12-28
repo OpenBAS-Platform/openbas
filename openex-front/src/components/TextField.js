@@ -1,6 +1,6 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import MuiTextField from '@material-ui/core/TextField';
+import MuiTextField from '@mui/material/TextField';
 
 const renderTextField = ({
   label,

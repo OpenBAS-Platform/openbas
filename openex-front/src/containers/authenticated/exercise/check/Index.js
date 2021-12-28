@@ -2,17 +2,17 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import withStyles from '@mui/styles/withStyles';
+import Typography from '@mui/material/Typography';
 import {
   OndemandVideoOutlined,
   NetworkCheckOutlined,
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';

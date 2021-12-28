@@ -2,21 +2,21 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Chip from '@material-ui/core/Chip';
-import List from '@material-ui/core/List';
-import Toolbar from '@material-ui/core/Toolbar';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
+import withStyles from '@mui/styles/withStyles';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import List from '@mui/material/List';
+import Toolbar from '@mui/material/Toolbar';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import {
   Add,
   InsertDriveFileOutlined,
   LabelOutlined,
-} from '@material-ui/icons';
-import ListItemText from '@material-ui/core/ListItemText';
-import Drawer from '@material-ui/core/Drawer';
-import Fab from '@material-ui/core/Fab';
+} from '@mui/icons-material';
+import ListItemText from '@mui/material/ListItemText';
+import Drawer from '@mui/material/Drawer';
+import Fab from '@mui/material/Fab';
 import { fetchExercises } from '../../actions/Exercise';
 import {
   addDocument,

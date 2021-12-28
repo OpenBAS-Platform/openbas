@@ -2,15 +2,15 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import withStyles from '@mui/styles/withStyles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 import { Link } from 'react-router-dom';
-import { DescriptionOutlined } from '@material-ui/icons';
+import { DescriptionOutlined } from '@mui/icons-material';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { updateUser, updateMePassword, meTokens } from '../../../actions/User';
 import { i18nRegister } from '../../../utils/Messages';
@@ -129,7 +129,7 @@ class Index extends Component {
               component={Link}
               to="/private/documents"
               className={classes.documents}
-            >
+              size="large">
               <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />

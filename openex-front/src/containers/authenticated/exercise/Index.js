@@ -3,19 +3,19 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
-import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
-import { withStyles } from '@material-ui/core/styles';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import withStyles from '@mui/styles/withStyles';
 import {
   CenterFocusStrongOutlined,
   EmailOutlined,
@@ -23,8 +23,8 @@ import {
   InputOutlined,
   KeyboardArrowDownOutlined,
   SmsOutlined,
-} from '@material-ui/icons';
-import { green, red } from '@material-ui/core/colors';
+} from '@mui/icons-material';
+import { green, red } from '@mui/material/colors';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import { downloadFile } from '../../../actions/File';

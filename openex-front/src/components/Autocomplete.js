@@ -1,7 +1,7 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import TextField from '@material-ui/core/TextField';
-import MuiAutocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@mui/material/TextField';
+import MuiAutocomplete from '@mui/material/Autocomplete';
 
 const renderAutocomplete = ({
   label,
@@ -26,6 +26,7 @@ const renderAutocomplete = ({
     renderInput={(params) => (
       <TextField
         {...params}
+        variant={others.variant || 'standard'}
         label={label}
         fullWidth={fullWidth}
         style={style}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
-import MenuItem from '@material-ui/core/MenuItem';
+import MenuItem from '@mui/material/MenuItem';
 import { T } from '../../../components/I18n';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';

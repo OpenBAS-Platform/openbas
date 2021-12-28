@@ -3,7 +3,7 @@ import { FORM_ERROR } from 'final-form';
 import FileSaver from 'file-saver';
 import * as R from 'ramda';
 import * as Constants from '../constants/ActionTypes';
-import { api } from '../Network';
+import { api } from '../network';
 
 export const submitForm = (formId) => {
   document

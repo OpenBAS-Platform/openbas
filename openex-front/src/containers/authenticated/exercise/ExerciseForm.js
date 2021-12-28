@@ -3,13 +3,12 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
-import MenuItem from '@material-ui/core/MenuItem';
-import { InfoOutlined } from '@material-ui/icons';
-import { T } from '../../../components/I18n';
+import MenuItem from '@mui/material/MenuItem';
+import { InfoOutlined } from '@mui/icons-material';
 import { TextField } from '../../../components/TextField';
 import { DateTimePicker } from '../../../components/DateTimePicker';
-import { i18nRegister } from '../../../utils/Messages';
 import { Select } from '../../../components/Select';
+import inject18n from '../../../components/i18n';
 
 i18nRegister({
   fr: {
@@ -142,9 +141,9 @@ class ExerciseForm extends Component {
 
 ExerciseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-  edit: PropTypes.bool,
+  editing: PropTypes.bool,
   change: PropTypes.func,
   groups: PropTypes.array,
 };
 
-export default ExerciseForm;
+export default inject18n(ExerciseForm);

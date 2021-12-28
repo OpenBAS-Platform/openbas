@@ -3,16 +3,16 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
 import { injectIntl } from 'react-intl';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import Chip from '@material-ui/core/Chip';
-import { AttachmentOutlined, CloseOutlined } from '@material-ui/icons';
-import Slide from '@material-ui/core/Slide';
-import { withStyles } from '@material-ui/core/styles';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+import { AttachmentOutlined, CloseOutlined } from '@mui/icons-material';
+import Slide from '@mui/material/Slide';
+import withStyles from '@mui/styles/withStyles';
 import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 import { TextField } from '../../../../components/TextField';
 import { T } from '../../../../components/I18n';
@@ -220,7 +220,7 @@ class InjectContentForm extends Component {
                               color="inherit"
                               onClick={this.handleCloseGallery.bind(this)}
                               aria-label="close"
-                            >
+                              size="large">
                               <CloseOutlined />
                             </IconButton>
                             <Typography variant="h6" className={classes.title}>

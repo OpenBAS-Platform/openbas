@@ -1,10 +1,12 @@
 import React from 'react';
-import { KeyboardDateTimePicker } from '@material-ui/pickers';
+import TextField from '@mui/material/TextField';
+import KeyboardDateTimePicker from '@mui/lab/DateTimePicker';
 import { Field } from 'react-final-form';
 
 const renderDateTimePicker = ({
   input: { onBlur, value, ...inputProps },
   meta: { submitting, error, touched },
+  textFieldProps,
   ...others
 }) => (
   <KeyboardDateTimePicker
@@ -20,6 +22,7 @@ const renderDateTimePicker = ({
       ? inputProps.onChange(date.toISOString())
       : inputProps.onChange(null))
     }
+    renderInput={(props) => <TextField {...props} {...textFieldProps} />}
   />
 );
 

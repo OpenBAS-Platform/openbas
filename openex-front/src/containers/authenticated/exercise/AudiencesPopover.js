@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import IconButton from '@material-ui/core/IconButton';
-import { withStyles } from '@material-ui/core/styles';
-import { MoreVert } from '@material-ui/icons';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@mui/material/IconButton';
+import withStyles from '@mui/styles/withStyles';
+import { MoreVert } from '@mui/icons-material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { downloadExportAudiences } from '../../../actions/Audience';
 import { i18nRegister } from '../../../utils/Messages';
 import { T } from '../../../components/I18n';
@@ -51,7 +51,7 @@ class AudiencesPopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-        >
+          size="large">
           <MoreVert />
         </IconButton>
         <Menu

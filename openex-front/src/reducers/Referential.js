@@ -22,16 +22,14 @@ export const entitiesInitializer = Immutable({
     inject_types: Immutable({}),
     inject_statuses: Immutable({}),
     logs: Immutable({}),
-    planificateurs_audiences: Immutable({}),
-    planificateurs_events: Immutable({}),
-    tag: Immutable({}),
+    tags: Immutable({}),
     documents: Immutable({}),
     outcomes: Immutable({}),
     parmeters: Immutable({}),
   }),
 });
 
-const referential = (state = Immutable({}), action) => {
+const referential = (state = Immutable({}), action = {}) => {
   switch (action.type) {
     case Constants.DATA_FETCH_SUCCESS: {
       if (isImmutable(action.payload)) {

@@ -3,8 +3,8 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Bar, HorizontalBar, Line } from 'react-chartjs-2';
 
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import { getStatisticsForExercise } from '../../../../actions/Exercise';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';

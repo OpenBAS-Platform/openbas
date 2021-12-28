@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import MUIAvatar from '@material-ui/core/Avatar';
+import MUIAvatar from '@mui/material/Avatar';
 import * as Constants from '../constants/ComponentTypes';
 
 const avatarStyle = {

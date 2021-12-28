@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@mui/styles/withStyles';
 import {
   RowingOutlined,
   GroupOutlined,
   CallToActionOutlined,
-} from '@material-ui/icons';
-import Grid from '@material-ui/core/Grid';
+} from '@mui/icons-material';
+import Grid from '@mui/material/Grid';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
 import { fetchStatistics } from '../../../actions/Application';

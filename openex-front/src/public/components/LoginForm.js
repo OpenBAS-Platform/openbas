@@ -1,0 +1,70 @@
+import React from 'react';
+import * as PropTypes from 'prop-types';
+import { Form } from 'react-final-form';
+import Button from '@mui/material/Button';
+import { TextField } from '../../components/TextField';
+import inject18n from '../../components/i18n';
+
+const LoginForm = (props) => {
+  const { t, error, onSubmit } = props;
+  const validate = (values) => {
+    const errors = {};
+    const requiredFields = ['username', 'password'];
+    requiredFields.forEach((field) => {
+      if (!values[field]) {
+        errors[field] = t('This field is required.');
+      }
+    });
+    return errors;
+  };
+  return (
+    <div style={{ padding: 15 }}>
+      <Form onSubmit={onSubmit} validate={validate}>
+        {({
+          handleSubmit, submitError, touched, submitting, pristine,
+        }) => (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              name="username"
+              type="text"
+              variant="standard"
+              label={t('Email address')}
+              fullWidth={true}
+              style={{ marginTop: 5 }}
+            />
+            <TextField
+              name="password"
+              type="password"
+              variant="standard"
+              label={t('Password')}
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              error={error || submitError}
+              helperText={
+                (error || submitError) && touched && (error || submitError)
+              }
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={pristine || submitting}
+              onClick={handleSubmit}
+              style={{ marginTop: 30 }}
+            >
+              {t('Sign in')}
+            </Button>
+          </form>
+        )}
+      </Form>
+    </div>
+  );
+};
+
+LoginForm.propTypes = {
+  t: PropTypes.func,
+  error: PropTypes.string,
+  onSubmit: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func,
+};
+
+export default inject18n(LoginForm);

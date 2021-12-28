@@ -2,14 +2,14 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { withStyles } from '@material-ui/core/styles';
-import GridList from '@material-ui/core/GridList';
-import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
-import IconButton from '@material-ui/core/IconButton';
-import TextField from '@material-ui/core/TextField';
-import Fab from '@material-ui/core/Fab';
-import { Add, CloudDownloadOutlined, DeleteOutlined } from '@material-ui/icons';
+import withStyles from '@mui/styles/withStyles';
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Fab from '@mui/material/Fab';
+import { Add, CloudDownloadOutlined, DeleteOutlined } from '@mui/icons-material';
 import { i18nRegister } from '../../utils/Messages';
 import { T } from '../../components/I18n';
 import {
@@ -95,12 +95,12 @@ class FileGallery extends Component {
           style={{ marginBottom: 20 }}
         />
         <div className={classes.root}>
-          <GridList cellHeight={180} cols={4}>
+          <ImageList cellHeight={180} cols={4}>
             {filteredFiles.map((file) => {
               const type = file.file_type;
               return (
-                <GridListTile key={file.file_id} className={classes.tile}>
-                  <GridListTileBar
+                <ImageListItem key={file.file_id} className={classes.tile}>
+                  <ImageListItemBar
                     title={file.file_name}
                     actionIcon={
                       <div style={{ width: 100 }}>
@@ -111,7 +111,7 @@ class FileGallery extends Component {
                             file.file_name,
                           )}
                           style={{ color: '#ffffff' }}
-                        >
+                          size="large">
                           <CloudDownloadOutlined />
                         </IconButton>
                         <IconButton
@@ -120,7 +120,7 @@ class FileGallery extends Component {
                             file.file_id,
                           )}
                           style={{ color: '#ffffff' }}
-                        >
+                          size="large">
                           <DeleteOutlined />
                         </IconButton>
                       </div>
@@ -144,10 +144,10 @@ class FileGallery extends Component {
                       onClick={this.handleFileSelect.bind(this, file)}
                     />
                     )}
-                </GridListTile>
+                </ImageListItem>
               );
             })}
-          </GridList>
+          </ImageList>
         </div>
         <Fab
           onClick={this.openFileDialog.bind(this)}

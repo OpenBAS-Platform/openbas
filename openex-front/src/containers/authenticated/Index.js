@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import { withStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
+import { withStyles } from '@mui/styles';
+import Grid from '@mui/material/Grid';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
 import { Link } from 'react-router-dom';
-import { DescriptionOutlined } from '@material-ui/icons';
+import { DescriptionOutlined } from '@mui/icons-material';
 import { dateFormat, timeDiff } from '../../utils/Time';
 import { fetchExercises } from '../../actions/Exercise';
 import { dataFile } from '../../actions/File';
@@ -83,6 +83,7 @@ class IndexAuthenticated extends Component {
               component={Link}
               to="/private/documents"
               className={classes.documents}
+              size="large"
             >
               <DescriptionOutlined fontSize="default" />
             </IconButton>

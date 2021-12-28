@@ -1,7 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core';
-import Paper from '@material-ui/core/Paper';
+import withStyles from '@mui/styles/withStyles';
+import Paper from '@mui/material/Paper';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import * as R from 'ramda';

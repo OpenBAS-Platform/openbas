@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { Link } from 'react-router-dom';
-import { withStyles } from '@material-ui/core/styles';
-import { AccountCircleOutlined } from '@material-ui/icons';
+import withStyles from '@mui/styles/withStyles';
+import { AccountCircleOutlined } from '@mui/icons-material';
 import { logout } from '../../actions/Application';
 import { i18nRegister } from '../../utils/Messages';
 import { T } from '../../components/I18n';
@@ -59,7 +59,7 @@ class UserPopover extends Component {
         <IconButton
           onClick={this.handleOpen.bind(this)}
           className={classes.topAvatar}
-        >
+          size="large">
           <AccountCircleOutlined />
         </IconButton>
         <Menu

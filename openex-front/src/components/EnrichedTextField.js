@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import CKEditor4 from 'ckeditor4-react';
 import * as PropTypes from 'prop-types';
-import FormLabel from '@material-ui/core/FormLabel';
+import FormLabel from '@mui/material/FormLabel';
 import { Field } from 'react-final-form';
 import { injectIntl } from 'react-intl';
 

@@ -1,5 +1,4 @@
 import moment from 'moment-timezone';
-import countdown from 'countdown';
 
 const dayDateFormat = 'YYYY-MM-DD';
 const timeDateFormat = 'HH:mm';
@@ -24,15 +23,6 @@ export const dateFormat = (data, specificFormat) => (data ? parse(data).format(s
 export const dateToISO = (date) => {
   const momentDate = parse(date, openexDateFormat, true);
   return momentDate.isValid() ? momentDate.format() : 'invalid-date';
-};
-
-export const dateFromNow = (dateString) => (dateString ? countdown(parse(dateString).toDate()).toString() : '-');
-
-export const convertToCountdown = (durationInMillis) => {
-  if (durationInMillis === null) return '-';
-  const end = now();
-  const start = moment(end).subtract(durationInMillis, 'ms');
-  return countdown(start.toDate(), end.toDate()).toString();
 };
 
 export const logDate = () => now().format('HH:mm:ss.SSS');

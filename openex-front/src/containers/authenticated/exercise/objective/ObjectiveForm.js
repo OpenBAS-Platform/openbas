@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import MenuItem from '@material-ui/core/MenuItem';
+import MenuItem from '@mui/material/MenuItem';
 import { TextField } from '../../../../components/TextField';
 import { i18nRegister } from '../../../../utils/Messages';
 import { T } from '../../../../components/I18n';

@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import Drawer from '@material-ui/core/Drawer';
-import ListItemText from '@material-ui/core/ListItemText';
-import Toolbar from '@material-ui/core/Toolbar';
-import MenuList from '@material-ui/core/MenuList';
-import MenuItem from '@material-ui/core/MenuItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
+import Drawer from '@mui/material/Drawer';
+import ListItemText from '@mui/material/ListItemText';
+import Toolbar from '@mui/material/Toolbar';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
 import {
   DashboardOutlined,
   PersonOutlined,
   GroupOutlined,
-} from '@material-ui/icons';
-import { withStyles } from '@material-ui/core/styles';
+} from '@mui/icons-material';
+import withStyles from '@mui/styles/withStyles';
 import { T } from '../../../../components/I18n';
 import { i18nRegister } from '../../../../utils/Messages';
 

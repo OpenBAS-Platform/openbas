@@ -3,13 +3,13 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import { Route, Switch, withRouter } from 'react-router';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Chip from '@material-ui/core/Chip';
-import { withStyles } from '@material-ui/core/styles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Chip from '@mui/material/Chip';
+import withStyles from '@mui/styles/withStyles';
 import { Link } from 'react-router-dom';
-import { DescriptionOutlined } from '@material-ui/icons';
-import IconButton from '@material-ui/core/IconButton';
+import { DescriptionOutlined } from '@mui/icons-material';
+import IconButton from '@mui/material/IconButton';
 import {
   redirectToExercise,
   redirectToHome,
@@ -129,7 +129,7 @@ class RootExercise extends Component {
               component={Link}
               to="/private/documents"
               className={classes.documents}
-            >
+              size="large">
               <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />

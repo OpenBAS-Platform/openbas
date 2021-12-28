@@ -1,7 +1,7 @@
 import Immutable from 'seamless-immutable';
 import * as Constants from '../constants/ActionTypes';
 
-const screen = (state = Immutable({}), action) => {
+const screen = (state = Immutable({}), action = {}) => {
   switch (action.type) {
     case Constants.DATA_FETCH_SUBMITTED: {
       return state.set('loading', true);

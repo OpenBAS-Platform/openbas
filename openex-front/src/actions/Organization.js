@@ -1,5 +1,23 @@
 import * as schema from './Schema';
-import { getReferential } from '../utils/Action';
+import {
+  delReferential,
+  getReferential,
+  postReferential,
+  putReferential,
+} from '../utils/Action';
 
-// eslint-disable-next-line import/prefer-default-export
 export const fetchOrganizations = () => (dispatch) => getReferential(schema.arrayOfOrganizations, '/api/organizations')(dispatch);
+
+export const addOrganization = (data) => (dispatch) => postReferential(schema.organization, '/api/organizations', data)(dispatch);
+
+export const updateOrganization = (organizationId, type, data) => (dispatch) => putReferential(
+  schema.organization,
+  `/api/organizations/${organizationId}/${type}`,
+  data,
+)(dispatch);
+
+export const deleteOrganization = (organizationId) => (dispatch) => delReferential(
+  `/api/organizations/${organizationId}`,
+  'organizations',
+  organizationId,
+)(dispatch);

@@ -88,6 +88,10 @@ export const storeBrowser = (state) => ({
   _buildUser(usr) {
     return {
       ...usr,
+      getOrganizations: () => {
+        const all = R.values(state.referential.entities.organizations);
+        return R.filter((n) => n.organization_id === usr.user_organization, all);
+      },
       getTokens: () => {
         const all = R.values(state.referential.entities.tokens);
         return R.filter((n) => n.token_user === usr.user_id, all);

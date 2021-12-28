@@ -14,5 +14,5 @@ export const addTag = (data) => (dispatch) => {
 
 export const deleteTag = (tagId) => (dispatch) => {
   const uri = `/api/tag/${tagId}`;
-  return delReferential(uri, 'tag', tagId)(dispatch);
+  return delReferential(uri, 'tags', tagId)(dispatch);
 };

@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import * as PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router';
 import * as R from 'ramda';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
 import { Link, withRouter } from 'react-router-dom';
-import { DescriptionOutlined } from '@material-ui/icons';
-import { withStyles } from '@material-ui/core/styles';
+import { DescriptionOutlined } from '@mui/icons-material';
+import withStyles from '@mui/styles/withStyles';
 import { i18nRegister } from '../../../utils/Messages';
 import { redirectToHome } from '../../../actions/Application';
 import LeftBar from './nav/LeftBar';
@@ -81,7 +81,7 @@ class RootAuthenticated extends Component {
               component={Link}
               to="/private/documents"
               className={classes.documents}
-            >
+              size="large">
               <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />
