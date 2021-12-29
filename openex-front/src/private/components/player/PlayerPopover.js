@@ -51,8 +51,11 @@ class PlayerPopover extends Component {
   }
 
   onSubmitEdit(data) {
+    const inputValues = R.pipe(
+      R.assoc('user_tags', R.pluck('id', data.user_tags)),
+    )(data);
     return this.props
-      .updateUser(this.props.user.user_id, data)
+      .updateUser(this.props.user.user_id, inputValues)
       .then(() => this.handleCloseEdit());
   }
 
@@ -72,15 +75,20 @@ class PlayerPopover extends Component {
 
   render() {
     const {
-      t, userAdmin, user, organizations,
+      t, userAdmin, user, tags, organizations,
     } = this.props;
     const organizationPath = [
       R.prop('user_organization', this.props.user),
       'organization_name',
     ];
     const organizationName = R.pathOr('-', organizationPath, organizations);
+    const userTags = R.map((n) => {
+      const tag = R.propOr({}, n, tags);
+      return { id: tag.tag_id, label: tag.tag_name, color: tag.tag_color };
+    }, user.user_tags);
     const initialValues = R.pipe(
-      R.assoc('user_organization', organizationName), // Reformat organization
+      R.assoc('user_organization', organizationName),
+      R.assoc('user_tags', userTags),
       R.pick([
         'user_firstname',
         'user_lastname',
@@ -89,6 +97,7 @@ class PlayerPopover extends Component {
         'user_phone',
         'user_phone2',
         'user_pgp_key',
+        'user_tags',
       ]),
     )(user);
     return (
@@ -180,8 +189,10 @@ class PlayerPopover extends Component {
 
 const select = (state) => {
   const userId = R.path(['logged', 'user'], state.app);
+  const { tags, organizations } = state.referential.entities;
   return {
-    organizations: state.referential.entities.organizations,
+    tags,
+    organizations,
     userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
   };
 };
@@ -192,6 +203,7 @@ PlayerPopover.propTypes = {
   updateUser: PropTypes.func,
   deleteUser: PropTypes.func,
   organizations: PropTypes.object,
+  tags: PropTypes.object,
   userAdmin: PropTypes.bool,
 };
 

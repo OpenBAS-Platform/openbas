@@ -33,6 +33,7 @@ import ItemTags from '../../components/ItemTags';
 import MiniMap from './MiniMap';
 import inject18n from '../../components/i18n';
 import { fetchStatistics } from '../../actions/Application';
+import { fetchExercises } from '../../actions/Exercise';
 import { storeBrowser } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 
@@ -101,9 +102,10 @@ const styles = () => ({
 const Dashboard = (props) => {
   useEffect(() => {
     props.fetchStatistics();
+    props.fetchExercises();
   }, []);
   const {
-    theme, classes, t, statistics,
+    theme, classes, t, nsd, statistics, exercises,
   } = props;
   return (
     <div className={classes.root}>
@@ -164,115 +166,71 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">{t('On-going exercises')}</Typography>
+          <Typography variant="overline">{t('Recent exercises')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
             <List style={{ paddingTop: 0 }}>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <EventNoteOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '40%' }}
-                      >
-                        Ranswomare attack on the energy sector
+              {exercises.map((exercise) => (
+                <ListItem
+                  key={exercise.exercise_id}
+                  dense={true}
+                  button={true}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                  component={Link}
+                  to={`/exercises/${exercise.exercise_id}`}
+                >
+                  <ListItemIcon>
+                    <EventNoteOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <div>
+                        <div
+                          className={classes.bodyItem}
+                          style={{ width: '40%' }}
+                        >
+                          {exercise.exercise_name}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={{ width: '20%' }}
+                        >
+                          {exercise.exercise_start_date ? (
+                            nsd(exercise.exercise_start_date)
+                          ) : (
+                            <i>{t('Manual')}</i>
+                          )}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={{ width: '20%' }}
+                        >
+                          {exercise.exercise_end_date
+                            ? nsd(exercise.exercise_end_date)
+                            : '-'}
+                        </div>
+                        <div className={classes.bodyItem}>
+                          <ItemTags
+                            variant="list"
+                            tags={[
+                              {
+                                tag_id: 1,
+                                tag_name: 'cyber',
+                                tag_color: '#17BDBD',
+                              },
+                              {
+                                tag_id: 2,
+                                tag_name: 'crisis',
+                                tag_color: '#CF271A',
+                              },
+                            ]}
+                          />
+                        </div>
                       </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '20%' }}
-                      >
-                        Dec 24, 2021
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '20%' }}
-                      >
-                        Dec 31, 2021
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <ItemTags
-                          variant="list"
-                          tags={[
-                            {
-                              tag_id: 1,
-                              tag_name: 'cyber',
-                              tag_color: '#17BDBD',
-                            },
-                            {
-                              tag_id: 2,
-                              tag_name: 'crisis',
-                              tag_color: '#CF271A',
-                            },
-                          ]}
-                        />
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <EventNoteOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '40%' }}
-                      >
-                        Fire alert exercise with firefighters
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '20%' }}
-                      >
-                        Dec 24, 2021
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '20%' }}
-                      >
-                        Dec 31, 2021
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <ItemTags
-                          variant="list"
-                          tags={[
-                            {
-                              tag_id: 1,
-                              tag_name: 'fire',
-                              tag_color: '#E7A816',
-                            },
-                            {
-                              tag_id: 2,
-                              tag_name: 'drill',
-                              tag_color: '#D036F0',
-                            },
-                          ]}
-                        />
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
+                    }
+                  />
+                </ListItem>
+              ))}
             </List>
           </Paper>
         </Grid>
@@ -607,15 +565,25 @@ Dashboard.propTypes = {
   classes: PropTypes.object,
   theme: PropTypes.object,
   t: PropTypes.func,
+  fetchStatistics: PropTypes.func,
+  fetchExercises: PropTypes.func,
+  statistics: PropTypes.object,
+  exercises: PropTypes.array,
 };
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  return { statistics: browser.getStatistics() };
+  const sort = R.sortWith([R.descend(R.prop('exercise_end_date'))]);
+  const exercises = R.pipe(
+    R.values,
+    sort,
+    R.take(6),
+  )(state.referential.entities.exercises);
+  return { exercises, statistics: browser.getStatistics() };
 };
 
 export default R.compose(
-  connect(select, { fetchStatistics }),
+  connect(select, { fetchStatistics, fetchExercises }),
   inject18n,
   withTheme,
   withStyles(styles),

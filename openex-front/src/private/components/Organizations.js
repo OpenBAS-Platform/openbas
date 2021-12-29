@@ -123,7 +123,10 @@ class Organizations extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'organization_name', orderAsc: true, keyword: '', tags: [],
+      sortBy: 'organization_name',
+      orderAsc: true,
+      keyword: '',
+      tags: [],
     };
   }
 
@@ -183,7 +186,9 @@ class Organizations extends Component {
 
   render() {
     const { classes, organizations } = this.props;
-    const { keyword, sortBy, orderAsc } = this.state;
+    const {
+      keyword, sortBy, orderAsc, tags,
+    } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.organization_name || '')
         .toLowerCase()
@@ -195,6 +200,10 @@ class Organizations extends Component {
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedOrganizations = R.pipe(
+      R.filter(
+        (n) => tags.length === 0
+          || R.any((filter) => R.includes(filter, n.exercise_tags), tags),
+      ),
       R.filter(filterByKeyword),
       sort,
     )(organizations);
@@ -206,6 +215,13 @@ class Organizations extends Component {
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}
+            />
+          </div>
+          <div style={{ float: 'left', marginRight: 20 }}>
+            <SearchInput
+                variant="small"
+                onSubmit={this.handleSearch.bind(this)}
+                keyword={keyword}
             />
           </div>
         </div>
@@ -273,10 +289,7 @@ class Organizations extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.organization_tags}
                     >
-                      <ItemTags
-                        variant="list"
-                        tags={organization.getTags()}
-                      />
+                      <ItemTags variant="list" tags={organization.getTags()} />
                     </div>
                   </div>
                 }

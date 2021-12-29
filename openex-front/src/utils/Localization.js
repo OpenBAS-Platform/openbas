@@ -21,7 +21,7 @@ const i18n = {
       Language: 'Langue',
       Injects: 'Stimulis',
       Messages: 'Messages',
-      'On-going exercises': 'Exercices à venir',
+      'Recent exercises': 'Exercices récents',
       'Next injects to send': 'Prochains stimlis à envoyer',
       'Organizations distribution across exercises':
         'Distribution des organisations dans les exercices',

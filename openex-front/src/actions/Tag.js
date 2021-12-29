@@ -6,12 +6,12 @@ import {
   putReferential,
 } from '../utils/Action';
 
-export const fetchTags = () => (dispatch) => getReferential(schema.arrayOfTags, '/api/tag')(dispatch);
+export const fetchTags = () => (dispatch) => getReferential(schema.arrayOfTags, '/api/tags')(dispatch);
 
-export const fetchTag = (tagId) => (dispatch) => getReferential(schema.tag, `/api/tag/${tagId}`)(dispatch);
+export const fetchTag = (tagId) => (dispatch) => getReferential(schema.tag, `/api/tags/${tagId}`)(dispatch);
 
-export const addTag = (data) => (dispatch) => postReferential(schema.tag, '/api/tag', data)(dispatch);
+export const addTag = (data) => (dispatch) => postReferential(schema.tag, '/api/tags', data)(dispatch);
 
-export const updateTag = (userId, data) => (dispatch) => putReferential(schema.tag, `/api/tag/${userId}`, data)(dispatch);
+export const updateTag = (userId, data) => (dispatch) => putReferential(schema.tag, `/api/tags/${userId}`, data)(dispatch);
 
-export const deleteTag = (tagId) => (dispatch) => delReferential(`/api/tag/${tagId}`, 'tags', tagId)(dispatch);
+export const deleteTag = (tagId) => (dispatch) => delReferential(`/api/tags/${tagId}`, 'tags', tagId)(dispatch);

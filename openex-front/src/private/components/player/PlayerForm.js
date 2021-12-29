@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import { TextField } from '../../../components/TextField';
 import { Autocomplete } from '../../../components/Autocomplete';
 import inject18n from '../../../components/i18n';
+import TagField from '../common/TagField';
 
 class PlayerForm extends Component {
   validate(values) {
@@ -93,6 +94,7 @@ class PlayerForm extends Component {
                 style={{ marginTop: 20 }}
               />
             )}
+            <TagField name="user_tags" />
           </form>
         )}
       </Form>
