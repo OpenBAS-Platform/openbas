@@ -149,7 +149,7 @@ class Players extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'name', orderAsc: true, keyword: '', tags: [],
+      sortBy: 'user_email', orderAsc: true, keyword: '', tags: [],
     };
   }
 

@@ -35,7 +35,7 @@ class UserForm extends Component {
         validate={this.validate.bind(this)}
       >
         {({ handleSubmit }) => (
-          <form id="playerForm" onSubmit={handleSubmit}>
+          <form id="userForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
               name="user_email"

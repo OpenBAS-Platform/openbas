@@ -11,8 +11,8 @@ import Button from '@mui/material/Button';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
-import { addUser } from '../../../../actions/User';
-import UserForm from './UserForm';
+import { addGroup } from '../../../../actions/Group';
+import GroupForm from './GroupForm';
 import inject18n from '../../../../components/i18n';
 
 const styles = () => ({
@@ -28,7 +28,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-class CreateUser extends Component {
+class CreateGroup extends Component {
   constructor(props) {
     super(props);
     this.state = { openCreate: false };
@@ -44,7 +44,7 @@ class CreateUser extends Component {
 
   onSubmitCreate(data) {
     return this.props
-      .addUser(data)
+      .addGroup(data)
       .then((result) => (result.result ? this.handleCloseCreate() : result));
   }
 
@@ -65,9 +65,9 @@ class CreateUser extends Component {
           TransitionComponent={Transition}
           onClose={this.handleCloseCreate.bind(this)}
         >
-          <DialogTitle>{t('Create a user')}</DialogTitle>
+          <DialogTitle>{t('Create a group')}</DialogTitle>
           <DialogContent>
-            <UserForm
+            <GroupForm
               editing={false}
               onSubmit={this.onSubmitCreate.bind(this)}
               organizations={this.props.organizations}
@@ -85,7 +85,7 @@ class CreateUser extends Component {
               variant="contained"
               color="primary"
               type="submit"
-              form="userForm"
+              form="groupForm"
             >
               {t('Create')}
             </Button>
@@ -96,10 +96,10 @@ class CreateUser extends Component {
   }
 }
 
-CreateUser.propTypes = {
+CreateGroup.propTypes = {
   t: PropTypes.func,
   organizations: PropTypes.object,
-  addUser: PropTypes.func,
+  addGroup: PropTypes.func,
 };
 
 const select = (state) => ({
@@ -107,7 +107,7 @@ const select = (state) => ({
 });
 
 export default R.compose(
-  connect(select, { addUser }),
+  connect(select, { addGroup }),
   inject18n,
   withStyles(styles),
-)(CreateUser);
+)(CreateGroup);

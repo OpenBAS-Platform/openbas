@@ -6,22 +6,23 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  DomainOutlined,
+  PersonOutlined,
 } from '@mui/icons-material';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import inject18n from '../../components/i18n';
-import { fetchOrganizations } from '../../actions/Organization';
-import { FIVE_SECONDS } from '../../utils/Time';
-import ItemTags from '../../components/ItemTags';
-import SearchInput from '../../components/SearchInput';
-import { truncate } from '../../utils/String';
-import CreateOrganization from './organization/CreateOrganization';
-import OrganizationPopover from './organization/OrganizationPopover';
+import inject18n from '../../../components/i18n';
+import { fetchUsers } from '../../../actions/User';
+import { fetchOrganizations } from '../../../actions/Organization';
+import { FIVE_SECONDS } from '../../../utils/Time';
+import SearchInput from '../../../components/SearchInput';
+import CreateGroup from './group/CreateGroup';
+import { fetchGroups } from '../../../actions/Group';
+import { fetchExercises } from '../../../actions/Exercise';
+import GroupPopover from './group/GroupPopover';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -72,19 +73,19 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  organization_name: {
+  group_name: {
     float: 'left',
     width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
-  organization_description: {
+  group_description: {
     float: 'left',
-    width: '40%',
+    width: '50%',
     fontSize: 12,
     fontWeight: '700',
   },
-  organization_tags: {
+  group_users_number: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -92,7 +93,7 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  organization_name: {
+  group_name: {
     float: 'left',
     width: '30%',
     height: 20,
@@ -100,15 +101,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  organization_description: {
+  group_description: {
     float: 'left',
-    width: '40%',
+    width: '50%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  organization_tags: {
+  group_users_number: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -117,18 +118,23 @@ const inlineStyles = {
   },
 };
 
-class Organizations extends Component {
+class Groups extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'organization_name', orderAsc: true, keyword: '', tags: [],
+      sortBy: 'group_name',
+      orderAsc: true,
+      keyword: '',
+      tags: [],
     };
   }
 
   componentDidMount() {
     this.props.fetchOrganizations();
+    this.props.fetchUsers();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
+      this.props.fetchUsers();
     });
   }
 
@@ -179,22 +185,24 @@ class Organizations extends Component {
   }
 
   render() {
-    const { classes, organizations } = this.props;
+    const {
+      classes, groups, exercises, organizations, users,
+    } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.organization_name || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
+      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.group_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedOrganizations = R.pipe(
+    const sortedGroups = R.pipe(
+      R.map((n) => R.assoc('group_users_number', R.propOr([], 'group_users', n).length, n)),
       R.filter(filterByKeyword),
       sort,
-    )(organizations);
+    )(groups);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -227,92 +235,92 @@ class Organizations extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('organization_name', 'Name', true)}
-                  {this.sortHeader(
-                    'organization_description',
-                    'Description',
-                    true,
-                  )}
-                  {this.sortHeader('organization_tags', 'Tags', true)}
+                  {this.sortHeader('group_name', 'Name', true)}
+                  {this.sortHeader('group_description', 'Description', true)}
+                  {this.sortHeader('group_users_number', 'Users', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedOrganizations.map((organization) => (
-            <ListItem
-              key={organization.organization_id}
-              classes={{ root: classes.item }}
-              divider={true}
-            >
-              <ListItemIcon>
-                <DomainOutlined />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.organization_name}
-                    >
-                      {organization.organization_name}
+          {sortedGroups.map((group) => (
+              <ListItem
+                key={group.group_id}
+                classes={{ root: classes.item }}
+                divider={true}
+              >
+                <ListItemIcon>
+                  <PersonOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.group_name}
+                      >
+                        {group.group_name}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.group_description}
+                      >
+                        {group.group_description}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.group_users_number}
+                      >
+                        {group.group_users_number}
+                      </div>
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.organization_description}
-                    >
-                      {truncate(
-                        organization.organization_description || '-',
-                        50,
-                      )}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.organization_tags}
-                    >
-                      <ItemTags
-                        variant="list"
-                        tags={[
-                          {
-                            tag_id: 1,
-                            tag_name: 'cyber',
-                            tag_color: '#17BDBD',
-                          },
-                          {
-                            tag_id: 2,
-                            tag_name: 'crisis',
-                            tag_color: '#CF271A',
-                          },
-                        ]}
-                      />
-                    </div>
-                  </div>
-                }
-              />
-              <ListItemSecondaryAction>
-                <OrganizationPopover organization={organization} />
-              </ListItemSecondaryAction>
-            </ListItem>
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <GroupPopover
+                    group={group}
+                    groupUsersIds={group.group_users}
+                    organizations={organizations}
+                    users={users}
+                    exercises={exercises}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
           ))}
         </List>
-        <CreateOrganization />
+        <CreateGroup />
       </div>
     );
   }
 }
 
-Organizations.propTypes = {
+Groups.propTypes = {
   t: PropTypes.func,
-  organizations: PropTypes.array,
+  classes: PropTypes.object,
+  groups: PropTypes.object,
+  organizations: PropTypes.object,
+  exercises: PropTypes.object,
+  users: PropTypes.object,
+  fetchUsers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
+  fetchExercises: PropTypes.func,
+  fetchGroups: PropTypes.func,
 };
 
 const select = (state) => ({
-  organizations: R.values(state.referential.entities.organizations),
+  groups: state.referential.entities.groups,
+  exercises: state.referential.entities.exercises,
+  users: state.referential.entities.users,
+  organizations: state.referential.entities.organizations,
 });
 
 export default R.compose(
-  connect(select, { fetchOrganizations }),
+  connect(select, {
+    fetchGroups,
+    fetchExercises,
+    fetchUsers,
+    fetchOrganizations,
+  }),
   inject18n,
   withStyles(styles),
-)(Organizations);
+)(Groups);

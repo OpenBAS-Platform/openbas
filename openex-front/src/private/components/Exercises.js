@@ -147,7 +147,7 @@ class Exercises extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'name',
+      sortBy: 'exercise_name',
       orderAsc: true,
       keyword: '',
       tags: [],

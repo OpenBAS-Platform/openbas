@@ -56,6 +56,7 @@ const i18n = {
       'Update password': 'Modifier le mot de passe',
       Users: 'Utilisateurs',
       Groups: 'Groupes',
+      'Create a group': 'Créer un groupe',
       Cancel: 'Annuler',
       Next: 'Suivant',
       Create: 'Créer',

@@ -13,27 +13,21 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateUser,
-  deleteUser,
-  updateUserPassword,
-} from '../../../../actions/User';
-import UserForm from './UserForm';
+import { updateGroup, deleteGroup } from '../../../../actions/Group';
+import GroupForm from './GroupForm';
 import inject18n from '../../../../components/i18n';
-import UserPasswordForm from './UserPasswordForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-class UserPopover extends Component {
+class GroupPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
       openDelete: false,
       openEdit: false,
-      openEditPassword: false,
       openPopover: false,
     };
   }
@@ -58,23 +52,8 @@ class UserPopover extends Component {
 
   onSubmitEdit(data) {
     return this.props
-      .updateUser(this.props.user.user_id, data)
+      .updateGroup(this.props.group.group_id, data)
       .then(() => this.handleCloseEdit());
-  }
-
-  handleOpenEditPassword() {
-    this.setState({ openEditPassword: true });
-    this.handlePopoverClose();
-  }
-
-  handleCloseEditPassword() {
-    this.setState({ openEditPassword: false });
-  }
-
-  onSubmitEditPassword(data) {
-    return this.props
-      .updateUserPassword(this.props.user.user_id, data.user_plain_password)
-      .then(() => this.handleCloseEditPassword());
   }
 
   handleOpenDelete() {
@@ -87,33 +66,15 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteUser(this.props.user.user_id);
+    this.props.deleteGroup(this.props.group.group_id);
     this.handleCloseDelete();
   }
 
   render() {
     const { t } = this.props;
-    const organizationPath = [
-      R.prop('user_organization', this.props.user),
-      'organization_name',
-    ];
-    const organizationName = R.pathOr(
-      '-',
-      organizationPath,
-      this.props.organizations,
+    const initialValues = R.pipe(R.pick(['group_name', 'group_description']))(
+      this.props.group,
     );
-    const initialValues = R.pipe(
-      R.assoc('user_organization', organizationName), // Reformat organization
-      R.pick([
-        'user_firstname',
-        'user_lastname',
-        'user_email',
-        'user_organization',
-        'user_phone',
-        'user_phone2',
-        'user_pgp_key',
-      ]),
-    )(this.props.user);
     return (
       <div>
         <IconButton
@@ -131,9 +92,6 @@ class UserPopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenEditPassword.bind(this)}>
-            {t('Update password')}
-          </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>
@@ -145,7 +103,7 @@ class UserPopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to delete this user?')}
+              {t('Do you want to delete this group?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -170,12 +128,11 @@ class UserPopover extends Component {
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
         >
-          <DialogTitle>{t('Update the user')}</DialogTitle>
+          <DialogTitle>{t('Update the player')}</DialogTitle>
           <DialogContent>
-            <UserForm
+            <GroupForm
               initialValues={initialValues}
               editing={true}
-              organizations={this.props.organizations}
               onSubmit={this.onSubmitEdit.bind(this)}
             />
           </DialogContent>
@@ -191,34 +148,7 @@ class UserPopover extends Component {
               variant="contained"
               color="primary"
               type="submit"
-              form="userForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
-          open={this.state.openEditPassword}
-          onClose={this.handleCloseEditPassword.bind(this)}
-        >
-          <DialogTitle>{t('Update the user password')}</DialogTitle>
-          <DialogContent>
-            <UserPasswordForm onSubmit={this.onSubmitEditPassword.bind(this)} />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEditPassword.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="passwordForm"
+              form="playerForm"
             >
               {t('Update')}
             </Button>
@@ -230,19 +160,18 @@ class UserPopover extends Component {
 }
 
 const select = (state) => ({
-  organizations: state.referential.entities.organizations,
+  users: R.values(state.referential.entities.users),
 });
 
-UserPopover.propTypes = {
+GroupPopover.propTypes = {
   t: PropTypes.func,
-  user: PropTypes.object,
-  updateUser: PropTypes.func,
-  updateUserPassword: PropTypes.func,
-  deleteUser: PropTypes.func,
-  organizations: PropTypes.object,
+  group: PropTypes.object,
+  updateGroup: PropTypes.func,
+  deleteGroup: PropTypes.func,
+  users: PropTypes.array,
 };
 
 export default R.compose(
-  connect(select, { updateUser, updateUserPassword, deleteUser }),
+  connect(select, { updateGroup, deleteGroup }),
   inject18n,
-)(UserPopover);
+)(GroupPopover);
