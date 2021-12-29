@@ -128,13 +128,13 @@ const Dashboard = (props) => {
                 <RowingOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Exercises')}</div>
-              <div className={classes.number}>{statistics.exercises_count.global_count}</div>
+              <div className={classes.number}>{statistics?.exercises_count?.global_count ?? '-'}</div>
               <div className={classes.change}>
                 <Avatar sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}>
                   <ArrowUpwardOutlined fontSize="small" />
                 </Avatar>
                 <div className={classes.changeText}>
-                  +{statistics.exercises_count.progression_count}
+                  +{statistics?.exercises_count?.progression_count ?? '0'}
                 </div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
@@ -146,13 +146,13 @@ const Dashboard = (props) => {
                 <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Players')}</div>
-              <div className={classes.number}>{statistics.users_count.global_count}</div>
+              <div className={classes.number}>{statistics?.users_count?.global_count ?? '-'}</div>
               <div className={classes.change}>
                 <Avatar sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}>
                   <ArrowUpwardOutlined fontSize="small" />
                 </Avatar>
                 <div className={classes.changeText}>
-                  +{statistics.users_count.progression_count}
+                  +{statistics?.users_count?.progression_count ?? '0'}
                 </div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
@@ -164,13 +164,13 @@ const Dashboard = (props) => {
                 <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Injects')}</div>
-              <div className={classes.number}>{statistics.injects_count.global_count}</div>
+              <div className={classes.number}>{statistics?.injects_count?.global_count ?? '-'}</div>
               <div className={classes.change}>
                 <Avatar sx={{ bgcolor: 'rgba(96, 125, 139, 0.08)', color: '#607d8b' }}>
                   <EastOutlined fontSize="small" />
                 </Avatar>
                 <div className={classes.changeText}>
-                  +{statistics.injects_count.progression_count}
+                  +{statistics?.injects_count?.progression_count ?? '0'}
                 </div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
