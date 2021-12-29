@@ -112,6 +112,14 @@ export const storeBrowser = (state) => ({
       },
     };
   },
+  _buildOrganization(org) {
+    return {
+      ...org,
+      getTags: () => org.organization_tags
+        .map((id) => state.referential.entities.tags[id])
+        .filter((t) => t !== undefined),
+    };
+  },
   _buildExercise(id, ex) {
     const browser = this;
     return {
@@ -138,9 +146,15 @@ export const storeBrowser = (state) => ({
       },
     };
   },
-  // Exercises
+  getOrganizations() {
+    return R.values(state.referential.entities.organizations)
+      .map((org) => this._buildOrganization(org));
+  },
   getExercises() {
     return R.values(state.referential.entities.exercises);
+  },
+  getTags() {
+    return R.values(state.referential.entities.tags);
   },
   getExercise(id) {
     const ex = state.referential.entities.exercises[id];

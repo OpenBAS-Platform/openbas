@@ -22,6 +22,8 @@ import SearchInput from '../../components/SearchInput';
 import { truncate } from '../../utils/String';
 import CreateOrganization from './organization/CreateOrganization';
 import OrganizationPopover from './organization/OrganizationPopover';
+import { storeBrowser } from '../../actions/Schema';
+import { fetchTags } from '../../actions/Tag';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -127,6 +129,7 @@ class Organizations extends Component {
 
   componentDidMount() {
     this.props.fetchOrganizations();
+    this.props.fetchTags();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
     });
@@ -272,18 +275,7 @@ class Organizations extends Component {
                     >
                       <ItemTags
                         variant="list"
-                        tags={[
-                          {
-                            tag_id: 1,
-                            tag_name: 'cyber',
-                            tag_color: '#17BDBD',
-                          },
-                          {
-                            tag_id: 2,
-                            tag_name: 'crisis',
-                            tag_color: '#CF271A',
-                          },
-                        ]}
+                        tags={organization.getTags()}
                       />
                     </div>
                   </div>
@@ -305,14 +297,16 @@ Organizations.propTypes = {
   t: PropTypes.func,
   organizations: PropTypes.array,
   fetchOrganizations: PropTypes.func,
+  fetchTags: PropTypes.func,
 };
 
-const select = (state) => ({
-  organizations: R.values(state.referential.entities.organizations),
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return { organizations: browser.getOrganizations() };
+};
 
 export default R.compose(
-  connect(select, { fetchOrganizations }),
+  connect(select, { fetchOrganizations, fetchTags }),
   inject18n,
   withStyles(styles),
 )(Organizations);

@@ -8,7 +8,10 @@ import io.openex.rest.tag.form.TagUpdateInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
+
+import static io.openex.database.model.User.ROLE_ADMIN;
 
 @RestController
 public class TagApi extends RestBehavior {
@@ -25,6 +28,7 @@ public class TagApi extends RestBehavior {
         return tagRepository.findAll();
     }
 
+    @RolesAllowed(ROLE_ADMIN)
     @PutMapping("/api/tag/{tagId}")
     public Tag updateTag(@PathVariable String tagId,
                          @Valid @RequestBody TagUpdateInput input) {
@@ -33,6 +37,7 @@ public class TagApi extends RestBehavior {
         return tagRepository.save(tag);
     }
 
+    @RolesAllowed(ROLE_ADMIN)
     @PostMapping("/api/tag")
     public Tag createTag(@Valid @RequestBody TagCreateInput input) {
         Tag tag = new Tag();
@@ -40,6 +45,7 @@ public class TagApi extends RestBehavior {
         return tagRepository.save(tag);
     }
 
+    @RolesAllowed(ROLE_ADMIN)
     @DeleteMapping("/api/tag/{tagId}")
     public void deleteTag(@PathVariable String tagId) {
         tagRepository.deleteById(tagId);
