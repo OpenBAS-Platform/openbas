@@ -51,11 +51,11 @@ export default () => ({
             color: '#00b1ff',
           },
           'input:-webkit-autofill': {
-            '-webkit-animation': 'autofill 0s forwards',
+            WebkitAnimation: 'autofill 0s forwards',
             animation: 'autofill 0s forwards',
-            '-webkit-text-fill-color': '#ffffff !important',
+            WebkitTextFillColor: '#ffffff !important',
             caretColor: 'transparent !important',
-            '-webkit-box-shadow':
+            WebkitBoxShadow:
               '0 0 0 1000px rgba(4, 8, 17, 0.88) inset !important',
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',

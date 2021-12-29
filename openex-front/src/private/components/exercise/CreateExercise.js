@@ -67,7 +67,10 @@ class CreateExercise extends Component {
         >
           <DialogTitle>{t('Create a new exercise')}</DialogTitle>
           <DialogContent>
-            <ExerciseForm onSubmit={this.onSubmit.bind(this)} />
+            <ExerciseForm
+              onSubmit={this.onSubmit.bind(this)}
+              initialValues={{ exercise_tags: [] }}
+            />
           </DialogContent>
           <DialogActions>
             <Button

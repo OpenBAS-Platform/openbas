@@ -71,16 +71,14 @@ class PlayerPopover extends Component {
   }
 
   render() {
-    const { t, userAdmin } = this.props;
+    const {
+      t, userAdmin, user, organizations,
+    } = this.props;
     const organizationPath = [
       R.prop('user_organization', this.props.user),
       'organization_name',
     ];
-    const organizationName = R.pathOr(
-      '-',
-      organizationPath,
-      this.props.organizations,
-    );
+    const organizationName = R.pathOr('-', organizationPath, organizations);
     const initialValues = R.pipe(
       R.assoc('user_organization', organizationName), // Reformat organization
       R.pick([
@@ -92,7 +90,7 @@ class PlayerPopover extends Component {
         'user_phone2',
         'user_pgp_key',
       ]),
-    )(this.props.user);
+    )(user);
     return (
       <div>
         <IconButton
@@ -153,7 +151,7 @@ class PlayerPopover extends Component {
             <PlayerForm
               initialValues={initialValues}
               editing={true}
-              organizations={this.props.organizations}
+              organizations={organizations}
               onSubmit={this.onSubmitEdit.bind(this)}
             />
           </DialogContent>

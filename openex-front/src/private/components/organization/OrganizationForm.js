@@ -22,6 +22,7 @@ class OrganizationForm extends Component {
     const { t, onSubmit, initialValues } = this.props;
     return (
       <Form
+        keepDirtyOnReinitialize={true}
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}

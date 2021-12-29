@@ -71,6 +71,7 @@ class CreatePlayer extends Component {
               editing={false}
               onSubmit={this.onSubmitCreate.bind(this)}
               organizations={this.props.organizations}
+              initialValues={{ user_tags: [] }}
             />
           </DialogContent>
           <DialogActions>

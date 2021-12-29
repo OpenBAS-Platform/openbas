@@ -29,6 +29,7 @@ const renderAutocomplete = ({
       }}
       {...inputProps}
       {...others}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       renderInput={(params) => (
         <TextField
           {...params}

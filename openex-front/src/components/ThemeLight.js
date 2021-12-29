@@ -6,7 +6,7 @@ export default () => ({
       main: '#00b1ff',
     },
     secondary: {
-      main: '#0082d1',
+      main: '#01478DFF',
       transparent: 'rgba(0,130,209,0.2)',
     },
     background: {
@@ -25,24 +25,24 @@ export default () => ({
           },
           '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
             borderRadius: 8,
-            backgroundColor: '#00325a',
+            backgroundColor: '#01478DFF',
             minHeight: 24,
             border: '3px solid #001e3c',
           },
           '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus':
               {
-                backgroundColor: '#00325a',
+                backgroundColor: '#01478DFF',
               },
           '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active':
               {
-                backgroundColor: '#00325a',
+                backgroundColor: '#01478DFF',
               },
           '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
               {
-                backgroundColor: '#00325a',
+                backgroundColor: '#01478DFF',
               },
           '&::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
-            backgroundColor: '#00325a',
+            backgroundColor: '#01478DFF',
           },
           html: {
             WebkitFontSmoothing: 'auto',
@@ -51,20 +51,20 @@ export default () => ({
             color: '#00b1ff',
           },
           'input:-webkit-autofill': {
-            '-webkit-animation': 'autofill 0s forwards',
+            WebkitAnimation: 'autofill 0s forwards',
             animation: 'autofill 0s forwards',
-            '-webkit-text-fill-color': '#ffffff !important',
+            WebkitTextFillColor: '#ffffff !important',
             caretColor: 'transparent !important',
-            '-webkit-box-shadow':
+            WebkitBoxShadow:
                 '0 0 0 1000px rgba(4, 8, 17, 0.88) inset !important',
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',
           },
           pre: {
-            background: '#0059b2',
+            background: '#01478DFF',
           },
           code: {
-            background: '#0059b2',
+            background: '#01478DFF',
           },
           '.react-mde': {
             border: '0 !important',

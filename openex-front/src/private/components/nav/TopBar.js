@@ -22,7 +22,6 @@ const styles = (theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     background: 0,
     backgroundColor: theme.palette.background.header,
-    borderTop: 0,
     paddingTop: theme.spacing(0.2),
   },
   flex: {
@@ -90,7 +89,7 @@ class TopBar extends Component {
   render() {
     const { classes, t, location } = this.props;
     return (
-      <AppBar position="fixed" className={classes.appBar} variant="outlined">
+      <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <div className={classes.logoContainer}>
             <Link to="/">

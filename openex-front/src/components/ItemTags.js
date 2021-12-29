@@ -58,7 +58,7 @@ class ItemTags extends Component {
           R.map(
             (tag) => (
               <Chip
-                key={tag.id}
+                key={tag.tag_id}
                 variant="outlined"
                 classes={{ root: style }}
                 label={tag.tag_name}
@@ -82,11 +82,11 @@ class ItemTags extends Component {
             variant="outlined"
             label={t('No tag')}
             style={{
-              color: theme.palette.type === 'dark' ? '#ffffff' : '#000000',
+              color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
               borderColor:
-                theme.palette.type === 'dark' ? '#ffffff' : '#000000',
+                theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
               backgroundColor: hexToRGB(
-                theme.palette.type === 'dark' ? '#ffffff' : 'transparent',
+                theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
               ),
             }}
             onClick={

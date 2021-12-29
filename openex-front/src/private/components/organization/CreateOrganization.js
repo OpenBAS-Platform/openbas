@@ -43,8 +43,11 @@ class CreateOrganization extends Component {
   }
 
   onSubmit(data) {
+    const inputValues = R.pipe(
+      R.assoc('organization_tags', R.pluck('id', data.organization_tags)),
+    )(data);
     return this.props
-      .addOrganization(data)
+      .addOrganization(inputValues)
       .then((result) => (result.result ? this.handleClose() : result));
   }
 
@@ -67,7 +70,10 @@ class CreateOrganization extends Component {
         >
           <DialogTitle>{t('Create a new organization')}</DialogTitle>
           <DialogContent>
-            <OrganizationForm onSubmit={this.onSubmit.bind(this)} />
+            <OrganizationForm
+              onSubmit={this.onSubmit.bind(this)}
+              initialValues={{ organization_tags: [] }}
+            />
           </DialogContent>
           <DialogActions>
             <Button

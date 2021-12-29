@@ -78,14 +78,19 @@ class OrganizationPopover extends Component {
   }
 
   render() {
-    const { t } = this.props;
+    const { t, tags, organization } = this.props;
+    const organizationTags = R.map((n) => {
+      const tag = R.propOr({}, n, tags);
+      return { id: tag.tag_id, label: tag.tag_name, color: tag.tag_color };
+    }, organization.organization_tags);
     const initialValues = R.pipe(
+      R.assoc('organization_tags', organizationTags),
       R.pick([
         'organization_name',
         'organization_description',
         'organization_tags',
       ]),
-    )(this.props.organization);
+    )(organization);
     return (
       <div>
         <IconButton
@@ -142,7 +147,7 @@ class OrganizationPopover extends Component {
           <DialogTitle>{t('Update the organization')}</DialogTitle>
           <DialogContent>
             <OrganizationForm
-              initialValues={R.assoc('organization_tags', [], initialValues)}
+              initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
             />
@@ -173,7 +178,8 @@ class OrganizationPopover extends Component {
 const select = (state) => {
   const browser = storeBrowser(state);
   const userAdmin = browser.getMe().isAdmin();
-  return { userAdmin };
+  const { tags } = state.referential.entities;
+  return { userAdmin, tags };
 };
 
 OrganizationPopover.propTypes = {
@@ -182,6 +188,7 @@ OrganizationPopover.propTypes = {
   updateOrganization: PropTypes.func,
   deleteOrganization: PropTypes.func,
   userAdmin: PropTypes.bool,
+  tags: PropTypes.object,
 };
 
 export default R.compose(

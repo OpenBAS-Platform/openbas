@@ -37,6 +37,7 @@ const i18n = {
       'Start date (optional)': 'Date de début (optionnel)',
       'Create a player': 'Créer un joueur',
       'Update the player': 'Modifier le joueur',
+      'one month': 'un mois',
       'Phone number (mobile)': 'Numéro de téléphone (mobile)',
       'Phone number (fix)': 'Numéro de téléphone (fixe)',
       'PGP public key': 'Clé publique PGP',
