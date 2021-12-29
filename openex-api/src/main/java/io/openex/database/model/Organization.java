@@ -33,11 +33,11 @@ public class Organization implements Base {
 
     @Column(name = "organization_created_at")
     @JsonProperty("organization_created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "organization_updated_at")
     @JsonProperty("organization_updated_at")
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "organizations_tags",

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import * as R from 'ramda';
 import MenuItem from '@mui/material/MenuItem';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
@@ -10,10 +9,11 @@ import inject18n from '../../../components/i18n';
 
 class UserForm extends Component {
   render() {
-    const { t, onSubmit, initialValues } = this.props;
-    const options = R.map(
-      (val) => val.organization_name,
-      R.values(this.props.organizations),
+    const {
+      t, onSubmit, organizations, initialValues,
+    } = this.props;
+    const options = organizations.map(
+      (o) => ({ id: o.organization_id, label: o.organization_name }),
     );
     return (
       <Form onSubmit={onSubmit} initialValues={initialValues}>

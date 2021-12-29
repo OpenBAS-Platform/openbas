@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
@@ -7,7 +7,9 @@ import Button from '@mui/material/Button';
 import { withStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { updateUser, updateMePassword, meTokens } from '../../../actions/User';
+import {
+  updateMeProfile, updateMeInformation, updateMePassword, meTokens,
+} from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
@@ -43,52 +45,45 @@ const styles = (theme) => ({
   },
 });
 
-class Index extends Component {
-  componentDidMount() {
-    this.props.fetchOrganizations();
-    this.props.meTokens();
-  }
+const Index = (props) => {
+  useEffect(() => {
+    props.fetchOrganizations();
+    props.meTokens();
+  }, []);
 
-  onUpdate(data) {
-    return this.props.updateUser(this.props.user.user_id, data);
-  }
+  const {
+    classes, user, organizations, t,
+  } = props;
+  const userTokens = user.getTokens();
+  const organization = user.getOrganization();
+  const initOrganization = organization
+    ? { id: organization?.organization_id, label: organization?.organization_name } : undefined;
 
-  onUpdatePassword(data) {
-    return this.props.updateMePassword(data.user_plain_password);
-  }
+  const onUpdateProfile = (data) => {
+    const inputValues = R.assoc('user_organization', data.user_organization.id, data);
+    props.updateMeProfile(inputValues);
+  };
 
-  redirectToHome() {
-    this.props.history.push('/private');
-  }
+  const onUpdateInformation = (data) => props.updateMeInformation(data);
 
-  render() {
-    const { classes, t } = this.props;
-    const organizationPath = [
-      R.propOr('-', 'user_organization', this.props.user),
-      'organization_name',
-    ];
-    const organizationName = R.pathOr(
-      '-',
-      organizationPath,
-      this.props.organizations,
-    );
-    const initPipe = R.pipe(
-      R.assoc('user_organization', organizationName), // Reformat organization
-      R.pick([
-        'user_firstname',
-        'user_lastname',
-        'user_lang',
-        'user_email',
-        'user_organization',
-        'user_phone',
-        'user_phone2',
-        'user_pgp_key',
-      ]),
-    );
-    const informationValues = this.props.user !== undefined ? initPipe(this.props.user) : undefined;
-    const userTokens = this.props.user.getTokens();
-    const userToken = userTokens.length > 0 ? R.head(userTokens) : undefined;
-    return (
+  const onUpdatePassword = (data) => props.updateMePassword(data.user_plain_password);
+
+  const initPipe = R.pipe(
+    R.assoc('user_organization', initOrganization),
+    R.pick([
+      'user_firstname',
+      'user_lastname',
+      'user_lang',
+      'user_email',
+      'user_organization',
+      'user_phone',
+      'user_phone2',
+      'user_pgp_key',
+    ]),
+  );
+  const informationValues = user !== undefined ? initPipe(user) : undefined;
+  const userToken = userTokens.length > 0 ? R.head(userTokens) : undefined;
+  return (
       <div className={classes.container}>
         <div style={{ width: 800, margin: '0 auto' }}>
           <Paper variant="outlined" className={classes.paper}>
@@ -96,8 +91,8 @@ class Index extends Component {
               {t('Profile')}
             </Typography>
             <UserForm
-              organizations={this.props.organizations}
-              onSubmit={this.onUpdate.bind(this)}
+              organizations={organizations}
+              onSubmit={onUpdateProfile}
               initialValues={informationValues}
             />
             <br />
@@ -105,8 +100,7 @@ class Index extends Component {
               variant="contained"
               color="primary"
               type="submit"
-              form="userForm"
-            >
+              form="userForm">
               {t('Update')}
             </Button>
           </Paper>
@@ -115,7 +109,7 @@ class Index extends Component {
               {t('Information')}
             </Typography>
             <ProfileForm
-              onSubmit={this.onUpdate.bind(this)}
+              onSubmit={onUpdateInformation}
               initialValues={informationValues}
             />
             <br />
@@ -132,14 +126,13 @@ class Index extends Component {
             <Typography variant="h5" style={{ marginBottom: 20 }}>
               {t('Password')}
             </Typography>
-            <PasswordForm onSubmit={this.onUpdatePassword.bind(this)} />
+            <PasswordForm onSubmit={onUpdatePassword} />
             <br />
             <Button
               variant="contained"
               color="primary"
               type="submit"
-              form="passwordForm"
-            >
+              form="passwordForm">
               {t('Update')}
             </Button>
           </Paper>
@@ -155,8 +148,7 @@ class Index extends Component {
               <Typography
                 variant="h6"
                 gutterBottom={true}
-                style={{ marginTop: 20 }}
-              >
+                style={{ marginTop: 20 }}>
                 {t('Token key')}
               </Typography>
               <pre>{userToken?.token_value}</pre>
@@ -175,16 +167,14 @@ class Index extends Component {
               variant="contained"
               color="primary"
               component="a"
-              href="/swagger-ui/"
-            >
+              href="/swagger-ui/">
               {t('API documentation')}
             </Button>
           </Paper>
         </div>
       </div>
-    );
-  }
-}
+  );
+};
 
 Index.propTypes = {
   user: PropTypes.object,
@@ -196,17 +186,17 @@ Index.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  return {
-    user: browser.getMe(),
-    organizations: state.referential.entities.organizations,
-  };
+  const user = browser.getMe();
+  const organizations = browser.getOrganizations();
+  return { user, organizations };
 };
 
 export default R.compose(
   connect(select, {
     fetchOrganizations,
     meTokens,
-    updateUser,
+    updateMeProfile,
+    updateMeInformation,
     updateMePassword,
   }),
   inject18n,

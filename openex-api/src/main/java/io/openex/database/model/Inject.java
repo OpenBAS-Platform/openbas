@@ -61,11 +61,11 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     @Column(name = "inject_created_at")
     @JsonProperty("inject_created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "inject_updated_at")
     @JsonProperty("inject_updated_at")
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
     @Column(name = "inject_all_audiences")
     @JsonProperty("inject_all_audiences")

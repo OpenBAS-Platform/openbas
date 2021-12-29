@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class UserUpdateInput {
+public class UpdateProfileInput {
 
     @Email
     @JsonProperty("user_email")
@@ -24,14 +24,8 @@ public class UserUpdateInput {
     @JsonProperty("user_organization")
     private String organizationId;
 
-    @JsonProperty("user_pgp_key")
-    private String pgpKey;
-
-    @JsonProperty("user_phone")
-    private String phone;
-
-    @JsonProperty("user_phone2")
-    private String phone2;
+    @JsonProperty("user_lang")
+    private String lang;
 
     public String getEmail() {
         return email;
@@ -65,27 +59,11 @@ public class UserUpdateInput {
         this.organizationId = organizationId;
     }
 
-    public String getPgpKey() {
-        return pgpKey;
+    public String getLang() {
+        return lang;
     }
 
-    public void setPgpKey(String pgpKey) {
-        this.pgpKey = pgpKey;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getPhone2() {
-        return phone2;
-    }
-
-    public void setPhone2(String phone2) {
-        this.phone2 = phone2;
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 }

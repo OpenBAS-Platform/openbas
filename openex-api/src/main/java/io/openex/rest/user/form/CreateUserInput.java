@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class UserCreateInput {
+public class CreateUserInput {
 
     @Email
     @JsonProperty("user_email")

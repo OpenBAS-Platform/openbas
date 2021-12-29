@@ -1,24 +1,16 @@
 package io.openex.rest.user.form;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.validation.constraints.NotBlank;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class LoginInput {
+public class UpdatePasswordInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    private String login;
-
-    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("user_plain_password")
     private String password;
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
 
     public String getPassword() {
         return password;

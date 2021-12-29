@@ -106,11 +106,11 @@ public class Exercise implements Base {
 
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "exercise_updated_at")
     @JsonProperty("exercise_updated_at")
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)

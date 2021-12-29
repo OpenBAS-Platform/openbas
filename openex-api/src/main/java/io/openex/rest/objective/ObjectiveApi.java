@@ -11,13 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
-import static io.openex.database.model.User.ROLE_USER;
-
 @RestController
-@RolesAllowed(ROLE_USER)
 public class ObjectiveApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;

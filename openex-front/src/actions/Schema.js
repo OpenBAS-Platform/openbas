@@ -91,9 +91,8 @@ export const storeBrowser = (state) => ({
       isAdmin() {
         return usr.user_admin === true;
       },
-      getOrganizations() {
-        const all = R.values(state.referential.entities.organizations);
-        return R.filter((n) => n.organization_id === usr.user_organization, all);
+      getOrganization() {
+        return state.referential.entities.organizations[usr.user_organization];
       },
       getTokens() {
         const all = R.values(state.referential.entities.tokens);

@@ -15,21 +15,22 @@ export const updateUserPassword = (userId, password) => (dispatch) => putReferen
   user_plain_password: password,
 })(dispatch);
 
-export const updateUser = (userId, data) => (dispatch) => putReferential(
-  schema.user,
-  `/api/users/${userId}`,
-  data,
-)(dispatch).then((finalData) => {
-  dispatch({
-    type: Constants.LANG_UPDATE_ON_USER_CHANGE,
-    payload: finalData,
-  });
+export const updateUser = (userId, data) => (dispatch) => putReferential(schema.user, `/api/users/${userId}`, data)(dispatch).then((finalData) => {
+  dispatch({ type: Constants.LANG_UPDATE_ON_USER_CHANGE, payload: finalData });
 });
+
+export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);
+
+// Me
+export const meTokens = () => (dispatch) => getReferential(schema.arrayOfTokens, '/api/me/tokens')(dispatch);
 
 export const updateMePassword = (password) => (dispatch) => putReferential(schema.user, '/api/me/password', {
   user_plain_password: password,
 })(dispatch);
 
-export const meTokens = () => (dispatch) => getReferential(schema.arrayOfTokens, '/api/me/tokens')(dispatch);
+export const updateMeProfile = (data) => (dispatch) => putReferential(schema.user, '/api/me/profile', data)(dispatch)
+  .then((finalData) => {
+    dispatch({ type: Constants.LANG_UPDATE_ON_USER_CHANGE, payload: finalData });
+  });
 
-export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);
+export const updateMeInformation = (data) => (dispatch) => putReferential(schema.user, '/api/me/information', data)(dispatch);
