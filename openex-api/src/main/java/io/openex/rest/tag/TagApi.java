@@ -23,13 +23,13 @@ public class TagApi extends RestBehavior {
         this.tagRepository = tagRepository;
     }
 
-    @GetMapping("/api/tag")
+    @GetMapping("/api/tags")
     public Iterable<Tag> tags() {
         return tagRepository.findAll();
     }
 
     @RolesAllowed(ROLE_ADMIN)
-    @PutMapping("/api/tag/{tagId}")
+    @PutMapping("/api/tags/{tagId}")
     public Tag updateTag(@PathVariable String tagId,
                          @Valid @RequestBody TagUpdateInput input) {
         Tag tag = tagRepository.findById(tagId).orElseThrow();
@@ -38,7 +38,7 @@ public class TagApi extends RestBehavior {
     }
 
     @RolesAllowed(ROLE_ADMIN)
-    @PostMapping("/api/tag")
+    @PostMapping("/api/tags")
     public Tag createTag(@Valid @RequestBody TagCreateInput input) {
         Tag tag = new Tag();
         tag.setUpdateAttributes(input);
@@ -46,7 +46,7 @@ public class TagApi extends RestBehavior {
     }
 
     @RolesAllowed(ROLE_ADMIN)
-    @DeleteMapping("/api/tag/{tagId}")
+    @DeleteMapping("/api/tags/{tagId}")
     public void deleteTag(@PathVariable String tagId) {
         tagRepository.deleteById(tagId);
     }
