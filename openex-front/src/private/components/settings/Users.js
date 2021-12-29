@@ -19,7 +19,7 @@ import { fetchUsers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
-import SearchInput from '../../../components/SearchInput';
+import SearchFilter from '../../../components/SearchFilter';
 import CreateUser from './user/CreateUser';
 import UserPopover from './user/UserPopover';
 
@@ -250,7 +250,7 @@ class Users extends Component {
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
+            <SearchFilter
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}

@@ -9,10 +9,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import TagForm from '../settings/tag/TagForm';
-import { fetchTags, addTag } from '../../../actions/Tag';
-import { Autocomplete } from '../../../components/Autocomplete';
-import inject18n from '../../../components/i18n';
+import TagForm from '../private/components/settings/tag/TagForm';
+import { fetchTags, addTag } from '../actions/Tag';
+import { Autocomplete } from './Autocomplete';
+import inject18n from './i18n';
 
 const styles = () => ({
   icon: {

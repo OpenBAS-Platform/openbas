@@ -18,12 +18,13 @@ import inject18n from '../../components/i18n';
 import { fetchOrganizations } from '../../actions/Organization';
 import { FIVE_SECONDS } from '../../utils/Time';
 import ItemTags from '../../components/ItemTags';
-import SearchInput from '../../components/SearchInput';
 import { truncate } from '../../utils/String';
 import CreateOrganization from './organization/CreateOrganization';
 import OrganizationPopover from './organization/OrganizationPopover';
 import { storeBrowser } from '../../actions/Schema';
 import { fetchTags } from '../../actions/Tag';
+import SearchFilter from '../../components/SearchFilter';
+import TagsFilter from '../../components/TagsFilter';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -147,11 +148,13 @@ class Organizations extends Component {
   }
 
   handleAddTag(value) {
-    this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    if (value) {
+      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    }
   }
 
   handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n !== value, this.state.tags) });
+    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
   }
 
   reverseBy(field) {
@@ -202,7 +205,10 @@ class Organizations extends Component {
     const sortedOrganizations = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any((filter) => R.includes(filter, n.exercise_tags), tags),
+          || R.any(
+            (filter) => R.includes(filter, n.organization_tags),
+            R.pluck('id', tags),
+          ),
       ),
       R.filter(filterByKeyword),
       sort,
@@ -211,17 +217,17 @@ class Organizations extends Component {
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
+            <SearchFilter
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}
             />
           </div>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
-                variant="small"
-                onSubmit={this.handleSearch.bind(this)}
-                keyword={keyword}
+            <TagsFilter
+              onAddTag={this.handleAddTag.bind(this)}
+              onRemoveRag={this.handleRemoveTag.bind(this)}
+              currentTags={tags}
             />
           </div>
         </div>

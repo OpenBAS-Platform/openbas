@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
-import TagField from '../common/TagField';
+import TagField from '../../../components/TagField';
 
 class OrganizationForm extends Component {
   validate(values) {

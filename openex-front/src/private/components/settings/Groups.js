@@ -1,34 +1,34 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { connect } from 'react-redux';
-import { interval } from 'rxjs';
+import React, { Component } from "react";
+import * as PropTypes from "prop-types";
+import * as R from "ramda";
+import { withStyles } from "@mui/styles";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import { connect } from "react-redux";
+import { interval } from "rxjs";
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   PersonOutlined,
-} from '@mui/icons-material';
-import inject18n from '../../../components/i18n';
-import { fetchUsers } from '../../../actions/User';
-import { fetchOrganizations } from '../../../actions/Organization';
-import { FIVE_SECONDS } from '../../../utils/Time';
-import SearchInput from '../../../components/SearchInput';
-import CreateGroup from './group/CreateGroup';
-import { fetchGroups } from '../../../actions/Group';
-import { fetchExercises } from '../../../actions/Exercise';
-import GroupPopover from './group/GroupPopover';
+} from "@mui/icons-material";
+import inject18n from "../../../components/i18n";
+import { fetchUsers } from "../../../actions/User";
+import { fetchOrganizations } from "../../../actions/Organization";
+import { FIVE_SECONDS } from "../../../utils/Time";
+import SearchFilter from "../../../components/SearchFilter";
+import CreateGroup from "./group/CreateGroup";
+import { fetchGroups } from "../../../actions/Group";
+import { fetchExercises } from "../../../actions/Exercise";
+import GroupPopover from "./group/GroupPopover";
 
 const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   parameters: {
-    float: 'left',
+    float: "left",
     marginTop: -10,
   },
   container: {
@@ -36,30 +36,30 @@ const styles = (theme) => ({
   },
   itemHead: {
     paddingLeft: 10,
-    textTransform: 'uppercase',
-    cursor: 'pointer',
+    textTransform: "uppercase",
+    cursor: "pointer",
   },
   item: {
     paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
-    height: '100%',
+    height: "100%",
     fontSize: 13,
   },
   itemIcon: {
     color: theme.palette.primary.main,
   },
   goIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: -10,
   },
   inputLabel: {
-    float: 'left',
+    float: "left",
   },
   sortIcon: {
-    float: 'left',
-    margin: '-5px 0 0 15px',
+    float: "left",
+    margin: "-5px 0 0 15px",
   },
   icon: {
     color: theme.palette.primary.main,
@@ -68,53 +68,53 @@ const styles = (theme) => ({
 
 const inlineStylesHeaders = {
   iconSort: {
-    position: 'absolute',
-    margin: '0 0 0 5px',
+    position: "absolute",
+    margin: "0 0 0 5px",
     padding: 0,
-    top: '0px',
+    top: "0px",
   },
   group_name: {
-    float: 'left',
-    width: '30%',
+    float: "left",
+    width: "30%",
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   group_description: {
-    float: 'left',
-    width: '50%',
+    float: "left",
+    width: "50%",
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   group_users_number: {
-    float: 'left',
+    float: "left",
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 };
 
 const inlineStyles = {
   group_name: {
-    float: 'left',
-    width: '30%',
+    float: "left",
+    width: "30%",
     height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
   group_description: {
-    float: 'left',
-    width: '50%',
+    float: "left",
+    width: "50%",
     height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
   group_users_number: {
-    float: 'left',
+    float: "left",
     height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
 };
 
@@ -122,9 +122,9 @@ class Groups extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'group_name',
+      sortBy: "group_name",
       orderAsc: true,
-      keyword: '',
+      keyword: "",
       tags: [],
     };
   }
@@ -173,7 +173,7 @@ class Groups extends Component {
           onClick={this.reverseBy.bind(this, field)}
         >
           <span>{t(label)}</span>
-          {sortBy === field ? sortComponent : ''}
+          {sortBy === field ? sortComponent : ""}
         </div>
       );
     }
@@ -185,29 +185,30 @@ class Groups extends Component {
   }
 
   render() {
-    const {
-      classes, groups, exercises, organizations, users,
-    } = this.props;
+    const { classes, groups, exercises, organizations, users } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
-    const filterByKeyword = (n) => keyword === ''
-      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.group_description || '')
+    const filterByKeyword = (n) =>
+      keyword === "" ||
+      (n.group_name || "").toLowerCase().indexOf(keyword.toLowerCase()) !==
+        -1 ||
+      (n.group_description || "")
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
-      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
+      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))]
     );
     const sortedGroups = R.pipe(
-      R.map((n) => R.assoc('group_users_number', R.propOr([], 'group_users', n).length, n)),
+      R.map((n) =>
+        R.assoc("group_users_number", R.propOr([], "group_users", n).length, n)
+      ),
       R.filter(filterByKeyword),
-      sort,
+      sort
     )(groups);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
+          <div style={{ float: "left", marginRight: 20 }}>
+            <SearchFilter
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}
@@ -224,7 +225,7 @@ class Groups extends Component {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 8px',
+                  padding: "0 8px 0 8px",
                   fontWeight: 700,
                   fontSize: 12,
                 }}
@@ -235,57 +236,57 @@ class Groups extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('group_name', 'Name', true)}
-                  {this.sortHeader('group_description', 'Description', true)}
-                  {this.sortHeader('group_users_number', 'Users', true)}
+                  {this.sortHeader("group_name", "Name", true)}
+                  {this.sortHeader("group_description", "Description", true)}
+                  {this.sortHeader("group_users_number", "Users", true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
           {sortedGroups.map((group) => (
-              <ListItem
-                key={group.group_id}
-                classes={{ root: classes.item }}
-                divider={true}
-              >
-                <ListItemIcon>
-                  <PersonOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.group_name}
-                      >
-                        {group.group_name}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.group_description}
-                      >
-                        {group.group_description}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.group_users_number}
-                      >
-                        {group.group_users_number}
-                      </div>
+            <ListItem
+              key={group.group_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <PersonOutlined />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_name}
+                    >
+                      {group.group_name}
                     </div>
-                  }
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_description}
+                    >
+                      {group.group_description}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_users_number}
+                    >
+                      {group.group_users_number}
+                    </div>
+                  </div>
+                }
+              />
+              <ListItemSecondaryAction>
+                <GroupPopover
+                  group={group}
+                  groupUsersIds={group.group_users}
+                  organizations={organizations}
+                  users={users}
+                  exercises={exercises}
                 />
-                <ListItemSecondaryAction>
-                  <GroupPopover
-                    group={group}
-                    groupUsersIds={group.group_users}
-                    organizations={organizations}
-                    users={users}
-                    exercises={exercises}
-                  />
-                </ListItemSecondaryAction>
-              </ListItem>
+              </ListItemSecondaryAction>
+            </ListItem>
           ))}
         </List>
         <CreateGroup />
@@ -322,5 +323,5 @@ export default R.compose(
     fetchOrganizations,
   }),
   inject18n,
-  withStyles(styles),
+  withStyles(styles)
 )(Groups);

@@ -19,9 +19,10 @@ import { fetchUsers } from '../../actions/User';
 import { fetchOrganizations } from '../../actions/Organization';
 import { FIVE_SECONDS } from '../../utils/Time';
 import ItemTags from '../../components/ItemTags';
-import SearchInput from '../../components/SearchInput';
 import CreatePlayer from './player/CreatePlayer';
 import PlayerPopover from './player/PlayerPopover';
+import TagsFilter from '../../components/TagsFilter';
+import SearchFilter from '../../components/SearchFilter';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -149,7 +150,10 @@ class Players extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'user_email', orderAsc: true, keyword: '', tags: [],
+      sortBy: 'user_email',
+      orderAsc: true,
+      keyword: '',
+      tags: [],
     };
   }
 
@@ -210,7 +214,9 @@ class Players extends Component {
 
   render() {
     const { classes, users, organizations } = this.props;
-    const { keyword, sortBy, orderAsc } = this.state;
+    const {
+      keyword, sortBy, orderAsc, tags,
+    } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
@@ -247,10 +253,17 @@ class Players extends Component {
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
+            <SearchFilter
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}
+            />
+          </div>
+          <div style={{ float: 'left', marginRight: 20 }}>
+            <TagsFilter
+              onAddTag={this.handleAddTag.bind(this)}
+              onRemoveRag={this.handleRemoveTag.bind(this)}
+              currentTags={tags}
             />
           </div>
         </div>

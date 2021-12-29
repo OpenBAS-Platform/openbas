@@ -33,7 +33,7 @@ import {
 } from '../../../../actions/Group';
 import { addGrant, deleteGrant } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
-import SearchInput from '../../../../components/SearchInput';
+import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 
 const styles = {
@@ -280,7 +280,7 @@ class GroupPopover extends Component {
           maxWidth="md"
         >
           <DialogTitle>
-            <SearchInput
+            <SearchFilter
               onChange={this.handleSearchUsers.bind(this)}
               fullWidth={true}
             />

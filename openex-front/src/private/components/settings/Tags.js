@@ -17,7 +17,7 @@ import {
 import inject18n from '../../../components/i18n';
 import { fetchTags } from '../../../actions/Tag';
 import { FIVE_SECONDS } from '../../../utils/Time';
-import SearchInput from '../../../components/SearchInput';
+import SearchFilter from '../../../components/SearchFilter';
 import CreateTag from './tag/CreateTag';
 import TagPopover from './tag/TagPopover';
 
@@ -179,7 +179,7 @@ class Tags extends Component {
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
+            <SearchFilter
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}

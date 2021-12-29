@@ -34,7 +34,7 @@ const styles = (theme) => ({
   },
 });
 
-class SearchInput extends Component {
+class SearchFilter extends Component {
   render() {
     const {
       t, classes, onChange, onSubmit, variant, keyword, fullWidth,
@@ -45,6 +45,7 @@ class SearchInput extends Component {
     }
     return (
       <Input
+        style={{ height: 40 }}
         fullWidth={fullWidth}
         name="keyword"
         defaultValue={keyword}
@@ -80,7 +81,7 @@ class SearchInput extends Component {
   }
 }
 
-SearchInput.propTypes = {
+SearchFilter.propTypes = {
   keyword: PropTypes.string,
   t: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
@@ -90,4 +91,4 @@ SearchInput.propTypes = {
   fullWidth: PropTypes.bool,
 };
 
-export default compose(inject18n, withStyles(styles))(SearchInput);
+export default compose(inject18n, withStyles(styles))(SearchFilter);

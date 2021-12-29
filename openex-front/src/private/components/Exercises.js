@@ -18,7 +18,8 @@ import inject18n from '../../components/i18n';
 import { fetchExercises } from '../../actions/Exercise';
 import { FIVE_SECONDS } from '../../utils/Time';
 import ItemTags from '../../components/ItemTags';
-import SearchInput from '../../components/SearchInput';
+import SearchFilter from '../../components/SearchFilter';
+import TagsFilter from '../../components/TagsFilter';
 import CreateExercise from './exercise/CreateExercise';
 import { storeBrowser } from '../../actions/Schema';
 
@@ -239,17 +240,17 @@ class Exercises extends Component {
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
+            <SearchFilter
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}
             />
           </div>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchInput
-              variant="small"
-              onSubmit={this.handleSearch.bind(this)}
-              keyword={keyword}
+            <TagsFilter
+              onAddTag={this.handleAddTag.bind(this)}
+              onRemoveRag={this.handleRemoveTag.bind(this)}
+              currentTags={tags}
             />
           </div>
         </div>
