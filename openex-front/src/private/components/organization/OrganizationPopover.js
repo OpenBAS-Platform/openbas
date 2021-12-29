@@ -19,6 +19,7 @@ import {
 } from '../../../actions/Organization';
 import OrganizationForm from './OrganizationForm';
 import inject18n from '../../../components/i18n';
+import { storeBrowser } from '../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -170,10 +171,9 @@ class OrganizationPopover extends Component {
 }
 
 const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
-  return {
-    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
-  };
+  const browser = storeBrowser(state);
+  const userAdmin = browser.getMe().isAdmin();
+  return { userAdmin };
 };
 
 OrganizationPopover.propTypes = {

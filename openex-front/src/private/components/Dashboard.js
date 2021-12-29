@@ -8,6 +8,7 @@ import Grid from '@mui/material/Grid';
 import { connect } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -34,7 +35,6 @@ import MiniMap from './MiniMap';
 import inject18n from '../../components/i18n';
 import { fetchStatistics } from '../../actions/Application';
 import { storeBrowser } from '../../actions/Schema';
-import Loader from '../../components/Loader';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 
 const organizationsDistribution = [
@@ -45,7 +45,6 @@ const organizationsDistribution = [
   { label: 'RTE', value: 20 },
   { label: 'SNCF', value: 20 },
 ];
-
 const styles = () => ({
   root: {
     flexGrow: 1,
@@ -107,9 +106,6 @@ const Dashboard = (props) => {
   const {
     theme, classes, t, statistics,
   } = props;
-  if (!statistics) {
-    return <Loader />;
-  }
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -120,10 +116,10 @@ const Dashboard = (props) => {
             </div>
             <div className={classes.title}>{t('Exercises')}</div>
             <div className={classes.number}>
-              {statistics.exercises_count.global_count}
+              {statistics?.exercises_count?.global_count ?? '-'}
             </div>
             <ItemNumberDifference
-              difference={statistics.exercises_count.progression_count}
+              difference={statistics?.exercises_count?.progression_count ?? '0'}
               description={t('one month')}
             />
           </Paper>
@@ -135,10 +131,10 @@ const Dashboard = (props) => {
             </div>
             <div className={classes.title}>{t('Players')}</div>
             <div className={classes.number}>
-              {statistics.users_count.global_count}
+              {statistics?.users_count?.global_count ?? '-'}
             </div>
             <ItemNumberDifference
-              difference={statistics.users_count.progression_count}
+              difference={statistics?.users_count?.progression_count ?? '0'}
               description={t('one month')}
             />
           </Paper>
@@ -150,10 +146,10 @@ const Dashboard = (props) => {
             </div>
             <div className={classes.title}>{t('Injects')}</div>
             <div className={classes.number}>
-              {statistics.injects_count.global_count}
+              {statistics?.injects_count?.global_count ?? '-'}
             </div>
             <ItemNumberDifference
-              difference={statistics.injects_count.progression_count}
+              difference={statistics?.injects_count?.progression_count ?? '0'}
               description={t('one month')}
             />
           </Paper>
