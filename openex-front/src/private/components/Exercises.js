@@ -20,6 +20,7 @@ import { FIVE_SECONDS } from '../../utils/Time';
 import ItemTags from '../../components/ItemTags';
 import SearchInput from '../../components/SearchInput';
 import CreateExercise from './exercise/CreateExercise';
+import { storeBrowser } from '../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -368,11 +369,10 @@ Exercises.propTypes = {
 };
 
 const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
-  return {
-    exercises: R.values(state.referential.entities.exercises),
-    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
-  };
+  const browser = storeBrowser(state);
+  const userAdmin = browser.getMe().isAdmin();
+  const exercises = browser.getExercises();
+  return { exercises, userAdmin };
 };
 
 export default R.compose(

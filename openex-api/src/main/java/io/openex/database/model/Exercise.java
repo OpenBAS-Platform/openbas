@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -103,6 +104,14 @@ public class Exercise implements Base {
     @JsonProperty("exercise_longitude")
     private Double longitude;
 
+    @Column(name = "exercise_created_at")
+    @JsonProperty("exercise_created_at")
+    private Date createdAt;
+
+    @Column(name = "exercise_updated_at")
+    @JsonProperty("exercise_updated_at")
+    private Date updatedAt;
+
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
@@ -117,6 +126,15 @@ public class Exercise implements Base {
     @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
     private List<Objective> objectives = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "exercises_tags",
+            joinColumns = @JoinColumn(name = "exercise_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("audience_users")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Tag> tags = new ArrayList<>();
 
     // region transient
     @JsonProperty("exercise_status")
@@ -250,6 +268,22 @@ public class Exercise implements Base {
         return end;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public void setEnd(Date end) {
         this.end = end;
     }
@@ -316,5 +350,13 @@ public class Exercise implements Base {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

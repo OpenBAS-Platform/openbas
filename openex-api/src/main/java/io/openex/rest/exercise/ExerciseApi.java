@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.database.model.User.ROLE_PLANER;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static java.time.Instant.now;
@@ -152,7 +151,6 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region exercises
-    @RolesAllowed(ROLE_PLANER)
     @PostMapping("/api/exercises")
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         Exercise exercise = new Exercise();

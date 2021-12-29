@@ -88,11 +88,14 @@ export const storeBrowser = (state) => ({
   _buildUser(usr) {
     return {
       ...usr,
-      getOrganizations: () => {
+      isAdmin() {
+        return usr.user_admin === true;
+      },
+      getOrganizations() {
         const all = R.values(state.referential.entities.organizations);
         return R.filter((n) => n.organization_id === usr.user_organization, all);
       },
-      getTokens: () => {
+      getTokens() {
         const all = R.values(state.referential.entities.tokens);
         return R.filter((n) => n.token_user === usr.user_id, all);
       },
@@ -142,6 +145,9 @@ export const storeBrowser = (state) => ({
   getExercise(id) {
     const ex = state.referential.entities.exercises[id];
     return this._buildExercise(id, ex);
+  },
+  getStatistics() {
+    return state.referential.entities.statistics?.openex;
   },
   getMe() {
     const userId = R.path(['logged', 'user'], state.app);

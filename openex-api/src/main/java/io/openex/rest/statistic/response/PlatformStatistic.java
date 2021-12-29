@@ -8,18 +8,16 @@ public class PlatformStatistic {
     private String platformId = "openex";
 
     @JsonProperty("exercises_count")
-    private long exercisesCount;
+    private StatisticElement exercisesCount;
 
     @JsonProperty("users_count")
-    private long usersCount;
+    private StatisticElement usersCount;
 
     @JsonProperty("injects_count")
-    private long injectsCount;
+    private StatisticElement injectsCount;
 
-    public PlatformStatistic(long exercisesCount, long usersCount, long injectsCount) {
-        this.exercisesCount = exercisesCount;
-        this.usersCount = usersCount;
-        this.injectsCount = injectsCount;
+    public PlatformStatistic() {
+        // Default constructor
     }
 
     public String getPlatformId() {
@@ -30,27 +28,27 @@ public class PlatformStatistic {
         this.platformId = platformId;
     }
 
-    public long getExercisesCount() {
+    public StatisticElement getExercisesCount() {
         return exercisesCount;
     }
 
-    public void setExercisesCount(long exercisesCount) {
+    public void setExercisesCount(StatisticElement exercisesCount) {
         this.exercisesCount = exercisesCount;
     }
 
-    public long getUsersCount() {
+    public StatisticElement getUsersCount() {
         return usersCount;
     }
 
-    public void setUsersCount(long usersCount) {
+    public void setUsersCount(StatisticElement usersCount) {
         this.usersCount = usersCount;
     }
 
-    public long getInjectsCount() {
+    public StatisticElement getInjectsCount() {
         return injectsCount;
     }
 
-    public void setInjectsCount(long injectsCount) {
+    public void setInjectsCount(StatisticElement injectsCount) {
         this.injectsCount = injectsCount;
     }
 }

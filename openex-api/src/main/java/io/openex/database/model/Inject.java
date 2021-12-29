@@ -59,6 +59,14 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonProperty("inject_type")
     private String type;
 
+    @Column(name = "inject_created_at")
+    @JsonProperty("inject_created_at")
+    private Date createdAt;
+
+    @Column(name = "inject_updated_at")
+    @JsonProperty("inject_updated_at")
+    private Date updatedAt;
+
     @Column(name = "inject_all_audiences")
     @JsonProperty("inject_all_audiences")
     private boolean allAudiences;
@@ -155,6 +163,22 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public String getType() {

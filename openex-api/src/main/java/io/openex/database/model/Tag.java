@@ -25,6 +25,10 @@ public class Tag implements Base {
     @JsonProperty("tag_name")
     private String name;
 
+    @Column(name = "tag_color")
+    @JsonProperty("tag_color")
+    private String color;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "documents_tags",
             joinColumns = @JoinColumn(name = "tag_id"),
@@ -49,6 +53,14 @@ public class Tag implements Base {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public List<Document> getDocuments() {

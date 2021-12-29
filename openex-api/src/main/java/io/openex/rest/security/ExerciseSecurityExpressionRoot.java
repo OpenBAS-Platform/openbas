@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
-import static io.openex.database.model.User.ROLE_PLANER;
 
 public class ExerciseSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
@@ -29,7 +28,7 @@ public class ExerciseSecurityExpressionRoot extends SecurityExpressionRoot imple
     public boolean isExercisePlanner(String exerciseId) {
         User principal = (User) this.getPrincipal();
         boolean hasBypass = principal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .anyMatch(s -> s.equals(ROLE_PLANER) || s.equals(ROLE_ADMIN));
+                .anyMatch(s -> s.equals(ROLE_ADMIN));
         if (hasBypass) {
             return true;
         }

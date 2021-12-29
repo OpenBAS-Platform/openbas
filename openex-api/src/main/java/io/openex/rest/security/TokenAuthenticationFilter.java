@@ -57,9 +57,6 @@ public class TokenAuthenticationFilter extends GenericFilterBean {
                 if (user.isAdmin()) {
                     roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
                 }
-                if (user.isAdmin() || user.isPlanificateur()) {
-                    roles.add(new SimpleGrantedAuthority(ROLE_PLANER));
-                }
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 context.setAuthentication(new PreAuthenticatedAuthenticationToken(user, "", roles));
                 SecurityContextHolder.setContext(context);

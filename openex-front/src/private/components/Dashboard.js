@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
 import Countdown from 'react-countdown';
 import { withStyles, withTheme } from '@mui/styles';
 import Grid from '@mui/material/Grid';
+import { connect } from 'react-redux';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
@@ -34,6 +35,8 @@ import {
 import ItemTags from '../../components/ItemTags';
 import MiniMap from './MiniMap';
 import inject18n from '../../components/i18n';
+import { fetchStatistics } from '../../actions/Application';
+import { storeBrowser } from '../../actions/Schema';
 
 const organizationsDistribution = [
   { label: 'Luatix', value: 54 },
@@ -111,10 +114,12 @@ const styles = (theme) => ({
   },
 });
 
-class Dashboard extends Component {
-  render() {
-    const { theme, classes, t } = this.props;
-    return (
+const Dashboard = (props) => {
+  useEffect(() => { props.fetchStatistics(); }, []);
+  const {
+    theme, classes, t, statistics,
+  } = props;
+  return (
       <div className={classes.root}>
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={3}>
@@ -123,14 +128,14 @@ class Dashboard extends Component {
                 <RowingOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Exercises')}</div>
-              <div className={classes.number}>14</div>
+              <div className={classes.number}>{statistics.exercises_count.global_count}</div>
               <div className={classes.change}>
-                <Avatar
-                  sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}
-                >
+                <Avatar sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}>
                   <ArrowUpwardOutlined fontSize="small" />
                 </Avatar>
-                <div className={classes.changeText}>+2</div>
+                <div className={classes.changeText}>
+                  +{statistics.exercises_count.progression_count}
+                </div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
             </Paper>
@@ -141,14 +146,14 @@ class Dashboard extends Component {
                 <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Players')}</div>
-              <div className={classes.number}>156</div>
+              <div className={classes.number}>{statistics.users_count.global_count}</div>
               <div className={classes.change}>
-                <Avatar
-                  sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}
-                >
+                <Avatar sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}>
                   <ArrowUpwardOutlined fontSize="small" />
                 </Avatar>
-                <div className={classes.changeText}>+18</div>
+                <div className={classes.changeText}>
+                  +{statistics.users_count.progression_count}
+                </div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
             </Paper>
@@ -159,14 +164,14 @@ class Dashboard extends Component {
                 <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Injects')}</div>
-              <div className={classes.number}>89</div>
+              <div className={classes.number}>{statistics.injects_count.global_count}</div>
               <div className={classes.change}>
-                <Avatar
-                  sx={{ bgcolor: 'rgba(96, 125, 139, 0.08)', color: '#607d8b' }}
-                >
+                <Avatar sx={{ bgcolor: 'rgba(96, 125, 139, 0.08)', color: '#607d8b' }}>
                   <EastOutlined fontSize="small" />
                 </Avatar>
-                <div className={classes.changeText}>+0</div>
+                <div className={classes.changeText}>
+                  +{statistics.injects_count.progression_count}
+                </div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
             </Paper>
@@ -177,14 +182,12 @@ class Dashboard extends Component {
                 <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Messages')}</div>
-              <div className={classes.number}>289</div>
+              <div className={classes.number}>-</div>
               <div className={classes.change}>
-                <Avatar
-                  sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}
-                >
+                <Avatar sx={{ bgcolor: 'rgba(76, 175, 80, 0.08)', color: '#4caf50' }}>
                   <ArrowUpwardOutlined fontSize="small" />
                 </Avatar>
-                <div className={classes.changeText}>+15</div>
+                <div className={classes.changeText}>+0</div>
                 <div className={classes.since}>{t('one month')}</div>
               </div>
             </Paper>
@@ -629,9 +632,8 @@ class Dashboard extends Component {
           </Grid>
         </Grid>
       </div>
-    );
-  }
-}
+  );
+};
 
 Dashboard.propTypes = {
   classes: PropTypes.object,
@@ -639,4 +641,14 @@ Dashboard.propTypes = {
   t: PropTypes.func,
 };
 
-export default R.compose(inject18n, withTheme, withStyles(styles))(Dashboard);
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return { statistics: browser.getStatistics() };
+};
+
+export default R.compose(
+  connect(select, { fetchStatistics }),
+  inject18n,
+  withTheme,
+  withStyles(styles),
+)(Dashboard);

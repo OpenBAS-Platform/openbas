@@ -17,12 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
-import static io.openex.database.model.User.ROLE_PLANER;
 import static java.util.List.of;
 import static java.util.stream.StreamSupport.stream;
 
@@ -74,7 +72,6 @@ public class ComcheckApi extends RestBehavior {
         return comcheckStatusRepository.save(comcheckStatus);
     }
 
-    @RolesAllowed(ROLE_PLANER)
     @PostMapping("/api/exercises/{exerciseId}/comchecks")
     public Comcheck communicationCheck(@PathVariable String exerciseId,
                                        @Valid @RequestBody ComcheckInput comCheck) {

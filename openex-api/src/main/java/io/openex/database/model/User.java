@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.CryptoHelper;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,7 +22,6 @@ public class User implements Base, OAuth2User {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
-    public static final String ROLE_PLANER = "ROLE_PLANIFICATEUR";
 
     @Id
     @Column(name = "user_id")
@@ -45,10 +46,6 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_email")
     private String email;
 
-    @Column(name = "user_email2")
-    @JsonProperty("user_email2")
-    private String email2;
-
     @Column(name = "user_login")
     @JsonProperty("user_login")
     private String login;
@@ -60,10 +57,6 @@ public class User implements Base, OAuth2User {
     @Column(name = "user_phone2")
     @JsonProperty("user_phone2")
     private String phone2;
-
-    @Column(name = "user_phone3")
-    @JsonProperty("user_phone3")
-    private String phone3;
 
     @Column(name = "user_pgp_key")
     @JsonProperty("user_pgp_key")
@@ -77,6 +70,14 @@ public class User implements Base, OAuth2User {
     @JsonIgnore
     private String password;
 
+    @Column(name = "user_created_at")
+    @JsonProperty("user_created_at")
+    private Date createdAt;
+
+    @Column(name = "user_updated_at")
+    @JsonProperty("user_updated_at")
+    private Date updatedAt;
+
     @ManyToOne
     @JoinColumn(name = "user_organization")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -87,22 +88,6 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_admin")
     private boolean admin = false;
 
-    @Column(name = "user_planificateur")
-    @JsonProperty("user_planificateur")
-    private boolean planificateur = false;
-
-    @ManyToMany
-    @JoinTable(name = "users_groups",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("user_groups")
-    private List<Group> groups = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Token> tokens = new ArrayList<>();
-
     @Column(name = "user_latitude")
     @JsonProperty("user_latitude")
     private Double latitude;
@@ -110,6 +95,28 @@ public class User implements Base, OAuth2User {
     @Column(name = "user_longitude")
     @JsonProperty("user_longitude")
     private Double longitude;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Token> tokens = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_groups",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "group_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("user_groups")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Group> groups = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_audiences",
+            joinColumns = @JoinColumn(name = "audience_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("users_audiences")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Audience> audiences = new ArrayList<>();
 
     // region transient
     @JsonProperty("user_gravatar")
@@ -133,14 +140,6 @@ public class User implements Base, OAuth2User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getEmail2() {
-        return email2;
-    }
-
-    public void setEmail2(String email2) {
-        this.email2 = email2;
     }
 
     public String getLang() {
@@ -191,14 +190,6 @@ public class User implements Base, OAuth2User {
         this.phone2 = phone2;
     }
 
-    public String getPhone3() {
-        return phone3;
-    }
-
-    public void setPhone3(String phone3) {
-        this.phone3 = phone3;
-    }
-
     public Organization getOrganization() {
         return organization;
     }
@@ -215,12 +206,20 @@ public class User implements Base, OAuth2User {
         this.admin = admin;
     }
 
-    public boolean isPlanificateur() {
-        return planificateur;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPlanificateur(boolean planificateur) {
-        this.planificateur = planificateur;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public List<Group> getGroups() {
@@ -279,6 +278,14 @@ public class User implements Base, OAuth2User {
         this.status = status;
     }
 
+    public List<Audience> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<Audience> audiences) {
+        this.audiences = audiences;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
@@ -302,9 +309,6 @@ public class User implements Base, OAuth2User {
         roles.add(new SimpleGrantedAuthority(ROLE_USER));
         if (isAdmin()) {
             roles.add(new SimpleGrantedAuthority(ROLE_ADMIN));
-        }
-        if (isAdmin() || isPlanificateur()) {
-            roles.add(new SimpleGrantedAuthority(ROLE_PLANER));
         }
         return roles;
     }

@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.database.model.User.ROLE_PLANER;
 import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
@@ -79,7 +78,6 @@ public class InjectApi<T> extends RestBehavior {
                 .map(Contract::toRest).collect(Collectors.toList());
     }
 
-    @RolesAllowed({ROLE_PLANER})
     @GetMapping("/api/injects/try/{injectId}")
     public Execution execute(@PathVariable String injectId) {
         Optional<Inject<T>> injectOptional = injectRepository.findById(injectId);
