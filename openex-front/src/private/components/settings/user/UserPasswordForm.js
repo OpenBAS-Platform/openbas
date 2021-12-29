@@ -1,54 +1,45 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
 import { TextField } from '../../../../components/TextField';
-
-i18nRegister({
-  fr: {
-    'Email address': 'Adresse email',
-    Firstname: 'Prénom',
-    Lastname: 'Nom',
-    Organization: 'Organisation',
-    Administrator: 'Administrateur',
-  },
-});
-
-const validate = (values) => {
-  const errors = {};
-  if (
-    !values.user_plain_password
-    || values.user_plain_password !== values.password_confirmation
-  ) {
-    errors.user_plain_password = 'Passwords do no match';
-  }
-
-  return errors;
-};
+import inject18n from '../../../../components/i18n';
 
 class UserPasswordForm extends Component {
+  validate(values) {
+    const { t } = this.props;
+    const errors = {};
+    if (
+      !values.user_plain_password
+      || values.user_plain_password !== values.password_confirmation
+    ) {
+      errors.user_plain_password = t('Passwords do no match');
+    }
+    return errors;
+  }
+
   render() {
-    const { onSubmit, initialValues } = this.props;
+    const { t, onSubmit, initialValues } = this.props;
     return (
       <Form
         initialValues={initialValues}
         onSubmit={onSubmit}
-        validate={validate}
+        validate={this.validate.bind(this)}
       >
         {({ handleSubmit }) => (
           <form id="passwordForm" onSubmit={handleSubmit}>
             <TextField
+              variant="standard"
               name="user_plain_password"
               fullWidth={true}
               type="password"
-              label={<T>Password</T>}
+              label={t('Password')}
             />
             <TextField
+              variant="standard"
               name="password_confirmation"
               fullWidth={true}
               type="password"
-              label={<T>Confirmation</T>}
+              label={t('Confirmation')}
               style={{ marginTop: 20 }}
             />
           </form>
@@ -59,6 +50,7 @@ class UserPasswordForm extends Component {
 }
 
 UserPasswordForm.propTypes = {
+  t: PropTypes.func,
   error: PropTypes.string,
   pristine: PropTypes.bool,
   submitting: PropTypes.bool,
@@ -67,4 +59,4 @@ UserPasswordForm.propTypes = {
   change: PropTypes.func,
 };
 
-export default UserPasswordForm;
+export default inject18n(UserPasswordForm);

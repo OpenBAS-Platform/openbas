@@ -5,8 +5,9 @@ import { makeStyles } from '@mui/styles';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
 import NotFound from '../components/NotFound';
-import Dashboard from './components/Dashboard';
 import IndexProfile from './components/profile/Index';
+import IndexSettings from './components/settings/Index';
+import Dashboard from './components/Dashboard';
 import Exercises from './components/Exercises';
 import Players from './components/Players';
 import Organizations from './components/Organizations';
@@ -47,6 +48,7 @@ const Index = () => {
           <Route exact path="/exercises" component={Exercises} />
           <Route exact path="/players" component={Players} />
           <Route exact path="/organizations" component={Organizations} />
+          <Route path="/settings" component={IndexSettings} />
           <Route component={NotFound} />
         </Switch>
       </main>

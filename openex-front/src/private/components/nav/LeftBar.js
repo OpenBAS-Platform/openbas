@@ -140,7 +140,7 @@ const LeftBar = ({
           <MenuItem
             component={Link}
             to="/settings"
-            selected={location.pathname === '/settings'}
+            selected={location.pathname.includes('/settings')}
             dense={false}
             classes={{ root: classes.menuItem }}
           >

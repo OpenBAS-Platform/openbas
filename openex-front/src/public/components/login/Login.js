@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from '@mui/styles/withStyles';
+import { withStyles } from '@mui/styles';
 import Paper from '@mui/material/Paper';
 import * as R from 'ramda';
 import Button from '@mui/material/Button';
 import { VpnKeyOutlined } from '@mui/icons-material';
-import logo from '../../resources/images/logo.png';
+import logo from '../../../resources/images/logo.png';
 import {
   askToken,
   checkKerberos,
   fetchParameters,
-} from '../../actions/Application';
+} from '../../../actions/Application';
 import LoginForm from './LoginForm';
-import inject18n from '../../components/i18n';
+import inject18n from '../../../components/i18n';
 
 const styles = () => ({
   container: {

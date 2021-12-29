@@ -13,23 +13,14 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
-import { updateUser, deleteUser, updateUserPassword } from '../../../../actions/User';
+import {
+  updateUser,
+  deleteUser,
+  updateUserPassword,
+} from '../../../../actions/User';
 import UserForm from './UserForm';
+import inject18n from '../../../../components/i18n';
 import UserPasswordForm from './UserPasswordForm';
-import { submitForm } from '../../../../utils/Action';
-
-i18nRegister({
-  fr: {
-    'Do you want to delete this user?':
-      'Souhaitez-vous supprimer cet utilisateur ?',
-    'Update the user': "Mettre à jour l'utilisateur",
-    'Update the user password':
-      "Mettre à jour le mot de passe de l'utilisateur",
-    'Modify password': 'Modifier le mot de passe',
-  },
-});
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -67,15 +58,8 @@ class UserPopover extends Component {
 
   onSubmitEdit(data) {
     return this.props
-      .updateUser(
-        this.props.user.user_id,
-        R.assoc('user_admin', data.user_admin === true, data),
-      )
+      .updateUser(this.props.user.user_id, data)
       .then(() => this.handleCloseEdit());
-  }
-
-  submitFormEdit() {
-    this.refs.userForm.submit();
   }
 
   handleOpenEditPassword() {
@@ -93,10 +77,6 @@ class UserPopover extends Component {
       .then(() => this.handleCloseEditPassword());
   }
 
-  submitFormEditPassword() {
-    this.refs.userPasswordForm.submit();
-  }
-
   handleOpenDelete() {
     this.setState({ openDelete: true });
     this.handlePopoverClose();
@@ -112,6 +92,7 @@ class UserPopover extends Component {
   }
 
   render() {
+    const { t } = this.props;
     const organizationPath = [
       R.prop('user_organization', this.props.user),
       'organization_name',
@@ -127,14 +108,10 @@ class UserPopover extends Component {
         'user_firstname',
         'user_lastname',
         'user_email',
-        'user_email2',
         'user_organization',
         'user_phone',
         'user_phone2',
-        'user_phone3',
         'user_pgp_key',
-        'user_admin',
-        'user_planificateur',
       ]),
     )(this.props.user);
     return (
@@ -142,23 +119,23 @@ class UserPopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}
           onClose={this.handlePopoverClose.bind(this)}
-          style={{ marginTop: 50 }}
         >
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
-            <T>Edit</T>
+            {t('Update')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenEditPassword.bind(this)}>
-            <T>Modify password</T>
+            {t('Update password')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
-            <T>Delete</T>
+            {t('Delete')}
           </MenuItem>
         </Menu>
         <Dialog
@@ -168,22 +145,23 @@ class UserPopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              <T>Do you want to delete this user?</T>
+              {t('Do you want to delete this player?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button
-              variant="outlined"
+              variant="contained"
+              color="secondary"
               onClick={this.handleCloseDelete.bind(this)}
             >
-              <T>Cancel</T>
+              {t('Cancel')}
             </Button>
             <Button
-              variant="outlined"
-              color="secondary"
+              variant="contained"
+              color="primary"
               onClick={this.submitDelete.bind(this)}
             >
-              <T>Delete</T>
+              {t('Delete')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -192,9 +170,7 @@ class UserPopover extends Component {
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
         >
-          <DialogTitle>
-            <T>Update the user</T>
-          </DialogTitle>
+          <DialogTitle>{t('Update the player')}</DialogTitle>
           <DialogContent>
             <UserForm
               initialValues={initialValues}
@@ -205,17 +181,19 @@ class UserPopover extends Component {
           </DialogContent>
           <DialogActions>
             <Button
-              variant="outlined"
+              variant="contained"
+              color="secondary"
               onClick={this.handleCloseEdit.bind(this)}
             >
-              <T>Cancel</T>
+              {t('Cancel')}
             </Button>
             <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => submitForm('userForm')}
+              variant="contained"
+              color="primary"
+              type="submit"
+              form="playerForm"
             >
-              <T>Update</T>
+              {t('Update')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -224,25 +202,25 @@ class UserPopover extends Component {
           open={this.state.openEditPassword}
           onClose={this.handleCloseEditPassword.bind(this)}
         >
-          <DialogTitle>
-            <T>Update the user password</T>
-          </DialogTitle>
+          <DialogTitle>{t('Update the user password')}</DialogTitle>
           <DialogContent>
             <UserPasswordForm onSubmit={this.onSubmitEditPassword.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button
-              variant="outlined"
+              variant="contained"
+              color="secondary"
               onClick={this.handleCloseEditPassword.bind(this)}
             >
-              <T>Cancel</T>
+              {t('Cancel')}
             </Button>
             <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => submitForm('passwordForm')}
+              variant="contained"
+              color="primary"
+              type="submit"
+              form="passwordForm"
             >
-              <T>Update</T>
+              {t('Update')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -256,12 +234,15 @@ const select = (state) => ({
 });
 
 UserPopover.propTypes = {
+  t: PropTypes.func,
   user: PropTypes.object,
   updateUser: PropTypes.func,
   updateUserPassword: PropTypes.func,
   deleteUser: PropTypes.func,
   organizations: PropTypes.object,
-  children: PropTypes.node,
 };
 
-export default connect(select, { updateUser, updateUserPassword, deleteUser })(UserPopover);
+export default R.compose(
+  connect(select, { updateUser, updateUserPassword, deleteUser }),
+  inject18n,
+)(UserPopover);

@@ -5,7 +5,7 @@ import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import { AccountCircleOutlined } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
@@ -13,6 +13,8 @@ import MenuItem from '@mui/material/MenuItem';
 import { logout } from '../../../actions/Application';
 import logo from '../../../resources/images/logo_openex_horizontal_small.png';
 import inject18n from '../../../components/i18n';
+import TopMenuDashboard from './TopMenuDashboard';
+import TopMenuSettings from './TopMenuSettings';
 
 const styles = (theme) => ({
   appBar: {
@@ -23,6 +25,9 @@ const styles = (theme) => ({
     borderTop: 0,
     paddingTop: theme.spacing(0.2),
   },
+  flex: {
+    flexGrow: 1,
+  },
   logoContainer: {
     marginLeft: -10,
   },
@@ -30,15 +35,35 @@ const styles = (theme) => ({
     cursor: 'pointer',
     height: 35,
   },
-  title: {
-    fontSize: 25,
-    marginLeft: 20,
+  menuContainer: {
+    float: 'left',
+    marginLeft: 40,
   },
   barRight: {
     position: 'absolute',
     right: 5,
+    verticalAlign: 'middle',
+    height: '100%',
+  },
+  barContainer: {
+    display: 'table-cell',
+    float: 'left',
+    paddingTop: 10,
+  },
+  divider: {
+    display: 'table-cell',
+    float: 'left',
+    height: '100%',
+    margin: '0 5px 0 5px',
+  },
+  searchContainer: {
+    display: 'table-cell',
+    float: 'left',
+    marginRight: 5,
+    paddingTop: 9,
   },
   button: {
+    display: 'table-cell',
     float: 'left',
   },
 });
@@ -63,7 +88,7 @@ class TopBar extends Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, location } = this.props;
     return (
       <AppBar position="fixed" className={classes.appBar} variant="outlined">
         <Toolbar>
@@ -71,6 +96,11 @@ class TopBar extends Component {
             <Link to="/">
               <img src={logo} alt="logo" className={classes.logo} />
             </Link>
+          </div>
+          <div className={classes.menuContainer}>
+            {(location.pathname === '/'
+              || location.pathname.includes('/import')) && <TopMenuDashboard />}
+            {location.pathname.includes('/settings') && <TopMenuSettings />}
           </div>
           <div className={classes.barRight}>
             <IconButton
@@ -107,6 +137,7 @@ TopBar.propTypes = {
   classes: PropTypes.object,
   userGravatar: PropTypes.string,
   logout: PropTypes.func,
+  location: PropTypes.object,
 };
 
 const select = (state) => {
@@ -122,5 +153,6 @@ const select = (state) => {
 export default R.compose(
   connect(select, { logout }),
   inject18n,
+  withRouter,
   withStyles(styles),
 )(TopBar);

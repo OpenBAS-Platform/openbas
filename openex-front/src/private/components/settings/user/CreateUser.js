@@ -11,18 +11,9 @@ import Button from '@mui/material/Button';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
-import { i18nRegister } from '../../../../utils/Messages';
 import { addUser } from '../../../../actions/User';
 import UserForm from './UserForm';
-import { T } from '../../../../components/I18n';
-import { submitForm } from '../../../../utils/Action';
-
-i18nRegister({
-  fr: {
-    'Create user': "Créer l'utilisateur",
-    'Create a user': 'Créer un utilisateur',
-  },
-});
+import inject18n from '../../../../components/i18n';
 
 const styles = () => ({
   createButton: {
@@ -58,12 +49,12 @@ class CreateUser extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, t } = this.props;
     return (
       <div>
         <Fab
           onClick={this.handleOpenCreate.bind(this)}
-          color="secondary"
+          color="primary"
           aria-label="Add"
           className={classes.createButton}
         >
@@ -74,9 +65,7 @@ class CreateUser extends Component {
           TransitionComponent={Transition}
           onClose={this.handleCloseCreate.bind(this)}
         >
-          <DialogTitle>
-            <T>Create a user</T>
-          </DialogTitle>
+          <DialogTitle>{t('Create a user')}</DialogTitle>
           <DialogContent>
             <UserForm
               editing={false}
@@ -86,17 +75,19 @@ class CreateUser extends Component {
           </DialogContent>
           <DialogActions>
             <Button
-              variant="outlined"
+              variant="contained"
+              color="secondary"
               onClick={this.handleCloseCreate.bind(this)}
             >
-              <T>Cancel</T>
+              {t('Cancel')}
             </Button>
             <Button
-              variant="outlined"
-              color="secondary"
-              onClick={() => submitForm('userForm')}
+              variant="contained"
+              color="primary"
+              type="submit"
+              form="playerForm"
             >
-              <T>Create</T>
+              {t('Create')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -106,6 +97,7 @@ class CreateUser extends Component {
 }
 
 CreateUser.propTypes = {
+  t: PropTypes.func,
   organizations: PropTypes.object,
   addUser: PropTypes.func,
 };
@@ -116,5 +108,6 @@ const select = (state) => ({
 
 export default R.compose(
   connect(select, { addUser }),
+  inject18n,
   withStyles(styles),
 )(CreateUser);

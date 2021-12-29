@@ -2,8 +2,8 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import { TextField } from '../../components/TextField';
-import inject18n from '../../components/i18n';
+import { TextField } from '../../../components/TextField';
+import inject18n from '../../../components/i18n';
 
 const LoginForm = (props) => {
   const { t, error, onSubmit } = props;
