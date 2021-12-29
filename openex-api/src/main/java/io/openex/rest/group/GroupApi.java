@@ -40,7 +40,7 @@ public class GroupApi extends RestBehavior {
     }
 
     @PutMapping("/api/groups/{groupId}")
-    public Group updateExercise(@PathVariable String groupId,
+    public Group updateGroup(@PathVariable String groupId,
                                 @Valid @RequestBody GroupUpdateInput groupInput) {
         Group group = groupRepository.findById(groupId).orElseThrow();
         Spliterator<User> userSpliterator = userRepository.findAllById(groupInput.getUserIds()).spliterator();
