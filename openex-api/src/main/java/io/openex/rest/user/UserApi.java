@@ -3,11 +3,14 @@ package io.openex.rest.user;
 import io.openex.config.OpenExConfig;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
+import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TokenRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.LoginInput;
 import io.openex.rest.user.form.PasswordInput;
+import io.openex.rest.user.form.UserCreateInput;
+import io.openex.rest.user.form.UserUpdateInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -24,14 +27,21 @@ import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.database.specification.TokenSpecification.fromUser;
+import static io.openex.helper.DatabaseHelper.updateRelationResolver;
 
 @RestController
 public class UserApi extends RestBehavior {
 
+    private OrganizationRepository organizationRepository;
     private UserRepository userRepository;
     private TokenRepository tokenRepository;
     private UserService userService;
     private OpenExConfig openExConfig;
+
+    @Autowired
+    public void setOrganizationRepository(OrganizationRepository organizationRepository) {
+        this.organizationRepository = organizationRepository;
+    }
 
     @Autowired
     public void setTokenRepository(TokenRepository tokenRepository) {
@@ -94,6 +104,31 @@ public class UserApi extends RestBehavior {
         User user = userRepository.findById(userId).orElseThrow();
         user.setPassword(userService.encodeUserPassword(input.getPassword()));
         return userRepository.save(user);
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @PostMapping("/api/users")
+    public User createUser(@Valid @RequestBody UserCreateInput input) {
+        User user = new User();
+        user.setUpdateAttributes(input);
+        user.setLogin(input.getEmail());
+        user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+        return userRepository.save(user);
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @PutMapping("/api/users/{userId}")
+    public User updateUser(@PathVariable String userId, @Valid @RequestBody UserUpdateInput input) {
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setUpdateAttributes(input);
+        user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+        return userRepository.save(user);
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @DeleteMapping("/api/users/{userId}")
+    public void deleteUser(@PathVariable String userId) {
+        userRepository.deleteById(userId);
     }
 
     // region me

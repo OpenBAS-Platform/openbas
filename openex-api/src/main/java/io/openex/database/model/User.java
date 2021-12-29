@@ -64,7 +64,7 @@ public class User implements Base, OAuth2User {
 
     @Column(name = "user_status")
     @JsonProperty("user_status")
-    private Short status;
+    private Short status = 0;
 
     @Column(name = "user_password")
     @JsonIgnore
@@ -72,11 +72,11 @@ public class User implements Base, OAuth2User {
 
     @Column(name = "user_created_at")
     @JsonProperty("user_created_at")
-    private Date createdAt;
+    private Date createdAt = new Date();
 
     @Column(name = "user_updated_at")
     @JsonProperty("user_updated_at")
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 
     @ManyToOne
     @JoinColumn(name = "user_organization")
