@@ -10,9 +10,9 @@ export const fetchOrganizations = () => (dispatch) => getReferential(schema.arra
 
 export const addOrganization = (data) => (dispatch) => postReferential(schema.organization, '/api/organizations', data)(dispatch);
 
-export const updateOrganization = (organizationId, type, data) => (dispatch) => putReferential(
+export const updateOrganization = (organizationId, data) => (dispatch) => putReferential(
   schema.organization,
-  `/api/organizations/${organizationId}/${type}`,
+  `/api/organizations/${organizationId}`,
   data,
 )(dispatch);
 

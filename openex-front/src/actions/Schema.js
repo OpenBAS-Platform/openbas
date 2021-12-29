@@ -21,7 +21,7 @@ export const testsDeleteUsers = new schema.Object('delete_users_result');
 export const simulateChangeDuration = new schema.Array();
 export const changeDuration = new schema.Object('change_duration');
 
-export const tag = new schema.Entity('tag', {}, { idAttribute: 'tag_id' });
+export const tag = new schema.Entity('tags', {}, { idAttribute: 'tag_id' });
 export const arrayOfTags = new schema.Array(tag);
 
 export const injectType = new schema.Entity('inject_types', {}, { idAttribute: 'type' });

@@ -3,6 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
+import TagField from '../common/TagField';
 
 class OrganizationForm extends Component {
   validate(values) {
@@ -42,6 +43,7 @@ class OrganizationForm extends Component {
               label={t('Description')}
               style={{ marginTop: 20 }}
             />
+            <TagField name="organization_tags" />
           </form>
         )}
       </Form>

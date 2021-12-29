@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as R from 'ramda';
 import { LabelOutlined } from '@mui/icons-material';
+import Box from '@mui/material/Box';
 import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import inject18n from '../../../components/i18n';
@@ -44,6 +45,14 @@ class TagField extends Component {
     const {
       t, name, tags, classes,
     } = this.props;
+    const tagsOptions = R.map(
+      (n) => ({
+        id: n.tag_id,
+        label: n.tag_name,
+        color: n.tag_color,
+      }),
+      tags,
+    );
     return (
       <div>
         <Autocomplete
@@ -52,16 +61,16 @@ class TagField extends Component {
           fullWidth={true}
           multiple={true}
           label={t('Tags')}
-          options={tags}
+          options={tagsOptions}
           style={{ marginTop: 20 }}
           openCreate={this.handleOpenTagCreation.bind(this)}
-          renderOption={(option) => (
-            <React.Fragment>
-              <div className={classes.icon} style={{ color: option.tag_color }}>
+          renderOption={(props, option) => (
+            <Box component="li" {...props}>
+              <div className={classes.icon} style={{ color: option.color }}>
                 <LabelOutlined />
               </div>
-              <div className={classes.text}>{option.tag_name}</div>
-            </React.Fragment>
+              <div className={classes.text}>{option.label}</div>
+            </Box>
           )}
         />
       </div>

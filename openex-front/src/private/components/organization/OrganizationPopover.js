@@ -54,8 +54,11 @@ class OrganizationPopover extends Component {
   }
 
   onSubmitEdit(data) {
+    const inputValues = R.pipe(
+      R.assoc('organization_tags', R.pluck('id', data.organization_tags)),
+    )(data);
     return this.props
-      .updateOrganization(this.props.organization.organization_id, data)
+      .updateOrganization(this.props.organization.organization_id, inputValues)
       .then(() => this.handleCloseEdit());
   }
 
@@ -75,27 +78,13 @@ class OrganizationPopover extends Component {
 
   render() {
     const { t } = this.props;
-    const organizationPath = [
-      R.prop('user_organization', this.props.user),
-      'organization_name',
-    ];
-    const organizationName = R.pathOr(
-      '-',
-      organizationPath,
-      this.props.organizations,
-    );
     const initialValues = R.pipe(
-      R.assoc('user_organization', organizationName), // Reformat organization
       R.pick([
-        'user_firstname',
-        'user_lastname',
-        'user_email',
-        'user_organization',
-        'user_phone',
-        'user_phone2',
-        'user_pgp_key',
+        'organization_name',
+        'organization_description',
+        'organization_tags',
       ]),
-    )(this.props.user);
+    )(this.props.organization);
     return (
       <div>
         <IconButton
@@ -152,7 +141,7 @@ class OrganizationPopover extends Component {
           <DialogTitle>{t('Update the organization')}</DialogTitle>
           <DialogContent>
             <OrganizationForm
-              initialValues={initialValues}
+              initialValues={R.assoc('organization_tags', [], initialValues)}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
             />
@@ -183,7 +172,6 @@ class OrganizationPopover extends Component {
 const select = (state) => {
   const userId = R.path(['logged', 'user'], state.app);
   return {
-    organizations: state.referential.entities.organizations,
     userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
   };
 };

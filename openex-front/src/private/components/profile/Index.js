@@ -79,11 +79,9 @@ class Index extends Component {
         'user_lastname',
         'user_lang',
         'user_email',
-        'user_email2',
         'user_organization',
         'user_phone',
         'user_phone2',
-        'user_phone3',
         'user_pgp_key',
       ]),
     );
