@@ -114,9 +114,18 @@ public class User implements Base, OAuth2User {
             joinColumns = @JoinColumn(name = "audience_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("users_audiences")
+    @JsonProperty("user_audiences")
     @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_tags",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("user_tags")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Tag> tags = new ArrayList<>();
 
     // region transient
     @JsonProperty("user_gravatar")
@@ -284,6 +293,14 @@ public class User implements Base, OAuth2User {
 
     public void setAudiences(List<Audience> audiences) {
         this.audiences = audiences;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override

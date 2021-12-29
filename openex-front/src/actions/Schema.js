@@ -91,6 +91,11 @@ export const storeBrowser = (state) => ({
       isAdmin() {
         return usr.user_admin === true;
       },
+      getTags() {
+        return usr.user_tags
+          .map((id) => state.referential.entities.tags[id])
+          .filter((t) => t !== undefined);
+      },
       getOrganization() {
         return state.referential.entities.organizations[usr.user_organization];
       },
@@ -104,7 +109,7 @@ export const storeBrowser = (state) => ({
     const browser = this;
     return {
       ...aud,
-      getUsers: () => {
+      getUsers() {
         const all = R.values(state.referential.entities.users);
         return R.filter((n) => aud.audience_users.includes(n.user_id), all)
           .map((u) => browser._buildUser(u));
@@ -114,9 +119,11 @@ export const storeBrowser = (state) => ({
   _buildOrganization(org) {
     return {
       ...org,
-      getTags: () => org.organization_tags
-        .map((id) => state.referential.entities.tags[id])
-        .filter((t) => t !== undefined),
+      getTags() {
+        return org.organization_tags
+          .map((id) => state.referential.entities.tags[id])
+          .filter((t) => t !== undefined);
+      },
     };
   },
   _buildExercise(id, ex) {

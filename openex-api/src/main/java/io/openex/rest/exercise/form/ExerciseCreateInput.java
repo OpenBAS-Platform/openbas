@@ -3,7 +3,9 @@ package io.openex.rest.exercise.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -27,6 +29,9 @@ public class ExerciseCreateInput {
     @JsonProperty("exercise_end_date")
     private Date end;
 
+    @JsonProperty("exercise_tags")
+    private List<String> tagIds = new ArrayList<>();
+
     public String getName() {
         return name;
     }
@@ -49,6 +54,14 @@ public class ExerciseCreateInput {
 
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
+    }
+
+    public List<String> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<String> tagIds) {
+        this.tagIds = tagIds;
     }
 
     public Date getStart() {

@@ -32,12 +32,16 @@ public class RestBehavior {
         return bag;
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(AccessDeniedException.class)
-    public Map<String, String> handleValidationExceptions() {
-        Map<String, String> errors = new HashMap<>();
-        errors.put("Access is denied", "ACCESS_DENIED");
-        return errors;
+    public ValidationErrorBag handleValidationExceptions() {
+        ValidationErrorBag bag = new ValidationErrorBag(HttpStatus.UNAUTHORIZED.value(), "ACCESS_DENIED");
+        ValidationError errors = new ValidationError();
+        Map<String, ValidationContent> errorsBag = new HashMap<>();
+        errorsBag.put("username", new ValidationContent("Invalid user or password"));
+        errors.setChildren(errorsBag);
+        bag.setErrors(errors);
+        return bag;
     }
 
     protected <T> List<T> fromIterable(Iterable<T> results) {

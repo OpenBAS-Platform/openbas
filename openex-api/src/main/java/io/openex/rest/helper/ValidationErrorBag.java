@@ -36,6 +36,15 @@ public class ValidationErrorBag {
     private String message = "Validation Failed";
     private ValidationError errors;
 
+    public ValidationErrorBag() {
+        // Default constructor
+    }
+
+    public ValidationErrorBag(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public int getCode() {
         return code;
     }

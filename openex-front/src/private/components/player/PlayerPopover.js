@@ -16,6 +16,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { updateUser, deleteUser } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
+import { storeBrowser } from '../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -75,17 +76,11 @@ class PlayerPopover extends Component {
 
   render() {
     const {
-      t, userAdmin, user, tags, organizations,
+      t, userAdmin, user, organizations,
     } = this.props;
-    const organizationPath = [
-      R.prop('user_organization', this.props.user),
-      'organization_name',
-    ];
-    const organizationName = R.pathOr('-', organizationPath, organizations);
-    const userTags = R.map((n) => {
-      const tag = R.propOr({}, n, tags);
-      return { id: tag.tag_id, label: tag.tag_name, color: tag.tag_color };
-    }, user.user_tags);
+    const organizationName = user.getOrganization()?.organization_name;
+    const userTags = user.getTags()
+      .map((tag) => ({ id: tag.tag_id, label: tag.tag_name, color: tag.tag_color }));
     const initialValues = R.pipe(
       R.assoc('user_organization', organizationName),
       R.assoc('user_tags', userTags),
@@ -188,13 +183,10 @@ class PlayerPopover extends Component {
 }
 
 const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
-  const { tags, organizations } = state.referential.entities;
-  return {
-    tags,
-    organizations,
-    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
-  };
+  const browser = storeBrowser(state);
+  const user = browser.getMe();
+  const organizations = browser.getOrganizations();
+  return { user, userAdmin: user.isAdmin(), organizations };
 };
 
 PlayerPopover.propTypes = {

@@ -28,6 +28,7 @@ import static java.time.Instant.now;
 @RolesAllowed(ROLE_USER)
 public class ExerciseApi<T> extends RestBehavior {
     // region repositories
+    private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
     private ExerciseLogRepository exerciseLogRepository;
@@ -41,6 +42,11 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setTagRepository(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
+
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
@@ -156,6 +162,7 @@ public class ExerciseApi<T> extends RestBehavior {
         Exercise exercise = new Exercise();
         exercise.setUpdateAttributes(input);
         exercise.setOwner(currentUser());
+        exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return exerciseRepository.save(exercise);
     }
 
