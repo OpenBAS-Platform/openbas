@@ -65,7 +65,7 @@ class CreateGroup extends Component {
           TransitionComponent={Transition}
           onClose={this.handleCloseCreate.bind(this)}
         >
-          <DialogTitle>{t('Create a group')}</DialogTitle>
+          <DialogTitle>{t('Create a new group')}</DialogTitle>
           <DialogContent>
             <GroupForm
               editing={false}

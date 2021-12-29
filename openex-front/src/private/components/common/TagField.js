@@ -4,9 +4,15 @@ import { LabelOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
-import inject18n from '../../../components/i18n';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import TagForm from '../settings/tag/TagForm';
+import { fetchTags, addTag } from '../../../actions/Tag';
 import { Autocomplete } from '../../../components/Autocomplete';
-import { fetchTags } from '../../../actions/Tag';
+import inject18n from '../../../components/i18n';
 
 const styles = () => ({
   icon: {
@@ -41,6 +47,12 @@ class TagField extends Component {
     this.setState({ tagCreation: false });
   }
 
+  onSubmit(data) {
+    this.props
+      .addTag(data)
+      .then((result) => (result.result ? this.handleCloseTagCreation() : result));
+  }
+
   render() {
     const {
       t, name, tags, classes,
@@ -73,6 +85,32 @@ class TagField extends Component {
             </Box>
           )}
         />
+        <Dialog
+          open={this.state.tagCreation}
+          onClose={this.handleCloseTagCreation.bind(this)}
+        >
+          <DialogTitle>{t('Create a new tag')}</DialogTitle>
+          <DialogContent>
+            <TagForm onSubmit={this.onSubmit.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseTagCreation.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              form="tagForm"
+            >
+              {t('Create')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -83,7 +121,7 @@ const select = (state) => ({
 });
 
 export default R.compose(
-  connect(select, { fetchTags }),
+  connect(select, { fetchTags, addTag }),
   inject18n,
   withStyles(styles),
 )(TagField);

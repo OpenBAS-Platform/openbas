@@ -12,16 +12,14 @@ import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  PersonOutlined,
+  LabelOutlined,
 } from '@mui/icons-material';
 import inject18n from '../../../components/i18n';
-import { fetchUsers } from '../../../actions/User';
-import { fetchOrganizations } from '../../../actions/Organization';
+import { fetchTags } from '../../../actions/Tag';
 import { FIVE_SECONDS } from '../../../utils/Time';
-import ItemTags from '../../../components/ItemTags';
 import SearchInput from '../../../components/SearchInput';
-import CreateUser from './user/CreateUser';
-import UserPopover from './user/UserPopover';
+import CreateTag from './tag/CreateTag';
+import TagPopover from './tag/TagPopover';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -72,31 +70,13 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  user_email: {
+  tag_name: {
     float: 'left',
-    width: '25%',
+    width: '40%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_firstname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_organization: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_tags: {
+  tag_color: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -104,39 +84,15 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  user_email: {
+  tag_name: {
     float: 'left',
-    width: '25%',
+    width: '40%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_firstname: {
-    float: 'left',
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_organization: {
-    float: 'left',
-    width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_tags: {
+  tag_color: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -145,11 +101,11 @@ const inlineStyles = {
   },
 };
 
-class Users extends Component {
+class Tags extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'name',
+      sortBy: 'tag_name',
       orderAsc: true,
       keyword: '',
       tags: [],
@@ -157,11 +113,9 @@ class Users extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchOrganizations();
-    this.props.fetchUsers();
+    this.props.fetchTags();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchOrganizations();
-      this.props.fetchUsers();
+      this.props.fetchTags();
     });
   }
 
@@ -212,40 +166,15 @@ class Users extends Component {
   }
 
   render() {
-    const { classes, users, organizations } = this.props;
+    const { classes, tags } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_organization || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.tag_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+      || (n.tag_color || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedUsers = R.pipe(
-      R.map((u) => {
-        const userOrganization = R.propOr(
-          {},
-          u.user_organization,
-          organizations,
-        );
-        const organizationName = R.propOr(
-          '-',
-          'organization_name',
-          userOrganization,
-        );
-        return R.assoc('user_organization', organizationName, u);
-      }),
-      R.filter(filterByKeyword),
-      sort,
-    )(users);
+    const sortedTags = R.pipe(R.filter(filterByKeyword), sort)(tags);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -278,103 +207,66 @@ class Users extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('user_email', 'Email address', true)}
-                  {this.sortHeader('user_firstname', 'Firstname', true)}
-                  {this.sortHeader('user_lastname', 'Lastname', true)}
-                  {this.sortHeader('user_organization', 'Organization', true)}
-                  {this.sortHeader('user_tags', 'Tags', true)}
+                  {this.sortHeader('tag_name', 'Name', true)}
+                  {this.sortHeader('tag_color', 'Color', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedUsers.map((user) => (
+          {sortedTags.map((tag) => (
             <ListItem
-              key={user.user_id}
+              key={tag.tag_id}
               classes={{ root: classes.item }}
               divider={true}
             >
               <ListItemIcon>
-                <PersonOutlined />
+                <ListItemIcon style={{ color: tag.tag_color }}>
+                  <LabelOutlined />
+                </ListItemIcon>
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_email}
+                      style={inlineStyles.tag_name}
                     >
-                      {user.user_email}
+                      {tag.tag_name}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_firstname}
+                      style={inlineStyles.tag_color}
                     >
-                      {user.user_firstname}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.user_lastname}
-                    >
-                      {user.user_lastname}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.user_organization}
-                    >
-                      {user.user_organization}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
-                    >
-                      <ItemTags
-                        variant="list"
-                        tags={[
-                          {
-                            tag_id: 1,
-                            tag_name: 'cyber',
-                            tag_color: '#17BDBD',
-                          },
-                          {
-                            tag_id: 2,
-                            tag_name: 'crisis',
-                            tag_color: '#CF271A',
-                          },
-                        ]}
-                      />
+                      {tag.tag_color}
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <UserPopover user={user} />
+                <TagPopover tag={tag} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <CreateUser />
+        <CreateTag />
       </div>
     );
   }
 }
 
-Users.propTypes = {
+Tags.propTypes = {
   t: PropTypes.func,
-  nsdt: PropTypes.func,
-  users: PropTypes.array,
-  organizations: PropTypes.object,
-  fetchUsers: PropTypes.func,
-  fetchOrganizations: PropTypes.func,
+  tags: PropTypes.array,
+  fetchTags: PropTypes.func,
 };
 
 const select = (state) => ({
-  organizations: state.referential.entities.organizations,
-  users: R.values(state.referential.entities.users),
+  tags: R.values(state.referential.entities.tags),
 });
 
 export default R.compose(
-  connect(select, { fetchUsers, fetchOrganizations }),
+  connect(select, { fetchTags }),
   inject18n,
   withStyles(styles),
-)(Users);
+)(Tags);

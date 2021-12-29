@@ -3,7 +3,6 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -11,18 +10,10 @@ import DialogActions from '@mui/material/DialogActions';
 import { Add } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
 import Slide from '@mui/material/Slide';
-import Typography from '@mui/material/Typography';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
+import Fab from '@mui/material/Fab';
 import { addTag } from '../../../../actions/Tag';
 import TagForm from './TagForm';
-import { submitForm } from '../../../../utils/Action';
-
-i18nRegister({
-  fr: {
-    'Create a new tag': 'Créer un nouveau tag',
-  },
-});
+import inject18n from '../../../../components/i18n';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -31,8 +22,9 @@ Transition.displayName = 'TransitionSlide';
 
 const styles = () => ({
   createButton: {
-    float: 'left',
-    marginTop: -8,
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
   },
 });
 
@@ -57,40 +49,41 @@ class CreateTag extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, t } = this.props;
     return (
-      <div style={{ margin: '15px 0 0 15px' }}>
-        <Typography variant="h5" style={{ float: 'left' }}>
-          <T>Tags</T>
-        </Typography>
-        <IconButton
+      <div>
+        <Fab
           onClick={this.handleOpen.bind(this)}
+          color="primary"
           aria-label="Add"
           className={classes.createButton}
-          size="large">
-          <Add color="secondary" />
-        </IconButton>
+        >
+          <Add />
+        </Fab>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
         >
-          <DialogTitle>
-            <T>Create a new tag</T>
-          </DialogTitle>
+          <DialogTitle>{t('Create a new tag')}</DialogTitle>
           <DialogContent>
             <TagForm onSubmit={this.onSubmit.bind(this)} />
           </DialogContent>
           <DialogActions>
-            <Button variant="outlined" onClick={this.handleClose.bind(this)}>
-              <T>Cancel</T>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleClose.bind(this)}
+            >
+              {t('Cancel')}
             </Button>
             <Button
-              color="secondary"
-              variant="outlined"
-              onClick={() => submitForm('tagForm')}
+              variant="contained"
+              color="primary"
+              type="submit"
+              form="tagForm"
             >
-              <T>Create</T>
+              {t('Create')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -100,10 +93,13 @@ class CreateTag extends Component {
 }
 
 CreateTag.propTypes = {
+  t: PropTypes.func,
+  classes: PropTypes.object,
   addTag: PropTypes.func,
 };
 
 export default R.compose(
   connect(null, { addTag }),
+  inject18n,
   withStyles(styles),
 )(CreateTag);

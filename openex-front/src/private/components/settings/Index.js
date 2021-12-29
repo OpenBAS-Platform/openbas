@@ -4,13 +4,14 @@ import { Route, Switch } from 'react-router-dom';
 import Parameters from './Parameters';
 import Users from './Users';
 import Groups from './Groups';
+import Tags from './Tags';
 
 const Index = () => (
   <Switch>
     <Route exact path="/settings" component={Parameters} />
     <Route exact path="/settings/users" component={Users} />
     <Route exact path="/settings/groups" component={Groups} />
-    <Route exact path="/settings/tags" component={Users} />
+    <Route exact path="/settings/tags" component={Tags} />
   </Switch>
 );
 

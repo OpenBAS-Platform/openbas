@@ -149,7 +149,7 @@ class Users extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'name',
+      sortBy: 'user_email',
       orderAsc: true,
       keyword: '',
       tags: [],
