@@ -7,6 +7,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Chip from '@mui/material/Chip';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 
@@ -51,6 +55,31 @@ class Parameters extends Component {
               >
                 {t('Update')}
               </Button>
+            </Paper>
+          </Grid>
+          <Grid item={true} xs={6}>
+            <Typography variant="overline">
+              {t('Components version')}
+            </Typography>
+            <Paper variant="outlined" classes={{ root: classes.paper }}>
+              <List>
+                <ListItem divider={true}>
+                  <ListItemText primary={t('OpenEx platform')} />
+                  <Chip label='3.0.0' color="primary" />
+                </ListItem>
+                <ListItem divider={true}>
+                  <ListItemText primary={t('JAVA Virtual Machine')} />
+                  <Chip label='17' color="primary" />
+                </ListItem>
+                <ListItem divider={true}>
+                  <ListItemText primary={t('PostgreSQL')} />
+                  <Chip label='10.19' color="primary" />
+                </ListItem>
+                <ListItem divider={true}>
+                  <ListItemText primary={t('MinIO')} />
+                  <Chip label='RELEASE-2021' color="primary" />
+                </ListItem>
+              </List>
             </Paper>
           </Grid>
         </Grid>

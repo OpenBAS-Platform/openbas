@@ -246,6 +246,13 @@ class Players extends Component {
         );
         return R.assoc('user_organization', organizationName, u);
       }),
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.organization_tags),
+            R.pluck('id', tags),
+          ),
+      ),
       R.filter(filterByKeyword),
       sort,
     )(users);

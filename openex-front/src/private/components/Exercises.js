@@ -231,7 +231,10 @@ class Exercises extends Component {
     const sortedExercises = R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || R.any((filter) => R.includes(filter, n.exercise_tags), tags),
+          || R.any(
+            (filter) => R.includes(filter, n.organization_tags),
+            R.pluck('id', tags),
+          ),
       ),
       R.filter(filterByKeyword),
       sort,

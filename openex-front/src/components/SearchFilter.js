@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
-import Input from '@mui/material/Input';
+import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Search } from '@mui/icons-material';
 import { compose } from 'ramda';
@@ -9,13 +9,6 @@ import inject18n from './i18n';
 
 const styles = (theme) => ({
   searchRoot: {
-    borderRadius: 5,
-    padding: '0 10px 0 10px',
-    backgroundColor: theme.palette.background.paper,
-  },
-  searchRootInDrawer: {
-    borderRadius: 5,
-    padding: '0 10px 0 10px',
     backgroundColor: theme.palette.background.paper,
   },
   searchInput: {
@@ -39,13 +32,9 @@ class SearchFilter extends Component {
     const {
       t, classes, onChange, onSubmit, variant, keyword, fullWidth,
     } = this.props;
-    let classRoot = classes.searchRoot;
-    if (variant === 'drawer') {
-      classRoot = classes.searchRootInDrawer;
-    }
     return (
-      <Input
-        style={{ height: 40 }}
+      <TextField
+        size="small"
         fullWidth={fullWidth}
         name="keyword"
         defaultValue={keyword}
@@ -62,13 +51,16 @@ class SearchFilter extends Component {
             onSubmit(value);
           }
         }}
-        startAdornment={
-          <InputAdornment position="start">
-            <Search />
-          </InputAdornment>
-        }
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              {' '}
+              <Search />{' '}
+            </InputAdornment>
+          ),
+        }}
         classes={{
-          root: classRoot,
+          root: classes.searchRoot,
           input:
             variant === 'small'
               ? classes.searchInputSmall
