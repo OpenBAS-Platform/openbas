@@ -66,7 +66,6 @@ class SearchFilter extends Component {
               ? classes.searchInputSmall
               : classes.searchInput,
         }}
-        disableUnderline={true}
         autoComplete="off"
       />
     );

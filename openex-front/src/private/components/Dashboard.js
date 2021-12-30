@@ -497,7 +497,7 @@ const Dashboard = (props) => {
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="overline">
-            {t('Players distribution')}
+            {t('Organizations distribution across exercises')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.graph }}>
             <ResponsiveContainer height={380} width="100%">
@@ -550,7 +550,7 @@ const Dashboard = (props) => {
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="overline">
-            {t('Organizations distribution across exercises')}
+            {t('Players distribution')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.map }}>
             <MiniMap center={[48.8566969, 2.3514616]} zoom={2} />

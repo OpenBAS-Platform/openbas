@@ -83,7 +83,7 @@ class PlayerPopover extends Component {
       .map((tag) => ({ id: tag.tag_id, label: tag.tag_name, color: tag.tag_color }));
     const initialValues = R.pipe(
       R.assoc('user_organization', organizationName),
-      R.assoc('user_tags', userTags),
+      R.assoc('user_tags', userTags.asMutable()),
       R.pick([
         'user_firstname',
         'user_lastname',
@@ -194,7 +194,7 @@ PlayerPopover.propTypes = {
   user: PropTypes.object,
   updateUser: PropTypes.func,
   deleteUser: PropTypes.func,
-  organizations: PropTypes.object,
+  organizations: PropTypes.array,
   tags: PropTypes.object,
   userAdmin: PropTypes.bool,
 };

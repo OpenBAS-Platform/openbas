@@ -5,12 +5,6 @@ import * as R from 'ramda';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../network';
 
-export const submitForm = (formId) => {
-  document
-    .getElementById(formId)
-    .dispatchEvent(new Event('submit', { cancelable: true }));
-};
-
 const buildError = (data) => {
   const errorsExtractor = R.pipe(
     R.pathOr({}, ['errors', 'children']),

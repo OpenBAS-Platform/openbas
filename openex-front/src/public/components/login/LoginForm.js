@@ -6,7 +6,7 @@ import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 
 const LoginForm = (props) => {
-  const { t, error, onSubmit } = props;
+  const { t, onSubmit } = props;
   const validate = (values) => {
     const errors = {};
     const requiredFields = ['username', 'password'];
@@ -20,9 +20,7 @@ const LoginForm = (props) => {
   return (
     <div style={{ padding: 15 }}>
       <Form onSubmit={onSubmit} validate={validate}>
-        {({
-          handleSubmit, submitError, touched, submitting, pristine,
-        }) => (
+        {({ handleSubmit, submitting, pristine }) => (
           <form onSubmit={handleSubmit}>
             <TextField
               name="username"
@@ -39,10 +37,6 @@ const LoginForm = (props) => {
               label={t('Password')}
               fullWidth={true}
               style={{ marginTop: 20 }}
-              error={error || submitError}
-              helperText={
-                (error || submitError) && touched && (error || submitError)
-              }
             />
             <Button
               type="submit"

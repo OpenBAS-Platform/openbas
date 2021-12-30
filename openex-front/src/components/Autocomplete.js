@@ -19,6 +19,9 @@ const renderAutocomplete = ({
       label={label}
       selectOnFocus={true}
       autoHighlight={true}
+      clearIcon={true}
+      clearOnBlur={false}
+      clearOnEscape={false}
       onInputChange={(event, value) => {
         if (others.freeSolo) {
           onChange(value);

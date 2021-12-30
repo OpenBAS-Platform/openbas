@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withStyles } from '@mui/styles';
@@ -40,47 +40,40 @@ const styles = () => ({
   },
 });
 
-class IndexComcheck extends Component {
-  componentDidMount() {
-    this.props.fetchComcheckStatus(this.props.statusId);
-  }
-
-  render() {
-    const { classes, t, fldt } = this.props;
-    const statusState = R.propOr(0, 'status_state', this.props.comcheck_status);
-    const statusLastUpdate = R.propOr(
-      undefined,
-      'status_last_update',
-      this.props.comcheck_status,
-    );
-    const paddingTop = window.innerHeight / 2 - comcheckHeight / 2 - 180;
-    return (
-      <div className={classes.container} style={{ paddingTop }}>
-        <img src={logo} alt="logo" className={classes.logo} />
-        <div className={classes.comcheck}>
-          <AppBar
-            color="primary"
-            position="relative"
-            className={classes.appBar}
-          >
-            <Toolbar>
-              <div className={classes.subtitle}>{t('Communication check')}</div>
-            </Toolbar>
-          </AppBar>
-          {t('Your communication check is')}
-          <strong> {statusState ? t('successfull') : t('failed')}</strong>.
-          <br />
-          <br />
-          {statusLastUpdate !== undefined && (
-            <span>
-              {t('Verification done at')} {fldt(statusLastUpdate)}.
-            </span>
-          )}
-        </div>
+const IndexComcheck = (props) => {
+  useEffect(() => {
+    props.fetchComcheckStatus(this.props.statusId);
+  }, []);
+  const { classes, t, fldt } = this.props;
+  const statusState = R.propOr(0, 'status_state', this.props.comcheck_status);
+  const statusLastUpdate = R.propOr(
+    undefined,
+    'status_last_update',
+    this.props.comcheck_status,
+  );
+  const paddingTop = window.innerHeight / 2 - comcheckHeight / 2 - 180;
+  return (
+    <div className={classes.container} style={{ paddingTop }}>
+      <img src={logo} alt="logo" className={classes.logo} />
+      <div className={classes.comcheck}>
+        <AppBar color="primary" position="relative" className={classes.appBar}>
+          <Toolbar>
+            <div className={classes.subtitle}>{t('Communication check')}</div>
+          </Toolbar>
+        </AppBar>
+        {t('Your communication check is')}
+        <strong> {statusState ? t('successfull') : t('failed')}</strong>.
+        <br />
+        <br />
+        {statusLastUpdate !== undefined && (
+          <span>
+            {t('Verification done at')} {fldt(statusLastUpdate)}.
+          </span>
+        )}
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 IndexComcheck.propTypes = {
   t: PropTypes.func,

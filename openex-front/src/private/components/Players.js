@@ -23,6 +23,7 @@ import CreatePlayer from './player/CreatePlayer';
 import PlayerPopover from './player/PlayerPopover';
 import TagsFilter from '../../components/TagsFilter';
 import SearchFilter from '../../components/SearchFilter';
+import { storeBrowser } from '../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -158,10 +159,8 @@ class Players extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchOrganizations();
     this.props.fetchUsers();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchOrganizations();
       this.props.fetchUsers();
     });
   }
@@ -213,7 +212,7 @@ class Players extends Component {
   }
 
   render() {
-    const { classes, users, organizations } = this.props;
+    const { classes, users } = this.props;
     const {
       keyword, sortBy, orderAsc, tags,
     } = this.state;
@@ -232,30 +231,21 @@ class Players extends Component {
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedUsers = R.pipe(
-      R.map((u) => {
-        const userOrganization = R.propOr(
-          {},
-          u.user_organization,
-          organizations,
-        );
-        const organizationName = R.propOr(
-          '-',
-          'organization_name',
-          userOrganization,
-        );
-        return R.assoc('user_organization', organizationName, u);
-      }),
-      R.filter(
-        (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.organization_tags),
-            R.pluck('id', tags),
-          ),
-      ),
-      R.filter(filterByKeyword),
-      sort,
-    )(users);
+    const sortedUsers = sort(
+      users
+        .map((u) => ({
+          ...u,
+          user_organization: u.getOrganization()?.organization_name,
+        }))
+        .filter(
+          (n) => tags.length === 0
+            || R.any(
+              (filter) => R.includes(filter, n.organization_tags),
+              R.pluck('id', tags),
+            ),
+        )
+        .filter(filterByKeyword),
+    );
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -345,21 +335,7 @@ class Players extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.exercise_start_date}
                     >
-                      <ItemTags
-                        variant="list"
-                        tags={[
-                          {
-                            tag_id: 1,
-                            tag_name: 'cyber',
-                            tag_color: '#17BDBD',
-                          },
-                          {
-                            tag_id: 2,
-                            tag_name: 'crisis',
-                            tag_color: '#CF271A',
-                          },
-                        ]}
-                      />
+                      <ItemTags variant="list" tags={user.getTags()} />
                     </div>
                   </div>
                 }
@@ -380,15 +356,16 @@ Players.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
   users: PropTypes.array,
-  organizations: PropTypes.object,
   fetchUsers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
 };
 
-const select = (state) => ({
-  organizations: state.referential.entities.organizations,
-  users: R.values(state.referential.entities.users),
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return {
+    users: browser.getUsers(),
+  };
+};
 
 export default R.compose(
   connect(select, { fetchUsers, fetchOrganizations }),
