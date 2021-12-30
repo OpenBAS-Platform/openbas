@@ -252,25 +252,9 @@ class GroupPopover extends Component {
               initialValues={initialValues}
               onSubmit={this.onSubmitEdit.bind(this)}
               onSubmitSuccess={this.handleCloseEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEdit.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="groupForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
         </Dialog>
         <Dialog
           open={this.state.openUsers}

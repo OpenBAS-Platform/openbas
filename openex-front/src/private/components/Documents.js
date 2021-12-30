@@ -159,11 +159,13 @@ class Documents extends Component {
   }
 
   handleAddTag(value) {
-    this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    if (value) {
+      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    }
   }
 
   handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n !== value, this.state.tags) });
+    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
   }
 
   reverseBy(field) {

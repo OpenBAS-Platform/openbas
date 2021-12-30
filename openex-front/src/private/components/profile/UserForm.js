@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
 import { Autocomplete } from '../../../components/Autocomplete';
@@ -12,12 +13,17 @@ class UserForm extends Component {
     const {
       t, onSubmit, organizations, initialValues,
     } = this.props;
-    const options = organizations.map(
-      (o) => ({ id: o.organization_id, label: o.organization_name }),
-    );
+    const options = organizations.map((o) => ({
+      id: o.organization_id,
+      label: o.organization_name,
+    }));
     return (
-      <Form onSubmit={onSubmit} initialValues={initialValues}>
-        {({ handleSubmit }) => (
+      <Form
+        keepDirtyOnReinitialize={true}
+        onSubmit={onSubmit}
+        initialValues={initialValues}
+      >
+        {({ handleSubmit, pristine, submitting }) => (
           <form id="userForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -65,6 +71,16 @@ class UserForm extends Component {
                 Français
               </MenuItem>
             </Select>
+            <div style={{ marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {t('Update')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>
@@ -74,11 +90,7 @@ class UserForm extends Component {
 
 UserForm.propTypes = {
   t: PropTypes.func,
-  error: PropTypes.string,
-  pristine: PropTypes.bool,
-  submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func,
   organizations: PropTypes.object,
 };
 

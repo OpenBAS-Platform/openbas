@@ -57,8 +57,17 @@ class UserPopover extends Component {
   }
 
   onSubmitEdit(data) {
+    const inputValues = R.pipe(
+      R.assoc(
+        'user_organization',
+        data.user_organization && data.user_organization.id
+          ? data.user_organization.id
+          : data.user_organization,
+      ),
+      R.assoc('user_tags', R.pluck('id', data.user_tags)),
+    )(data);
     return this.props
-      .updateUser(this.props.user.user_id, data)
+      .updateUser(this.props.user.user_id, inputValues)
       .then(() => this.handleCloseEdit());
   }
 
@@ -175,25 +184,9 @@ class UserPopover extends Component {
               editing={true}
               organizations={organizations}
               onSubmit={this.onSubmitEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEdit.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="userForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
         </Dialog>
         <Dialog
           TransitionComponent={Transition}
@@ -202,25 +195,11 @@ class UserPopover extends Component {
         >
           <DialogTitle>{t('Update the user password')}</DialogTitle>
           <DialogContent>
-            <UserPasswordForm onSubmit={this.onSubmitEditPassword.bind(this)} />
+            <UserPasswordForm
+              onSubmit={this.onSubmitEditPassword.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
+            />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEditPassword.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="passwordForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );

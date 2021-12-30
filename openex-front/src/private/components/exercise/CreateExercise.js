@@ -7,8 +7,6 @@ import Fab from '@mui/material/Fab';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import { Add } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
 import ExerciseForm from './ExerciseForm';
@@ -75,23 +73,6 @@ class CreateExercise extends Component {
               initialValues={{ exercise_tags: [] }}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              onClick={this.handleClose.bind(this)}
-              color="secondary"
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="exerciseForm"
-            >
-              {t('Create')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );

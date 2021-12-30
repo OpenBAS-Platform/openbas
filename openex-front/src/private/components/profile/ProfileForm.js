@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 
@@ -8,8 +9,12 @@ class ProfileForm extends Component {
   render() {
     const { t, onSubmit, initialValues } = this.props;
     return (
-      <Form onSubmit={onSubmit} initialValues={initialValues}>
-        {({ handleSubmit }) => (
+      <Form
+        keepDirtyOnReinitialize={true}
+        onSubmit={onSubmit}
+        initialValues={initialValues}
+      >
+        {({ handleSubmit, pristine, submitting }) => (
           <form id="profileForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -33,6 +38,16 @@ class ProfileForm extends Component {
               label={t('PGP public key')}
               style={{ marginTop: 20 }}
             />
+            <div style={{ marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {t('Update')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>
@@ -42,12 +57,7 @@ class ProfileForm extends Component {
 
 ProfileForm.propTypes = {
   t: PropTypes.func,
-  error: PropTypes.string,
-  pristine: PropTypes.bool,
-  submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func,
-  change: PropTypes.func,
 };
 
 export default inject18n(ProfileForm);

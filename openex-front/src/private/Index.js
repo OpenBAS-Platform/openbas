@@ -12,6 +12,7 @@ import Exercises from './components/Exercises';
 import Players from './components/Players';
 import Organizations from './components/Organizations';
 import Documents from './components/Documents';
+import Message from '../components/Message';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -41,6 +42,7 @@ const Index = () => {
     <div className={classes.root}>
       <TopBar />
       <LeftBar />
+      <Message />
       <main className={classes.content} style={{ paddingRight: 24 }}>
         <div className={classes.toolbar} />
         <Switch>

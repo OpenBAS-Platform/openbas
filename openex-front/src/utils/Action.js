@@ -4,6 +4,7 @@ import FileSaver from 'file-saver';
 import * as R from 'ramda';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../network';
+import { MESSAGING$ } from './Environment';
 
 const buildError = (data) => {
   const errorsExtractor = R.pipe(
@@ -57,6 +58,7 @@ export const putReferential = (schema, uri, data) => (dispatch) => {
     .then((response) => {
       dispatch({ type: Constants.DATA_FETCH_SUCCESS, payload: response.data });
       dispatch({ type: Constants.DATA_UPDATE_SUCCESS, payload: response.data });
+      MESSAGING$.notifySuccess('The element has been updated');
       return response.data;
     })
     .catch((error) => {

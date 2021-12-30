@@ -79,13 +79,11 @@ class OrganizationPopover extends Component {
 
   render() {
     const { t, organization } = this.props;
-    const organizationTags = organization
-      .getTags()
-      .map((tag) => ({
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      }));
+    const organizationTags = organization.getTags().map((tag) => ({
+      id: tag.tag_id,
+      label: tag.tag_name,
+      color: tag.tag_color,
+    }));
     const initialValues = R.pipe(
       R.assoc('organization_tags', organizationTags.asMutable()),
       R.pick([
@@ -153,25 +151,9 @@ class OrganizationPopover extends Component {
               initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEdit.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="organizationForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );

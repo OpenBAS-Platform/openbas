@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import { Add } from '@mui/icons-material';
 import withStyles from '@mui/styles/withStyles';
 import Slide from '@mui/material/Slide';
@@ -67,25 +65,11 @@ class CreateTag extends Component {
         >
           <DialogTitle>{t('Create a new tag')}</DialogTitle>
           <DialogContent>
-            <TagForm onSubmit={this.onSubmit.bind(this)} />
+            <TagForm
+              onSubmit={this.onSubmit.bind(this)}
+              handleClose={this.handleClose.bind(this)}
+            />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleClose.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="tagForm"
-            >
-              {t('Create')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );

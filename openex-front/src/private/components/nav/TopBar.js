@@ -44,7 +44,8 @@ const styles = (theme) => ({
   },
   barRight: {
     position: 'absolute',
-    right: 5,
+    top: 15,
+    right: 15,
     verticalAlign: 'middle',
     height: '100%',
   },
@@ -112,11 +113,7 @@ class TopBar extends Component {
             {location.pathname.includes('/settings') && <TopMenuSettings />}
           </div>
           <div className={classes.barRight}>
-            <IconButton
-              onClick={this.handleOpen.bind(this)}
-              size="large"
-              classes={{ root: classes.button }}
-            >
+            <IconButton onClick={this.handleOpen.bind(this)} size="small">
               <AccountCircleOutlined />
             </IconButton>
             <Menu

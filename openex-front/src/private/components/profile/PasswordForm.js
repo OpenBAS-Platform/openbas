@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 
@@ -22,7 +23,7 @@ class PasswordForm extends Component {
     const { onSubmit, t } = this.props;
     return (
       <Form onSubmit={onSubmit} validate={this.validate.bind(this)}>
-        {({ handleSubmit }) => (
+        {({ handleSubmit, pristine, submitting }) => (
           <form id="passwordForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -39,6 +40,16 @@ class PasswordForm extends Component {
               label={t('Confirmation')}
               style={{ marginTop: 20 }}
             />
+            <div style={{ marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {t('Update')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>

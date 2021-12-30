@@ -73,6 +73,7 @@ const i18n = {
       Search: 'Rechercher',
       Required: 'Obligatoire',
       'This field is required.': 'Ce champ est requis.',
+      'The element has been updated': "L'élément a été modifié.",
       Close: 'Fermer',
       'Export to XLS': 'Exporter en XLS',
       Copy: 'Copier',

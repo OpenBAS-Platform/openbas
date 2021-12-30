@@ -3,6 +3,7 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@mui/material/MenuItem';
 import { InfoOutlined } from '@mui/icons-material';
+import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import { DateTimePicker } from '../../../components/DateTimePicker';
 import { Select } from '../../../components/Select';
@@ -24,7 +25,7 @@ class ExerciseForm extends Component {
 
   render() {
     const {
-      t, onSubmit, initialValues, editing,
+      t, onSubmit, initialValues, editing, handleClose,
     } = this.props;
     return (
       <Form
@@ -38,7 +39,9 @@ class ExerciseForm extends Component {
           },
         }}
       >
-        {({ handleSubmit, form, values }) => (
+        {({
+          handleSubmit, form, values, submitting, pristine,
+        }) => (
           <form id="exerciseForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -124,6 +127,26 @@ class ExerciseForm extends Component {
               values={values}
               setFieldValue={form.mutators.setValue}
             />
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleClose.bind(this)}
+                disabled={pristine || submitting}
+                style={{ marginRight: 10 }}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+                form="playerForm"
+              >
+                {editing ? t('Update') : t('Create')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>
@@ -134,8 +157,8 @@ class ExerciseForm extends Component {
 ExerciseForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
+  handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  change: PropTypes.func,
   groups: PropTypes.array,
 };
 

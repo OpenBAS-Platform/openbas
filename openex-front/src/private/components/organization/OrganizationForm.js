@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
@@ -19,7 +20,9 @@ class OrganizationForm extends Component {
   }
 
   render() {
-    const { t, onSubmit, initialValues } = this.props;
+    const {
+      t, onSubmit, handleClose, initialValues, editing,
+    } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -32,7 +35,9 @@ class OrganizationForm extends Component {
           },
         }}
       >
-        {({ handleSubmit, form, values }) => (
+        {({
+          handleSubmit, form, values, submitting, pristine,
+        }) => (
           <form id="organizationForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -54,6 +59,25 @@ class OrganizationForm extends Component {
               values={values}
               setFieldValue={form.mutators.setValue}
             />
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleClose.bind(this)}
+                style={{ marginRight: 10 }}
+                disabled={submitting}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {editing ? t('Update') : t('Create')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>
@@ -64,8 +88,8 @@ class OrganizationForm extends Component {
 OrganizationForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
-  edit: PropTypes.bool,
-  change: PropTypes.func,
+  handleClose: PropTypes.func,
+  editing: PropTypes.bool,
 };
 
 export default inject18n(OrganizationForm);

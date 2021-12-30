@@ -134,25 +134,9 @@ class TagPopover extends Component {
               initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEdit.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="tagForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );

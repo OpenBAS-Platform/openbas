@@ -6,8 +6,6 @@ import Fab from '@mui/material/Fab';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
@@ -31,21 +29,21 @@ Transition.displayName = 'TransitionSlide';
 class CreateGroup extends Component {
   constructor(props) {
     super(props);
-    this.state = { openCreate: false };
+    this.state = { open: false };
   }
 
-  handleOpenCreate() {
-    this.setState({ openCreate: true });
+  handleOpen() {
+    this.setState({ open: true });
   }
 
-  handleCloseCreate() {
-    this.setState({ openCreate: false });
+  handleClose() {
+    this.setState({ open: false });
   }
 
-  onSubmitCreate(data) {
+  onSubmit(data) {
     return this.props
       .addGroup(data)
-      .then((result) => (result.result ? this.handleCloseCreate() : result));
+      .then((result) => (result.result ? this.handleClose() : result));
   }
 
   render() {
@@ -53,7 +51,7 @@ class CreateGroup extends Component {
     return (
       <div>
         <Fab
-          onClick={this.handleOpenCreate.bind(this)}
+          onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
           className={classes.createButton}
@@ -63,33 +61,16 @@ class CreateGroup extends Component {
         <Dialog
           open={this.state.openCreate}
           TransitionComponent={Transition}
-          onClose={this.handleCloseCreate.bind(this)}
+          onClose={this.handleClose.bind(this)}
         >
           <DialogTitle>{t('Create a new group')}</DialogTitle>
           <DialogContent>
             <GroupForm
               editing={false}
-              onSubmit={this.onSubmitCreate.bind(this)}
-              organizations={this.props.organizations}
+              onSubmit={this.onSubmit.bind(this)}
+              handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseCreate.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="groupForm"
-            >
-              {t('Create')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );
@@ -98,7 +79,6 @@ class CreateGroup extends Component {
 
 CreateGroup.propTypes = {
   t: PropTypes.func,
-  organizations: PropTypes.object,
   addGroup: PropTypes.func,
 };
 

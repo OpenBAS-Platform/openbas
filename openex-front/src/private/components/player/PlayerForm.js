@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
+import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import { Autocomplete } from '../../../components/Autocomplete';
 import inject18n from '../../../components/i18n';
@@ -21,7 +22,7 @@ class PlayerForm extends Component {
 
   render() {
     const {
-      t, onSubmit, initialValues, editing, organizations,
+      t, onSubmit, initialValues, editing, organizations, handleClose,
     } = this.props;
     const options = organizations.map((o) => ({
       id: o.organization_id,
@@ -39,7 +40,9 @@ class PlayerForm extends Component {
           },
         }}
       >
-        {({ handleSubmit, form, values }) => (
+        {({
+          handleSubmit, form, values, submitting, pristine,
+        }) => (
           <form id="playerForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -104,6 +107,25 @@ class PlayerForm extends Component {
               values={values}
               setFieldValue={form.mutators.setValue}
             />
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleClose.bind(this)}
+                style={{ marginRight: 10 }}
+                disabled={submitting}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {editing ? t('Update') : t('Create')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>
@@ -114,11 +136,8 @@ class PlayerForm extends Component {
 PlayerForm.propTypes = {
   t: PropTypes.func,
   error: PropTypes.string,
-  pristine: PropTypes.bool,
-  submitting: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func,
-  change: PropTypes.func,
+  handleClose: PropTypes.func,
   organizations: PropTypes.array,
   editing: PropTypes.bool,
 };

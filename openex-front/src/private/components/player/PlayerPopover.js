@@ -53,6 +53,12 @@ class PlayerPopover extends Component {
 
   onSubmitEdit(data) {
     const inputValues = R.pipe(
+      R.assoc(
+        'user_organization',
+        data.user_organization && data.user_organization.id
+          ? data.user_organization.id
+          : data.user_organization,
+      ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
     return this.props
@@ -159,25 +165,9 @@ class PlayerPopover extends Component {
               editing={true}
               organizations={organizations}
               onSubmit={this.onSubmitEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEdit.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="playerForm"
-            >
-              {t('Update')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );
