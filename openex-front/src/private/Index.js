@@ -5,14 +5,15 @@ import { makeStyles } from '@mui/styles';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
 import NotFound from '../components/NotFound';
-import IndexProfile from './components/profile/Index';
-import IndexSettings from './components/settings/Index';
-import Dashboard from './components/Dashboard';
-import Exercises from './components/Exercises';
-import Players from './components/Players';
-import Organizations from './components/Organizations';
-import Documents from './components/Documents';
 import Message from '../components/Message';
+import IndexProfile from './components/profile/Index';
+import Dashboard from './components/Dashboard';
+import IndexExercises from './components/exercises/Index';
+import Players from './components/players/Players';
+import Organizations from './components/organizations/Organizations';
+import Documents from './components/documents/Documents';
+import IndexIntegrations from './components/integrations/Index';
+import IndexSettings from './components/settings/Index';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,11 +48,12 @@ const Index = () => {
         <div className={classes.toolbar} />
         <Switch>
           <Route exact path="/" component={Dashboard} />
-          <Route exact path="/profile" component={IndexProfile} />
-          <Route exact path="/exercises" component={Exercises} />
-          <Route exact path="/players" component={Players} />
-          <Route exact path="/organizations" component={Organizations} />
-          <Route exact path="/documents" component={Documents} />
+          <Route path="/profile" component={IndexProfile} />
+          <Route path="/exercises" component={IndexExercises} />
+          <Route path="/players" component={Players} />
+          <Route path="/organizations" component={Organizations} />
+          <Route path="/documents" component={Documents} />
+          <Route path="/integrations" component={IndexIntegrations} />
           <Route path="/settings" component={IndexSettings} />
           <Route component={NotFound} />
         </Switch>

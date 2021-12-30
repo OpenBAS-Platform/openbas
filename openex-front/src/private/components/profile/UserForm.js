@@ -16,6 +16,11 @@ class UserForm extends Component {
         keepDirtyOnReinitialize={true}
         onSubmit={onSubmit}
         initialValues={initialValues}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+        }}
       >
         {({
           form, handleSubmit, pristine, submitting, values,

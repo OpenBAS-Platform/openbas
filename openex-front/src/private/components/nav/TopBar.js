@@ -19,6 +19,7 @@ import TopMenuExercises from './TopMenuExercises';
 import TopMenuPlayers from './TopMenuPlayers';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
+import TopMenuIntegrations from './TopMenuIntegrations';
 
 const styles = (theme) => ({
   appBar: {
@@ -110,6 +111,9 @@ class TopBar extends Component {
               <TopMenuOrganizations />
             )}
             {location.pathname.includes('/documents') && <TopMenuDocuments />}
+            {location.pathname.includes('/integrations') && (
+              <TopMenuIntegrations />
+            )}
             {location.pathname.includes('/settings') && <TopMenuSettings />}
           </div>
           <div className={classes.barRight}>

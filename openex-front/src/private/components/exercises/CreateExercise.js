@@ -71,6 +71,7 @@ class CreateExercise extends Component {
             <ExerciseForm
               onSubmit={this.onSubmit.bind(this)}
               initialValues={{ exercise_tags: [] }}
+              handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>
         </Dialog>

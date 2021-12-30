@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import OrganizationForm from '../private/components/organization/OrganizationForm';
+import OrganizationForm from '../private/components/organizations/OrganizationForm';
 import { fetchOrganizations, addOrganization } from '../actions/Organization';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
@@ -84,7 +84,7 @@ class OrganizationField extends Component {
           name={name}
           fullWidth={true}
           multiple={false}
-          label={t('Organizations')}
+          label={t('Organization')}
           options={organizationsOptions}
           style={{ marginTop: 20 }}
           openCreate={this.handleOpenOrganizationCreation.bind(this)}

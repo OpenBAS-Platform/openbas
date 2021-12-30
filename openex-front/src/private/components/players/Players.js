@@ -6,22 +6,24 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { Link } from 'react-router-dom';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  EventNoteOutlined,
+  PersonOutlined,
 } from '@mui/icons-material';
-import inject18n from '../../components/i18n';
-import { fetchExercises } from '../../actions/Exercise';
-import { FIVE_SECONDS } from '../../utils/Time';
-import ItemTags from '../../components/ItemTags';
-import SearchFilter from '../../components/SearchFilter';
-import TagsFilter from '../../components/TagsFilter';
-import CreateExercise from './exercise/CreateExercise';
-import { storeBrowser } from '../../actions/Schema';
+import inject18n from '../../../components/i18n';
+import { fetchUsers } from '../../../actions/User';
+import { fetchOrganizations } from '../../../actions/Organization';
+import { FIVE_SECONDS } from '../../../utils/Time';
+import ItemTags from '../../../components/ItemTags';
+import CreatePlayer from './CreatePlayer';
+import PlayerPopover from './PlayerPopover';
+import TagsFilter from '../../../components/TagsFilter';
+import SearchFilter from '../../../components/SearchFilter';
+import { storeBrowser } from '../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -72,31 +74,31 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  exercise_name: {
+  user_email: {
     float: 'left',
-    width: '20%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  exercise_subtitle: {
-    float: 'left',
-    width: '30%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  exercise_start_date: {
+  user_firstname: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  exercise_end_date: {
+  user_lastname: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  exercise_tags: {
+  user_organization: {
+    float: 'left',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_tags: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -104,23 +106,15 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  exercise_name: {
+  user_email: {
     float: 'left',
-    width: '20%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  exercise_subtitle: {
-    float: 'left',
-    width: '30%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  exercise_start_date: {
+  user_firstname: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -128,7 +122,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  exercise_end_date: {
+  user_lastname: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -136,7 +130,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  exercise_tags: {
+  user_organization: {
+    float: 'left',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_tags: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -145,11 +147,11 @@ const inlineStyles = {
   },
 };
 
-class Exercises extends Component {
+class Players extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'exercise_name',
+      sortBy: 'user_email',
       orderAsc: true,
       keyword: '',
       tags: [],
@@ -157,9 +159,10 @@ class Exercises extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchExercises();
+    this.props.fetchOrganizations();
+    this.props.fetchUsers();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchExercises();
+      this.props.fetchUsers();
     });
   }
 
@@ -212,35 +215,37 @@ class Exercises extends Component {
   }
 
   render() {
-    const {
-      nsdt, t, classes, exercises, userAdmin,
-    } = this.props;
+    const { classes, users } = this.props;
     const {
       keyword, sortBy, orderAsc, tags,
     } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.exercise_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.exercise_subtitle || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.exercise_description || '')
+      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_organization || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedExercises = R.pipe(
+    const sortedUsers = R.pipe(
+      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
       R.filter(
         (n) => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.exercise_tags || []),
+            (filter) => R.includes(filter, n.user_tags),
             R.pluck('id', tags),
           ),
       ),
       R.filter(filterByKeyword),
       sort,
-    )(exercises);
+    )(users);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -280,96 +285,90 @@ class Exercises extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('exercise_name', 'Name', true)}
-                  {this.sortHeader('exercise_subtitle', 'Subtitle', true)}
-                  {this.sortHeader('exercise_start_date', 'Start date', true)}
-                  {this.sortHeader('exercise_end_date', 'End date', true)}
-                  {this.sortHeader('exercise_tags', 'Tags', true)}
+                  {this.sortHeader('user_email', 'Email address', true)}
+                  {this.sortHeader('user_firstname', 'Firstname', true)}
+                  {this.sortHeader('user_lastname', 'Lastname', true)}
+                  {this.sortHeader('user_organization', 'Organization', true)}
+                  {this.sortHeader('user_tags', 'Tags', true)}
                 </div>
               }
             />
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedExercises.map((exercise) => (
+          {sortedUsers.map((user) => (
             <ListItem
-              key={exercise.exercise_id}
+              key={user.user_id}
               classes={{ root: classes.item }}
               divider={true}
-              button={true}
-              component={Link}
-              to={`/exercises/${exercise.exercise_id}`}
             >
               <ListItemIcon>
-                <EventNoteOutlined />
+                <PersonOutlined />
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_name}
+                      style={inlineStyles.user_email}
                     >
-                      {exercise.exercise_name}
+                      {user.user_email}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_subtitle}
+                      style={inlineStyles.user_firstname}
                     >
-                      {exercise.exercise_subtitle}
+                      {user.user_firstname}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
+                      style={inlineStyles.user_lastname}
                     >
-                      {exercise.exercise_start_date ? (
-                        nsdt(exercise.exercise_start_date)
-                      ) : (
-                        <i>{t('Manual')}</i>
-                      )}
+                      {user.user_lastname}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
+                      style={inlineStyles.user_organization}
                     >
-                      {exercise.exercise_end_date
-                        ? nsdt(exercise.exercise_end_date)
-                        : '-'}
+                      {user.user_organization}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_tags}
+                      style={inlineStyles.user_tags}
                     >
-                      <ItemTags variant="list" tags={exercise.getTags()} />
+                      <ItemTags variant="list" tags={user.getTags()} />
                     </div>
                   </div>
                 }
               />
+              <ListItemSecondaryAction>
+                <PlayerPopover user={user} />
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        {userAdmin && <CreateExercise />}
+        <CreatePlayer />
       </div>
     );
   }
 }
 
-Exercises.propTypes = {
+Players.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
-  exercises: PropTypes.array,
-  fetchExercises: PropTypes.func,
-  userAdmin: PropTypes.bool,
+  users: PropTypes.array,
+  fetchUsers: PropTypes.func,
+  fetchOrganizations: PropTypes.func,
 };
 
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    exercises: browser.getExercises(),
-    userAdmin: browser.getMe().isAdmin(),
+    users: browser.getUsers(),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchExercises }),
+  connect(select, { fetchUsers, fetchOrganizations }),
   inject18n,
   withStyles(styles),
-)(Exercises);
+)(Players);

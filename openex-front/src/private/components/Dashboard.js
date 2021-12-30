@@ -27,7 +27,7 @@ import {
   NotificationsOutlined,
   GroupsOutlined,
   ContactMailOutlined,
-  EventNoteOutlined,
+  Kayaking,
 } from '@mui/icons-material';
 import ItemTags from '../../components/ItemTags';
 import MiniMap from './MiniMap';
@@ -180,7 +180,7 @@ const Dashboard = (props) => {
                   to={`/exercises/${exercise.exercise_id}`}
                 >
                   <ListItemIcon>
-                    <EventNoteOutlined />
+                    <Kayaking />
                   </ListItemIcon>
                   <ListItemText
                     primary={

@@ -11,20 +11,18 @@ import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  DomainOutlined,
+  DescriptionOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import inject18n from '../../components/i18n';
-import { fetchOrganizations } from '../../actions/Organization';
-import { FIVE_SECONDS } from '../../utils/Time';
-import ItemTags from '../../components/ItemTags';
-import { truncate } from '../../utils/String';
-import CreateOrganization from './organization/CreateOrganization';
-import OrganizationPopover from './organization/OrganizationPopover';
-import { storeBrowser } from '../../actions/Schema';
-import { fetchTags } from '../../actions/Tag';
-import SearchFilter from '../../components/SearchFilter';
-import TagsFilter from '../../components/TagsFilter';
+import inject18n from '../../../components/i18n';
+import { fetchDocuments } from '../../../actions/Document';
+import { FIVE_SECONDS } from '../../../utils/Time';
+import ItemTags from '../../../components/ItemTags';
+import SearchFilter from '../../../components/SearchFilter';
+import TagsFilter from '../../../components/TagsFilter';
+import { storeBrowser } from '../../../actions/Schema';
+import CreateDocument from './CreateDocument';
+import DocumentPopover from './DocumentPopover';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -75,19 +73,25 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  organization_name: {
+  document_name: {
+    float: 'left',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_description: {
     float: 'left',
     width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
-  organization_description: {
+  document_type: {
     float: 'left',
-    width: '40%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  organization_tags: {
+  document_tags: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -95,7 +99,15 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  organization_name: {
+  document_name: {
+    float: 'left',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_description: {
     float: 'left',
     width: '30%',
     height: 20,
@@ -103,15 +115,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  organization_description: {
+  document_type: {
     float: 'left',
-    width: '40%',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  organization_tags: {
+  document_tags: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -120,11 +132,11 @@ const inlineStyles = {
   },
 };
 
-class Organizations extends Component {
+class Documents extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'organization_name',
+      sortBy: 'document_name',
       orderAsc: true,
       keyword: '',
       tags: [],
@@ -132,10 +144,9 @@ class Organizations extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchOrganizations();
-    this.props.fetchTags();
+    this.props.fetchDocuments();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchOrganizations();
+      this.props.fetchDocuments();
     });
   }
 
@@ -188,31 +199,32 @@ class Organizations extends Component {
   }
 
   render() {
-    const { classes, organizations } = this.props;
+    const { classes, documents, userAdmin } = this.props;
     const {
       keyword, sortBy, orderAsc, tags,
     } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.organization_name || '')
+      || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.organization_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedOrganizations = R.pipe(
+    const sortedDocuments = R.pipe(
       R.filter(
         (n) => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.organization_tags),
+            (filter) => R.includes(filter, n.document_tags),
             R.pluck('id', tags),
           ),
       ),
       R.filter(filterByKeyword),
       sort,
-    )(organizations);
+    )(documents);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -252,80 +264,84 @@ class Organizations extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('organization_name', 'Name', true)}
-                  {this.sortHeader(
-                    'organization_description',
-                    'Description',
-                    true,
-                  )}
-                  {this.sortHeader('organization_tags', 'Tags', true)}
+                  {this.sortHeader('document_name', 'Name', true)}
+                  {this.sortHeader('document_description', 'Description', true)}
+                  {this.sortHeader('document_type', 'Type', true)}
+                  {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedOrganizations.map((organization) => (
+          {sortedDocuments.map((document) => (
             <ListItem
-              key={organization.organization_id}
+              key={document.document_id}
               classes={{ root: classes.item }}
               divider={true}
             >
               <ListItemIcon>
-                <DomainOutlined />
+                <DescriptionOutlined />
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.organization_name}
+                      style={inlineStyles.document_name}
                     >
-                      {organization.organization_name}
+                      {document.document_name}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.organization_description}
+                      style={inlineStyles.document_description}
                     >
-                      {truncate(
-                        organization.organization_description || '-',
-                        50,
-                      )}
+                      {document.document_description}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.organization_tags}
+                      style={inlineStyles.document_type}
                     >
-                      <ItemTags variant="list" tags={organization.getTags()} />
+                      {document.document_type}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_tags}
+                    >
+                      <ItemTags variant="list" tags={document.getTags()} />
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <OrganizationPopover organization={organization} />
+                <DocumentPopover document={document} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <CreateOrganization />
+        {userAdmin && <CreateDocument />}
       </div>
     );
   }
 }
 
-Organizations.propTypes = {
+Documents.propTypes = {
   t: PropTypes.func,
-  organizations: PropTypes.array,
-  fetchOrganizations: PropTypes.func,
-  fetchTags: PropTypes.func,
+  nsdt: PropTypes.func,
+  documents: PropTypes.array,
+  fetchDocuments: PropTypes.func,
+  userAdmin: PropTypes.bool,
 };
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  return { organizations: browser.getOrganizations() };
+  return {
+    documents: browser.getDocuments(),
+    userAdmin: browser.getMe().isAdmin(),
+  };
 };
 
 export default R.compose(
-  connect(select, { fetchOrganizations, fetchTags }),
+  connect(select, { fetchDocuments }),
   inject18n,
   withStyles(styles),
-)(Organizations);
+)(Documents);

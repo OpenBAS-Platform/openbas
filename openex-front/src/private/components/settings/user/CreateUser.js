@@ -56,7 +56,7 @@ class CreateUser extends Component {
   }
 
   render() {
-    const { classes, t, organizations } = this.props;
+    const { classes, t } = this.props;
     return (
       <div>
         <Fab
@@ -77,7 +77,7 @@ class CreateUser extends Component {
             <UserForm
               editing={false}
               onSubmit={this.onSubmit.bind(this)}
-              organizations={organizations}
+              initialValues={{ user_tags: [] }}
               handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>

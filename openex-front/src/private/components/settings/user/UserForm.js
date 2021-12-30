@@ -31,6 +31,11 @@ class UserForm extends Component {
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+        }}
       >
         {({
           handleSubmit, form, values, submitting, pristine,

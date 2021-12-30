@@ -256,9 +256,12 @@ export const storeBrowser = (state) => ({
   getUsers() {
     return R.values(state.referential.entities.users).map((usr) => this._buildUser(usr));
   },
-  getOrganizations() {
-    // eslint-disable-next-line max-len
-    return R.values(state.referential.entities.organizations).map((org) => this._buildOrganization(org));
+  getOrganizations(sortBy = 'organization_name', orderAsc = true) {
+    return sort(
+      R.values(state.referential.entities.organizations),
+      sortBy,
+      orderAsc,
+    ).map((org) => this._buildOrganization(org));
   },
   getDocuments(sortBy = 'document_name', orderAsc = true) {
     return sort(

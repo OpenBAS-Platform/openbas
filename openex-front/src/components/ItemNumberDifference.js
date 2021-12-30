@@ -55,12 +55,13 @@ class ItemNumberDifference extends Component {
     if (difference < 0) {
       return (
         <div className={classes.diff} style={inlineStyles.red}>
-          <ArrowDownwardOutlined color="inherit" classes={{ root: classes.diffIcon }} />
+          <ArrowDownwardOutlined
+            color="inherit"
+            classes={{ root: classes.diffIcon }}
+          />
           <div className={classes.diffNumber}>{difference}</div>
-          {description ? (
+          {description && (
             <div className={classes.diffDescription}>({t(description)})</div>
-          ) : (
-            ''
           )}
         </div>
       );
@@ -68,24 +69,26 @@ class ItemNumberDifference extends Component {
     if (difference === 0) {
       return (
         <div className={classes.diff} style={inlineStyles.blueGrey}>
-          <ArrowForwardOutlined color="inherit" classes={{ root: classes.diffIcon }} />
+          <ArrowForwardOutlined
+            color="inherit"
+            classes={{ root: classes.diffIcon }}
+          />
           <div className={classes.diffNumber}>{difference}</div>
-          {description ? (
+          {description && (
             <div className={classes.diffDescription}>({t(description)})</div>
-          ) : (
-            ''
           )}
         </div>
       );
     }
     return (
       <div className={classes.diff} style={inlineStyles.green}>
-        <ArrowUpwardOutlined color="inherit" classes={{ root: classes.diffIcon }} />
+        <ArrowUpwardOutlined
+          color="inherit"
+          classes={{ root: classes.diffIcon }}
+        />
         <div className={classes.diffNumber}>{difference}</div>
-        {description ? (
+        {description && (
           <div className={classes.diffDescription}>({t(description)})</div>
-        ) : (
-          ''
         )}
       </div>
     );
