@@ -256,6 +256,13 @@ export const storeBrowser = (state) => ({
   getUsers() {
     return R.values(state.referential.entities.users).map((usr) => this._buildUser(usr));
   },
+  getUser(id) {
+    const usr = state.referential.entities.users[id];
+    return this._buildUser(usr);
+  },
+  getGroups() {
+    return R.values(state.referential.entities.groups);
+  },
   getOrganizations(sortBy = 'organization_name', orderAsc = true) {
     return sort(
       R.values(state.referential.entities.organizations),
@@ -277,15 +284,15 @@ export const storeBrowser = (state) => ({
       orderAsc,
     ).map((ex) => this._buildExercise(ex.exercise_id, ex));
   },
+  getExercise(id) {
+    const ex = state.referential.entities.exercises[id];
+    return this._buildExercise(id, ex);
+  },
   getTags(sortBy = 'tag_name', orderAsc = true) {
     return sort(R.values(state.referential.entities.tags), sortBy, orderAsc);
   },
   getTag(id) {
     return state.referential.entities.tags[id];
-  },
-  getExercise(id) {
-    const ex = state.referential.entities.exercises[id];
-    return this._buildExercise(id, ex);
   },
   getStatistics() {
     return state.referential.entities.statistics?.openex;

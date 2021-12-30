@@ -25,6 +25,10 @@ public class Group implements Base {
     @JsonProperty("group_name")
     private String name;
 
+    @Column(name = "group_description")
+    @JsonProperty("group_description")
+    private String description;
+
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     @JsonProperty("group_grants")
     private List<Grant> grants = new ArrayList<>();
@@ -52,6 +56,14 @@ public class Group implements Base {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<User> getUsers() {

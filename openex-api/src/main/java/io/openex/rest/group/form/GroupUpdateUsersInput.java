@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class GroupUpdateInput {
+public class GroupUpdateUsersInput {
 
     @JsonProperty("group_users")
     private List<String> userIds;

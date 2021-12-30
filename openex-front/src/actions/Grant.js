@@ -8,7 +8,7 @@ export const addGrant = (groupId, data) => (dispatch) => postReferential(
 )(dispatch);
 
 export const deleteGrant = (groupId, grantId) => (dispatch) => delReferential(
-  `/api/groups/${groupId}/grants/${grantId}`,
+  `/api/grants/${grantId}`,
   'grants',
   groupId,
 )(dispatch);

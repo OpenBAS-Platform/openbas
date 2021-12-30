@@ -27,14 +27,13 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import withStyles from '@mui/styles/withStyles';
 import {
-  fetchGroup,
-  updateGroup,
-  deleteGroup,
+  fetchGroup, deleteGroup, updateGroupUsers, updateGroupInformation,
 } from '../../../../actions/Group';
 import { addGrant, deleteGrant } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const styles = {
   main: {
@@ -95,11 +94,9 @@ class GroupPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    return this.props.updateGroup(this.props.group.group_id, data);
-  }
-
-  submitFormEdit() {
-    this.refs.groupForm.submit();
+    this.props.updateGroupInformation(this.props.group.group_id, data).then(() => {
+      this.setState({ openEdit: false });
+    });
   }
 
   handleOpenUsers() {
@@ -126,7 +123,7 @@ class GroupPopover extends Component {
   }
 
   submitAddUsers() {
-    this.props.updateGroup(this.props.group.group_id, {
+    this.props.updateGroupUsers(this.props.group.group_id, {
       group_users: this.state.usersIds,
     });
     this.handleCloseUsers();
@@ -177,14 +174,14 @@ class GroupPopover extends Component {
 
   render() {
     const { classes, t } = this.props;
-    const initialValues = R.pick(['group_name'], this.props.group); // Pickup only needed fields
+    const initialValues = R.pick(['group_name', 'group_description'], this.props.group);
     // region filter users by active keyword
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.filter(filterByKeyword, R.values(this.props.users));
+    const filteredUsers = R.filter(filterByKeyword, this.props.users);
     // endregion
     return (
       <div>
@@ -250,8 +247,8 @@ class GroupPopover extends Component {
           <DialogContent>
             <GroupForm
               initialValues={initialValues}
+              editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
-              onSubmitSuccess={this.handleCloseEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
@@ -272,7 +269,7 @@ class GroupPopover extends Component {
           <DialogContent>
             <duv>
               {this.state.usersIds.map((userId) => {
-                const user = R.propOr({}, userId, this.props.users);
+                const user = this.props.browser.getUser(userId);
                 const userFirstname = R.propOr('-', 'user_firstname', user);
                 const userLastname = R.propOr('-', 'user_lastname', user);
                 const userGravatar = R.propOr('-', 'user_gravatar', user);
@@ -367,7 +364,7 @@ class GroupPopover extends Component {
                 </TableRow>
               </TableHead>
               <TableBody displayRowCheckbox={false}>
-                {R.values(this.props.exercises).map((exercise) => {
+                {this.props.exercises.map((exercise) => {
                   const grantPlanner = R.find(
                     (g) => g.grant_exercise === exercise.exercise_id
                       && g.grant_name === 'PLANNER',
@@ -435,30 +432,36 @@ class GroupPopover extends Component {
   }
 }
 
-const select = (state) => ({
-  users: state.referential.entities.users,
-  organizations: state.referential.entities.organizations,
-  exercises: state.referential.entities.exercises,
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  const users = browser.getUsers();
+  const exercises = browser.getExercises();
+  const organizations = browser.getOrganizations();
+  return {
+    users, organizations, exercises, browser,
+  };
+};
 
 GroupPopover.propTypes = {
   t: PropTypes.func,
   group: PropTypes.object,
   fetchGroup: PropTypes.func,
-  updateGroup: PropTypes.func,
+  updateGroupUsers: PropTypes.func,
+  updateGroupInformation: PropTypes.func,
   deleteGroup: PropTypes.func,
   addGrant: PropTypes.func,
   deleteGrant: PropTypes.func,
-  organizations: PropTypes.object,
-  exercises: PropTypes.object,
-  users: PropTypes.object,
+  organizations: PropTypes.array,
+  exercises: PropTypes.array,
+  users: PropTypes.array,
   groupUsersIds: PropTypes.array,
 };
 
 export default R.compose(
   connect(select, {
     fetchGroup,
-    updateGroup,
+    updateGroupInformation,
+    updateGroupUsers,
     deleteGroup,
     addGrant,
     deleteGrant,

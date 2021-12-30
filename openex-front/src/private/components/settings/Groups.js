@@ -23,6 +23,7 @@ import CreateGroup from './group/CreateGroup';
 import { fetchGroups } from '../../../actions/Group';
 import { fetchExercises } from '../../../actions/Exercise';
 import GroupPopover from './group/GroupPopover';
+import { storeBrowser } from '../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -132,9 +133,13 @@ class Groups extends Component {
   componentDidMount() {
     this.props.fetchOrganizations();
     this.props.fetchUsers();
+    this.props.fetchGroups();
+    this.props.fetchExercises();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
       this.props.fetchUsers();
+      this.props.fetchGroups();
+      this.props.fetchExercises();
     });
   }
 
@@ -297,22 +302,26 @@ class Groups extends Component {
 Groups.propTypes = {
   t: PropTypes.func,
   classes: PropTypes.object,
-  groups: PropTypes.object,
-  organizations: PropTypes.object,
-  exercises: PropTypes.object,
-  users: PropTypes.object,
+  groups: PropTypes.array,
+  organizations: PropTypes.array,
+  exercises: PropTypes.array,
+  users: PropTypes.array,
   fetchUsers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
   fetchExercises: PropTypes.func,
   fetchGroups: PropTypes.func,
 };
 
-const select = (state) => ({
-  groups: state.referential.entities.groups,
-  exercises: state.referential.entities.exercises,
-  users: state.referential.entities.users,
-  organizations: state.referential.entities.organizations,
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  const groups = browser.getGroups();
+  const exercises = browser.getExercises();
+  const users = browser.getUsers();
+  const organizations = browser.getOrganizations();
+  return {
+    groups, exercises, users, organizations,
+  };
+};
 
 export default R.compose(
   connect(select, {
