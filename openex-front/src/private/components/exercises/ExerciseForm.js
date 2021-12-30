@@ -142,7 +142,6 @@ class ExerciseForm extends Component {
                 color="primary"
                 type="submit"
                 disabled={pristine || submitting}
-                form="playerForm"
               >
                 {editing ? t('Update') : t('Create')}
               </Button>

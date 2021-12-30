@@ -72,7 +72,7 @@ class CreatePlayer extends Component {
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
         >
-          <DialogTitle>{t('Create a player')}</DialogTitle>
+          <DialogTitle>{t('Create a new player')}</DialogTitle>
           <DialogContent>
             <PlayerForm
               editing={false}

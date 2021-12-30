@@ -16,6 +16,7 @@ import inject18n from '../../../components/i18n';
 import TopMenuDashboard from './TopMenuDashboard';
 import TopMenuSettings from './TopMenuSettings';
 import TopMenuExercises from './TopMenuExercises';
+import TopMenuExercise from './TopMenuExercise';
 import TopMenuPlayers from './TopMenuPlayers';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
@@ -105,7 +106,8 @@ class TopBar extends Component {
           <div className={classes.menuContainer}>
             {(location.pathname === '/'
               || location.pathname.includes('/import')) && <TopMenuDashboard />}
-            {location.pathname.includes('/exercises') && <TopMenuExercises />}
+            {location.pathname === '/exercises' && <TopMenuExercises />}
+            {location.pathname.includes('/exercises/') && <TopMenuExercise />}
             {location.pathname.includes('/players') && <TopMenuPlayers />}
             {location.pathname.includes('/organizations') && (
               <TopMenuOrganizations />

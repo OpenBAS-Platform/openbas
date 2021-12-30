@@ -35,7 +35,7 @@ const i18n = {
       'Do you want to delete this player?':
         'Souhaitez-vous supprimer ce joueur ?',
       'Start date (optional)': 'Date de début (optionnel)',
-      'Create a player': 'Créer un joueur',
+      'Create a new player': 'Créer un nouveau joueur',
       'Update the player': 'Modifier le joueur',
       'one month': 'un mois',
       'Phone number (mobile)': 'Numéro de téléphone (mobile)',
