@@ -12,7 +12,6 @@ import { Add } from '@mui/icons-material';
 import { addUser } from '../../../../actions/User';
 import UserForm from './UserForm';
 import inject18n from '../../../../components/i18n';
-import { storeBrowser } from '../../../../actions/Schema';
 
 const styles = () => ({
   createButton: {
@@ -69,7 +68,7 @@ class CreateUser extends Component {
           <Add />
         </Fab>
         <Dialog
-          open={this.state.openCreate}
+          open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
         >
@@ -94,13 +93,8 @@ CreateUser.propTypes = {
   addUser: PropTypes.func,
 };
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  return { organizations: browser.getOrganizations() };
-};
-
 export default R.compose(
-  connect(select, { addUser }),
+  connect(null, { addUser }),
   inject18n,
   withStyles(styles),
 )(CreateUser);

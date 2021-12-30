@@ -102,13 +102,20 @@ class UserPopover extends Component {
 
   render() {
     const { t, user, organizations } = this.props;
+    const userOrganizationValue = user.getOrganization();
+    const userOrganization = userOrganizationValue
+      ? {
+        id: userOrganizationValue.organization_id,
+        label: userOrganizationValue.organization_name,
+      }
+      : null;
     const userTags = user.getTags().map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,
     }));
     const initialValues = R.pipe(
-      R.assoc('user_organization', user.getOrganization()?.organization_name),
+      R.assoc('user_organization', userOrganization),
       R.assoc('user_tags', userTags.asMutable()),
       R.pick([
         'user_firstname',
@@ -120,7 +127,7 @@ class UserPopover extends Component {
         'user_pgp_key',
         'user_tags',
       ]),
-    )(this.props.user);
+    )(user);
     return (
       <div>
         <IconButton

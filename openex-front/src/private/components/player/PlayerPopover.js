@@ -84,13 +84,20 @@ class PlayerPopover extends Component {
     const {
       t, userAdmin, user, organizations,
     } = this.props;
+    const userOrganizationValue = user.getOrganization();
+    const userOrganization = userOrganizationValue
+      ? {
+        id: userOrganizationValue.organization_id,
+        label: userOrganizationValue.organization_name,
+      }
+      : null;
     const userTags = user.getTags().map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,
     }));
     const initialValues = R.pipe(
-      R.assoc('user_organization', user.getOrganization()?.organization_name),
+      R.assoc('user_organization', userOrganization),
       R.assoc('user_tags', userTags.asMutable()),
       R.pick([
         'user_firstname',
@@ -179,7 +186,6 @@ PlayerPopover.propTypes = {
   user: PropTypes.object,
   updateUser: PropTypes.func,
   deleteUser: PropTypes.func,
-  organizations: PropTypes.array,
   tags: PropTypes.object,
   userAdmin: PropTypes.bool,
 };
@@ -188,7 +194,6 @@ const select = (state) => {
   const browser = storeBrowser(state);
   return {
     userAdmin: browser.getMe().isAdmin(),
-    organizations: browser.getOrganizations(),
   };
 };
 

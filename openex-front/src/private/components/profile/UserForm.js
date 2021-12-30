@@ -5,25 +5,21 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import { Select } from '../../../components/Select';
 import { TextField } from '../../../components/TextField';
-import { Autocomplete } from '../../../components/Autocomplete';
 import inject18n from '../../../components/i18n';
+import OrganizationField from '../../../components/OrganizationField';
 
 class UserForm extends Component {
   render() {
-    const {
-      t, onSubmit, organizations, initialValues,
-    } = this.props;
-    const options = organizations.map((o) => ({
-      id: o.organization_id,
-      label: o.organization_name,
-    }));
+    const { t, onSubmit, initialValues } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
         onSubmit={onSubmit}
         initialValues={initialValues}
       >
-        {({ handleSubmit, pristine, submitting }) => (
+        {({
+          form, handleSubmit, pristine, submitting, values,
+        }) => (
           <form id="userForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -45,14 +41,10 @@ class UserForm extends Component {
               label={t('Lastname')}
               style={{ marginTop: 20 }}
             />
-            <Autocomplete
-              variant="standard"
+            <OrganizationField
               name="user_organization"
-              fullWidth={true}
-              label={t('Organization')}
-              options={options}
-              style={{ marginTop: 20 }}
-              freeSolo={true}
+              values={values}
+              setFieldValue={form.mutators.setValue}
             />
             <Select
               variant="standard"
@@ -91,7 +83,6 @@ class UserForm extends Component {
 UserForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
-  organizations: PropTypes.object,
 };
 
 export default inject18n(UserForm);

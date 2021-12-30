@@ -12,7 +12,6 @@ import { Add } from '@mui/icons-material';
 import { addUser } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
-import { storeBrowser } from '../../../actions/Schema';
 
 const styles = () => ({
   createButton: {
@@ -41,7 +40,7 @@ class CreatePlayer extends Component {
     this.setState({ open: false });
   }
 
-  onSubmitCreate(data) {
+  onSubmit(data) {
     const inputValues = R.pipe(
       R.assoc(
         'user_organization',
@@ -77,7 +76,7 @@ class CreatePlayer extends Component {
           <DialogContent>
             <PlayerForm
               editing={false}
-              onSubmit={this.onSubmitCreate.bind(this)}
+              onSubmit={this.onSubmit.bind(this)}
               organizations={organizations}
               initialValues={{ user_tags: [] }}
               handleClose={this.handleClose.bind(this)}
@@ -91,17 +90,11 @@ class CreatePlayer extends Component {
 
 CreatePlayer.propTypes = {
   t: PropTypes.func,
-  organizations: PropTypes.array,
   addUser: PropTypes.func,
 };
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  return { organizations: browser.getOrganizations() };
-};
-
 export default R.compose(
-  connect(select, { addUser }),
+  connect(null, { addUser }),
   inject18n,
   withStyles(styles),
 )(CreatePlayer);

@@ -3,10 +3,10 @@ import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import { TextField } from '../../../../components/TextField';
-import { Autocomplete } from '../../../../components/Autocomplete';
 import inject18n from '../../../../components/i18n';
 import { Switch } from '../../../../components/Switch';
 import TagField from '../../../../components/TagField';
+import OrganizationField from '../../../../components/OrganizationField';
 
 class UserForm extends Component {
   validate(values) {
@@ -23,12 +23,8 @@ class UserForm extends Component {
 
   render() {
     const {
-      t, onSubmit, initialValues, editing, organizations, handleClose,
+      t, onSubmit, initialValues, editing, handleClose,
     } = this.props;
-    const options = organizations.map((o) => ({
-      id: o.organization_id,
-      label: o.organization_name,
-    }));
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -60,14 +56,10 @@ class UserForm extends Component {
               label={t('Lastname')}
               style={{ marginTop: 20 }}
             />
-            <Autocomplete
-              variant="standard"
+            <OrganizationField
               name="user_organization"
-              fullWidth={true}
-              label={t('Organization')}
-              options={options}
-              style={{ marginTop: 20 }}
-              freeSolo={true}
+              values={values}
+              setFieldValue={form.mutators.setValue}
             />
             {!editing && (
               <TextField
@@ -148,7 +140,6 @@ UserForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
-  organizations: PropTypes.array,
   editing: PropTypes.bool,
 };
 

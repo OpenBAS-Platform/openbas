@@ -59,7 +59,7 @@ class CreateGroup extends Component {
           <Add />
         </Fab>
         <Dialog
-          open={this.state.openCreate}
+          open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
         >

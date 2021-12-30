@@ -159,6 +159,7 @@ class Players extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchOrganizations();
     this.props.fetchUsers();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchUsers();

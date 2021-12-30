@@ -7,8 +7,6 @@ import { connect } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/Button';
 import TagForm from '../private/components/settings/tag/TagForm';
 import { fetchTags, addTag } from '../actions/Tag';
 import { Autocomplete } from './Autocomplete';
@@ -108,25 +106,11 @@ class TagField extends Component {
         >
           <DialogTitle>{t('Create a new tag')}</DialogTitle>
           <DialogContent>
-            <TagForm onSubmit={this.onSubmit.bind(this)} />
+            <TagForm
+              onSubmit={this.onSubmit.bind(this)}
+              handleClose={this.handleCloseTagCreation.bind(this)}
+            />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseTagCreation.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              form="tagForm"
-            >
-              {t('Create')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );

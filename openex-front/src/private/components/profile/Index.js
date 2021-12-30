@@ -58,41 +58,40 @@ const Index = (props) => {
     classes, user, organizations, t,
   } = props;
   const userTokens = user.getTokens();
-  const organization = user.getOrganization();
-  const initOrganization = organization
-    ? {
-      id: organization?.organization_id,
-      label: organization?.organization_name,
-    }
-    : undefined;
-
-  const onUpdateProfile = (data) => {
-    const inputValues = R.assoc(
-      'user_organization',
-      data.user_organization?.id,
-      data,
-    );
+  const onUpdate = (data) => {
+    const inputValues = R.pipe(
+      R.assoc(
+        'user_organization',
+        data.user_organization && data.user_organization.id
+          ? data.user_organization.id
+          : data.user_organization,
+      ),
+    )(data);
     return props.updateMeProfile(inputValues);
   };
 
-  const onUpdateInformation = (data) => props.updateMeInformation(data);
-
   const onUpdatePassword = (data) => props.updateMePassword(data.user_plain_password);
 
-  const initPipe = R.pipe(
-    R.assoc('user_organization', initOrganization),
+  const userOrganizationValue = user.getOrganization();
+  const userOrganization = userOrganizationValue
+    ? {
+      id: userOrganizationValue.organization_id,
+      label: userOrganizationValue.organization_name,
+    }
+    : null;
+  const initialValues = R.pipe(
+    R.assoc('user_organization', userOrganization),
     R.pick([
       'user_firstname',
       'user_lastname',
-      'user_lang',
       'user_email',
       'user_organization',
       'user_phone',
       'user_phone2',
       'user_pgp_key',
+      'user_lang',
     ]),
-  );
-  const informationValues = user !== undefined ? initPipe(user) : undefined;
+  )(user);
   const userToken = userTokens.length > 0 ? R.head(userTokens) : undefined;
   return (
     <div className={classes.container}>
@@ -103,18 +102,15 @@ const Index = (props) => {
           </Typography>
           <UserForm
             organizations={organizations}
-            onSubmit={onUpdateProfile}
-            initialValues={informationValues}
+            onSubmit={onUpdate}
+            initialValues={initialValues}
           />
         </Paper>
         <Paper variant="outlined" className={classes.paper}>
           <Typography variant="h5" style={{ marginBottom: 20 }}>
             {t('Information')}
           </Typography>
-          <ProfileForm
-            onSubmit={onUpdateInformation}
-            initialValues={informationValues}
-          />
+          <ProfileForm onSubmit={onUpdate} initialValues={initialValues} />
         </Paper>
         <Paper variant="outlined" className={classes.paper}>
           <Typography variant="h5" style={{ marginBottom: 20 }}>
