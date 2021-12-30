@@ -78,11 +78,14 @@ class OrganizationPopover extends Component {
   }
 
   render() {
-    const { t, tags, organization } = this.props;
-    const organizationTags = R.map((n) => {
-      const tag = R.propOr({}, n, tags);
-      return { id: tag.tag_id, label: tag.tag_name, color: tag.tag_color };
-    }, organization.organization_tags);
+    const { t, organization } = this.props;
+    const organizationTags = organization
+      .getTags()
+      .map((tag) => ({
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      }));
     const initialValues = R.pipe(
       R.assoc('organization_tags', organizationTags),
       R.pick([
@@ -177,9 +180,8 @@ class OrganizationPopover extends Component {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const userAdmin = browser.getMe().isAdmin();
-  const { tags } = state.referential.entities;
-  return { userAdmin, tags };
+  const user = browser.getMe();
+  return { user, userAdmin: user.isAdmin() };
 };
 
 OrganizationPopover.propTypes = {

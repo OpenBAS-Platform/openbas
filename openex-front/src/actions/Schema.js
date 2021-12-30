@@ -206,6 +206,14 @@ export const storeBrowser = (state) => ({
     return {
       ...ex,
       exercise_id: id,
+      getTags() {
+        return (
+          ex.exercise_tags
+          || []
+            .map((tagId) => state.referential.entities.tags[tagId])
+            .filter((t) => t !== undefined)
+        );
+      },
       getInjects(sortBy = 'inject_date') {
         const all = R.values(state.referential.entities.injects);
         const injects = R.filter((n) => n.inject_exercise === id, all);
@@ -237,8 +245,12 @@ export const storeBrowser = (state) => ({
     // eslint-disable-next-line max-len
     return R.values(state.referential.entities.organizations).map((org) => this._buildOrganization(org));
   },
-  getExercises() {
-    return R.values(state.referential.entities.exercises);
+  getExercises(sortBy = 'exercise_start_date', orderAsc = false) {
+    const sort = R.sortWith(
+      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
+    );
+    // eslint-disable-next-line max-len
+    return sort(R.values(state.referential.entities.exercises)).map((ex) => this._buildExercise(ex.exercise_id, ex));
   },
   getTags() {
     return R.values(state.referential.entities.tags);

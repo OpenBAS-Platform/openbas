@@ -7,6 +7,7 @@ import { TextField } from '../../../components/TextField';
 import { DateTimePicker } from '../../../components/DateTimePicker';
 import { Select } from '../../../components/Select';
 import inject18n from '../../../components/i18n';
+import TagField from '../../../components/TagField';
 
 class ExerciseForm extends Component {
   validate(values) {
@@ -27,6 +28,7 @@ class ExerciseForm extends Component {
     } = this.props;
     return (
       <Form
+        keepDirtyOnReinitialize={true}
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
@@ -46,15 +48,17 @@ class ExerciseForm extends Component {
               label={t('Subtitle')}
               style={{ marginTop: 20 }}
             />
-            <TextField
-              variant="standard"
-              name="exercise_description"
-              fullWidth={true}
-              multiline={true}
-              rows={2}
-              label={t('Description')}
-              style={{ marginTop: 20 }}
-            />
+            {editing && (
+              <TextField
+                variant="standard"
+                name="exercise_description"
+                fullWidth={true}
+                multiline={true}
+                rows={2}
+                label={t('Description')}
+                style={{ marginTop: 20 }}
+              />
+            )}
             <DateTimePicker
               name="exercise_start_date"
               label={t('Start date (optional)')}
@@ -110,6 +114,7 @@ class ExerciseForm extends Component {
                 style={{ marginTop: 20 }}
               />
             )}
+            <TagField name="exercise_tags" />
           </form>
         )}
       </Form>

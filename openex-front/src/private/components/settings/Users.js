@@ -22,6 +22,7 @@ import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import CreateUser from './user/CreateUser';
 import UserPopover from './user/UserPopover';
+import { storeBrowser } from '../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -212,7 +213,7 @@ class Users extends Component {
   }
 
   render() {
-    const { classes, users, organizations } = this.props;
+    const { classes, users } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -230,19 +231,7 @@ class Users extends Component {
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedUsers = R.pipe(
-      R.map((u) => {
-        const userOrganization = R.propOr(
-          {},
-          u.user_organization,
-          organizations,
-        );
-        const organizationName = R.propOr(
-          '-',
-          'organization_name',
-          userOrganization,
-        );
-        return R.assoc('user_organization', organizationName, u);
-      }),
+      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
       R.filter(filterByKeyword),
       sort,
     )(users);
@@ -328,21 +317,7 @@ class Users extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.exercise_start_date}
                     >
-                      <ItemTags
-                        variant="list"
-                        tags={[
-                          {
-                            tag_id: 1,
-                            tag_name: 'cyber',
-                            tag_color: '#17BDBD',
-                          },
-                          {
-                            tag_id: 2,
-                            tag_name: 'crisis',
-                            tag_color: '#CF271A',
-                          },
-                        ]}
-                      />
+                      <ItemTags variant="list" tags={user.getTags()} />
                     </div>
                   </div>
                 }
@@ -368,10 +343,12 @@ Users.propTypes = {
   fetchOrganizations: PropTypes.func,
 };
 
-const select = (state) => ({
-  organizations: state.referential.entities.organizations,
-  users: R.values(state.referential.entities.users),
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return {
+    users: browser.getUsers(),
+  };
+};
 
 export default R.compose(
   connect(select, { fetchUsers, fetchOrganizations }),

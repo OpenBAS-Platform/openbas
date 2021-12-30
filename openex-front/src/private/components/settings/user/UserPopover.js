@@ -21,6 +21,7 @@ import {
 import UserForm from './UserForm';
 import inject18n from '../../../../components/i18n';
 import UserPasswordForm from './UserPasswordForm';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -92,18 +93,15 @@ class UserPopover extends Component {
   }
 
   render() {
-    const { t } = this.props;
-    const organizationPath = [
-      R.prop('user_organization', this.props.user),
-      'organization_name',
-    ];
-    const organizationName = R.pathOr(
-      '-',
-      organizationPath,
-      this.props.organizations,
-    );
+    const { t, user, organizations } = this.props;
+    const userTags = user.getTags().map((tag) => ({
+      id: tag.tag_id,
+      label: tag.tag_name,
+      color: tag.tag_color,
+    }));
     const initialValues = R.pipe(
-      R.assoc('user_organization', organizationName), // Reformat organization
+      R.assoc('user_organization', user.getOrganization()?.organization_name),
+      R.assoc('user_tags', userTags.asMutable()),
       R.pick([
         'user_firstname',
         'user_lastname',
@@ -112,6 +110,7 @@ class UserPopover extends Component {
         'user_phone',
         'user_phone2',
         'user_pgp_key',
+        'user_tags',
       ]),
     )(this.props.user);
     return (
@@ -175,7 +174,7 @@ class UserPopover extends Component {
             <UserForm
               initialValues={initialValues}
               editing={true}
-              organizations={this.props.organizations}
+              organizations={organizations}
               onSubmit={this.onSubmitEdit.bind(this)}
             />
           </DialogContent>
@@ -229,17 +228,18 @@ class UserPopover extends Component {
   }
 }
 
-const select = (state) => ({
-  organizations: state.referential.entities.organizations,
-});
-
 UserPopover.propTypes = {
   t: PropTypes.func,
   user: PropTypes.object,
   updateUser: PropTypes.func,
   updateUserPassword: PropTypes.func,
   deleteUser: PropTypes.func,
-  organizations: PropTypes.object,
+  organizations: PropTypes.array,
+};
+
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return { organizations: browser.getOrganizations() };
 };
 
 export default R.compose(

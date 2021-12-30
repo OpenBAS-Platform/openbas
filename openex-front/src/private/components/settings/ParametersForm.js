@@ -9,7 +9,11 @@ class ParametersForm extends Component {
   render() {
     const { t, onSubmit, initialValues } = this.props;
     return (
-      <Form onSubmit={onSubmit} initialValues={initialValues}>
+      <Form
+        keepDirtyOnReinitialize={true}
+        onSubmit={onSubmit}
+        initialValues={initialValues}
+      >
         {({ handleSubmit }) => (
           <form id="parametersForm" onSubmit={handleSubmit}>
             <Select

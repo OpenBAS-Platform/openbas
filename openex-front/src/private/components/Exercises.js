@@ -232,7 +232,7 @@ class Exercises extends Component {
       R.filter(
         (n) => tags.length === 0
           || R.any(
-            (filter) => R.includes(filter, n.organization_tags),
+            (filter) => R.includes(filter, n.exercise_tags),
             R.pluck('id', tags),
           ),
       ),
@@ -336,21 +336,7 @@ class Exercises extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.exercise_start_date}
                     >
-                      <ItemTags
-                        variant="list"
-                        tags={[
-                          {
-                            tag_id: 1,
-                            tag_name: 'cyber',
-                            tag_color: '#17BDBD',
-                          },
-                          {
-                            tag_id: 2,
-                            tag_name: 'crisis',
-                            tag_color: '#CF271A',
-                          },
-                        ]}
-                      />
+                      <ItemTags variant="list" tags={exercise.getTags()} />
                     </div>
                   </div>
                 }
@@ -374,9 +360,10 @@ Exercises.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const userAdmin = browser.getMe().isAdmin();
-  const exercises = browser.getExercises();
-  return { exercises, userAdmin };
+  return {
+    exercises: browser.getExercises(),
+    userAdmin: browser.getMe().isAdmin(),
+  };
 };
 
 export default R.compose(

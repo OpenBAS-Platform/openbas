@@ -14,6 +14,7 @@ import { Add } from '@mui/icons-material';
 import { addUser } from '../../../../actions/User';
 import UserForm from './UserForm';
 import inject18n from '../../../../components/i18n';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const styles = () => ({
   createButton: {
@@ -102,9 +103,10 @@ CreateUser.propTypes = {
   addUser: PropTypes.func,
 };
 
-const select = (state) => ({
-  organizations: state.referential.entities.organizations,
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return { organizations: browser.getOrganizations() };
+};
 
 export default R.compose(
   connect(select, { addUser }),

@@ -14,6 +14,7 @@ import { Add } from '@mui/icons-material';
 import { addUser } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
+import { storeBrowser } from '../../../actions/Schema';
 
 const styles = () => ({
   createButton: {
@@ -52,7 +53,7 @@ class CreatePlayer extends Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, organizations } = this.props;
     return (
       <div>
         <Fab
@@ -73,7 +74,7 @@ class CreatePlayer extends Component {
             <PlayerForm
               editing={false}
               onSubmit={this.onSubmitCreate.bind(this)}
-              organizations={this.props.organizations}
+              organizations={organizations}
               initialValues={{ user_tags: [] }}
             />
           </DialogContent>
@@ -102,13 +103,14 @@ class CreatePlayer extends Component {
 
 CreatePlayer.propTypes = {
   t: PropTypes.func,
-  organizations: PropTypes.object,
+  organizations: PropTypes.array,
   addUser: PropTypes.func,
 };
 
-const select = (state) => ({
-  organizations: state.referential.entities.organizations,
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return { organizations: browser.getOrganizations() };
+};
 
 export default R.compose(
   connect(select, { addUser }),

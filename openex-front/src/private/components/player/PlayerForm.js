@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import * as R from 'ramda';
 import { TextField } from '../../../components/TextField';
 import { Autocomplete } from '../../../components/Autocomplete';
 import inject18n from '../../../components/i18n';
@@ -22,14 +21,15 @@ class PlayerForm extends Component {
 
   render() {
     const {
-      t, onSubmit, initialValues, editing,
+      t, onSubmit, initialValues, editing, organizations,
     } = this.props;
-    const dataSource = R.map(
-      (val) => val.organization_name,
-      R.values(this.props.organizations),
-    );
+    const options = organizations.map((o) => ({
+      id: o.organization_id,
+      label: o.organization_name,
+    }));
     return (
       <Form
+        keepDirtyOnReinitialize={true}
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
@@ -61,7 +61,7 @@ class PlayerForm extends Component {
               name="user_organization"
               fullWidth={true}
               label={t('Organization')}
-              options={dataSource}
+              options={options}
               style={{ marginTop: 20 }}
               freeSolo={true}
             />
@@ -110,7 +110,7 @@ PlayerForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func,
   change: PropTypes.func,
-  organizations: PropTypes.object,
+  organizations: PropTypes.array,
   editing: PropTypes.bool,
 };
 

@@ -13,6 +13,7 @@ import TagForm from '../private/components/settings/tag/TagForm';
 import { fetchTags, addTag } from '../actions/Tag';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
+import { storeBrowser } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -69,6 +70,7 @@ class TagField extends Component {
       <div>
         <Autocomplete
           variant="standard"
+          size="small"
           name={name}
           fullWidth={true}
           multiple={true}
@@ -84,6 +86,7 @@ class TagField extends Component {
               <div className={classes.text}>{option.label}</div>
             </Box>
           )}
+          classes={{ clearIndicator: classes.autoCompleteIndicator }}
         />
         <Dialog
           open={this.state.tagCreation}
@@ -116,9 +119,12 @@ class TagField extends Component {
   }
 }
 
-const select = (state) => ({
-  tags: R.values(state.referential.entities.tags),
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return {
+    tags: browser.getTags(),
+  };
+};
 
 export default R.compose(
   connect(select, { fetchTags, addTag }),

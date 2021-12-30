@@ -573,13 +573,10 @@ Dashboard.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const sort = R.sortWith([R.descend(R.prop('exercise_end_date'))]);
-  const exercises = R.pipe(
-    R.values,
-    sort,
-    R.take(6),
-  )(state.referential.entities.exercises);
-  return { exercises, statistics: browser.getStatistics() };
+  return {
+    exercises: browser.getExercises(),
+    statistics: browser.getStatistics(),
+  };
 };
 
 export default R.compose(

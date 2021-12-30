@@ -174,11 +174,13 @@ class Players extends Component {
   }
 
   handleAddTag(value) {
-    this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    if (value) {
+      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    }
   }
 
   handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n !== value, this.state.tags) });
+    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
   }
 
   reverseBy(field) {
@@ -231,21 +233,18 @@ class Players extends Component {
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedUsers = sort(
-      users
-        .map((u) => ({
-          ...u,
-          user_organization: u.getOrganization()?.organization_name,
-        }))
-        .filter(
-          (n) => tags.length === 0
-            || R.any(
-              (filter) => R.includes(filter, n.organization_tags),
-              R.pluck('id', tags),
-            ),
-        )
-        .filter(filterByKeyword),
-    );
+    const sortedUsers = R.pipe(
+      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.user_tags),
+            R.pluck('id', tags),
+          ),
+      ),
+      R.filter(filterByKeyword),
+      sort,
+    )(users);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
