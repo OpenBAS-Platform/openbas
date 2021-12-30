@@ -2,18 +2,14 @@
 import { schema } from 'normalizr';
 import * as R from 'ramda';
 
-export const file = new schema.Entity('files', {}, { idAttribute: 'file_id' });
-export const arrayOfFiles = new schema.Array(file);
-
 export const document = new schema.Entity(
-  'document',
+  'documents',
   {},
   { idAttribute: 'document_id' },
 );
-export const arrayOfDocument = new schema.Array(document);
+export const arrayOfDocuments = new schema.Array(document);
 
 export const fileSheet = new schema.Array();
-export const listOfUserPlanificateur = new schema.Array();
 
 export const checkIfExerciseNameExistResult = new schema.Object(
   'check_if_exercise_name_exist',
@@ -158,6 +154,11 @@ export const arrayOfLogs = new schema.Array(log);
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
+const sort = (data, sortBy, orderAsc = true) => R.sortWith(
+  orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
+  data,
+);
+
 export const storeBrowser = (state) => ({
   _buildUser(usr) {
     return {
@@ -238,6 +239,20 @@ export const storeBrowser = (state) => ({
       },
     };
   },
+  _buildDocument(id, doc) {
+    return {
+      ...doc,
+      document_id: id,
+      getTags() {
+        return (
+          doc.document_tags
+          || []
+            .map((tagId) => state.referential.entities.tags[tagId])
+            .filter((t) => t !== undefined)
+        );
+      },
+    };
+  },
   getUsers() {
     return R.values(state.referential.entities.users).map((usr) => this._buildUser(usr));
   },
@@ -245,15 +260,25 @@ export const storeBrowser = (state) => ({
     // eslint-disable-next-line max-len
     return R.values(state.referential.entities.organizations).map((org) => this._buildOrganization(org));
   },
-  getExercises(sortBy = 'exercise_start_date', orderAsc = false) {
-    const sort = R.sortWith(
-      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
-    );
-    // eslint-disable-next-line max-len
-    return sort(R.values(state.referential.entities.exercises)).map((ex) => this._buildExercise(ex.exercise_id, ex));
+  getDocuments(sortBy = 'document_name', orderAsc = true) {
+    return sort(
+      R.values(state.referential.entities.documents),
+      sortBy,
+      orderAsc,
+    ).map((doc) => this._buildDocument(doc.document_id, doc));
   },
-  getTags() {
-    return R.values(state.referential.entities.tags);
+  getExercises(sortBy = 'exercise_start_date', orderAsc = false) {
+    return sort(
+      R.values(state.referential.entities.exercises),
+      sortBy,
+      orderAsc,
+    ).map((ex) => this._buildExercise(ex.exercise_id, ex));
+  },
+  getTags(sortBy = 'tag_name', orderAsc = true) {
+    return sort(R.values(state.referential.entities.tags), sortBy, orderAsc);
+  },
+  getTag(id) {
+    return state.referential.entities.tags[id];
   },
   getExercise(id) {
     const ex = state.referential.entities.exercises[id];

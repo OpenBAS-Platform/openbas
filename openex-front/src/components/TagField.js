@@ -49,9 +49,23 @@ class TagField extends Component {
   }
 
   onSubmit(data) {
-    this.props
-      .addTag(data)
-      .then((result) => (result.result ? this.handleCloseTagCreation() : result));
+    const { name, setFieldValue, values } = this.props;
+    this.props.addTag(data).then((result) => {
+      if (result.result) {
+        const newTag = result.entities.tags[result.result];
+        const tags = R.append(
+          {
+            id: newTag.tag_id,
+            label: newTag.tag_name,
+            color: newTag.tag_color,
+          },
+          values[name],
+        );
+        setFieldValue(name, tags);
+        return this.handleCloseTagCreation();
+      }
+      return result;
+    });
   }
 
   render() {

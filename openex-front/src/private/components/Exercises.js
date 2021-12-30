@@ -334,7 +334,7 @@ class Exercises extends Component {
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
+                      style={inlineStyles.exercise_tags}
                     >
                       <ItemTags variant="list" tags={exercise.getTags()} />
                     </div>

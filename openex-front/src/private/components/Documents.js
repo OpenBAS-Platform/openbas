@@ -6,23 +6,23 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  PersonOutlined,
+  DescriptionOutlined,
 } from '@mui/icons-material';
-import inject18n from '../../../components/i18n';
-import { fetchUsers } from '../../../actions/User';
-import { fetchOrganizations } from '../../../actions/Organization';
-import { FIVE_SECONDS } from '../../../utils/Time';
-import ItemTags from '../../../components/ItemTags';
-import SearchFilter from '../../../components/SearchFilter';
-import CreateUser from './user/CreateUser';
-import UserPopover from './user/UserPopover';
-import { storeBrowser } from '../../../actions/Schema';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import inject18n from '../../components/i18n';
+import { fetchDocuments } from '../../actions/Document';
+import { FIVE_SECONDS } from '../../utils/Time';
+import ItemTags from '../../components/ItemTags';
+import SearchFilter from '../../components/SearchFilter';
+import TagsFilter from '../../components/TagsFilter';
+import CreateDocument from './document/CreateDocument';
+import { storeBrowser } from '../../actions/Schema';
+import DocumentPopover from './document/DocumentPopover';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -73,31 +73,25 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  user_email: {
+  document_name: {
     float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_firstname: {
+  document_description: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_type: {
     float: 'left',
     width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_organization: {
-    float: 'left',
-    width: '25%',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  user_tags: {
+  document_tags: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -105,7 +99,7 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  user_email: {
+  document_name: {
     float: 'left',
     width: '25%',
     height: 20,
@@ -113,7 +107,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_firstname: {
+  document_description: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_type: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -121,23 +123,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  user_lastname: {
-    float: 'left',
-    width: '15%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_organization: {
-    float: 'left',
-    width: '25%',
-    height: 20,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  user_tags: {
+  document_tags: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -146,11 +132,11 @@ const inlineStyles = {
   },
 };
 
-class Users extends Component {
+class Documents extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'user_email',
+      sortBy: 'document_name',
       orderAsc: true,
       keyword: '',
       tags: [],
@@ -158,11 +144,9 @@ class Users extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchOrganizations();
-    this.props.fetchUsers();
+    this.props.fetchDocuments();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchOrganizations();
-      this.props.fetchUsers();
+      this.props.fetchDocuments();
     });
   }
 
@@ -213,28 +197,32 @@ class Users extends Component {
   }
 
   render() {
-    const { classes, users } = this.props;
-    const { keyword, sortBy, orderAsc } = this.state;
+    const { classes, documents, userAdmin } = this.props;
+    const {
+      keyword, sortBy, orderAsc, tags,
+    } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_organization || '')
+      || (n.document_description || '')
         .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+        .indexOf(keyword.toLowerCase()) !== -1
+      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedUsers = R.pipe(
-      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
+    const sortedDocuments = R.pipe(
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.document_tags),
+            R.pluck('id', tags),
+          ),
+      ),
       R.filter(filterByKeyword),
       sort,
-    )(users);
+    )(documents);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -243,6 +231,13 @@ class Users extends Component {
               variant="small"
               onSubmit={this.handleSearch.bind(this)}
               keyword={keyword}
+            />
+          </div>
+          <div style={{ float: 'left', marginRight: 20 }}>
+            <TagsFilter
+              onAddTag={this.handleAddTag.bind(this)}
+              onRemoveRag={this.handleRemoveTag.bind(this)}
+              currentTags={tags}
             />
           </div>
         </div>
@@ -267,91 +262,84 @@ class Users extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('user_email', 'Email address', true)}
-                  {this.sortHeader('user_firstname', 'Firstname', true)}
-                  {this.sortHeader('user_lastname', 'Lastname', true)}
-                  {this.sortHeader('user_organization', 'Organization', true)}
-                  {this.sortHeader('user_tags', 'Tags', true)}
+                  {this.sortHeader('document_name', 'Name', true)}
+                  {this.sortHeader('document_description', 'Description', true)}
+                  {this.sortHeader('document_type', 'Type', true)}
+                  {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedUsers.map((user) => (
+          {sortedDocuments.map((document) => (
             <ListItem
-              key={user.user_id}
+              key={document.document_id}
               classes={{ root: classes.item }}
               divider={true}
             >
               <ListItemIcon>
-                <PersonOutlined />
+                <DescriptionOutlined />
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_email}
+                      style={inlineStyles.document_name}
                     >
-                      {user.user_email}
+                      {document.document_name}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_firstname}
+                      style={inlineStyles.document_description}
                     >
-                      {user.user_firstname}
+                      {document.document_description}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_lastname}
+                      style={inlineStyles.document_type}
                     >
-                      {user.user_lastname}
+                      {document.document_type}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.user_organization}
+                      style={inlineStyles.document_tags}
                     >
-                      {user.user_organization}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.user_tags}
-                    >
-                      <ItemTags variant="list" tags={user.getTags()} />
+                      <ItemTags variant="list" tags={document.getTags()} />
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <UserPopover user={user} />
+                <DocumentPopover document={document} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <CreateUser />
+        {userAdmin && <CreateDocument />}
       </div>
     );
   }
 }
 
-Users.propTypes = {
+Documents.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
-  users: PropTypes.array,
-  organizations: PropTypes.object,
-  fetchUsers: PropTypes.func,
-  fetchOrganizations: PropTypes.func,
+  documents: PropTypes.array,
+  fetchDocuments: PropTypes.func,
+  userAdmin: PropTypes.bool,
 };
 
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    users: browser.getUsers(),
+    documents: browser.getDocuments(),
+    userAdmin: browser.getMe().isAdmin(),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchUsers, fetchOrganizations }),
+  connect(select, { fetchDocuments }),
   inject18n,
   withStyles(styles),
-)(Users);
+)(Documents);

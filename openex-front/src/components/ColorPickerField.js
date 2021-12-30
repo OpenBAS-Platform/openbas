@@ -15,8 +15,7 @@ const renderColorPickerField = ({
   },
   ...others
 }) => {
-  const anchorEl = React.createRef();
-  const [open, setOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
   const handleChange = (color) => {
     onChange(color && color.hex ? color.hex : '');
   };
@@ -31,7 +30,10 @@ const renderColorPickerField = ({
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <IconButton aria-label="open" onClick={() => setOpen(true)}>
+              <IconButton
+                aria-label="open"
+                onClick={(event) => setAnchorEl(event.currentTarget)}
+              >
                 <ColorLensOutlined />
               </IconButton>
             </InputAdornment>
@@ -39,9 +41,9 @@ const renderColorPickerField = ({
         }}
       />
       <Popover
-        open={open}
-        anchorEl={anchorEl.current}
-        onClose={() => setOpen(false)}
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'center',

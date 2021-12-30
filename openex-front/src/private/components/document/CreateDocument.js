@@ -11,8 +11,12 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { Add } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
-import ExerciseForm from './ExerciseForm';
-import { addExercise } from '../../../actions/Exercise';
+import DocumentForm from './DocumentForm';
+import {
+  addDocument,
+  fetchDocument,
+  updateDocument,
+} from '../../../actions/Document';
 import inject18n from '../../../components/i18n';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -28,7 +32,7 @@ const styles = () => ({
   },
 });
 
-class CreateExercise extends Component {
+class CreateDocument extends Component {
   constructor(props) {
     super(props);
     this.state = { open: false };
@@ -44,11 +48,18 @@ class CreateExercise extends Component {
 
   onSubmit(data) {
     const inputValues = R.pipe(
-      R.assoc('exercise_tags', R.pluck('id', data.exercise_tags)),
+      R.assoc('document_tags', R.pluck('id', data.document_tags)),
     )(data);
-    return this.props
-      .addExercise(inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+    const formData = new FormData();
+    formData.append('file', data.document_file[0]);
+    this.props.addDocument(formData).then((document) => {
+      this.props.fetchDocument(document.result).then((finalDocument) => {
+        this.props.updateDocument(document.result, {
+          ...finalDocument,
+          ...inputValues,
+        });
+      });
+    });
   }
 
   render() {
@@ -68,11 +79,11 @@ class CreateExercise extends Component {
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
         >
-          <DialogTitle>{t('Create a new exercise')}</DialogTitle>
+          <DialogTitle>{t('Create a new document')}</DialogTitle>
           <DialogContent>
-            <ExerciseForm
+            <DocumentForm
               onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ exercise_tags: [] }}
+              initialValues={{ document_tags: [] }}
             />
           </DialogContent>
           <DialogActions>
@@ -87,7 +98,7 @@ class CreateExercise extends Component {
               variant="contained"
               color="primary"
               type="submit"
-              form="exerciseForm"
+              form="documentForm"
             >
               {t('Create')}
             </Button>
@@ -98,14 +109,16 @@ class CreateExercise extends Component {
   }
 }
 
-CreateExercise.propTypes = {
+CreateDocument.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
-  addExercise: PropTypes.func,
+  addDocument: PropTypes.func,
+  fetchDocument: PropTypes.func,
+  updateDocument: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addExercise }),
+  connect(null, { addDocument, fetchDocument, updateDocument }),
   inject18n,
   withStyles(styles),
-)(CreateExercise);
+)(CreateDocument);

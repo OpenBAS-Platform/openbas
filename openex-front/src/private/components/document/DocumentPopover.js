@@ -13,11 +13,8 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateOrganization,
-  deleteOrganization,
-} from '../../../actions/Organization';
-import OrganizationForm from './OrganizationForm';
+import { updateDocument, deleteDocument } from '../../../actions/Document';
+import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
 import { storeBrowser } from '../../../actions/Schema';
 
@@ -26,7 +23,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-class OrganizationPopover extends Component {
+class DocumentPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -56,10 +53,10 @@ class OrganizationPopover extends Component {
 
   onSubmitEdit(data) {
     const inputValues = R.pipe(
-      R.assoc('organization_tags', R.pluck('id', data.organization_tags)),
+      R.assoc('document_tags', R.pluck('id', data.document_tags)),
     )(data);
     return this.props
-      .updateOrganization(this.props.organization.organization_id, inputValues)
+      .updateDocument(this.props.document.document_id, inputValues)
       .then(() => this.handleCloseEdit());
   }
 
@@ -73,27 +70,26 @@ class OrganizationPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteOrganization(this.props.organization.organization_id);
+    this.props.deleteDocument(this.props.document.document_id);
     this.handleCloseDelete();
   }
 
   render() {
-    const { t, organization } = this.props;
-    const organizationTags = organization
-      .getTags()
-      .map((tag) => ({
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      }));
+    const { t, document } = this.props;
+    const documentTags = document.getTags().map((tag) => ({
+      id: tag.tag_id,
+      label: tag.tag_name,
+      color: tag.tag_color,
+    }));
     const initialValues = R.pipe(
-      R.assoc('organization_tags', organizationTags.asMutable()),
+      R.assoc('document_tags', documentTags.asMutable()),
       R.pick([
-        'organization_name',
-        'organization_description',
-        'organization_tags',
+        'document_name',
+        'document_description',
+        'document_type',
+        'document_tags',
       ]),
-    )(organization);
+    )(document);
     return (
       <div>
         <IconButton
@@ -122,7 +118,7 @@ class OrganizationPopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to delete this organization?')}
+              {t('Do you want to delete this document?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -147,9 +143,9 @@ class OrganizationPopover extends Component {
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
         >
-          <DialogTitle>{t('Update the organization')}</DialogTitle>
+          <DialogTitle>{t('Update the document')}</DialogTitle>
           <DialogContent>
-            <OrganizationForm
+            <DocumentForm
               initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
@@ -167,7 +163,7 @@ class OrganizationPopover extends Component {
               variant="contained"
               color="primary"
               type="submit"
-              form="organizationForm"
+              form="documentForm"
             >
               {t('Update')}
             </Button>
@@ -184,16 +180,16 @@ const select = (state) => {
   return { user, userAdmin: user.isAdmin() };
 };
 
-OrganizationPopover.propTypes = {
+DocumentPopover.propTypes = {
   t: PropTypes.func,
-  organization: PropTypes.object,
-  updateOrganization: PropTypes.func,
-  deleteOrganization: PropTypes.func,
+  document: PropTypes.object,
+  updateDocument: PropTypes.func,
+  deleteDocument: PropTypes.func,
   userAdmin: PropTypes.bool,
   tags: PropTypes.object,
 };
 
 export default R.compose(
-  connect(select, { updateOrganization, deleteOrganization }),
+  connect(select, { updateDocument, deleteDocument }),
   inject18n,
-)(OrganizationPopover);
+)(DocumentPopover);

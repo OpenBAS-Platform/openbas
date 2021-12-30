@@ -9,6 +9,7 @@ import { LabelOutlined } from '@mui/icons-material';
 import { connect } from 'react-redux';
 import { fetchTags } from '../actions/Tag';
 import inject18n from './i18n';
+import { storeBrowser } from '../actions/Schema';
 
 const styles = () => ({
   input: {
@@ -99,9 +100,12 @@ class TagsFilter extends Component {
   }
 }
 
-const select = (state) => ({
-  tags: R.values(state.referential.entities.tags),
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return {
+    tags: browser.getTags(),
+  };
+};
 
 export default R.compose(
   connect(select, { fetchTags }),

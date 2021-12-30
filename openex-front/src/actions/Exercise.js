@@ -13,9 +13,9 @@ export const fetchExercise = (exerciseId) => (dispatch) => getReferential(schema
 
 export const addExercise = (data) => (dispatch) => postReferential(schema.exercise, '/api/exercises', data)(dispatch);
 
-export const updateExercise = (exerciseId, type, data) => (dispatch) => putReferential(
+export const updateExercise = (exerciseId, data) => (dispatch) => putReferential(
   schema.exercise,
-  `/api/exercises/${exerciseId}/${type}`,
+  `/api/exercises/${exerciseId}`,
   data,
 )(dispatch);
 

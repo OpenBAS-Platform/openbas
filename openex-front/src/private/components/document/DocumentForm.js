@@ -4,12 +4,13 @@ import { Form } from 'react-final-form';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
+import FileField from '../../../components/FileField';
 
-class OrganizationForm extends Component {
+class DocumentForm extends Component {
   validate(values) {
-    const { t } = this.props;
+    const { t, editing } = this.props;
     const errors = {};
-    const requiredFields = ['organization_name'];
+    const requiredFields = editing ? [] : ['document_file'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -19,7 +20,9 @@ class OrganizationForm extends Component {
   }
 
   render() {
-    const { t, onSubmit, initialValues } = this.props;
+    const {
+      t, editing, onSubmit, initialValues,
+    } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -33,27 +36,30 @@ class OrganizationForm extends Component {
         }}
       >
         {({ handleSubmit, form, values }) => (
-          <form id="organizationForm" onSubmit={handleSubmit}>
+          <form id="documentForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
-              name="organization_name"
-              fullWidth={true}
-              label={t('Name')}
-            />
-            <TextField
-              variant="standard"
-              name="organization_description"
+              name="document_description"
               fullWidth={true}
               multiline={true}
               rows={2}
               label={t('Description')}
-              style={{ marginTop: 20 }}
             />
             <TagField
-              name="organization_tags"
+              name="document_tags"
               values={values}
               setFieldValue={form.mutators.setValue}
             />
+            {!editing && (
+              <FileField
+                variant="standard"
+                type="file"
+                name="document_file"
+                fullWidth={true}
+                label={t('File')}
+                style={{ marginTop: 20 }}
+              />
+            )}
           </form>
         )}
       </Form>
@@ -61,11 +67,12 @@ class OrganizationForm extends Component {
   }
 }
 
-OrganizationForm.propTypes = {
+DocumentForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
-  edit: PropTypes.bool,
+  editing: PropTypes.bool,
   change: PropTypes.func,
+  groups: PropTypes.array,
 };
 
-export default inject18n(OrganizationForm);
+export default inject18n(DocumentForm);

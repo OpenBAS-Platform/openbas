@@ -35,7 +35,6 @@ class UserPopover extends Component {
       openDelete: false,
       openEdit: false,
       openEditPassword: false,
-      openPopover: false,
     };
   }
 

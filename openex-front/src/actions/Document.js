@@ -3,35 +3,24 @@ import {
   getReferential,
   postReferential,
   delReferential,
-  fileSave, putReferential,
+  fileSave,
+  putReferential,
 } from '../utils/Action';
+
+export const fetchDocuments = () => (dispatch) => getReferential(schema.arrayOfDocuments, '/api/documents')(dispatch);
+
+export const fetchDocument = (documentId) => (dispatch) => getReferential(schema.document, `/api/documents/${documentId}`)(dispatch);
 
 export const addDocument = (data) => (dispatch) => {
   const uri = '/api/documents';
   return postReferential(schema.document, uri, data)(dispatch);
 };
 
-export const searchDocument = (data) => (dispatch) => {
-  const uri = '/api/documents';
-  return getReferential(schema.arrayOfDocument, uri, data)(dispatch);
-};
-
-export const saveDocument = (documentId, data) => (dispatch) => {
-  const uri = `/api/documents/${documentId}`;
-  return putReferential(schema.document, uri, data)(dispatch);
-};
-
-export const getDocument = (documentId) => (dispatch) => getReferential(schema.document, `/api/document/${documentId}`)(dispatch);
-
-export const getDocumentTags = (documentId) => (dispatch) => getReferential(
-  schema.arrayOfTags,
-  `/api/documents/${documentId}/tags`,
+export const updateDocument = (documentId, data) => (dispatch) => putReferential(
+  schema.document,
+  `/api/documents/${documentId}`,
+  data,
 )(dispatch);
-
-export const editDocumentTags = (documentId, data) => (dispatch) => {
-  const uri = `/api/documents/${documentId}/tags`;
-  return putReferential(schema.document, uri, data)(dispatch);
-};
 
 export const deleteDocument = (documentId) => (dispatch) => {
   const uri = `/api/documents/${documentId}`;

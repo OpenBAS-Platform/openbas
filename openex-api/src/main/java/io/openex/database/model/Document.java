@@ -39,7 +39,7 @@ public class Document implements Base {
     @JoinTable(name = "documents_tags",
             joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonProperty("document_liste_tags")
+    @JsonProperty("document_tags")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 

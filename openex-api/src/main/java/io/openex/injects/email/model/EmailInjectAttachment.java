@@ -25,7 +25,7 @@ public class EmailInjectAttachment {
     @JsonProperty("document_path")
     private String path;
 
-    @JsonProperty("document_liste_tags")
+    @JsonProperty("document_tags")
     private List<Tag> tags = new ArrayList<>();
 
     public String getId() {

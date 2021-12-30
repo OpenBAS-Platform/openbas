@@ -32,8 +32,13 @@ class ExerciseForm extends Component {
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+        }}
       >
-        {({ handleSubmit }) => (
+        {({ handleSubmit, form, values }) => (
           <form id="exerciseForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -114,7 +119,11 @@ class ExerciseForm extends Component {
                 style={{ marginTop: 20 }}
               />
             )}
-            <TagField name="exercise_tags" />
+            <TagField
+              name="exercise_tags"
+              values={values}
+              setFieldValue={form.mutators.setValue}
+            />
           </form>
         )}
       </Form>

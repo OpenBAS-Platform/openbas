@@ -11,6 +11,7 @@ import Dashboard from './components/Dashboard';
 import Exercises from './components/Exercises';
 import Players from './components/Players';
 import Organizations from './components/Organizations';
+import Documents from './components/Documents';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,6 +49,7 @@ const Index = () => {
           <Route exact path="/exercises" component={Exercises} />
           <Route exact path="/players" component={Players} />
           <Route exact path="/organizations" component={Organizations} />
+          <Route exact path="/documents" component={Documents} />
           <Route path="/settings" component={IndexSettings} />
           <Route component={NotFound} />
         </Switch>

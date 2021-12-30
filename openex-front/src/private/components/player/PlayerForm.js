@@ -33,8 +33,13 @@ class PlayerForm extends Component {
         initialValues={initialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+        }}
       >
-        {({ handleSubmit }) => (
+        {({ handleSubmit, form, values }) => (
           <form id="playerForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -94,7 +99,11 @@ class PlayerForm extends Component {
                 style={{ marginTop: 20 }}
               />
             )}
-            <TagField name="user_tags" />
+            <TagField
+              name="user_tags"
+              values={values}
+              setFieldValue={form.mutators.setValue}
+            />
           </form>
         )}
       </Form>

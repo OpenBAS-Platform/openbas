@@ -44,8 +44,11 @@ class CreateUser extends Component {
   }
 
   onSubmitCreate(data) {
+    const inputValues = R.pipe(
+      R.assoc('user_tags', R.pluck('id', data.user_tags)),
+    )(data);
     return this.props
-      .addUser(data)
+      .addUser(inputValues)
       .then((result) => (result.result ? this.handleCloseCreate() : result));
   }
 

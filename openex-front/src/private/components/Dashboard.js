@@ -210,21 +210,7 @@ const Dashboard = (props) => {
                             : '-'}
                         </div>
                         <div className={classes.bodyItem}>
-                          <ItemTags
-                            variant="list"
-                            tags={[
-                              {
-                                tag_id: 1,
-                                tag_name: 'cyber',
-                                tag_color: '#17BDBD',
-                              },
-                              {
-                                tag_id: 2,
-                                tag_name: 'crisis',
-                                tag_color: '#CF271A',
-                              },
-                            ]}
-                          />
+                          <ItemTags variant="list" tags={exercise.getTags()} />
                         </div>
                       </div>
                     }

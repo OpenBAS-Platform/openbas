@@ -20,6 +20,7 @@ import { FIVE_SECONDS } from '../../../utils/Time';
 import SearchFilter from '../../../components/SearchFilter';
 import CreateTag from './tag/CreateTag';
 import TagPopover from './tag/TagPopover';
+import { storeBrowser } from '../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -261,9 +262,12 @@ Tags.propTypes = {
   fetchTags: PropTypes.func,
 };
 
-const select = (state) => ({
-  tags: R.values(state.referential.entities.tags),
-});
+const select = (state) => {
+  const browser = storeBrowser(state);
+  return {
+    tags: browser.getTags(),
+  };
+};
 
 export default R.compose(
   connect(select, { fetchTags }),

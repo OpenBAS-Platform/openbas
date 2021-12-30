@@ -332,7 +332,7 @@ class Players extends Component {
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
+                      style={inlineStyles.user_tags}
                     >
                       <ItemTags variant="list" tags={user.getTags()} />
                     </div>
