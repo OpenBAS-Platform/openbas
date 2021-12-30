@@ -11,6 +11,11 @@ import javax.persistence.*;
 @Table(name = "grants")
 public class Grant implements Base {
 
+    public enum GRANT_TYPE {
+        OBSERVER,
+        PLANNER
+    }
+
     @Id
     @Column(name = "grant_id")
     @GeneratedValue(generator = "UUID")
@@ -64,10 +69,5 @@ public class Grant implements Base {
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
-    }
-
-    public enum GRANT_TYPE {
-        OBSERVER,
-        PLANNER
     }
 }

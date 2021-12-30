@@ -71,7 +71,7 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Specific case of react index
-        registry.addResourceHandler("/", "/private", "/private/**")
+        registry.addResourceHandler("*")
                 .addResourceLocations("classpath:/build/")
                 .setCachePeriod(CACHE_PERIOD)
                 .resourceChain(true)

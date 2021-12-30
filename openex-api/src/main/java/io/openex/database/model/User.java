@@ -16,6 +16,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import javax.persistence.*;
 import java.util.*;
 
+import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
+
 @Entity
 @Table(name = "users")
 public class User implements Base, OAuth2User {
@@ -132,6 +134,19 @@ public class User implements Base, OAuth2User {
     public String getGravatar() {
         String emailMd5 = CryptoHelper.md5Hex(getEmail().trim().toLowerCase());
         return "https://www.gravatar.com/avatar/" + emailMd5 + "?d=mm";
+    }
+
+    @JsonProperty("user_invited")
+    public boolean isInvited() {
+        return !isAdmin() && getGroups().stream()
+                .mapToLong(group -> group.getGrants().size()).sum() == 0;
+    }
+
+    @JsonProperty("user_can_invite")
+    public boolean canInvite() {
+        return isAdmin() || getGroups().stream()
+                .flatMap(group -> group.getGrants().stream())
+                .anyMatch(grant -> grant.getName().equals(PLANNER.name()));
     }
     // endregion
 
