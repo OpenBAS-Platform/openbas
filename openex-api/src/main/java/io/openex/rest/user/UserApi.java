@@ -3,6 +3,7 @@ package io.openex.rest.user;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
+import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.CreateUserInput;
@@ -29,7 +30,13 @@ public class UserApi extends RestBehavior {
 
     private OrganizationRepository organizationRepository;
     private UserRepository userRepository;
+    private TagRepository tagRepository;
     private UserService userService;
+
+    @Autowired
+    public void setTagRepository(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
 
     @Autowired
     public void setOrganizationRepository(OrganizationRepository organizationRepository) {
@@ -90,6 +97,7 @@ public class UserApi extends RestBehavior {
         User user = new User();
         user.setUpdateAttributes(input);
         user.setLogin(input.getEmail());
+        user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         return userRepository.save(user);
     }
@@ -99,6 +107,7 @@ public class UserApi extends RestBehavior {
     public User updateUser(@PathVariable String userId, @Valid @RequestBody UpdateUserInput input) {
         User user = userRepository.findById(userId).orElseThrow();
         user.setUpdateAttributes(input);
+        user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         return userRepository.save(user);
     }

@@ -3,9 +3,8 @@ package io.openex.rest.user.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
-import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UpdateUserInput {
 
@@ -13,11 +12,12 @@ public class UpdateUserInput {
     @JsonProperty("user_email")
     private String email;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("user_admin")
+    private boolean admin;
+
     @JsonProperty("user_firstname")
     private String firstname;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("user_lastname")
     private String lastname;
 
@@ -33,12 +33,23 @@ public class UpdateUserInput {
     @JsonProperty("user_phone2")
     private String phone2;
 
+    @JsonProperty("user_tags")
+    private List<String> tagIds = new ArrayList<>();
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     public String getFirstname() {
@@ -87,5 +98,13 @@ public class UpdateUserInput {
 
     public void setPhone2(String phone2) {
         this.phone2 = phone2;
+    }
+
+    public List<String> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<String> tagIds) {
+        this.tagIds = tagIds;
     }
 }
