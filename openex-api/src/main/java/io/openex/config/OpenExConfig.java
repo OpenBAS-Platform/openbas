@@ -30,9 +30,6 @@ public class OpenExConfig {
     @JsonProperty("auth_openid_enable")
     private boolean authOpenidEnable;
 
-    @JsonProperty("auth_openid_label")
-    private String authOpenidLabel;
-
     @JsonProperty("auth_kerberos_enable")
     private boolean authKerberosEnable;
 
@@ -123,14 +120,6 @@ public class OpenExConfig {
 
     public void setAuthOpenidEnable(boolean authOpenidEnable) {
         this.authOpenidEnable = authOpenidEnable;
-    }
-
-    public String getAuthOpenidLabel() {
-        return authOpenidLabel;
-    }
-
-    public void setAuthOpenidLabel(String authOpenidLabel) {
-        this.authOpenidLabel = authOpenidLabel;
     }
 
     public boolean isAuthKerberosEnable() {

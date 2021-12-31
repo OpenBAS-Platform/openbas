@@ -1,19 +1,17 @@
 package io.openex.rest.user;
 
-import io.openex.config.OpenExConfig;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.user.form.CreateUserInput;
 import io.openex.rest.user.form.LoginUserInput;
 import io.openex.rest.user.form.UpdatePasswordInput;
-import io.openex.rest.user.form.CreateUserInput;
 import io.openex.rest.user.form.UpdateUserInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +30,6 @@ public class UserApi extends RestBehavior {
     private OrganizationRepository organizationRepository;
     private UserRepository userRepository;
     private UserService userService;
-    private OpenExConfig openExConfig;
 
     @Autowired
     public void setOrganizationRepository(OrganizationRepository organizationRepository) {
@@ -49,20 +46,10 @@ public class UserApi extends RestBehavior {
         this.userRepository = userRepository;
     }
 
-    @Autowired
-    public void setOpenExConfig(OpenExConfig openExConfig) {
-        this.openExConfig = openExConfig;
-    }
-
     @RolesAllowed(ROLE_USER)
     @GetMapping("/api/users")
     public Iterable<User> users() {
         return userRepository.findAll();
-    }
-
-    @GetMapping("/api/parameters")
-    public OpenExConfig parameter() {
-        return openExConfig;
     }
 
     @RolesAllowed(ROLE_USER)

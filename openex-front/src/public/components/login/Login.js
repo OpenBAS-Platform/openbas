@@ -14,6 +14,7 @@ import {
 } from '../../../actions/Application';
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
+import { storeBrowser } from '../../../actions/Schema';
 
 const styles = () => ({
   container: {
@@ -41,7 +42,9 @@ const styles = () => ({
 });
 
 const Login = (props) => {
-  const { classes, t } = props;
+  const { classes, parameters, t } = props;
+  const { auth_openid_enable: isOpenId, auth_local_enable: isLocal } = parameters;
+  const { platform_providers: providers } = parameters;
   const [dimension, setDimension] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -59,12 +62,9 @@ const Login = (props) => {
   }, []);
   const onSubmit = (data) => props.askToken(data.username, data.password);
   let loginHeight = 260;
-  if (
-    props.parameters.auth_openid_enable
-    && props.parameters.auth_local_enable
-  ) {
+  if (isOpenId && isLocal) {
     loginHeight = 350;
-  } else if (props.parameters.auth_openid_enable) {
+  } else if (isOpenId) {
     loginHeight = 150;
   }
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
@@ -74,23 +74,19 @@ const Login = (props) => {
       <Paper variant="outlined">
         <LoginForm onSubmit={onSubmit} />
       </Paper>
-      {props.parameters.auth_openid_enable && (
-        <Button
-          component="a"
-          href="/oauth2/authorization/citeum"
-          variant="outlined"
-          color="secondary"
-          size="small"
-          style={{ marginTop: 20 }}
-          startIcon={<VpnKeyOutlined />}
-        >
-          {props.parameters.auth_openid_label.length > 0 ? (
-            props.parameters.auth_openid_label
-          ) : (
-            <span>{t('Login with OpenID<')}</span>
-          )}
-        </Button>
-      )}
+      {(providers ?? [])
+        .map((provider) => <div key={provider.provider_name}>
+          <Button
+              component="a"
+              href={provider.provider_uri}
+              variant="outlined"
+              color="secondary"
+              size="small"
+              style={{ marginTop: 20 }}
+              startIcon={<VpnKeyOutlined />}>
+            <span>{t(provider.provider_login)}</span>
+          </Button>
+      </div>)}
     </div>
   );
 };
@@ -105,11 +101,8 @@ Login.propTypes = {
 };
 
 const select = (state) => {
-  const parameters = R.propOr(
-    {},
-    'global',
-    state.referential.entities.parameters,
-  );
+  const browser = storeBrowser(state);
+  const parameters = browser.getSettings() ?? {};
   return { parameters };
 };
 

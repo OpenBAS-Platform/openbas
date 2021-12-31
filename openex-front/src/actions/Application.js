@@ -4,7 +4,7 @@ import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
 import { postReferential, getReferential, simpleCall } from '../utils/Action';
 
-export const fetchParameters = () => (dispatch) => getReferential(schema.parameters, '/api/parameters')(dispatch);
+export const fetchParameters = () => (dispatch) => getReferential(schema.parameters, '/api/settings')(dispatch);
 
 export const askToken = (username, password) => (dispatch) => {
   const data = { login: username, password };

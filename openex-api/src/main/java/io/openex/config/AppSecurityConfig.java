@@ -1,8 +1,9 @@
-package io.openex.rest.security;
+package io.openex.config;
 
-import io.openex.config.OpenExConfig;
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
+import io.openex.security.OAuthRefererAuthenticationSuccessHandler;
+import io.openex.security.TokenAuthenticationFilter;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 import java.util.Optional;
 
@@ -48,12 +50,15 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .requestCache()
+                /**/.requestCache(new HttpSessionRequestCache())
+                .and()
                 .csrf()
                 /**/.disable()
                 .formLogin()
                 /**/.disable()
                 .authorizeRequests()
-                /**/.antMatchers("/api/parameters").permitAll()
+                /**/.antMatchers("/api/settings").permitAll()
                 /**/.antMatchers("/api/comcheck").permitAll()
                 /**/.antMatchers("/api/login").permitAll()
                 /**/.antMatchers("/api/**").authenticated()
@@ -64,7 +69,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.logoutSuccessUrl("/");
 
         if (openExConfig.isAuthOpenidEnable()) {
-            http.oauth2Login();
+            http.oauth2Login().successHandler(new OAuthRefererAuthenticationSuccessHandler());
         }
 
         // Rewrite 403 code to 401

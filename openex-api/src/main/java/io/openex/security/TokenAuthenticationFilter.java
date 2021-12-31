@@ -1,4 +1,4 @@
-package io.openex.rest.security;
+package io.openex.security;
 
 import io.openex.database.model.Token;
 import io.openex.database.model.User;

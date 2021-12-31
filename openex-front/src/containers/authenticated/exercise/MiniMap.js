@@ -6,6 +6,7 @@ import { Map, TileLayer, Marker } from 'react-leaflet';
 import L from 'leaflet';
 import * as R from 'ramda';
 import { connect } from 'react-redux';
+import { storeBrowser } from '../../../actions/Schema';
 
 const styles = () => ({
   paper: {
@@ -80,11 +81,8 @@ MiniMap.propTypes = {
 };
 
 const select = (state) => {
-  const parameters = R.propOr(
-    {},
-    'global',
-    state.referential.entities.parameters,
-  );
+  const browser = storeBrowser(state);
+  const parameters = browser.getSettings() ?? {};
   return { parameters };
 };
 
