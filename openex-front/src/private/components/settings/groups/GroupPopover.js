@@ -27,7 +27,10 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import withStyles from '@mui/styles/withStyles';
 import {
-  fetchGroup, deleteGroup, updateGroupUsers, updateGroupInformation,
+  fetchGroup,
+  deleteGroup,
+  updateGroupUsers,
+  updateGroupInformation,
 } from '../../../../actions/Group';
 import { addGrant, deleteGrant } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
@@ -35,26 +38,42 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
 
-const styles = {
-  main: {
-    position: 'absolute',
-    top: '7px',
-    right: 0,
-  },
-  name: {
-    float: 'left',
-    width: '30%',
-    padding: '5px 0 0 0',
-  },
-  mail: {
-    float: 'left',
-    width: '40%',
-    padding: '5px 0 0 0',
-  },
-  org: {
-    float: 'left',
-    padding: '5px 0 0 0',
-  },
+const styles = (theme) => {
+  const { grey } = theme.palette;
+  return {
+    main: {
+      position: 'absolute',
+      top: '7px',
+      right: 0,
+    },
+    name: {
+      float: 'left',
+      width: '30%',
+      padding: '5px 0 0 0',
+    },
+    mail: {
+      float: 'left',
+      width: '40%',
+      padding: '5px 0 0 0',
+    },
+    org: {
+      float: 'left',
+      padding: '5px 0 0 0',
+    },
+    tableHeader: {
+      borderBottom: `1px solid ${
+        theme.palette.mode === 'dark' ? grey[200] : grey[800]
+      }`,
+    },
+    tableCell: {
+      borderTop: `1px solid ${
+        theme.palette.mode === 'dark' ? grey[200] : grey[800]
+      }`,
+      borderBottom: `1px solid ${
+        theme.palette.mode === 'dark' ? grey[200] : grey[800]
+      }`,
+    },
+  };
 };
 
 const Transition = React.forwardRef((props, ref) => (
@@ -72,7 +91,7 @@ class GroupPopover extends Component {
       openGrants: false,
       openPopover: false,
       searchTerm: '',
-      usersIds: this.props.groupUsersIds,
+      usersIds: props.groupUsersIds,
     };
   }
 
@@ -94,9 +113,11 @@ class GroupPopover extends Component {
   }
 
   onSubmitEdit(data) {
-    this.props.updateGroupInformation(this.props.group.group_id, data).then(() => {
-      this.setState({ openEdit: false });
-    });
+    this.props
+      .updateGroupInformation(this.props.group.group_id, data)
+      .then(() => {
+        this.setState({ openEdit: false });
+      });
   }
 
   handleOpenUsers() {
@@ -174,7 +195,10 @@ class GroupPopover extends Component {
 
   render() {
     const { classes, t } = this.props;
-    const initialValues = R.pick(['group_name', 'group_description'], this.props.group);
+    const initialValues = R.pick(
+      ['group_name', 'group_description'],
+      this.props.group,
+    );
     // region filter users by active keyword
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
@@ -196,10 +220,9 @@ class GroupPopover extends Component {
           anchorEl={this.state.anchorEl}
           open={Boolean(this.state.anchorEl)}
           onClose={this.handlePopoverClose.bind(this)}
-          style={{ marginTop: 50 }}
         >
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
-            {t('Edit')}
+            {t('Update')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenUsers.bind(this)}>
             {t('Manage users')}
@@ -355,12 +378,24 @@ class GroupPopover extends Component {
         >
           <DialogTitle>{t('Manage grants')}</DialogTitle>
           <DialogContent>
-            <Table selectable={false} style={{ marginTop: '5px' }}>
+            <Table selectable={false} size="small">
               <TableHead adjustForCheckbox={false} displaySelectAll={false}>
                 <TableRow>
-                  <TableCell>{t('Exercise')}</TableCell>
-                  <TableCell>{t('Read/Write')}</TableCell>
-                  <TableCell>{t('Read only')}</TableCell>
+                  <TableCell classes={{ root: classes.tableHeader }}>
+                    {t('Exercise')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableHeader }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    {t('Read/Write')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableHeader }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    {t('Read Only')}
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody displayRowCheckbox={false}>
@@ -385,8 +420,13 @@ class GroupPopover extends Component {
                   );
                   return (
                     <TableRow key={exercise.exercise_id}>
-                      <TableCell>{exercise.exercise_name}</TableCell>
-                      <TableCell>
+                      <TableCell classes={{ root: classes.tableCell }}>
+                        {exercise.exercise_name}
+                      </TableCell>
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        style={{ textAlign: 'center' }}
+                      >
                         <Checkbox
                           checked={grantPlannerId !== null}
                           onChange={this.handleGrantCheck.bind(
@@ -397,7 +437,10 @@ class GroupPopover extends Component {
                           )}
                         />
                       </TableCell>
-                      <TableCell>
+                      <TableCell
+                        classes={{ root: classes.tableCell }}
+                        style={{ textAlign: 'center' }}
+                      >
                         <Checkbox
                           checked={
                             grantObserverId !== null || grantPlannerId !== null
@@ -432,16 +475,6 @@ class GroupPopover extends Component {
   }
 }
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  const users = browser.getUsers();
-  const exercises = browser.getExercises();
-  const organizations = browser.getOrganizations();
-  return {
-    users, organizations, exercises, browser,
-  };
-};
-
 GroupPopover.propTypes = {
   t: PropTypes.func,
   group: PropTypes.object,
@@ -455,6 +488,19 @@ GroupPopover.propTypes = {
   exercises: PropTypes.array,
   users: PropTypes.array,
   groupUsersIds: PropTypes.array,
+};
+
+const select = (state) => {
+  const browser = storeBrowser(state);
+  const users = browser.getUsers();
+  const exercises = browser.getExercises();
+  const organizations = browser.getOrganizations();
+  return {
+    users,
+    organizations,
+    exercises,
+    browser,
+  };
 };
 
 export default R.compose(

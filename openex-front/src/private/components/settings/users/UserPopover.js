@@ -126,6 +126,7 @@ class UserPopover extends Component {
         'user_phone2',
         'user_pgp_key',
         'user_tags',
+        'user_admin',
       ]),
     )(user);
     return (

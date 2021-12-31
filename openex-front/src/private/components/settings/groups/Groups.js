@@ -12,15 +12,18 @@ import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  LabelOutlined,
+  GroupOutlined,
 } from '@mui/icons-material';
-import inject18n from '../../../components/i18n';
-import { fetchTags } from '../../../actions/Tag';
-import { FIVE_SECONDS } from '../../../utils/Time';
-import SearchFilter from '../../../components/SearchFilter';
-import CreateTag from './tag/CreateTag';
-import TagPopover from './tag/TagPopover';
-import { storeBrowser } from '../../../actions/Schema';
+import inject18n from '../../../../components/i18n';
+import { fetchUsers } from '../../../../actions/User';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { FIVE_SECONDS } from '../../../../utils/Time';
+import SearchFilter from '../../../../components/SearchFilter';
+import CreateGroup from './CreateGroup';
+import { fetchGroups } from '../../../../actions/Group';
+import { fetchExercises } from '../../../../actions/Exercise';
+import GroupPopover from './GroupPopover';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -71,13 +74,19 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  tag_name: {
+  group_name: {
     float: 'left',
-    width: '40%',
+    width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
-  tag_color: {
+  group_description: {
+    float: 'left',
+    width: '50%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  group_users_number: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -85,15 +94,23 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  tag_name: {
+  group_name: {
     float: 'left',
-    width: '40%',
+    width: '30%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  tag_color: {
+  group_description: {
+    float: 'left',
+    width: '50%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  group_users_number: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -102,11 +119,11 @@ const inlineStyles = {
   },
 };
 
-class Tags extends Component {
+class Groups extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'tag_name',
+      sortBy: 'group_name',
       orderAsc: true,
       keyword: '',
       tags: [],
@@ -114,9 +131,15 @@ class Tags extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchTags();
+    this.props.fetchOrganizations();
+    this.props.fetchUsers();
+    this.props.fetchGroups();
+    this.props.fetchExercises();
     this.subscription = interval$.subscribe(() => {
-      this.props.fetchTags();
+      this.props.fetchOrganizations();
+      this.props.fetchUsers();
+      this.props.fetchGroups();
+      this.props.fetchExercises();
     });
   }
 
@@ -167,15 +190,24 @@ class Tags extends Component {
   }
 
   render() {
-    const { classes, tags } = this.props;
+    const {
+      classes, groups, exercises, organizations, users,
+    } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.tag_name || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || (n.tag_color || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.group_description || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedTags = R.pipe(R.filter(filterByKeyword), sort)(tags);
+    const sortedGroups = R.pipe(
+      R.map((n) => R.assoc('group_users_number', R.propOr([], 'group_users', n).length, n)),
+      R.filter(filterByKeyword),
+      sort,
+    )(groups);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -208,69 +240,99 @@ class Tags extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('tag_name', 'Name', true)}
-                  {this.sortHeader('tag_color', 'Color', true)}
+                  {this.sortHeader('group_name', 'Name', true)}
+                  {this.sortHeader('group_description', 'Description', true)}
+                  {this.sortHeader('group_users_number', 'Users', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedTags.map((tag) => (
+          {sortedGroups.map((group) => (
             <ListItem
-              key={tag.tag_id}
+              key={group.group_id}
               classes={{ root: classes.item }}
               divider={true}
             >
               <ListItemIcon>
-                <ListItemIcon style={{ color: tag.tag_color }}>
-                  <LabelOutlined />
-                </ListItemIcon>
+                <GroupOutlined />
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.tag_name}
+                      style={inlineStyles.group_name}
                     >
-                      {tag.tag_name}
+                      {group.group_name}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.tag_color}
+                      style={inlineStyles.group_description}
                     >
-                      {tag.tag_color}
+                      {group.group_description}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_users_number}
+                    >
+                      {group.group_users_number}
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <TagPopover tag={tag} />
+                <GroupPopover
+                  group={group}
+                  groupUsersIds={group.group_users}
+                  organizations={organizations}
+                  users={users}
+                  exercises={exercises}
+                />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <CreateTag />
+        <CreateGroup />
       </div>
     );
   }
 }
 
-Tags.propTypes = {
+Groups.propTypes = {
   t: PropTypes.func,
-  tags: PropTypes.array,
-  fetchTags: PropTypes.func,
+  classes: PropTypes.object,
+  groups: PropTypes.array,
+  organizations: PropTypes.array,
+  exercises: PropTypes.array,
+  users: PropTypes.array,
+  fetchUsers: PropTypes.func,
+  fetchOrganizations: PropTypes.func,
+  fetchExercises: PropTypes.func,
+  fetchGroups: PropTypes.func,
 };
 
 const select = (state) => {
   const browser = storeBrowser(state);
+  const groups = browser.getGroups();
+  const exercises = browser.getExercises();
+  const users = browser.getUsers();
+  const organizations = browser.getOrganizations();
   return {
-    tags: browser.getTags(),
+    groups,
+    exercises,
+    users,
+    organizations,
   };
 };
 
 export default R.compose(
-  connect(select, { fetchTags }),
+  connect(select, {
+    fetchGroups,
+    fetchExercises,
+    fetchUsers,
+    fetchOrganizations,
+  }),
   inject18n,
   withStyles(styles),
-)(Tags);
+)(Groups);

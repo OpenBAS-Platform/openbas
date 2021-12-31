@@ -2,9 +2,9 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import Parameters from './Parameters';
-import Users from './Users';
-import Groups from './Groups';
-import Tags from './Tags';
+import Users from './users/Users';
+import Groups from './groups/Groups';
+import Tags from './tags/Tags';
 
 const Index = () => (
   <Switch>

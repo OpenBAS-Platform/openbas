@@ -13,17 +13,17 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   PersonOutlined,
+  CheckCircleOutlined,
 } from '@mui/icons-material';
-import inject18n from '../../../components/i18n';
-import { fetchUsers } from '../../../actions/User';
-import { fetchOrganizations } from '../../../actions/Organization';
-import { FIVE_SECONDS } from '../../../utils/Time';
-import SearchFilter from '../../../components/SearchFilter';
-import CreateGroup from './group/CreateGroup';
-import { fetchGroups } from '../../../actions/Group';
-import { fetchExercises } from '../../../actions/Exercise';
-import GroupPopover from './group/GroupPopover';
-import { storeBrowser } from '../../../actions/Schema';
+import inject18n from '../../../../components/i18n';
+import { fetchUsers } from '../../../../actions/User';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import { FIVE_SECONDS } from '../../../../utils/Time';
+import ItemTags from '../../../../components/ItemTags';
+import SearchFilter from '../../../../components/SearchFilter';
+import CreateUser from './CreateUser';
+import UserPopover from './UserPopover';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -74,19 +74,37 @@ const inlineStylesHeaders = {
     padding: 0,
     top: '0px',
   },
-  group_name: {
+  user_email: {
     float: 'left',
-    width: '30%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  group_description: {
+  user_firstname: {
     float: 'left',
-    width: '50%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
-  group_users_number: {
+  user_lastname: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_organization: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_admin: {
+    float: 'left',
+    width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_tags: {
     float: 'left',
     fontSize: 12,
     fontWeight: '700',
@@ -94,23 +112,47 @@ const inlineStylesHeaders = {
 };
 
 const inlineStyles = {
-  group_name: {
+  user_email: {
     float: 'left',
-    width: '30%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  group_description: {
+  user_firstname: {
     float: 'left',
-    width: '50%',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  group_users_number: {
+  user_lastname: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_organization: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_admin: {
+    float: 'left',
+    width: '10%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_tags: {
     float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
@@ -119,11 +161,11 @@ const inlineStyles = {
   },
 };
 
-class Groups extends Component {
+class Users extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sortBy: 'group_name',
+      sortBy: 'user_email',
       orderAsc: true,
       keyword: '',
       tags: [],
@@ -133,13 +175,9 @@ class Groups extends Component {
   componentDidMount() {
     this.props.fetchOrganizations();
     this.props.fetchUsers();
-    this.props.fetchGroups();
-    this.props.fetchExercises();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
       this.props.fetchUsers();
-      this.props.fetchGroups();
-      this.props.fetchExercises();
     });
   }
 
@@ -190,24 +228,28 @@ class Groups extends Component {
   }
 
   render() {
-    const {
-      classes, groups, exercises, organizations, users,
-    } = this.props;
+    const { classes, users } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.group_description || '')
+      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_organization || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const sort = R.sortWith(
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
-    const sortedGroups = R.pipe(
-      R.map((n) => R.assoc('group_users_number', R.propOr([], 'group_users', n).length, n)),
+    const sortedUsers = R.pipe(
+      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
       R.filter(filterByKeyword),
       sort,
-    )(groups);
+    )(users);
     return (
       <div className={classes.container}>
         <div className={classes.parameters}>
@@ -240,17 +282,20 @@ class Groups extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('group_name', 'Name', true)}
-                  {this.sortHeader('group_description', 'Description', true)}
-                  {this.sortHeader('group_users_number', 'Users', true)}
+                  {this.sortHeader('user_email', 'Email address', true)}
+                  {this.sortHeader('user_firstname', 'Firstname', true)}
+                  {this.sortHeader('user_lastname', 'Lastname', true)}
+                  {this.sortHeader('user_organization', 'Organization', true)}
+                  {this.sortHeader('user_admin', 'Administrator', true)}
+                  {this.sortHeader('user_tags', 'Tags', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedGroups.map((group) => (
+          {sortedUsers.map((user) => (
             <ListItem
-              key={group.group_id}
+              key={user.user_id}
               classes={{ root: classes.item }}
               divider={true}
             >
@@ -262,74 +307,73 @@ class Groups extends Component {
                   <div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.group_name}
+                      style={inlineStyles.user_email}
                     >
-                      {group.group_name}
+                      {user.user_email}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.group_description}
+                      style={inlineStyles.user_firstname}
                     >
-                      {group.group_description}
+                      {user.user_firstname}
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.group_users_number}
+                      style={inlineStyles.user_lastname}
                     >
-                      {group.group_users_number}
+                      {user.user_lastname}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_organization}
+                    >
+                      {user.user_organization}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_admin}
+                    >
+                      {user.user_admin ? <CheckCircleOutlined fontSize="small" /> : '-'}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_tags}
+                    >
+                      <ItemTags variant="list" tags={user.getTags()} />
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <GroupPopover
-                  group={group}
-                  groupUsersIds={group.group_users}
-                  organizations={organizations}
-                  users={users}
-                  exercises={exercises}
-                />
+                <UserPopover user={user} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
-        <CreateGroup />
+        <CreateUser />
       </div>
     );
   }
 }
 
-Groups.propTypes = {
+Users.propTypes = {
   t: PropTypes.func,
-  classes: PropTypes.object,
-  groups: PropTypes.array,
-  organizations: PropTypes.array,
-  exercises: PropTypes.array,
+  nsdt: PropTypes.func,
   users: PropTypes.array,
+  organizations: PropTypes.object,
   fetchUsers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
-  fetchExercises: PropTypes.func,
-  fetchGroups: PropTypes.func,
 };
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const groups = browser.getGroups();
-  const exercises = browser.getExercises();
-  const users = browser.getUsers();
-  const organizations = browser.getOrganizations();
   return {
-    groups, exercises, users, organizations,
+    users: browser.getUsers(),
   };
 };
 
 export default R.compose(
-  connect(select, {
-    fetchGroups,
-    fetchExercises,
-    fetchUsers,
-    fetchOrganizations,
-  }),
+  connect(select, { fetchUsers, fetchOrganizations }),
   inject18n,
   withStyles(styles),
-)(Groups);
+)(Users);
