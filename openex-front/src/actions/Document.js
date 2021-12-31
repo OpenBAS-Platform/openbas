@@ -24,7 +24,7 @@ export const updateDocument = (documentId, data) => (dispatch) => putReferential
 
 export const deleteDocument = (documentId) => (dispatch) => {
   const uri = `/api/documents/${documentId}`;
-  return delReferential(uri, 'document', documentId)(dispatch);
+  return delReferential(uri, 'documents', documentId)(dispatch);
 };
 
 export const downloadDocument = (documentId, documentName) => (dispatch) => fileSave(`/api/files/${documentId}`, documentName)(dispatch);

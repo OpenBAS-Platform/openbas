@@ -141,8 +141,7 @@ class DocumentPopover extends Component {
         <Dialog
           TransitionComponent={Transition}
           open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
-        >
+          onClose={this.handleCloseEdit.bind(this)}>
           <DialogTitle>{t('Update the document')}</DialogTitle>
           <DialogContent>
             <DocumentForm

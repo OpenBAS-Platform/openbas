@@ -5,6 +5,7 @@ import io.openex.database.model.Tag;
 import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.specification.DocumentSpecification;
+import io.openex.rest.file.form.DocumentCreateInput;
 import io.openex.rest.file.form.DocumentTagUpdateInput;
 import io.openex.rest.file.form.DocumentUpdateInput;
 import io.openex.rest.helper.RestBehavior;
@@ -42,13 +43,16 @@ public class FileApi extends RestBehavior {
 
     @Transactional
     @PostMapping("/api/documents")
-    public Document uploadDocument(@RequestPart("file") MultipartFile file) throws Exception {
+    public Document uploadDocument(@Valid @RequestPart("input") DocumentCreateInput input,
+                                   @RequestPart("file") MultipartFile file) throws Exception {
         fileService.uploadFile(file);
-        Document save = new Document();
-        save.setName(file.getOriginalFilename());
-        save.setPath("minio");
-        save.setType(file.getContentType());
-        return documentRepository.save(save);
+        Document document = new Document();
+        document.setName(file.getOriginalFilename());
+        document.setDescription(input.getDescription());
+        document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        document.setPath("minio");
+        document.setType(file.getContentType());
+        return documentRepository.save(document);
     }
 
     @GetMapping("/api/documents")
@@ -81,6 +85,7 @@ public class FileApi extends RestBehavior {
                                               @Valid @RequestBody DocumentUpdateInput input) {
         Document document = documentRepository.findById(documentId).orElseThrow();
         document.setUpdateAttributes(input);
+        document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
     }
 

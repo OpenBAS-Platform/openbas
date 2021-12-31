@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
@@ -13,7 +13,6 @@ import DocumentForm from './DocumentForm';
 import {
   addDocument,
   fetchDocument,
-  updateDocument,
 } from '../../../actions/Document';
 import inject18n from '../../../components/i18n';
 
@@ -30,77 +29,58 @@ const styles = () => ({
   },
 });
 
-class CreateDocument extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { open: false };
-  }
+const CreateDocument = (props) => {
+  const { classes, t } = props;
 
-  handleOpen() {
-    this.setState({ open: true });
-  }
+  const [open, setOpen] = useState(false);
 
-  handleClose() {
-    this.setState({ open: false });
-  }
-
-  onSubmit(data) {
+  const onSubmit = (data) => {
     const inputValues = R.pipe(
       R.assoc('document_tags', R.pluck('id', data.document_tags)),
     )(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
-    this.props.addDocument(formData).then((document) => {
-      this.props.fetchDocument(document.result).then((finalDocument) => {
-        this.props.updateDocument(document.result, {
-          ...finalDocument,
-          ...inputValues,
-        });
-      });
+    const blob = new Blob([JSON.stringify(inputValues)], {
+      type: 'application/json',
     });
-  }
+    formData.append('input', blob);
+    props.addDocument(formData).then(() => setOpen(false));
+  };
 
-  render() {
-    const { classes, t } = this.props;
-    return (
+  return (
       <div>
         <Fab
-          onClick={this.handleOpen.bind(this)}
+          onClick={() => setOpen(true)}
           color="primary"
           aria-label="Add"
-          className={classes.createButton}
-        >
+          className={classes.createButton}>
           <Add />
         </Fab>
-        <Dialog
-          open={this.state.open}
+        <Dialog open={open}
           TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-        >
+          onClose={() => setOpen(false)}>
           <DialogTitle>{t('Create a new document')}</DialogTitle>
           <DialogContent>
             <DocumentForm
-              onSubmit={this.onSubmit.bind(this)}
+              onSubmit={onSubmit}
               initialValues={{ document_tags: [] }}
-              handleClose={this.handleClose.bind(this)}
+              handleClose={() => setOpen(false)}
             />
           </DialogContent>
         </Dialog>
       </div>
-    );
-  }
-}
+  );
+};
 
 CreateDocument.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
   addDocument: PropTypes.func,
   fetchDocument: PropTypes.func,
-  updateDocument: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addDocument, fetchDocument, updateDocument }),
+  connect(null, { addDocument, fetchDocument }),
   inject18n,
   withStyles(styles),
 )(CreateDocument);
