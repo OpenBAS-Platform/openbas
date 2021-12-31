@@ -12,7 +12,6 @@ public class GroupCreateInput {
     @JsonProperty("group_name")
     private String name;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("group_description")
     private String description;
 

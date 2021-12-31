@@ -16,12 +16,11 @@ public class ExerciseCreateInput {
     private String name;
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("exercise_description")
-    private String description;
-
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_subtitle")
     private String subtitle;
+
+    @JsonProperty("exercise_description")
+    private String description;
 
     @JsonProperty("exercise_start_date")
     private Date start;
