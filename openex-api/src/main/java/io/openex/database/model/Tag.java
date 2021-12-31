@@ -52,7 +52,7 @@ public class Tag implements Base {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = name.toLowerCase();
     }
 
     public String getColor() {
@@ -60,7 +60,7 @@ public class Tag implements Base {
     }
 
     public void setColor(String color) {
-        this.color = color;
+        this.color = color.toLowerCase();
     }
 
     public List<Document> getDocuments() {
