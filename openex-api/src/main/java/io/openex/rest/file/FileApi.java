@@ -40,7 +40,6 @@ public class FileApi extends RestBehavior {
         this.fileService = fileService;
     }
 
-    // region documents
     @Transactional
     @PostMapping("/api/documents")
     public Document uploadDocument(@RequestPart("file") MultipartFile file) throws Exception {
@@ -56,6 +55,11 @@ public class FileApi extends RestBehavior {
     public List<Document> documents() {
         Sort sorting = Sort.by(Sort.Direction.DESC, "id");
         return documentRepository.findAll(DocumentSpecification.onlyMinio(), sorting);
+    }
+
+    @GetMapping("/api/documents/{documentId}")
+    public Document document(@PathVariable String documentId) {
+        return documentRepository.findById(documentId).orElseThrow();
     }
 
     @GetMapping("/api/documents/{documentId}/tags")
@@ -79,5 +83,9 @@ public class FileApi extends RestBehavior {
         document.setUpdateAttributes(input);
         return documentRepository.save(document);
     }
-    // endregion
+
+    @DeleteMapping("/api/documents/{documentId}")
+    public void deleteDocument(@PathVariable String documentId) {
+        documentRepository.deleteById(documentId);
+    }
 }
