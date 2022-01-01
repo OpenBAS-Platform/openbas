@@ -104,11 +104,11 @@ class Exercise extends Component {
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <Grid container={true} spacing={3}>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h6">{t('Description')}</Typography>
+                  <Typography variant="h5">{t('Description')}</Typography>
                   {exercise.exercise_description || '-'}
                 </Grid>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h6">{t('Start date')}</Typography>
+                  <Typography variant="h5">{t('Start date')}</Typography>
                   {fldt(exercise.exercise_start_date) || t('Manual')}
                 </Grid>
               </Grid>
@@ -119,7 +119,7 @@ class Exercise extends Component {
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <Grid container={true} spacing={3}>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h6">{t('Current status')}</Typography>
+                  <Typography variant="h5">{t('Current status')}</Typography>
                 </Grid>
               </Grid>
             </Paper>

@@ -17,8 +17,21 @@ export default () => ({
     },
   },
   typography: {
+    body2: {
+      fontSize: '0.8rem',
+    },
+    body1: {
+      fontSize: '0.9rem',
+    },
     overline: {
       fontWeight: 500,
+    },
+    h5: {
+      margin: '0 0 10px 0',
+      padding: 0,
+      color: '#00b1ff',
+      fontWeight: 400,
+      fontSize: 13,
     },
   },
   components: {
