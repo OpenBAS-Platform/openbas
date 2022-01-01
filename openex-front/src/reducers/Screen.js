@@ -21,20 +21,6 @@ const screen = (state = Immutable({}), action = {}) => {
       return state.set('saved', false);
     }
 
-    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_UNFOLDING: {
-      return state.setIn(
-        ['navbar_left_unfolding'],
-        !state.navbar_left_unfolding,
-      );
-    }
-
-    case Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_CONFIGURATION: {
-      return state.setIn(
-        ['navbar_left_configuration'],
-        !state.navbar_left_configuration,
-      );
-    }
-
     default: {
       return state;
     }

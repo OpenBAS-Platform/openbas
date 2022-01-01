@@ -7,6 +7,7 @@ import MuiAutocomplete from '@mui/material/Autocomplete';
 
 const renderAutocomplete = ({
   label,
+  placeholder,
   input: { onChange, ...inputProps },
   meta: { touched, invalid, error },
   fullWidth,
@@ -37,6 +38,7 @@ const renderAutocomplete = ({
           {...params}
           variant={others.variant || 'standard'}
           label={label}
+          placeholder={placeholder}
           fullWidth={fullWidth}
           style={style}
           error={touched && invalid}
@@ -48,7 +50,7 @@ const renderAutocomplete = ({
       <IconButton
         onClick={() => openCreate()}
         edge="end"
-        style={{ position: 'absolute', top: 30, right: 35 }}
+        style={{ position: 'absolute', top: placeholder ? -5 : 30, right: 35 }}
       >
         <AddOutlined />
       </IconButton>

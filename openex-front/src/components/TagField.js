@@ -68,7 +68,7 @@ class TagField extends Component {
 
   render() {
     const {
-      t, name, tags, classes,
+      t, name, tags, classes, onKeyDown, style, label, placeholder,
     } = this.props;
     const tagsOptions = R.map(
       (n) => ({
@@ -86,10 +86,12 @@ class TagField extends Component {
           name={name}
           fullWidth={true}
           multiple={true}
-          label={t('Tags')}
+          label={label}
+          placeholder={placeholder}
           options={tagsOptions}
-          style={{ marginTop: 20 }}
+          style={style}
           openCreate={this.handleOpenTagCreation.bind(this)}
+          onKeyDown={onKeyDown}
           renderOption={(props, option) => (
             <Box component="li" {...props}>
               <div className={classes.icon} style={{ color: option.color }}>

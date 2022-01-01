@@ -41,14 +41,6 @@ export const logout = () => (dispatch) => {
   return ref.then(() => dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS }));
 };
 
-export const toggleLeftUnfolding = () => (dispatch) => {
-  dispatch({ type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_UNFOLDING });
-};
-
-export const toggleLeftConfiguration = () => (dispatch) => {
-  dispatch({ type: Constants.APPLICATION_NAVBAR_LEFT_TOGGLE_CONFIGURATION });
-};
-
 export const savedDismiss = () => (dispatch) => {
   dispatch({ type: Constants.DATA_SAVED_DISMISS });
 };

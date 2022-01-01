@@ -56,8 +56,10 @@ class OrganizationForm extends Component {
             />
             <TagField
               name="organization_tags"
+              label={t('Tags')}
               values={values}
               setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

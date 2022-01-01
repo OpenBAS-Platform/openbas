@@ -106,26 +106,12 @@ class ExerciseForm extends Component {
                 ))}
               </Select>
             )}
-            {editing && (
-              <TextField
-                name="exercise_latitude"
-                fullWidth={true}
-                label={t('Latitude')}
-                style={{ marginTop: 20 }}
-              />
-            )}
-            {editing && (
-              <TextField
-                name="exercise_longitude"
-                fullWidth={true}
-                label={t('Longitude')}
-                style={{ marginTop: 20 }}
-              />
-            )}
             <TagField
               name="exercise_tags"
+              label={t('Tags')}
               values={values}
               setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

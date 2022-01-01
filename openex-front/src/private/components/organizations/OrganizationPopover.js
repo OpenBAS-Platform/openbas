@@ -19,7 +19,6 @@ import {
 } from '../../../actions/Organization';
 import OrganizationForm from './OrganizationForm';
 import inject18n from '../../../components/i18n';
-import { storeBrowser } from '../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -162,22 +161,14 @@ class OrganizationPopover extends Component {
   }
 }
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  const user = browser.getMe();
-  return { user, userAdmin: user.isAdmin() };
-};
-
 OrganizationPopover.propTypes = {
   t: PropTypes.func,
   organization: PropTypes.object,
   updateOrganization: PropTypes.func,
   deleteOrganization: PropTypes.func,
-  userAdmin: PropTypes.bool,
-  tags: PropTypes.object,
 };
 
 export default R.compose(
-  connect(select, { updateOrganization, deleteOrganization }),
+  connect(null, { updateOrganization, deleteOrganization }),
   inject18n,
 )(OrganizationPopover);

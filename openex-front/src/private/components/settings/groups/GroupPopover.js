@@ -186,7 +186,7 @@ class GroupPopover extends Component {
       || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.filter(filterByKeyword, users);
+    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(users);
     return (
       <div>
         <IconButton
@@ -218,8 +218,6 @@ class GroupPopover extends Component {
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
         >
           <DialogContent>
             <DialogContentText>

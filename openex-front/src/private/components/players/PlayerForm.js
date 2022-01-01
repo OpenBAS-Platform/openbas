@@ -96,8 +96,10 @@ class PlayerForm extends Component {
             )}
             <TagField
               name="user_tags"
+              label={t('Tags')}
               values={values}
               setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

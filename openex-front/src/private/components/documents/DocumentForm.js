@@ -51,7 +51,9 @@ class DocumentForm extends Component {
             <TagField
               name="document_tags"
               values={values}
+              label={t('Tags')}
               setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
             />
             {!editing && (
               <FileField

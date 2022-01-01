@@ -8,7 +8,8 @@ import NotFound from '../components/NotFound';
 import Message from '../components/Message';
 import IndexProfile from './components/profile/Index';
 import Dashboard from './components/Dashboard';
-import IndexExercises from './components/exercises/Index';
+import Exercises from './components/exercises/Exercises';
+import IndexExercise from './components/exercises/Index';
 import Players from './components/players/Players';
 import Organizations from './components/organizations/Organizations';
 import Documents from './components/documents/Documents';
@@ -49,11 +50,12 @@ const Index = () => {
         <Switch>
           <Route exact path="/" component={Dashboard} />
           <Route path="/profile" component={IndexProfile} />
-          <Route path="/exercises" component={IndexExercises} />
-          <Route path="/players" component={Players} />
-          <Route path="/organizations" component={Organizations} />
-          <Route path="/documents" component={Documents} />
-          <Route path="/integrations" component={IndexIntegrations} />
+          <Route exact path="/exercises" component={Exercises} />
+          <Route path="/exercises/:exerciseId" component={IndexExercise} />
+          <Route exact path="/players" component={Players} />
+          <Route exact path="/organizations" component={Organizations} />
+          <Route exact path="/documents" component={Documents} />
+          <Route exact path="/integrations" component={IndexIntegrations} />
           <Route path="/settings" component={IndexSettings} />
           <Route component={NotFound} />
         </Switch>

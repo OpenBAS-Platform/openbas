@@ -107,8 +107,10 @@ class UserForm extends Component {
             )}
             <TagField
               name="user_tags"
+              label={t('Tags')}
               values={values}
               setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
             />
             <Switch
               name="user_admin"
