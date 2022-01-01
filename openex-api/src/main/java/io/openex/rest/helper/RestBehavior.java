@@ -1,5 +1,7 @@
 package io.openex.rest.helper;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -42,6 +44,22 @@ public class RestBehavior {
         errors.setChildren(errorsBag);
         bag.setErrors(errors);
         return bag;
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ViolationErrorBag handleIntegrityException(DataIntegrityViolationException e) {
+        ViolationErrorBag errorBag = new ViolationErrorBag();
+        errorBag.setType(DataIntegrityViolationException.class.getSimpleName());
+        if (e.getCause() instanceof ConstraintViolationException violationException) {
+            errorBag.setType(ConstraintViolationException.class.getSimpleName());
+            errorBag.setMessage("Error applying constraint " + violationException.getConstraintName());
+            errorBag.setError(violationException.getLocalizedMessage());
+        } else {
+            errorBag.setMessage("Database integrity violation");
+            errorBag.setError(e.getLocalizedMessage());
+        }
+        return errorBag;
     }
 
     protected <T> List<T> fromIterable(Iterable<T> results) {
