@@ -38,23 +38,25 @@ class Message extends Component {
   }
 
   render() {
+    const { t } = this.props;
+    const { text, error, open } = this.state;
     return (
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={this.state.open}
+        open={open}
         onClose={this.handleCloseMessage.bind(this)}
         autoHideDuration={4000}
       >
-        {this.state.error ? (
+        {error ? (
           <Alert severity="error" onClose={this.handleCloseMessage.bind(this)}>
-            {this.state.text}
+            {text.length > 0 && t(text)}
           </Alert>
         ) : (
           <Alert
             severity="success"
             onClose={this.handleCloseMessage.bind(this)}
           >
-            {this.state.text}
+            {text.length > 0 && t(text)}
           </Alert>
         )}
       </Snackbar>

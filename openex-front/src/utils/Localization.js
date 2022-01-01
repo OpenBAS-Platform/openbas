@@ -88,6 +88,7 @@ const i18n = {
       Light: 'Clair',
       'This field is required.': 'Ce champ est requis.',
       'The element has been updated': "L'élément a été modifié.",
+      'The element already exists': "L'élément existe déjà.",
       'Manage the users of this group': 'Gérer les utilisateurs de ce groupe',
       Close: 'Fermer',
       'Export to XLS': 'Exporter en XLS',

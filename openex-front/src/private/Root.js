@@ -41,7 +41,6 @@ RootPrivate.propTypes = {
 };
 
 const select = (state) => ({
-  savedPopupOpen: state.screen.saved || false,
   logged: state.app.logged,
 });
 

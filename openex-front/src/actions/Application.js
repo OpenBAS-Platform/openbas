@@ -1,4 +1,3 @@
-import { push } from 'connected-react-router';
 import { FORM_ERROR } from 'final-form';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
@@ -39,40 +38,6 @@ export const fetchMe = () => (dispatch) => {
 export const logout = () => (dispatch) => {
   const ref = simpleCall('/logout');
   return ref.then(() => dispatch({ type: Constants.IDENTITY_LOGOUT_SUCCESS }));
-};
-
-export const savedDismiss = () => (dispatch) => {
-  dispatch({ type: Constants.DATA_SAVED_DISMISS });
-};
-
-export const redirectToHome = () => (dispatch) => {
-  dispatch(push('/'));
-};
-
-export const redirectToExercise = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}`));
-};
-
-export const redirectToScenario = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/scenario`));
-};
-
-export const redirectToAudiences = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/audiences`));
-};
-
-export const redirectToChecks = (exerciseId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/checks`));
-};
-
-export const redirectToComcheck = (exerciseId, comcheckId) => (dispatch) => {
-  dispatch(
-    push(`/private/exercise/${exerciseId}/checks/comcheck/${comcheckId}`),
-  );
-};
-
-export const redirectToDryrun = (exerciseId, dryrunId) => (dispatch) => {
-  dispatch(push(`/private/exercise/${exerciseId}/checks/dryrun/${dryrunId}`));
 };
 
 export const fetchStatistics = () => (dispatch) => {

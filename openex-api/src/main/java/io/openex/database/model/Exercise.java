@@ -144,9 +144,10 @@ public class Exercise implements Base {
         }
         Date now = new Date();
         List<Inject<?>> injects = getInjects().stream().filter(inject -> inject.getStatus() == null).toList();
+        long totalCount = injects.size();
         long totalPastCount = injects.stream().filter(inject -> inject.getDate().before(now)).count();
         long totalFutureCount = injects.stream().filter(inject -> inject.getDate().after(now)).count();
-        if (totalPastCount == 0 && totalFutureCount > 0) {
+        if (totalCount == 0 || (totalPastCount == 0 && totalFutureCount > 0)) {
             return STATUS.SCHEDULED.name();
         } else if (totalFutureCount > 0) {
             return STATUS.RUNNING.name();

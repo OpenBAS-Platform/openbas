@@ -5,8 +5,17 @@ import { withStyles, styled } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 import { withRouter } from 'react-router-dom';
-import { GroupsOutlined, NotificationsOutlined, PublishedWithChangesOutlined } from '@mui/icons-material';
+import {
+  GroupsOutlined,
+  NotificationsOutlined,
+  CheckCircleOutlineOutlined,
+  ScheduleOutlined,
+  HighlightOffOutlined,
+  CastOutlined,
+  PlayArrowOutlined,
+} from '@mui/icons-material';
 import LinearProgress, {
   linearProgressClasses,
 } from '@mui/material/LinearProgress';
@@ -58,6 +67,21 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
+const iconStatus = (status) => {
+  switch (status) {
+    case 'FINISHED':
+      return (
+        <CheckCircleOutlineOutlined color="primary" sx={{ fontSize: 50 }} />
+      );
+    case 'CANCELED':
+      return <HighlightOffOutlined color="primary" sx={{ fontSize: 50 }} />;
+    case 'RUNNING':
+      return <CastOutlined color="primary" sx={{ fontSize: 50 }} />;
+    default:
+      return <ScheduleOutlined color="primary" sx={{ fontSize: 50 }} />;
+  }
+};
+
 class Exercise extends Component {
   render() {
     const {
@@ -69,7 +93,7 @@ class Exercise extends Component {
           <Grid item={true} xs={6}>
             <Paper variant="outlined" classes={{ root: classes.metric }}>
               <div className={classes.icon}>
-                <PublishedWithChangesOutlined color="primary" sx={{ fontSize: 50 }} />
+                {iconStatus(exercise.exercise_status)}
               </div>
               <div className={classes.title}>{t('Status')}</div>
               <ExerciseStatus status={exercise.exercise_status} />
@@ -104,22 +128,29 @@ class Exercise extends Component {
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <Grid container={true} spacing={3}>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h5">{t('Description')}</Typography>
+                  <Typography variant="h1">{t('Description')}</Typography>
                   {exercise.exercise_description || '-'}
                 </Grid>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h5">{t('Start date')}</Typography>
+                  <Typography variant="h1">{t('Start date')}</Typography>
                   {fldt(exercise.exercise_start_date) || t('Manual')}
                 </Grid>
               </Grid>
             </Paper>
           </Grid>
           <Grid item={true} xs={6}>
-            <Typography variant="overline">{t('Status')}</Typography>
+            <Typography variant="overline">{t('Control')}</Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <Grid container={true} spacing={3}>
                 <Grid item={true} xs={6}>
-                  <Typography variant="h5">{t('Current status')}</Typography>
+                  <Typography variant="h1">{t('Play')}</Typography>
+                  <Button
+                    variant="contained"
+                    endIcon={<PlayArrowOutlined />}
+                    color="success"
+                  >
+                    {t('Démarrer')}
+                  </Button>
                 </Grid>
               </Grid>
             </Paper>
