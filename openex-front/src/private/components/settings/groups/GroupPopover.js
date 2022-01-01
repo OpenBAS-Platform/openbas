@@ -15,17 +15,19 @@ import Checkbox from '@mui/material/Checkbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
-import { MoreVert } from '@mui/icons-material';
+import { MoreVert, PersonOutlined } from '@mui/icons-material';
+import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import withStyles from '@mui/styles/withStyles';
+import { ListItemIcon } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import {
   fetchGroup,
   deleteGroup,
@@ -38,43 +40,23 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
 
-const styles = (theme) => {
-  const { grey } = theme.palette;
-  return {
-    main: {
-      position: 'absolute',
-      top: '7px',
-      right: 0,
-    },
-    name: {
-      float: 'left',
-      width: '30%',
-      padding: '5px 0 0 0',
-    },
-    mail: {
-      float: 'left',
-      width: '40%',
-      padding: '5px 0 0 0',
-    },
-    org: {
-      float: 'left',
-      padding: '5px 0 0 0',
-    },
-    tableHeader: {
-      borderBottom: `1px solid ${
-        theme.palette.mode === 'dark' ? grey[200] : grey[800]
-      }`,
-    },
-    tableCell: {
-      borderTop: `1px solid ${
-        theme.palette.mode === 'dark' ? grey[200] : grey[800]
-      }`,
-      borderBottom: `1px solid ${
-        theme.palette.mode === 'dark' ? grey[200] : grey[800]
-      }`,
-    },
-  };
-};
+const styles = () => ({
+  box: {
+    width: '100%',
+    padding: 20,
+    border: '1px dashed rgba(255, 255, 255, 0.15)',
+  },
+  chip: {
+    margin: '0 10px 10px 0',
+  },
+  tableHeader: {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
+  tableCell: {
+    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
+});
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -90,7 +72,7 @@ class GroupPopover extends Component {
       openUsers: false,
       openGrants: false,
       openPopover: false,
-      searchTerm: '',
+      keyword: '',
       usersIds: props.groupUsersIds,
     };
   }
@@ -125,8 +107,8 @@ class GroupPopover extends Component {
     this.handlePopoverClose();
   }
 
-  handleSearchUsers(event) {
-    this.setState({ searchTerm: event.target.value });
+  handleSearchUsers(value) {
+    this.setState({ keyword: value });
   }
 
   addUser(userId) {
@@ -140,7 +122,7 @@ class GroupPopover extends Component {
   }
 
   handleCloseUsers() {
-    this.setState({ openUsers: false, searchTerm: '' });
+    this.setState({ openUsers: false, keyword: '' });
   }
 
   submitAddUsers() {
@@ -194,19 +176,17 @@ class GroupPopover extends Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, users } = this.props;
     const initialValues = R.pick(
       ['group_name', 'group_description'],
       this.props.group,
     );
-    // region filter users by active keyword
-    const keyword = this.state.searchTerm;
+    const { keyword } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
       || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.filter(filterByKeyword, this.props.users);
-    // endregion
+    const filteredUsers = R.filter(filterByKeyword, users);
     return (
       <div>
         <IconButton
@@ -238,6 +218,8 @@ class GroupPopover extends Component {
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogContent>
             <DialogContentText>
@@ -265,6 +247,8 @@ class GroupPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Update the group')}</DialogTitle>
           <DialogContent>
@@ -282,75 +266,73 @@ class GroupPopover extends Component {
           onClose={this.handleCloseUsers.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{
+            sx: {
+              minHeight: '50vh',
+              maxHeight: '50vh',
+            },
+          }}
         >
-          <DialogTitle>
-            <SearchFilter
-              onChange={this.handleSearchUsers.bind(this)}
-              fullWidth={true}
-            />
-          </DialogTitle>
+          <DialogTitle>{t('Manage the users of this group')}</DialogTitle>
           <DialogContent>
-            <duv>
-              {this.state.usersIds.map((userId) => {
-                const user = this.props.browser.getUser(userId);
-                const userFirstname = R.propOr('-', 'user_firstname', user);
-                const userLastname = R.propOr('-', 'user_lastname', user);
-                const userGravatar = R.propOr('-', 'user_gravatar', user);
-                return (
-                  <Chip
-                    key={userId}
-                    onDelete={this.removeUser.bind(this, userId)}
-                    label={`${userFirstname} ${userLastname}`}
-                    variant="outlined"
-                    avatar={<Avatar src={userGravatar} size={32} />}
-                  />
-                );
-              })}
-              <div className="clearfix" />
-            </duv>
-            <List>
-              {filteredUsers.map((user) => {
-                const disabled = R.find(
-                  (userId) => userId === user.user_id,
-                  this.state.usersIds,
-                ) !== undefined;
-                const userOrganization = R.propOr(
-                  {},
-                  user.user_organization,
-                  this.props.organizations,
-                );
-                const organizationName = R.propOr(
-                  '-',
-                  'organization_name',
-                  userOrganization,
-                );
-                return (
-                  <ListItem
-                    key={user.user_id}
-                    disabled={disabled}
-                    button={true}
-                    divider={true}
-                    onClick={this.addUser.bind(this, user.user_id)}
-                  >
-                    <ListItemAvatar>
-                      <Avatar src={user.user_gravatar} />
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div className={classes.name}>
-                            {user.user_firstname} {user.user_lastname}
-                          </div>
-                          <div className={classes.mail}>{user.user_email}</div>
-                          <div className={classes.org}>{organizationName}</div>
-                          <div className="clearfix" />
-                        </div>
-                      }
-                    />
-                  </ListItem>
-                );
-              })}
-            </List>
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={8}>
+                <SearchFilter
+                  onChange={this.handleSearchUsers.bind(this)}
+                  fullWidth={true}
+                />
+                <List>
+                  {filteredUsers.map((user) => {
+                    const disabled = R.find(
+                      (userId) => userId === user.user_id,
+                      this.state.usersIds,
+                    ) !== undefined;
+                    const organizationName = R.propOr(
+                      '-',
+                      'organization_name',
+                      user.getOrganization(),
+                    );
+                    return (
+                      <ListItem
+                        key={user.user_id}
+                        disabled={disabled}
+                        button={true}
+                        divider={true}
+                        dense={true}
+                        onClick={this.addUser.bind(this, user.user_id)}
+                      >
+                        <ListItemIcon>
+                          <PersonOutlined />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={user.user_email}
+                          secondary={organizationName}
+                        />
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </Grid>
+              <Grid item={true} xs={4}>
+                <Box className={classes.box}>
+                  {this.state.usersIds.map((userId) => {
+                    const user = this.props.browser.getUser(userId);
+                    const userFirstname = R.propOr('-', 'user_firstname', user);
+                    const userLastname = R.propOr('-', 'user_lastname', user);
+                    const userGravatar = R.propOr('-', 'user_gravatar', user);
+                    return (
+                      <Chip
+                        key={userId}
+                        onDelete={this.removeUser.bind(this, userId)}
+                        label={`${userFirstname} ${userLastname}`}
+                        avatar={<Avatar src={userGravatar} size={32} />}
+                        classes={{ root: classes.chip }}
+                      />
+                    );
+                  })}
+                </Box>
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button

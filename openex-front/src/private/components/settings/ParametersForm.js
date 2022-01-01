@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import { Select } from '../../../components/Select';
 import inject18n from '../../../components/i18n';
+import { TextField } from '../../../components/TextField';
 
 class ParametersForm extends Component {
   render() {
@@ -14,13 +16,20 @@ class ParametersForm extends Component {
         onSubmit={onSubmit}
         initialValues={initialValues}
       >
-        {({ handleSubmit }) => (
+        {({ handleSubmit, pristine, submitting }) => (
           <form id="parametersForm" onSubmit={handleSubmit}>
+            <TextField
+              variant="standard"
+              name="platform_name"
+              fullWidth={true}
+              label={t('Platform name')}
+            />
             <Select
               variant="standard"
               label={t('Default theme')}
               name="platform_theme"
               fullWidth={true}
+              style={{ marginTop: 20 }}
             >
               <MenuItem key="dark" value="dark">
                 {t('Dark')}
@@ -46,6 +55,16 @@ class ParametersForm extends Component {
                 Français
               </MenuItem>
             </Select>
+            <div style={{ marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {t('Update')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>

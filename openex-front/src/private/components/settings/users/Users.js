@@ -255,8 +255,8 @@ class Users extends Component {
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
-              variant="small"
-              onSubmit={this.handleSearch.bind(this)}
+              small={true}
+              onChange={this.handleSearch.bind(this)}
               keyword={keyword}
             />
           </div>

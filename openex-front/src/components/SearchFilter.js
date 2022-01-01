@@ -13,27 +13,39 @@ const styles = (theme) => ({
   },
   searchInput: {
     transition: theme.transitions.create('width'),
-    width: 200,
-    '&:focus': {
-      width: 350,
-    },
+    width: 300,
+  },
+  searchInputFocused: {
+    width: 400,
   },
   searchInputSmall: {
     transition: theme.transitions.create('width'),
-    width: 150,
-    '&:focus': {
-      width: 250,
-    },
+    width: 200,
+  },
+  searchInputFocusedSmall: {
+    width: 300,
   },
 });
 
 class SearchFilter extends Component {
   render() {
     const {
-      t, classes, onChange, onSubmit, variant, keyword, fullWidth,
+      t,
+      classes,
+      onChange,
+      onSubmit,
+      variant,
+      keyword,
+      fullWidth,
+      small,
     } = this.props;
+    const searchInput = small ? classes.searchInputSmall : classes.searchInput;
+    const searchInputFocused = small
+      ? classes.searchInputFocusedSmall
+      : classes.searchInputFocused;
     return (
       <TextField
+        variant={variant}
         size="small"
         fullWidth={fullWidth}
         name="keyword"
@@ -54,18 +66,15 @@ class SearchFilter extends Component {
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              {' '}
-              <Search />{' '}
+              <Search />
             </InputAdornment>
           ),
+          classes: !fullWidth && {
+            root: searchInput,
+            focused: searchInputFocused,
+          },
         }}
-        classes={{
-          root: classes.searchRoot,
-          input:
-            variant === 'small'
-              ? classes.searchInputSmall
-              : classes.searchInput,
-        }}
+        classes={{ root: classes.searchRoot }}
         autoComplete="off"
       />
     );
@@ -78,6 +87,7 @@ SearchFilter.propTypes = {
   classes: PropTypes.object.isRequired,
   onChange: PropTypes.func,
   onSubmit: PropTypes.func,
+  small: PropTypes.bool,
   variant: PropTypes.string,
   fullWidth: PropTypes.bool,
 };

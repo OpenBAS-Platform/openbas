@@ -62,6 +62,8 @@ class CreateTag extends Component {
           open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Create a new tag')}</DialogTitle>
           <DialogContent>

@@ -127,6 +127,8 @@ class TagPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Update the tag')}</DialogTitle>
           <DialogContent>

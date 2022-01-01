@@ -144,6 +144,8 @@ class OrganizationPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Update the organization')}</DialogTitle>
           <DialogContent>

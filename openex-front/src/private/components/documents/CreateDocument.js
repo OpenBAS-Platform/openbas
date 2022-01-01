@@ -10,10 +10,7 @@ import DialogContent from '@mui/material/DialogContent';
 import { Add } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
 import DocumentForm from './DocumentForm';
-import {
-  addDocument,
-  fetchDocument,
-} from '../../../actions/Document';
+import { addDocument, fetchDocument } from '../../../actions/Document';
 import inject18n from '../../../components/i18n';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -48,27 +45,32 @@ const CreateDocument = (props) => {
   };
 
   return (
-      <div>
-        <Fab
-          onClick={() => setOpen(true)}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}>
-          <Add />
-        </Fab>
-        <Dialog open={open}
-          TransitionComponent={Transition}
-          onClose={() => setOpen(false)}>
-          <DialogTitle>{t('Create a new document')}</DialogTitle>
-          <DialogContent>
-            <DocumentForm
-              onSubmit={onSubmit}
-              initialValues={{ document_tags: [] }}
-              handleClose={() => setOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+    <div>
+      <Fab
+        onClick={() => setOpen(true)}
+        color="primary"
+        aria-label="Add"
+        className={classes.createButton}
+      >
+        <Add />
+      </Fab>
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        fullWidth={true}
+        maxWidth="md"
+        onClose={() => setOpen(false)}
+      >
+        <DialogTitle>{t('Create a new document')}</DialogTitle>
+        <DialogContent>
+          <DocumentForm
+            onSubmit={onSubmit}
+            initialValues={{ document_tags: [] }}
+            handleClose={() => setOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

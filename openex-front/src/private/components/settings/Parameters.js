@@ -4,7 +4,6 @@ import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
 import { connect } from 'react-redux';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
@@ -42,19 +41,11 @@ class Parameters extends Component {
               <ParametersForm
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={{
+                  platform_name: 'OpenEx - Exercises planning platform',
                   platform_theme: 'dark',
                   platform_lang: 'auto',
                 }}
               />
-              <br />
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                form="parametersForm"
-              >
-                {t('Update')}
-              </Button>
             </Paper>
           </Grid>
           <Grid item={true} xs={6}>

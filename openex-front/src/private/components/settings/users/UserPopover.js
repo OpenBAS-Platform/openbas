@@ -184,6 +184,8 @@ class UserPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Update the user')}</DialogTitle>
           <DialogContent>
@@ -200,12 +202,14 @@ class UserPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEditPassword}
           onClose={this.handleCloseEditPassword.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Update the user password')}</DialogTitle>
           <DialogContent>
             <UserPasswordForm
               onSubmit={this.onSubmitEditPassword.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
+              handleClose={this.handleCloseEditPassword.bind(this)}
             />
           </DialogContent>
         </Dialog>
