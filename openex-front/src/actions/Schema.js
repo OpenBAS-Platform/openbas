@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { schema } from 'normalizr';
 import * as R from 'ramda';
-import { lime } from '@mui/material/colors';
 
 export const document = new schema.Entity(
   'documents',

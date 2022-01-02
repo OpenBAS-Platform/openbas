@@ -52,7 +52,6 @@ class ItemTags extends Component {
       style = classes.tagInSearch;
     }
     const orderedTags = R.sortWith([R.ascend(R.prop('tag_name'))], tags);
-    console.log(orderedTags);
     return (
       <div>
         {orderedTags.length > 0 ? (
