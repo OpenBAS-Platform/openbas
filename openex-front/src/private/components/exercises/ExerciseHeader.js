@@ -11,6 +11,7 @@ import {
   MoreVertRounded,
   AddOutlined,
   CloseOutlined,
+  DoneOutlined,
 } from '@mui/icons-material';
 import { connect } from 'react-redux';
 import { Form } from 'react-final-form';
@@ -63,26 +64,26 @@ class ExerciseHeader extends Component {
     const { exercise } = this.props;
     const exerciseTags = exercise.getTags();
     const tags = exerciseTags.filter((t) => t.tag_id !== tagId);
-    return this.props.updateExercise(exercise.exercise_id, {
-      exercise_tags: tags.map((t) => t.id),
+    return this.props.updateExerciseTags(exercise.exercise_id, {
+      exercise_tags: tags.map((t) => t.tag_id),
     });
   }
 
   submitTags(values) {
     const { exercise } = this.props;
+    const exerciseTags = exercise.getTags();
+    this.handleToggleAddTag();
     return this.props.updateExerciseTags(exercise.exercise_id, {
-      exercise_tags: values.exercise_tags.map((t) => t.id),
+      exercise_tags: R.uniq([
+        ...values.exercise_tags.map((t) => t.id),
+        ...exerciseTags.map((t) => t.tag_id),
+      ]),
     });
   }
 
   render() {
     const { classes, exercise, t } = this.props;
     const tags = exercise.getTags();
-    const exerciseTags = tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
     return (
       <div className={classes.container}>
         <Typography
@@ -112,14 +113,27 @@ class ExerciseHeader extends Component {
               &nbsp;&nbsp;{t('More')}
             </Button>
           ) : (
-            <IconButton
-              style={{ float: 'left', marginTop: -5 }}
-              color="primary"
-              aria-label="Tag"
-              onClick={this.handleToggleAddTag.bind(this)}
-            >
-              {this.state.openTagAdd ? <CloseOutlined /> : <AddOutlined />}
-            </IconButton>
+            <div style={{ float: 'left', marginTop: -5 }}>
+              {this.state.openTagAdd && (
+                <IconButton
+                  style={{ float: 'left' }}
+                  color="primary"
+                  aria-label="Tag"
+                  type="submit"
+                  form="tagsForm"
+                >
+                  <DoneOutlined />
+                </IconButton>
+              )}
+              <IconButton
+                style={{ float: 'left' }}
+                color="primary"
+                aria-label="Tag"
+                onClick={this.handleToggleAddTag.bind(this)}
+              >
+                {this.state.openTagAdd ? <CloseOutlined /> : <AddOutlined />}
+              </IconButton>
+            </div>
           )}
           <Slide
             direction="left"
@@ -130,7 +144,7 @@ class ExerciseHeader extends Component {
             <div className={classes.tagsInput}>
               <Form
                 keepDirtyOnReinitialize={true}
-                initialValues={{ exercise_tags: exerciseTags }}
+                initialValues={{ exercise_tags: [] }}
                 onSubmit={this.submitTags.bind(this)}
                 mutators={{
                   setValue: ([field, value], state, { changeValue }) => {
@@ -139,19 +153,13 @@ class ExerciseHeader extends Component {
                 }}
               >
                 {({ handleSubmit, form, values }) => (
-                  <form onSubmit={handleSubmit}>
+                  <form id="tagsForm" onSubmit={handleSubmit}>
                     <TagField
                       name="exercise_tags"
                       values={values}
                       label={null}
                       placeholder={t('Tags')}
                       setFieldValue={form.mutators.setValue}
-                      onKeyDown={(e) => {
-                        if (e.keyCode === 13) {
-                          return handleSubmit();
-                        }
-                        return true;
-                      }}
                     />
                   </form>
                 )}

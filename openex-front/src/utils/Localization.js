@@ -63,8 +63,10 @@ const i18n = {
       'Update the tag': 'Modifier le tag',
       'Manage grants': 'Gérer les permissions',
       'Manage users': 'Gérer les utilisateurs',
-      'Do you want to delete this user?': 'Souhaitez-vous supprimer cet utilisateur ?',
-      'Do you want to delete this group?': 'Souhaitez-vous supprimer ce groupe ?',
+      'Do you want to delete this user?':
+        'Souhaitez-vous supprimer cet utilisateur ?',
+      'Do you want to delete this group?':
+        'Souhaitez-vous supprimer ce groupe ?',
       'No tag': 'Aucun tag',
       'Update the user': "Modifier l'utilisateur",
       Exercise: 'Exercice',
@@ -94,15 +96,11 @@ const i18n = {
       Close: 'Fermer',
       'Export to XLS': 'Exporter en XLS',
       Copy: 'Copier',
-    },
-    en: {
-      TECHNICAL: 'Technique',
-      OPERATIONAL: 'Opérationnel',
-      STRATEGIC: 'Stratégique',
-      SCHEDULED: 'Scheduled',
-      RUNNING: 'Running',
-      FINISHED: 'Finished',
-      CANCELED: 'Disabled',
+      Start: 'Démarrer',
+      Status: 'Statut',
+      Information: 'Information',
+      Control: 'Contrôle',
+      Scheduled: 'Planifié',
     },
   },
 };

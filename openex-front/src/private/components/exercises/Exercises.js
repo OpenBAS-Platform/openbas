@@ -82,7 +82,7 @@ const inlineStylesHeaders = {
   },
   exercise_subtitle: {
     float: 'left',
-    width: '30%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -116,7 +116,7 @@ const inlineStyles = {
   },
   exercise_subtitle: {
     float: 'left',
-    width: '30%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -341,7 +341,10 @@ class Exercises extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.exercise_tags}
                     >
-                      <ItemTags variant="list" tags={exercise.getTags()} />
+                      <ItemTags
+                        variant="list"
+                        tags={exercise.getTags('tag_name', true, 4)}
+                      />
                     </div>
                   </div>
                 }

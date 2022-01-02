@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { schema } from 'normalizr';
 import * as R from 'ramda';
+import { lime } from '@mui/material/colors';
 
 export const document = new schema.Entity(
   'documents',
@@ -156,9 +157,12 @@ export const arrayOfLogs = new schema.Array(log);
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
-const sort = (data, sortBy, orderAsc = true) => R.sortWith(
-  orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
-  data,
+const sort = (data, sortBy, orderAsc = true, limit = 1000) => R.take(
+  limit,
+  R.sortWith(
+    orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
+    data,
+  ),
 );
 
 export const storeBrowser = (state) => ({
@@ -209,13 +213,11 @@ export const storeBrowser = (state) => ({
     return {
       ...ex,
       exercise_id: id,
-      getTags() {
-        return (
-          ex.exercise_tags
-          || []
-            .map((tagId) => state.referential.entities.tags[tagId])
-            .filter((t) => t !== undefined)
-        );
+      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
+        const tags = ex.exercise_tags
+          .map((tagId) => state.referential.entities.tags[tagId])
+          .filter((t) => t !== undefined);
+        return sort(tags, sortBy, orderAsc, limit);
       },
       getInjects(sortBy = 'inject_date') {
         const all = R.values(state.referential.entities.injects);

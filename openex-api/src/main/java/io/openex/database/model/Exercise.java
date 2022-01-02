@@ -123,7 +123,7 @@ public class Exercise implements Base {
             joinColumns = @JoinColumn(name = "exercise_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("exercises_tags")
+    @JsonProperty("exercise_tags")
     @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 

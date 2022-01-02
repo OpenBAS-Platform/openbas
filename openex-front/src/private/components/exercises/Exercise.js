@@ -41,9 +41,9 @@ const styles = () => ({
     float: 'left',
   },
   progress: {
-    width: 300,
     float: 'right',
-    marginRight: 80,
+    margin: '25px 90px 0 50px',
+    flexGrow: 1,
   },
   icon: {
     position: 'absolute',
@@ -90,12 +90,18 @@ const Exercise = (props) => {
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={6}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
+          <Paper
+            variant="outlined"
+            classes={{ root: classes.metric }}
+            style={{ display: 'flex' }}
+          >
             <div className={classes.icon}>
               {iconStatus(exercise.exercise_status)}
             </div>
-            <div className={classes.title}>{t('Status')}</div>
-            <ExerciseStatus status={exercise.exercise_status} />
+            <div>
+              <div className={classes.title}>{t('Status')}</div>
+              <ExerciseStatus status={exercise.exercise_status} />
+            </div>
             <div className={classes.progress}>
               <BorderLinearProgress
                 value={
@@ -150,7 +156,7 @@ const Exercise = (props) => {
           <Typography variant="overline">{t('Control')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+              <Grid item={true} xs={3}>
                 <Typography variant="h1">{t('Play')}</Typography>
                 <Button
                   variant="contained"
@@ -158,6 +164,16 @@ const Exercise = (props) => {
                   color="success"
                 >
                   {t('Start')}
+                </Button>
+              </Grid>
+              <Grid item={true} xs={3}>
+                <Typography variant="h1">{t('Play')}</Typography>
+                <Button
+                  variant="contained"
+                  endIcon={<HighlightOffOutlined />}
+                  color="warning"
+                >
+                  {t('Cancel')}
                 </Button>
               </Grid>
             </Grid>
