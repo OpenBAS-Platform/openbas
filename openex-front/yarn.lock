@@ -4763,6 +4763,11 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
+gantt-task-react@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/gantt-task-react/-/gantt-task-react-0.3.7.tgz#91d2409504852a4585b737042a365fc56636c419"
+  integrity sha512-u4doKox68fmGYzEbg+QifdKlTC+KSbXmB7fU3cMsjAeJ8csC0jG6sgpHf9hcRj6cNWBIj1didmqfcncK1YMzBA==
+
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"

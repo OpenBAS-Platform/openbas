@@ -90,6 +90,7 @@ const i18n = {
       'The element has been updated': "L'élément a été modifié.",
       'The element already exists': "L'élément existe déjà.",
       'Manage the users of this group': 'Gérer les utilisateurs de ce groupe',
+      'Create a new document': 'Créer un nouveau document',
       Close: 'Fermer',
       'Export to XLS': 'Exporter en XLS',
       Copy: 'Copier',

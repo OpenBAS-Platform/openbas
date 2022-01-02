@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles, styled } from '@mui/styles';
@@ -41,9 +41,9 @@ const styles = () => ({
     float: 'left',
   },
   progress: {
-    width: '60%',
+    width: 300,
     float: 'right',
-    marginRight: 150,
+    marginRight: 80,
   },
   icon: {
     position: 'absolute',
@@ -87,75 +87,84 @@ const Exercise = (props) => {
     t, fldt, classes, exercise,
   } = props;
   return (
-      <div className={classes.root}>
-        <Grid container={true} spacing={3}>
-          <Grid item={true} xs={6}>
-            <Paper variant="outlined" classes={{ root: classes.metric }}>
-              <div className={classes.icon}>
-                {iconStatus(exercise.exercise_status)}
-              </div>
-              <div className={classes.title}>{t('Status')}</div>
-              <ExerciseStatus status={exercise.exercise_status} />
-              <div className={classes.progress}>
-                <BorderLinearProgress value={exercise?.exercise_injects_statistics?.total_progress ?? 0} variant="determinate" />
-              </div>
-            </Paper>
-          </Grid>
-          <Grid item={true} xs={3}>
-            <Paper variant="outlined" classes={{ root: classes.metric }}>
-              <div className={classes.icon}>
-                <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
-              </div>
-              <div className={classes.title}>{t('Injects')}</div>
-              <div className={classes.number}>{exercise?.exercise_injects_statistics?.total_count ?? '-'}</div>
-            </Paper>
-          </Grid>
-          <Grid item={true} xs={3}>
-            <Paper variant="outlined" classes={{ root: classes.metric }}>
-              <div className={classes.icon}>
-                <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
-              </div>
-              <div className={classes.title}>{t('Players')}</div>
-              <div className={classes.number}>{exercise?.exercise_users_number ?? '-'}</div>
-            </Paper>
-          </Grid>
+    <div className={classes.root}>
+      <Grid container={true} spacing={3}>
+        <Grid item={true} xs={6}>
+          <Paper variant="outlined" classes={{ root: classes.metric }}>
+            <div className={classes.icon}>
+              {iconStatus(exercise.exercise_status)}
+            </div>
+            <div className={classes.title}>{t('Status')}</div>
+            <ExerciseStatus status={exercise.exercise_status} />
+            <div className={classes.progress}>
+              <BorderLinearProgress
+                value={
+                  exercise?.exercise_injects_statistics?.total_progress ?? 0
+                }
+                variant="determinate"
+              />
+            </div>
+          </Paper>
         </Grid>
-        <br />
-        <Grid container={true} spacing={3}>
-          <Grid item={true} xs={6}>
-            <Typography variant="overline">{t('Information')}</Typography>
-            <Paper variant="outlined" classes={{ root: classes.paper }}>
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={6}>
-                  <Typography variant="h1">{t('Description')}</Typography>
-                  {exercise.exercise_description || '-'}
-                </Grid>
-                <Grid item={true} xs={6}>
-                  <Typography variant="h1">{t('Start date')}</Typography>
-                  {fldt(exercise.exercise_start_date) || t('Manual')}
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
-          <Grid item={true} xs={6}>
-            <Typography variant="overline">{t('Control')}</Typography>
-            <Paper variant="outlined" classes={{ root: classes.paper }}>
-              <Grid container={true} spacing={3}>
-                <Grid item={true} xs={6}>
-                  <Typography variant="h1">{t('Play')}</Typography>
-                  <Button
-                    variant="contained"
-                    endIcon={<PlayArrowOutlined />}
-                    color="success"
-                  >
-                    {t('Démarrer')}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Paper>
-          </Grid>
+        <Grid item={true} xs={3}>
+          <Paper variant="outlined" classes={{ root: classes.metric }}>
+            <div className={classes.icon}>
+              <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
+            </div>
+            <div className={classes.title}>{t('Injects')}</div>
+            <div className={classes.number}>
+              {exercise?.exercise_injects_statistics?.total_count ?? '-'}
+            </div>
+          </Paper>
         </Grid>
-      </div>
+        <Grid item={true} xs={3}>
+          <Paper variant="outlined" classes={{ root: classes.metric }}>
+            <div className={classes.icon}>
+              <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
+            </div>
+            <div className={classes.title}>{t('Players')}</div>
+            <div className={classes.number}>
+              {exercise?.exercise_users_number ?? '-'}
+            </div>
+          </Paper>
+        </Grid>
+      </Grid>
+      <br />
+      <Grid container={true} spacing={3}>
+        <Grid item={true} xs={6}>
+          <Typography variant="overline">{t('Information')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Description')}</Typography>
+                {exercise.exercise_description || '-'}
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Start date')}</Typography>
+                {fldt(exercise.exercise_start_date) || t('Manual')}
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6}>
+          <Typography variant="overline">{t('Control')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Play')}</Typography>
+                <Button
+                  variant="contained"
+                  endIcon={<PlayArrowOutlined />}
+                  color="success"
+                >
+                  {t('Start')}
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
+    </div>
   );
 };
 

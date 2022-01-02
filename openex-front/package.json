@@ -17,6 +17,7 @@
     "date-fns": "2.27.0",
     "file-saver": "2.0.5",
     "final-form": "4.20.6",
+    "gantt-task-react": "^0.3.7",
     "history": "4.10.1",
     "http-proxy-middleware": "2.0.1",
     "leaflet": "1.7.1",
