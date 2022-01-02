@@ -26,6 +26,10 @@ public class Audience implements Base {
     @JsonProperty("audience_name")
     private String name;
 
+    @Column(name = "audience_description")
+    @JsonProperty("audience_description")
+    private String description;
+
     @Column(name = "audience_enabled")
     @JsonProperty("audience_enabled")
     private boolean enabled = true;
@@ -35,6 +39,15 @@ public class Audience implements Base {
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("audience_exercise")
     private Exercise exercise;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "audiences_tags",
+            joinColumns = @JoinColumn(name = "audience_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("audience_tags")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_audiences",
@@ -66,12 +79,28 @@ public class Audience implements Base {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public List<User> getUsers() {
