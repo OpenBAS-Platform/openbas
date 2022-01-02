@@ -116,7 +116,9 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     // region transient
     @JsonProperty("inject_users_number")
     public long getNumberOfTargetUsers() {
-        // TODO Handle all audiences count
+        if (allAudiences) {
+            return getExercise().usersNumber();
+        }
         return getAudiences().stream()
                 .map(Audience::getUsersNumber)
                 .reduce(Long::sum).orElse(0L);

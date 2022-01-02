@@ -28,7 +28,7 @@ const MiniMap = (props) => {
         attributionControl={false}
         style={{ height: '100%' }}
       >
-        <TileLayer url={parameters.map_tile_server} />
+        <TileLayer url={parameters.map_tile_server ?? ''} />
       </MapContainer>
     </div>
   );

@@ -184,6 +184,15 @@ public class ExerciseApi<T> extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
+    @PutMapping("/api/exercises/{exerciseId}/tags")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise updateExerciseTags(@PathVariable String exerciseId,
+                                       @Valid @RequestBody ExerciseUpdateTagsInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        return exerciseRepository.save(exercise);
+    }
+
     @PutMapping("/api/exercises/{exerciseId}/image")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseImage(@PathVariable String exerciseId,
@@ -206,7 +215,7 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @GetMapping("/api/exercises")
-    // @PostAuthorize - Exercises are filtered by query
+    @RolesAllowed(ROLE_USER)
     public Iterable<Exercise> exercises() {
         return currentUser().isAdmin() ?
                 exerciseRepository.findAll() :

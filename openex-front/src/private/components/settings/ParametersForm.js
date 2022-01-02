@@ -7,10 +7,9 @@ import { Select } from '../../../components/Select';
 import inject18n from '../../../components/i18n';
 import { TextField } from '../../../components/TextField';
 
-class ParametersForm extends Component {
-  render() {
-    const { t, onSubmit, initialValues } = this.props;
-    return (
+const ParametersForm = (props) => {
+  const { t, onSubmit, initialValues } = props;
+  return (
       <Form
         keepDirtyOnReinitialize={true}
         onSubmit={onSubmit}
@@ -68,9 +67,8 @@ class ParametersForm extends Component {
           </form>
         )}
       </Form>
-    );
-  }
-}
+  );
+};
 
 ParametersForm.propTypes = {
   t: PropTypes.func,

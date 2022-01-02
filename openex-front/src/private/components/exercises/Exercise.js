@@ -82,12 +82,11 @@ const iconStatus = (status) => {
   }
 };
 
-class Exercise extends Component {
-  render() {
-    const {
-      t, fldt, classes, exercise,
-    } = this.props;
-    return (
+const Exercise = (props) => {
+  const {
+    t, fldt, classes, exercise,
+  } = props;
+  return (
       <div className={classes.root}>
         <Grid container={true} spacing={3}>
           <Grid item={true} xs={6}>
@@ -98,7 +97,7 @@ class Exercise extends Component {
               <div className={classes.title}>{t('Status')}</div>
               <ExerciseStatus status={exercise.exercise_status} />
               <div className={classes.progress}>
-                <BorderLinearProgress value={80} variant="determinate" />
+                <BorderLinearProgress value={exercise?.exercise_injects_statistics?.total_progress ?? 0} variant="determinate" />
               </div>
             </Paper>
           </Grid>
@@ -108,7 +107,7 @@ class Exercise extends Component {
                 <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Injects')}</div>
-              <div className={classes.number}>30</div>
+              <div className={classes.number}>{exercise?.exercise_injects_statistics?.total_count ?? '-'}</div>
             </Paper>
           </Grid>
           <Grid item={true} xs={3}>
@@ -117,7 +116,7 @@ class Exercise extends Component {
                 <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
               </div>
               <div className={classes.title}>{t('Players')}</div>
-              <div className={classes.number}>25</div>
+              <div className={classes.number}>{exercise?.exercise_users_number ?? '-'}</div>
             </Paper>
           </Grid>
         </Grid>
@@ -157,9 +156,8 @@ class Exercise extends Component {
           </Grid>
         </Grid>
       </div>
-    );
-  }
-}
+  );
+};
 
 Exercise.propTypes = {
   t: PropTypes.func,

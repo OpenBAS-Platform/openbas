@@ -90,12 +90,11 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
             String emailAttribute = user.getAttribute("email");
             String email = ofNullable(emailAttribute).orElseThrow();
             if (hasLength(email)) {
-                String name = user.getAttribute("name");
                 String firstName = user.getAttribute("given_name");
                 String lastName = user.getAttribute("family_name");
                 Optional<User> optionalUser = userRepository.findByEmail(email);
                 return optionalUser.orElseGet(() ->
-                        userService.createUser(email, name, firstName, lastName));
+                        userService.createUser(email, firstName, lastName));
             }
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("invalid_token", "User conversion fail", "")

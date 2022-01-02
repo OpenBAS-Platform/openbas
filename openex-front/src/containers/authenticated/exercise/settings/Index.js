@@ -249,7 +249,7 @@ class Index extends Component {
         'exercise_end_date',
         'exercise_message_header',
         'exercise_message_footer',
-        'exercise_mail_expediteur',
+        'exercise_mail_from',
         'exercise_animation_group',
         'exercise_latitude',
         'exercise_longitude',
@@ -605,7 +605,7 @@ const select = (state, ownProps) => {
     id: exerciseId,
     exercise,
     groups: R.values(state.referential.entities.groups),
-    initialEmailExpediteur: R.prop('exercise_mail_expediteur', exercise),
+    initialEmailExpediteur: R.prop('exercise_mail_from', exercise),
   };
 };
 

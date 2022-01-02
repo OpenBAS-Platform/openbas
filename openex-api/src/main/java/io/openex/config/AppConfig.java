@@ -14,11 +14,18 @@ import org.springframework.stereotype.Component;
 @EnableAsync
 public class AppConfig {
 
+    private final static String ANONYMOUS_USER = "anonymousUser";
+
     // Validations
     public final static String MANDATORY_MESSAGE = "This value should not be blank.";
 
     public static User currentUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (ANONYMOUS_USER.equals(principal)) {
+            return null;
+        }
+        assert principal instanceof User;
+        return (User) principal;
     }
 
     @Bean

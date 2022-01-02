@@ -12,6 +12,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
+import { storeBrowser } from '../../../actions/Schema';
+import { updateParameters } from '../../../actions/Application';
 
 const styles = () => ({
   root: {
@@ -31,7 +33,7 @@ class Parameters extends Component {
   }
 
   render() {
-    const { t, classes } = this.props;
+    const { t, classes, settings } = this.props;
     return (
       <div className={classes.root}>
         <Grid container={true} spacing={3}>
@@ -41,9 +43,9 @@ class Parameters extends Component {
               <ParametersForm
                 onSubmit={this.onUpdate.bind(this)}
                 initialValues={{
-                  platform_name: 'OpenEx - Exercises planning platform',
-                  platform_theme: 'dark',
-                  platform_lang: 'auto',
+                  platform_name: settings?.platform_name,
+                  platform_theme: settings?.platform_theme,
+                  platform_lang: settings?.platform_lang,
                 }}
               />
             </Paper>
@@ -56,19 +58,15 @@ class Parameters extends Component {
               <List style={{ paddingTop: 0 }}>
                 <ListItem divider={true}>
                   <ListItemText primary={t('OpenEx platform')} />
-                  <Chip label='3.0.0' color="primary" />
+                  <Chip label={settings?.platform_version} color="primary" />
                 </ListItem>
                 <ListItem divider={true}>
                   <ListItemText primary={t('JAVA Virtual Machine')} />
-                  <Chip label='17' color="primary" />
+                  <Chip label={settings?.java_version} color="primary" />
                 </ListItem>
                 <ListItem divider={true}>
                   <ListItemText primary={t('PostgreSQL')} />
-                  <Chip label='10.19' color="primary" />
-                </ListItem>
-                <ListItem divider={true}>
-                  <ListItemText primary={t('MinIO')} />
-                  <Chip label='RELEASE-2021' color="primary" />
+                  <Chip label={settings?.postgre_version} color="primary" />
                 </ListItem>
               </List>
             </Paper>
@@ -87,14 +85,14 @@ Parameters.propTypes = {
 };
 
 const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
-  return {
-    userAdmin: R.path([userId, 'user_admin'], state.referential.entities.users),
-  };
+  const browser = storeBrowser(state);
+  const userAdmin = browser.getMe().isAdmin();
+  const settings = browser.getSettings();
+  return { userAdmin, settings };
 };
 
 export default R.compose(
-  connect(select),
+  connect(select, { updateParameters }),
   inject18n,
   withStyles(styles),
 )(Parameters);

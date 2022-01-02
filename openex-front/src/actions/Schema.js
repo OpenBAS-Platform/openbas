@@ -45,8 +45,10 @@ export const arrayOfInjectStatuses = new schema.Array(injectStatus);
 export const parameters = new schema.Entity(
   'parameters',
   {},
-  { idAttribute: 'platform_id' },
+  { idAttribute: 'setting_key' },
 );
+
+export const arrayOfParameters = new schema.Array(parameters);
 
 export const token = new schema.Entity(
   'tokens',
@@ -298,7 +300,8 @@ export const storeBrowser = (state) => ({
     return state.referential.entities.statistics?.openex;
   },
   getSettings() {
-    return state.referential.entities.parameters?.openex;
+    const params = Object.entries(state.referential.entities.parameters ?? {});
+    return R.mergeAll(params.map(([k, v]) => ({ [k]: v.setting_value })));
   },
   getMe() {
     const userId = R.path(['logged', 'user'], state.app);

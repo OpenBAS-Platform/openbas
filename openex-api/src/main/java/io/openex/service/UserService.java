@@ -74,10 +74,9 @@ public class UserService {
         tokenRepository.save(token);
     }
 
-    public User createUser(String email, String name, String firstName, String lastName) {
+    public User createUser(String email, String firstName, String lastName) {
         User user = new User();
         user.setEmail(email);
-        user.setLogin(name);
         user.setFirstname(firstName);
         user.setLastname(lastName);
         user.setStatus((short) 0);

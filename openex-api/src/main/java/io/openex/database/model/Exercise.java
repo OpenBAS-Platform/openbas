@@ -11,9 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.annotation.Nullable;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.Grant.GRANT_TYPE.OBSERVER;
@@ -88,21 +86,9 @@ public class Exercise implements Base {
     @JsonProperty("exercise_message_footer")
     private String footer = "EXERCISE - EXERCISE - EXERCISE";
 
-    @Column(name = "exercise_mail_expediteur")
-    @JsonProperty("exercise_mail_expediteur")
+    @Column(name = "exercise_mail_from")
+    @JsonProperty("exercise_mail_from")
     private String replyTo = "planners@openex.io";
-
-    @Column(name = "exercise_type")
-    @JsonProperty("exercise_type")
-    private String type = "standard";
-
-    @Column(name = "exercise_latitude")
-    @JsonProperty("exercise_latitude")
-    private Double latitude;
-
-    @Column(name = "exercise_longitude")
-    @JsonProperty("exercise_longitude")
-    private Double longitude;
 
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
@@ -111,6 +97,11 @@ public class Exercise implements Base {
     @Column(name = "exercise_updated_at")
     @JsonProperty("exercise_updated_at")
     private Date updatedAt = new Date();
+
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
+    private List<Audience> audiences = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
@@ -132,21 +123,36 @@ public class Exercise implements Base {
             joinColumns = @JoinColumn(name = "exercise_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("audience_users")
+    @JsonProperty("exercises_tags")
     @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
     // region transient
+    @JsonProperty("exercise_injects_statistics")
+    public Map<String, Long> getInjectStatistics() {
+        Map<String, Long> stats = new HashMap<>();
+        Date now = new Date();
+        long total = injects.size();
+        stats.put("total_count", total);
+        long executed = injects.stream().filter(inject -> inject.getStatus() != null).count();
+        stats.put("total_executed", executed);
+        stats.put("total_remaining", injects.stream().filter(inject -> inject.getStatus() == null).count());
+        stats.put("total_past", injects.stream().filter(inject -> inject.getDate().before(now)).count());
+        stats.put("total_future", injects.stream().filter(inject -> inject.getDate().after(now)).count());
+        stats.put("total_progress", total > 0 ? (executed * 100 / total) : 0);
+        return stats;
+    }
+
     @JsonProperty("exercise_status")
     public String getStatus() {
         if (isCanceled()) {
             return STATUS.CANCELED.name();
         }
         Date now = new Date();
-        List<Inject<?>> injects = getInjects().stream().filter(inject -> inject.getStatus() == null).toList();
-        long totalCount = injects.size();
-        long totalPastCount = injects.stream().filter(inject -> inject.getDate().before(now)).count();
-        long totalFutureCount = injects.stream().filter(inject -> inject.getDate().after(now)).count();
+        long totalCount = getInjects().size();
+        List<Inject<?>> injectsToExecute = getInjects().stream().filter(inject -> inject.getStatus() == null).toList();
+        long totalPastCount = injectsToExecute.stream().filter(inject -> inject.getDate().before(now)).count();
+        long totalFutureCount = injectsToExecute.stream().filter(inject -> inject.getDate().after(now)).count();
         if (totalCount == 0 || (totalPastCount == 0 && totalFutureCount > 0)) {
             return STATUS.SCHEDULED.name();
         } else if (totalFutureCount > 0) {
@@ -171,6 +177,12 @@ public class Exercise implements Base {
     @JsonIgnore
     public List<User> getObservers() {
         return getUsersByType(PLANNER.name(), OBSERVER.name());
+    }
+
+    @JsonProperty("exercise_users_number")
+    public long usersNumber() {
+        return getAudiences().stream()
+                .map(audience -> audience.getUsers().stream()).count();
     }
 
     @JsonProperty("user_can_update")
@@ -313,6 +325,14 @@ public class Exercise implements Base {
         this.injects = injects;
     }
 
+    public List<Audience> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<Audience> audiences) {
+        this.audiences = audiences;
+    }
+
     public List<Grant> getGrants() {
         return grants;
     }
@@ -321,36 +341,12 @@ public class Exercise implements Base {
         this.grants = grants;
     }
 
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
     public List<Objective> getObjectives() {
         return objectives;
     }
 
     public void setObjectives(List<Objective> objectives) {
         this.objectives = objectives;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public List<Tag> getTags() {

@@ -18,6 +18,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -93,13 +94,15 @@ public class UserApi extends RestBehavior {
 
     @RolesAllowed(ROLE_ADMIN)
     @PostMapping("/api/users")
+    @Transactional
     public User createUser(@Valid @RequestBody CreateUserInput input) {
         User user = new User();
         user.setUpdateAttributes(input);
-        user.setLogin(input.getEmail());
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        userService.createUserToken(savedUser);
+        return savedUser;
     }
 
     @RolesAllowed(ROLE_ADMIN)

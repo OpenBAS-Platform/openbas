@@ -48,10 +48,6 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_email")
     private String email;
 
-    @Column(name = "user_login")
-    @JsonProperty("user_login")
-    private String login;
-
     @Column(name = "user_phone")
     @JsonProperty("user_phone")
     private String phone;
@@ -286,14 +282,6 @@ public class User implements Base, OAuth2User {
         this.longitude = longitude;
     }
 
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
     public Short getStatus() {
         return status;
     }
@@ -329,7 +317,6 @@ public class User implements Base, OAuth2User {
         HashMap<String, Object> attributes = new HashMap<>();
         attributes.put("id", getId());
         attributes.put("name", getName());
-        attributes.put("login", getLogin());
         attributes.put("email", getEmail());
         return attributes;
     }

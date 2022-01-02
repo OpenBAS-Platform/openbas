@@ -120,7 +120,7 @@ const Dashboard = (props) => {
               {statistics?.exercises_count?.global_count ?? '-'}
             </div>
             <ItemNumberDifference
-              difference={statistics?.exercises_count?.progression_count ?? '0'}
+              difference={statistics?.exercises_count?.progression_count ?? 0}
               description={t('one month')}
             />
           </Paper>
@@ -135,7 +135,7 @@ const Dashboard = (props) => {
               {statistics?.users_count?.global_count ?? '-'}
             </div>
             <ItemNumberDifference
-              difference={statistics?.users_count?.progression_count ?? '0'}
+              difference={statistics?.users_count?.progression_count ?? 0}
               description={t('one month')}
             />
           </Paper>
@@ -150,7 +150,7 @@ const Dashboard = (props) => {
               {statistics?.injects_count?.global_count ?? '-'}
             </div>
             <ItemNumberDifference
-              difference={statistics?.injects_count?.progression_count ?? '0'}
+              difference={statistics?.injects_count?.progression_count ?? 0}
               description={t('one month')}
             />
           </Paper>

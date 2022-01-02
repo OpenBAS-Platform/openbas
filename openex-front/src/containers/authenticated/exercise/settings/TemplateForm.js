@@ -34,7 +34,7 @@ class TemplateForm extends Component {
               style={{ marginTop: 20 }}
             />
             <TextField
-              name="exercise_mail_expediteur"
+              name="exercise_mail_from"
               fullWidth={true}
               label={<T>Sender email address</T>}
               style={{ marginTop: 20 }}

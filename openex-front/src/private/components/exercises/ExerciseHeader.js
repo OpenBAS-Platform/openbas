@@ -15,7 +15,7 @@ import {
 import { connect } from 'react-redux';
 import { Form } from 'react-final-form';
 import inject18n from '../../../components/i18n';
-import { updateExercise } from '../../../actions/Exercise';
+import { updateExerciseTags } from '../../../actions/Exercise';
 import TagField from '../../../components/TagField';
 
 const styles = () => ({
@@ -70,7 +70,7 @@ class ExerciseHeader extends Component {
 
   submitTags(values) {
     const { exercise } = this.props;
-    return this.props.updateExercise(exercise.exercise_id, {
+    return this.props.updateExerciseTags(exercise.exercise_id, {
       exercise_tags: values.exercise_tags.map((t) => t.id),
     });
   }
@@ -168,11 +168,11 @@ ExerciseHeader.propTypes = {
   t: PropTypes.func,
   nsdt: PropTypes.func,
   exercise: PropTypes.object,
-  updateExercise: PropTypes.func,
+  updateExerciseTags: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { updateExercise }),
+  connect(null, { updateExerciseTags }),
   withStyles(styles),
   inject18n,
 )(ExerciseHeader);
