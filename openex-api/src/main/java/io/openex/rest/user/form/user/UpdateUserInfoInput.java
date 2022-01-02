@@ -1,8 +1,8 @@
-package io.openex.rest.user.form;
+package io.openex.rest.user.form.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UpdateInfoInput {
+public class UpdateUserInfoInput {
 
     @JsonProperty("user_pgp_key")
     private String pgpKey;

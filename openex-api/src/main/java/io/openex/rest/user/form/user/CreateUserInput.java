@@ -1,4 +1,4 @@
-package io.openex.rest.user.form;
+package io.openex.rest.user.form.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,6 +24,9 @@ public class CreateUserInput {
     @JsonProperty("user_organization")
     private String organizationId;
 
+    @JsonProperty("user_password")
+    private String password;
+
     @JsonProperty("user_tags")
     private List<String> tagIds = new ArrayList<>();
 
@@ -33,6 +36,14 @@ public class CreateUserInput {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public boolean isAdmin() {

@@ -43,13 +43,13 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonProperty("inject_description")
     private String description;
 
-    @Column(name = "inject_latitude")
-    @JsonProperty("inject_latitude")
-    private Double latitude;
+    @Column(name = "inject_country")
+    @JsonProperty("inject_country")
+    private String country;
 
-    @Column(name = "inject_longitude")
-    @JsonProperty("inject_longitude")
-    private Double longitude;
+    @Column(name = "inject_city")
+    @JsonProperty("inject_city")
+    private String city;
 
     @Column(name = "inject_enabled")
     @JsonProperty("inject_enabled")
@@ -240,20 +240,20 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.description = description;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    public String getCountry() {
+        return country;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
-    public Double getLongitude() {
-        return longitude;
+    public String getCity() {
+        return city;
     }
 
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public User getUser() {

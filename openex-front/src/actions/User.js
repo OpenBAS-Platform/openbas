@@ -1,12 +1,20 @@
 import * as schema from './Schema';
 import * as Constants from '../constants/ActionTypes';
 import {
-  getReferential,
-  postReferential,
-  putReferential,
-  delReferential,
+  delReferential, getReferential, postReferential, putReferential,
 } from '../utils/Action';
 
+// region users
+export const fetchPlayers = () => (dispatch) => getReferential(schema.arrayOfUsers, '/api/players')(dispatch);
+
+export const addPlayer = (data) => (dispatch) => postReferential(schema.user, '/api/players', data)(dispatch);
+
+export const updatePlayer = (userId, data) => (dispatch) => putReferential(schema.user, `/api/players/${userId}`, data)(dispatch);
+
+export const deletePlayer = (userId) => (dispatch) => delReferential(`/api/players/${userId}`, 'users', userId)(dispatch);
+// endregion
+
+// region users
 export const fetchUsers = () => (dispatch) => getReferential(schema.arrayOfUsers, '/api/users')(dispatch);
 
 export const addUser = (data) => (dispatch) => postReferential(schema.user, '/api/users', data)(dispatch);
@@ -20,8 +28,9 @@ export const updateUser = (userId, data) => (dispatch) => putReferential(schema.
 });
 
 export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);
+// endregion
 
-// Me
+// region me
 export const meTokens = () => (dispatch) => getReferential(schema.arrayOfTokens, '/api/me/tokens')(dispatch);
 
 export const updateMePassword = (password) => (dispatch) => putReferential(schema.user, '/api/me/password', {
@@ -34,3 +43,4 @@ export const updateMeProfile = (data) => (dispatch) => putReferential(schema.use
   });
 
 export const updateMeInformation = (data) => (dispatch) => putReferential(schema.user, '/api/me/information', data)(dispatch);
+// endregion

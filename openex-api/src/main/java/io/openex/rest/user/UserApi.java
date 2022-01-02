@@ -6,10 +6,10 @@ import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.user.form.CreateUserInput;
-import io.openex.rest.user.form.LoginUserInput;
-import io.openex.rest.user.form.UpdatePasswordInput;
-import io.openex.rest.user.form.UpdateUserInput;
+import io.openex.rest.user.form.login.LoginUserInput;
+import io.openex.rest.user.form.user.CreateUserInput;
+import io.openex.rest.user.form.user.UpdatePasswordInput;
+import io.openex.rest.user.form.user.UpdateUserInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -23,8 +23,7 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
-import static io.openex.database.model.User.ROLE_USER;
-import static io.openex.helper.DatabaseHelper.updateRelationResolver;
+import static io.openex.helper.DatabaseHelper.updateRelation;
 
 @RestController
 public class UserApi extends RestBehavior {
@@ -54,18 +53,6 @@ public class UserApi extends RestBehavior {
         this.userRepository = userRepository;
     }
 
-    @RolesAllowed(ROLE_USER)
-    @GetMapping("/api/users")
-    public Iterable<User> users() {
-        return userRepository.findAll();
-    }
-
-    @RolesAllowed(ROLE_USER)
-    @GetMapping("/api/logout")
-    public ResponseEntity<Object> logout() {
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, userService.buildLogoutCookie()).build();
-    }
-
     @PostMapping("/api/login")
     public ResponseEntity<User> login(@Valid @RequestBody LoginUserInput input) {
         Optional<User> optionalUser = userRepository.findByEmail(input.getLogin());
@@ -84,6 +71,12 @@ public class UserApi extends RestBehavior {
     }
 
     @RolesAllowed(ROLE_ADMIN)
+    @GetMapping("/api/users")
+    public Iterable<User> users() {
+        return userRepository.findAll();
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
     @PutMapping("/api/users/{userId}/password")
     public User changePassword(@PathVariable String userId,
                                @Valid @RequestBody UpdatePasswordInput input) {
@@ -92,14 +85,15 @@ public class UserApi extends RestBehavior {
         return userRepository.save(user);
     }
 
+    @Transactional
     @RolesAllowed(ROLE_ADMIN)
     @PostMapping("/api/users")
-    @Transactional
     public User createUser(@Valid @RequestBody CreateUserInput input) {
         User user = new User();
         user.setUpdateAttributes(input);
+        user.setPassword(userService.encodeUserPassword(input.getPassword()));
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-        user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+        user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         User savedUser = userRepository.save(user);
         userService.createUserToken(savedUser);
         return savedUser;
@@ -111,7 +105,7 @@ public class UserApi extends RestBehavior {
         User user = userRepository.findById(userId).orElseThrow();
         user.setUpdateAttributes(input);
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-        user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+        user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         return userRepository.save(user);
     }
 

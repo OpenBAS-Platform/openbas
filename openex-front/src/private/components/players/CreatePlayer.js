@@ -9,7 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
-import { addUser } from '../../../actions/User';
+import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
 
@@ -51,7 +51,7 @@ class CreatePlayer extends Component {
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
     return this.props
-      .addUser(inputValues)
+      .addPlayer(inputValues)
       .then((result) => (result.result ? this.handleClose() : result));
   }
 
@@ -92,11 +92,11 @@ class CreatePlayer extends Component {
 
 CreatePlayer.propTypes = {
   t: PropTypes.func,
-  addUser: PropTypes.func,
+  addPlayer: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addUser }),
+  connect(null, { addPlayer }),
   inject18n,
   withStyles(styles),
 )(CreatePlayer);

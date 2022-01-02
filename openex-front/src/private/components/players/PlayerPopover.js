@@ -13,7 +13,7 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { updateUser, deleteUser } from '../../../actions/User';
+import { updatePlayer, deletePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
 import { storeBrowser } from '../../../actions/Schema';
@@ -62,7 +62,7 @@ class PlayerPopover extends Component {
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
     return this.props
-      .updateUser(this.props.user.user_id, inputValues)
+      .updatePlayer(this.props.user.user_id, inputValues)
       .then(() => this.handleCloseEdit());
   }
 
@@ -76,7 +76,7 @@ class PlayerPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteUser(this.props.user.user_id);
+    this.props.deletePlayer(this.props.user.user_id);
     this.handleCloseDelete();
   }
 
@@ -186,8 +186,8 @@ class PlayerPopover extends Component {
 PlayerPopover.propTypes = {
   t: PropTypes.func,
   user: PropTypes.object,
-  updateUser: PropTypes.func,
-  deleteUser: PropTypes.func,
+  updatePlayer: PropTypes.func,
+  deletePlayer: PropTypes.func,
   tags: PropTypes.object,
   userAdmin: PropTypes.bool,
 };
@@ -200,6 +200,6 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { updateUser, deleteUser }),
+  connect(select, { updatePlayer, deletePlayer }),
   inject18n,
 )(PlayerPopover);

@@ -86,13 +86,13 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_admin")
     private boolean admin = false;
 
-    @Column(name = "user_latitude")
-    @JsonProperty("user_latitude")
-    private Double latitude;
+    @Column(name = "user_country")
+    @JsonProperty("user_country")
+    private String country;
 
-    @Column(name = "user_longitude")
-    @JsonProperty("user_longitude")
-    private Double longitude;
+    @Column(name = "user_city")
+    @JsonProperty("users_city")
+    private String city;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -132,17 +132,22 @@ public class User implements Base, OAuth2User {
         return "https://www.gravatar.com/avatar/" + emailMd5 + "?d=mm";
     }
 
-    @JsonProperty("user_invited")
-    public boolean isInvited() {
-        return !isAdmin() && getGroups().stream()
-                .mapToLong(group -> group.getGrants().size()).sum() == 0;
-    }
-
-    @JsonProperty("user_can_invite")
-    public boolean canInvite() {
+    @JsonProperty("user_is_planner")
+    public boolean isPlanner() {
         return isAdmin() || getGroups().stream()
                 .flatMap(group -> group.getGrants().stream())
-                .anyMatch(grant -> grant.getName().equals(PLANNER.name()));
+                .anyMatch(grant -> PLANNER.name().equals(grant.getName()));
+    }
+
+    @JsonProperty("user_is_observer")
+    public boolean isObserver() {
+        return isAdmin() || getGroups().stream()
+                .mapToLong(group -> group.getGrants().size()).sum() > 0;
+    }
+
+    @JsonProperty("user_is_manager")
+    public boolean isManager() {
+        return isPlanner() || isObserver();
     }
     // endregion
 
@@ -266,20 +271,20 @@ public class User implements Base, OAuth2User {
         this.tokens = tokens;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    public String getCountry() {
+        return country;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
-    public Double getLongitude() {
-        return longitude;
+    public String getCity() {
+        return city;
     }
 
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public Short getStatus() {

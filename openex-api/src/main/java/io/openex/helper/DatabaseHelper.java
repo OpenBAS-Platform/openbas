@@ -10,7 +10,7 @@ import static org.springframework.util.StringUtils.hasLength;
 
 public class DatabaseHelper {
 
-    public static <T> T updateRelationResolver(String inputRelationId, Base current, CrudRepository<T, String> repository) {
+    public static <T> T updateRelation(String inputRelationId, Base current, CrudRepository<T, String> repository) {
         if (hasLength(inputRelationId)) {
             String currentGroupId = ofNullable(current).map(Base::getId).orElse(null);
             if (!inputRelationId.equals(currentGroupId)) {
@@ -19,6 +19,14 @@ public class DatabaseHelper {
             }
             //noinspection unchecked
             return (T) current;
+        }
+        return null;
+    }
+
+    public static <T> T resolveRelation(String inputRelationId, CrudRepository<T, String> repository) {
+        if (hasLength(inputRelationId)) {
+            Optional<T> existingEntity = repository.findById(inputRelationId);
+            return existingEntity.orElse(null);
         }
         return null;
     }

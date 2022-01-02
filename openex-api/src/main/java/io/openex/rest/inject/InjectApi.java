@@ -20,14 +20,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.helper.DatabaseHelper.updateRelationResolver;
+import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
 import static org.springframework.util.StringUtils.hasLength;
@@ -103,7 +102,7 @@ public class InjectApi<T> extends RestBehavior {
         inject.setUpdateAttributes(input);
         inject.setContent(input.getContent());
         // Set dependencies
-        inject.setDependsOn(updateRelationResolver(input.getDependsOn(), inject.getDependsOn(), injectRepository));
+        inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         return injectRepository.save(inject);
     }

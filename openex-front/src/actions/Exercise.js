@@ -41,17 +41,27 @@ export const exportExercise = (exerciseId, data) => (dispatch) => {
   return fileSave(uri, 'export.xlsx')(dispatch);
 };
 
-export const importExercise = (fileId, data) => (dispatch) => {
-  const uri = `/api/exercises/import?file=${fileId}&import_exercise=${data.exercise}&import_audience=${data.audience}&import_objective=${data.objective}&import_scenarios=${data.scenarios}&import_injects=${data.injects}&import_incidents=${data.incidents}`;
-
-  return postReferential(schema.importExerciseResult, uri, data)(dispatch);
+export const importingExercise = (data) => (dispatch) => {
+  const uri = '/api/exercises/import';
+  return postReferential(schema.exercise, uri, data)(dispatch);
 };
 
-export const importExerciseFromPath = (data) => (dispatch) => {
-  const uri = `/api/exercises/import?import_exercise=${data.exercise}&import_audience=${data.audience}&import_objective=${data.objective}&import_scenarios=${data.scenarios}&import_injects=${data.injects}&import_incidents=${data.incidents}&import_path=${data.import_path}`;
+// export const importExercise = (fileId, data) => (dispatch) => {
+//   const uri = `/api/exercises/import?file=${fileId}&import_exercise=${data.exercise}
+//   &import_audience=${data.audience}&import_objective=${data.objective}&import_scenarios
+//   =${data.scenarios}&import_injects=${data.injects}&import_incidents=${data.incidents}`;
+//
+//   return postReferential(schema.importExerciseResult, uri, data)(dispatch);
+// };
 
-  return postReferential(schema.importExerciseResult, uri, data)(dispatch);
-};
+// export const importExerciseFromPath = (data) => (dispatch) => {
+//   const uri = `/api/exercises/import?import_exercise=${data.exercise}
+//   &import_audience=${data.audience}&import_objective=${data.objective}
+//   &import_scenarios=${data.scenarios}&import_injects=${data.injects}
+//   &import_incidents=${data.incidents}&import_path=${data.import_path}`;
+//
+//   return postReferential(schema.importExerciseResult, uri, data)(dispatch);
+// };
 
 export const exportInjectEml = (exerciseId) => (dispatch) => fileSave(
   `/api/exercises/${exerciseId}/export/inject/eml`,

@@ -6,11 +6,13 @@ import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TokenRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.user.form.UpdateInfoInput;
-import io.openex.rest.user.form.UpdateProfileInput;
-import io.openex.rest.user.form.UpdatePasswordInput;
+import io.openex.rest.user.form.me.UpdateProfileInput;
+import io.openex.rest.user.form.user.UpdatePasswordInput;
+import io.openex.rest.user.form.user.UpdateUserInfoInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +25,7 @@ import java.util.List;
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.database.specification.TokenSpecification.fromUser;
-import static io.openex.helper.DatabaseHelper.updateRelationResolver;
+import static io.openex.helper.DatabaseHelper.updateRelation;
 
 @RestController
 public class MeApi extends RestBehavior {
@@ -54,6 +56,12 @@ public class MeApi extends RestBehavior {
     }
 
     @RolesAllowed(ROLE_USER)
+    @GetMapping("/api/logout")
+    public ResponseEntity<Object> logout() {
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, userService.buildLogoutCookie()).build();
+    }
+
+    @RolesAllowed(ROLE_USER)
     @GetMapping("/api/me")
     public User me() {
         return userRepository.findById(currentUser().getId()).orElseThrow();
@@ -65,13 +73,13 @@ public class MeApi extends RestBehavior {
         User currentUser = currentUser();
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
         user.setUpdateAttributes(input);
-        user.setOrganization(updateRelationResolver(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+        user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         return userRepository.save(user);
     }
 
     @RolesAllowed(ROLE_USER)
     @PutMapping("/api/me/information")
-    public User updateInformation(@Valid @RequestBody UpdateInfoInput input) {
+    public User updateInformation(@Valid @RequestBody UpdateUserInfoInput input) {
         User currentUser = currentUser();
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
         user.setUpdateAttributes(input);

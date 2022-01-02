@@ -1,32 +1,54 @@
 package io.openex.rest.exercise;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.database.specification.ComcheckSpecification;
 import io.openex.database.specification.DryRunSpecification;
 import io.openex.database.specification.ExerciseLogSpecification;
+import io.openex.rest.exercise.export.ExerciseFileExport;
+import io.openex.rest.exercise.export.ExerciseFileImport;
+import io.openex.rest.exercise.export.ExerciseImport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
-import static io.openex.helper.DatabaseHelper.updateRelationResolver;
+import static io.openex.helper.DatabaseHelper.resolveRelation;
+import static io.openex.helper.DatabaseHelper.updateRelation;
 import static java.time.Instant.now;
 
 @RestController
 @RolesAllowed(ROLE_USER)
 public class ExerciseApi<T> extends RestBehavior {
+
+    // region resources
+    @Resource
+    private ObjectMapper mapper;
+    // endregion
+
     // region repositories
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
@@ -35,6 +57,8 @@ public class ExerciseApi<T> extends RestBehavior {
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
     private GroupRepository groupRepository;
+    private AudienceRepository audienceRepository;
+    private InjectRepository injectRepository;
     // endregion
 
     // region services
@@ -42,6 +66,16 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setAudienceRepository(AudienceRepository audienceRepository) {
+        this.audienceRepository = audienceRepository;
+    }
+
+    @Autowired
+    public void setInjectRepository(InjectRepository injectRepository) {
+        this.injectRepository = injectRepository;
+    }
+
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
@@ -180,7 +214,7 @@ public class ExerciseApi<T> extends RestBehavior {
                                               @Valid @RequestBody ExerciseUpdateInfoInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
-        exercise.setAnimationGroup(updateRelationResolver(input.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));
+        exercise.setAnimationGroup(updateRelation(input.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));
         return exerciseRepository.save(exercise);
     }
 
@@ -212,6 +246,67 @@ public class ExerciseApi<T> extends RestBehavior {
     @PostAuthorize("isExerciseObserver(#exerciseId)")
     public Exercise exercise(@PathVariable String exerciseId) {
         return exerciseRepository.findById(exerciseId).orElseThrow();
+    }
+
+    @PostMapping("/api/exercises/{exerciseId}/export")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    public ResponseEntity<ExerciseFileExport> exerciseExport(@PathVariable String exerciseId) {
+        ExerciseFileExport importExport = new ExerciseFileExport();
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        importExport.setExercise(exercise);
+        importExport.setAudiences(exercise.getAudiences());
+        importExport.setInjects(exercise.getInjects());
+        importExport.setTags(exercise.getTags());
+        String attachmentName = "attachment; filename=" + exercise.getName() + "_" + Instant.now().toString() + ".json";
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, attachmentName)
+                .contentType(MediaType.parseMediaType("application/json"))
+                .body(importExport);
+    }
+
+    @Transactional
+    @PostMapping("/api/exercises/import")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    public Exercise exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
+        ExerciseFileImport dataImport = mapper.readValue(file.getInputStream(), ExerciseFileImport.class);
+        // Create tags
+        Map<String, Tag> tagMap = fromIterable(tagRepository.findAll()).stream().collect(
+                Collectors.toMap(Tag::getName, Function.identity()));
+        List<Tag> tagsToCreate = dataImport.getTags().stream()
+                .filter(tagImport -> tagMap.get(tagImport.getName()) == null)
+                .map(tagImport -> {
+                    Tag tag = new Tag();
+                    tag.setUpdateAttributes(tagImport);
+                    return tag;
+                }).toList();
+        List<Tag> createdTags = fromIterable(tagRepository.saveAll(tagsToCreate));
+        List<Tag> tagsToRemap = dataImport.getTags().stream()
+                .filter(tagImport -> tagMap.get(tagImport.getName()) != null)
+                .map(tagImport -> tagMap.get(tagImport.getName())).toList();
+        List<Tag> exerciseTags = Stream.concat(createdTags.stream(), tagsToRemap.stream()).toList();
+        // Create exercise
+        ExerciseImport inputExercise = dataImport.getExercise();
+        Exercise exerciseToSave = new Exercise();
+        exerciseToSave.setUpdateAttributes(inputExercise);
+        exerciseToSave.setOwner(currentUser());
+        exerciseToSave.setTags(exerciseTags);
+        exerciseToSave.setAnimationGroup(resolveRelation(inputExercise.getAnimationGroup(), groupRepository));
+        exerciseToSave.setImage(resolveRelation(inputExercise.getImage(), documentRepository));
+        Exercise exercise = exerciseRepository.save(exerciseToSave);
+        // Create audiences
+        List<Audience> audiences = dataImport.getAudiences().stream()
+                .map(audienceImport -> {
+                    Audience audience = new Audience();
+                    audience.setUpdateAttributes(audienceImport);
+                    audience.setExercise(exercise);
+                    // audience.setUsers();
+                    return audience;
+                }).toList();
+        audienceRepository.saveAll(audiences);
+        // Create injects
+        // TODO
+        // Return exercise
+        return exerciseRepository.findById(exercise.getId()).orElseThrow();
     }
 
     @GetMapping("/api/exercises")
