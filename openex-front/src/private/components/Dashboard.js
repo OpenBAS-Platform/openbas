@@ -193,7 +193,7 @@ const Dashboard = (props) => {
                         </div>
                         <div
                           className={classes.bodyItem}
-                          style={{ width: '15%' }}
+                          style={{ width: '20%' }}
                         >
                           {exercise.exercise_start_date ? (
                             nsd(exercise.exercise_start_date)
@@ -201,10 +201,13 @@ const Dashboard = (props) => {
                             <i>{t('Manual')}</i>
                           )}
                         </div>
-                        <div className={classes.bodyItem}>
+                        <div
+                          className={classes.bodyItem}
+                          style={{ width: '40%' }}
+                        >
                           <ItemTags
                             variant="list"
-                            tags={exercise.getTags('tag_name', true, 2)}
+                            tags={exercise.getTags('tag_name', true, 3)}
                           />
                         </div>
                       </div>

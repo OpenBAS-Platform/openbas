@@ -134,8 +134,8 @@ class Organizations extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchOrganizations();
     this.props.fetchTags();
+    this.props.fetchOrganizations();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
     });

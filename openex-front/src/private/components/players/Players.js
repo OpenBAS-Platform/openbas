@@ -24,6 +24,7 @@ import PlayerPopover from './PlayerPopover';
 import TagsFilter from '../../../components/TagsFilter';
 import SearchFilter from '../../../components/SearchFilter';
 import { storeBrowser } from '../../../actions/Schema';
+import { fetchTags } from '../../../actions/Tag';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -161,6 +162,7 @@ class Players extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchTags();
     this.props.fetchOrganizations();
     this.props.fetchPlayers();
     this.subscription = interval$.subscribe(() => {
@@ -363,6 +365,7 @@ Players.propTypes = {
   users: PropTypes.array,
   fetchPlayers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
+  fetchTags: PropTypes.func,
 };
 
 const select = (state) => {
@@ -373,7 +376,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchPlayers, fetchOrganizations }),
+  connect(select, { fetchPlayers, fetchOrganizations, fetchTags }),
   inject18n,
   withStyles(styles),
 )(Players);

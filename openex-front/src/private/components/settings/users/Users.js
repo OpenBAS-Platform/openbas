@@ -24,6 +24,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import CreateUser from './CreateUser';
 import UserPopover from './UserPopover';
 import { storeBrowser } from '../../../../actions/Schema';
+import { fetchTags } from '../../../../actions/Tag';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -173,6 +174,7 @@ class Users extends Component {
   }
 
   componentDidMount() {
+    this.props.fetchTags();
     this.props.fetchOrganizations();
     this.props.fetchUsers();
     this.subscription = interval$.subscribe(() => {
@@ -367,6 +369,7 @@ Users.propTypes = {
   organizations: PropTypes.object,
   fetchUsers: PropTypes.func,
   fetchOrganizations: PropTypes.func,
+  fetchTags: PropTypes.func,
 };
 
 const select = (state) => {
@@ -377,7 +380,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchUsers, fetchOrganizations }),
+  connect(select, { fetchUsers, fetchOrganizations, fetchTags }),
   inject18n,
   withStyles(styles),
 )(Users);
