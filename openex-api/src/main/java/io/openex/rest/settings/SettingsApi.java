@@ -11,6 +11,7 @@ import io.openex.rest.settings.response.OAuthProvider;
 import io.openex.rest.settings.response.PlatformSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -36,13 +37,16 @@ import static java.util.Optional.ofNullable;
 public class SettingsApi extends RestBehavior {
 
     private SettingRepository settingRepository;
+    private ApplicationContext context;
     private Environment env;
 
     @Resource
-    private OAuth2ClientProperties properties;
-
-    @Resource
     private OpenExConfig openExConfig;
+
+    @Autowired
+    public void setContext(ApplicationContext context) {
+        this.context = context;
+    }
 
     @Autowired
     public void setSettingRepository(SettingRepository settingRepository) {
@@ -55,13 +59,19 @@ public class SettingsApi extends RestBehavior {
     }
 
     private List<OAuthProvider> buildProviders() {
-        Map<String, OAuth2ClientProperties.Provider> providers = properties.getProvider();
-        return providers.keySet().stream()
-                .map(s -> {
-                    String providerLogin = env.getProperty("openex.provider." + s + ".login", "Login with " + s);
-                    return new OAuthProvider(s, "/oauth2/authorization/" + s, providerLogin);
-                })
-                .toList();
+        try {
+            OAuth2ClientProperties properties = context.getBean(OAuth2ClientProperties.class);
+            Map<String, OAuth2ClientProperties.Provider> providers = properties.getProvider();
+            return providers.keySet().stream()
+                    .map(s -> {
+                        String providerLogin = env.getProperty("openex.provider." + s + ".login", "Login with " + s);
+                        return new OAuthProvider(s, "/oauth2/authorization/" + s, providerLogin);
+                    })
+                    .toList();
+        } catch (Exception e) {
+            // No provider defined in the configuration
+            return new ArrayList<>();
+        }
     }
 
     private PlatformSetting buildPlatformSetting(Map<String, Setting> dbSettings, SETTING_KEYS setting) {
