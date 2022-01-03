@@ -10,6 +10,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,14 @@ public class Audience implements Base {
     @JsonProperty("audience_exercise")
     private Exercise exercise;
 
+    @Column(name = "audience_created_at")
+    @JsonProperty("audience_created_at")
+    private Date createdAt = new Date();
+
+    @Column(name = "audience_updated_at")
+    @JsonProperty("audience_updated_at")
+    private Date updatedAt = new Date();
+    
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "audiences_tags",
             joinColumns = @JoinColumn(name = "audience_id"),
@@ -94,6 +103,14 @@ public class Audience implements Base {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public Date getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    public Date getUpdatedAt() { return updatedAt; }
+
+    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
 
     public List<Tag> getTags() {
         return tags;

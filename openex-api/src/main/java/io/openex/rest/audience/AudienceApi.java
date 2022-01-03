@@ -5,18 +5,22 @@ import io.openex.database.model.Exercise;
 import io.openex.database.model.User;
 import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ExerciseRepository;
+import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.database.specification.AudienceSpecification;
 import io.openex.rest.audience.form.AudienceUpdateActivationInput;
 import io.openex.rest.audience.form.CreateAudienceInput;
 import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.audience.form.AudienceUpdateInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
+
+import java.util.Date;
 
 import static io.openex.database.model.User.ROLE_USER;
 
@@ -27,6 +31,7 @@ public class AudienceApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private AudienceRepository audienceRepository;
     private UserRepository userRepository;
+    private TagRepository tagRepository;
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -41,6 +46,11 @@ public class AudienceApi extends RestBehavior {
     @Autowired
     public void setAudienceRepository(AudienceRepository audienceRepository) {
         this.audienceRepository = audienceRepository;
+    }
+
+    @Autowired
+    public void setTagRepository(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
     }
 
     @GetMapping("/api/exercises/{exerciseId}/audiences")
@@ -76,6 +86,17 @@ public class AudienceApi extends RestBehavior {
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteAudience(@PathVariable String audienceId) {
         audienceRepository.deleteById(audienceId);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Audience updateAudience(@PathVariable String audienceId,
+                                           @Valid @RequestBody AudienceUpdateInput input) {
+        Audience audience = audienceRepository.findById(audienceId).orElseThrow();
+        audience.setUpdateAttributes(input);
+        audience.setUpdatedAt(new Date());
+        audience.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        return audienceRepository.save(audience);
     }
 
     @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/players")
