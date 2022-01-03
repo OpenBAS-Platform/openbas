@@ -34,6 +34,12 @@ public abstract class InjectInput<T> {
     @JsonProperty("inject_content")
     private T content;
 
+    @JsonProperty("inject_country")
+    private String country;
+
+    @JsonProperty("inject_city")
+    private String city;
+
     public String getTitle() {
         return title;
     }
@@ -102,6 +108,22 @@ public abstract class InjectInput<T> {
         this.dependsDuration = dependsDuration;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public abstract Inject<T> injectInstance();
 
     public Inject<T> toInject() {
@@ -112,6 +134,8 @@ public abstract class InjectInput<T> {
         inject.setType(getType());
         inject.setContent(getContent());
         inject.setAllAudiences(getAllAudiences());
+        inject.setCountry(getCountry());
+        inject.setCity(getCity());
         return inject;
     }
 }

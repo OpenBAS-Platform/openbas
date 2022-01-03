@@ -10,6 +10,9 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
+import java.util.Optional;
+
 @Component
 public class FileService {
 
@@ -26,22 +29,31 @@ public class FileService {
         this.minioClient = minioClient;
     }
 
-    public void uploadFile(MultipartFile file) throws Exception {
+    public void uploadFile(String name, InputStream data, long size, String contentType) throws Exception {
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(minioConfig.getBucket())
-                        .object(file.getOriginalFilename())
-                        .stream(file.getInputStream(), file.getSize(), -1)
-                        .contentType(file.getContentType())
+                        .object(name)
+                        .stream(data, size, -1)
+                        .contentType(contentType)
                         .build());
     }
 
-    public InputStreamResource getFile(String fileName) throws Exception {
-        GetObjectResponse objectStream = minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(minioConfig.getBucket())
-                        .object(fileName)
-                        .build());
-        return new InputStreamResource(objectStream);
+    public void uploadFile(MultipartFile file) throws Exception {
+        uploadFile(file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
+    }
+
+    public Optional<InputStream> getFile(String fileName) {
+        try {
+            GetObjectResponse objectStream = minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(minioConfig.getBucket())
+                            .object(fileName)
+                            .build());
+            InputStreamResource streamResource = new InputStreamResource(objectStream);
+            return Optional.of(streamResource.getInputStream());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 }

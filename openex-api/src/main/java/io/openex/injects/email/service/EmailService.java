@@ -3,14 +3,13 @@ package io.openex.injects.email.service;
 import io.openex.database.model.Document;
 import io.openex.database.repository.DocumentRepository;
 import io.openex.helper.TemplateHelper;
+import io.openex.injects.base.InjectAttachment;
 import io.openex.injects.email.model.EmailAttachment;
-import io.openex.injects.email.model.EmailInjectAttachment;
 import io.openex.model.Execution;
 import io.openex.model.UserInjectContext;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -21,6 +20,7 @@ import javax.mail.Multipart;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,18 +56,18 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
-    public List<EmailAttachment> resolveAttachments(Execution execution, List<EmailInjectAttachment> attachments) {
+    public List<EmailAttachment> resolveAttachments(Execution execution, List<InjectAttachment> attachments) {
         List<EmailAttachment> resolved = new ArrayList<>();
-        for (EmailInjectAttachment attachment : attachments) {
-            String fileName = attachment.getName();
+        for (InjectAttachment attachment : attachments) {
+            String documentId = attachment.getId();
             try {
-                Document doc = documentRepository.findById(attachment.getId()).orElseThrow();
-                InputStreamResource fileInputStream = fileService.getFile(doc.getName());
-                byte[] content = IOUtils.toByteArray(fileInputStream.getInputStream());
-                resolved.add(new EmailAttachment(fileName, content, doc.getType()));
+                Document doc = documentRepository.findById(documentId).orElseThrow();
+                InputStream fileInputStream = fileService.getFile(doc.getName()).orElseThrow();
+                byte[] content = IOUtils.toByteArray(fileInputStream);
+                resolved.add(new EmailAttachment(doc.getName(), content, doc.getType()));
             } catch (Exception e) {
                 // Can't fetch the attachments, ignore
-                execution.addMessage("Error getting content for " + fileName);
+                execution.addMessage("Error getting content for " + documentId);
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         }

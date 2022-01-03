@@ -102,6 +102,15 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     private Outcome outcome;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "injects_tags",
+            joinColumns = @JoinColumn(name = "inject_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("inject_tags")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Tag> tags = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "injects_audiences",
             joinColumns = @JoinColumn(name = "inject_id"),
             inverseJoinColumns = @JoinColumn(name = "audience_id"))
@@ -278,6 +287,14 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     public void setDependsDuration(Long dependsDuration) {
         this.dependsDuration = dependsDuration;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     @JsonIgnore

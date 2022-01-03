@@ -6,43 +6,55 @@ import io.openex.database.repository.*;
 import io.openex.database.specification.ComcheckSpecification;
 import io.openex.database.specification.DryRunSpecification;
 import io.openex.database.specification.ExerciseLogSpecification;
+import io.openex.injects.base.AttachmentContent;
+import io.openex.injects.base.InjectAttachment;
 import io.openex.rest.exercise.export.ExerciseFileExport;
 import io.openex.rest.exercise.export.ExerciseFileImport;
 import io.openex.rest.exercise.export.ExerciseImport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
+import io.openex.service.FileService;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.time.Instant;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import static io.openex.config.AppConfig.currentUser;
+import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.resolveRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
+import static java.io.File.createTempFile;
 import static java.time.Instant.now;
 
 @RestController
 @RolesAllowed(ROLE_USER)
 public class ExerciseApi<T> extends RestBehavior {
+
+    private final static String EXPORT_ENTRY_EXERCISE = "Exercise";
+    private final static String EXPORT_ENTRY_ATTACHMENT = "Attachment";
 
     // region resources
     @Resource
@@ -58,22 +70,28 @@ public class ExerciseApi<T> extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private GroupRepository groupRepository;
     private AudienceRepository audienceRepository;
-    private InjectRepository injectRepository;
+    private InjectRepository<T> injectRepository;
     // endregion
 
     // region services
     private DryrunService<T> dryrunService;
+    private FileService fileService;
     // endregion
 
     // region setters
     @Autowired
-    public void setAudienceRepository(AudienceRepository audienceRepository) {
-        this.audienceRepository = audienceRepository;
+    public void setInjectRepository(InjectRepository<T> injectRepository) {
+        this.injectRepository = injectRepository;
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository injectRepository) {
-        this.injectRepository = injectRepository;
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
+
+    @Autowired
+    public void setAudienceRepository(AudienceRepository audienceRepository) {
+        this.audienceRepository = audienceRepository;
     }
 
     @Autowired
@@ -248,27 +266,19 @@ public class ExerciseApi<T> extends RestBehavior {
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }
 
-    @PostMapping("/api/exercises/{exerciseId}/export")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
-    public ResponseEntity<ExerciseFileExport> exerciseExport(@PathVariable String exerciseId) {
-        ExerciseFileExport importExport = new ExerciseFileExport();
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        importExport.setExercise(exercise);
-        importExport.setAudiences(exercise.getAudiences());
-        importExport.setInjects(exercise.getInjects());
-        importExport.setTags(exercise.getTags());
-        String attachmentName = "attachment; filename=" + exercise.getName() + "_" + Instant.now().toString() + ".json";
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, attachmentName)
-                .contentType(MediaType.parseMediaType("application/json"))
-                .body(importExport);
+    @GetMapping("/api/exercises")
+    @RolesAllowed(ROLE_USER)
+    public Iterable<Exercise> exercises() {
+        return currentUser().isAdmin() ?
+                exerciseRepository.findAll() :
+                exerciseRepository.findAllGranted(currentUser().getId());
     }
+    // endregion
 
-    @Transactional
-    @PostMapping("/api/exercises/import")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
-    public Exercise exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
-        ExerciseFileImport dataImport = mapper.readValue(file.getInputStream(), ExerciseFileImport.class);
+    // region import/export
+    private void handleDataImport(InputStream inputStream) throws IOException {
+        @SuppressWarnings("unchecked")
+        ExerciseFileImport<T> dataImport = mapper.readValue(inputStream, ExerciseFileImport.class);
         // Create tags
         Map<String, Tag> tagMap = fromIterable(tagRepository.findAll()).stream().collect(
                 Collectors.toMap(Tag::getName, Function.identity()));
@@ -304,17 +314,103 @@ public class ExerciseApi<T> extends RestBehavior {
                 }).toList();
         audienceRepository.saveAll(audiences);
         // Create injects
-        // TODO
-        // Return exercise
-        return exerciseRepository.findById(exercise.getId()).orElseThrow();
+        List<Inject<T>> injects = dataImport.getInjects().stream().map(injectInput -> {
+            Inject<T> inject = injectInput.toInject();
+            inject.setExercise(exercise);
+            inject.setDependsOn(resolveRelation(injectInput.getDependsOn(), injectRepository));
+            inject.setAudiences(fromIterable(audienceRepository.findAllById(injectInput.getAudiences())));
+            // inject.setUser(resolveRelation(injectInput.geUser(), userRepository));
+            return inject;
+        }).toList();
+        injectRepository.saveAll(injects);
     }
 
-    @GetMapping("/api/exercises")
-    @RolesAllowed(ROLE_USER)
-    public Iterable<Exercise> exercises() {
-        return currentUser().isAdmin() ?
-                exerciseRepository.findAll() :
-                exerciseRepository.findAllGranted(currentUser().getId());
+    @GetMapping("/api/exercises/{exerciseId}/export")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    public void exerciseExport(@PathVariable String exerciseId, HttpServletResponse response) throws IOException {
+        ExerciseFileExport importExport = new ExerciseFileExport();
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        // Build the response
+        String zipName = exercise.getName() + "_" + now().toString() + ".zip";
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
+        response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
+        response.setStatus(HttpServletResponse.SC_OK);
+        // Build the export
+        importExport.setExercise(exercise);
+        List<Tag> exerciseTags = new ArrayList<>(exercise.getTags());
+        // Audiences
+        List<Audience> audiences = exercise.getAudiences();
+        importExport.setAudiences(audiences);
+        exerciseTags.addAll(audiences.stream().flatMap(audience -> audience.getTags().stream()).toList());
+        // Injects
+        List<Inject<?>> injects = exercise.getInjects();
+        exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
+        importExport.setInjects(injects);
+        // Tags
+        importExport.setTags(exerciseTags);
+        // Documents
+        List<String> documentIds = injects.stream()
+                .map(Injection::getContent)
+                .filter(content -> content instanceof AttachmentContent)
+                .map(content -> (AttachmentContent) content)
+                .flatMap(attachmentContent -> attachmentContent.getAttachments().stream())
+                .map(InjectAttachment::getId).toList();
+        // Build the zip
+        ZipOutputStream zipExport = new ZipOutputStream(response.getOutputStream());
+        ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");
+        zipEntry.setComment(EXPORT_ENTRY_EXERCISE);
+        zipExport.putNextEntry(zipEntry);
+        zipExport.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
+        zipExport.closeEntry();
+        documentIds.forEach(docId -> {
+            Document doc = documentRepository.findById(docId).orElseThrow();
+            Optional<InputStream> docStream = fileService.getFile(doc.getName());
+            if (docStream.isPresent()) {
+                try {
+                    ZipEntry zipDoc = new ZipEntry(doc.getName());
+                    zipDoc.setComment(EXPORT_ENTRY_ATTACHMENT);
+                    byte[] data = docStream.get().readAllBytes();
+                    zipExport.putNextEntry(zipDoc);
+                    zipExport.write(data);
+                    zipExport.closeEntry();
+                } catch (IOException e) {
+                    // Cant add to zip
+                    e.printStackTrace();
+                }
+            }
+        });
+        zipExport.finish();
+        zipExport.close();
+    }
+
+    @Transactional
+    @PostMapping("/api/exercises/import")
+    @RolesAllowed(ROLE_ADMIN)
+    public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
+        // 01. Use a temporary file.
+        File tempFile = createTempFile("openex-import-" + now().getEpochSecond(), ".zip");
+        FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
+        // 02. Use this file to load zip with information
+        ZipFile zipFile = new ZipFile(tempFile);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        // Iter on each element to process it.
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
+            String entryType = entry.getComment();
+            InputStream zipInputStream = zipFile.getInputStream(entry);
+            switch (entryType) {
+                case EXPORT_ENTRY_EXERCISE -> handleDataImport(zipInputStream);
+                case EXPORT_ENTRY_ATTACHMENT -> {
+                    String entryName = entry.getName();
+                    String contentType = new MimetypesFileTypeMap().getContentType(entryName);
+                    fileService.uploadFile(entryName, zipInputStream, entry.getSize(), contentType);
+                }
+                default -> throw new UnsupportedOperationException("Cant import type " + entryType);
+            }
+        }
+        // 03. Delete the temporary file
+        //noinspection ResultOfMethodCallIgnored
+        tempFile.delete();
     }
     // endregion
 }
