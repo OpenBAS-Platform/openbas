@@ -74,7 +74,7 @@ const Login = (props) => {
       <Paper variant="outlined">
         <LoginForm onSubmit={onSubmit} />
       </Paper>
-      {(providers ?? []).map((provider) => (
+      {isOpenId && (providers ?? []).map((provider) => (
         <div key={provider.provider_name}>
           <Button
             component="a"
