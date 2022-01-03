@@ -9,7 +9,7 @@ import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.database.specification.AudienceSpecification;
 import io.openex.rest.audience.form.AudienceUpdateActivationInput;
-import io.openex.rest.audience.form.CreateAudienceInput;
+import io.openex.rest.audience.form.AudienceCreateInput;
 import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.audience.form.AudienceUpdateInput;
@@ -74,7 +74,7 @@ public class AudienceApi extends RestBehavior {
     @PostMapping("/api/exercises/{exerciseId}/audiences")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Audience createAudience(@PathVariable String exerciseId,
-                                   @Valid @RequestBody CreateAudienceInput input) {
+                                   @Valid @RequestBody AudienceCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Audience audience = new Audience();
         audience.setUpdateAttributes(input);

@@ -7,7 +7,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { connect } from 'react-redux';
-import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
@@ -21,7 +20,6 @@ import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import inject18n from '../../../../components/i18n';
-import { FIVE_SECONDS } from '../../../../utils/Time';
 import { fetchAudiencePlayers } from '../../../../actions/Audience';
 import { fetchOrganizations } from '../../../../actions/Organization';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -30,8 +28,6 @@ import ItemTags from '../../../../components/ItemTags';
 import PlayerPopover from '../../players/PlayerPopover';
 import { storeBrowser } from '../../../../actions/Schema';
 import AudienceAddPlayers from './AudienceAddPlayers';
-
-const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   header: {
@@ -173,14 +169,6 @@ class AudiencesPlayers extends Component {
     const { exerciseId, audienceId } = this.props;
     this.props.fetchOrganizations();
     this.props.fetchAudiencePlayers(exerciseId, audienceId);
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchOrganizations();
-      this.props.fetchAudiencePlayers(exerciseId, audienceId);
-    });
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
   }
 
   handleSearch(value) {

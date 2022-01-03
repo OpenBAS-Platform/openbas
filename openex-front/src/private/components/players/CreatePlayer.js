@@ -16,11 +16,16 @@ import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
 
-const styles = () => ({
+const styles = (theme) => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
     right: 30,
+  },
+  text: {
+    fontSize: 15,
+    color: theme.palette.primary.main,
+    fontWeight: 500,
   },
 });
 

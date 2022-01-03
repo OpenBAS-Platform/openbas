@@ -73,7 +73,10 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(this.props.audience.audience_id);
+    this.props.deleteAudience(
+      this.props.exercise.exercise_id,
+      this.props.audience.audience_id,
+    );
     this.handleCloseDelete();
   }
 

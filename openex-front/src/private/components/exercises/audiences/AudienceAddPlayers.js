@@ -19,19 +19,15 @@ import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
-import { interval } from 'rxjs';
 import { updateAudiencePlayers } from '../../../../actions/Audience';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
 import { fetchPlayers } from '../../../../actions/User';
-import { FIVE_SECONDS } from '../../../../utils/Time';
 import CreatePlayer from '../../players/CreatePlayer';
 import { resolveUserName } from '../../../../utils/String';
 
-const interval$ = interval(FIVE_SECONDS);
-
-const styles = (theme) => ({
+const styles = () => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
@@ -45,11 +41,6 @@ const styles = (theme) => ({
   },
   chip: {
     margin: '0 10px 10px 0',
-  },
-  text: {
-    fontSize: 15,
-    color: theme.palette.primary.main,
-    fontWeight: 800,
   },
 });
 
@@ -70,13 +61,6 @@ class AudienceAddPlayers extends Component {
 
   componentDidMount() {
     this.props.fetchPlayers();
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchPlayers();
-    });
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
   }
 
   handleOpen() {
