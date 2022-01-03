@@ -1,11 +1,12 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Route, Switch } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import Integrations from './Integrations';
+import { BoundaryRoute } from '../../../components/Error';
 
 const Index = () => (
   <Switch>
-    <Route exact path="/integrations" component={Integrations} />
+    <BoundaryRoute exact path="/integrations" component={Integrations} />
   </Switch>
 );
 

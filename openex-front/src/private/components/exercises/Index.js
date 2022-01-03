@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { Route, Switch, withRouter } from 'react-router-dom';
+import { Switch, withRouter } from 'react-router-dom';
 import * as R from 'ramda';
 import { connect } from 'react-redux';
 import { withStyles } from '@mui/styles';
@@ -15,6 +15,7 @@ import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
+import { BoundaryRoute } from '../../../components/Error';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -50,21 +51,21 @@ class Index extends Component {
           <ExerciseHeader exercise={exercise} />
           <div className="clearfix" />
           <Switch>
-            <Route
+            <BoundaryRoute
               exact
               path="/exercises/:exerciseId"
               render={(routeProps) => (
                 <Exercise {...routeProps} exercise={exercise} />
               )}
             />
-            <Route
+            <BoundaryRoute
               exact
               path="/exercises/:exerciseId/audiences"
               render={(routeProps) => (
                 <Audiences {...routeProps} exercise={exercise} />
               )}
             />
-            <Route
+            <BoundaryRoute
               exact
               path="/exercises/:exerciseId/scenario"
               render={(routeProps) => (

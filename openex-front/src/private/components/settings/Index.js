@@ -1,17 +1,18 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Route, Switch } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import Parameters from './Parameters';
 import Users from './users/Users';
 import Groups from './groups/Groups';
 import Tags from './tags/Tags';
+import { BoundaryRoute } from '../../../components/Error';
 
 const Index = () => (
   <Switch>
-    <Route exact path="/settings" component={Parameters} />
-    <Route exact path="/settings/users" component={Users} />
-    <Route exact path="/settings/groups" component={Groups} />
-    <Route exact path="/settings/tags" component={Tags} />
+    <BoundaryRoute exact path="/settings" component={Parameters} />
+    <BoundaryRoute exact path="/settings/users" component={Users} />
+    <BoundaryRoute exact path="/settings/groups" component={Groups} />
+    <BoundaryRoute exact path="/settings/tags" component={Tags} />
   </Switch>
 );
 

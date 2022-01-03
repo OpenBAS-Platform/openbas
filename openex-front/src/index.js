@@ -5,4 +5,9 @@ import './resources/css/main.css';
 import './resources/css/leaflet.css';
 import App from './app';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+<React.StrictMode>
+    <App />
+</React.StrictMode>,
+document.getElementById('root'),
+);

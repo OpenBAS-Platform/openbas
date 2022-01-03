@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Route, Switch } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
@@ -14,6 +14,7 @@ import Players from './components/players/Players';
 import Organizations from './components/organizations/Organizations';
 import Documents from './components/documents/Documents';
 import IndexIntegrations from './components/integrations/Index';
+import { BoundaryRoute } from '../components/Error';
 import IndexSettings from './components/settings/Index';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,16 +49,16 @@ const Index = () => {
       <main className={classes.content} style={{ paddingRight: 24 }}>
         <div className={classes.toolbar} />
         <Switch>
-          <Route exact path="/" component={Dashboard} />
-          <Route path="/profile" component={IndexProfile} />
-          <Route exact path="/exercises" component={Exercises} />
-          <Route path="/exercises/:exerciseId" component={IndexExercise} />
-          <Route exact path="/players" component={Players} />
-          <Route exact path="/organizations" component={Organizations} />
-          <Route exact path="/documents" component={Documents} />
-          <Route exact path="/integrations" component={IndexIntegrations} />
-          <Route path="/settings" component={IndexSettings} />
-          <Route component={NotFound} />
+          <BoundaryRoute exact path="/" component={Dashboard} />
+          <BoundaryRoute path="/profile" component={IndexProfile} />
+          <BoundaryRoute exact path="/exercises" component={Exercises} />
+          <BoundaryRoute path="/exercises/:exerciseId" component={IndexExercise} />
+          <BoundaryRoute exact path="/players" component={Players} />
+          <BoundaryRoute exact path="/organizations" component={Organizations} />
+          <BoundaryRoute exact path="/documents" component={Documents} />
+          <BoundaryRoute exact path="/integrations" component={IndexIntegrations} />
+          <BoundaryRoute path="/settings" component={IndexSettings} />
+          <BoundaryRoute component={NotFound} />
         </Switch>
       </main>
     </div>

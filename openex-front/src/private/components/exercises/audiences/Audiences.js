@@ -403,7 +403,7 @@ const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const { exercise } = ownProps;
   return {
-    audiences: browser.getExercise(exercise.exercise_id).getAudiences(),
+    audiences: undefined,
   };
 };
 

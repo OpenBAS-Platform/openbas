@@ -92,7 +92,7 @@ class ExerciseStatus extends Component {
 ExerciseStatus.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
-  status: PropTypes.number,
+  status: PropTypes.string,
 };
 
 export default R.compose(inject18n, withStyles(styles))(ExerciseStatus);
