@@ -15,12 +15,14 @@ import io.openex.model.Executor;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.InjectInput;
 import io.openex.rest.inject.form.InjectUpdateActivationInput;
+import io.openex.rest.inject.response.InjectNext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +35,8 @@ import static org.springframework.util.StringUtils.hasLength;
 
 @RestController
 public class InjectApi<T> extends RestBehavior {
+
+    private static final int MAX_NEXT_INJECTS = 10;
 
     private ExerciseRepository exerciseRepository;
     private InjectRepository<T> injectRepository;
@@ -141,5 +145,21 @@ public class InjectApi<T> extends RestBehavior {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());
         return injectRepository.save(inject);
+    }
+
+    @GetMapping("/api/injects/next")
+    public List<InjectNext> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
+        Comparator<Inject<T>> injectComparator = Comparator.comparing(Inject::getDate);
+        return injectRepository.findAll(InjectSpecification.executable()).stream()
+                // Keep only injects visible by the user
+                .filter(inject -> inject.getExercise().isUserObserver(currentUser()))
+                // Order by near execution
+                .sorted(injectComparator.reversed())
+                // Keep only the expected size
+                .limit(size.orElse(MAX_NEXT_INJECTS))
+                // Map to NextInject to keep only useful information
+                .map(i -> new InjectNext(i.getTitle(), i.getDescription(), i.getType(), i.getDate()))
+                // Collect the result
+                .toList();
     }
 }
