@@ -10,9 +10,7 @@ export const fetchComchecks = (exerciseId, noloading) => (dispatch) => {
   return getReferential(schema.arrayOfComchecks, uri, noloading)(dispatch);
 };
 
-export const fetchComcheck = (exerciseId, comcheckId, noloading) => (
-  dispatch,
-) => {
+export const fetchComcheck = (exerciseId, comcheckId, noloading) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/comchecks/${comcheckId}`;
   return getReferential(schema.comcheck, uri, noloading)(dispatch);
 };
@@ -27,9 +25,7 @@ export const deleteComcheck = (exerciseId, comcheckId) => (dispatch) => {
   return delReferential(uri, 'comchecks', comcheckId)(dispatch);
 };
 
-export const fetchComcheckStatuses = (exerciseId, comcheckId, noloading) => (
-  dispatch,
-) => {
+export const fetchComcheckStatuses = (exerciseId, comcheckId, noloading) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/comchecks/${comcheckId}/statuses`;
   return getReferential(
     schema.arrayOfComcheckStatuses,

@@ -12,10 +12,6 @@ const initialState = {
     logged: {},
     worker: { status: 'RUNNING' },
   }),
-  screen: Immutable({
-    navbar_left_unfolding: true,
-    navbar_left_configuration: true,
-  }),
   referential: entitiesInitializer,
 };
 

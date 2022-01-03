@@ -134,16 +134,11 @@ class CreateInject extends Component {
 
   createInject() {
     const data = this.state.injectData;
-    this.props
-      .addInject(
-        this.props.exerciseId,
-        data,
-      )
-      .then(() => {
-        // this.props.fetchIncident(
-        //   this.props.exerciseId,
-        // );
-      });
+    this.props.addInject(this.props.exerciseId, data).then(() => {
+      // this.props.fetchIncident(
+      //   this.props.exerciseId,
+      // );
+    });
     this.handleClose();
   }
 

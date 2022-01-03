@@ -198,10 +198,7 @@ class IndexAudience extends Component {
 
   renderUsers() {
     const {
-      classes,
-      exerciseId,
-      audienceId,
-      audience,
+      classes, exerciseId, audienceId, audience,
     } = this.props;
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
@@ -297,10 +294,7 @@ class IndexAudience extends Component {
 
   render() {
     const {
-      classes,
-      exerciseId,
-      audienceId,
-      audience,
+      classes, exerciseId, audienceId, audience,
     } = this.props;
     if (audience) {
       return (
@@ -325,7 +319,7 @@ class IndexAudience extends Component {
             <SearchField onChange={this.handleSearchUsers.bind(this)} />
           </div>
           <div className="clearfix" />
-          { this.renderUsers() }
+          {this.renderUsers()}
         </div>
       );
     }
@@ -365,7 +359,10 @@ const select = (state, ownProps) => {
   const exercise = browser.getExercise(exerciseId);
   const audience = R.prop(audienceId, state.referential.entities.audiences);
   const audiences = exercise.getAudiences();
-  const comchecks = filterComchecks(state.referential.entities.comchecks, audienceId);
+  const comchecks = filterComchecks(
+    state.referential.entities.comchecks,
+    audienceId,
+  );
   return {
     exerciseId,
     exercise,

@@ -24,6 +24,7 @@ import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import CreateExercise from './CreateExercise';
 import { storeBrowser } from '../../../actions/Schema';
+import ExerciseStatus from './ExerciseStatus';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -92,7 +93,7 @@ const inlineStylesHeaders = {
     fontSize: 12,
     fontWeight: '700',
   },
-  exercise_end_date: {
+  exercise_status: {
     float: 'left',
     width: '15%',
     fontSize: 12,
@@ -100,6 +101,7 @@ const inlineStylesHeaders = {
   },
   exercise_tags: {
     float: 'left',
+    width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -130,7 +132,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  exercise_end_date: {
+  exercise_status: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -140,6 +142,7 @@ const inlineStyles = {
   },
   exercise_tags: {
     float: 'left',
+    width: '30%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -285,7 +288,7 @@ class Exercises extends Component {
                   {this.sortHeader('exercise_name', 'Name', true)}
                   {this.sortHeader('exercise_subtitle', 'Subtitle', true)}
                   {this.sortHeader('exercise_start_date', 'Start date', true)}
-                  {this.sortHeader('exercise_end_date', 'End date', true)}
+                  {this.sortHeader('exercise_status', 'Status', true)}
                   {this.sortHeader('exercise_tags', 'Tags', true)}
                 </div>
               }
@@ -333,9 +336,10 @@ class Exercises extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.exercise_start_date}
                     >
-                      {exercise.exercise_end_date
-                        ? nsdt(exercise.exercise_end_date)
-                        : '-'}
+                      <ExerciseStatus
+                        variant="list"
+                        status={exercise.exercise_status}
+                      />
                     </div>
                     <div
                       className={classes.bodyItem}

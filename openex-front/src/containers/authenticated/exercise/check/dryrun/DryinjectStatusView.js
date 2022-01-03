@@ -47,7 +47,11 @@ class DryinjectStatusView extends Component {
       'dryinject_status',
       this.props.dryinject,
     );
-    const dryinjectMessageLines = R.propOr([], 'messages', dryinjectStatus?.status_message);
+    const dryinjectMessageLines = R.propOr(
+      [],
+      'messages',
+      dryinjectStatus?.status_message,
+    );
     const time = convertToCountdown(dryinjectStatus.status_execution);
 
     return (

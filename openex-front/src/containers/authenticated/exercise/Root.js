@@ -119,7 +119,11 @@ class RootExercise extends Component {
               {R.propOr('', 'exercise_name', exercise)}
             </div>
             <Chip
-              style={{ marginLeft: 20, backgroundColor: color, color: '#ffffff' }}
+              style={{
+                marginLeft: 20,
+                backgroundColor: color,
+                color: '#ffffff',
+              }}
               variant="outlined"
               label={
                 <T>{R.propOr('SCHEDULED', 'exercise_status', exercise)}</T>
@@ -129,7 +133,8 @@ class RootExercise extends Component {
               component={Link}
               to="/private/documents"
               className={classes.documents}
-              size="large">
+              size="large"
+            >
               <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />

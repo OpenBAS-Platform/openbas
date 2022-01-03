@@ -109,8 +109,11 @@ class AddUsers extends Component {
       R.map((u) => u.user_id),
       R.concat(this.props.audienceUsersIds),
     )(this.state.users);
-    this.props.updateAudienceUsers(this.props.exerciseId,
-      this.props.audienceId, { audience_users: userIds });
+    this.props.updateAudienceUsers(
+      this.props.exerciseId,
+      this.props.audienceId,
+      { audience_users: userIds },
+    );
     this.handleCloseAddUsers();
   }
 

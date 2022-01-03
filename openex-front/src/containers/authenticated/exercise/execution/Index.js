@@ -33,7 +33,10 @@ import { T } from '../../../../components/I18n';
 import Countdown from '../../../../components/Countdown';
 import { fetchGroups } from '../../../../actions/Group';
 import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import {
+  fetchExerciseInjects,
+  fetchInjectTypes,
+} from '../../../../actions/Inject';
 import { downloadFile } from '../../../../actions/File';
 import ExercisePopover from './ExercisePopover';
 import InjectPopover from '../scenario/InjectPopover';
@@ -173,7 +176,11 @@ class IndexExecution extends Component {
 
   render() {
     const { classes } = this.props;
-    const exerciseStatus = R.propOr('SCHEDULED', 'exercise_status', this.props.exercise);
+    const exerciseStatus = R.propOr(
+      'SCHEDULED',
+      'exercise_status',
+      this.props.exercise,
+    );
     const userCanUpdate = this.props.exercise?.user_can_update;
     const countdown = this.props.nextInject && (
       <Countdown targetDate={this.props.nextInject} />
@@ -239,7 +246,8 @@ class IndexExecution extends Component {
                   'inject_audiences',
                   inject,
                 );
-                const injectInProgress = R.path(['inject_status', 'status_name'], inject) === 'PENDING';
+                const injectInProgress = R.path(['inject_status', 'status_name'], inject)
+                  === 'PENDING';
                 const injectIcon = injectInProgress ? (
                   <CircularProgress size={20} color="primary" />
                 ) : (

@@ -74,7 +74,8 @@ class CreateExercise extends Component {
           onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
-          className={classes.createButton}>
+          className={classes.createButton}
+        >
           <Add />
         </Fab>
         <Dialog
@@ -94,24 +95,25 @@ class CreateExercise extends Component {
           </DialogContent>
         </Dialog>
         <Fab
-            onClick={this.handleOpenImport.bind(this)}
-            color="primary"
-            aria-label="Add"
-            className={classes.importButton}>
+          onClick={this.handleOpenImport.bind(this)}
+          color="primary"
+          aria-label="Add"
+          className={classes.importButton}
+        >
           <ImportExport />
         </Fab>
         <Dialog
-            open={this.state.openImport}
-            TransitionComponent={Transition}
-            onClose={this.handleClose.bind(this)}
-            fullWidth={true}
-            maxWidth="md"
+          open={this.state.openImport}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
           <DialogTitle>{t('Import an exercise')}</DialogTitle>
           <DialogContent>
             <ExerciseImportForm
-                onSubmit={this.onSubmitImport.bind(this)}
-                handleClose={this.handleClose.bind(this)}
+              onSubmit={this.onSubmitImport.bind(this)}
+              handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>
         </Dialog>

@@ -116,7 +116,7 @@ class UserPopover extends Component {
     }));
     const initialValues = R.pipe(
       R.assoc('user_organization', userOrganization),
-      R.assoc('user_tags', userTags.asMutable()),
+      R.assoc('user_tags', userTags),
       R.pick([
         'user_firstname',
         'user_lastname',

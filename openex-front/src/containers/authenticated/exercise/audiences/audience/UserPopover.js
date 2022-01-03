@@ -74,9 +74,14 @@ class UserPopover extends Component {
   }
 
   submitDelete() {
-    const userIds = this.props.audience.audience_users.filter((a) => a !== this.props.user.user_id);
-    this.props.updateAudienceUsers(this.props.exerciseId,
-      this.props.audience.audience_id, { audience_users: userIds });
+    const userIds = this.props.audience.audience_users.filter(
+      (a) => a !== this.props.user.user_id,
+    );
+    this.props.updateAudienceUsers(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      { audience_users: userIds },
+    );
     this.handleCloseDelete();
   }
 
@@ -114,7 +119,8 @@ class UserPopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu

@@ -23,9 +23,7 @@ class TopMenuIntegrations extends Component {
         <Button
           component={Link}
           to="/"
-          variant={
-            location.pathname === '/integrations' ? 'contained' : 'text'
-          }
+          variant={location.pathname === '/integrations' ? 'contained' : 'text'}
           size="small"
           color={
             location.pathname === '/integrations' ? 'secondary' : 'inherit'

@@ -79,7 +79,10 @@ class ObjectivePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteObjective(this.props.exerciseId, this.props.objective.objective_id);
+    this.props.deleteObjective(
+      this.props.exerciseId,
+      this.props.objective.objective_id,
+    );
     this.handleCloseDelete();
   }
 
@@ -103,7 +106,8 @@ class ObjectivePopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu

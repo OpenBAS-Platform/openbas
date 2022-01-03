@@ -239,8 +239,14 @@ const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const exercise = state.referential.entities.exercises[exerciseId];
   const dryruns = filterDryruns(state.referential.entities.dryruns, exerciseId);
-  const comchecks = filterComchecks(state.referential.entities.comchecks, exerciseId);
-  const audiences = filterAudiences(state.referential.entities.audiences, exerciseId);
+  const comchecks = filterComchecks(
+    state.referential.entities.comchecks,
+    exerciseId,
+  );
+  const audiences = filterAudiences(
+    state.referential.entities.audiences,
+    exerciseId,
+  );
   return {
     exerciseId,
     exercise,

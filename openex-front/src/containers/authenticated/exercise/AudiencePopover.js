@@ -14,7 +14,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Slide from '@mui/material/Slide';
 import { T } from '../../../components/I18n';
 import { i18nRegister } from '../../../utils/Messages';
-import { updateAudience, updateAudienceActivation } from '../../../actions/Audience';
+import {
+  updateAudience,
+  updateAudienceActivation,
+} from '../../../actions/Audience';
 
 i18nRegister({
   fr: {
@@ -102,7 +105,8 @@ class AudiencePopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu
@@ -191,4 +195,6 @@ AudiencePopover.propTypes = {
   updateAudienceActivation: PropTypes.func,
 };
 
-export default connect(null, { updateAudience, updateAudienceActivation })(AudiencePopover);
+export default connect(null, { updateAudience, updateAudienceActivation })(
+  AudiencePopover,
+);

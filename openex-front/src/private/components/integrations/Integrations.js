@@ -50,9 +50,7 @@ class Integrations extends Component {
             </Paper>
           </Grid>
           <Grid item={true} xs={6}>
-            <Typography variant="overline">
-              {t('Contracts')}
-            </Typography>
+            <Typography variant="overline">{t('Contracts')}</Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <List style={{ paddingTop: 0 }}>
                 <ListItem divider={true}>

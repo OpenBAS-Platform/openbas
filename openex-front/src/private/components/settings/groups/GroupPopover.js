@@ -43,8 +43,9 @@ import { storeBrowser } from '../../../../actions/Schema';
 const styles = () => ({
   box: {
     width: '100%',
+    minHeight: '100%',
     padding: 20,
-    border: '1px dashed rgba(255, 255, 255, 0.15)',
+    border: '1px dashed rgba(255, 255, 255, 0.3)',
   },
   chip: {
     margin: '0 10px 10px 0',
@@ -183,9 +184,17 @@ class GroupPopover extends Component {
     );
     const { keyword } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || n.user_email.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || n.user_firstname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || n.user_lastname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_organization || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(users);
     return (
       <div>
@@ -266,8 +275,8 @@ class GroupPopover extends Component {
           maxWidth="md"
           PaperProps={{
             sx: {
-              minHeight: '50vh',
-              maxHeight: '50vh',
+              minHeight: 480,
+              maxHeight: 480,
             },
           }}
         >
@@ -281,10 +290,7 @@ class GroupPopover extends Component {
                 />
                 <List>
                   {filteredUsers.map((user) => {
-                    const disabled = R.find(
-                      (userId) => userId === user.user_id,
-                      this.state.usersIds,
-                    ) !== undefined;
+                    const disabled = this.state.usersIds.includes(user.user_id);
                     const organizationName = R.propOr(
                       '-',
                       'organization_name',

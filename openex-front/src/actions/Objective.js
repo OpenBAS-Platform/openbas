@@ -16,9 +16,7 @@ export const fetchObjective = (exerciseId, objectiveId) => (dispatch) => {
   return getReferential(schema.objective, uri)(dispatch);
 };
 
-export const updateObjective = (exerciseId, objectiveId, data) => (
-  dispatch,
-) => {
+export const updateObjective = (exerciseId, objectiveId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}`;
   return putReferential(schema.objective, uri, data)(dispatch);
 };

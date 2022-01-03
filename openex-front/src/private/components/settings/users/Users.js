@@ -333,13 +333,17 @@ class Users extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.user_admin}
                     >
-                      {user.user_admin ? <CheckCircleOutlined fontSize="small" /> : '-'}
+                      {user.user_admin ? (
+                        <CheckCircleOutlined fontSize="small" />
+                      ) : (
+                        '-'
+                      )}
                     </div>
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.user_tags}
                     >
-                      <ItemTags variant="list" tags={user.getTags()} />
+                      <ItemTags variant="list" tags={user.getTags('tag_name', true, 3)} />
                     </div>
                   </div>
                 }

@@ -13,6 +13,8 @@ import { FIVE_SECONDS } from '../../../utils/Time';
 import Loader from '../../../components/Loader';
 import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
+import Audiences from './audiences/Audiences';
+import Injects from './injects/Injects';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -46,12 +48,27 @@ class Index extends Component {
         <div className={classes.root}>
           <TopBar />
           <ExerciseHeader exercise={exercise} />
+          <div className="clearfix" />
           <Switch>
             <Route
               exact
               path="/exercises/:exerciseId"
               render={(routeProps) => (
                 <Exercise {...routeProps} exercise={exercise} />
+              )}
+            />
+            <Route
+              exact
+              path="/exercises/:exerciseId/audiences"
+              render={(routeProps) => (
+                <Audiences {...routeProps} exercise={exercise} />
+              )}
+            />
+            <Route
+              exact
+              path="/exercises/:exerciseId/scenario"
+              render={(routeProps) => (
+                <Injects {...routeProps} exercise={exercise} />
               )}
             />
           </Switch>

@@ -171,10 +171,11 @@ export const storeBrowser = (state) => ({
       isAdmin() {
         return usr.user_admin === true;
       },
-      getTags() {
-        return usr.user_tags
-          .map((id) => state.referential.entities.tags[id])
+      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
+        const tags = usr.user_tags
+          .map((tagId) => state.referential.entities.tags[tagId])
           .filter((t) => t !== undefined);
+        return sort(tags, sortBy, orderAsc, limit);
       },
       getOrganization() {
         return state.referential.entities.organizations[usr.user_organization];
@@ -186,9 +187,16 @@ export const storeBrowser = (state) => ({
     };
   },
   _buildAudience(aud) {
+    if (aud === undefined) return aud;
     const browser = this;
     return {
       ...aud,
+      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
+        const tags = aud.audience_tags
+          .map((tagId) => state.referential.entities.tags[tagId])
+          .filter((t) => t !== undefined);
+        return sort(tags, sortBy, orderAsc, limit);
+      },
       getUsers() {
         const all = R.values(state.referential.entities.users);
         return R.filter((n) => aud.audience_users.includes(n.user_id), all).map(
@@ -200,10 +208,11 @@ export const storeBrowser = (state) => ({
   _buildOrganization(org) {
     return {
       ...org,
-      getTags() {
-        return org.organization_tags
-          .map((id) => state.referential.entities.tags[id])
+      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
+        const tags = org.organization_tags
+          .map((tagId) => state.referential.entities.tags[tagId])
           .filter((t) => t !== undefined);
+        return sort(tags, sortBy, orderAsc, limit);
       },
     };
   },
@@ -246,13 +255,11 @@ export const storeBrowser = (state) => ({
     return {
       ...doc,
       document_id: id,
-      getTags() {
-        return (
-          doc.document_tags
-          || []
-            .map((tagId) => state.referential.entities.tags[tagId])
-            .filter((t) => t !== undefined)
-        );
+      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
+        const tags = doc.document_tags
+          .map((tagId) => state.referential.entities.tags[tagId])
+          .filter((t) => t !== undefined);
+        return sort(tags, sortBy, orderAsc, limit);
       },
     };
   },
@@ -290,6 +297,10 @@ export const storeBrowser = (state) => ({
   getExercise(id) {
     const ex = state.referential.entities.exercises[id];
     return this._buildExercise(id, ex);
+  },
+  getAudience(id) {
+    const aud = state.referential.entities.audiences[id];
+    return this._buildAudience(aud);
   },
   getTags(sortBy = 'tag_name', orderAsc = true) {
     return sort(R.values(state.referential.entities.tags), sortBy, orderAsc);

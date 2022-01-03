@@ -251,12 +251,6 @@ LeftBar.propTypes = {
   configuration: PropTypes.bool,
 };
 
-const select = (state) => ({
-  unfolding: state.screen.navbar_left_unfolding,
-  configuration: state.screen.navbar_left_configuration,
-  loading: state.screen.loading || false,
-});
-
 export default R.compose(
   connect(select, {
     redirectToExercise,

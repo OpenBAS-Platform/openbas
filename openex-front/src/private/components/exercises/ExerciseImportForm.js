@@ -34,17 +34,15 @@ class ExerciseImportForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, submitting, pristine,
-        }) => (
+        {({ handleSubmit, submitting, pristine }) => (
           <form id="documentForm" onSubmit={handleSubmit}>
             <FileField
-                variant="standard"
-                type="file"
-                name="document_file"
-                fullWidth={true}
-                label={t('File')}
-                style={{ marginTop: 20 }}
+              variant="standard"
+              type="file"
+              name="document_file"
+              fullWidth={true}
+              label={t('File')}
+              style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

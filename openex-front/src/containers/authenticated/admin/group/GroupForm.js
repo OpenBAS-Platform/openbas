@@ -33,11 +33,7 @@ class GroupForm extends Component {
       >
         {({ handleSubmit }) => (
           <form id="groupForm" onSubmit={handleSubmit}>
-            <TextField
-              name="group_name"
-              fullWidth={true}
-              label={<T>Name</T>}
-            />
+            <TextField name="group_name" fullWidth={true} label={<T>Name</T>} />
           </form>
         )}
       </Form>

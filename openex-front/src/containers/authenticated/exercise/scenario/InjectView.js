@@ -113,9 +113,9 @@ class InjectView extends Component {
           ) : (
             <List>
               {this.props.inject.inject_audiences.map((id) => {
-                const audience = R.find(
-                  (a) => a.audience_id === id,
-                )(this.props.audiences);
+                const audience = R.find((a) => a.audience_id === id)(
+                  this.props.audiences,
+                );
                 const audienceId = R.propOr('-', 'audience_id', audience);
                 const audienceName = R.propOr('-', 'audience_name', audience);
 

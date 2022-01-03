@@ -389,7 +389,8 @@ class CreateExercise extends Component {
         <IconButton
           className={classes.import}
           onClick={this.openFileDialog.bind(this)}
-          size="large">
+          size="large"
+        >
           <CloudUploadOutlined fontSize="default" />
         </IconButton>
         <input

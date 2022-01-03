@@ -434,7 +434,8 @@ class Index extends Component {
               component={Link}
               to="/private/documents"
               className={classes.documents}
-              size="large">
+              size="large"
+            >
               <DescriptionOutlined fontSize="default" />
             </IconButton>
             <UserPopover />
@@ -581,7 +582,10 @@ class Index extends Component {
                   </ListItemIcon>
                   <ListItemText primary={tag.tag_name} />
                   <ListItemSecondaryAction>
-                    <IconButton onClick={this.handleOpenConfirmDeleteTag.bind(this, tag)} size="large">
+                    <IconButton
+                      onClick={this.handleOpenConfirmDeleteTag.bind(this, tag)}
+                      size="large"
+                    >
                       <DeleteOutlined />
                     </IconButton>
                   </ListItemSecondaryAction>

@@ -178,15 +178,9 @@ class ScenarioPopover extends Component {
       exerciseEndDateSimulate: '',
       exerciseDurationSimulate: '',
     };
-    this.handleChangeCheckContinuousDays = this.handleChangeCheckContinuousDays.bind(
-      this,
-    );
-    this.handleChangeCheckUseCloseHours = this.handleChangeCheckUseCloseHours.bind(
-      this,
-    );
-    this.handleChangeDurationDesired = this.handleChangeDurationDesired.bind(
-      this,
-    );
+    this.handleChangeCheckContinuousDays = this.handleChangeCheckContinuousDays.bind(this);
+    this.handleChangeCheckUseCloseHours = this.handleChangeCheckUseCloseHours.bind(this);
+    this.handleChangeDurationDesired = this.handleChangeDurationDesired.bind(this);
     this.handleChangeStartTimeDay = this.handleChangeStartTimeDay.bind(this);
     this.handleChangeEndTimeDay = this.handleChangeEndTimeDay.bind(this);
   }
@@ -406,7 +400,8 @@ class ScenarioPopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu

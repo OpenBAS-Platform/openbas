@@ -67,7 +67,8 @@ class CreateTag extends Component {
           onClick={this.handleOpen.bind(this)}
           aria-label="Add"
           className={classes.createButton}
-          size="large">
+          size="large"
+        >
           <Add color="secondary" />
         </IconButton>
         <Dialog

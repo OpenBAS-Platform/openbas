@@ -91,32 +91,32 @@ class IndexObjective extends Component {
         )}
         <List>
           {objectives.map((objective) => (
-              <div key={objective.objective_id}>
-                <ListItem
-                  onClick={this.handleOpenObjective.bind(this, objective)}
-                  button={true}
-                  divider={true}
-                >
-                  <ListItemIcon>
-                    <CenterFocusStrongOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={objective.objective_title}
-                    secondary={objective.objective_description}
-                  />
-                  <div className={classes.priority}>
-                    {objective.objective_priority}
-                  </div>
-                  {userCanUpdate && (
-                    <ListItemSecondaryAction>
-                      <ObjectivePopover
-                        exerciseId={exerciseId}
-                        objective={objective}
-                      />
-                    </ListItemSecondaryAction>
-                  )}
-                </ListItem>
-              </div>
+            <div key={objective.objective_id}>
+              <ListItem
+                onClick={this.handleOpenObjective.bind(this, objective)}
+                button={true}
+                divider={true}
+              >
+                <ListItemIcon>
+                  <CenterFocusStrongOutlined />
+                </ListItemIcon>
+                <ListItemText
+                  primary={objective.objective_title}
+                  secondary={objective.objective_description}
+                />
+                <div className={classes.priority}>
+                  {objective.objective_priority}
+                </div>
+                {userCanUpdate && (
+                  <ListItemSecondaryAction>
+                    <ObjectivePopover
+                      exerciseId={exerciseId}
+                      objective={objective}
+                    />
+                  </ListItemSecondaryAction>
+                )}
+              </ListItem>
+            </div>
           ))}
         </List>
         <Dialog
@@ -140,9 +140,7 @@ class IndexObjective extends Component {
             </Button>
           </DialogActions>
         </Dialog>
-        {userCanUpdate && (
-          <CreateObjective exerciseId={exerciseId} />
-        )}
+        {userCanUpdate && <CreateObjective exerciseId={exerciseId} />}
       </div>
     );
   }
@@ -166,7 +164,10 @@ const filterObjectives = (objectives, exerciseId) => {
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const exercise = state.referential.entities.exercises[ownProps.id];
-  const objectives = filterObjectives(state.referential.entities.objectives, exerciseId);
+  const objectives = filterObjectives(
+    state.referential.entities.objectives,
+    exerciseId,
+  );
   return { exerciseId, exercise, objectives };
 };
 

@@ -84,7 +84,7 @@ class OrganizationPopover extends Component {
       color: tag.tag_color,
     }));
     const initialValues = R.pipe(
-      R.assoc('organization_tags', organizationTags.asMutable()),
+      R.assoc('organization_tags', organizationTags),
       R.pick([
         'organization_name',
         'organization_description',

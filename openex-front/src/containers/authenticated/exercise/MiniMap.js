@@ -49,14 +49,20 @@ const MiniMap = (props) => {
           zoomControl={false}
         >
           <TileLayer url={parameters.map_tile_server} />
-          {R.filter((n) => n.inject_latitude && n.inject_longitude, injects || []).map((inject) => (
+          {R.filter(
+            (n) => n.inject_latitude && n.inject_longitude,
+            injects || [],
+          ).map((inject) => (
             <Marker
               key={inject.inject_id}
               position={[inject.inject_latitude, inject.inject_longitude]}
               icon={injectIcon}
             />
           ))}
-          {R.filter((n) => n.user_latitude && n.user_longitude, users || []).map((user) => (
+          {R.filter(
+            (n) => n.user_latitude && n.user_longitude,
+            users || [],
+          ).map((user) => (
             <Marker
               key={user.user_id}
               position={[user.user_latitude, user.user_longitude]}

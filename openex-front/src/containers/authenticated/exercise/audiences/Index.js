@@ -114,9 +114,7 @@ class IndexAudiences extends Component {
             </ListItem>
           ))}
         </List>
-        {userCanUpdate && (
-          <CreateAudience exerciseId={this.props.exerciseId} />
-        )}
+        {userCanUpdate && <CreateAudience exerciseId={this.props.exerciseId} />}
       </div>
     );
   }
@@ -141,7 +139,10 @@ const filteredAudiences = (audiences, exerciseId) => {
 const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const exercise = state.referential.entities.exercises[ownProps.id];
-  const audiences = filteredAudiences(state.referential.entities.audiences, exerciseId);
+  const audiences = filteredAudiences(
+    state.referential.entities.audiences,
+    exerciseId,
+  );
   return {
     exerciseId,
     exercise,

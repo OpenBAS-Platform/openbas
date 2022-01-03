@@ -74,19 +74,21 @@ const Login = (props) => {
       <Paper variant="outlined">
         <LoginForm onSubmit={onSubmit} />
       </Paper>
-      {(providers ?? [])
-        .map((provider) => <div key={provider.provider_name}>
+      {(providers ?? []).map((provider) => (
+        <div key={provider.provider_name}>
           <Button
-              component="a"
-              href={provider.provider_uri}
-              variant="outlined"
-              color="secondary"
-              size="small"
-              style={{ marginTop: 20 }}
-              startIcon={<VpnKeyOutlined />}>
+            component="a"
+            href={provider.provider_uri}
+            variant="outlined"
+            color="secondary"
+            size="small"
+            style={{ marginTop: 20 }}
+            startIcon={<VpnKeyOutlined />}
+          >
             <span>{t(provider.provider_login)}</span>
           </Button>
-      </div>)}
+        </div>
+      ))}
     </div>
   );
 };

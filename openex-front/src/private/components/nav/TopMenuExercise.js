@@ -79,17 +79,15 @@ class TopMenuExercise extends Component {
         </Button>
         <Button
           component={Link}
-          to={`/exercises/${exerciseId}/knowledge`}
+          to={`/exercises/${exerciseId}/execution`}
           variant={
-            location.pathname.includes(
-              `/exercises/exercises/${exerciseId}/knowledge`,
-            )
+            location.pathname.includes(`/exercises/${exerciseId}/execution`)
               ? 'contained'
               : 'text'
           }
           size="small"
           color={
-            location.pathname.includes(`/exercises/${exerciseId}/knowledge`)
+            location.pathname.includes(`/exercises/${exerciseId}/execution`)
               ? 'secondary'
               : 'inherit'
           }
@@ -99,39 +97,39 @@ class TopMenuExercise extends Component {
         </Button>
         <Button
           component={Link}
-          to={`/exercises/${exerciseId}/analysis`}
+          to={`/exercises/${exerciseId}/audiences`}
           variant={
-            location.pathname === `/exercises/${exerciseId}/analysis`
+            location.pathname.includes(`/exercises/${exerciseId}/audiences`)
               ? 'contained'
               : 'text'
           }
           size="small"
           color={
-            location.pathname === `/exercises/${exerciseId}/analysis`
+            location.pathname.includes(`/exercises/${exerciseId}/audiences`)
+              ? 'secondary'
+              : 'inherit'
+          }
+          classes={{ root: classes.button }}
+        >
+          {t('Audiences')}
+        </Button>
+        <Button
+          component={Link}
+          to={`/exercises/${exerciseId}/scenario`}
+          variant={
+            location.pathname === `/exercises/${exerciseId}/scenario`
+              ? 'contained'
+              : 'text'
+          }
+          size="small"
+          color={
+            location.pathname === `/exercises/${exerciseId}/scenario`
               ? 'secondary'
               : 'inherit'
           }
           classes={{ root: classes.button }}
         >
           {t('Scenario')}
-        </Button>
-        <Button
-          component={Link}
-          to={`/exercises/${exerciseId}/indicators`}
-          variant={
-            location.pathname.includes(`/exercises/${exerciseId}/indicators`)
-              ? 'contained'
-              : 'text'
-          }
-          size="small"
-          color={
-            location.pathname.includes(`/exercises/${exerciseId}/indicators`)
-              ? 'secondary'
-              : 'inherit'
-          }
-          classes={{ root: classes.button }}
-        >
-          {t('Interactions')}
         </Button>
         <Button
           component={Link}

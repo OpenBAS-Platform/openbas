@@ -12,9 +12,9 @@ export const fetchInjects = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
-export const fetchExerciseInjects = (exerciseId, noloading) => (dispatch) => {
+export const fetchExerciseInjects = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
-  return getReferential(schema.arrayOfInjects, uri, noloading)(dispatch);
+  return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
 export const downloadExportInjects = (exerciseId) => (dispatch) => fileSave(
@@ -32,23 +32,17 @@ export const updateInjectActivation = (exerciseId, injectId, data) => (dispatch)
   return putReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const addInject = (exerciseId, data) => (
-  dispatch,
-) => {
+export const addInject = (exerciseId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
   return postReferential(schema.inject, uri, data)(dispatch);
 };
 
-export const deleteInject = (exerciseId, injectId) => (
-  dispatch,
-) => {
+export const deleteInject = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
   return delReferential(uri, 'injects', injectId)(dispatch);
 };
 
-export const tryInject = (injectId) => (
-  dispatch,
-) => {
+export const tryInject = (injectId) => (dispatch) => {
   const uri = `/api/injects/try/${injectId}`;
   return getReferential(null, uri, null)(dispatch);
 };
@@ -58,9 +52,7 @@ export const shiftAllInjects = (exerciseId, data) => (dispatch) => {
   return putReferential(schema.arrayOfInjects, uri, data)(dispatch);
 };
 
-export const simulateChangeDurationExercise = (exerciseId, data) => (
-  dispatch,
-) => postReferential(
+export const simulateChangeDurationExercise = (exerciseId, data) => (dispatch) => postReferential(
   schema.simulateChangeDuration,
   `/api/exercises/${exerciseId}/injects/simulate/changeDuration`,
   data,

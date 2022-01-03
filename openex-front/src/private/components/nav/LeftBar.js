@@ -75,7 +75,7 @@ const LeftBar = ({
       <MenuItem
         component={Link}
         to="/exercises"
-        selected={location.pathname === '/exercises'}
+        selected={location.pathname.includes('/exercises')}
         dense={false}
         classes={{ root: classes.menuItem }}
       >

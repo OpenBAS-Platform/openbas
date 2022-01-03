@@ -8,7 +8,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
-import { Add } from '@mui/icons-material';
+import { Add, ControlPointOutlined } from '@mui/icons-material';
+import { ListItemIcon } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
+import ListItem from '@mui/material/ListItem';
 import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
@@ -50,23 +53,48 @@ class CreatePlayer extends Component {
       ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
-    return this.props
-      .addPlayer(inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+    return this.props.addPlayer(inputValues).then((result) => {
+      if (result.result) {
+        if (this.props.onCreate) {
+          this.props.onCreate(result.result);
+        }
+        return this.handleClose();
+      }
+      return result;
+    });
   }
 
   render() {
-    const { classes, t, organizations } = this.props;
+    const {
+      classes, t, organizations, inline,
+    } = this.props;
     return (
       <div>
-        <Fab
-          onClick={this.handleOpen.bind(this)}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
+        {inline === true ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new player')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+        ) : (
+          <Fab
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+        )}
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -93,6 +121,8 @@ class CreatePlayer extends Component {
 CreatePlayer.propTypes = {
   t: PropTypes.func,
   addPlayer: PropTypes.func,
+  inline: PropTypes.bool,
+  onCreate: PropTypes.func,
 };
 
 export default R.compose(

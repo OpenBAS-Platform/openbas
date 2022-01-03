@@ -93,6 +93,7 @@ const inlineStylesHeaders = {
   },
   document_tags: {
     float: 'left',
+    width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -125,6 +126,7 @@ const inlineStyles = {
   },
   document_tags: {
     float: 'left',
+    width: '30%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',

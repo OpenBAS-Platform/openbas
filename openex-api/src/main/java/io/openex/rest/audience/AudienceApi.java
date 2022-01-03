@@ -44,8 +44,21 @@ public class AudienceApi extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exerciseId}/audiences")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Audience> getAudiences(@PathVariable String exerciseId) {
         return audienceRepository.findAll(AudienceSpecification.fromExercise(exerciseId));
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/audiences/{audienceId}")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    public Audience getAudience(@PathVariable String audienceId) {
+        return audienceRepository.findById(audienceId).orElseThrow();
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/players")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<User> getAudiencePlayers(@PathVariable String audienceId) {
+        return audienceRepository.findById(audienceId).orElseThrow().getUsers();
     }
 
     @PostMapping("/api/exercises/{exerciseId}/audiences")
@@ -65,7 +78,7 @@ public class AudienceApi extends RestBehavior {
         audienceRepository.deleteById(audienceId);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/users")
+    @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/players")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Audience updateAudienceUsers(@PathVariable String audienceId,
                                         @Valid @RequestBody UpdateUsersAudienceInput input) {

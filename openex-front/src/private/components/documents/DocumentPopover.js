@@ -82,7 +82,7 @@ class DocumentPopover extends Component {
       color: tag.tag_color,
     }));
     const initialValues = R.pipe(
-      R.assoc('document_tags', documentTags.asMutable()),
+      R.assoc('document_tags', documentTags),
       R.pick([
         'document_name',
         'document_description',
@@ -141,7 +141,8 @@ class DocumentPopover extends Component {
         <Dialog
           TransitionComponent={Transition}
           open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}>
+          onClose={this.handleCloseEdit.bind(this)}
+        >
           <DialogTitle>{t('Update the document')}</DialogTitle>
           <DialogContent>
             <DocumentForm

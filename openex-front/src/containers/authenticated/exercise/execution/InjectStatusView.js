@@ -38,7 +38,11 @@ const styles = {
 class InjectStatusView extends Component {
   render() {
     const injectStatus = R.propOr('-', 'inject_status', this.props.inject);
-    const injectMessageLines = R.propOr([], 'messages', injectStatus?.status_message);
+    const injectMessageLines = R.propOr(
+      [],
+      'messages',
+      injectStatus?.status_message,
+    );
     const time = convertToCountdown(injectStatus.status_execution);
 
     return (

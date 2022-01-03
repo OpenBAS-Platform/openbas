@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { compose } from 'ramda';
+import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
 import { withStyles } from '@mui/styles';
 import Chip from '@mui/material/Chip';
@@ -16,9 +16,10 @@ const styles = () => ({
     fontSize: 12,
     lineHeight: '12px',
     height: 20,
-    float: 'right',
+    float: 'left',
     textTransform: 'uppercase',
     borderRadius: '0',
+    width: 120,
   },
 });
 
@@ -50,7 +51,7 @@ class ExerciseStatus extends Component {
     const {
       t, status, classes, variant,
     } = this.props;
-    const style = variant === 'inList' ? classes.chipInList : classes.chip;
+    const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (status) {
       case 'CANCELED':
         return (
@@ -94,4 +95,4 @@ ExerciseStatus.propTypes = {
   status: PropTypes.number,
 };
 
-export default compose(inject18n, withStyles(styles))(ExerciseStatus);
+export default R.compose(inject18n, withStyles(styles))(ExerciseStatus);

@@ -12,7 +12,11 @@ export const fetchGroup = (groupId) => (dispatch) => getReferential(schema.group
 
 export const addGroup = (data) => (dispatch) => postReferential(schema.group, '/api/groups', data)(dispatch);
 
-export const updateGroupInformation = (groupId, data) => (dispatch) => putReferential(schema.group, `/api/groups/${groupId}/information`, data)(dispatch);
+export const updateGroupInformation = (groupId, data) => (dispatch) => putReferential(
+  schema.group,
+  `/api/groups/${groupId}/information`,
+  data,
+)(dispatch);
 
 export const updateGroupUsers = (groupId, data) => (dispatch) => putReferential(schema.group, `/api/groups/${groupId}/users`, data)(dispatch);
 

@@ -22,6 +22,7 @@ import TagField from '../../../components/TagField';
 const styles = () => ({
   container: {
     width: '100%',
+    paddingBottom: 50,
   },
   title: {
     float: 'left',

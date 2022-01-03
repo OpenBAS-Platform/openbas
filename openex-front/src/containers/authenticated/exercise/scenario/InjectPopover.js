@@ -206,10 +206,7 @@ class InjectPopover extends Component {
 
   submitDelete() {
     this.props
-      .deleteInject(
-        this.props.exerciseId,
-        this.props.inject.inject_id,
-      )
+      .deleteInject(this.props.exerciseId, this.props.inject.inject_id)
       .then(() => {
         // this.props.fetchIncident(
         //   this.props.exerciseId,
@@ -309,10 +306,9 @@ class InjectPopover extends Component {
   }
 
   submitTry() {
-    this.props.tryInject(this.props.inject.inject_id)
-      .then((payload) => {
-        this.setState({ injectResult: payload, openResult: true });
-      });
+    this.props.tryInject(this.props.inject.inject_id).then((payload) => {
+      this.setState({ injectResult: payload, openResult: true });
+    });
     this.handleCloseTry();
   }
 
@@ -405,7 +401,8 @@ class InjectPopover extends Component {
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu
@@ -636,7 +633,11 @@ class InjectPopover extends Component {
           <DialogContent>
             <div>
               <strong>
-                <T>{this.state.injectResult ? this.state.injectResult.status : 'Unknown'}</T>
+                <T>
+                  {this.state.injectResult
+                    ? this.state.injectResult.status
+                    : 'Unknown'}
+                </T>
               </strong>
             </div>
             <br />

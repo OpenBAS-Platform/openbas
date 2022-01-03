@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import { withRouter } from 'react-router-dom';
 import {
   GroupsOutlined,
@@ -15,6 +16,8 @@ import {
   HighlightOffOutlined,
   CastOutlined,
   PlayArrowOutlined,
+  VideoSettingsOutlined,
+  MarkEmailReadOutlined,
 } from '@mui/icons-material';
 import LinearProgress, {
   linearProgressClasses,
@@ -149,15 +152,28 @@ const Exercise = (props) => {
                 <Typography variant="h1">{t('Start date')}</Typography>
                 {fldt(exercise.exercise_start_date) || t('Manual')}
               </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Creation date')}</Typography>
+                {fldt(exercise.exercise_created_at)}
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Sender mail address')}</Typography>
+                {exercise.exercise_mail_from}
+              </Grid>
             </Grid>
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="overline">{t('Control')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Grid container={true} spacing={3}>
-              <Grid item={true} xs={3}>
-                <Typography variant="h1">{t('Play')}</Typography>
+            <Alert severity="info">
+              {t(
+                'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.',
+              )}
+            </Alert>
+            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+              <Grid item={true} xs={4}>
+                <Typography variant="h1">{t('Execution')}</Typography>
                 <Button
                   variant="contained"
                   endIcon={<PlayArrowOutlined />}
@@ -166,14 +182,24 @@ const Exercise = (props) => {
                   {t('Start')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={3}>
-                <Typography variant="h1">{t('Play')}</Typography>
+              <Grid item={true} xs={4}>
+                <Typography variant="h1">{t('Dryrun')}</Typography>
                 <Button
                   variant="contained"
-                  endIcon={<HighlightOffOutlined />}
-                  color="warning"
+                  endIcon={<VideoSettingsOutlined />}
+                  color="info"
                 >
-                  {t('Cancel')}
+                  {t('Launch')}
+                </Button>
+              </Grid>
+              <Grid item={true} xs={4}>
+                <Typography variant="h1">{t('Comcheck')}</Typography>
+                <Button
+                  variant="contained"
+                  endIcon={<MarkEmailReadOutlined />}
+                  color="secondary"
+                >
+                  {t('Send')}
                 </Button>
               </Grid>
             </Grid>

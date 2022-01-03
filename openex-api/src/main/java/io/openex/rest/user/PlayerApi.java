@@ -1,5 +1,6 @@
 package io.openex.rest.user;
 
+import io.openex.config.AppConfig;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import static io.openex.config.AppConfig.currentUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 
 @RestController
@@ -68,7 +70,7 @@ public class PlayerApi extends RestBehavior {
     @PostAuthorize("isPlanner()")
     public User updatePlayer(@PathVariable String userId, @Valid @RequestBody UpdatePlayerInput input) {
         User user = userRepository.findById(userId).orElseThrow();
-        if (user.isManager()) {
+        if (!currentUser().isAdmin() && user.isManager()) {
             throw new UnsupportedOperationException("You dont have the right to update this user");
         }
         user.setUpdateAttributes(input);
@@ -81,7 +83,7 @@ public class PlayerApi extends RestBehavior {
     @PostAuthorize("isPlanner()")
     public void deletePlayer(@PathVariable String userId) {
         User user = userRepository.findById(userId).orElseThrow();
-        if (user.isManager()) {
+        if (!currentUser().isAdmin() && user.isManager()) {
             throw new UnsupportedOperationException("You dont have the right to delete this user");
         }
         userRepository.deleteById(userId);

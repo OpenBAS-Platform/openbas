@@ -1,7 +1,6 @@
 import * as schema from './Schema';
 import {
   getReferential,
-  fileSave,
   putReferential,
   postReferential,
   delReferential,
@@ -12,20 +11,15 @@ export const fetchAudiences = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfAudiences, uri)(dispatch);
 };
 
-export const fetchAudience = (audienceId, exerciseId) => (dispatch) => {
+export const fetchAudiencePlayers = (exerciseId, audienceId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/players`;
+  return getReferential(schema.arrayOfUsers, uri)(dispatch);
+};
+
+export const fetchAudience = (exerciseId, audienceId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}`;
   return getReferential(schema.audience, uri)(dispatch);
 };
-
-export const downloadExportAudiences = (exerciseId) => (dispatch) => fileSave(
-  `/api/exercises/${exerciseId}/audiences.xlsx`,
-  'audiences.xlsx',
-)(dispatch);
-
-export const downloadExportAudience = (exerciseId, audienceId) => (dispatch) => fileSave(
-  `/api/exercises/${exerciseId}/audiences/${audienceId}/users.xlsx`,
-  'users.xlsx',
-)(dispatch);
 
 export const updateAudience = (exerciseId, audienceId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}`;
@@ -37,8 +31,8 @@ export const updateAudienceActivation = (exerciseId, audienceId, data) => (dispa
   return putReferential(schema.audience, uri, data)(dispatch);
 };
 
-export const updateAudienceUsers = (exerciseId, audienceId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/users`;
+export const updateAudiencePlayers = (exerciseId, audienceId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/audiences/${audienceId}/players`;
   return putReferential(schema.audience, uri, data)(dispatch);
 };
 
@@ -52,9 +46,7 @@ export const deleteAudience = (exerciseId, audienceId) => (dispatch) => {
   return delReferential(uri, 'audiences', audienceId)(dispatch);
 };
 
-export const copyAudienceToExercise = (exerciseId, audienceId, data) => (
-  dispatch,
-) => {
+export const copyAudienceToExercise = (exerciseId, audienceId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/copy-audience/${audienceId}`;
   return putReferential(schema.audience, uri, data)(dispatch);
 };

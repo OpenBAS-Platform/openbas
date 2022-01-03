@@ -14,11 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import withStyles from '@mui/styles/withStyles';
-import {
-  EmailOutlined,
-  SmsOutlined,
-  InputOutlined,
-} from '@mui/icons-material';
+import { EmailOutlined, SmsOutlined, InputOutlined } from '@mui/icons-material';
 import { green, red } from '@mui/material/colors';
 import { dateFormat } from '../../../../utils/Time';
 import { i18nRegister } from '../../../../utils/Messages';
@@ -177,8 +173,11 @@ class Index extends Component {
     const keyword = this.state.searchTerm;
     const filterByKeyword = (n) => keyword === ''
       || n.inject_title.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
-      || JSON.stringify(n.inject_content).toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+      || n.inject_description.toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || JSON.stringify(n.inject_content)
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
     const injects = rawInjects.filter((i) => filterByKeyword(i));
     const userCanUpdate = this.props.exercise?.user_can_update;
     return (
@@ -198,7 +197,8 @@ class Index extends Component {
             const injectAudiences = inject?.inject_audiences ?? [];
             const injectUsersNumber = inject?.inject_users_number ?? '-';
             const impactedUsers = inject.inject_all_audiences
-              ? exercise.getUsers().length : injectUsersNumber;
+              ? exercise.getUsers().length
+              : injectUsersNumber;
             const injectEnabled = inject?.inject_enabled ?? true;
             const injectTypeInHere = this.props.inject_types[injectType] ?? false;
             const injectDisabled = !injectTypeInHere;
@@ -288,19 +288,19 @@ class Index extends Component {
   render() {
     const { classes, exercise, injects } = this.props;
     return (
-        <div className={classes.container}>
-          <div>
-            <Typography variant="h5" style={{ float: 'left' }}>
-              <T>Exercise injects</T>
-            </Typography>
-            <div className={classes.search}>
-              <SearchField onChange={this.handleSearchInjects.bind(this)} />
-            </div>
-            <div className="clearfix" />
+      <div className={classes.container}>
+        <div>
+          <Typography variant="h5" style={{ float: 'left' }}>
+            <T>Exercise injects</T>
+          </Typography>
+          <div className={classes.search}>
+            <SearchField onChange={this.handleSearchInjects.bind(this)} />
           </div>
           <div className="clearfix" />
-          {this.renderInjects(exercise, injects)}
         </div>
+        <div className="clearfix" />
+        {this.renderInjects(exercise, injects)}
+      </div>
     );
   }
 }

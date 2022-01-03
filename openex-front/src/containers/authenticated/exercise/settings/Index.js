@@ -143,8 +143,12 @@ class Index extends Component {
   }
 
   onUpdate(data) {
-    const start = data.exercise_start_date !== null ? dateToISO(data.exercise_start_date) : null;
-    const end = data.exercise_end_date !== null ? dateToISO(data.exercise_end_date) : null;
+    const start = data.exercise_start_date !== null
+      ? dateToISO(data.exercise_start_date)
+      : null;
+    const end = data.exercise_end_date !== null
+      ? dateToISO(data.exercise_end_date)
+      : null;
     const newData = R.pipe(
       // Need to convert date to ISO format with timezone
       R.assoc('exercise_start_date', start),
@@ -339,7 +343,8 @@ class Index extends Component {
                       color="inherit"
                       onClick={this.handleCloseGallery.bind(this)}
                       aria-label="close"
-                      size="large">
+                      size="large"
+                    >
                       <Close />
                     </IconButton>
                     <Typography variant="h6" className={classes.title}>

@@ -1,0 +1,462 @@
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
+import { withStyles } from '@mui/styles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { connect } from 'react-redux';
+import { interval } from 'rxjs';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  CloseRounded,
+  EmailOutlined,
+  KeyOutlined,
+  PersonOutlined,
+  SmartphoneOutlined,
+} from '@mui/icons-material';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import inject18n from '../../../../components/i18n';
+import { FIVE_SECONDS } from '../../../../utils/Time';
+import { fetchAudiencePlayers } from '../../../../actions/Audience';
+import { fetchOrganizations } from '../../../../actions/Organization';
+import SearchFilter from '../../../../components/SearchFilter';
+import TagsFilter from '../../../../components/TagsFilter';
+import ItemTags from '../../../../components/ItemTags';
+import PlayerPopover from '../../players/PlayerPopover';
+import { storeBrowser } from '../../../../actions/Schema';
+import AudienceAddPlayers from './AudienceAddPlayers';
+
+const interval$ = interval(FIVE_SECONDS);
+
+const styles = (theme) => ({
+  header: {
+    backgroundColor: theme.palette.background.paper,
+    padding: '20px 20px 20px 60px',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 15,
+    left: 5,
+    color: 'inherit',
+  },
+  title: {
+    float: 'left',
+  },
+  search: {
+    float: 'right',
+    width: 200,
+    marginRight: 20,
+  },
+  tags: {
+    float: 'right',
+  },
+  parameters: {
+    float: 'left',
+    marginTop: -10,
+  },
+  container: {
+    marginTop: 10,
+  },
+  itemHead: {
+    paddingLeft: 10,
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+  },
+  item: {
+    paddingLeft: 10,
+    height: 50,
+  },
+  bodyItem: {
+    height: '100%',
+    fontSize: 13,
+  },
+  itemIcon: {
+    color: theme.palette.primary.main,
+  },
+  inputLabel: {
+    float: 'left',
+  },
+  sortIcon: {
+    float: 'left',
+    margin: '-5px 0 0 15px',
+  },
+  icon: {
+    marginRight: 10,
+  },
+});
+
+const inlineStylesHeaders = {
+  iconSort: {
+    position: 'absolute',
+    margin: '0 0 0 5px',
+    padding: 0,
+    top: '0px',
+  },
+  user_email: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_options: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_organization: {
+    float: 'left',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  user_tags: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+};
+
+const inlineStyles = {
+  user_email: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_options: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_organization: {
+    float: 'left',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  user_tags: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
+
+class AudiencesPlayers extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sortBy: 'user_email',
+      orderAsc: true,
+      keyword: '',
+      tags: [],
+    };
+  }
+
+  componentDidMount() {
+    const { exerciseId, audienceId } = this.props;
+    this.props.fetchOrganizations();
+    this.props.fetchAudiencePlayers(exerciseId, audienceId);
+    this.subscription = interval$.subscribe(() => {
+      this.props.fetchOrganizations();
+      this.props.fetchAudiencePlayers(exerciseId, audienceId);
+    });
+  }
+
+  componentWillUnmount() {
+    this.subscription.unsubscribe();
+  }
+
+  handleSearch(value) {
+    this.setState({ keyword: value });
+  }
+
+  handleAddTag(value) {
+    if (value) {
+      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    }
+  }
+
+  handleRemoveTag(value) {
+    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
+  }
+
+  reverseBy(field) {
+    this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
+  }
+
+  sortHeader(field, label, isSortable) {
+    const { t } = this.props;
+    const { orderAsc, sortBy } = this.state;
+    const sortComponent = orderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
+    if (isSortable) {
+      return (
+        <div
+          style={inlineStylesHeaders[field]}
+          onClick={this.reverseBy.bind(this, field)}
+        >
+          <span>{t(label)}</span>
+          {sortBy === field ? sortComponent : ''}
+        </div>
+      );
+    }
+    return (
+      <div style={inlineStylesHeaders[field]}>
+        <span>{t(label)}</span>
+      </div>
+    );
+  }
+
+  render() {
+    const {
+      classes,
+      users,
+      handleClose,
+      audience,
+      organizations,
+      exerciseId,
+      audienceId,
+    } = this.props;
+    const {
+      keyword, sortBy, orderAsc, tags,
+    } = this.state;
+    const filterByKeyword = (n) => keyword === ''
+      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1
+      || (n.user_organization || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1;
+    const sort = R.sortWith(
+      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
+    );
+    const sortedUsers = R.pipe(
+      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.user_tags),
+            R.pluck('id', tags),
+          ),
+      ),
+      R.filter(filterByKeyword),
+      sort,
+    )(users);
+    return (
+      <div>
+        <div className={classes.header}>
+          <IconButton
+            aria-label="Close"
+            className={classes.closeButton}
+            onClick={handleClose.bind(this)}
+          >
+            <CloseRounded />
+          </IconButton>
+          <Typography variant="h6" classes={{ root: classes.title }}>
+            {R.propOr('-', 'audience_name', audience)}
+          </Typography>
+          <div className={classes.tags}>
+            <TagsFilter
+              onAddTag={this.handleAddTag.bind(this)}
+              onRemoveRag={this.handleRemoveTag.bind(this)}
+              currentTags={tags}
+            />
+          </div>
+          <div className={classes.search}>
+            <SearchFilter
+              small={true}
+              fullWidth={true}
+              onChange={this.handleSearch.bind(this)}
+              keyword={keyword}
+            />
+          </div>
+          <div className="clearfix" />
+        </div>
+        <List classes={{ root: classes.container }}>
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+          >
+            <ListItemIcon>
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+                #
+              </span>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <div>
+                  {this.sortHeader('user_email', 'Email address', true)}
+                  {this.sortHeader('user_options', 'Options', false)}
+                  {this.sortHeader('user_organization', 'Organization', true)}
+                  {this.sortHeader('user_tags', 'Tags', true)}
+                </div>
+              }
+            />
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+          </ListItem>
+          {sortedUsers.map((user) => (
+            <ListItem
+              key={user.user_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <PersonOutlined />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_email}
+                    >
+                      {user.user_email}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_options}
+                    >
+                      {R.isNil(user.user_email)
+                      || R.isEmpty(user.user_email) ? (
+                        <EmailOutlined
+                          color="warning"
+                          fontSize="small"
+                          className={classes.icon}
+                        />
+                        ) : (
+                        <EmailOutlined
+                          color="success"
+                          fontSize="small"
+                          className={classes.icon}
+                        />
+                        )}
+                      {R.isNil(user.user_pgp_key)
+                      || R.isEmpty(user.user_pgp_key) ? (
+                        <KeyOutlined
+                          color="warning"
+                          fontSize="small"
+                          className={classes.icon}
+                        />
+                        ) : (
+                        <KeyOutlined
+                          color="success"
+                          fontSize="small"
+                          className={classes.icon}
+                        />
+                        )}
+                      {R.isNil(user.user_phone)
+                      || R.isEmpty(user.user_phone) ? (
+                        <SmartphoneOutlined
+                          color="warning"
+                          fontSize="small"
+                          className={classes.icon}
+                        />
+                        ) : (
+                        <SmartphoneOutlined
+                          color="success"
+                          fontSize="small"
+                          className={classes.icon}
+                        />
+                        )}
+                    </div>
+
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_organization}
+                    >
+                      {user.user_organization}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.user_tags}
+                    >
+                      <ItemTags
+                        variant="list"
+                        tags={user.getTags('tag_name', true, 2)}
+                      />
+                    </div>
+                  </div>
+                }
+              />
+              <ListItemSecondaryAction>
+                <PlayerPopover
+                  user={user}
+                  exerciseId={exerciseId}
+                  audienceId={audienceId}
+                  audienceUsersIds={users.map((u) => u.user_id)}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+        <AudienceAddPlayers
+          organizations={organizations}
+          exerciseId={exerciseId}
+          audienceId={audienceId}
+          audienceUsersIds={users.map((u) => u.user_id)}
+        />
+      </div>
+    );
+  }
+}
+
+AudiencesPlayers.propTypes = {
+  t: PropTypes.func,
+  nsdt: PropTypes.func,
+  exerciseId: PropTypes.string,
+  audienceId: PropTypes.string,
+  audience: PropTypes.object,
+  organizations: PropTypes.array,
+  users: PropTypes.array,
+  fetchAudiencePlayers: PropTypes.func,
+  fetchOrganizations: PropTypes.func,
+  handleClose: PropTypes.func,
+};
+
+const select = (state, ownProps) => {
+  const browser = storeBrowser(state);
+  const { audienceId } = ownProps;
+  return {
+    organization: browser.getOrganizations(),
+    audience: browser.getAudience(audienceId),
+    users: browser.getAudience(audienceId)?.getUsers() || [],
+  };
+};
+
+export default R.compose(
+  connect(select, { fetchAudiencePlayers, fetchOrganizations }),
+  inject18n,
+  withStyles(styles),
+)(AudiencesPlayers);
