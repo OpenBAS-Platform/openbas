@@ -109,11 +109,18 @@ const i18n = {
       Add: 'Ajouter',
       'Remove from the audience': "Retirer de l'audience",
       'Update the audience': "Modifier l'audience",
-      'Do you want to remove the player from the audience?': 'Souhaitez-vous retirer le joueur de cette audience ?',
+      'Do you want to remove the player from the audience?':
+        'Souhaitez-vous retirer le joueur de cette audience ?',
       'Add players in this audience': 'Ajouter des joueurs dans cette audience',
       'Create a new audience': 'Créer une nouvelle audience',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.':
         "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails des joueurs et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+      openex_email: 'Email',
+      openex_ovh_sms: 'SMS (OVH)',
+    },
+    en: {
+      openex_email: 'Email',
+      openex_ovh_sms: 'SMS (OVH)',
     },
   },
 };

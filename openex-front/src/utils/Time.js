@@ -20,6 +20,10 @@ export const timeFormat = (data) => (data ? parse(data).format(timeDateFormat) :
 
 export const dateFormat = (data, specificFormat) => (data ? parse(data).format(specificFormat || openexDateFormat) : '-');
 
+export const durationFormat = (data) => moment
+  .utc(moment.duration({ seconds: data }).asMilliseconds())
+  .format('H[H] m[M]');
+
 export const dateToISO = (date) => {
   const momentDate = parse(date, openexDateFormat, true);
   return momentDate.isValid() ? momentDate.format() : 'invalid-date';

@@ -128,6 +128,7 @@ CreatePlayer.propTypes = {
   addPlayer: PropTypes.func,
   inline: PropTypes.bool,
   onCreate: PropTypes.func,
+  organizations: PropTypes.array,
 };
 
 export default R.compose(

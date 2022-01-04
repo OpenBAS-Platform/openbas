@@ -34,6 +34,7 @@ import MiniMap from './MiniMap';
 import inject18n from '../../components/i18n';
 import { fetchStatistics } from '../../actions/Application';
 import { fetchExercises } from '../../actions/Exercise';
+import { fetchTags } from '../../actions/Tag';
 import { storeBrowser } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 
@@ -103,6 +104,7 @@ const Dashboard = (props) => {
   useEffect(() => {
     props.fetchStatistics();
     props.fetchExercises();
+    props.fetchTags();
   }, []);
   const {
     theme, classes, t, nsd, statistics, exercises,
@@ -551,6 +553,7 @@ Dashboard.propTypes = {
   t: PropTypes.func,
   fetchStatistics: PropTypes.func,
   fetchExercises: PropTypes.func,
+  fetchTags: PropTypes.func,
   statistics: PropTypes.object,
   exercises: PropTypes.array,
 };
@@ -564,7 +567,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchStatistics, fetchExercises }),
+  connect(select, { fetchStatistics, fetchExercises, fetchTags }),
   inject18n,
   withTheme,
   withStyles(styles),

@@ -1,5 +1,6 @@
 version: 2.1
-
+orbs: 
+  slack: circleci/slack@4.5.1
 jobs:
   build_frontend:
     working_directory: ~/openex
@@ -25,7 +26,9 @@ jobs:
             - openex
             - openex_docker
             - openex_musl
-
+      - slack/notify:
+          event: always
+          
   build_platform:
     working_directory: ~/openex
     docker:
@@ -40,6 +43,8 @@ jobs:
           root: ~/
           paths:
             - openex
+      - slack/notify:
+          event: always
 
   build_platform_musl:
     working_directory: ~/openex_musl
@@ -56,6 +61,8 @@ jobs:
           root: ~/
           paths:
             - openex_musl
+      - slack/notify:
+          event: always
 
   package_rolling:
     working_directory: ~/openex
@@ -76,6 +83,8 @@ jobs:
       - run: 
           working_directory: ~/openex/release
           command: scp "openex-$(date '+%Y%m%d').tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
+      - slack/notify:
+          event: always
 
   package_rolling_musl:
     working_directory: ~/openex_musl
@@ -96,6 +105,8 @@ jobs:
       - run: 
           working_directory: ~/openex_musl/release
           command: scp "openex-$(date '+%Y%m%d')_musl.tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/          
+      - slack/notify:
+          event: always
 
   deploy_demo:
     working_directory: ~/openex
@@ -125,6 +136,8 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: always
 
   deploy_reference:
     working_directory: ~/openex
@@ -154,6 +167,8 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: always
 
   deploy_lab:
     working_directory: ~/openex
@@ -183,6 +198,8 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: always
 
   deploy_testing:
     working_directory: ~/openex
@@ -212,6 +229,8 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: always
 
   docker_build_platform:
     working_directory: ~/openex_docker
@@ -245,6 +264,8 @@ jobs:
           name: Build Docker image openex/platform
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:latest -t openexhq/platform:${CIRCLE_TAG} --push .
           no_output_timeout: 30m
+      - slack/notify:
+          event: always
 
   docker_build_platform_rolling:
     working_directory: ~/openex_docker
@@ -279,6 +300,8 @@ jobs:
           name: Build Docker image openex/platform
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:rolling --push .
           no_output_timeout: 30m
+      - slack/notify:
+          event: always
 
 workflows:
   openex:

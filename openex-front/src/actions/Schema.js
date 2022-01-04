@@ -20,7 +20,6 @@ export const objectOfStatistics = new schema.Object('object_of_statistics');
 export const importExerciseResult = new schema.Object('import_exercise_result');
 export const exportExerciseResult = new schema.Object('export_exercise_result');
 export const testsDeleteUsers = new schema.Object('delete_users_result');
-export const simulateChangeDuration = new schema.Array();
 export const changeDuration = new schema.Object('change_duration');
 
 export const tag = new schema.Entity('tags', {}, { idAttribute: 'tag_id' });
@@ -227,10 +226,16 @@ export const storeBrowser = (state) => ({
           .filter((t) => t !== undefined);
         return sort(tags, sortBy, orderAsc, limit);
       },
-      getInjects(sortBy = 'inject_date') {
+      getInjects(
+        sortBy = 'inject_depends_duration',
+        orderAsc = true,
+        limit = 100,
+      ) {
         const all = R.values(state.referential.entities.injects);
-        const injects = R.filter((n) => n.inject_exercise === id, all);
-        return R.sortWith([R.ascend(R.prop(sortBy))])(injects);
+        const injects = R.filter((n) => n.inject_exercise === id, all).map(
+          (i) => browser._buildInject(i.inject_id, i),
+        );
+        return sort(injects, sortBy, orderAsc, limit);
       },
       getObjectives(sortBy = 'objective_priority') {
         const all = R.values(state.referential.entities.objectives);
@@ -248,6 +253,18 @@ export const storeBrowser = (state) => ({
         return this.getAudiences()
           .map((a) => a.getUsers())
           .flat();
+      },
+    };
+  },
+  _buildInject(id, inj) {
+    return {
+      ...inj,
+      inject_id: id,
+      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
+        const tags = inj.inject_tags
+          .map((tagId) => state.referential.entities.tags[tagId])
+          .filter((t) => t !== undefined);
+        return sort(tags, sortBy, orderAsc, limit);
       },
     };
   },

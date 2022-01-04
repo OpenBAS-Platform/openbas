@@ -187,7 +187,7 @@ public class Exercise implements Base {
     @JsonProperty("exercise_users_number")
     public long usersNumber() {
         return getAudiences().stream()
-                .map(audience -> audience.getUsers().stream()).count();
+                .mapToLong(audience -> audience.getUsers().size()).sum();
     }
 
     @JsonProperty("user_can_update")

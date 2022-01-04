@@ -69,6 +69,10 @@ const Parameters = (props) => {
                 <ListItemText primary={t('PostgreSQL')} />
                 <Chip label={settings?.postgre_version} color="primary" />
               </ListItem>
+              <ListItem divider={true}>
+                <ListItemText primary={t('Minio (S3)')} />
+                <Chip label={t('Latest stable build')} color="primary" />
+              </ListItem>
             </List>
           </Paper>
         </Grid>

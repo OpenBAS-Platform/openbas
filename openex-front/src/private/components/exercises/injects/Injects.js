@@ -11,17 +11,17 @@ import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  Kayaking,
   ChevronRightOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import inject18n from '../../../../components/i18n';
-import { FIVE_SECONDS } from '../../../../utils/Time';
+import { durationFormat, FIVE_SECONDS } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { storeBrowser } from '../../../../actions/Schema';
 import { fetchExerciseInjects } from '../../../../actions/Inject';
+import InjectIcon from './InjectIcon';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -74,13 +74,13 @@ const inlineStylesHeaders = {
   },
   inject_type: {
     float: 'left',
-    width: '15%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   inject_title: {
     float: 'left',
-    width: '20%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -106,7 +106,7 @@ const inlineStylesHeaders = {
 const inlineStyles = {
   inject_type: {
     float: 'left',
-    width: '15%',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -114,7 +114,7 @@ const inlineStyles = {
   },
   inject_title: {
     float: 'left',
-    width: '20%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -213,7 +213,9 @@ class Injects extends Component {
   }
 
   render() {
-    const { classes, injects, exercise } = this.props;
+    const {
+      t, classes, injects, exercise,
+    } = this.props;
     const {
       keyword, sortBy, orderAsc, tags,
     } = this.state;
@@ -300,20 +302,20 @@ class Injects extends Component {
                 divider={true}
               >
                 <ListItemIcon>
-                  <Kayaking />
+                  <InjectIcon type={inject.inject_type} />
                 </ListItemIcon>
                 <ListItemText
                   primary={
                     <div>
                       <div
                         className={classes.bodyItem}
-                        style={inlineStyles.exercise_name}
+                        style={inlineStyles.inject_type}
                       >
-                        {inject.inject_type}
+                        {t(inject.inject_type)}
                       </div>
                       <div
                         className={classes.bodyItem}
-                        style={inlineStyles.exercise_subtitle}
+                        style={inlineStyles.inject_title}
                       >
                         {inject.inject_title}
                       </div>
@@ -321,7 +323,7 @@ class Injects extends Component {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_depends_duration}
                       >
-                        {inject.inject_depends_duration}
+                        {durationFormat(inject.inject_depends_duration)}
                       </div>
                       <div
                         className={classes.bodyItem}

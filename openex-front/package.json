@@ -4,6 +4,8 @@
   "author": "Luatix",
   "license": "Apache-2.0",
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^31.1.0",
+    "@ckeditor/ckeditor5-react": "^3.0.3",
     "@date-io/date-fns": "2.11.0",
     "@emotion/react": "11.7.1",
     "@emotion/styled": "11.6.0",

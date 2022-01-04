@@ -79,6 +79,7 @@ public class AudienceApi extends RestBehavior {
         Audience audience = new Audience();
         audience.setUpdateAttributes(input);
         audience.setExercise(exercise);
+        audience.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return audienceRepository.save(audience);
     }
 

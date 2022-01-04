@@ -52,23 +52,6 @@ export const shiftAllInjects = (exerciseId, data) => (dispatch) => {
   return putReferential(schema.arrayOfInjects, uri, data)(dispatch);
 };
 
-export const simulateChangeDurationExercise = (exerciseId, data) => (dispatch) => postReferential(
-  schema.simulateChangeDuration,
-  `/api/exercises/${exerciseId}/injects/simulate/changeDuration`,
-  data,
-)(dispatch);
-
-export const changeDurationExercise = (exerciseId, data) => (dispatch) => postReferential(
-  schema.changeDuration,
-  `/api/exercises/${exerciseId}/injects/changeDuration`,
-  data,
-)(dispatch);
-
-export const fetchInjectTypesExerciseSimple = () => (dispatch) => getReferential(
-  schema.injectTypeExerciseSimple,
-  '/api/inject_types',
-)(dispatch);
-
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
 
 export const injectDone = (injectId) => (dispatch) => {
