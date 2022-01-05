@@ -158,13 +158,11 @@ const _buildUser = (state, usr) => {
   return {
     ...usr,
     admin: usr.user_admin === true,
-    // eslint-disable-next-line max-len
-    tags: usr.user_tags
+    tags: usr.user_tags.asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
     organization:
       state.referential.entities.organizations[usr.user_organization],
-    // eslint-disable-next-line max-len
     tokens: R.filter(
       (n) => n.token_user === usr.user_id,
       R.values(state.referential.entities.tokens),
@@ -257,9 +255,7 @@ export const storeBrowser = (state) => ({
       ([k, v]) => ({ [k]: v.setting_value }),
     ),
   ),
-  me: _buildUser(
-    state.referential.entities.users[R.path(['logged', 'user'], state.app)],
-  ),
+  me: _buildUser(state, state.referential.entities.users[R.path(['logged', 'user'], state.app)]),
   statistics: state.referential.entities.statistics?.openex,
   getUser(id) {
     return _buildUser(state, state.referential.entities.users[id]);

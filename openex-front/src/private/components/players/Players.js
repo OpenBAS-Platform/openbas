@@ -7,11 +7,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  PersonOutlined,
-} from '@mui/icons-material';
+import { ArrowDropDownOutlined, ArrowDropUpOutlined, PersonOutlined } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
@@ -228,15 +224,14 @@ const Players = () => {
         : [R.descend(R.prop(order.sortBy))],
     );
     const tagIds = tags.map((ta) => ta.id);
-    const result = R.pipe(
+    return R.pipe(
       R.filter(
         (n) => tags.length === 0
-          || n.user_tags.some((usrTag) => tagIds.includes(usrTag)),
+                || n.user_tags.some((usrTag) => tagIds.includes(usrTag)),
       ),
       R.filter(filterByKeyword),
       sort,
     )(users);
-    return result;
   };
 
   return (
@@ -322,7 +317,7 @@ const Players = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_organization}
                   >
-                    {user.user_organization}
+                    {user.organization?.organization_name || '-'}
                   </div>
                   <div
                     className={classes.bodyItem}
