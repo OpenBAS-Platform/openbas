@@ -7,7 +7,8 @@ import io.openex.database.model.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "inject_type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "inject_type", visible = true)
 public abstract class InjectInput<T> {
 
     @JsonProperty("inject_title")

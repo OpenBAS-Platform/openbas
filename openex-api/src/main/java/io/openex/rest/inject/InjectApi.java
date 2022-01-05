@@ -28,10 +28,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.DatabaseHelper.resolveRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.model.ExecutionStatus.ERROR;
 import static java.util.List.of;
-import static org.springframework.util.StringUtils.hasLength;
 
 @RestController
 public class InjectApi<T> extends RestBehavior {
@@ -135,9 +135,7 @@ public class InjectApi<T> extends RestBehavior {
         // Set dependencies
         inject.setUser(currentUser());
         inject.setExercise(exercise);
-        if (hasLength(input.getDependsOn())) {
-            inject.setDependsOn(injectRepository.findById(input.getDependsOn()).orElse(null));
-        }
+        inject.setDependsOn(resolveRelation(input.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         return injectRepository.save(inject);
     }
