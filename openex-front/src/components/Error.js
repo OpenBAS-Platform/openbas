@@ -1,7 +1,7 @@
 import React from 'react';
-import { compose, dissoc } from 'ramda';
+import { compose } from 'ramda';
 import * as PropTypes from 'prop-types';
-import { Route, withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 class ErrorBoundaryComponent extends React.Component {
   constructor(props) {
