@@ -42,12 +42,10 @@ const styles = (theme) => ({
     marginTop: 10,
   },
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    padding: 10,
     height: 50,
   },
   bodyItem: {
@@ -111,7 +109,7 @@ const inlineStylesHeaders = {
   },
   inject_depends_duration: {
     float: 'left',
-    width: 220,
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -147,7 +145,7 @@ const inlineStyles = {
   },
   inject_depends_duration: {
     float: 'left',
-    width: 220,
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -301,7 +299,7 @@ class Injects extends Component {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 8px',
+                  padding: '0 8px 0 10px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
@@ -407,12 +405,12 @@ class Injects extends Component {
           <InjectDefinition
             injectId={selectedInject}
             exerciseId={exercise.exercise_id}
+            injectTypes={injectTypes}
             handleClose={this.handleSelectInject.bind(this, null)}
           />
         </Drawer>
         <CreateInject
           exerciseId={exercise.exercise_id}
-          injectTypes={injectTypes}
         />
       </div>
     );

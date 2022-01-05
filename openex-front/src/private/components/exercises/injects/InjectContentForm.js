@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import * as R from 'ramda';
-import { injectIntl } from 'react-intl';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
@@ -15,10 +14,9 @@ import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 import { TextField } from '../../../../components/TextField';
-import { T } from '../../../../components/I18n';
-import { i18nRegister } from '../../../../utils/Messages';
-import DocumentGallery from '../../DocumentGallery';
 import { Switch } from '../../../../components/Switch';
+import inject18n from '../../../../components/i18n';
+import Loader from '../../../../components/Loader';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -37,49 +35,6 @@ const styles = () => ({
   },
 });
 
-i18nRegister({
-  fr: {
-    sender: 'Expéditeur',
-    subject: 'Sujet',
-    body: 'Message',
-    message: 'Message',
-    encrypted: 'Chiffrement',
-    content: 'Contenu',
-    'Select a document': 'Sélectionner un document',
-    'Add an attachment': 'Ajouter une pièce jointe',
-    'No content available for this inject type.':
-      "Aucun contenu disponible pour ce type d'injection",
-  },
-  en: {
-    sender: 'Sender',
-    subject: 'Subject',
-    body: 'Message',
-    message: 'Message',
-    content: 'Content',
-  },
-});
-
-const validate = (values, props) => {
-  const errors = {};
-  let currentType;
-  if (Array.isArray(props.types)) {
-    props.types.forEach((type) => {
-      if (type.type === props.type) {
-        currentType = type;
-      }
-    });
-  }
-  if (currentType && Array.isArray(currentType.fields)) {
-    currentType.fields.forEach((field) => {
-      const value = values[field.name];
-      if (field.mandatory && !value) {
-        errors[field.name] = props.intl.formatMessage({ id: 'Required' });
-      }
-    });
-  }
-  return errors;
-};
-
 class InjectContentForm extends Component {
   constructor(props) {
     super(props);
@@ -87,20 +42,6 @@ class InjectContentForm extends Component {
       openGallery: false,
       current_type: null,
     };
-    // dirty hack to get types
-    // when editing inject
-    if (Array.isArray(this.props.types)) {
-      this.props.types.forEach((type) => {
-        if (type.type === this.props.type) {
-          // eslint-disable-next-line
-          this.state.current_type = type;
-        }
-      });
-      // when creating inject
-    } else if (this.props.types[this.props.type]) {
-      // eslint-disable-next-line
-      this.state.current_type = this.props.types[this.props.type];
-    }
   }
 
   handleOpenGallery() {
@@ -121,35 +62,46 @@ class InjectContentForm extends Component {
     this.handleCloseGallery();
   }
 
-  render() {
-    const { classes, onSubmit, initialValues } = this.props;
-    if (this.props.type === null) {
-      return (
-        <div>
-          <T>No content available for this inject type.</T>
-        </div>
-      );
+  validate(values) {
+    const { t, initialValues, injectTypes } = this.props;
+    const errors = {};
+    const injectType = R.head(
+      injectTypes.filter((i) => i.type === initialValues.inject_type),
+    );
+    if (injectType && Array.isArray(injectType.fields)) {
+      injectType.fields.forEach((field) => {
+        const value = values[field.name];
+        if (field.mandatory && !value) {
+          errors[field.name] = t('This field is required.');
+        }
+      });
     }
-    if (!this.state.current_type || !this.state.current_type.fields) {
-      return (
-        <div>
-          <T>No type available for this inject.</T>
-        </div>
-      );
+    return errors;
+  }
+
+  render() {
+    const {
+      t, classes, onSubmit, initialValues, type, injectTypes,
+    } = this.props;
+    const injectType = R.head(injectTypes.filter((i) => i.type === type));
+    if (R.isNil(injectType) || R.isEmpty(injectType)) {
+      return <Loader variant="inElement" />;
     }
     return (
       <Form
+        keepDirtyOnReinitialize={true}
         initialValues={initialValues}
         onSubmit={onSubmit}
-        validate={(values) => validate(values, this.props)}
+        validate={this.validate.bind(this)}
+        mutators={{
+          setValue: ([field, value], state, { changeValue }) => {
+            changeValue(state, field, () => value);
+          },
+        }}
       >
-        {({ handleSubmit }) => (
-          <form
-            id="contentForm"
-            onSubmit={handleSubmit}
-            style={{ marginTop: -20 }}
-          >
-            {this.state.current_type.fields.map((field) => {
+        {({ handleSubmit, submitting, pristine }) => (
+          <form id="injectContentForm" onSubmit={handleSubmit}>
+            {injectType.fields.map((field) => {
               switch (field.type) {
                 case 'textarea':
                   return (
@@ -168,7 +120,7 @@ class InjectContentForm extends Component {
                     <div key={field.name} style={{ marginTop: 20 }}>
                       <EnrichedTextField name={field.name} label={field.name} />
                       <div className={classes.variables}>
-                        <T>The available variables are: </T>
+                        {t('The available variables are: ')}
                         <kbd>
                           {'${'}FIRSTNAME{'}'}
                         </kbd>
@@ -193,7 +145,7 @@ class InjectContentForm extends Component {
                     <Switch
                       key={field.name}
                       name={field.name}
-                      label={<T>{field.name}</T>}
+                      label={t('{field.name}')}
                       style={{ marginTop: 20 }}
                     />
                   );
@@ -205,7 +157,7 @@ class InjectContentForm extends Component {
                         color="primary"
                         onClick={this.handleOpenGallery.bind(this)}
                       >
-                        <T>Add an attachment</T>
+                        {t('Add an attachment')}
                       </Button>
                       <Dialog
                         open={this.state.openGallery}
@@ -225,38 +177,21 @@ class InjectContentForm extends Component {
                               <CloseOutlined />
                             </IconButton>
                             <Typography variant="h6" className={classes.title}>
-                              <T>Select a file</T>
+                              {t('Select a file')}
                             </Typography>
                           </Toolbar>
                         </AppBar>
-                        <DocumentGallery
-                          fileSelector={this.handleDocumentSelection.bind(this)}
-                        />
                       </Dialog>
                       <div style={{ marginTop: 20 }}>
-                        {this.props.attachments.map((attachment) => {
+                        {initialValues.attachments.map((attachment) => {
                           const documentName = R.propOr(
                             '-',
                             'document_name',
                             attachment,
                           );
-                          const documentId = R.propOr(
-                            '-',
-                            'document_id',
-                            attachment,
-                          );
                           return (
                             <Chip
                               key={documentName}
-                              onDelete={this.props.onContentAttachmentDelete.bind(
-                                this,
-                                documentName,
-                              )}
-                              onClick={this.props.downloadAttachment.bind(
-                                this,
-                                documentId,
-                                documentName,
-                              )}
                               icon={<AttachmentOutlined />}
                               label={documentName}
                             />
@@ -279,6 +214,16 @@ class InjectContentForm extends Component {
                   );
               }
             })}
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={pristine || submitting}
+              >
+                {t('Update')}
+              </Button>
+            </div>
           </form>
         )}
       </Form>
@@ -287,20 +232,10 @@ class InjectContentForm extends Component {
 }
 
 InjectContentForm.propTypes = {
-  error: PropTypes.string,
-  pristine: PropTypes.bool,
-  submitting: PropTypes.bool,
+  initialValues: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func,
-  change: PropTypes.func,
-  changeType: PropTypes.func,
-  types: PropTypes.object,
+  injectTypes: PropTypes.array,
   type: PropTypes.string,
-  onContentAttachmentAdd: PropTypes.func,
-  onContentAttachmentDelete: PropTypes.func,
-  attachments: PropTypes.array,
-  downloadAttachment: PropTypes.func,
 };
 
-const formComponent = InjectContentForm;
-export default R.compose(injectIntl, withStyles(styles))(formComponent);
+export default R.compose(inject18n, withStyles(styles))(InjectContentForm);

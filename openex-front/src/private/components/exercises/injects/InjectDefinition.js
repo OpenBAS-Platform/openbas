@@ -26,6 +26,7 @@ import { storeBrowser } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddAudiences from './InjectAddAudiences';
+import InjectContentForm from './InjectContentForm';
 
 const styles = (theme) => ({
   header: {
@@ -59,6 +60,7 @@ const styles = (theme) => ({
   },
   allAudiences: {
     float: 'right',
+    marginTop: -7,
   },
   container: {
     padding: 20,
@@ -207,6 +209,18 @@ class InjectDefinition extends Component {
     );
   }
 
+  onSubmitContent(data) {
+    const initialValues = this.buildIinitialValues();
+    const inputValues = { ...initialValues, ...data };
+    return this.props
+      .updateInject(
+        this.props.exerciseId,
+        this.props.inject.inject_id,
+        inputValues,
+      )
+      .then(() => this.handleCloseEdit());
+  }
+
   render() {
     const {
       t,
@@ -217,6 +231,7 @@ class InjectDefinition extends Component {
       injectId,
       audiences,
       exercise,
+      injectTypes,
     } = this.props;
     const sort = R.sortWith([R.ascend(R.prop('audience_name'))]);
     const sortedAudiences = sort(audiences);
@@ -387,6 +402,15 @@ class InjectDefinition extends Component {
               </div>
             )}
           </List>
+          <Typography variant="h2" style={{ marginTop: 20 }}>
+            {t('Content')}
+          </Typography>
+          <InjectContentForm
+            initialValues={R.propOr({}, 'inject_content', inject)}
+            type={R.propOr('-', 'inject_type', inject)}
+            onSubmit={this.onSubmitContent.bind(this)}
+            injectTypes={injectTypes}
+          />
         </div>
       </div>
     );
@@ -404,6 +428,7 @@ InjectDefinition.propTypes = {
   fetchInjectAudiences: PropTypes.func,
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
+  injectTypes: PropTypes.array,
 };
 
 const select = (state, ownProps) => {

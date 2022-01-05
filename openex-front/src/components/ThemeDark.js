@@ -36,10 +36,10 @@ export default () => ({
     h2: {
       margin: '0 0 10px 0',
       padding: 0,
-      color: '#ffffff',
-      fontWeight: 400,
+      color: '#00b1ff',
+      fontWeight: 600,
       fontSize: 16,
-      letterSpacing: 1.5,
+      letterSpacing: 1.2,
     },
   },
   components: {
@@ -136,6 +136,9 @@ export default () => ({
           },
           '.react_time_range__handle_marker': {
             backgroundColor: '#00bcd4 !important',
+          },
+          '.leaflet-container': {
+            backgroundColor: '#0a1929 !important',
           },
         },
       },

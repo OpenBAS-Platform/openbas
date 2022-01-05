@@ -42,7 +42,6 @@ const styles = (theme) => ({
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -241,15 +240,15 @@ class Organizations extends Component {
             style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
-              <span
+              <div
                 style={{
-                  padding: '0 8px 0 8px',
+                  padding: '0 8px 0 10px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
                 #
-              </span>
+              </div>
             </ListItemIcon>
             <ListItemText
               primary={

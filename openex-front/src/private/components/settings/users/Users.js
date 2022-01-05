@@ -37,12 +37,10 @@ const styles = (theme) => ({
     marginTop: 10,
   },
   itemHead: {
-    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -273,7 +271,7 @@ class Users extends Component {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 8px',
+                  padding: '0 8px 0 10px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}

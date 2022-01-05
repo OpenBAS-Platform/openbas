@@ -5,6 +5,7 @@ import { withStyles } from '@mui/styles';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { connect } from 'react-redux';
 import { storeBrowser } from '../../actions/Schema';
+import Loader from '../../components/Loader';
 
 const styles = () => ({
   paper: {
@@ -18,6 +19,9 @@ const styles = () => ({
 
 const MiniMap = (props) => {
   const { parameters, center, zoom } = props;
+  if (R.isEmpty(parameters) || R.isNil(parameters)) {
+    return <Loader variant="inElement" />;
+  }
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <MapContainer

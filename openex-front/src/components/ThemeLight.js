@@ -26,12 +26,20 @@ export default () => ({
     overline: {
       fontWeight: 500,
     },
-    h5: {
+    h1: {
       margin: '0 0 10px 0',
       padding: 0,
       color: '#00b1ff',
       fontWeight: 400,
       fontSize: 13,
+    },
+    h2: {
+      margin: '0 0 10px 0',
+      padding: 0,
+      color: '#ffffff',
+      fontWeight: 400,
+      fontSize: 16,
+      letterSpacing: 1.5,
     },
   },
   components: {
@@ -49,17 +57,17 @@ export default () => ({
             border: '3px solid #001e3c',
           },
           '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus':
-            {
-              backgroundColor: '#01478DFF',
-            },
+              {
+                backgroundColor: '#01478DFF',
+              },
           '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active':
-            {
-              backgroundColor: '#01478DFF',
-            },
+              {
+                backgroundColor: '#01478DFF',
+              },
           '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
-            {
-              backgroundColor: '#01478DFF',
-            },
+              {
+                backgroundColor: '#01478DFF',
+              },
           '&::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
             backgroundColor: '#01478DFF',
           },
@@ -75,7 +83,7 @@ export default () => ({
             WebkitTextFillColor: '#ffffff !important',
             caretColor: 'transparent !important',
             WebkitBoxShadow:
-              '0 0 0 1000px rgba(4, 8, 17, 0.88) inset !important',
+                '0 0 0 1000px rgba(4, 8, 17, 0.88) inset !important',
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',
           },
@@ -128,6 +136,9 @@ export default () => ({
           },
           '.react_time_range__handle_marker': {
             backgroundColor: '#00bcd4 !important',
+          },
+          '.leaflet-container': {
+            backgroundColor: '#0a1929 !important',
           },
         },
       },

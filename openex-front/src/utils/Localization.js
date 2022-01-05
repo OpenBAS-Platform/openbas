@@ -109,6 +109,8 @@ const i18n = {
       Add: 'Ajouter',
       Scenario: 'Scénario',
       Title: 'Titre',
+      Enabled: 'Activé',
+      Disabled: 'Désactivé',
       'Add target audiences in this inject': 'Ajouter des audiences cibles dans ce stimuli',
       'Targeted audiences': 'Audiences ciblées',
       'All audiences': 'Toutes les audiences',
