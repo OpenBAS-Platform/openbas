@@ -47,7 +47,7 @@ const useDataLoader = (loader = () => {}) => {
   };
   useEffect(() => {
     listeners.set(loader, '');
-    if (sseClient === undefined) {
+    if (EventSource && sseClient === undefined) {
       sseClient = sseConnect();
     } else {
       loader();
