@@ -82,7 +82,7 @@ class AudiencePopover extends Component {
 
   render() {
     const { t, audience } = this.props;
-    const audienceTags = audience.getTags().map((tag) => ({
+    const audienceTags = audience.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,

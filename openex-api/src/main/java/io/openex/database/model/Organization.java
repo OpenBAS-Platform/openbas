@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "organizations")
+@EntityListeners(ModelBaseListener.class)
 public class Organization implements Base {
     @Id
     @Column(name = "organization_id")

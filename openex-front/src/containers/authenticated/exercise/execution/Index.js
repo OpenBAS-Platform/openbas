@@ -403,7 +403,7 @@ IndexExecution.propTypes = {
 };
 
 const filterInjectsPending = (state, { id }) => {
-  const injects = storeBrowser(state).getExercise(id).getInjects();
+  const { injects } = storeBrowser(state).getExercise(id);
   const injectsFilterAndSorting = R.pipe(
     R.filter((n) => {
       const statusName = n.inject_status?.status_name;

@@ -197,7 +197,7 @@ class Index extends Component {
             const injectAudiences = inject?.inject_audiences ?? [];
             const injectUsersNumber = inject?.inject_users_number ?? '-';
             const impactedUsers = inject.inject_all_audiences
-              ? exercise.getUsers().length
+              ? exercise.users.length
               : injectUsersNumber;
             const injectEnabled = inject?.inject_enabled ?? true;
             const injectTypeInHere = this.props.inject_types[injectType] ?? false;
@@ -326,8 +326,8 @@ const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const browser = storeBrowser(state);
   const exercise = browser.getExercise(exerciseId);
-  const audiences = exercise.getAudiences();
-  const injects = exercise.getInjects();
+  const { audiences } = exercise;
+  const { injects } = exercise;
   // endregion
   return {
     exerciseId,

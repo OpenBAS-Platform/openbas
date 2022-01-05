@@ -32,8 +32,6 @@ export const injectType = new schema.Entity(
 );
 export const arrayOfInjectTypes = new schema.Array(injectType);
 
-export const injectTypeExerciseSimple = new schema.Array();
-
 export const injectStatus = new schema.Entity(
   'inject_statuses',
   {},
@@ -155,200 +153,108 @@ export const arrayOfLogs = new schema.Array(log);
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
-const sort = (data, sortBy, orderAsc = true, limit = 1000) => R.take(
-  limit,
-  R.sortWith(
-    orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
-    data,
-  ),
-);
-
+const _buildUser = (state, usr) => {
+  if (usr === undefined) return usr;
+  return {
+    ...usr,
+    admin: usr.user_admin === true,
+    // eslint-disable-next-line max-len
+    tags: usr.user_tags
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+    organization:
+      state.referential.entities.organizations[usr.user_organization],
+    // eslint-disable-next-line max-len
+    tokens: R.filter(
+      (n) => n.token_user === usr.user_id,
+      R.values(state.referential.entities.tokens),
+    ),
+  };
+};
+const _buildOrganization = (state, org) => {
+  if (org === undefined) return org;
+  return {
+    ...org,
+    tags: org.organization_tags
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+  };
+};
+const _buildAudience = (state, aud) => {
+  if (aud === undefined) return aud;
+  return {
+    ...aud,
+    tags: aud.audience_tags
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+    users: R.values(state.referential.entities.users)
+      .filter((n) => aud.audience_users.includes(n.user_id))
+      .map((u) => _buildUser(state, u)),
+  };
+};
+const _buildExercise = (state, id, ex) => {
+  if (ex === undefined) return ex;
+  const getAudiences = () => R.filter(
+    (n) => n.audience_exercise === id,
+    R.values(state.referential.entities.audiences),
+  ).map((a) => _buildAudience(state, a));
+  return {
+    ...ex,
+    exercise_id: id,
+    tags: ex.exercise_tags
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+    injects: R.filter(
+      (n) => n.inject_exercise === id,
+      R.values(state.referential.entities.injects),
+    ),
+    objectives: R.filter(
+      (n) => n.objective_exercise === id,
+      R.values(state.referential.entities.objectives),
+    ),
+    audiences: getAudiences(),
+    users: getAudiences()
+      .map((a) => a.users)
+      .flat(),
+  };
+};
+const _buildDocument = (state, id, doc) => {
+  if (doc === undefined) return doc;
+  return {
+    ...doc,
+    document_id: id,
+    tags: doc.document_tags
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+  };
+};
 export const storeBrowser = (state) => ({
-  _buildUser(usr) {
-    return {
-      ...usr,
-      isAdmin() {
-        return usr.user_admin === true;
-      },
-      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
-        const tags = usr.user_tags
-          .map((tagId) => state.referential.entities.tags[tagId])
-          .filter((t) => t !== undefined);
-        return sort(tags, sortBy, orderAsc, limit);
-      },
-      getOrganization() {
-        return state.referential.entities.organizations[usr.user_organization];
-      },
-      getTokens() {
-        const all = R.values(state.referential.entities.tokens);
-        return R.filter((n) => n.token_user === usr.user_id, all);
-      },
-    };
-  },
-  _buildAudience(aud) {
-    if (aud === undefined) return aud;
-    const browser = this;
-    return {
-      ...aud,
-      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
-        const tags = aud.audience_tags
-          .map((tagId) => state.referential.entities.tags[tagId])
-          .filter((t) => t !== undefined);
-        return sort(tags, sortBy, orderAsc, limit);
-      },
-      getUsers() {
-        const all = R.values(state.referential.entities.users);
-        return R.filter((n) => aud.audience_users.includes(n.user_id), all).map(
-          (u) => browser._buildUser(u),
-        );
-      },
-    };
-  },
-  _buildOrganization(org) {
-    return {
-      ...org,
-      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
-        const tags = org.organization_tags
-          .map((tagId) => state.referential.entities.tags[tagId])
-          .filter((t) => t !== undefined);
-        return sort(tags, sortBy, orderAsc, limit);
-      },
-    };
-  },
-  _buildExercise(id, ex) {
-    if (ex === undefined) return ex;
-    const browser = this;
-    return {
-      ...ex,
-      exercise_id: id,
-      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
-        const tags = ex.exercise_tags
-          .map((tagId) => state.referential.entities.tags[tagId])
-          .filter((t) => t !== undefined);
-        return sort(tags, sortBy, orderAsc, limit);
-      },
-      getInjects(
-        sortBy = 'inject_depends_duration',
-        orderAsc = true,
-        limit = 100,
-      ) {
-        const all = R.values(state.referential.entities.injects);
-        const injects = R.filter((n) => n.inject_exercise === id, all).map(
-          (i) => browser._buildInject(i.inject_id, i),
-        );
-        return sort(injects, sortBy, orderAsc, limit);
-      },
-      getObjectives(sortBy = 'objective_priority') {
-        const all = R.values(state.referential.entities.objectives);
-        const objectives = R.filter((n) => n.objective_exercise === id, all);
-        return R.sortWith([R.ascend(R.prop(sortBy))])(objectives);
-      },
-      getAudiences(sortBy = 'audience_name') {
-        const all = R.values(state.referential.entities.audiences);
-        const audiences = R.filter((n) => n.audience_exercise === id, all).map(
-          (a) => browser._buildAudience(a),
-        );
-        return R.sortWith([R.ascend(R.prop(sortBy))])(audiences);
-      },
-      getUsers() {
-        return this.getAudiences()
-          .map((a) => a.getUsers())
-          .flat();
-      },
-    };
-  },
-  _buildInject(id, inj) {
-    if (inj === undefined) return inj;
-    const browser = this;
-    return {
-      ...inj,
-      inject_id: id,
-      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
-        const tags = inj.inject_tags
-          .map((tagId) => state.referential.entities.tags[tagId])
-          .filter((t) => t !== undefined);
-        return sort(tags, sortBy, orderAsc, limit);
-      },
-      getAudiences() {
-        const all = R.values(state.referential.entities.audiences);
-        const audiences = R.filter(
-          (n) => inj.inject_audiences.includes(n.audience_id),
-          all,
-        ).map((a) => browser._buildAudience(a));
-        return R.sortWith([R.ascend(R.prop('audience_name'))])(audiences);
-      },
-    };
-  },
-  _buildDocument(id, doc) {
-    return {
-      ...doc,
-      document_id: id,
-      getTags(sortBy = 'tag_name', orderAsc = true, limit = 100) {
-        const tags = doc.document_tags
-          .map((tagId) => state.referential.entities.tags[tagId])
-          .filter((t) => t !== undefined);
-        return sort(tags, sortBy, orderAsc, limit);
-      },
-    };
-  },
-  getUsers() {
-    return R.values(state.referential.entities.users).map((usr) => this._buildUser(usr));
-  },
+  logged: state.app.logged,
+  users: R.values(state.referential.entities.users).map((usr) => _buildUser(state, usr)),
+  tags: R.values(state.referential.entities.tags),
+  groups: R.values(state.referential.entities.groups),
+  // eslint-disable-next-line max-len
+  organizations: R.values(state.referential.entities.organizations).map((org) => _buildOrganization(state, org)),
+  // eslint-disable-next-line max-len
+  documents: R.values(state.referential.entities.documents).map((doc) => _buildDocument(state, doc.document_id, doc)),
+  // eslint-disable-next-line max-len
+  exercises: R.values(state.referential.entities.exercises).map((ex) => _buildExercise(state, ex.exercise_id, ex)),
+  settings: R.mergeAll(
+    Object.entries(state.referential.entities.parameters ?? {}).map(
+      ([k, v]) => ({ [k]: v.setting_value }),
+    ),
+  ),
+  me: _buildUser(
+    state.referential.entities.users[R.path(['logged', 'user'], state.app)],
+  ),
+  statistics: state.referential.entities.statistics?.openex,
   getUser(id) {
-    const usr = state.referential.entities.users[id];
-    return this._buildUser(usr);
-  },
-  getGroups() {
-    return R.values(state.referential.entities.groups);
-  },
-  getOrganizations(sortBy = 'organization_name', orderAsc = true) {
-    return sort(
-      R.values(state.referential.entities.organizations),
-      sortBy,
-      orderAsc,
-    ).map((org) => this._buildOrganization(org));
-  },
-  getDocuments(sortBy = 'document_name', orderAsc = true) {
-    return sort(
-      R.values(state.referential.entities.documents),
-      sortBy,
-      orderAsc,
-    ).map((doc) => this._buildDocument(doc.document_id, doc));
-  },
-  getExercises(sortBy = 'exercise_start_date', orderAsc = false) {
-    return sort(
-      R.values(state.referential.entities.exercises),
-      sortBy,
-      orderAsc,
-    ).map((ex) => this._buildExercise(ex.exercise_id, ex));
+    return _buildUser(state, state.referential.entities.users[id]);
   },
   getExercise(id) {
-    const ex = state.referential.entities.exercises[id];
-    return this._buildExercise(id, ex);
+    return _buildExercise(state, id, state.referential.entities.exercises[id]);
   },
   getAudience(id) {
-    const aud = state.referential.entities.audiences[id];
-    return this._buildAudience(aud);
-  },
-  getInject(id) {
-    const inj = state.referential.entities.injects[id];
-    return this._buildInject(id, inj);
-  },
-  getTags(sortBy = 'tag_name', orderAsc = true) {
-    return sort(R.values(state.referential.entities.tags), sortBy, orderAsc);
-  },
-  getTag(id) {
-    return state.referential.entities.tags[id];
-  },
-  getStatistics() {
-    return state.referential.entities.statistics?.openex;
-  },
-  getSettings() {
-    const params = Object.entries(state.referential.entities.parameters ?? {});
-    return R.mergeAll(params.map(([k, v]) => ({ [k]: v.setting_value })));
-  },
-  getMe() {
-    const userId = R.path(['logged', 'user'], state.app);
-    return this._buildUser(state.referential.entities.users[userId]);
+    return _buildAudience(state, state.referential.entities.audiences[id]);
   },
 });

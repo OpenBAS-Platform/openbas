@@ -102,14 +102,14 @@ class UserPopover extends Component {
 
   render() {
     const { t, user, organizations } = this.props;
-    const userOrganizationValue = user.getOrganization();
+    const userOrganizationValue = user.organization;
     const userOrganization = userOrganizationValue
       ? {
         id: userOrganizationValue.organization_id,
         label: userOrganizationValue.organization_name,
       }
       : null;
-    const userTags = user.getTags().map((tag) => ({
+    const userTags = user.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,
@@ -229,7 +229,7 @@ UserPopover.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  return { organizations: browser.getOrganizations() };
+  return { organizations: browser.organizations };
 };
 
 export default R.compose(

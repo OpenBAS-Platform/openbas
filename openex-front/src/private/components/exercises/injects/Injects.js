@@ -324,8 +324,8 @@ class Injects extends Component {
           </ListItem>
           {sortedInjects.map((inject) => {
             const injectUsersNumber = inject?.inject_users_number ?? '-';
-            const impactedUsers = inject.inject_all_injects
-              ? exercise.getUsers().length
+            const impactedUsers = inject.inject_all_audiences
+              ? exercise.users.length
               : injectUsersNumber;
             const duration = splitDuration(inject.inject_depends_duration || 0);
             return (
@@ -380,10 +380,7 @@ class Injects extends Component {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_tags}
                       >
-                        <ItemTags
-                          variant="list"
-                          tags={inject.getTags('tag_name', true, 4)}
-                        />
+                        <ItemTags variant="list" tags={inject.tags} />
                       </div>
                     </div>
                   }
@@ -435,7 +432,7 @@ const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const { exercise } = ownProps;
   return {
-    injects: browser.getExercise(exercise.exercise_id).getInjects(),
+    injects: browser.getExercise(exercise.exercise_id).injects,
     injectTypes: R.values(state.referential.entities.inject_types),
   };
 };

@@ -314,10 +314,9 @@ Groups.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const groups = browser.getGroups();
-  const exercises = browser.getExercises();
-  const users = browser.getUsers();
-  const organizations = browser.getOrganizations();
+  const {
+    groups, exercises, users, organizations,
+  } = browser;
   return {
     groups,
     exercises,

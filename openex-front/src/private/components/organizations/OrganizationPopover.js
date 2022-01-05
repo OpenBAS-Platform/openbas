@@ -78,7 +78,7 @@ class OrganizationPopover extends Component {
 
   render() {
     const { t, organization } = this.props;
-    const organizationTags = organization.getTags().map((tag) => ({
+    const organizationTags = organization.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,

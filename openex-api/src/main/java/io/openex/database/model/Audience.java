@@ -1,7 +1,9 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "audiences")
+@EntityListeners(ModelBaseListener.class)
 public class Audience implements Base {
     @Id
     @Column(name = "audience_id")
@@ -70,6 +73,12 @@ public class Audience implements Base {
     @JsonProperty("audience_users_number")
     public long getUsersNumber() {
         return getUsers().size();
+    }
+
+    @JsonIgnore
+    @Override
+    public boolean isUserObserver(User user) {
+        return getExercise().isUserObserver(user);
     }
 
     public String getId() {

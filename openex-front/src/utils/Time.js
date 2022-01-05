@@ -37,6 +37,9 @@ export const splitDuration = (duration = 0) => {
   delta -= minutes * 60;
   const seconds = delta % 60;
   return {
-    days, hours, minutes, seconds,
+    days,
+    hours,
+    minutes,
+    seconds,
   };
 };

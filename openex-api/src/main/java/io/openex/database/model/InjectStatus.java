@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.database.converter.StatusReportingConverter;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -10,6 +11,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "injects_statuses")
+@EntityListeners(ModelBaseListener.class)
 public class InjectStatus implements Base {
     @Id
     @Column(name = "status_id")

@@ -9,13 +9,9 @@ import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
-import { interval } from 'rxjs';
-import { addInject, fetchInjectTypes } from '../../../../actions/Inject';
+import { addInject } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
-import { FIVE_SECONDS } from '../../../../utils/Time';
-
-const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   createButton: {

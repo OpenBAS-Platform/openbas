@@ -3,6 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.database.repository.InjectReportingRepository;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
@@ -22,6 +23,7 @@ import static java.util.Optional.ofNullable;
 @Table(name = "injects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "inject_type")
+@EntityListeners(ModelBaseListener.class)
 public abstract class Inject<T> extends Injection<T> implements Base {
 
     public enum STATUS {
@@ -123,6 +125,12 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     private InjectReportingRepository<T> statusRepository;
 
     // region transient
+    @JsonIgnore
+    @Override
+    public boolean isUserObserver(User user) {
+        return getExercise().isUserObserver(user);
+    }
+
     @JsonProperty("inject_users_number")
     public long getNumberOfTargetUsers() {
         if (allAudiences) {

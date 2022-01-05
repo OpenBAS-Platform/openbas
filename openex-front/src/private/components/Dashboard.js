@@ -207,10 +207,7 @@ const Dashboard = (props) => {
                           className={classes.bodyItem}
                           style={{ width: '40%' }}
                         >
-                          <ItemTags
-                            variant="list"
-                            tags={exercise.getTags('tag_name', true, 3)}
-                          />
+                          <ItemTags variant="list" tags={exercise.tags} />
                         </div>
                       </div>
                     }
@@ -561,8 +558,8 @@ Dashboard.propTypes = {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    exercises: browser.getExercises(),
-    statistics: browser.getStatistics(),
+    exercises: browser.exercises,
+    statistics: browser.statistics,
   };
 };
 

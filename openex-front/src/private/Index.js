@@ -1,6 +1,5 @@
 import React from 'react';
-import * as PropTypes from 'prop-types';
-import { Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import TopBar from './components/nav/TopBar';
 import LeftBar from './components/nav/LeftBar';
@@ -14,7 +13,7 @@ import Players from './components/players/Players';
 import Organizations from './components/organizations/Organizations';
 import Documents from './components/documents/Documents';
 import IndexIntegrations from './components/integrations/Index';
-import { BoundaryRoute } from '../components/Error';
+import { errorWrapper } from '../components/Error';
 import IndexSettings from './components/settings/Index';
 
 const useStyles = makeStyles((theme) => ({
@@ -49,24 +48,31 @@ const Index = () => {
       <main className={classes.content} style={{ paddingRight: 24 }}>
         <div className={classes.toolbar} />
         <Switch>
-          <BoundaryRoute exact path="/" component={Dashboard} />
-          <BoundaryRoute path="/profile" component={IndexProfile} />
-          <BoundaryRoute exact path="/exercises" component={Exercises} />
-          <BoundaryRoute path="/exercises/:exerciseId" component={IndexExercise} />
-          <BoundaryRoute exact path="/players" component={Players} />
-          <BoundaryRoute exact path="/organizations" component={Organizations} />
-          <BoundaryRoute exact path="/documents" component={Documents} />
-          <BoundaryRoute exact path="/integrations" component={IndexIntegrations} />
-          <BoundaryRoute path="/settings" component={IndexSettings} />
-          <BoundaryRoute component={NotFound} />
+          <Route exact path="/" render={errorWrapper(Dashboard)} />
+          <Route path="/profile" render={errorWrapper(IndexProfile)} />
+          <Route exact path="/exercises" render={errorWrapper(Exercises)} />
+          <Route
+            path="/exercises/:exerciseId"
+            render={errorWrapper(IndexExercise)}
+          />
+          <Route exact path="/players" render={errorWrapper(Players)} />
+          <Route
+            exact
+            path="/organizations"
+            render={errorWrapper(Organizations)}
+          />
+          <Route exact path="/documents" render={errorWrapper(Documents)} />
+          <Route
+            exact
+            path="/integrations"
+            render={errorWrapper(IndexIntegrations)}
+          />
+          <Route path="/settings" render={errorWrapper(IndexSettings)} />
+          <Route component={NotFound} />
         </Switch>
       </main>
     </div>
   );
-};
-
-Index.propTypes = {
-  classes: PropTypes.object,
 };
 
 export default Index;

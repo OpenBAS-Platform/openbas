@@ -7,6 +7,10 @@ import javax.persistence.Transient;
 public interface Base {
     String getId();
 
+    default boolean isUserObserver(User user) {
+        return user.isAdmin();
+    }
+
     @Transient
     default void setUpdateAttributes(Object input) {
         BeanUtils.copyProperties(input, this);

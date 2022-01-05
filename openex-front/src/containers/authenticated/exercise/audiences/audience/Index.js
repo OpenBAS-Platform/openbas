@@ -358,7 +358,7 @@ const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const exercise = browser.getExercise(exerciseId);
   const audience = R.prop(audienceId, state.referential.entities.audiences);
-  const audiences = exercise.getAudiences();
+  const { audiences } = exercise;
   const comchecks = filterComchecks(
     state.referential.entities.comchecks,
     audienceId,

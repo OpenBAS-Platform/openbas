@@ -1,25 +1,29 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import * as PropTypes from 'prop-types';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import { StyledEngineProvider } from '@mui/material/styles';
-import { withRouter } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import { fetchMe, fetchParameters } from '../actions/Application';
 import { ConnectedIntlProvider } from '../components/AppIntlProvider';
 import { ConnectedThemeProvider } from '../components/AppThemeProvider';
 import RootPublic from '../public/Root';
 import Index from './Index';
+import useDataLoader from '../utils/ServerSideEvent';
+import { useStore } from '../store';
 
-const RootPrivate = (props) => {
-  useEffect(() => {
-    props.fetchMe();
-    props.fetchParameters();
-  }, []);
-  if (R.isEmpty(props.logged)) {
+const RootPrivate = () => {
+  const dispatch = useDispatch();
+  const logged = useStore((store) => store.logged);
+
+  useDataLoader(() => {
+    dispatch(fetchMe());
+    dispatch(fetchParameters());
+  });
+
+  if (R.isEmpty(logged)) {
     return <div />;
   }
-  if (!props.logged) {
+  if (!logged) {
     return <RootPublic />;
   }
   return (
@@ -34,17 +38,4 @@ const RootPrivate = (props) => {
   );
 };
 
-RootPrivate.propTypes = {
-  children: PropTypes.node,
-  fetchMe: PropTypes.func,
-  fetchParameters: PropTypes.func,
-};
-
-const select = (state) => ({
-  logged: state.app.logged,
-});
-
-export default R.compose(
-  connect(select, { fetchMe, fetchParameters }),
-  withRouter,
-)(RootPrivate);
+export default RootPrivate;

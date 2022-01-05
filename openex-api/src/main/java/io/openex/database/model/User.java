@@ -3,6 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.CryptoHelper;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
@@ -20,6 +21,7 @@ import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
 
 @Entity
 @Table(name = "users")
+@EntityListeners(ModelBaseListener.class)
 public class User implements Base, OAuth2User {
 
     public static final String ROLE_ADMIN = "ROLE_ADMIN";

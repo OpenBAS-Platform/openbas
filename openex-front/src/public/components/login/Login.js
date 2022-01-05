@@ -74,21 +74,22 @@ const Login = (props) => {
       <Paper variant="outlined">
         <LoginForm onSubmit={onSubmit} />
       </Paper>
-      {isOpenId && (providers ?? []).map((provider) => (
-        <div key={provider.provider_name}>
-          <Button
-            component="a"
-            href={provider.provider_uri}
-            variant="outlined"
-            color="secondary"
-            size="small"
-            style={{ marginTop: 20 }}
-            startIcon={<VpnKeyOutlined />}
-          >
-            <span>{t(provider.provider_login)}</span>
-          </Button>
-        </div>
-      ))}
+      {isOpenId
+        && (providers ?? []).map((provider) => (
+          <div key={provider.provider_name}>
+            <Button
+              component="a"
+              href={provider.provider_uri}
+              variant="outlined"
+              color="secondary"
+              size="small"
+              style={{ marginTop: 20 }}
+              startIcon={<VpnKeyOutlined />}
+            >
+              <span>{t(provider.provider_login)}</span>
+            </Button>
+          </div>
+        ))}
     </div>
   );
 };
@@ -104,7 +105,7 @@ Login.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const parameters = browser.getSettings() ?? {};
+  const parameters = browser.settings ?? {};
   return { parameters };
 };
 

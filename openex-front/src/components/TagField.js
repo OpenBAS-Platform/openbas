@@ -122,7 +122,7 @@ class TagField extends Component {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    tags: browser.getTags(),
+    tags: browser.tags,
   };
 };
 

@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "objectives")
+@EntityListeners(ModelBaseListener.class)
 public class Objective implements Base {
     @Id
     @Column(name = "objective_id")
