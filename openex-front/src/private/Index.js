@@ -15,6 +15,7 @@ import Documents from './components/documents/Documents';
 import IndexIntegrations from './components/integrations/Index';
 import { errorWrapper } from '../components/Error';
 import IndexSettings from './components/settings/Index';
+import useDataLoader from '../utils/ServerSideEvent';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -40,6 +41,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Index = () => {
   const classes = useStyles();
+  useDataLoader();
+
   return (
     <div className={classes.root}>
       <TopBar />
