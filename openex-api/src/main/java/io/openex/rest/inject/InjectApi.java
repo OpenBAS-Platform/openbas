@@ -1,10 +1,7 @@
 package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
-import io.openex.database.model.Audience;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Inject;
-import io.openex.database.model.InjectTypes;
+import io.openex.database.model.*;
 import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
@@ -13,9 +10,11 @@ import io.openex.helper.InjectHelper;
 import io.openex.model.ExecutableInject;
 import io.openex.model.Execution;
 import io.openex.model.Executor;
+import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.InjectInput;
 import io.openex.rest.inject.form.InjectUpdateActivationInput;
+import io.openex.rest.inject.form.UpdateAudiencesInjectInput;
 import io.openex.rest.inject.response.InjectNext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -155,6 +154,16 @@ public class InjectApi<T> extends RestBehavior {
                                             @Valid @RequestBody InjectUpdateActivationInput input) {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());
+        return injectRepository.save(inject);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject<T> updateInjectAudiences(@PathVariable String injectId,
+                                        @Valid @RequestBody UpdateAudiencesInjectInput input) {
+        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+        Iterable<Audience> injectAudiences = audienceRepository.findAllById(input.getAudienceIds());
+        inject.setAudiences(fromIterable(injectAudiences));
         return injectRepository.save(inject);
     }
 

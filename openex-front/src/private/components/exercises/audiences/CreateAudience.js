@@ -7,8 +7,11 @@ import Fab from '@mui/material/Fab';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import { Add } from '@mui/icons-material';
+import { Add, ControlPointOutlined } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
+import ListItem from '@mui/material/ListItem';
+import { ListItemIcon } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
 import AudienceForm from './AudienceForm';
 import { addAudience } from '../../../../actions/Audience';
 import inject18n from '../../../../components/i18n';
@@ -18,11 +21,16 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const styles = () => ({
+const styles = (theme) => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
     right: 30,
+  },
+  text: {
+    fontSize: 15,
+    color: theme.palette.primary.main,
+    fontWeight: 500,
   },
 });
 
@@ -46,21 +54,46 @@ class CreateAudience extends Component {
     )(data);
     return this.props
       .addAudience(this.props.exercise.exercise_id, inputValues)
-      .then((result) => (result.result ? this.handleClose() : result));
+      .then((result) => {
+        if (result.result) {
+          if (this.props.onCreate) {
+            this.props.onCreate(result.result);
+          }
+          return this.handleClose();
+        }
+        return result;
+      });
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, inline } = this.props;
     return (
       <div>
-        <Fab
-          onClick={this.handleOpen.bind(this)}
-          color="primary"
-          aria-label="Add"
-          className={classes.createButton}
-        >
-          <Add />
-        </Fab>
+        {inline === true ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Create a new audience')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+        ) : (
+          <Fab
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+        )}
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -87,6 +120,8 @@ CreateAudience.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
   addAudience: PropTypes.func,
+  inline: PropTypes.bool,
+  onCreate: PropTypes.func,
 };
 
 export default R.compose(

@@ -199,7 +199,7 @@ const _buildInject = (state, inj) => {
       .filter((t) => t !== undefined),
     audiences: R.values(state.referential.entities.audiences)
       .filter((n) => inj.inject_audiences.includes(n.audience_id))
-      .map((u) => _buildUser(state, u)),
+      .map((a) => _buildAudience(state, a)),
   };
 };
 const _buildExercise = (state, id, ex) => {
@@ -265,5 +265,8 @@ export const storeBrowser = (state) => ({
   },
   getAudience(id) {
     return _buildAudience(state, state.referential.entities.audiences[id]);
+  },
+  getInject(id) {
+    return _buildInject(state, state.referential.entities.injects[id]);
   },
 });
