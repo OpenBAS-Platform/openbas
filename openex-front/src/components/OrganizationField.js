@@ -119,7 +119,7 @@ class OrganizationField extends Component {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    organizations: browser.getOrganizations(),
+    organizations: browser.organizations,
   };
 };
 

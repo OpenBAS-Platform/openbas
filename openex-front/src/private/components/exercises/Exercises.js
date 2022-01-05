@@ -347,7 +347,7 @@ class Exercises extends Component {
                     >
                       <ItemTags
                         variant="list"
-                        tags={exercise.getTags('tag_name', true, 4)}
+                        tags={exercise.tags}
                       />
                     </div>
                   </div>
@@ -376,8 +376,8 @@ Exercises.propTypes = {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    exercises: browser.getExercises(),
-    userAdmin: browser.getMe().isAdmin(),
+    exercises: browser.exercises,
+    userAdmin: browser.me?.admin,
   };
 };
 

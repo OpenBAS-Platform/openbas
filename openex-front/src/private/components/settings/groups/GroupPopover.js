@@ -294,7 +294,7 @@ class GroupPopover extends Component {
                     const organizationName = R.propOr(
                       '-',
                       'organization_name',
-                      user.getOrganization(),
+                      user.organization,
                     );
                     return (
                       <ListItem
@@ -478,9 +478,7 @@ GroupPopover.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const users = browser.getUsers();
-  const exercises = browser.getExercises();
-  const organizations = browser.getOrganizations();
+  const { users, exercises, organizations } = browser;
   return {
     users,
     organizations,

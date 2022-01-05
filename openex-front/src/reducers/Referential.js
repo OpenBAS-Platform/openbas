@@ -1,4 +1,5 @@
-import Immutable, { isImmutable } from 'seamless-immutable';
+import Immutable from 'seamless-immutable';
+import * as R from 'ramda';
 import * as Constants from '../constants/ActionTypes';
 
 export const entitiesInitializer = Immutable({
@@ -25,22 +26,20 @@ export const entitiesInitializer = Immutable({
     tags: Immutable({}),
     documents: Immutable({}),
     outcomes: Immutable({}),
-    parmeters: Immutable({}),
+    parameters: Immutable({}),
   }),
 });
 
 const referential = (state = Immutable({}), action = {}) => {
   switch (action.type) {
+    case Constants.DATA_UPDATE_SUCCESS:
     case Constants.DATA_FETCH_SUCCESS: {
-      if (isImmutable(action.payload)) {
-        return state.merge(action.payload.without('result'), { deep: true });
-      }
-      return state;
+      return state.merge(R.dissoc('result', action.payload), { deep: true });
     }
     case Constants.DATA_DELETE_SUCCESS: {
       return state.setIn(
         ['entities', action.payload.type],
-        state.entities[action.payload.type].without(action.payload.id),
+        R.dissoc(action.payload.id, state.entities[action.payload.type]),
       );
     }
     default: {

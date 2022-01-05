@@ -177,8 +177,8 @@ class IndexExercise extends Component {
 
   render() {
     const { classes } = this.props;
-    const exerciseUsers = this.props.exercise.getUsers();
-    const exerciseObjectives = this.props.exercise.getObjectives();
+    const exerciseUsers = this.props.exercise.users;
+    const exerciseObjectives = this.props.exercise.objectives;
     return (
       <div>
         <Grid container spacing={3}>
@@ -411,7 +411,7 @@ class IndexExercise extends Component {
                     : [48.8566969, 2.3514616]
                 }
                 users={exerciseUsers}
-                injects={this.props.exercise.getInjects()}
+                injects={this.props.exercise.injects}
               />
             )}
           </Grid>
@@ -522,7 +522,7 @@ const select = (state, ownProps) => {
   const { id: exerciseId } = ownProps;
   const browser = storeBrowser(state);
   const exercise = browser.getExercise(exerciseId);
-  const audiences = exercise.getAudiences();
+  const { audiences } = exercise;
   return { exerciseId, exercise, audiences };
 };
 

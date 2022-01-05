@@ -1,6 +1,7 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.audit.ModelBaseListener;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "documents")
+@EntityListeners(ModelBaseListener.class)
 public class Document implements Base {
     @Id
     @Column(name = "document_id")

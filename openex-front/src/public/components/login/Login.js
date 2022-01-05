@@ -104,7 +104,7 @@ Login.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const parameters = browser.getSettings() ?? {};
+  const parameters = browser.settings ?? {};
   return { parameters };
 };
 

@@ -1,12 +1,14 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.audit.ModelBaseListener;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "parameters")
+@EntityListeners(ModelBaseListener.class)
 public class Setting implements Base {
 
     public enum SETTING_KEYS {

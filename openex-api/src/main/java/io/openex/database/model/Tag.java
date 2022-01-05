@@ -1,7 +1,9 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "tags")
+@EntityListeners(ModelBaseListener.class)
 public class Tag implements Base {
     @Id
     @Column(name = "tag_id")
@@ -37,6 +40,12 @@ public class Tag implements Base {
     @JsonProperty("tags_documents")
     @Fetch(FetchMode.SUBSELECT)
     private List<Document> documents = new ArrayList<>();
+
+    @JsonIgnore
+    @Override
+    public boolean isUserObserver(User user) {
+        return true;
+    }
 
     @Override
     public String getId() {

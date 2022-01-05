@@ -109,14 +109,14 @@ class PlayerPopover extends Component {
     const {
       t, userAdmin, user, organizations, audienceId,
     } = this.props;
-    const userOrganizationValue = user.getOrganization();
+    const userOrganizationValue = user.organization;
     const userOrganization = userOrganizationValue
       ? {
         id: userOrganizationValue.organization_id,
         label: userOrganizationValue.organization_name,
       }
       : null;
-    const userTags = user.getTags().map((tag) => ({
+    const userTags = user.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,
@@ -256,7 +256,7 @@ PlayerPopover.propTypes = {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    userAdmin: browser.getMe().isAdmin(),
+    userAdmin: browser.me?.admin,
   };
 };
 

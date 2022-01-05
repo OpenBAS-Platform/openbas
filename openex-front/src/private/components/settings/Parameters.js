@@ -86,8 +86,8 @@ Parameters.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const userAdmin = browser.getMe().isAdmin();
-  const settings = browser.getSettings();
+  const userAdmin = browser.me?.admin;
+  const { settings } = browser;
   return { userAdmin, settings };
 };
 

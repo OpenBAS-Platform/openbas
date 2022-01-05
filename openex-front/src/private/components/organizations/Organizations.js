@@ -297,7 +297,7 @@ class Organizations extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.organization_tags}
                     >
-                      <ItemTags variant="list" tags={organization.getTags()} />
+                      <ItemTags variant="list" tags={organization.tags} />
                     </div>
                   </div>
                 }
@@ -323,7 +323,7 @@ Organizations.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  return { organizations: browser.getOrganizations() };
+  return { organizations: browser.organizations };
 };
 
 export default R.compose(

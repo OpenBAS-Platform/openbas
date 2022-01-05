@@ -291,7 +291,7 @@ class Injects extends Component {
           {sortedInjects.map((inject) => {
             const injectUsersNumber = inject?.inject_users_number ?? '-';
             const impactedUsers = inject.inject_all_audiences
-              ? exercise.getUsers().length
+              ? exercise.users.length
               : injectUsersNumber;
             return (
               <ListItem
@@ -335,7 +335,7 @@ class Injects extends Component {
                       >
                         <ItemTags
                           variant="list"
-                          tags={inject.getTags('tag_name', true, 4)}
+                          tags={inject.tags}
                         />
                       </div>
                     </div>
@@ -365,7 +365,7 @@ const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const { exercise } = ownProps;
   return {
-    injects: browser.getExercise(exercise.exercise_id).getInjects(),
+    injects: browser.getExercise(exercise.exercise_id).injects,
   };
 };
 

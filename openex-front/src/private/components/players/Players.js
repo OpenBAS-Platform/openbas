@@ -1,34 +1,30 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import { connect } from 'react-redux';
-import { interval } from 'rxjs';
+import { useDispatch } from 'react-redux';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   PersonOutlined,
 } from '@mui/icons-material';
-import inject18n from '../../../components/i18n';
+import { useFormatter } from '../../../components/i18n';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
-import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
 import CreatePlayer from './CreatePlayer';
 import PlayerPopover from './PlayerPopover';
 import TagsFilter from '../../../components/TagsFilter';
 import SearchFilter from '../../../components/SearchFilter';
-import { storeBrowser } from '../../../actions/Schema';
 import { fetchTags } from '../../../actions/Tag';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { useStore } from '../../../store';
 
-const interval$ = interval(FIVE_SECONDS);
-
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   parameters: {
     float: 'left',
     marginTop: -10,
@@ -66,7 +62,7 @@ const styles = (theme) => ({
   icon: {
     color: theme.palette.primary.main,
   },
-});
+}));
 
 const inlineStylesHeaders = {
   iconSort: {
@@ -150,52 +146,41 @@ const inlineStyles = {
   },
 };
 
-class Players extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sortBy: 'user_email',
-      orderAsc: true,
-      keyword: '',
-      tags: [],
-    };
-  }
+const Players = () => {
+  const classes = useStyles();
+  const { t } = useFormatter();
+  const dispatch = useDispatch();
+  const [order, setOrder] = useState({ sortBy: 'user_email', orderAsc: true });
+  const [keyword, setKeyword] = useState('');
+  const [tags, setTags] = useState([]);
 
-  componentDidMount() {
-    this.props.fetchTags();
-    this.props.fetchOrganizations();
-    this.props.fetchPlayers();
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchPlayers();
-    });
-  }
+  const users = useStore((store) => store.users);
 
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-  }
+  useDataLoader(() => {
+    dispatch(fetchTags());
+    dispatch(fetchOrganizations());
+    dispatch(fetchPlayers());
+  });
 
-  handleSearch(value) {
-    this.setState({ keyword: value });
-  }
+  const handleSearch = (value) => {
+    setKeyword(value);
+  };
 
-  handleAddTag(value) {
-    if (value) {
-      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
-    }
-  }
+  const handleAddTag = (value) => {
+    setTags(R.uniq(R.append(value, tags)));
+  };
 
-  handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
-  }
+  const handleRemoveTag = (value) => {
+    const remainingTags = R.filter((n) => n.id !== value, tags);
+    setTags(remainingTags);
+  };
 
-  reverseBy(field) {
-    this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
-  }
+  const reverseBy = (field) => {
+    setOrder({ sortBy: field, orderAsc: !this.state.orderAsc });
+  };
 
-  sortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
+  const sortHeader = (field, label, isSortable) => {
+    const sortComponent = order.orderAsc ? (
       <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
     ) : (
       <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
@@ -204,10 +189,10 @@ class Players extends Component {
       return (
         <div
           style={inlineStylesHeaders[field]}
-          onClick={this.reverseBy.bind(this, field)}
+          onClick={reverseBy}
         >
           <span>{t(label)}</span>
-          {sortBy === field ? sortComponent : ''}
+          {order.sortBy === field ? sortComponent : ''}
         </div>
       );
     }
@@ -216,54 +201,45 @@ class Players extends Component {
         <span>{t(label)}</span>
       </div>
     );
-  }
+  };
 
-  render() {
-    const { classes, users } = this.props;
-    const {
-      keyword, sortBy, orderAsc, tags,
-    } = this.state;
-    const filterByKeyword = (n) => keyword === ''
-      || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.user_organization || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
+  const filterByKeyword = (n) => {
+    const isEmptyKeyword = keyword === '';
+    const isEmail = (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const isFirstname = (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const isLastname = (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const isPhone = (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    const isOrganization = (n.user_organization || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    return isEmptyKeyword || isEmail || isFirstname || isLastname || isPhone || isOrganization;
+  };
+
+  const sortedUsers = () => {
     const sort = R.sortWith(
-      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
+      order ? [R.ascend(R.prop(order.sortBy))] : [R.descend(R.prop(order.sortBy))],
     );
-    const sortedUsers = R.pipe(
-      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
-      R.filter(
-        (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.user_tags),
-            R.pluck('id', tags),
-          ),
-      ),
+    const tagIds = tags.map((ta) => ta.id);
+    const result = R.pipe(
+      R.filter((n) => tags.length === 0 || n.user_tags.some((usrTag) => tagIds.includes(usrTag))),
       R.filter(filterByKeyword),
       sort,
     )(users);
-    return (
+    return result;
+  };
+
+  return (
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
               small={true}
-              onChange={this.handleSearch.bind(this)}
+              onChange={handleSearch}
               keyword={keyword}
             />
           </div>
           <div style={{ float: 'left', marginRight: 20 }}>
             <TagsFilter
-              onAddTag={this.handleAddTag.bind(this)}
-              onRemoveRag={this.handleRemoveTag.bind(this)}
+              onAddTag={handleAddTag}
+              onRemoveTag={handleRemoveTag}
               currentTags={tags}
             />
           </div>
@@ -289,17 +265,17 @@ class Players extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('user_email', 'Email address', true)}
-                  {this.sortHeader('user_firstname', 'Firstname', true)}
-                  {this.sortHeader('user_lastname', 'Lastname', true)}
-                  {this.sortHeader('user_organization', 'Organization', true)}
-                  {this.sortHeader('user_tags', 'Tags', true)}
+                  {sortHeader('user_email', 'Email address', true)}
+                  {sortHeader('user_firstname', 'Firstname', true)}
+                  {sortHeader('user_lastname', 'Lastname', true)}
+                  {sortHeader('user_organization', 'Organization', true)}
+                  {sortHeader('user_tags', 'Tags', true)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedUsers.map((user) => (
+          {sortedUsers().map((user) => (
             <ListItem
               key={user.user_id}
               classes={{ root: classes.item }}
@@ -341,7 +317,7 @@ class Players extends Component {
                     >
                       <ItemTags
                         variant="list"
-                        tags={user.getTags('tag_name', true, 3)}
+                        tags={user.tags}
                       />
                     </div>
                   </div>
@@ -355,28 +331,7 @@ class Players extends Component {
         </List>
         <CreatePlayer />
       </div>
-    );
-  }
-}
-
-Players.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  users: PropTypes.array,
-  fetchPlayers: PropTypes.func,
-  fetchOrganizations: PropTypes.func,
-  fetchTags: PropTypes.func,
+  );
 };
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  return {
-    users: browser.getUsers(),
-  };
-};
-
-export default R.compose(
-  connect(select, { fetchPlayers, fetchOrganizations, fetchTags }),
-  inject18n,
-  withStyles(styles),
-)(Players);
+export default Players;

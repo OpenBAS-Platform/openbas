@@ -244,7 +244,7 @@ class AudiencesPlayers extends Component {
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedUsers = R.pipe(
-      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
+      R.map((n) => R.assoc('user_organization', n.organization?.organization_name, n)),
       R.filter(
         (n) => tags.length === 0
           || R.any(
@@ -392,7 +392,7 @@ class AudiencesPlayers extends Component {
                     >
                       <ItemTags
                         variant="list"
-                        tags={user.getTags('tag_name', true, 2)}
+                        tags={user.tags}
                       />
                     </div>
                   </div>
@@ -436,10 +436,11 @@ AudiencesPlayers.propTypes = {
 const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const { audienceId } = ownProps;
+  const audience = browser.getAudience(audienceId);
   return {
-    organization: browser.getOrganizations(),
-    audience: browser.getAudience(audienceId),
-    users: browser.getAudience(audienceId)?.getUsers() || [],
+    organization: browser.organizations,
+    audience,
+    users: audience?.users || [],
   };
 };
 

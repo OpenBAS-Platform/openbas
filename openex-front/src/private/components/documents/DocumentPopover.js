@@ -76,7 +76,7 @@ class DocumentPopover extends Component {
 
   render() {
     const { t, document } = this.props;
-    const documentTags = document.getTags().map((tag) => ({
+    const documentTags = document.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,
@@ -160,8 +160,8 @@ class DocumentPopover extends Component {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const user = browser.getMe();
-  return { user, userAdmin: user.isAdmin() };
+  const user = browser.me;
+  return { user, userAdmin: user?.admin };
 };
 
 DocumentPopover.propTypes = {

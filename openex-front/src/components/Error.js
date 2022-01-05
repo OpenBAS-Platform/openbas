@@ -26,48 +26,16 @@ ErrorBoundaryComponent.propTypes = {
 };
 export const ErrorBoundary = compose(withRouter)(ErrorBoundaryComponent);
 
-export const wrapBound = (WrappedComponent) => {
-  class Wrapper extends React.PureComponent {
-    render() {
-      return (
-        <ErrorBoundary display={<SimpleError />}>
-          <WrappedComponent {...this.props} />
-        </ErrorBoundary>
-      );
-    }
-  }
-  return Wrapper;
-};
-
-export const BoundaryRoute = (props) => {
-  if (props.component) {
-    const route = dissoc('component', props);
-    return <Route component={wrapBound(props.component)} {...route} />;
-  }
-  if (props.render) {
-    const route = dissoc('render', props);
-    return (
-      <Route
-        render={(routeProps) => {
-          const comp = props.render(routeProps);
-          return (
-            <ErrorBoundary display={<SimpleError />}>{comp}</ErrorBoundary>
-          );
-        }}
-        {...route}
-      />
-    );
-  }
-  return <Route {...props} />;
-};
-
-BoundaryRoute.propTypes = {
-  display: PropTypes.object,
-};
-
-// Really simple error display
-export const SimpleError = () => (
-  <div>
-    An unknown error occurred. Please contact your administrator or the OpenEx maintainers.
-  </div>
+const SimpleError = () => (
+    <div>
+      An unknown error occurred. Please contact your administrator or the OpenEx maintainers.
+    </div>
 );
+
+// eslint-disable-next-line react/display-name,arrow-body-style
+export const errorWrapper = (Component) => {
+  // eslint-disable-next-line react/display-name
+  return (routeProps) => <ErrorBoundary display={<SimpleError />}>
+        <Component {...routeProps} />
+    </ErrorBoundary>;
+};

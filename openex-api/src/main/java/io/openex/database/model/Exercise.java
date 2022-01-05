@@ -3,6 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
@@ -20,6 +21,7 @@ import static java.util.Arrays.stream;
 
 @Entity
 @Table(name = "exercises")
+@EntityListeners(ModelBaseListener.class)
 public class Exercise implements Base {
 
     private enum STATUS {
@@ -180,6 +182,7 @@ public class Exercise implements Base {
     }
 
     @JsonIgnore
+    @Override
     public boolean isUserObserver(User user) {
         return user.isAdmin() || getObservers().stream().map(User::getId).anyMatch(u -> u.equals(user.getId()));
     }

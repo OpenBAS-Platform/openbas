@@ -309,7 +309,7 @@ class Documents extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.document_tags}
                     >
-                      <ItemTags variant="list" tags={document.getTags()} />
+                      <ItemTags variant="list" tags={document.tags} />
                     </div>
                   </div>
                 }
@@ -337,8 +337,8 @@ Documents.propTypes = {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    documents: browser.getDocuments(),
-    userAdmin: browser.getMe().isAdmin(),
+    documents: browser.documents,
+    userAdmin: browser.me?.admin,
   };
 };
 

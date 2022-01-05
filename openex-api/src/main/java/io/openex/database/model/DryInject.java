@@ -2,6 +2,7 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.database.repository.DryInjectReportingRepository;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.model.Execution;
@@ -17,6 +18,7 @@ import java.util.List;
 @Table(name = "dryinjects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dryinject_type")
+@EntityListeners(ModelBaseListener.class)
 public abstract class DryInject<T> extends Injection<T> implements Base {
 
     @Id

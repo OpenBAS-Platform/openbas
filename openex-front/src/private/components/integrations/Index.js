@@ -1,12 +1,12 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Switch } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 import Integrations from './Integrations';
-import { BoundaryRoute } from '../../../components/Error';
+import { errorWrapper } from '../../../components/Error';
 
 const Index = () => (
   <Switch>
-    <BoundaryRoute exact path="/integrations" component={Integrations} />
+    <Route exact path="/integrations" render={errorWrapper(Integrations)} />
   </Switch>
 );
 

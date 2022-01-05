@@ -248,7 +248,7 @@ class Users extends Component {
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedUsers = R.pipe(
-      R.map((n) => R.assoc('user_organization', n.getOrganization()?.organization_name, n)),
+      R.map((n) => R.assoc('user_organization', n.organization?.organization_name, n)),
       R.filter(filterByKeyword),
       sort,
     )(users);
@@ -345,7 +345,7 @@ class Users extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.user_tags}
                     >
-                      <ItemTags variant="list" tags={user.getTags('tag_name', true, 3)} />
+                      <ItemTags variant="list" tags={user.tags} />
                     </div>
                   </div>
                 }
@@ -375,7 +375,7 @@ Users.propTypes = {
 const select = (state) => {
   const browser = storeBrowser(state);
   return {
-    users: browser.getUsers(),
+    users: browser.users,
   };
 };
 

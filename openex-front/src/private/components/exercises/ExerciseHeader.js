@@ -63,7 +63,7 @@ class ExerciseHeader extends Component {
 
   deleteTag(tagId) {
     const { exercise } = this.props;
-    const exerciseTags = exercise.getTags();
+    const exerciseTags = exercise.tags;
     const tags = exerciseTags.filter((t) => t.tag_id !== tagId);
     return this.props.updateExerciseTags(exercise.exercise_id, {
       exercise_tags: tags.map((t) => t.tag_id),
@@ -72,7 +72,7 @@ class ExerciseHeader extends Component {
 
   submitTags(values) {
     const { exercise } = this.props;
-    const exerciseTags = exercise.getTags();
+    const exerciseTags = exercise.tags;
     this.handleToggleAddTag();
     return this.props.updateExerciseTags(exercise.exercise_id, {
       exercise_tags: R.uniq([
@@ -84,7 +84,7 @@ class ExerciseHeader extends Component {
 
   render() {
     const { classes, exercise, t } = this.props;
-    const tags = exercise.getTags();
+    const { tags } = exercise;
     return (
       <div className={classes.container}>
         <Typography

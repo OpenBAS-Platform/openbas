@@ -57,7 +57,7 @@ const Index = (props) => {
   const {
     classes, user, organizations, t,
   } = props;
-  const userTokens = user.getTokens();
+  const userTokens = user.tokens;
   const onUpdate = (data) => {
     const inputValues = R.pipe(
       R.assoc(
@@ -72,7 +72,7 @@ const Index = (props) => {
 
   const onUpdatePassword = (data) => props.updateMePassword(data.user_plain_password);
 
-  const userOrganizationValue = user.getOrganization();
+  const userOrganizationValue = user.organization;
   const userOrganization = userOrganizationValue
     ? {
       id: userOrganizationValue.organization_id,
@@ -173,7 +173,7 @@ Index.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  return { user: browser.getMe(), organizations: browser.getOrganizations() };
+  return { user: browser.me, organizations: browser.organizations };
 };
 
 export default R.compose(

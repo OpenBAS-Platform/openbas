@@ -1,13 +1,11 @@
 import React from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles, styled } from '@mui/styles';
+import { makeStyles, styled } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
-import { withRouter } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   GroupsOutlined,
   NotificationsOutlined,
@@ -22,10 +20,11 @@ import {
 import LinearProgress, {
   linearProgressClasses,
 } from '@mui/material/LinearProgress';
-import inject18n from '../../../components/i18n';
+import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
+import { useStore } from '../../../store';
 
-const styles = () => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
@@ -59,7 +58,7 @@ const styles = () => ({
     overflow: 'hidden',
     height: '100%',
   },
-});
+}));
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
@@ -85,10 +84,11 @@ const iconStatus = (status) => {
   }
 };
 
-const Exercise = (props) => {
-  const {
-    t, fldt, classes, exercise,
-  } = props;
+const Exercise = () => {
+  const classes = useStyles();
+  const { exerciseId } = useParams();
+  const { t, fldt } = useFormatter();
+  const exercise = useStore((store) => store.getExercise(exerciseId));
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -210,10 +210,4 @@ const Exercise = (props) => {
   );
 };
 
-Exercise.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  exercise: PropTypes.object,
-};
-
-export default R.compose(inject18n, withRouter, withStyles(styles))(Exercise);
+export default Exercise;

@@ -359,7 +359,7 @@ class Audiences extends Component {
                     >
                       <ItemTags
                         variant="list"
-                        tags={audience.getTags('tag_name', true, 4)}
+                        tags={audience.tags}
                       />
                     </div>
                   </div>
@@ -403,7 +403,7 @@ const select = (state, ownProps) => {
   const browser = storeBrowser(state);
   const { exercise } = ownProps;
   return {
-    audiences: browser.getExercise(exercise.exercise_id).getAudiences(),
+    audiences: browser.getExercise(exercise.exercise_id).audiences,
   };
 };
 

@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import IndexComcheck from './components/comcheck/Index';
 import Login from './components/login/Login';
-import { BoundaryRoute } from '../components/Error';
+import { errorWrapper } from '../components/Error';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,7 +34,7 @@ const Index = () => {
     <div className={classes.root}>
       <main className={classes.content}>
         <Switch>
-          <BoundaryRoute exact path="/comcheck/:statusId" component={IndexComcheck} />
+          <Route exact path="/comcheck/:statusId" render={errorWrapper(IndexComcheck)} />
           <Route component={Login} />
         </Switch>
       </main>

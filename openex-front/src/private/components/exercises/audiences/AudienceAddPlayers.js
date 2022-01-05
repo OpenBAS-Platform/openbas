@@ -160,7 +160,7 @@ class AudienceAddPlayers extends Component {
                     const organizationName = R.propOr(
                       '-',
                       'organization_name',
-                      user.getOrganization(),
+                      user.organization,
                     );
                     return (
                       <ListItem
@@ -241,8 +241,7 @@ AudienceAddPlayers.propTypes = {
 
 const select = (state) => {
   const browser = storeBrowser(state);
-  const users = browser.getUsers();
-  const organizations = browser.getOrganizations();
+  const { users, organizations } = browser;
   return {
     users,
     organizations,
