@@ -12,9 +12,19 @@ export const fetchInjects = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
+export const fetchInject = (exerciseId, injectId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
+  return getReferential(schema.inject, uri)(dispatch);
+};
+
 export const fetchExerciseInjects = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects`;
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
+};
+
+export const fetchInjectAudiences = (exerciseId, injectId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/injects/${injectId}/audiences`;
+  return getReferential(schema.arrayOfAudiences, uri)(dispatch);
 };
 
 export const downloadExportInjects = (exerciseId) => (dispatch) => fileSave(

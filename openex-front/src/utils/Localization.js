@@ -107,8 +107,13 @@ const i18n = {
       Send: 'Envoyer',
       Remove: 'Retirer',
       Add: 'Ajouter',
+      Scenario: 'Scénario',
+      Title: 'Titre',
+      'Trigger after': 'Se déclenche après',
+      'Create a new inject': 'Créer un nouveau stimuli',
       'Remove from the audience': "Retirer de l'audience",
       'Update the audience': "Modifier l'audience",
+      'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the audience?':
         'Souhaitez-vous retirer le joueur de cette audience ?',
       'Add players in this audience': 'Ajouter des joueurs dans cette audience',
@@ -117,10 +122,12 @@ const i18n = {
         "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails des joueurs et une simulation pour envoyer les stimulis à l'équipe d'animation.",
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
+      openex_manual: 'Manuel (rappel)',
     },
     en: {
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
+      openex_manual: 'Manual (reminder)',
     },
   },
 };

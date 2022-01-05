@@ -216,6 +216,7 @@ export const storeBrowser = (state) => ({
     };
   },
   _buildExercise(id, ex) {
+    if (ex === undefined) return ex;
     const browser = this;
     return {
       ...ex,
@@ -257,6 +258,8 @@ export const storeBrowser = (state) => ({
     };
   },
   _buildInject(id, inj) {
+    if (inj === undefined) return inj;
+    const browser = this;
     return {
       ...inj,
       inject_id: id,
@@ -265,6 +268,14 @@ export const storeBrowser = (state) => ({
           .map((tagId) => state.referential.entities.tags[tagId])
           .filter((t) => t !== undefined);
         return sort(tags, sortBy, orderAsc, limit);
+      },
+      getAudiences() {
+        const all = R.values(state.referential.entities.audiences);
+        const audiences = R.filter(
+          (n) => inj.inject_audiences.includes(n.audience_id),
+          all,
+        ).map((a) => browser._buildAudience(a));
+        return R.sortWith([R.ascend(R.prop('audience_name'))])(audiences);
       },
     };
   },
@@ -318,6 +329,10 @@ export const storeBrowser = (state) => ({
   getAudience(id) {
     const aud = state.referential.entities.audiences[id];
     return this._buildAudience(aud);
+  },
+  getInject(id) {
+    const inj = state.referential.entities.injects[id];
+    return this._buildInject(id, inj);
   },
   getTags(sortBy = 'tag_name', orderAsc = true) {
     return sort(R.values(state.referential.entities.tags), sortBy, orderAsc);

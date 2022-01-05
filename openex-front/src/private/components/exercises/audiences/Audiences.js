@@ -366,7 +366,10 @@ class Audiences extends Component {
                 }
               />
               <ListItemSecondaryAction>
-                <AudiencePopover audience={audience} exercise={exercise} />
+                <AudiencePopover
+                  exerciseId={exercise.exercise_id}
+                  audience={audience}
+                />
               </ListItemSecondaryAction>
             </ListItem>
           ))}

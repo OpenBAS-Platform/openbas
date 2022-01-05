@@ -20,13 +20,23 @@ export const timeFormat = (data) => (data ? parse(data).format(timeDateFormat) :
 
 export const dateFormat = (data, specificFormat) => (data ? parse(data).format(specificFormat || openexDateFormat) : '-');
 
-export const durationFormat = (data) => moment
-  .utc(moment.duration({ seconds: data }).asMilliseconds())
-  .format('H[H] m[M]');
-
 export const dateToISO = (date) => {
   const momentDate = parse(date, openexDateFormat, true);
   return momentDate.isValid() ? momentDate.format() : 'invalid-date';
 };
 
 export const logDate = () => now().format('HH:mm:ss.SSS');
+
+export const splitDuration = (duration = 0) => {
+  let delta = duration;
+  const days = Math.floor(delta / 86400);
+  delta -= days * 86400;
+  const hours = Math.floor(delta / 3600) % 24;
+  delta -= hours * 3600;
+  const minutes = Math.floor(delta / 60) % 60;
+  delta -= minutes * 60;
+  const seconds = delta % 60;
+  return {
+    days, hours, minutes, seconds,
+  };
+};

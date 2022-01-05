@@ -33,6 +33,14 @@ export default () => ({
       fontWeight: 400,
       fontSize: 13,
     },
+    h2: {
+      margin: '0 0 10px 0',
+      padding: 0,
+      color: '#ffffff',
+      fontWeight: 400,
+      fontSize: 16,
+      letterSpacing: 1.5,
+    },
   },
   components: {
     MuiCssBaseline: {

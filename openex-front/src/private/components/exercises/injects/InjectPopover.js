@@ -13,16 +13,17 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { updateAudience, deleteAudience } from '../../../../actions/Audience';
+import { updateInject, deleteInject } from '../../../../actions/Inject';
+import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
-import AudienceForm from './AudienceForm';
+import { splitDuration } from '../../../../utils/Time';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-class AudiencePopover extends Component {
+class InjectPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -52,12 +53,23 @@ class AudiencePopover extends Component {
 
   onSubmitEdit(data) {
     const inputValues = R.pipe(
-      R.assoc('audience_tags', R.pluck('id', data.audience_tags)),
+      R.assoc(
+        'inject_depends_duration',
+        data.inject_depends_duration_days * 3600 * 24
+          + data.inject_depends_duration_hours * 3600
+          + data.inject_depends_duration_minutes * 60
+          + data.inject_depends_duration_seconds,
+      ),
+      R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
+      R.dissoc('inject_depends_duration_days'),
+      R.dissoc('inject_depends_duration_hours'),
+      R.dissoc('inject_depends_duration_minutes'),
+      R.dissoc('inject_depends_duration_seconds'),
     )(data);
     return this.props
-      .updateAudience(
+      .updateInject(
         this.props.exerciseId,
-        this.props.audience.audience_id,
+        this.props.inject.inject_id,
         inputValues,
       )
       .then(() => this.handleCloseEdit());
@@ -73,24 +85,31 @@ class AudiencePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteAudience(
-      this.props.exerciseId,
-      this.props.audience.audience_id,
-    );
+    this.props.deleteInject(this.props.inject.inject_id);
     this.handleCloseDelete();
   }
 
   render() {
-    const { t, audience } = this.props;
-    const audienceTags = audience.getTags().map((tag) => ({
+    const { t, inject, injectTypes } = this.props;
+    const injectTags = inject.getTags().map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,
     }));
+    const duration = splitDuration(inject.inject_depends_duration || 0);
     const initialValues = R.pipe(
-      R.assoc('audience_tags', audienceTags),
-      R.pick(['audience_name', 'audience_description', 'audience_tags']),
-    )(audience);
+      R.assoc('inject_tags', injectTags),
+      R.pick([
+        'inject_title',
+        'inject_type',
+        'inject_description',
+        'inject_tags',
+      ]),
+      R.assoc('inject_depends_duration_days', duration.days),
+      R.assoc('inject_depends_duration_hours', duration.hours),
+      R.assoc('inject_depends_duration_minutes', duration.minutes),
+      R.assoc('inject_depends_duration_seconds', duration.seconds),
+    )(inject);
     return (
       <div>
         <IconButton
@@ -119,7 +138,7 @@ class AudiencePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to delete this audience?')}
+              {t('Do you want to delete this inject?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -146,11 +165,12 @@ class AudiencePopover extends Component {
           fullWidth={true}
           maxWidth="md"
         >
-          <DialogTitle>{t('Update the audience')}</DialogTitle>
+          <DialogTitle>{t('Update the inject')}</DialogTitle>
           <DialogContent>
-            <AudienceForm
+            <InjectForm
               initialValues={initialValues}
               editing={true}
+              injectTypes={injectTypes}
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
             />
@@ -161,15 +181,16 @@ class AudiencePopover extends Component {
   }
 }
 
-AudiencePopover.propTypes = {
+InjectPopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
-  audience: PropTypes.object,
-  updateAudience: PropTypes.func,
-  deleteAudience: PropTypes.func,
+  inject: PropTypes.object,
+  updateInject: PropTypes.func,
+  deleteInject: PropTypes.func,
+  injectTypes: PropTypes.array,
 };
 
 export default R.compose(
-  connect(null, { updateAudience, deleteAudience }),
+  connect(null, { updateInject, deleteInject }),
   inject18n,
-)(AudiencePopover);
+)(InjectPopover);

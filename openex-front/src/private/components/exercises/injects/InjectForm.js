@@ -4,18 +4,43 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import withStyles from '@mui/styles/withStyles';
 import { TextField } from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import { Select } from '../../../../components/Select';
 
+const styles = (theme) => ({
+  duration: {
+    marginTop: 20,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-between',
+    border: `1px solid ${theme.palette.primary.main}`,
+    padding: 15,
+  },
+  trigger: {
+    fontFamily: ' Consolas, monaco, monospace',
+    fontSize: 12,
+    paddingTop: 15,
+    color: theme.palette.primary.main,
+  },
+});
+
 class InjectForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    const requiredFields = ['inject_name'];
+    const requiredFields = [
+      'inject_title',
+      'inject_type',
+      'inject_depends_duration_days',
+      'inject_depends_duration_hours',
+      'inject_depends_duration_minutes',
+      'inject_depends_duration_seconds',
+    ];
     requiredFields.forEach((field) => {
-      if (!values[field]) {
+      if (R.isNil(values[field])) {
         errors[field] = t('This field is required.');
       }
     });
@@ -24,7 +49,13 @@ class InjectForm extends Component {
 
   render() {
     const {
-      t, onSubmit, handleClose, initialValues, editing, types
+      t,
+      onSubmit,
+      handleClose,
+      initialValues,
+      editing,
+      injectTypes,
+      classes,
     } = this.props;
     return (
       <Form
@@ -53,9 +84,10 @@ class InjectForm extends Component {
               label={t('Type')}
               name="inject_type"
               fullWidth={true}
+              disabled={editing}
               style={{ marginTop: 20 }}
             >
-              {R.values(types).map((type) => (
+              {R.values(injectTypes).map((type) => (
                 <MenuItem key={type.type} value={type.type}>
                   {t(type.type)}
                 </MenuItem>
@@ -77,6 +109,37 @@ class InjectForm extends Component {
               setFieldValue={form.mutators.setValue}
               style={{ marginTop: 20 }}
             />
+            <div className={classes.duration}>
+              <div className={classes.trigger}>{t('Trigger after')}</div>
+              <TextField
+                variant="standard"
+                name="inject_depends_duration_days"
+                type="number"
+                label={t('Days')}
+                style={{ width: '15%' }}
+              />
+              <TextField
+                variant="standard"
+                name="inject_depends_duration_hours"
+                type="number"
+                label={t('Hours')}
+                style={{ width: '15%' }}
+              />
+              <TextField
+                variant="standard"
+                name="inject_depends_duration_minutes"
+                type="number"
+                label={t('Minutes')}
+                style={{ width: '15%' }}
+              />
+              <TextField
+                variant="standard"
+                name="inject_depends_duration_seconds"
+                type="number"
+                label={t('Seconds')}
+                style={{ width: '15%' }}
+              />
+            </div>
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
                 variant="contained"
@@ -104,11 +167,12 @@ class InjectForm extends Component {
 }
 
 InjectForm.propTypes = {
+  classes: PropTypes.object,
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  types: PropTypes.array,
+  injectTypes: PropTypes.array,
 };
 
-export default inject18n(InjectForm);
+export default R.compose(inject18n, withStyles(styles))(InjectForm);

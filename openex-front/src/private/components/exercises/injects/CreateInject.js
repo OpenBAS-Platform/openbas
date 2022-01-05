@@ -8,14 +8,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
-import { Add, ControlPointOutlined } from '@mui/icons-material';
-import { ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
-import ListItem from '@mui/material/ListItem';
+import { Add } from '@mui/icons-material';
+import { interval } from 'rxjs';
 import { addInject, fetchInjectTypes } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
-import {storeBrowser} from "../../../../actions/Schema";
+import { FIVE_SECONDS } from '../../../../utils/Time';
+
+const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   createButton: {
@@ -52,55 +52,41 @@ class CreateInject extends Component {
   onSubmit(data) {
     const inputValues = R.pipe(
       R.assoc(
-        'inject_organization',
-        data.inject_organization && data.inject_organization.id
-          ? data.inject_organization.id
-          : data.inject_organization,
+        'inject_depends_duration',
+        data.inject_depends_duration_days * 3600 * 24
+          + data.inject_depends_duration_hours * 3600
+          + data.inject_depends_duration_minutes * 60
+          + data.inject_depends_duration_seconds,
       ),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
+      R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
+      R.dissoc('inject_depends_duration_days'),
+      R.dissoc('inject_depends_duration_hours'),
+      R.dissoc('inject_depends_duration_minutes'),
+      R.dissoc('inject_depends_duration_seconds'),
     )(data);
-    return this.props.addInject(inputValues).then((result) => {
-      if (result.result) {
-        if (this.props.onCreate) {
-          this.props.onCreate(result.result);
+    return this.props
+      .addInject(this.props.exerciseId, inputValues)
+      .then((result) => {
+        if (result.result) {
+          return this.handleClose();
         }
-        return this.handleClose();
-      }
-      return result;
-    });
+        return result;
+      });
   }
 
   render() {
-    const {
-      classes, t, organizations, inline,
-    } = this.props;
+    const { classes, t, injectTypes } = this.props;
     return (
       <div>
-        {inline === true ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new inject')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
-        ) : (
-          <Fab
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-            aria-label="Add"
-            className={classes.createButton}
-          >
-            <Add />
-          </Fab>
-        )}
+        <Fab
+          onClick={this.handleOpen.bind(this)}
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -113,9 +99,15 @@ class CreateInject extends Component {
             <InjectForm
               editing={false}
               onSubmit={this.onSubmit.bind(this)}
-              organizations={organizations}
-              initialValues={{ inject_tags: [] }}
+              initialValues={{
+                inject_tags: [],
+                inject_depends_duration_days: 0,
+                inject_depends_duration_hours: 0,
+                inject_depends_duration_minutes: 0,
+                inject_depends_duration_seconds: 0,
+              }}
               handleClose={this.handleClose.bind(this)}
+              injectTypes={injectTypes}
             />
           </DialogContent>
         </Dialog>
@@ -126,22 +118,13 @@ class CreateInject extends Component {
 
 CreateInject.propTypes = {
   t: PropTypes.func,
+  exerciseId: PropTypes.string,
   addInject: PropTypes.func,
-  fetchInjectTypes: PropTypes.func,
-  inline: PropTypes.bool,
-  onCreate: PropTypes.func,
-  organizations: PropTypes.array,
-  inject_types: PropTypes.array,
-};
-
-const select = (state) => {
-  return {
-    inject_types: state.referential.entities.inject_types,
-  };
+  injectTypes: PropTypes.array,
 };
 
 export default R.compose(
-  connect(select, { addInject, fetchInjectTypes }),
+  connect(null, { addInject }),
   inject18n,
   withStyles(styles),
 )(CreateInject);

@@ -11,17 +11,25 @@ import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
-  ChevronRightOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import Chip from '@mui/material/Chip';
+import Drawer from '@mui/material/Drawer';
 import inject18n from '../../../../components/i18n';
-import { durationFormat, FIVE_SECONDS } from '../../../../utils/Time';
+import { FIVE_SECONDS, splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import { storeBrowser } from '../../../../actions/Schema';
-import { fetchExerciseInjects } from '../../../../actions/Inject';
+import {
+  fetchExerciseInjects,
+  fetchInjectTypes,
+} from '../../../../actions/Inject';
 import InjectIcon from './InjectIcon';
+import CreateInject from './CreateInject';
+import InjectPopover from './InjectPopover';
+import InjectType from './InjectType';
+import InjectDefinition from './InjectDefinition';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -39,7 +47,7 @@ const styles = (theme) => ({
     cursor: 'pointer',
   },
   item: {
-    paddingLeft: 10,
+    padding: 10,
     height: 50,
   },
   bodyItem: {
@@ -62,6 +70,23 @@ const styles = (theme) => ({
   },
   icon: {
     color: theme.palette.primary.main,
+  },
+  duration: {
+    fontSize: 12,
+    lineHeight: '12px',
+    height: 20,
+    float: 'left',
+    marginRight: 7,
+    borderRadius: 0,
+    width: 180,
+    backgroundColor: 'rgba(244, 67, 54, 0.08)',
+    color: '#f44336',
+    border: '1px solid #f44336',
+  },
+  drawerPaper: {
+    minHeight: '100vh',
+    width: '50%',
+    padding: 0,
   },
 });
 
@@ -86,7 +111,7 @@ const inlineStylesHeaders = {
   },
   inject_depends_duration: {
     float: 'left',
-    width: '15%',
+    width: 220,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -122,7 +147,7 @@ const inlineStyles = {
   },
   inject_depends_duration: {
     float: 'left',
-    width: '15%',
+    width: 220,
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -153,19 +178,26 @@ class Injects extends Component {
       orderAsc: true,
       keyword: '',
       tags: [],
+      selectedInject: null,
     };
   }
 
   componentDidMount() {
     const { exercise } = this.props;
+    this.props.fetchInjectTypes();
     this.props.fetchExerciseInjects(exercise.exercise_id);
     this.subscription = interval$.subscribe(() => {
+      this.props.fetchInjectTypes();
       this.props.fetchExerciseInjects(exercise.exercise_id);
     });
   }
 
   componentWillUnmount() {
     this.subscription.unsubscribe();
+  }
+
+  handleSelectInject(injectId) {
+    this.setState({ selectedInject: injectId });
   }
 
   handleSearch(value) {
@@ -214,10 +246,10 @@ class Injects extends Component {
 
   render() {
     const {
-      t, classes, injects, exercise,
+      t, classes, injects, exercise, injectTypes,
     } = this.props;
     const {
-      keyword, sortBy, orderAsc, tags,
+      keyword, sortBy, orderAsc, tags, selectedInject,
     } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.inject_title || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -292,14 +324,17 @@ class Injects extends Component {
           </ListItem>
           {sortedInjects.map((inject) => {
             const injectUsersNumber = inject?.inject_users_number ?? '-';
-            const impactedUsers = inject.inject_all_audiences
+            const impactedUsers = inject.inject_all_injects
               ? exercise.getUsers().length
               : injectUsersNumber;
+            const duration = splitDuration(inject.inject_depends_duration || 0);
             return (
               <ListItem
-                key={inject.tag_id}
+                key={inject.inject_id}
                 classes={{ root: classes.item }}
                 divider={true}
+                button={true}
+                onClick={this.handleSelectInject.bind(this, inject.inject_id)}
               >
                 <ListItemIcon>
                   <InjectIcon type={inject.inject_type} />
@@ -311,7 +346,10 @@ class Injects extends Component {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_type}
                       >
-                        {t(inject.inject_type)}
+                        <InjectType
+                          variant="list"
+                          status={inject.inject_type}
+                        />
                       </div>
                       <div
                         className={classes.bodyItem}
@@ -323,7 +361,14 @@ class Injects extends Component {
                         className={classes.bodyItem}
                         style={inlineStyles.inject_depends_duration}
                       >
-                        {durationFormat(inject.inject_depends_duration)}
+                        <Chip
+                          classes={{ root: classes.duration }}
+                          label={`${duration.days}
+                            ${t('d')}, ${duration.hours}
+                            ${t('h')}, ${duration.minutes}
+                            ${t('m')}, ${duration.seconds}
+                            ${t('s')}`}
+                        />
                       </div>
                       <div
                         className={classes.bodyItem}
@@ -344,12 +389,34 @@ class Injects extends Component {
                   }
                 />
                 <ListItemSecondaryAction>
-                  <ChevronRightOutlined />
+                  <InjectPopover
+                    exerciseId={exercise.exercise_id}
+                    inject={inject}
+                    injectTypes={injectTypes}
+                  />
                 </ListItemSecondaryAction>
               </ListItem>
             );
           })}
         </List>
+        <Drawer
+          open={selectedInject !== null}
+          keepMounted={false}
+          anchor="right"
+          sx={{ zIndex: 1202 }}
+          classes={{ paper: classes.drawerPaper }}
+          onClose={this.handleSelectInject.bind(this, null)}
+        >
+          <InjectDefinition
+            injectId={selectedInject}
+            exerciseId={exercise.exercise_id}
+            handleClose={this.handleSelectInject.bind(this, null)}
+          />
+        </Drawer>
+        <CreateInject
+          exerciseId={exercise.exercise_id}
+          injectTypes={injectTypes}
+        />
       </div>
     );
   }
@@ -361,6 +428,7 @@ Injects.propTypes = {
   exercise: PropTypes.object,
   injects: PropTypes.array,
   fetchExerciseInjects: PropTypes.func,
+  fetchInjectTypes: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
@@ -368,11 +436,12 @@ const select = (state, ownProps) => {
   const { exercise } = ownProps;
   return {
     injects: browser.getExercise(exercise.exercise_id).getInjects(),
+    injectTypes: R.values(state.referential.entities.inject_types),
   };
 };
 
 export default R.compose(
-  connect(select, { fetchExerciseInjects }),
+  connect(select, { fetchExerciseInjects, fetchInjectTypes }),
   inject18n,
   withStyles(styles),
 )(Injects);

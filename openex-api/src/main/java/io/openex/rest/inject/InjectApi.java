@@ -1,6 +1,7 @@
 package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
+import io.openex.database.model.Audience;
 import io.openex.database.model.Exercise;
 import io.openex.database.model.Inject;
 import io.openex.database.model.InjectTypes;
@@ -114,6 +115,16 @@ public class InjectApi<T> extends RestBehavior {
     @GetMapping("/api/exercises/{exerciseId}/injects")
     public Iterable<Inject<T>> exerciseInjects(@PathVariable String exerciseId) {
         return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId));
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
+    public Inject<T> exerciseInject(@PathVariable String injectId) {
+        return injectRepository.findById(injectId).orElseThrow();
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
+    public Iterable<Audience> exerciseInjectAudiences(@PathVariable String injectId) {
+        return injectRepository.findById(injectId).orElseThrow().getAudiences();
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
