@@ -91,7 +91,7 @@ class InjectPopover extends Component {
 
   render() {
     const { t, inject, injectTypes } = this.props;
-    const injectTags = inject.getTags().map((tag) => ({
+    const injectTags = inject.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
       color: tag.tag_color,

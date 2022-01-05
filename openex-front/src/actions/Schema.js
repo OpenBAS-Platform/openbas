@@ -192,26 +192,39 @@ const _buildAudience = (state, aud) => {
       .map((u) => _buildUser(state, u)),
   };
 };
+const _buildInject = (state, inj) => {
+  if (inj === undefined) return inj;
+  return {
+    ...inj,
+    tags: inj.inject_tags
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+    audiences: R.values(state.referential.entities.audiences)
+      .filter((n) => inj.inject_audiences.includes(n.audience_id))
+      .map((u) => _buildUser(state, u)),
+  };
+};
 const _buildExercise = (state, id, ex) => {
   if (ex === undefined) return ex;
   const getAudiences = () => R.filter(
     (n) => n.audience_exercise === id,
     R.values(state.referential.entities.audiences),
   ).map((a) => _buildAudience(state, a));
+  const getInjects = () => R.filter(
+    (n) => n.inject_exercise === id,
+    R.values(state.referential.entities.injects),
+  ).map((a) => _buildInject(state, a));
   return {
     ...ex,
     exercise_id: id,
     tags: ex.exercise_tags
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
-    injects: R.filter(
-      (n) => n.inject_exercise === id,
-      R.values(state.referential.entities.injects),
-    ),
     objectives: R.filter(
       (n) => n.objective_exercise === id,
       R.values(state.referential.entities.objectives),
     ),
+    injects: getInjects(),
     audiences: getAudiences(),
     users: getAudiences()
       .map((a) => a.users)
