@@ -27,7 +27,7 @@ jobs:
             - openex_docker
             - openex_musl
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -48,7 +48,7 @@ jobs:
           paths:
             - openex
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -70,7 +70,7 @@ jobs:
           paths:
             - openex_musl
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -96,7 +96,7 @@ jobs:
           working_directory: ~/openex/release
           command: scp "openex-$(date '+%Y%m%d').tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -122,7 +122,7 @@ jobs:
           working_directory: ~/openex_musl/release
           command: scp "openex-$(date '+%Y%m%d')_musl.tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/          
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -157,7 +157,7 @@ jobs:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -192,7 +192,7 @@ jobs:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -227,7 +227,7 @@ jobs:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -262,7 +262,7 @@ jobs:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -301,7 +301,7 @@ jobs:
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:latest -t openexhq/platform:${CIRCLE_TAG} --push .
           no_output_timeout: 30m
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
@@ -341,7 +341,7 @@ jobs:
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:rolling --push .
           no_output_timeout: 30m
       - slack/notify:
-          event: success
+          event: pass
           template: basic_success_1
       - slack/notify:
           event: fail
