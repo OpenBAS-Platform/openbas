@@ -53,7 +53,7 @@ class CreateAudience extends Component {
       R.assoc('audience_tags', R.pluck('id', data.audience_tags)),
     )(data);
     return this.props
-      .addAudience(this.props.exercise.exercise_id, inputValues)
+      .addAudience(this.props.exerciseId, inputValues)
       .then((result) => {
         if (result.result) {
           if (this.props.onCreate) {
@@ -116,7 +116,7 @@ class CreateAudience extends Component {
 }
 
 CreateAudience.propTypes = {
-  exercise: PropTypes.object,
+  exerciseId: PropTypes.object,
   classes: PropTypes.object,
   t: PropTypes.func,
   addAudience: PropTypes.func,

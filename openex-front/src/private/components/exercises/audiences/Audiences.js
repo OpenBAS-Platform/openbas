@@ -385,7 +385,9 @@ class Audiences extends Component {
             handleClose={this.handleSelectAudience.bind(this, null)}
           />
         </Drawer>
-        {exercise.user_can_update && <CreateAudience exercise={exercise} />}
+        {exercise.user_can_update && (
+          <CreateAudience exerciseId={exercise.exercise_id} />
+        )}
       </div>
     );
   }

@@ -116,7 +116,7 @@ class InjectAddAudiences extends Component {
 
   render() {
     const {
-      classes, t, audiences, injectAudiencesIds,
+      classes, t, audiences, injectAudiencesIds, exerciseId,
     } = this.props;
     const { keyword, audiencesIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -203,6 +203,7 @@ class InjectAddAudiences extends Component {
                     );
                   })}
                   <CreateAudience
+                    exerciseId={exerciseId}
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
                   />

@@ -19,7 +19,10 @@ jobs:
           no_output_timeout: 30m
       - run: 
           working_directory: ~/
-          command: cp -a openex openex_docker && cp -a openex openex_musl          
+          command: cp -a openex openex_docker && cp -a openex openex_musl
+      - slack/notify:
+          event: fail
+          template: basic_fail_1                 
       - persist_to_workspace:
           root: ~/
           paths:
@@ -53,6 +56,9 @@ jobs:
       - run: 
           working_directory: ~/openex_musl/openex-api
           command: mvn install -DskipTests
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
       - persist_to_workspace:
           root: ~/
           paths:
@@ -77,6 +83,9 @@ jobs:
       - run: 
           working_directory: ~/openex/release
           command: scp "openex-$(date '+%Y%m%d').tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
 
   package_rolling_musl:
     working_directory: ~/openex_musl
@@ -96,7 +105,10 @@ jobs:
           command: tar -zcvf "openex-$(date '+%Y%m%d')_musl.tar.gz" openex
       - run: 
           working_directory: ~/openex_musl/release
-          command: scp "openex-$(date '+%Y%m%d')_musl.tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/          
+          command: scp "openex-$(date '+%Y%m%d')_musl.tar.gz" git-9qdBths0@openex.io:/dns/io/openex/releases/
+      - slack/notify:
+          event: fail
+          template: basic_fail_1                 
       
   deploy_demo:
     working_directory: ~/openex
@@ -126,6 +138,9 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
 
 
   deploy_reference:
@@ -156,6 +171,9 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
       
   deploy_lab:
     working_directory: ~/openex
@@ -185,6 +203,9 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
 
   deploy_testing:
     working_directory: ~/openex
@@ -214,6 +235,9 @@ jobs:
       - run:
           working_directory: ~/openex/deploy
           command: git diff-index --quiet HEAD || git commit -a -m "[CircleCI-Workflow] Deploy new version" && git push origin master
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
 
   docker_build_platform:
     working_directory: ~/openex_docker
@@ -247,6 +271,9 @@ jobs:
           name: Build Docker image openex/platform
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:latest -t openexhq/platform:${CIRCLE_TAG} --push .
           no_output_timeout: 30m
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
 
   docker_build_platform_rolling:
     working_directory: ~/openex_docker
@@ -280,7 +307,10 @@ jobs:
           working_directory: ~/openex_docker
           name: Build Docker image openex/platform
           command: docker buildx build --platform $BUILDX_PLATFORMS -f Dockerfile_circleci -t openexhq/platform:rolling --push .
-          no_output_timeout: 30m
+          no_output_timeout: 30
+      - slack/notify:
+          event: fail
+          template: basic_fail_1          
   notify:
     docker:
       - image: 'cimg/base:stable'
@@ -288,9 +318,6 @@ jobs:
       - slack/notify:
           event: pass
           template: basic_success_1
-      - slack/notify:
-          event: fail
-          template: basic_fail_1
 
 workflows:
   openex:
@@ -368,4 +395,11 @@ workflows:
               only: /[0-9]+(\.[0-9]+)+(\.[0-9]+)*/
             branches:
               ignore: /.*/
-      - notify
+      - notify:
+          requires:
+            - deploy_demo
+            - deploy_lab
+            - deploy_reference
+            - deploy_testing
+            - package_rolling
+            - package_rolling_musl
