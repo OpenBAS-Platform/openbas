@@ -168,7 +168,7 @@ class InjectAddAudiences extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add audiences in this inject')}</DialogTitle>
+          <DialogTitle>{t('Add target audiences in this inject')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={8}>
