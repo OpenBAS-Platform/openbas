@@ -170,51 +170,71 @@ const Dashboard = (props) => {
         <Grid item={true} xs={6}>
           <Typography variant="overline">{t('Recent exercises')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
-            <List style={{ paddingTop: 0 }}>
-              {exercises.map((exercise) => (
-                <ListItem
-                  key={exercise.exercise_id}
-                  dense={true}
-                  button={true}
-                  classes={{ root: classes.item }}
-                  divider={true}
-                  component={Link}
-                  to={`/exercises/${exercise.exercise_id}`}
+            {exercises.length > 0 ? (
+              <List style={{ paddingTop: 0 }}>
+                {exercises.map((exercise) => (
+                  <ListItem
+                    key={exercise.exercise_id}
+                    dense={true}
+                    button={true}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    component={Link}
+                    to={`/exercises/${exercise.exercise_id}`}
+                  >
+                    <ListItemIcon>
+                      <Kayaking />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '40%' }}
+                          >
+                            {exercise.exercise_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '20%' }}
+                          >
+                            {exercise.exercise_start_date ? (
+                              nsd(exercise.exercise_start_date)
+                            ) : (
+                              <i>{t('Manual')}</i>
+                            )}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '40%' }}
+                          >
+                            <ItemTags variant="list" tags={exercise.tags} />
+                          </div>
+                        </div>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <div
+                style={{
+                  display: 'table',
+                  height: '100%',
+                  width: '100%',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'table-cell',
+                    verticalAlign: 'middle',
+                    textAlign: 'center',
+                  }}
                 >
-                  <ListItemIcon>
-                    <Kayaking />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <div>
-                        <div
-                          className={classes.bodyItem}
-                          style={{ width: '40%' }}
-                        >
-                          {exercise.exercise_name}
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={{ width: '20%' }}
-                        >
-                          {exercise.exercise_start_date ? (
-                            nsd(exercise.exercise_start_date)
-                          ) : (
-                            <i>{t('Manual')}</i>
-                          )}
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={{ width: '40%' }}
-                        >
-                          <ItemTags variant="list" tags={exercise.tags} />
-                        </div>
-                      </div>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
+                  {t('No available exercise on this platform yet.')}
+                </span>
+              </div>
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>

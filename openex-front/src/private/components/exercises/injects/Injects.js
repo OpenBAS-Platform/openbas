@@ -410,6 +410,7 @@ class Injects extends Component {
           />
         </Drawer>
         <CreateInject
+          injectTypes={injectTypes}
           exerciseId={exercise.exercise_id}
         />
       </div>

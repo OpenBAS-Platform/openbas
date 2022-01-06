@@ -88,145 +88,136 @@ class InjectContentForm extends Component {
       return <Loader variant="inElement" />;
     }
     return (
-      <Form
-        keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
-        validate={this.validate.bind(this)}
-        mutators={{
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}
-      >
-        {({ handleSubmit, submitting, pristine }) => (
-          <form id="injectContentForm" onSubmit={handleSubmit}>
-            {injectType.fields.map((field) => {
-              switch (field.type) {
-                case 'textarea':
-                  return (
-                    <TextField
-                      key={field.name}
-                      name={field.name}
-                      fullWidth={true}
-                      multiline={true}
-                      rows={3}
-                      label={field.name}
-                      style={{ marginTop: 20 }}
-                    />
-                  );
-                case 'richtextarea':
-                  return (
-                    <div key={field.name} style={{ marginTop: 20 }}>
-                      <EnrichedTextField name={field.name} label={field.name} />
-                      <div className={classes.variables}>
-                        {t('The available variables are: ')}
-                        <kbd>
-                          {'${'}FIRSTNAME{'}'}
-                        </kbd>
-                        ,{' '}
-                        <kbd>
-                          {'${'}LASTNAME{'}'}
-                        </kbd>
-                        ,{' '}
-                        <kbd>
-                          {'${'}ORGANIZATION{'}'}
-                        </kbd>{' '}
-                        et{' '}
-                        <kbd>
-                          {'${'}AUDIENCES{'}'}
-                        </kbd>
-                        .
+      <div style={{ marginTop: -20 }}>
+        <Form
+          keepDirtyOnReinitialize={true}
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          validate={this.validate.bind(this)}
+          mutators={{
+            setValue: ([field, value], state, { changeValue }) => {
+              changeValue(state, field, () => value);
+            },
+          }}
+        >
+          {({ handleSubmit, submitting, pristine }) => (
+            <form id="injectContentForm" onSubmit={handleSubmit}>
+              {injectType.fields.map((field) => {
+                switch (field.type) {
+                  case 'textarea':
+                    return (
+                      <TextField
+                        variant="standard"
+                        key={field.name}
+                        name={field.name}
+                        fullWidth={true}
+                        multiline={true}
+                        rows={3}
+                        label={t(field.name)}
+                        style={{ marginTop: 20 }}
+                      />
+                    );
+                  case 'richtextarea':
+                    return (
+                      <EnrichedTextField
+                        name={field.name}
+                        label={t(field.name)}
+                        style={{ marginTop: 20 }}
+                      />
+                    );
+                  case 'checkbox':
+                    return (
+                      <Switch
+                        key={field.name}
+                        name={field.name}
+                        label={t(field.name)}
+                        style={{ marginTop: 20 }}
+                      />
+                    );
+                  case 'attachment':
+                    return (
+                      <div key={field.name} className={classes.attachment}>
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          onClick={this.handleOpenGallery.bind(this)}
+                        >
+                          {t('Add an attachment')}
+                        </Button>
+                        <Dialog
+                          open={this.state.openGallery}
+                          TransitionComponent={Transition}
+                          onClose={this.handleCloseGallery.bind(this)}
+                          fullScreen={true}
+                        >
+                          <AppBar className={classes.appBar}>
+                            <Toolbar>
+                              <IconButton
+                                edge="start"
+                                color="inherit"
+                                onClick={this.handleCloseGallery.bind(this)}
+                                aria-label="close"
+                                size="large"
+                              >
+                                <CloseOutlined />
+                              </IconButton>
+                              <Typography
+                                variant="h6"
+                                className={classes.title}
+                              >
+                                {t('Select a file')}
+                              </Typography>
+                            </Toolbar>
+                          </AppBar>
+                        </Dialog>
+                        <div style={{ marginTop: 20 }}>
+                          {R.propOr([], 'attachments', initialValues).map(
+                            (attachment) => {
+                              const documentName = R.propOr(
+                                '-',
+                                'document_name',
+                                attachment,
+                              );
+                              return (
+                                <Chip
+                                  key={documentName}
+                                  icon={<AttachmentOutlined />}
+                                  label={documentName}
+                                />
+                              );
+                            },
+                          )}
+                          <div className="clearfix" />
+                        </div>
                       </div>
-                    </div>
-                  );
-                case 'checkbox':
-                  return (
-                    <Switch
-                      key={field.name}
-                      name={field.name}
-                      label={t('{field.name}')}
-                      style={{ marginTop: 20 }}
-                    />
-                  );
-                case 'attachment':
-                  return (
-                    <div key={field.name} className={classes.attachment}>
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={this.handleOpenGallery.bind(this)}
-                      >
-                        {t('Add an attachment')}
-                      </Button>
-                      <Dialog
-                        open={this.state.openGallery}
-                        TransitionComponent={Transition}
-                        onClose={this.handleCloseGallery.bind(this)}
-                        fullScreen={true}
-                      >
-                        <AppBar className={classes.appBar}>
-                          <Toolbar>
-                            <IconButton
-                              edge="start"
-                              color="inherit"
-                              onClick={this.handleCloseGallery.bind(this)}
-                              aria-label="close"
-                              size="large"
-                            >
-                              <CloseOutlined />
-                            </IconButton>
-                            <Typography variant="h6" className={classes.title}>
-                              {t('Select a file')}
-                            </Typography>
-                          </Toolbar>
-                        </AppBar>
-                      </Dialog>
-                      <div style={{ marginTop: 20 }}>
-                        {initialValues.attachments.map((attachment) => {
-                          const documentName = R.propOr(
-                            '-',
-                            'document_name',
-                            attachment,
-                          );
-                          return (
-                            <Chip
-                              key={documentName}
-                              icon={<AttachmentOutlined />}
-                              label={documentName}
-                            />
-                          );
-                        })}
-                        <div className="clearfix" />
-                      </div>
-                    </div>
-                  );
-                default:
-                  return (
-                    <TextField
-                      key={field.name}
-                      name={field.name}
-                      fullWidth={true}
-                      type="text"
-                      label={field.name}
-                      style={{ marginTop: 20 }}
-                    />
-                  );
-              }
-            })}
-            <div style={{ float: 'right', marginTop: 20 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                disabled={pristine || submitting}
-              >
-                {t('Update')}
-              </Button>
-            </div>
-          </form>
-        )}
-      </Form>
+                    );
+                  default:
+                    return (
+                      <TextField
+                        variant="standard"
+                        key={field.name}
+                        name={field.name}
+                        fullWidth={true}
+                        label={t(field.name)}
+                        style={{ marginTop: 20 }}
+                      />
+                    );
+                }
+              })}
+              <div style={{ float: 'right', marginTop: 20 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={pristine || submitting}
+                >
+                  {t('Update')}
+                </Button>
+              </div>
+            </form>
+          )}
+        </Form>
+      </div>
     );
   }
 }

@@ -129,11 +129,17 @@ const i18n = {
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_manual: 'Manuel (rappel)',
+      subject: 'Sujet du mail',
+      body: 'Corps du mail',
+      encrypted: 'Chiffrer ce mail',
     },
     en: {
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_manual: 'Manual (reminder)',
+      subject: 'Email subject',
+      body: 'Email body',
+      encrypted: 'Encrypt this email',
     },
   },
 };
