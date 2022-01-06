@@ -7,7 +7,11 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { ArrowDropDownOutlined, ArrowDropUpOutlined, PersonOutlined } from '@mui/icons-material';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  PersonOutlined,
+} from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
@@ -170,7 +174,7 @@ const Players = () => {
   };
 
   const reverseBy = (field) => {
-    setOrder({ sortBy: field, orderAsc: !this.state.orderAsc });
+    setOrder({ sortBy: field, orderAsc: !order.orderAsc });
   };
 
   const sortHeader = (field, label, isSortable) => {
@@ -181,7 +185,10 @@ const Players = () => {
     );
     if (isSortable) {
       return (
-        <div style={inlineStylesHeaders[field]} onClick={reverseBy}>
+        <div
+          style={inlineStylesHeaders[field]}
+          onClick={() => reverseBy(field)}
+        >
           <span>{t(label)}</span>
           {order.sortBy === field ? sortComponent : ''}
         </div>
@@ -217,7 +224,7 @@ const Players = () => {
 
   const sortedUsers = () => {
     const sort = R.sortWith(
-      order
+      order.orderAsc
         ? [R.ascend(R.prop(order.sortBy))]
         : [R.descend(R.prop(order.sortBy))],
     );
@@ -225,7 +232,7 @@ const Players = () => {
     return R.pipe(
       R.filter(
         (n) => tags.length === 0
-                || n.user_tags.some((usrTag) => tagIds.includes(usrTag)),
+          || n.user_tags.some((usrTag) => tagIds.includes(usrTag)),
       ),
       R.filter(filterByKeyword),
       sort,

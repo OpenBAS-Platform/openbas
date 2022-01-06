@@ -131,7 +131,7 @@ class InjectContentForm extends Component {
                                   const document = browser.getDocument(
                                     attachment.document_id,
                                   );
-                                  if (document) {
+                                  if (document && document.document_name) {
                                     return (
                                       <Chip
                                         key={document.document_id}
