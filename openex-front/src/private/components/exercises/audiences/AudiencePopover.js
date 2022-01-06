@@ -14,6 +14,7 @@ import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { updateAudience, deleteAudience } from '../../../../actions/Audience';
+import { updateInjectAudiences } from '../../../../actions/Inject';
 import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 
@@ -28,6 +29,7 @@ class AudiencePopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
+      openRemove: false,
       openPopover: false,
     };
   }
@@ -80,8 +82,31 @@ class AudiencePopover extends Component {
     this.handleCloseDelete();
   }
 
+  handleOpenRemove() {
+    this.setState({ openRemove: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseRemove() {
+    this.setState({ openRemove: false });
+  }
+
+  submitRemove() {
+    this.props.updateInjectAudiences(
+      this.props.exerciseId,
+      this.props.injectId,
+      {
+        inject_audiences: R.filter(
+          (n) => n !== this.props.audience.audience_id,
+          this.props.injectAudiencesIds,
+        ),
+      },
+    );
+    this.handleCloseRemove();
+  }
+
   render() {
-    const { t, audience } = this.props;
+    const { t, audience, injectId } = this.props;
     const audienceTags = audience.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
@@ -108,6 +133,11 @@ class AudiencePopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
+          {injectId && (
+            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
+              {t('Remove from the inject')}
+            </MenuItem>
+          )}
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>
@@ -156,6 +186,33 @@ class AudiencePopover extends Component {
             />
           </DialogContent>
         </Dialog>
+        <Dialog
+          open={this.state.openRemove}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseRemove.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to remove the audience from the inject?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseRemove.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitRemove.bind(this)}
+            >
+              {t('Remove')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -167,9 +224,12 @@ AudiencePopover.propTypes = {
   audience: PropTypes.object,
   updateAudience: PropTypes.func,
   deleteAudience: PropTypes.func,
+  updateInjectAudiences: PropTypes.func,
+  injectId: PropTypes.string,
+  injectAudiencesIds: PropTypes.string,
 };
 
 export default R.compose(
-  connect(null, { updateAudience, deleteAudience }),
+  connect(null, { updateAudience, deleteAudience, updateInjectAudiences }),
   inject18n,
 )(AudiencePopover);

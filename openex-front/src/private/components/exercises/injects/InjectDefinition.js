@@ -211,7 +211,7 @@ class InjectDefinition extends Component {
 
   onSubmitContent(data) {
     const initialValues = this.buildIinitialValues();
-    const inputValues = { ...initialValues, ...data };
+    const inputValues = { ...initialValues, inject_content: data };
     return this.props
       .updateInject(
         this.props.exerciseId,
@@ -390,6 +390,8 @@ class InjectDefinition extends Component {
                       <AudiencePopover
                         exerciseId={exerciseId}
                         audience={audience}
+                        injectId={injectId}
+                        injectAudiencesIds={audiences.map((a) => a.audience_id)}
                       />
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -403,7 +405,7 @@ class InjectDefinition extends Component {
             )}
           </List>
           <Typography variant="h2" style={{ marginTop: 20 }}>
-            {t('Content')}
+            {t('Inject data')}
           </Typography>
           <InjectContentForm
             initialValues={R.propOr({}, 'inject_content', inject)}

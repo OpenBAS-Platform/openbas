@@ -39,7 +39,7 @@ const inlineStyles = {
   openex_manual: {
     backgroundColor: 'rgba(96, 125, 139, 0.08)',
     color: '#607d8b',
-    fontStyle: 'italic',
+    border: '1px solid #607d8b',
   },
 };
 

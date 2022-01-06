@@ -1,16 +1,26 @@
 import React from 'react';
 import { Field } from 'react-final-form';
-import FormLabel from '@mui/material/FormLabel';
+import InputLabel from '@mui/material/InputLabel';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import '../resources/css/CKEditorDark.css';
 
-const renderEnrichedTextField = ({ label, input, style }) => (
-  <div style={{ ...style, minHeight: 400 }}>
-    <FormLabel>{label}</FormLabel>
+const renderEnrichedTextField = ({
+  label,
+  input: { onChange, value },
+  style,
+}) => (
+  <div style={style}>
+    <InputLabel variant="standard" shrink={true}>
+      {label}
+    </InputLabel>
     <CKEditor
       editor={ClassicEditor}
-      data={input.value}
-      onChange={input.onChange}
+      config={{ width: '100%', height: 300 }}
+      data={value}
+      onChange={(event, editor) => {
+        onChange(editor.getData());
+      }}
     />
   </div>
 );

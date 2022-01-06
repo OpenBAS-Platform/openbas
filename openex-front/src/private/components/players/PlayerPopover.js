@@ -13,6 +13,7 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { updateAudiencePlayers } from '../../../actions/Audience';
 import { updatePlayer, deletePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
@@ -81,9 +82,32 @@ class PlayerPopover extends Component {
     this.handleCloseDelete();
   }
 
+  handleOpenRemove() {
+    this.setState({ openRemove: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseRemove() {
+    this.setState({ openRemove: false });
+  }
+
+  submitRemove() {
+    this.props.updateAudiencePlayers(
+      this.props.exerciseId,
+      this.props.audienceId,
+      {
+        audience_users: R.filter(
+          (n) => n !== this.props.user.user_id,
+          this.props.audienceUsersIds,
+        ),
+      },
+    );
+    this.handleCloseRemove();
+  }
+
   render() {
     const {
-      t, userAdmin, user, organizations,
+      t, userAdmin, user, organizations, audienceId,
     } = this.props;
     const userOrganizationValue = user.organization;
     const userOrganization = userOrganizationValue
@@ -128,6 +152,11 @@ class PlayerPopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
+          {audienceId && (
+            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
+              {t('Remove from the audience')}
+            </MenuItem>
+          )}
           {userAdmin && (
             <MenuItem onClick={this.handleOpenDelete.bind(this)}>
               {t('Delete')}
@@ -179,6 +208,33 @@ class PlayerPopover extends Component {
             />
           </DialogContent>
         </Dialog>
+        <Dialog
+          open={this.state.openRemove}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseRemove.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to remove the player from the audience?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseRemove.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitRemove.bind(this)}
+            >
+              {t('Remove')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -191,6 +247,9 @@ PlayerPopover.propTypes = {
   deletePlayer: PropTypes.func,
   tags: PropTypes.object,
   userAdmin: PropTypes.bool,
+  exerciseId: PropTypes.string,
+  audienceId: PropTypes.string,
+  audienceUsersIds: PropTypes.string,
 };
 
 const select = (state) => {
@@ -201,6 +260,6 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { updatePlayer, deletePlayer }),
+  connect(select, { updatePlayer, deletePlayer, updateAudiencePlayers }),
   inject18n,
 )(PlayerPopover);

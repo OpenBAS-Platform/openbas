@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { EmailOutlined, SmsOutlined, HelpOutlined } from '@mui/icons-material';
+import {
+  EmailOutlined,
+  SmsOutlined,
+  NotificationsActiveOutlined,
+  HelpOutlined,
+} from '@mui/icons-material';
 
 const iconSelector = (type, variant, fontSize, color) => {
   let style = {};
@@ -25,6 +30,8 @@ const iconSelector = (type, variant, fontSize, color) => {
       return <EmailOutlined style={style} fontSize={fontSize} />;
     case 'openex_ovh_sms':
       return <SmsOutlined style={style} fontSize={fontSize} />;
+    case 'openex_manual':
+      return <NotificationsActiveOutlined style={style} fontSize={fontSize} />;
     default:
       return <HelpOutlined style={style} fontSize={fontSize} />;
   }

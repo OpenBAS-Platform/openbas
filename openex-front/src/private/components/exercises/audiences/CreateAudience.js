@@ -116,7 +116,7 @@ class CreateAudience extends Component {
 }
 
 CreateAudience.propTypes = {
-  exerciseId: PropTypes.object,
+  exerciseId: PropTypes.string,
   classes: PropTypes.object,
   t: PropTypes.func,
   addAudience: PropTypes.func,

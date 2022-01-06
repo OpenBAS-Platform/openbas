@@ -111,7 +111,9 @@ const i18n = {
       Title: 'Titre',
       Enabled: 'Activé',
       Disabled: 'Désactivé',
-      'Add target audiences in this inject': 'Ajouter des audiences cibles dans ce stimuli',
+      'Inject data': 'Données du stimuli',
+      'Add target audiences in this inject':
+        'Ajouter des audiences cibles dans ce stimuli',
       'Targeted audiences': 'Audiences ciblées',
       'All audiences': 'Toutes les audiences',
       'Add target audiences': 'Ajouter des audiences cibles',
@@ -124,6 +126,9 @@ const i18n = {
         'Souhaitez-vous retirer le joueur de cette audience ?',
       'Add players in this audience': 'Ajouter des joueurs dans cette audience',
       'Create a new audience': 'Créer une nouvelle audience',
+      'Remove from the inject': 'Retirer du stimuli',
+      'Do you want to remove the audience from the inject?':
+        "Souhaitez-vous retirer l'audience du stimuli ?",
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.':
         "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails des joueurs et une simulation pour envoyer les stimulis à l'équipe d'animation.",
       openex_email: 'Email',
@@ -132,6 +137,7 @@ const i18n = {
       subject: 'Sujet du mail',
       body: 'Corps du mail',
       encrypted: 'Chiffrer ce mail',
+      content: 'Contenu et explications',
     },
     en: {
       openex_email: 'Email',
@@ -140,6 +146,7 @@ const i18n = {
       subject: 'Email subject',
       body: 'Email body',
       encrypted: 'Encrypt this email',
+      content: 'Content and explanations',
     },
   },
 };

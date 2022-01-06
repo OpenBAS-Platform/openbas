@@ -122,7 +122,8 @@ class InjectContentForm extends Component {
                       <EnrichedTextField
                         name={field.name}
                         label={t(field.name)}
-                        style={{ marginTop: 20 }}
+                        fullWidth={true}
+                        style={{ marginTop: 20, minHeight: 300 }}
                       />
                     );
                   case 'checkbox':
