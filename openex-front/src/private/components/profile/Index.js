@@ -70,6 +70,7 @@ const Index = (props) => {
     return props.updateMeProfile(inputValues);
   };
 
+  const onUpdateInformation = (data) => props.updateMeInformation(data);
   const onUpdatePassword = (data) => props.updateMePassword(data.user_plain_password);
 
   const userOrganizationValue = user.organization;
@@ -110,7 +111,7 @@ const Index = (props) => {
           <Typography variant="h5" style={{ marginBottom: 20 }}>
             {t('Information')}
           </Typography>
-          <ProfileForm onSubmit={onUpdate} initialValues={initialValues} />
+          <ProfileForm onSubmit={onUpdateInformation} initialValues={initialValues} />
         </Paper>
         <Paper variant="outlined" className={classes.paper}>
           <Typography variant="h5" style={{ marginBottom: 20 }}>
