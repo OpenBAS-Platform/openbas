@@ -6,12 +6,20 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { Field } from 'react-final-form';
 
 const renderFromHelper = ({
-  touched, error, submitError, helperText,
+  touched,
+  error,
+  submitError,
+  helperText,
+  variant,
 }) => {
   if (!(touched && error)) {
     return helperText;
   }
-  return <FormHelperText>{touched && (error || submitError)}</FormHelperText>;
+  return (
+    <FormHelperText variant={variant}>
+      {touched && (error || submitError)}
+    </FormHelperText>
+  );
 };
 
 const renderSelectField = ({
@@ -51,6 +59,7 @@ const renderSelectField = ({
       error,
       submitError,
       helperText,
+      variant: others.variant || 'standard',
     })}
   </FormControl>
 );
