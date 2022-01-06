@@ -63,22 +63,10 @@ public class Exercise implements Base {
     private boolean canceled = false;
 
     @ManyToOne
-    @JoinColumn(name = "exercise_owner")
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("exercise_owner")
-    private User owner;
-
-    @ManyToOne
     @JoinColumn(name = "exercise_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("exercise_image")
     private Document image;
-
-    @OneToOne
-    @JoinColumn(name = "exercise_animation_group")
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("exercise_animation_group")
-    private Group animationGroup;
 
     @Column(name = "exercise_message_header")
     @JsonProperty("exercise_message_header")
@@ -229,14 +217,6 @@ public class Exercise implements Base {
         this.canceled = canceled;
     }
 
-    public Group getAnimationGroup() {
-        return animationGroup;
-    }
-
-    public void setAnimationGroup(Group animationGroup) {
-        this.animationGroup = animationGroup;
-    }
-
     public String getHeader() {
         return header;
     }
@@ -307,14 +287,6 @@ public class Exercise implements Base {
 
     public void setEnd(Date end) {
         this.end = end;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
     }
 
     public Document getImage() {

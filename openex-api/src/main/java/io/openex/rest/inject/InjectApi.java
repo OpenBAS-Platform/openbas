@@ -9,7 +9,6 @@ import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.InjectSpecification;
-import io.openex.helper.InjectHelper;
 import io.openex.model.ExecutableInject;
 import io.openex.model.Execution;
 import io.openex.model.Executor;
@@ -44,7 +43,6 @@ public class InjectApi<T> extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private InjectRepository<T> injectRepository;
     private AudienceRepository audienceRepository;
-    private InjectHelper<T> injectHelper;
     private ApplicationContext context;
     private List<Contract> contracts;
 
@@ -66,11 +64,6 @@ public class InjectApi<T> extends RestBehavior {
     @Autowired
     public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
-    }
-
-    @Autowired
-    public void setInjectHelper(InjectHelper<T> injectHelper) {
-        this.injectHelper = injectHelper;
     }
 
     @Autowired

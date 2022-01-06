@@ -33,9 +33,6 @@ public class ExerciseUpdateInfoInput {
     @JsonProperty("exercise_end_date")
     private Date end;
 
-    @JsonProperty("exercise_animation_group")
-    private String animationGroup;
-
     public String getName() {
         return name;
     }
@@ -74,14 +71,6 @@ public class ExerciseUpdateInfoInput {
 
     public void setEnd(Date end) {
         this.end = end;
-    }
-
-    public String getAnimationGroup() {
-        return animationGroup;
-    }
-
-    public void setAnimationGroup(String animationGroup) {
-        this.animationGroup = animationGroup;
     }
 
     public Double getLatitude() {

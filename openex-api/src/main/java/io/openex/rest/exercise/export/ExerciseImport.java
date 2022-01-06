@@ -32,9 +32,6 @@ public class ExerciseImport {
     @JsonProperty("exercise_image")
     private String image;
 
-    @JsonProperty("exercise_animation_group")
-    private String animationGroup;
-
     @JsonProperty("exercise_message_header")
     private String header;
 
@@ -109,14 +106,6 @@ public class ExerciseImport {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public String getAnimationGroup() {
-        return animationGroup;
-    }
-
-    public void setAnimationGroup(String animationGroup) {
-        this.animationGroup = animationGroup;
     }
 
     public String getHeader() {

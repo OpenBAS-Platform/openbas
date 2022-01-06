@@ -206,7 +206,6 @@ public class ExerciseApi<T> extends RestBehavior {
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         Exercise exercise = new Exercise();
         exercise.setUpdateAttributes(input);
-        exercise.setOwner(currentUser());
         exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return exerciseRepository.save(exercise);
     }
@@ -225,7 +224,6 @@ public class ExerciseApi<T> extends RestBehavior {
                                               @Valid @RequestBody ExerciseUpdateInfoInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
-        exercise.setAnimationGroup(updateRelation(input.getAnimationGroup(), exercise.getAnimationGroup(), groupRepository));
         return exerciseRepository.save(exercise);
     }
 
@@ -291,9 +289,7 @@ public class ExerciseApi<T> extends RestBehavior {
         ExerciseImport inputExercise = dataImport.getExercise();
         Exercise exerciseToSave = new Exercise();
         exerciseToSave.setUpdateAttributes(inputExercise);
-        exerciseToSave.setOwner(currentUser());
         exerciseToSave.setTags(exerciseTags);
-        exerciseToSave.setAnimationGroup(resolveRelation(inputExercise.getAnimationGroup(), groupRepository));
         exerciseToSave.setImage(resolveRelation(inputExercise.getImage(), documentRepository));
         Exercise exercise = exerciseRepository.save(exerciseToSave);
         // Create audiences

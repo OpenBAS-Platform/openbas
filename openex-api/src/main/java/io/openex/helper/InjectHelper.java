@@ -1,6 +1,9 @@
 package io.openex.helper;
 
-import io.openex.database.model.*;
+import io.openex.database.model.Audience;
+import io.openex.database.model.Exercise;
+import io.openex.database.model.Injection;
+import io.openex.database.model.User;
 import io.openex.database.repository.*;
 import io.openex.database.specification.DryInjectSpecification;
 import io.openex.database.specification.InjectSpecification;
@@ -12,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,8 +65,7 @@ public class InjectHelper<T> {
                 .flatMap(audience -> audience.getUsers().stream()
                         .map(user -> new UserInjectContext(user, exercise, audience.getName())));
         // Create stream from animation group
-        Group animationGroup = exercise.getAnimationGroup();
-        List<User> animationUsers = animationGroup != null ? animationGroup.getUsers() : new ArrayList<>();
+        List<User> animationUsers = exercise.getObservers();
         Stream<UserInjectContext> animationUserStream = animationUsers.stream()
                 .map(user -> new UserInjectContext(user, exercise, "Animation Group"));
         // Build result
