@@ -1,6 +1,5 @@
 package io.openex.rest.user;
 
-import io.openex.config.AppConfig;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;

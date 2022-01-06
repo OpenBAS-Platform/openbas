@@ -1,7 +1,10 @@
 package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
-import io.openex.database.model.*;
+import io.openex.database.model.Audience;
+import io.openex.database.model.Exercise;
+import io.openex.database.model.Inject;
+import io.openex.database.model.InjectTypes;
 import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
@@ -10,7 +13,7 @@ import io.openex.helper.InjectHelper;
 import io.openex.model.ExecutableInject;
 import io.openex.model.Execution;
 import io.openex.model.Executor;
-import io.openex.rest.audience.form.UpdateUsersAudienceInput;
+import io.openex.model.UserInjectContext;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.InjectInput;
 import io.openex.rest.inject.form.InjectUpdateActivationInput;
@@ -91,7 +94,9 @@ public class InjectApi<T> extends RestBehavior {
             return execution;
         }
         Inject<T> inject = injectOptional.get();
-        ExecutableInject<T> injection = new ExecutableInject<>(inject, injectHelper.buildUsersFromInject(inject));
+        UserInjectContext userInjectContext = new UserInjectContext(currentUser(),
+                inject.getExercise(), "Direct test");
+        ExecutableInject<T> injection = new ExecutableInject<>(inject, of(userInjectContext));
         Class<? extends Executor<T>> executorClass = inject.executor();
         Executor<T> executor = context.getBean(executorClass);
         return executor.execute(injection);
@@ -158,7 +163,7 @@ public class InjectApi<T> extends RestBehavior {
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Inject<T> updateInjectAudiences(@PathVariable String injectId,
-                                        @Valid @RequestBody UpdateAudiencesInjectInput input) {
+                                           @Valid @RequestBody UpdateAudiencesInjectInput input) {
         Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
         Iterable<Audience> injectAudiences = audienceRepository.findAllById(input.getAudienceIds());
         inject.setAudiences(fromIterable(injectAudiences));

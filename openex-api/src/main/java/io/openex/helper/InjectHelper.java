@@ -61,17 +61,17 @@ public class InjectHelper<T> {
         Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
         Stream<UserInjectContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
                 .flatMap(audience -> audience.getUsers().stream()
-                        .map(user -> new UserInjectContext(exercise, user, audience.getName())));
+                        .map(user -> new UserInjectContext(user, exercise, audience.getName())));
         // Create stream from animation group
         Group animationGroup = exercise.getAnimationGroup();
         List<User> animationUsers = animationGroup != null ? animationGroup.getUsers() : new ArrayList<>();
         Stream<UserInjectContext> animationUserStream = animationUsers.stream()
-                .map(user -> new UserInjectContext(exercise, user, "Animation Group"));
+                .map(user -> new UserInjectContext(user, exercise, "Animation Group"));
         // Build result
         Stream<UserInjectContext> usersStream = concat(injectUserStream, animationUserStream);
         return usersStream
                 .collect(groupingBy(UserInjectContext::getUser)).entrySet().stream()
-                .map(entry -> new UserInjectContext(exercise, entry.getKey(),
+                .map(entry -> new UserInjectContext(entry.getKey(), exercise,
                         entry.getValue().stream().flatMap(ua -> ua.getAudiences().stream()).toList()))
                 .toList();
     }

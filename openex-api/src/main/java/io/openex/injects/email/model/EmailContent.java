@@ -21,6 +21,9 @@ public class EmailContent implements AttachmentContent {
     @JsonProperty("subject")
     private String subject;
 
+    @JsonProperty("encrypted")
+    private boolean encrypted;
+
     @JsonProperty("attachments")
     private List<InjectAttachment> attachments = new ArrayList<>();
 
@@ -34,6 +37,14 @@ public class EmailContent implements AttachmentContent {
 
     public void setSubject(String subject) {
         this.subject = subject;
+    }
+
+    public boolean isEncrypted() {
+        return encrypted;
+    }
+
+    public void setEncrypted(boolean encrypted) {
+        this.encrypted = encrypted;
     }
 
     public String buildMessage(String footer, String header) {

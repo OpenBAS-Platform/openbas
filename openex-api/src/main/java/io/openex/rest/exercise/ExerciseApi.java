@@ -1,6 +1,5 @@
 package io.openex.rest.exercise;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.database.specification.ComcheckSpecification;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -55,11 +53,6 @@ public class ExerciseApi<T> extends RestBehavior {
 
     private final static String EXPORT_ENTRY_EXERCISE = "Exercise";
     private final static String EXPORT_ENTRY_ATTACHMENT = "Attachment";
-
-    // region resources
-    @Resource
-    private ObjectMapper mapper;
-    // endregion
 
     // region repositories
     private TagRepository tagRepository;

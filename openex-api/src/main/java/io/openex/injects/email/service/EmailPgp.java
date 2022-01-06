@@ -19,17 +19,16 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.Spliterators.spliteratorUnknownSize;
+import static org.springframework.util.StringUtils.hasLength;
 
 @Component
 public class EmailPgp {
 
-    public String encryptText(User user, String message) throws IOException {
-        PGPPublicKey pgpKey = userPgpKey(user);
-        return encrypt(message, pgpKey);
-    }
-
-    private PGPPublicKey userPgpKey(User user) throws IOException {
+    public PGPPublicKey getUserPgpKey(User user) throws IOException {
         String userPgpKey = user.getPgpKey();
+        if (!hasLength(user.getPgpKey())) {
+            throw new IllegalArgumentException(user.getEmail() + " has no PGP public key");
+        }
         byte[] pgpKey = Base64.decode(userPgpKey);
         InputStream in = new ByteArrayInputStream(pgpKey);
         InputStream decoderStream = PGPUtil.getDecoderStream(in);
@@ -37,10 +36,10 @@ public class EmailPgp {
         Spliterator<PGPPublicKey> splitIterator = spliteratorUnknownSize(keyRing.getPublicKeys(), Spliterator.ORDERED);
         Stream<PGPPublicKey> targetStream = StreamSupport.stream(splitIterator, false);
         return targetStream.filter(pgpPublicKey -> pgpPublicKey.isEncryptionKey() && !pgpPublicKey.isMasterKey())
-                .findFirst().orElseThrow(() -> new IllegalArgumentException(user.getEmail() + " error: Invalid PGP public key"));
+                .findFirst().orElseThrow(() -> new IllegalArgumentException(user.getEmail() + " has invalid PGP public key"));
     }
 
-    private String encrypt(String clearData, PGPPublicKey encKey) {
+    public String encrypt(PGPPublicKey encKey, String clearData) {
         return new String(encrypt(clearData.getBytes(), encKey), StandardCharsets.UTF_8);
     }
 

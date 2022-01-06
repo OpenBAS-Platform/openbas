@@ -37,16 +37,17 @@ public class EmailExecutor implements Executor<EmailContent> {
         EmailContent content = inject.getContent();
         String subject = content.getSubject();
         String message = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
+        boolean mustBeEncrypted = content.isEncrypted();
         // Resolve the attachments only once
         List<EmailAttachment> attachments = emailService.resolveAttachments(execution, content.getAttachments());
         List<UserInjectContext> users = injection.getUsers();
         int numberOfExpected = users.size();
         AtomicInteger errors = new AtomicInteger(0);
-        users.stream().parallel().forEach(user -> {
-            String email = user.getUser().getEmail();
-            String replyTo = user.getExercise().getReplyTo();
+        users.stream().parallel().forEach(userInjectContext -> {
+            String email = userInjectContext.getUser().getEmail();
+            String replyTo = userInjectContext.getExercise().getReplyTo();
             try {
-                emailService.sendEmail(user, replyTo, subject, message, attachments);
+                emailService.sendEmail(userInjectContext, replyTo, mustBeEncrypted, subject, message, attachments);
                 execution.addMessage("Mail sent to " + email);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);

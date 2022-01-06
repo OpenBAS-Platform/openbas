@@ -9,10 +9,10 @@ import io.openex.model.Execution;
 import io.openex.model.UserInjectContext;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
+import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.activation.DataHandler;
 import javax.mail.Message;
@@ -74,7 +74,8 @@ public class EmailService {
         return resolved;
     }
 
-    public void sendEmail(UserInjectContext context, String from, String subject, String message, List<EmailAttachment> attachments) throws Exception {
+    public void sendEmail(UserInjectContext context, String from, boolean mustBeEncrypted,
+                          String subject, String message, List<EmailAttachment> attachments) throws Exception {
         String email = context.getUser().getEmail();
         System.out.println("Sending mail to " + email);
         String body = TemplateHelper.buildContextualContent(message, context);
@@ -98,8 +99,8 @@ public class EmailService {
         }
         mimeMessage.setContent(mailMultipart);
         // Crypt if needed
-        boolean needEncrypt = StringUtils.hasLength(context.getUser().getPgpKey());
-        if (needEncrypt) {
+        if (mustBeEncrypted) {
+            PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(context.getUser());
             // Need to create another email that will wrap everything.
             MimeMessage encMessage = emailSender.createMimeMessage();
             encMessage.setFrom(from);
@@ -115,7 +116,7 @@ public class EmailService {
             // Export and crypt to basic email
             ByteArrayOutputStream multiEncStream = new ByteArrayOutputStream();
             mimeMessage.writeTo(multiEncStream);
-            String encryptedEmail = emailPgp.encryptText(context.getUser(), multiEncStream.toString());
+            String encryptedEmail = emailPgp.encrypt(userPgpKey, multiEncStream.toString());
             MimeBodyPart encBodyPart = new MimeBodyPart();
             encBodyPart.setDisposition("inline");
             encBodyPart.setFileName("openpgp-encrypted-message.asc");

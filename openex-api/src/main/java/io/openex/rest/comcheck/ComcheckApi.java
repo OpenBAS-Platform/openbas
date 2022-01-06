@@ -105,7 +105,7 @@ public class ComcheckApi extends RestBehavior {
             emailInject.setContent(content);
             emailInject.setAudiences(of(audience));
             List<UserInjectContext> userInjectContexts = users.stream()
-                    .map(user -> new UserInjectContext(exercise, user, audience.getName()))
+                    .map(user -> new UserInjectContext(user, exercise, audience.getName()))
                     .toList();
             ExecutableInject<EmailContent> injection = new ExecutableInject<>(emailInject, userInjectContexts);
             EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);

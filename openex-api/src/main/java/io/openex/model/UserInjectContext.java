@@ -10,14 +10,14 @@ public class UserInjectContext {
     private Exercise exercise;
     private List<String> audiences;
 
-    public UserInjectContext(Exercise exercise, User user, List<String> audiences) {
-        this.exercise = exercise;
+    public UserInjectContext(User user, Exercise exercise, List<String> audiences) {
         this.user = user;
+        this.exercise = exercise;
         this.audiences = audiences;
     }
 
-    public UserInjectContext(Exercise exercise, User user, String audience) {
-        this(exercise, user, List.of(audience));
+    public UserInjectContext(User user, Exercise exercise, String audience) {
+        this(user, exercise, List.of(audience));
     }
 
     public User getUser() {
