@@ -20,13 +20,17 @@ import {
 import LinearProgress, {
   linearProgressClasses,
 } from '@mui/material/LinearProgress';
+import * as R from 'ramda';
+import { updateExercise } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useStore } from '../../../store';
+import ExerciseForm from './ExerciseForm';
 
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
+    marginTop: -20,
   },
   metric: {
     position: 'relative',
@@ -89,10 +93,22 @@ const Exercise = () => {
   const { exerciseId } = useParams();
   const { t, fldt } = useFormatter();
   const exercise = useStore((store) => store.getExercise(exerciseId));
+  const submitUpdate = (data) => updateExercise(exerciseId, data);
+  const initialValues = R.pipe(
+    R.pick([
+      'exercise_name',
+      'exercise_description',
+      'exercise_subtitle',
+      'exercise_start_date',
+      'exercise_message_header',
+      'exercise_message_footer',
+      'exercise_mail_from',
+    ]),
+  )(exercise);
   return (
     <div className={classes.root}>
-      <Grid container={true} spacing={3}>
-        <Grid item={true} xs={6}>
+      <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
+        <Grid item={true} xs={6} style={{ marginTop: -14 }}>
           <Paper
             variant="outlined"
             classes={{ root: classes.metric }}
@@ -115,7 +131,7 @@ const Exercise = () => {
             </div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
               <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -126,7 +142,7 @@ const Exercise = () => {
             </div>
           </Paper>
         </Grid>
-        <Grid item={true} xs={3}>
+        <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>
             <div className={classes.icon}>
               <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
@@ -203,6 +219,25 @@ const Exercise = () => {
                 </Button>
               </Grid>
             </Grid>
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+          <Typography variant="overline">{t('Settings')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <ExerciseForm
+              initialValues={initialValues}
+              editing={true}
+              onSubmit={submitUpdate}
+            />
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <ExerciseForm
+              initialValues={initialValues}
+              editing={true}
+              onSubmit={submitUpdate}
+            />
           </Paper>
         </Grid>
       </Grid>

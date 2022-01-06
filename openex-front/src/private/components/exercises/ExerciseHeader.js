@@ -18,6 +18,7 @@ import { Form } from 'react-final-form';
 import inject18n from '../../../components/i18n';
 import { updateExerciseTags } from '../../../actions/Exercise';
 import TagField from '../../../components/TagField';
+import ExercisePopover from './ExercisePopover';
 
 const styles = () => ({
   container: {
@@ -94,6 +95,7 @@ class ExerciseHeader extends Component {
         >
           {exercise.exercise_name}
         </Typography>
+        <ExercisePopover exercise={exercise} />
         <div className={classes.tags}>
           {R.take(5, tags).map((tag) => (
             <Chip

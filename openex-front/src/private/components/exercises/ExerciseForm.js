@@ -77,52 +77,27 @@ class ExerciseForm extends Component {
                 style: { marginTop: 20 },
               }}
             />
-            {editing && (
-              <Select
-                label={t('Exercise control (animation)')}
-                name="exercise_animation_group"
-                fullWidth={true}
+            {!editing && (
+              <TagField
+                name="exercise_tags"
+                label={t('Tags')}
+                values={values}
+                setFieldValue={form.mutators.setValue}
                 style={{ marginTop: 20 }}
-                helperText={
-                  <span
-                    style={{
-                      marginTop: 5,
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <InfoOutlined color="primary" /> &nbsp;
-                    {t(
-                      'This group receives a copy of all injects and is used in dryruns.',
-                    )}
-                  </span>
-                }
-              >
-                <MenuItem value={null}> &nbsp; </MenuItem>
-                {this.props.groups.map((data) => (
-                  <MenuItem key={data.group_id} value={data.group_id}>
-                    {data.group_name}
-                  </MenuItem>
-                ))}
-              </Select>
+              />
             )}
-            <TagField
-              name="exercise_tags"
-              label={t('Tags')}
-              values={values}
-              setFieldValue={form.mutators.setValue}
-              style={{ marginTop: 20 }}
-            />
             <div style={{ float: 'right', marginTop: 20 }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleClose.bind(this)}
-                disabled={pristine || submitting}
-                style={{ marginRight: 10 }}
-              >
-                {t('Cancel')}
-              </Button>
+              {handleClose && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleClose.bind(this)}
+                  disabled={pristine || submitting}
+                  style={{ marginRight: 10 }}
+                >
+                  {t('Cancel')}
+                </Button>
+              )}
               <Button
                 variant="contained"
                 color="primary"

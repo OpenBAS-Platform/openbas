@@ -12,7 +12,7 @@ const i18n = {
       Organizations: 'Organisations',
       Documents: 'Documents',
       Integrations: 'Intégrations',
-      Settings: 'Paramètres',
+      Settings: 'Configuraiton',
       Profile: 'Profil',
       Logout: 'Se déconnecter',
       Firstname: 'Prénom',
