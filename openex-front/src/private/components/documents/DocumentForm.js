@@ -60,7 +60,6 @@ class DocumentForm extends Component {
                 variant="standard"
                 type="file"
                 name="document_file"
-                fullWidth={true}
                 label={t('File')}
                 style={{ marginTop: 20 }}
               />

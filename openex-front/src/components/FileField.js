@@ -1,10 +1,13 @@
 import React, { useCallback } from 'react';
 import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
+import Button from '@mui/material/Button';
+import { useFormatter } from './i18n';
 
 const FileFieldInput = ({
   required, input, dropZoneProps, ...props
 }) => {
+  const { t } = useFormatter();
   const onDrop = useCallback(
     (files) => {
       input.onChange(files);
@@ -17,15 +20,23 @@ const FileFieldInput = ({
     ...dropZoneProps,
   });
   const files = acceptedFiles.map((file) => (
-    <span key={file.path}>
+    <div key={file.path} style={{ float: 'left', margin: '5px 0 0 10px' }}>
       {file.path} - {file.size} bytes
-    </span>
+    </div>
   ));
   return (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <button {...props}>{props.label || 'choose file'}</button>
+      <Button
+        {...props}
+        variant="outlined"
+        color="primary"
+        style={{ float: 'left' }}
+      >
+        {t('Select a file')}
+      </Button>
       {files}
+      <div className="clearfix" />
     </div>
   );
 };
