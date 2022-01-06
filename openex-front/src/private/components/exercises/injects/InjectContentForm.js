@@ -94,6 +94,7 @@ class InjectContentForm extends Component {
                   case 'richtextarea':
                     return (
                       <EnrichedTextField
+                        key={field.name}
                         name={field.name}
                         label={t(field.name)}
                         fullWidth={true}
@@ -111,7 +112,7 @@ class InjectContentForm extends Component {
                     );
                   case 'attachment':
                     return (
-                      <Field name={field.name}>
+                      <Field key={field.name} name={field.name}>
                         {(props) => (
                           <div>
                             <InjectAddDocuments
@@ -131,7 +132,7 @@ class InjectContentForm extends Component {
                                   const document = browser.getDocument(
                                     attachment.document_id,
                                   );
-                                  if (document && document.document_name) {
+                                  if (document.document_name) {
                                     return (
                                       <Chip
                                         key={document.document_id}
