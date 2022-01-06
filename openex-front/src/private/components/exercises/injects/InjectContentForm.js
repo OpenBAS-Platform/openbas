@@ -132,7 +132,7 @@ class InjectContentForm extends Component {
                                   const document = browser.getDocument(
                                     attachment.document_id,
                                   );
-                                  if (document.document_name) {
+                                  if (document) {
                                     return (
                                       <Chip
                                         key={document.document_id}
@@ -154,7 +154,7 @@ class InjectContentForm extends Component {
                                       />
                                     );
                                   }
-                                  return <div key={document.document_id} />;
+                                  return <div key={attachment.document_id} />;
                                 },
                               )}
                               <div className="clearfix" />

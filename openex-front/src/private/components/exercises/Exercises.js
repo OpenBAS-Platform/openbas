@@ -259,7 +259,7 @@ class Exercises extends Component {
           <div style={{ float: 'left', marginRight: 20 }}>
             <TagsFilter
               onAddTag={this.handleAddTag.bind(this)}
-              onRemoveRag={this.handleRemoveTag.bind(this)}
+              onRemoveTag={this.handleRemoveTag.bind(this)}
               currentTags={tags}
             />
           </div>

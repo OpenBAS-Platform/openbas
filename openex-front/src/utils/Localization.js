@@ -111,9 +111,11 @@ const i18n = {
       Title: 'Titre',
       Enabled: 'Activé',
       Disabled: 'Désactivé',
+      'Try the inject': 'Tester le stimuli',
       'Select  a file': 'Sélectionner un fichier',
       'Add attachments': 'Ajouter des pièces jointes',
-      'Add attachments in this inject': 'Ajouter des pièces jointes dans ce stimuli',
+      'Add attachments in this inject':
+        'Ajouter des pièces jointes dans ce stimuli',
       'Update the document': 'Modifier le document',
       'Inject data': 'Données du stimuli',
       'Add target audiences in this inject':

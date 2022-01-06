@@ -15,7 +15,7 @@ const UserForm = (props) => {
   const { t } = useFormatter();
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['user_email'];
+    const requiredFields = ['user_email', 'user_plain_password'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');

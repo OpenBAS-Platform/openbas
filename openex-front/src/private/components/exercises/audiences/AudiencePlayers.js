@@ -269,7 +269,7 @@ class AudiencesPlayers extends Component {
           <div className={classes.tags}>
             <TagsFilter
               onAddTag={this.handleAddTag.bind(this)}
-              onRemoveRag={this.handleRemoveTag.bind(this)}
+              onRemoveTag={this.handleRemoveTag.bind(this)}
               currentTags={tags}
             />
           </div>

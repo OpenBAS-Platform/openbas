@@ -249,7 +249,7 @@ PlayerPopover.propTypes = {
   userAdmin: PropTypes.bool,
   exerciseId: PropTypes.string,
   audienceId: PropTypes.string,
-  audienceUsersIds: PropTypes.string,
+  audienceUsersIds: PropTypes.array,
 };
 
 const select = (state) => {

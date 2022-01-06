@@ -34,6 +34,7 @@ class InjectPopover extends Component {
       openDelete: false,
       openEdit: false,
       openPopover: false,
+      openTry: false,
     };
   }
 

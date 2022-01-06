@@ -24,7 +24,7 @@ public class CreateUserInput {
     @JsonProperty("user_organization")
     private String organizationId;
 
-    @JsonProperty("user_password")
+    @JsonProperty("user_plain_password")
     private String password;
 
     @JsonProperty("user_tags")

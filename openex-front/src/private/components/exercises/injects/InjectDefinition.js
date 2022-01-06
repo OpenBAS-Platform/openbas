@@ -220,7 +220,7 @@ class InjectDefinition extends Component {
         this.props.inject.inject_id,
         inputValues,
       )
-      .then(() => this.handleCloseEdit());
+      .then(() => this.props.handleClose());
   }
 
   render() {
