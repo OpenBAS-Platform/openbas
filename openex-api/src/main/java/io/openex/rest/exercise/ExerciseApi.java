@@ -43,7 +43,6 @@ import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.resolveRelation;
-import static io.openex.helper.DatabaseHelper.updateRelation;
 import static java.io.File.createTempFile;
 import static java.time.Instant.now;
 
@@ -61,7 +60,6 @@ public class ExerciseApi<T> extends RestBehavior {
     private ExerciseLogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
-    private GroupRepository groupRepository;
     private AudienceRepository audienceRepository;
     private InjectRepository<T> injectRepository;
     // endregion
@@ -95,16 +93,6 @@ public class ExerciseApi<T> extends RestBehavior {
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
-    }
-
-    @Autowired
-    public void setDryrunService(DryrunService<T> dryrunService) {
-        this.dryrunService = dryrunService;
-    }
-
-    @Autowired
-    public void setGroupRepository(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
     }
 
     @Autowired

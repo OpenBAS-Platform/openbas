@@ -1,6 +1,9 @@
 package io.openex.rest.group;
 
-import io.openex.database.model.*;
+import io.openex.database.model.Exercise;
+import io.openex.database.model.Grant;
+import io.openex.database.model.Group;
+import io.openex.database.model.User;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.GrantRepository;
 import io.openex.database.repository.GroupRepository;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.Spliterator;
-import java.util.stream.Collectors;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;

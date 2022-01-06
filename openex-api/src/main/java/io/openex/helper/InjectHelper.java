@@ -3,7 +3,6 @@ package io.openex.helper;
 import io.openex.database.model.Audience;
 import io.openex.database.model.Exercise;
 import io.openex.database.model.Injection;
-import io.openex.database.model.User;
 import io.openex.database.repository.*;
 import io.openex.database.specification.DryInjectSpecification;
 import io.openex.database.specification.InjectSpecification;
@@ -65,8 +64,7 @@ public class InjectHelper<T> {
                 .flatMap(audience -> audience.getUsers().stream()
                         .map(user -> new UserInjectContext(user, exercise, audience.getName())));
         // Create stream from animation group
-        List<User> animationUsers = exercise.getObservers();
-        Stream<UserInjectContext> animationUserStream = animationUsers.stream()
+        Stream<UserInjectContext> animationUserStream = exercise.getObservers().stream()
                 .map(user -> new UserInjectContext(user, exercise, "Animation Group"));
         // Build result
         Stream<UserInjectContext> usersStream = concat(injectUserStream, animationUserStream);
