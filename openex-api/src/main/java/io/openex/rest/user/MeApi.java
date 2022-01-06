@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static io.openex.config.AppConfig.currentUser;
+import static io.openex.config.AppConfig.updateSessionUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.database.specification.TokenSpecification.fromUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;
@@ -74,7 +75,9 @@ public class MeApi extends RestBehavior {
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
         user.setUpdateAttributes(input);
         user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        updateSessionUser(savedUser);
+        return savedUser;
     }
 
     @RolesAllowed(ROLE_USER)
@@ -83,7 +86,9 @@ public class MeApi extends RestBehavior {
         User currentUser = currentUser();
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
         user.setUpdateAttributes(input);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        updateSessionUser(savedUser);
+        return savedUser;
     }
 
     @RolesAllowed(ROLE_USER)
