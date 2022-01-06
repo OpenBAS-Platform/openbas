@@ -5,7 +5,7 @@ jobs:
   build_frontend:
     working_directory: ~/openex
     docker:
-      - image: nikolaik/python-nodejs:python3.9-nodejs14
+      - image: nikolaik/python-nodejs:python3.9-nodejs16
     steps:
       - run:
           command: apt-get update --allow-insecure-repositories --allow-unauthenticated && apt-get install -y build-essential
@@ -15,7 +15,7 @@ jobs:
           command: yarn install
       - run:
           working_directory: ~/openex/openex-front
-          command: yarn build
+          command: NODE_OPTIONS=--max-old-space-size=8096 yarn build yarn build
           no_output_timeout: 30m
       - run: 
           working_directory: ~/
