@@ -2,6 +2,8 @@ import React from 'react';
 import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 class ErrorBoundaryComponent extends React.Component {
   constructor(props) {
@@ -27,10 +29,11 @@ ErrorBoundaryComponent.propTypes = {
 export const ErrorBoundary = R.compose(withRouter)(ErrorBoundaryComponent);
 
 const SimpleError = () => (
-  <div>
+  <Alert severity="error">
+    <AlertTitle>Error</AlertTitle>
     An unknown error occurred. Please contact your administrator or the OpenEx
     maintainers.
-  </div>
+  </Alert>
 );
 
 // eslint-disable-next-line react/display-name,arrow-body-style

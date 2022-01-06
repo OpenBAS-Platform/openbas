@@ -3,6 +3,7 @@ import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
 import Button from '@mui/material/Button';
 import { useFormatter } from './i18n';
+import { bytesFormat } from '../utils/Number';
 
 const FileFieldInput = ({
   required, input, dropZoneProps, ...props
@@ -20,12 +21,13 @@ const FileFieldInput = ({
     ...dropZoneProps,
   });
   const files = acceptedFiles.map((file) => (
-    <div key={file.path} style={{ float: 'left', margin: '5px 0 0 10px' }}>
-      {file.path} - {file.size} bytes
+    <div key={file.path} style={{ float: 'left', margin: '8px 0 0 10px' }}>
+      {file.path} - {bytesFormat(file.size).number}
+      {bytesFormat(file.size).symbol}
     </div>
   ));
   return (
-    <div {...getRootProps()}>
+    <div {...getRootProps()} style={{ marginTop: 20 }}>
       <input {...getInputProps()} />
       <Button
         {...props}

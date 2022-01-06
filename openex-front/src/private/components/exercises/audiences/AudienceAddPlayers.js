@@ -25,7 +25,7 @@ import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
 import { fetchPlayers } from '../../../../actions/User';
 import CreatePlayer from '../../players/CreatePlayer';
-import { resolveUserName } from '../../../../utils/String';
+import { resolveUserName, truncate } from '../../../../utils/String';
 
 const styles = () => ({
   createButton: {
@@ -147,7 +147,7 @@ class AudienceAddPlayers extends Component {
         >
           <DialogTitle>{t('Add players in this audience')}</DialogTitle>
           <DialogContent>
-            <Grid container={true} spacing={3}>
+            <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
                 <SearchFilter
                   onChange={this.handleSearchUsers.bind(this)}
@@ -196,7 +196,7 @@ class AudienceAddPlayers extends Component {
                       <Chip
                         key={userId}
                         onDelete={this.removeUser.bind(this, userId)}
-                        label={resolveUserName(user)}
+                        label={truncate(resolveUserName(user), 22)}
                         avatar={<Avatar src={userGravatar} size={32} />}
                         classes={{ root: classes.chip }}
                       />

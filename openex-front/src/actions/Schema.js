@@ -158,7 +158,8 @@ const _buildUser = (state, usr) => {
   return {
     ...usr,
     admin: usr.user_admin === true,
-    tags: usr.user_tags.asMutable()
+    tags: usr.user_tags
+      .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
     organization:
@@ -174,6 +175,7 @@ const _buildOrganization = (state, org) => {
   return {
     ...org,
     tags: org.organization_tags
+      .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
   };
@@ -183,6 +185,7 @@ const _buildAudience = (state, aud) => {
   return {
     ...aud,
     tags: aud.audience_tags
+      .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
     users: R.values(state.referential.entities.users)
@@ -195,6 +198,7 @@ const _buildInject = (state, inj) => {
   return {
     ...inj,
     tags: inj.inject_tags
+      .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
     audiences: R.values(state.referential.entities.audiences)
@@ -216,6 +220,7 @@ const _buildExercise = (state, id, ex) => {
     ...ex,
     exercise_id: id,
     tags: ex.exercise_tags
+      .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
     objectives: R.filter(
@@ -235,6 +240,7 @@ const _buildDocument = (state, id, doc) => {
     ...doc,
     document_id: id,
     tags: doc.document_tags
+      .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
   };
@@ -255,7 +261,10 @@ export const storeBrowser = (state) => ({
       ([k, v]) => ({ [k]: v.setting_value }),
     ),
   ),
-  me: _buildUser(state, state.referential.entities.users[R.path(['logged', 'user'], state.app)]),
+  me: _buildUser(
+    state,
+    state.referential.entities.users[R.path(['logged', 'user'], state.app)],
+  ),
   statistics: state.referential.entities.statistics?.openex,
   getUser(id) {
     return _buildUser(state, state.referential.entities.users[id]);
@@ -268,5 +277,8 @@ export const storeBrowser = (state) => ({
   },
   getInject(id) {
     return _buildInject(state, state.referential.entities.injects[id]);
+  },
+  getDocument(id) {
+    return _buildDocument(state, id, state.referential.entities.documents[id]);
   },
 });

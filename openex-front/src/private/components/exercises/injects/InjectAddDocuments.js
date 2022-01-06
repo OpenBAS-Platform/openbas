@@ -12,20 +12,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import {
-  CastForEducationOutlined,
-  ControlPointOutlined,
-} from '@mui/icons-material';
+import { DescriptionOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { updateInjectAudiences } from '../../../../actions/Inject';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
-import { fetchAudiences } from '../../../../actions/Audience';
-import CreateAudience from '../audiences/CreateAudience';
+import { fetchDocuments } from '../../../../actions/Document';
+import CreateDocument from '../../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 
 const styles = (theme) => ({
@@ -59,18 +55,18 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-class InjectAddAudiences extends Component {
+class InjectAddDocuments extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
       keyword: '',
-      audiencesIds: [],
+      documentsIds: [],
     };
   }
 
   componentDidMount() {
-    this.props.fetchAudiences(this.props.exerciseId);
+    this.props.fetchDocuments();
   }
 
   handleOpen() {
@@ -78,83 +74,65 @@ class InjectAddAudiences extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, keyword: '', audiencesIds: [] });
+    this.setState({ open: false, keyword: '', documentsIds: [] });
   }
 
-  handleSearchAudiences(value) {
+  handleSearchDocuments(value) {
     this.setState({ keyword: value });
   }
 
-  addAudience(audienceId) {
+  addDocument(documentId) {
     this.setState({
-      audiencesIds: R.append(audienceId, this.state.audiencesIds),
+      documentsIds: R.append(documentId, this.state.documentsIds),
     });
   }
 
-  removeAudience(audienceId) {
+  removeDocument(documentId) {
     this.setState({
-      audiencesIds: R.filter((u) => u !== audienceId, this.state.audiencesIds),
+      documentsIds: R.filter((u) => u !== documentId, this.state.documentsIds),
     });
   }
 
-  submitAddAudiences() {
-    this.props.updateInjectAudiences(
-      this.props.exerciseId,
-      this.props.injectId,
-      {
-        inject_audiences: R.uniq([
-          ...this.props.injectAudiencesIds,
-          ...this.state.audiencesIds,
-        ]),
-      },
+  submitAddDocuments() {
+    this.props.onChange(
+      R.uniq([
+        ...this.props.injectDocumentsIds,
+        ...this.state.documentsIds,
+      ]).map((i) => this.props.browser.getDocument(i)),
     );
     this.handleClose();
   }
 
   onCreate(result) {
-    this.addAudience(result);
+    this.addDocument(result);
   }
 
   render() {
     const {
-      classes, t, audiences, injectAudiencesIds, exerciseId,
+      classes, t, documents, injectDocumentsIds, exerciseId,
     } = this.props;
-    const { keyword, audiencesIds } = this.state;
+    const { keyword, documentsIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.audience_email || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.audience_firstname || '')
+      || (n.document_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.audience_lastname || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.audience_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.audience_organization || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredAudiences = R.pipe(
+      || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
+        !== -1;
+    const filteredDocuments = R.pipe(
       R.filter(filterByKeyword),
       R.take(5),
-    )(audiences);
+    )(documents);
     return (
-      <div>
-        <ListItem
-          classes={{ root: classes.item }}
-          button={true}
-          divider={true}
-          onClick={this.handleOpen.bind(this)}
+      <div style={{ marginTop: 20 }}>
+        <Button
+          variant="outlined"
           color="primary"
+          onClick={this.handleOpen.bind(this)}
         >
-          <ListItemIcon color="primary">
-            <ControlPointOutlined color="primary" />
-          </ListItemIcon>
-          <ListItemText
-            primary={t('Add target audiences')}
-            classes={{ primary: classes.text }}
-          />
-        </ListItem>
+          {t('Add attachments')}
+        </Button>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -169,41 +147,41 @@ class InjectAddAudiences extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add target audiences in this inject')}</DialogTitle>
+          <DialogTitle>{t('Add attachments in this inject')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
                 <SearchFilter
-                  onChange={this.handleSearchAudiences.bind(this)}
+                  onChange={this.handleSearchDocuments.bind(this)}
                   fullWidth={true}
                 />
                 <List>
-                  {filteredAudiences.map((audience) => {
-                    const disabled = audiencesIds.includes(audience.audience_id)
-                      || injectAudiencesIds.includes(audience.audience_id);
+                  {filteredDocuments.map((document) => {
+                    const disabled = documentsIds.includes(document.document_id)
+                      || injectDocumentsIds.includes(document.document_id);
                     return (
                       <ListItem
-                        key={audience.audience_id}
+                        key={document.document_id}
                         disabled={disabled}
                         button={true}
                         divider={true}
                         dense={true}
-                        onClick={this.addAudience.bind(
+                        onClick={this.addDocument.bind(
                           this,
-                          audience.audience_id,
+                          document.document_id,
                         )}
                       >
                         <ListItemIcon>
-                          <CastForEducationOutlined />
+                          <DescriptionOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={audience.audience_name}
-                          secondary={audience.audience_description}
+                          primary={document.document_name}
+                          secondary={document.document_description}
                         />
                       </ListItem>
                     );
                   })}
-                  <CreateAudience
+                  <CreateDocument
                     exerciseId={exerciseId}
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
@@ -212,14 +190,14 @@ class InjectAddAudiences extends Component {
               </Grid>
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
-                  {this.state.audiencesIds.map((audienceId) => {
-                    const audience = this.props.browser.getAudience(audienceId);
+                  {this.state.documentsIds.map((documentId) => {
+                    const document = this.props.browser.getDocument(documentId);
                     return (
                       <Chip
-                        key={audienceId}
-                        onDelete={this.removeAudience.bind(this, audienceId)}
-                        label={truncate(audience.audience_name, 22)}
-                        icon={<CastForEducationOutlined />}
+                        key={documentId}
+                        onDelete={this.removeDocument.bind(this, documentId)}
+                        label={truncate(document.document_name, 22)}
+                        icon={<DescriptionOutlined />}
                         classes={{ root: classes.chip }}
                       />
                     );
@@ -239,7 +217,7 @@ class InjectAddAudiences extends Component {
             <Button
               variant="contained"
               color="primary"
-              onClick={this.submitAddAudiences.bind(this)}
+              onClick={this.submitAddDocuments.bind(this)}
             >
               {t('Add')}
             </Button>
@@ -250,29 +228,25 @@ class InjectAddAudiences extends Component {
   }
 }
 
-InjectAddAudiences.propTypes = {
+InjectAddDocuments.propTypes = {
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
-  injectId: PropTypes.string,
-  updateInjectAudiences: PropTypes.func,
-  fetchAudiences: PropTypes.func,
-  organizations: PropTypes.array,
-  audiences: PropTypes.array,
-  injectAudiencesIds: PropTypes.array,
+  fetchDocuments: PropTypes.func,
+  documents: PropTypes.array,
+  injectDocumentsIds: PropTypes.array,
+  browser: PropTypes.object,
+  onChange: PropTypes.func,
 };
 
-const select = (state, ownProps) => {
+const select = (state) => {
   const browser = storeBrowser(state);
-  const { exerciseId } = ownProps;
-  const exercise = browser.getExercise(exerciseId);
   return {
-    audiences: exercise.audiences,
+    documents: browser.documents,
     browser,
   };
 };
 
 export default R.compose(
-  connect(select, { updateInjectAudiences, fetchAudiences }),
+  connect(select, { fetchDocuments }),
   inject18n,
   withStyles(styles),
-)(InjectAddAudiences);
+)(InjectAddDocuments);

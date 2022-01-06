@@ -74,7 +74,7 @@ class SearchFilter extends Component {
             focused: searchInputFocused,
           },
         }}
-        classes={fullWidth ? null : { root: classes.searchRoot }}
+        classes={!fullWidth && { root: classes.searchRoot }}
         autoComplete="off"
       />
     );

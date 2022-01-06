@@ -21,6 +21,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
+import { fetchDocuments } from '../../../../actions/Document';
 import ItemTags from '../../../../components/ItemTags';
 import { storeBrowser } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
@@ -146,6 +147,7 @@ class InjectDefinition extends Component {
 
   componentDidMount() {
     const { exerciseId, injectId } = this.props;
+    this.props.fetchDocuments();
     this.props.fetchInjectAudiences(exerciseId, injectId);
   }
 
@@ -431,6 +433,7 @@ InjectDefinition.propTypes = {
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
+  fetchDocuments: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
@@ -445,7 +448,7 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { fetchInjectAudiences, updateInject }),
+  connect(select, { fetchInjectAudiences, updateInject, fetchDocuments }),
   inject18n,
   withStyles(styles),
 )(InjectDefinition);

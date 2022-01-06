@@ -23,6 +23,7 @@ import TagsFilter from '../../../components/TagsFilter';
 import { storeBrowser } from '../../../actions/Schema';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
+import DocumentType from './DocumentType';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -301,7 +302,10 @@ class Documents extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.document_type}
                     >
-                      {document.document_type}
+                      <DocumentType
+                        type={document.document_type}
+                        variant="list"
+                      />
                     </div>
                     <div
                       className={classes.bodyItem}

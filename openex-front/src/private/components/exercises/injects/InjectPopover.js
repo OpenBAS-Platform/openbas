@@ -13,7 +13,11 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { updateInject, deleteInject } from '../../../../actions/Inject';
+import {
+  updateInject,
+  deleteInject,
+  tryInject,
+} from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
@@ -89,6 +93,26 @@ class InjectPopover extends Component {
     this.handleCloseDelete();
   }
 
+  handleOpenTry() {
+    this.setState({
+      openTry: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseTry() {
+    this.setState({
+      openTry: false,
+    });
+  }
+
+  submitTry() {
+    this.props.tryInject(this.props.inject.inject_id).then((payload) => {
+      this.setState({ injectResult: payload, openResult: true });
+    });
+    this.handleCloseTry();
+  }
+
   render() {
     const { t, inject, injectTypes } = this.props;
     const injectTags = inject.tags.map((tag) => ({
@@ -130,6 +154,9 @@ class InjectPopover extends Component {
         >
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenTry.bind(this)}>
+            {t('Try the inject')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
@@ -180,6 +207,33 @@ class InjectPopover extends Component {
             />
           </DialogContent>
         </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openTry}
+          onClose={this.handleCloseTry.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to try this inject?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseTry.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitTry.bind(this)}
+            >
+              {t('Try')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -195,6 +249,6 @@ InjectPopover.propTypes = {
 };
 
 export default R.compose(
-  connect(null, { updateInject, deleteInject }),
+  connect(null, { updateInject, deleteInject, tryInject }),
   inject18n,
 )(InjectPopover);
