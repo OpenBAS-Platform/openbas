@@ -6,6 +6,7 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "grants")
@@ -69,5 +70,18 @@ public class Grant implements Base {
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

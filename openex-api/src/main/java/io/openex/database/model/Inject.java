@@ -338,9 +338,9 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Inject<?> inject = (Inject<?>) o;
-        return id.equals(inject.id);
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
     }
 
     @Override

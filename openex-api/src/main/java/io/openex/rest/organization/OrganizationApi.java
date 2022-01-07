@@ -1,8 +1,12 @@
 package io.openex.rest.organization;
 
+import io.openex.database.model.Inject;
 import io.openex.database.model.Organization;
+import io.openex.database.model.basic.BasicInject;
+import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
+import io.openex.database.repository.basic.BasicInjectRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.organization.form.OrganizationCreateInput;
 import io.openex.rest.organization.form.OrganizationUpdateInput;
@@ -16,10 +20,16 @@ import java.util.Date;
 import static io.openex.database.model.User.ROLE_ADMIN;
 
 @RestController
-public class OrganizationApi extends RestBehavior {
+public class OrganizationApi<T> extends RestBehavior {
 
+    private BasicInjectRepository basicInjectRepository;
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
+
+    @Autowired
+    public void setBasicInjectRepository(BasicInjectRepository basicInjectRepository) {
+        this.basicInjectRepository = basicInjectRepository;
+    }
 
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
@@ -33,7 +43,9 @@ public class OrganizationApi extends RestBehavior {
 
     @GetMapping("/api/organizations")
     public Iterable<Organization> organizations() {
-        return organizationRepository.findAll();
+        Iterable<BasicInject> injects = basicInjectRepository.findAll();
+        return fromIterable(organizationRepository.findAll()).stream()
+                .peek(org -> org.resolveInjects(injects)).toList();
     }
 
     @RolesAllowed(ROLE_ADMIN)
@@ -48,7 +60,7 @@ public class OrganizationApi extends RestBehavior {
     @RolesAllowed(ROLE_ADMIN)
     @PutMapping("/api/organizations/{organizationId}")
     public Organization updateOrganization(@PathVariable String organizationId,
-                         @Valid @RequestBody OrganizationUpdateInput input) {
+                                           @Valid @RequestBody OrganizationUpdateInput input) {
         Organization organization = organizationRepository.findById(organizationId).orElseThrow();
         organization.setUpdateAttributes(input);
         organization.setUpdatedAt(new Date());

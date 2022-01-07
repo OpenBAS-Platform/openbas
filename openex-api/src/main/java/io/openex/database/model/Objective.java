@@ -7,6 +7,7 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "objectives")
@@ -75,5 +76,18 @@ public class Objective implements Base {
 
     public void setPriority(Short priority) {
         this.priority = priority;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

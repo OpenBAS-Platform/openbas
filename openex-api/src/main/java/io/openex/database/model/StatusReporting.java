@@ -8,11 +8,7 @@ import java.util.List;
 public class StatusReporting {
 
     @JsonProperty("messages")
-    private List<String> messages = new ArrayList<>();
-
-    public StatusReporting() {
-        // Nothing to do
-    }
+    private List<String> messages;
 
     public StatusReporting(List<String> messages) {
         this.messages = messages;

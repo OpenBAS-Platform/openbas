@@ -1,9 +1,11 @@
 package io.openex.rest.user;
 
 import io.openex.database.model.User;
+import io.openex.database.model.basic.BasicInject;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
+import io.openex.database.repository.basic.BasicInjectRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.player.CreatePlayerInput;
 import io.openex.rest.user.form.player.UpdatePlayerInput;
@@ -22,9 +24,15 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 public class PlayerApi extends RestBehavior {
 
     private OrganizationRepository organizationRepository;
+    private BasicInjectRepository basicInjectRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
     private UserService userService;
+
+    @Autowired
+    public void setBasicInjectRepository(BasicInjectRepository basicInjectRepository) {
+        this.basicInjectRepository = basicInjectRepository;
+    }
 
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
@@ -49,7 +57,9 @@ public class PlayerApi extends RestBehavior {
     @GetMapping("/api/players")
     @PostAuthorize("isObserver()")
     public Iterable<User> players() {
-        return userRepository.findAll();
+        Iterable<BasicInject> injects = basicInjectRepository.findAll();
+        return fromIterable(userRepository.findAll()).stream()
+                .peek(user -> user.resolveInjects(injects)).toList();
     }
 
     @Transactional

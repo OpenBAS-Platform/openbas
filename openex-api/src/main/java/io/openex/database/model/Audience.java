@@ -171,9 +171,9 @@ public class Audience implements Base {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Audience audience = (Audience) o;
-        return id.equals(audience.id);
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
     }
 
     @Override

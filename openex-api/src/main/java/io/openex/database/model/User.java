@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.database.model.basic.BasicInject;
+import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.InjectRepository;
 import io.openex.helper.CryptoHelper;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
@@ -16,8 +19,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
+import static java.util.stream.StreamSupport.stream;
 
 @Entity
 @Table(name = "users")
@@ -111,8 +116,8 @@ public class User implements Base, OAuth2User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_audiences",
-            joinColumns = @JoinColumn(name = "audience_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "audience_id"))
     @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("user_audiences")
     @Fetch(FetchMode.SUBSELECT)
@@ -128,6 +133,25 @@ public class User implements Base, OAuth2User {
     private List<Tag> tags = new ArrayList<>();
 
     // region transient
+    private transient List<BasicInject> injects = new ArrayList<>();
+    public void resolveInjects(Iterable<BasicInject> injects) {
+        this.injects = stream(injects.spliterator(), false)
+                .filter(inject -> inject.isAllAudiences() || inject.getAudiences().stream()
+                        .anyMatch(audience -> getAudiences().contains(audience)))
+                .collect(Collectors.toList());
+    }
+
+    @JsonProperty("user_injects")
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    public List<BasicInject> getUserInject() {
+        return injects;
+    }
+
+    @JsonProperty("user_injects_number")
+    public long getUserInjectsNumber() {
+        return injects.size();
+    }
+
     @JsonProperty("user_gravatar")
     public String getGravatar() {
         String emailMd5 = CryptoHelper.md5Hex(getEmail().trim().toLowerCase());
@@ -314,11 +338,6 @@ public class User implements Base, OAuth2User {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
     @JsonIgnore
     public Map<String, Object> getAttributes() {
         HashMap<String, Object> attributes = new HashMap<>();
@@ -348,8 +367,13 @@ public class User implements Base, OAuth2User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return id.equals(user.id);
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
