@@ -70,9 +70,23 @@ public class Audience implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "injects_audiences",
+            joinColumns = @JoinColumn(name = "audience_id"),
+            inverseJoinColumns = @JoinColumn(name = "inject_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("audience_injects")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Inject<?>> injects = new ArrayList<>();
+
     @JsonProperty("audience_users_number")
     public long getUsersNumber() {
         return getUsers().size();
+    }
+
+    @JsonProperty("audience_injects_number")
+    public long getInjectsNumber() {
+        return getInjects().size();
     }
 
     @JsonIgnore
@@ -135,6 +149,14 @@ public class Audience implements Base {
 
     public void setUsers(List<User> users) {
         this.users = users;
+    }
+
+    public List<Inject<?>> getInjects() {
+        return injects;
+    }
+
+    public void setInjects(List<Inject<?>> injects) {
+        this.injects = injects;
     }
 
     public Exercise getExercise() {
