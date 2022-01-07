@@ -14,6 +14,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Entity
 @Table(name = "audiences")
@@ -152,7 +153,12 @@ public class Audience implements Base {
     }
 
     public List<Inject<?>> getInjects() {
-        return injects;
+        Stream<Inject<?>> stream = injects.stream();
+        Stream<Inject<?>> allInjectStream = getExercise().getAudiences().stream()
+                .flatMap(audience -> audience.getInjects().stream())
+                .filter(Inject::isGlobalInject);
+        Stream<Inject<?>> injectsStream = Stream.concat(stream, allInjectStream);
+        return injectsStream.distinct().toList();
     }
 
     public void setInjects(List<Inject<?>> injects) {
