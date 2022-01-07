@@ -3,35 +3,38 @@ package io.openex.rest.exercise.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class ExerciseUpdateInfoInput {
+public class ExerciseUpdateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_name")
     private String name;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("exercise_description")
-    private String description;
-
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 
-    @JsonProperty("exercise_latitude")
-    private Double latitude;
-
-    @JsonProperty("exercise_longitude")
-    private Double longitude;
+    @JsonProperty("exercise_description")
+    private String description;
 
     @JsonProperty("exercise_start_date")
     private Date start;
 
-    @JsonProperty("exercise_end_date")
-    private Date end;
+    @JsonProperty("exercise_mail_from")
+    private String mailFrom;
+
+    @JsonProperty("exercise_message_header")
+    private String messageHeader;
+
+    @JsonProperty("exercise_message_footer")
+    private String messageFooter;
+
+    @JsonProperty("exercise_tags")
+    private List<String> tagIds = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -65,27 +68,23 @@ public class ExerciseUpdateInfoInput {
         this.start = start;
     }
 
-    public Date getEnd() {
-        return end;
+    public String getMessageFooter() {
+        return messageFooter;
     }
 
-    public void setEnd(Date end) {
-        this.end = end;
+    public void setMessageFooter(String messageFooter) {
+        this.messageFooter = messageFooter;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    public String getMessageHeader() {
+        return messageHeader;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+    public String getMailFrom() {
+        return mailFrom;
     }
 
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
+    public void setMailFrom(String mailFrom) {
+        this.mailFrom = mailFrom;
     }
 }

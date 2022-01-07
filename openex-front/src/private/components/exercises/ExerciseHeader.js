@@ -7,7 +7,10 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Slide from '@mui/material/Slide';
 import {
-  AddOutlined, CloseOutlined, DoneOutlined, MoreVertRounded,
+  AddOutlined,
+  CloseOutlined,
+  DoneOutlined,
+  MoreVertRounded,
 } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { Form } from 'react-final-form';
@@ -57,100 +60,110 @@ const ExerciseHeader = () => {
 
   const deleteTag = (tagId) => {
     const tags = exercise.tags.filter((tag) => tag.tag_id !== tagId);
-    dispatch(updateExerciseTags(exercise.exercise_id, {
-      exercise_tags: tags.map((tag) => tag.tag_id),
-    }));
+    dispatch(
+      updateExerciseTags(exercise.exercise_id, {
+        exercise_tags: tags.map((tag) => tag.tag_id),
+      }),
+    );
   };
   const submitTags = (values) => {
     handleToggleAddTag();
-    dispatch(updateExerciseTags(exercise.exercise_id, {
-      exercise_tags: R.uniq([
-        ...values.exercise_tags.map((tag) => tag.id),
-        ...exercise.tags.map((tag) => tag.tag_id),
-      ]),
-    }));
+    dispatch(
+      updateExerciseTags(exercise.exercise_id, {
+        exercise_tags: R.uniq([
+          ...values.exercise_tags.map((tag) => tag.id),
+          ...exercise.tags.map((tag) => tag.tag_id),
+        ]),
+      }),
+    );
   };
 
   const { tags } = exercise;
   return (
-      <div className={classes.container}>
-        <Typography
-          variant="h5"
-          gutterBottom={true}
-          classes={{ root: classes.title }}>
-          {exercise.exercise_name}
-        </Typography>
-        <ExercisePopover exercise={exercise} />
-        <div className={classes.tags}>
-          {R.take(5, tags).map((tag) => (
-            <Chip
-              key={tag.tag_id}
-              classes={{ root: classes.tag }}
-              label={tag.tag_name}
-              onDelete={() => deleteTag(tag.tag_id)}
-            />
-          ))}
-          {tags.length > 5 ? (
-            <Button
-              color="primary"
-              aria-label="More"
-              onClick={handleToggleOpenTags}
-              style={{ fontSize: 14 }}>
-              <MoreVertRounded />
-              &nbsp;&nbsp;{t('More')}
-            </Button>
-          ) : (
-            <div style={{ float: 'left', marginTop: -5 }}>
-              {openTagAdd && (
-                <IconButton
-                  style={{ float: 'left' }}
-                  color="primary"
-                  aria-label="Tag"
-                  type="submit"
-                  form="tagsForm">
-                  <DoneOutlined />
-                </IconButton>
-              )}
+    <div className={classes.container}>
+      <Typography
+        variant="h5"
+        gutterBottom={true}
+        classes={{ root: classes.title }}
+      >
+        {exercise.exercise_name}
+      </Typography>
+      <ExercisePopover exercise={exercise} />
+      <div className={classes.tags}>
+        {R.take(5, tags).map((tag) => (
+          <Chip
+            key={tag.tag_id}
+            classes={{ root: classes.tag }}
+            label={tag.tag_name}
+            onDelete={() => deleteTag(tag.tag_id)}
+          />
+        ))}
+        {tags.length > 5 ? (
+          <Button
+            color="primary"
+            aria-label="More"
+            onClick={handleToggleOpenTags}
+            style={{ fontSize: 14 }}
+          >
+            <MoreVertRounded />
+            &nbsp;&nbsp;{t('More')}
+          </Button>
+        ) : (
+          <div style={{ float: 'left', marginTop: -5 }}>
+            {openTagAdd && (
               <IconButton
                 style={{ float: 'left' }}
                 color="primary"
                 aria-label="Tag"
-                onClick={handleToggleAddTag}>
-                {openTagAdd ? <CloseOutlined /> : <AddOutlined />}
+                type="submit"
+                form="tagsForm"
+              >
+                <DoneOutlined />
               </IconButton>
-            </div>
-          )}
-          <Slide
-            direction="left"
-            in={openTagAdd}
-            mountOnEnter={true}
-            unmountOnExit={true}>
-            <div className={classes.tagsInput}>
-              <Form
-                keepDirtyOnReinitialize={true}
-                initialValues={{ exercise_tags: [] }}
-                onSubmit={submitTags}
-                mutators={{
-                  setValue: ([field, value], state, { changeValue }) => {
-                    changeValue(state, field, () => value);
-                  },
-                }}>
-                {({ handleSubmit, form, values }) => (
-                  <form id="tagsForm" onSubmit={handleSubmit}>
-                    <TagField
-                      name="exercise_tags"
-                      values={values}
-                      label={null}
-                      placeholder={t('Tags')}
-                      setFieldValue={form.mutators.setValue}
-                    />
-                  </form>
-                )}
-              </Form>
-            </div>
-          </Slide>
-        </div>
+            )}
+            <IconButton
+              style={{ float: 'left' }}
+              color="primary"
+              aria-label="Tag"
+              onClick={handleToggleAddTag}
+            >
+              {openTagAdd ? <CloseOutlined /> : <AddOutlined />}
+            </IconButton>
+          </div>
+        )}
+        <Slide
+          direction="left"
+          in={openTagAdd}
+          mountOnEnter={true}
+          unmountOnExit={true}
+        >
+          <div className={classes.tagsInput}>
+            <Form
+              keepDirtyOnReinitialize={true}
+              initialValues={{ exercise_tags: [] }}
+              onSubmit={submitTags}
+              mutators={{
+                setValue: ([field, value], state, { changeValue }) => {
+                  changeValue(state, field, () => value);
+                },
+              }}
+            >
+              {({ handleSubmit, form, values }) => (
+                <form id="tagsForm" onSubmit={handleSubmit}>
+                  <TagField
+                    name="exercise_tags"
+                    values={values}
+                    label={null}
+                    placeholder={t('Tags')}
+                    setFieldValue={form.mutators.setValue}
+                  />
+                </form>
+              )}
+            </Form>
+          </div>
+        </Slide>
       </div>
+    </div>
   );
 };
 

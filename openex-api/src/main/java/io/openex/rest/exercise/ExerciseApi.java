@@ -206,10 +206,10 @@ public class ExerciseApi<T> extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/information")
+    @PutMapping("/api/exercises/{exerciseId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseInformation(@PathVariable String exerciseId,
-                                              @Valid @RequestBody ExerciseUpdateInfoInput input) {
+                                              @Valid @RequestBody ExerciseUpdateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
         return exerciseRepository.save(exercise);

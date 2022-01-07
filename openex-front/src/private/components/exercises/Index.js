@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  Route, Switch, useParams,
-} from 'react-router-dom';
+import { Route, Switch, useParams } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import Exercise from './Exercise';
@@ -33,16 +31,28 @@ const Index = () => {
 
   if (exercise) {
     return (
-        <div className={classes.root}>
-          <TopBar />
-          <ExerciseHeader/>
-          <div className="clearfix" />
-          <Switch>
-            <Route exact path="/exercises/:exerciseId" render={errorWrapper(Exercise)}/>
-            <Route exact path="/exercises/:exerciseId/audiences" render={errorWrapper(Audiences)}/>
-            <Route exact path="/exercises/:exerciseId/scenario" render={errorWrapper(Injects)}/>
-          </Switch>
-        </div>
+      <div className={classes.root}>
+        <TopBar />
+        <ExerciseHeader />
+        <div className="clearfix" />
+        <Switch>
+          <Route
+            exact
+            path="/exercises/:exerciseId"
+            render={errorWrapper(Exercise)}
+          />
+          <Route
+            exact
+            path="/exercises/:exerciseId/audiences"
+            render={errorWrapper(Audiences)}
+          />
+          <Route
+            exact
+            path="/exercises/:exerciseId/scenario"
+            render={errorWrapper(Injects)}
+          />
+        </Switch>
+      </div>
     );
   }
   return <Loader />;

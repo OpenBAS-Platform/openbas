@@ -1,5 +1,6 @@
 import React from 'react';
-import { makeStyles, styled } from '@mui/styles';
+import Chart from 'react-apexcharts';
+import { makeStyles, styled, useTheme } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -16,21 +17,29 @@ import {
   PlayArrowOutlined,
   VideoSettingsOutlined,
   MarkEmailReadOutlined,
+  CancelOutlined,
 } from '@mui/icons-material';
 import LinearProgress, {
   linearProgressClasses,
 } from '@mui/material/LinearProgress';
 import * as R from 'ramda';
+import { useDispatch } from 'react-redux';
+import Countdown from 'react-countdown';
 import { updateExercise } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useStore } from '../../../store';
-import ExerciseForm from './ExerciseForm';
+import ExerciseParametersForm from './ExerciseParametersForm';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { fetchAudiences } from '../../../actions/Audience';
+import Empty from '../../../components/Empty';
+import { distributionChartOptions } from '../../../utils/Charts';
 
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     marginTop: -20,
+    paddingBottom: 50,
   },
   metric: {
     position: 'relative',
@@ -58,9 +67,19 @@ const useStyles = makeStyles(() => ({
   },
   paper: {
     position: 'relative',
-    padding: 20,
+    padding: '20px 20px 0 20px',
     overflow: 'hidden',
     height: '100%',
+  },
+  paperNoPadding: {
+    position: 'relative',
+    padding: '0 20px 0 0',
+    overflow: 'hidden',
+    height: '100%',
+  },
+  countdown: {
+    letterSpacing: 2,
+    fontSize: 20,
   },
 }));
 
@@ -90,9 +109,15 @@ const iconStatus = (status) => {
 
 const Exercise = () => {
   const classes = useStyles();
+  const theme = useTheme();
+  const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const { t, fldt } = useFormatter();
   const exercise = useStore((store) => store.getExercise(exerciseId));
+  const { audiences } = exercise;
+  useDataLoader(() => {
+    dispatch(fetchAudiences(exerciseId));
+  });
   const submitUpdate = (data) => updateExercise(exerciseId, data);
   const initialValues = R.pipe(
     R.pick([
@@ -105,6 +130,18 @@ const Exercise = () => {
       'exercise_mail_from',
     ]),
   )(exercise);
+  const distributionChartData = [
+    {
+      name: t('Number of injects'),
+      data: audiences?.map((a) => ({
+        x: a.audience_name,
+        y: a.audience_injects_number,
+      })),
+    },
+  ];
+  const maxInjectsNumber = Math.max(
+    ...(audiences || []).map((a) => a.audience_injects_number),
+  );
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
@@ -156,7 +193,7 @@ const Exercise = () => {
       </Grid>
       <br />
       <Grid container={true} spacing={3}>
-        <Grid item={true} xs={6}>
+        <Grid item={true} xs={4}>
           <Typography variant="overline">{t('Information')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
@@ -179,30 +216,58 @@ const Exercise = () => {
             </Grid>
           </Paper>
         </Grid>
-        <Grid item={true} xs={6}>
-          <Typography variant="overline">{t('Control')}</Typography>
+        <Grid item={true} xs={4}>
+          <Typography variant="overline">{t('Execution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <Alert severity="info">
-              {t(
-                'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.',
-              )}
-            </Alert>
-            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-              <Grid item={true} xs={4}>
+            <Grid container={true} spacing={3}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Next inject')}</Typography>
+                <div className={classes.countdown}>
+                  <Countdown date={Date.now() + 500000} />
+                </div>
+              </Grid>
+              <Grid item={true} xs={6}>
+                <Alert severity="warning">
+                  {t('Cancelling the exercise is irreversible.')}
+                </Alert>
+              </Grid>
+              <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Execution')}</Typography>
                 <Button
                   variant="contained"
-                  endIcon={<PlayArrowOutlined />}
+                  startIcon={<PlayArrowOutlined />}
                   color="success"
                 >
                   {t('Start')}
                 </Button>
               </Grid>
-              <Grid item={true} xs={4}>
+              <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Dangerous zone')}</Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<CancelOutlined />}
+                  color="error"
+                >
+                  {t('Cancel')}
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={4}>
+          <Typography variant="overline">{t('Control')}</Typography>
+          <Paper variant="outlined" classes={{ root: classes.paper }}>
+            <Alert severity="info">
+              {t(
+                'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.',
+              )}
+            </Alert>
+            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+              <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Dryrun')}</Typography>
                 <Button
                   variant="contained"
-                  endIcon={<VideoSettingsOutlined />}
+                  startIcon={<VideoSettingsOutlined />}
                   color="info"
                 >
                   {t('Launch')}
@@ -212,7 +277,7 @@ const Exercise = () => {
                 <Typography variant="h1">{t('Comcheck')}</Typography>
                 <Button
                   variant="contained"
-                  endIcon={<MarkEmailReadOutlined />}
+                  startIcon={<MarkEmailReadOutlined />}
                   color="secondary"
                 >
                   {t('Send')}
@@ -222,20 +287,31 @@ const Exercise = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
-          <Typography variant="overline">{t('Settings')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ExerciseForm
-              initialValues={initialValues}
-              editing={true}
-              onSubmit={submitUpdate}
-            />
+          <Typography variant="overline">
+            {t('Injects distribution')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperNoPadding }}>
+            {audiences.length > 0 ? (
+              <Chart
+                options={distributionChartOptions(
+                  theme,
+                  maxInjectsNumber === 1,
+                )}
+                series={distributionChartData}
+                type="bar"
+                width="100%"
+                height={50 + audiences.length * 50}
+              />
+            ) : (
+              <Empty message={t('No audiences in this exercise.')} />
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
+          <Typography variant="overline">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <ExerciseForm
+            <ExerciseParametersForm
               initialValues={initialValues}
-              editing={true}
               onSubmit={submitUpdate}
             />
           </Paper>

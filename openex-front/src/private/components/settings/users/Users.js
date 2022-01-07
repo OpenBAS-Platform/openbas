@@ -25,6 +25,7 @@ import CreateUser from './CreateUser';
 import UserPopover from './UserPopover';
 import { storeBrowser } from '../../../../actions/Schema';
 import { fetchTags } from '../../../../actions/Tag';
+import TagsFilter from '../../../../components/TagsFilter';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -190,11 +191,13 @@ class Users extends Component {
   }
 
   handleAddTag(value) {
-    this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    if (value) {
+      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
+    }
   }
 
   handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n !== value, this.state.tags) });
+    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
   }
 
   reverseBy(field) {
@@ -229,7 +232,9 @@ class Users extends Component {
 
   render() {
     const { classes, users } = this.props;
-    const { keyword, sortBy, orderAsc } = this.state;
+    const {
+      keyword, sortBy, orderAsc, tags,
+    } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
@@ -246,6 +251,13 @@ class Users extends Component {
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedUsers = R.pipe(
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.user_tags),
+            R.pluck('id', tags),
+          ),
+      ),
       R.map((n) => R.assoc('user_organization', n.organization?.organization_name, n)),
       R.filter(filterByKeyword),
       sort,
@@ -258,6 +270,13 @@ class Users extends Component {
               small={true}
               onChange={this.handleSearch.bind(this)}
               keyword={keyword}
+            />
+          </div>
+          <div style={{ float: 'left', marginRight: 20 }}>
+            <TagsFilter
+              onAddTag={this.handleAddTag.bind(this)}
+              onRemoveTag={this.handleRemoveTag.bind(this)}
+              currentTags={tags}
             />
           </div>
         </div>

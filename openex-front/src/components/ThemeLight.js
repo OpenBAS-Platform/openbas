@@ -57,17 +57,17 @@ export default () => ({
             border: '3px solid #001e3c',
           },
           '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus':
-              {
-                backgroundColor: '#01478DFF',
-              },
+            {
+              backgroundColor: '#01478DFF',
+            },
           '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active':
-              {
-                backgroundColor: '#01478DFF',
-              },
+            {
+              backgroundColor: '#01478DFF',
+            },
           '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
-              {
-                backgroundColor: '#01478DFF',
-              },
+            {
+              backgroundColor: '#01478DFF',
+            },
           '&::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
             backgroundColor: '#01478DFF',
           },
@@ -83,7 +83,7 @@ export default () => ({
             WebkitTextFillColor: '#ffffff !important',
             caretColor: 'transparent !important',
             WebkitBoxShadow:
-                '0 0 0 1000px rgba(4, 8, 17, 0.88) inset !important',
+              '0 0 0 1000px rgba(4, 8, 17, 0.88) inset !important',
             borderTopLeftRadius: 'inherit',
             borderTopRightRadius: 'inherit',
           },

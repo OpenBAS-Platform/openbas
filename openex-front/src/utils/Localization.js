@@ -12,7 +12,7 @@ const i18n = {
       Organizations: 'Organisations',
       Documents: 'Documents',
       Integrations: 'Intégrations',
-      Settings: 'Configuraiton',
+      Settings: 'Configuration',
       Profile: 'Profil',
       Logout: 'Se déconnecter',
       Firstname: 'Prénom',
@@ -22,6 +22,9 @@ const i18n = {
       Injects: 'Stimulis',
       Messages: 'Messages',
       'Recent exercises': 'Exercices récents',
+      'No audiences in this exercise.': 'Aucune audience dans cet exercice.',
+      'No exercises in this platform.': 'Aucun exercice dans cette plateforme.',
+      'Injects distribution': 'Distribution des stimulis',
       'Next injects to send': 'Prochains stimlis à envoyer',
       'Organizations distribution across exercises':
         'Distribution des organisations dans les exercices',
@@ -128,6 +131,7 @@ const i18n = {
       'Create a new inject': 'Créer un nouveau stimuli',
       'Remove from the audience': "Retirer de l'audience",
       'Update the audience': "Modifier l'audience",
+      'Update the exercise': "Modifier l'exercice",
       'Update the inject': 'Modifier le stimuli',
       'Do you want to remove the player from the audience?':
         'Souhaitez-vous retirer le joueur de cette audience ?',
@@ -136,6 +140,8 @@ const i18n = {
       'Remove from the inject': 'Retirer du stimuli',
       'Do you want to remove the audience from the inject?':
         "Souhaitez-vous retirer l'audience du stimuli ?",
+      'Do you want to delete this exercise?':
+        'Souhaitez-vous supprimer cet exercice ?',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.':
         "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails des joueurs et une simulation pour envoyer les stimulis à l'équipe d'animation.",
       openex_email: 'Email',

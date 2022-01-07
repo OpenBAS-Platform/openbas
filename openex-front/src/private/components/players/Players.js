@@ -144,7 +144,13 @@ const Players = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   // Filter and sort hook
-  const searchColumns = ['email', 'firstname', 'lastname', 'phone', 'organization'];
+  const searchColumns = [
+    'email',
+    'firstname',
+    'lastname',
+    'phone',
+    'organization',
+  ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
   // Fetching data
   const users = useStore((store) => store.users);
@@ -158,11 +164,18 @@ const Players = () => {
     <div className={classes.container}>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <SearchFilter small={true} onChange={filtering.handleSearch} keyword={filtering.keyword}/>
+          <SearchFilter
+            small={true}
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
         </div>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <TagsFilter onAddTag={filtering.handleAddTag}
-                      onRemoveTag={filtering.handleRemoveTag} currentTags={filtering.tags}/>
+          <TagsFilter
+            onAddTag={filtering.handleAddTag}
+            onRemoveTag={filtering.handleRemoveTag}
+            currentTags={filtering.tags}
+          />
         </div>
       </div>
       <div className="clearfix" />
@@ -186,10 +199,30 @@ const Players = () => {
           <ListItemText
             primary={
               <div>
-                {filtering.buildHeader('user_email', 'Email address', true, headerStyles)}
-                {filtering.buildHeader('user_firstname', 'Firstname', true, headerStyles)}
-                {filtering.buildHeader('user_lastname', 'Lastname', true, headerStyles)}
-                {filtering.buildHeader('user_organization', 'Organization', true, headerStyles)}
+                {filtering.buildHeader(
+                  'user_email',
+                  'Email address',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_firstname',
+                  'Firstname',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_lastname',
+                  'Lastname',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_organization',
+                  'Organization',
+                  true,
+                  headerStyles,
+                )}
                 {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </div>
             }

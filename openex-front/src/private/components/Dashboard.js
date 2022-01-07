@@ -14,15 +14,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import LinearProgress from '@mui/material/LinearProgress';
 import {
-  BarChart,
-  Cell,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import {
   RowingOutlined,
   NotificationsOutlined,
   GroupsOutlined,
@@ -37,15 +28,8 @@ import { fetchExercises } from '../../actions/Exercise';
 import { fetchTags } from '../../actions/Tag';
 import { storeBrowser } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
+import Empty from '../../components/Empty';
 
-const organizationsDistribution = [
-  { label: 'Luatix', value: 54 },
-  { label: 'ANSSI', value: 40 },
-  { label: 'BNP Paribas', value: 20 },
-  { label: 'Engie', value: 20 },
-  { label: 'RTE', value: 20 },
-  { label: 'SNCF', value: 20 },
-];
 const styles = () => ({
   root: {
     flexGrow: 1,
@@ -107,7 +91,7 @@ const Dashboard = (props) => {
     props.fetchTags();
   }, []);
   const {
-    theme, classes, t, nsd, statistics, exercises,
+    classes, t, nsd, statistics, exercises,
   } = props;
   return (
     <div className={classes.root}>
@@ -217,23 +201,7 @@ const Dashboard = (props) => {
                 ))}
               </List>
             ) : (
-              <div
-                style={{
-                  display: 'table',
-                  height: '100%',
-                  width: '100%',
-                }}
-              >
-                <span
-                  style={{
-                    display: 'table-cell',
-                    verticalAlign: 'middle',
-                    textAlign: 'center',
-                  }}
-                >
-                  {t('No available exercise on this platform yet.')}
-                </span>
-              </div>
+              <Empty message={t('No exercises in this platform.')} />
             )}
           </Paper>
         </Grid>
@@ -503,52 +471,7 @@ const Dashboard = (props) => {
             {t('Organizations distribution across exercises')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.graph }}>
-            <ResponsiveContainer height={380} width="100%">
-              <BarChart
-                layout="vertical"
-                data={organizationsDistribution}
-                margin={{
-                  top: 0,
-                  right: 0,
-                  bottom: 20,
-                  left: 0,
-                }}
-              >
-                <XAxis
-                  type="number"
-                  dataKey="value"
-                  stroke={theme.palette.text.primary}
-                  allowDecimals={false}
-                />
-                <YAxis
-                  stroke={theme.palette.text.primary}
-                  dataKey="label"
-                  type="category"
-                  angle={-30}
-                  textAnchor="end"
-                />
-                <Tooltip
-                  cursor={{
-                    fill: 'rgba(0, 0, 0, 0.2)',
-                    stroke: 'rgba(0, 0, 0, 0.2)',
-                    strokeWidth: 2,
-                  }}
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    fontSize: 12,
-                    borderRadius: 10,
-                  }}
-                />
-                <Bar dataKey="value" barSize={15}>
-                  {organizationsDistribution.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={theme.palette.primary.main}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            test
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>

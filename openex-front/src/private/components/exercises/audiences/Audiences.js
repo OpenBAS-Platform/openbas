@@ -154,7 +154,10 @@ const Audiences = () => {
   const { t } = useFormatter();
   const [selectedAudience, setSelectedAudience] = useState(null);
   // Filter and sort hook
-  const filtering = useSearchAnFilter('audience', 'name', ['name', 'description']);
+  const filtering = useSearchAnFilter('audience', 'name', [
+    'name',
+    'description',
+  ]);
   // Fetching data
   const { exerciseId } = useParams();
   const exercise = useStore((store) => store.getExercise(exerciseId));
@@ -164,108 +167,154 @@ const Audiences = () => {
   });
 
   return (
-      <div className={classes.container}>
-        <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchFilter small={true} onChange={filtering.handleSearch}
-                          keyword={filtering.keyword}/>
-          </div>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <TagsFilter onAddTag={filtering.handleAddTag}
-                        onRemoveTag={filtering.handleRemoveTag} currentTags={filtering.tags}/>
-          </div>
+    <div className={classes.container}>
+      <div className={classes.parameters}>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <SearchFilter
+            small={true}
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
         </div>
-        <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <TagsFilter
+            onAddTag={filtering.handleAddTag}
+            onRemoveTag={filtering.handleRemoveTag}
+            currentTags={filtering.tags}
+          />
+        </div>
+      </div>
+      <div className="clearfix" />
+      <List classes={{ root: classes.container }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon>
+            <span
+              style={{
+                padding: '0 8px 0 10px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
+              #
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <div>
+                {filtering.buildHeader(
+                  'audience_name',
+                  'Name',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_description',
+                  'Description',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_users_number',
+                  'Players',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_enabled',
+                  'Status',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_tags',
+                  'Tags',
+                  true,
+                  headerStyles,
+                )}
+              </div>
+            }
+          />
+          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+        </ListItem>
+        {filtering.filterAndSort(audiences).map((audience) => (
           <ListItem
-            classes={{ root: classes.itemHead }}
-            divider={false}
-            style={{ paddingTop: 0 }}>
+            key={audience.audience_id}
+            classes={{ root: classes.item }}
+            divider={true}
+            button={true}
+            onClick={() => setSelectedAudience(audience.audience_id)}
+          >
             <ListItemIcon>
-              <span
-                style={{
-                  padding: '0 8px 0 10px',
-                  fontWeight: 700,
-                  fontSize: 12,
-                }}>
-                #
-              </span>
+              <CastForEducationOutlined />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
-                  {filtering.buildHeader('audience_name', 'Name', true, headerStyles)}
-                  {filtering.buildHeader('audience_description', 'Description', true, headerStyles)}
-                  {filtering.buildHeader('audience_users_number', 'Players', true, headerStyles)}
-                  {filtering.buildHeader('audience_enabled', 'Status', false, headerStyles)}
-                  {filtering.buildHeader('audience_tags', 'Tags', true, headerStyles)}
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_name}
+                  >
+                    {audience.audience_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_description}
+                  >
+                    {audience.audience_description}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_users_number}
+                  >
+                    {audience.audience_users_number}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_enabled}
+                  >
+                    <ItemBoolean
+                      status={audience.audience_enabled}
+                      label={
+                        audience.audience_enabled ? t('Enabled') : t('Disabled')
+                      }
+                      variant="list"
+                    />
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_tags}
+                  >
+                    <ItemTags variant="list" tags={audience.tags} />
+                  </div>
                 </div>
               }
             />
-            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+            <ListItemSecondaryAction>
+              <AudiencePopover exerciseId={exerciseId} audience={audience} />
+            </ListItemSecondaryAction>
           </ListItem>
-          {filtering.filterAndSort(audiences).map((audience) => (
-            <ListItem
-              key={audience.audience_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              button={true}
-              onClick={() => setSelectedAudience(audience.audience_id)}>
-              <ListItemIcon>
-                <CastForEducationOutlined />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    <div className={classes.bodyItem} style={inlineStyles.audience_name}>
-                      {audience.audience_name}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.audience_description}>
-                      {audience.audience_description}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.audience_users_number}>
-                      {audience.audience_users_number}
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.audience_enabled}>
-                      <ItemBoolean
-                        status={audience.audience_enabled}
-                        label={
-                          audience.audience_enabled
-                            ? t('Enabled')
-                            : t('Disabled')
-                        }
-                        variant="list"
-                      />
-                    </div>
-                    <div className={classes.bodyItem} style={inlineStyles.audience_tags}>
-                      <ItemTags variant="list" tags={audience.tags} />
-                    </div>
-                  </div>
-                }
-              />
-              <ListItemSecondaryAction>
-                <AudiencePopover exerciseId={exerciseId} audience={audience}/>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-        <Drawer
-          open={selectedAudience !== null}
-          keepMounted={false}
-          anchor="right"
-          sx={{ zIndex: 1202 }}
-          classes={{ paper: classes.drawerPaper }}
-          onClose={() => setSelectedAudience(null)}>
-          <AudiencePlayers
-            audienceId={selectedAudience}
-            exerciseId={exerciseId}
-            handleClose={() => setSelectedAudience(null)}
-          />
-        </Drawer>
-        {exercise.user_can_update && (
-          <CreateAudience exerciseId={exerciseId} />
-        )}
-      </div>
+        ))}
+      </List>
+      <Drawer
+        open={selectedAudience !== null}
+        keepMounted={false}
+        anchor="right"
+        sx={{ zIndex: 1202 }}
+        classes={{ paper: classes.drawerPaper }}
+        onClose={() => setSelectedAudience(null)}
+      >
+        <AudiencePlayers
+          audienceId={selectedAudience}
+          exerciseId={exerciseId}
+          handleClose={() => setSelectedAudience(null)}
+        />
+      </Drawer>
+      {exercise.user_can_update && <CreateAudience exerciseId={exerciseId} />}
+    </div>
   );
 };
 

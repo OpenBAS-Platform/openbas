@@ -34,7 +34,11 @@ const Index = () => {
     <div className={classes.root}>
       <main className={classes.content}>
         <Switch>
-          <Route exact path="/comcheck/:statusId" render={errorWrapper(IndexComcheck)}/>
+          <Route
+            exact
+            path="/comcheck/:statusId"
+            render={errorWrapper(IndexComcheck)}
+          />
           <Route component={Login} />
         </Switch>
       </main>

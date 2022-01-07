@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
-import MenuItem from '@mui/material/MenuItem';
-import { InfoOutlined } from '@mui/icons-material';
 import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import { DateTimePicker } from '../../../components/DateTimePicker';
-import { Select } from '../../../components/Select';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 
@@ -14,7 +11,7 @@ class ExerciseForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    const requiredFields = ['exercise_name', 'exercise_subtitle'];
+    const requiredFields = ['exercise_name'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -119,7 +116,6 @@ ExerciseForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  groups: PropTypes.array,
 };
 
 export default inject18n(ExerciseForm);

@@ -170,7 +170,11 @@ const Injects = () => {
   const [selectedInject, setSelectedInject] = useState(null);
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
-  const filtering = useSearchAnFilter('inject', 'depends_duration', searchColumns);
+  const filtering = useSearchAnFilter(
+    'inject',
+    'depends_duration',
+    searchColumns,
+  );
   // Fetching data
   const { exerciseId } = useParams();
   const exercise = useStore((store) => store.getExercise(exerciseId));
@@ -182,146 +186,170 @@ const Injects = () => {
   });
   // Rendering
   return (
-      <div className={classes.container}>
-        <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchFilter
-              small={true}
-              onChange={filtering.handleSearch}
-              keyword={filtering.keyword}
-            />
-          </div>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <TagsFilter
-              onAddTag={filtering.handleAddTag}
-              onRemoveTag={filtering.handleRemoveTag}
-              currentTags={filtering.tags}
-            />
-          </div>
+    <div className={classes.container}>
+      <div className={classes.parameters}>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <SearchFilter
+            small={true}
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
         </div>
-        <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
-          <ListItem
-            classes={{ root: classes.itemHead }}
-            divider={false}
-            style={{ paddingTop: 0 }}>
-            <ListItemIcon>
-              <span
-                style={{
-                  padding: '0 8px 0 10px',
-                  fontWeight: 700,
-                  fontSize: 12,
-                }}
-              >
-                #
-              </span>
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <div>
-                  {filtering.buildHeader('inject_type', 'Type', true, headerStyles)}
-                  {filtering.buildHeader('inject_title', 'Title', true, headerStyles)}
-                  {filtering.buildHeader('inject_depends_duration', 'Trigger', true, headerStyles)}
-                  {filtering.buildHeader('inject_players', 'Players', false, headerStyles)}
-                  {filtering.buildHeader('inject_tags', 'Tags', true, headerStyles)}
-                </div>
-              }
-            />
-            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-          </ListItem>
-          {filtering.filterAndSort(injects).map((inject) => {
-            const injectUsersNumber = inject?.inject_users_number ?? '-';
-            const impactedUsers = inject.inject_all_audiences
-              ? exercise.users.length
-              : injectUsersNumber;
-            const duration = splitDuration(inject.inject_depends_duration || 0);
-            return (
-              <ListItem
-                key={inject.inject_id}
-                classes={{ root: classes.item }}
-                divider={true}
-                button={true}
-                onClick={() => setSelectedInject(inject.inject_id)}
-              >
-                <ListItemIcon>
-                  <InjectIcon type={inject.inject_type} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_type}
-                      >
-                        <InjectType
-                          variant="list"
-                          status={inject.inject_type}
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_title}
-                      >
-                        {inject.inject_title}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_depends_duration}
-                      >
-                        <Chip
-                          classes={{ root: classes.duration }}
-                          label={`${duration.days}
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <TagsFilter
+            onAddTag={filtering.handleAddTag}
+            onRemoveTag={filtering.handleRemoveTag}
+            currentTags={filtering.tags}
+          />
+        </div>
+      </div>
+      <div className="clearfix" />
+      <List classes={{ root: classes.container }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon>
+            <span
+              style={{
+                padding: '0 8px 0 10px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
+              #
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <div>
+                {filtering.buildHeader(
+                  'inject_type',
+                  'Type',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'inject_title',
+                  'Title',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'inject_depends_duration',
+                  'Trigger',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'inject_players',
+                  'Players',
+                  false,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'inject_tags',
+                  'Tags',
+                  true,
+                  headerStyles,
+                )}
+              </div>
+            }
+          />
+          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+        </ListItem>
+        {filtering.filterAndSort(injects).map((inject) => {
+          const injectUsersNumber = inject?.inject_users_number ?? '-';
+          const impactedUsers = inject.inject_all_audiences
+            ? exercise.users.length
+            : injectUsersNumber;
+          const duration = splitDuration(inject.inject_depends_duration || 0);
+          return (
+            <ListItem
+              key={inject.inject_id}
+              classes={{ root: classes.item }}
+              divider={true}
+              button={true}
+              onClick={() => setSelectedInject(inject.inject_id)}
+            >
+              <ListItemIcon>
+                <InjectIcon type={inject.inject_type} />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.inject_type}
+                    >
+                      <InjectType variant="list" status={inject.inject_type} />
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.inject_title}
+                    >
+                      {inject.inject_title}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.inject_depends_duration}
+                    >
+                      <Chip
+                        classes={{ root: classes.duration }}
+                        label={`${duration.days}
                             ${t('d')}, ${duration.hours}
                             ${t('h')}, ${duration.minutes}
                             ${t('m')}, ${duration.seconds}
                             ${t('s')}`}
-                        />
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_players}
-                      >
-                        {impactedUsers}
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={inlineStyles.inject_tags}
-                      >
-                        <ItemTags variant="list" tags={inject.tags} />
-                      </div>
+                      />
                     </div>
-                  }
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.inject_players}
+                    >
+                      {impactedUsers}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.inject_tags}
+                    >
+                      <ItemTags variant="list" tags={inject.tags} />
+                    </div>
+                  </div>
+                }
+              />
+              <ListItemSecondaryAction>
+                <InjectPopover
+                  exerciseId={exercise.exercise_id}
+                  inject={inject}
+                  injectTypes={injectTypes}
                 />
-                <ListItemSecondaryAction>
-                  <InjectPopover
-                    exerciseId={exercise.exercise_id}
-                    inject={inject}
-                    injectTypes={injectTypes}
-                  />
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
-        </List>
-        <Drawer
-          open={selectedInject !== null}
-          keepMounted={false}
-          anchor="right"
-          sx={{ zIndex: 1202 }}
-          classes={{ paper: classes.drawerPaper }}
-          onClose={() => setSelectedInject(null)}>
-          <InjectDefinition
-            injectId={selectedInject}
-            exerciseId={exercise.exercise_id}
-            injectTypes={injectTypes}
-            handleClose={() => setSelectedInject(null)}
-          />
-        </Drawer>
-        <CreateInject
-          injectTypes={injectTypes}
+              </ListItemSecondaryAction>
+            </ListItem>
+          );
+        })}
+      </List>
+      <Drawer
+        open={selectedInject !== null}
+        keepMounted={false}
+        anchor="right"
+        sx={{ zIndex: 1202 }}
+        classes={{ paper: classes.drawerPaper }}
+        onClose={() => setSelectedInject(null)}
+      >
+        <InjectDefinition
+          injectId={selectedInject}
           exerciseId={exercise.exercise_id}
+          injectTypes={injectTypes}
+          handleClose={() => setSelectedInject(null)}
         />
-      </div>
+      </Drawer>
+      <CreateInject
+        injectTypes={injectTypes}
+        exerciseId={exercise.exercise_id}
+      />
+    </div>
   );
 };
 

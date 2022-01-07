@@ -58,10 +58,6 @@ public class Exercise implements Base {
     @JsonProperty("exercise_end_date")
     private Date end;
 
-    @Column(name = "exercise_canceled")
-    @JsonProperty("exercise_canceled")
-    private boolean canceled = false;
-
     @ManyToOne
     @JoinColumn(name = "exercise_image")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -135,9 +131,6 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_status")
     public String getStatus() {
-        if (isCanceled()) {
-            return STATUS.CANCELED.name();
-        }
         Date now = new Date();
         long totalCount = getInjects().size();
         List<Inject<?>> injectsToExecute = getInjects().stream().filter(inject -> inject.getStatus() == null).toList();
@@ -207,14 +200,6 @@ public class Exercise implements Base {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
     }
 
     public String getHeader() {

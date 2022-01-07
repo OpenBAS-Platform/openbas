@@ -54,11 +54,22 @@ const Index = () => {
           <Route exact path="/" render={errorWrapper(Dashboard)} />
           <Route path="/profile" render={errorWrapper(IndexProfile)} />
           <Route exact path="/exercises" render={errorWrapper(Exercises)} />
-          <Route path="/exercises/:exerciseId" render={errorWrapper(IndexExercise)}/>
+          <Route
+            path="/exercises/:exerciseId"
+            render={errorWrapper(IndexExercise)}
+          />
           <Route exact path="/players" render={errorWrapper(Players)} />
-          <Route exact path="/organizations" render={errorWrapper(Organizations)}/>
+          <Route
+            exact
+            path="/organizations"
+            render={errorWrapper(Organizations)}
+          />
           <Route exact path="/documents" render={errorWrapper(Documents)} />
-          <Route exact path="/integrations" render={errorWrapper(IndexIntegrations)}/>
+          <Route
+            exact
+            path="/integrations"
+            render={errorWrapper(IndexIntegrations)}
+          />
           <Route path="/settings" render={errorWrapper(IndexSettings)} />
           <Route component={NotFound} />
         </Switch>

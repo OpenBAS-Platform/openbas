@@ -27,7 +27,7 @@ Transition.displayName = 'TransitionSlide';
 const styles = () => ({
   button: {
     float: 'left',
-    margin: '-8px 0 0 10px',
+    margin: '-8px 0 0 5px',
   },
 });
 
@@ -80,7 +80,7 @@ class ExercisePopover extends Component {
   submitDelete() {
     this.props.deleteExercise(this.props.exercise.exercise_id);
     this.handleCloseDelete();
-    this.props.history.push('/dashboard/observations/indicators');
+    this.props.history.push('/exercises');
   }
 
   render() {
@@ -92,7 +92,16 @@ class ExercisePopover extends Component {
     }));
     const initialValues = R.pipe(
       R.assoc('exercise_tags', exerciseTags),
-      R.pick(['exercise_name', 'exercise_description', 'exercise_tags']),
+      R.pick([
+        'exercise_name',
+        'exercise_subtitle',
+        'exercise_description',
+        'exercise_start_date',
+        'exercise_mail_from',
+        'exercise_message_header',
+        'exercise_message_footer',
+        'exercise_tags',
+      ]),
     )(exercise);
     return (
       <div>
@@ -171,6 +180,7 @@ ExercisePopover.propTypes = {
   exercise: PropTypes.object,
   updateExercise: PropTypes.func,
   deleteExercise: PropTypes.func,
+  history: PropTypes.object,
 };
 
 export default R.compose(
