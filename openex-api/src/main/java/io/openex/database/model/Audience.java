@@ -14,7 +14,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 @Entity
 @Table(name = "audiences")
@@ -52,7 +53,7 @@ public class Audience implements Base {
     @Column(name = "audience_updated_at")
     @JsonProperty("audience_updated_at")
     private Date updatedAt = new Date();
-    
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "audiences_tags",
             joinColumns = @JoinColumn(name = "audience_id"),
@@ -71,18 +72,16 @@ public class Audience implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "injects_audiences",
-            joinColumns = @JoinColumn(name = "audience_id"),
-            inverseJoinColumns = @JoinColumn(name = "inject_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("audience_injects")
-    @Fetch(FetchMode.SUBSELECT)
-    private List<Inject<?>> injects = new ArrayList<>();
-
     @JsonProperty("audience_users_number")
     public long getUsersNumber() {
         return getUsers().size();
+    }
+
+    // region transient
+    @JsonProperty("audience_injects")
+    public List<Inject<?>> getInjects() {
+        Predicate<Inject<?>> selectedInject = inject -> inject.isGlobalInject() || inject.getAudiences().contains(this);
+        return getExercise().getInjects().stream().filter(selectedInject).distinct().toList();
     }
 
     @JsonProperty("audience_injects_number")
@@ -95,6 +94,7 @@ public class Audience implements Base {
     public boolean isUserObserver(User user) {
         return getExercise().isUserObserver(user);
     }
+    // endregion
 
     public String getId() {
         return id;
@@ -128,13 +128,21 @@ public class Audience implements Base {
         this.enabled = enabled;
     }
 
-    public Date getCreatedAt() { return createdAt; }
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public Date getUpdatedAt() { return updatedAt; }
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
 
-    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
     public List<Tag> getTags() {
         return tags;
@@ -152,24 +160,24 @@ public class Audience implements Base {
         this.users = users;
     }
 
-    public List<Inject<?>> getInjects() {
-        Stream<Inject<?>> stream = injects.stream();
-        Stream<Inject<?>> allInjectStream = getExercise().getAudiences().stream()
-                .flatMap(audience -> audience.getInjects().stream())
-                .filter(Inject::isGlobalInject);
-        Stream<Inject<?>> injectsStream = Stream.concat(stream, allInjectStream);
-        return injectsStream.distinct().toList();
-    }
-
-    public void setInjects(List<Inject<?>> injects) {
-        this.injects = injects;
-    }
-
     public Exercise getExercise() {
         return exercise;
     }
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Audience audience = (Audience) o;
+        return id.equals(audience.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
