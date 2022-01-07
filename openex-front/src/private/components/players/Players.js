@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import * as R from 'ramda';
+import React from 'react';
 import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -7,12 +6,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  PersonOutlined,
-} from '@mui/icons-material';
-import { useFormatter } from '../../../components/i18n';
+import { PersonOutlined } from '@mui/icons-material';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
@@ -23,6 +17,7 @@ import SearchFilter from '../../../components/SearchFilter';
 import { fetchTags } from '../../../actions/Tag';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useStore } from '../../../store';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -62,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const inlineStylesHeaders = {
+const headerStyles = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -145,116 +140,29 @@ const inlineStyles = {
 };
 
 const Players = () => {
+  // Standard hooks
   const classes = useStyles();
-  const { t } = useFormatter();
   const dispatch = useDispatch();
-  const [order, setOrder] = useState({ sortBy: 'user_email', orderAsc: true });
-  const [keyword, setKeyword] = useState('');
-  const [tags, setTags] = useState([]);
-
+  // Filter and sort hook
+  const searchColumns = ['email', 'firstname', 'lastname', 'phone', 'organization'];
+  const filtering = useSearchAnFilter('user', 'email', searchColumns);
+  // Fetching data
   const users = useStore((store) => store.users);
-
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
     dispatch(fetchPlayers());
   });
 
-  const handleSearch = (value) => {
-    setKeyword(value);
-  };
-
-  const handleAddTag = (value) => {
-    setTags(R.uniq(R.append(value, tags)));
-  };
-
-  const handleRemoveTag = (value) => {
-    const remainingTags = R.filter((n) => n.id !== value, tags);
-    setTags(remainingTags);
-  };
-
-  const reverseBy = (field) => {
-    setOrder({ sortBy: field, orderAsc: !order.orderAsc });
-  };
-
-  const sortHeader = (field, label, isSortable) => {
-    const sortComponent = order.orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={() => reverseBy(field)}
-        >
-          <span>{t(label)}</span>
-          {order.sortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  };
-
-  const filterByKeyword = (n) => {
-    const isEmptyKeyword = keyword === '';
-    const isEmail = (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const isFirstname = (n.user_firstname || '').toLowerCase().indexOf(keyword.toLowerCase())
-      !== -1;
-    const isLastname = (n.user_lastname || '').toLowerCase().indexOf(keyword.toLowerCase())
-      !== -1;
-    const isPhone = (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-    const isOrganization = (n.user_organization || '')
-      .toLowerCase()
-      .indexOf(keyword.toLowerCase()) !== -1;
-    return (
-      isEmptyKeyword
-      || isEmail
-      || isFirstname
-      || isLastname
-      || isPhone
-      || isOrganization
-    );
-  };
-
-  const sortedUsers = () => {
-    const sort = R.sortWith(
-      order.orderAsc
-        ? [R.ascend(R.prop(order.sortBy))]
-        : [R.descend(R.prop(order.sortBy))],
-    );
-    const tagIds = tags.map((ta) => ta.id);
-    return R.pipe(
-      R.filter(
-        (n) => tags.length === 0
-          || n.user_tags.some((usrTag) => tagIds.includes(usrTag)),
-      ),
-      R.filter(filterByKeyword),
-      sort,
-    )(users);
-  };
-
   return (
     <div className={classes.container}>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <SearchFilter
-            small={true}
-            onChange={handleSearch}
-            keyword={keyword}
-          />
+          <SearchFilter small={true} onChange={filtering.handleSearch} keyword={filtering.keyword}/>
         </div>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <TagsFilter
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
-            currentTags={tags}
-          />
+          <TagsFilter onAddTag={filtering.handleAddTag}
+                      onRemoveTag={filtering.handleRemoveTag} currentTags={filtering.tags}/>
         </div>
       </div>
       <div className="clearfix" />
@@ -278,17 +186,17 @@ const Players = () => {
           <ListItemText
             primary={
               <div>
-                {sortHeader('user_email', 'Email address', true)}
-                {sortHeader('user_firstname', 'Firstname', true)}
-                {sortHeader('user_lastname', 'Lastname', true)}
-                {sortHeader('user_organization', 'Organization', true)}
-                {sortHeader('user_tags', 'Tags', true)}
+                {filtering.buildHeader('user_email', 'Email address', true, headerStyles)}
+                {filtering.buildHeader('user_firstname', 'Firstname', true, headerStyles)}
+                {filtering.buildHeader('user_lastname', 'Lastname', true, headerStyles)}
+                {filtering.buildHeader('user_organization', 'Organization', true, headerStyles)}
+                {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </div>
             }
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {sortedUsers().map((user) => (
+        {filtering.filterAndSort(users).map((user) => (
           <ListItem
             key={user.user_id}
             classes={{ root: classes.item }}

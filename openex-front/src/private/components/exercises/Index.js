@@ -51,18 +51,8 @@ class Index extends Component {
           <ExerciseHeader exercise={exercise} />
           <div className="clearfix" />
           <Switch>
-            <Route
-              exact
-              path="/exercises/:exerciseId"
-              render={errorWrapper(Exercise)}
-            />
-            <Route
-              exact
-              path="/exercises/:exerciseId/audiences"
-              render={(routeProps) => (
-                <Audiences {...routeProps} exercise={exercise} />
-              )}
-            />
+            <Route exact path="/exercises/:exerciseId" render={errorWrapper(Exercise)}/>
+            <Route exact path="/exercises/:exerciseId/audiences" render={errorWrapper(Audiences)}/>
             <Route
               exact
               path="/exercises/:exerciseId/scenario"

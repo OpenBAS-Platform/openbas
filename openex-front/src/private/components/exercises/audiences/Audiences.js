@@ -1,35 +1,28 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import React, { useState } from 'react';
+import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Drawer from '@mui/material/Drawer';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { connect } from 'react-redux';
-import { interval } from 'rxjs';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  CastForEducationOutlined,
-} from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
+import { CastForEducationOutlined } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import inject18n from '../../../../components/i18n';
-import { FIVE_SECONDS } from '../../../../utils/Time';
+import { useParams } from 'react-router-dom';
+import { useFormatter } from '../../../../components/i18n';
+import useDataLoader from '../../../../utils/ServerSideEvent';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { storeBrowser } from '../../../../actions/Schema';
 import { fetchAudiences } from '../../../../actions/Audience';
 import CreateAudience from './CreateAudience';
 import AudiencePopover from './AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import AudiencePlayers from './AudiencePlayers';
+import { useStore } from '../../../../store';
+import useSearchAnFilter from '../../../../utils/SortingFiltering';
 
-const interval$ = interval(FIVE_SECONDS);
-
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   parameters: {
     float: 'left',
     marginTop: -10,
@@ -70,9 +63,9 @@ const styles = (theme) => ({
     width: '50%',
     padding: 0,
   },
-});
+}));
 
-const inlineStylesHeaders = {
+const headerStyles = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -154,121 +147,32 @@ const inlineStyles = {
   },
 };
 
-class Audiences extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sortBy: 'audience_name',
-      orderAsc: true,
-      keyword: '',
-      tags: [],
-      selectedAudience: null,
-    };
-  }
+const Audiences = () => {
+  // Standard hooks
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { t } = useFormatter();
+  const [selectedAudience, setSelectedAudience] = useState(null);
+  // Filter and sort hook
+  const filtering = useSearchAnFilter('audience', 'name', ['name', 'description']);
+  // Fetching data
+  const { exerciseId } = useParams();
+  const exercise = useStore((store) => store.getExercise(exerciseId));
+  const { audiences } = exercise;
+  useDataLoader(() => {
+    dispatch(fetchAudiences(exerciseId));
+  });
 
-  componentDidMount() {
-    const { exercise } = this.props;
-    this.props.fetchExerciseAudiences(exercise.exercise_id);
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchExerciseAudiences(exercise.exercise_id);
-    });
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-  }
-
-  handleSelectAudience(audienceId) {
-    this.setState({ selectedAudience: audienceId });
-  }
-
-  handleSearch(value) {
-    this.setState({ keyword: value });
-  }
-
-  handleAddTag(value) {
-    if (value) {
-      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
-    }
-  }
-
-  handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
-  }
-
-  reverseBy(field) {
-    this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
-  }
-
-  sortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.reverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {sortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
-  render() {
-    const {
-      t, classes, audiences, exercise,
-    } = this.props;
-    const {
-      keyword, sortBy, orderAsc, tags, selectedAudience,
-    } = this.state;
-    const filterByKeyword = (n) => keyword === ''
-      || (n.audience_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.audience_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
-    const sort = R.sortWith(
-      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
-    );
-    const sortedAudiences = R.pipe(
-      R.filter(
-        (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.audience_tags || []),
-            R.pluck('id', tags),
-          ),
-      ),
-      R.filter(filterByKeyword),
-      sort,
-    )(audiences);
-    return (
+  return (
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchFilter
-              small={true}
-              onChange={this.handleSearch.bind(this)}
-              keyword={keyword}
-            />
+            <SearchFilter small={true} onChange={filtering.handleSearch}
+                          keyword={filtering.keyword}/>
           </div>
           <div style={{ float: 'left', marginRight: 20 }}>
-            <TagsFilter
-              onAddTag={this.handleAddTag.bind(this)}
-              onRemoveTag={this.handleRemoveTag.bind(this)}
-              currentTags={tags}
-            />
+            <TagsFilter onAddTag={filtering.handleAddTag}
+                        onRemoveTag={filtering.handleRemoveTag} currentTags={filtering.tags}/>
           </div>
         </div>
         <div className="clearfix" />
@@ -276,71 +180,53 @@ class Audiences extends Component {
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}
-            style={{ paddingTop: 0 }}
-          >
+            style={{ paddingTop: 0 }}>
             <ListItemIcon>
               <span
                 style={{
                   padding: '0 8px 0 10px',
                   fontWeight: 700,
                   fontSize: 12,
-                }}
-              >
+                }}>
                 #
               </span>
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('audience_name', 'Name', true)}
-                  {this.sortHeader('audience_description', 'Description', true)}
-                  {this.sortHeader('audience_users_number', 'Players', true)}
-                  {this.sortHeader('audience_enabled', 'Status', false)}
-                  {this.sortHeader('audience_tags', 'Tags', true)}
+                  {filtering.buildHeader('audience_name', 'Name', true, headerStyles)}
+                  {filtering.buildHeader('audience_description', 'Description', true, headerStyles)}
+                  {filtering.buildHeader('audience_users_number', 'Players', true, headerStyles)}
+                  {filtering.buildHeader('audience_enabled', 'Status', false, headerStyles)}
+                  {filtering.buildHeader('audience_tags', 'Tags', true, headerStyles)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedAudiences.map((audience) => (
+          {filtering.filterAndSort(audiences).map((audience) => (
             <ListItem
               key={audience.audience_id}
               classes={{ root: classes.item }}
               divider={true}
               button={true}
-              onClick={this.handleSelectAudience.bind(
-                this,
-                audience.audience_id,
-              )}
-            >
+              onClick={() => setSelectedAudience(audience.audience_id)}>
               <ListItemIcon>
                 <CastForEducationOutlined />
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.audience_name}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.audience_name}>
                       {audience.audience_name}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.audience_description}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.audience_description}>
                       {audience.audience_description}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.audience_users_number}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.audience_users_number}>
                       {audience.audience_users_number}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.audience_enabled}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.audience_enabled}>
                       <ItemBoolean
                         status={audience.audience_enabled}
                         label={
@@ -351,20 +237,14 @@ class Audiences extends Component {
                         variant="list"
                       />
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.audience_tags}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.audience_tags}>
                       <ItemTags variant="list" tags={audience.tags} />
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <AudiencePopover
-                  exerciseId={exercise.exercise_id}
-                  audience={audience}
-                />
+                <AudiencePopover exerciseId={exerciseId} audience={audience}/>
               </ListItemSecondaryAction>
             </ListItem>
           ))}
@@ -375,40 +255,18 @@ class Audiences extends Component {
           anchor="right"
           sx={{ zIndex: 1202 }}
           classes={{ paper: classes.drawerPaper }}
-          onClose={this.handleSelectAudience.bind(this, null)}
-        >
+          onClose={() => setSelectedAudience(null)}>
           <AudiencePlayers
             audienceId={selectedAudience}
-            exerciseId={exercise.exercise_id}
-            handleClose={this.handleSelectAudience.bind(this, null)}
+            exerciseId={exerciseId}
+            handleClose={() => setSelectedAudience(null)}
           />
         </Drawer>
         {exercise.user_can_update && (
-          <CreateAudience exerciseId={exercise.exercise_id} />
+          <CreateAudience exerciseId={exerciseId} />
         )}
       </div>
-    );
-  }
-}
-
-Audiences.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  exercise: PropTypes.object,
-  audiences: PropTypes.array,
-  fetchExerciseAudiences: PropTypes.func,
+  );
 };
 
-const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
-  const { exercise } = ownProps;
-  return {
-    audiences: browser.getExercise(exercise.exercise_id).audiences,
-  };
-};
-
-export default R.compose(
-  connect(select, { fetchExerciseAudiences: fetchAudiences }),
-  inject18n,
-  withStyles(styles),
-)(Audiences);
+export default Audiences;
