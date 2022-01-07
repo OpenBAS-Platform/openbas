@@ -1,7 +1,9 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -42,6 +44,7 @@ public class Document implements Base {
     @JoinTable(name = "documents_tags",
             joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("document_tags")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
