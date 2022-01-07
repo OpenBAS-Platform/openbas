@@ -151,6 +151,7 @@ public class User implements Base, OAuth2User {
     public long getUserInjectsNumber() {
         return injects.size();
     }
+    // endregion
 
     @JsonProperty("user_gravatar")
     public String getGravatar() {
