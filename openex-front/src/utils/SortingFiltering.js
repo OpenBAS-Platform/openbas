@@ -42,8 +42,9 @@ const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
   const filterAndSort = (elements) => {
     const filterByKeyword = (e) => {
       const isEmptyKeyword = keyword === '';
-      const isKnownColumn = searchColumns.map((d) => (e[`${schema}_${d}`] || '')
-        .toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
+      const isKnownColumn = searchColumns.map((d) => (e[`${schema}_${d}`] || ''))
+        .map((data) => (typeof data === 'object' ? JSON.stringify(data) : data))
+        .map((info) => info.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
         .reduce((a, b) => a || b);
       return isEmptyKeyword || isKnownColumn;
     };

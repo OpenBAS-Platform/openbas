@@ -250,6 +250,7 @@ export const storeBrowser = (state) => ({
   users: R.values(state.referential.entities.users).map((usr) => _buildUser(state, usr)),
   tags: R.values(state.referential.entities.tags),
   groups: R.values(state.referential.entities.groups),
+  inject_types: R.values(state.referential.entities.inject_types),
   // eslint-disable-next-line max-len
   organizations: R.values(state.referential.entities.organizations).map((org) => _buildOrganization(state, org)),
   // eslint-disable-next-line max-len

@@ -1,96 +1,51 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { Route, Switch, withRouter } from 'react-router-dom';
-import * as R from 'ramda';
-import { connect } from 'react-redux';
-import { withStyles } from '@mui/styles';
-import { interval } from 'rxjs';
+import React from 'react';
+import {
+  Route, Switch, useParams,
+} from 'react-router-dom';
+import { makeStyles } from '@mui/styles';
+import { useDispatch } from 'react-redux';
 import Exercise from './Exercise';
-import { storeBrowser } from '../../../actions/Schema';
 import { fetchExercise } from '../../../actions/Exercise';
-import inject18n from '../../../components/i18n';
-import { FIVE_SECONDS } from '../../../utils/Time';
 import Loader from '../../../components/Loader';
 import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
 import { errorWrapper } from '../../../components/Error';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { useStore } from '../../../store';
 
-const interval$ = interval(FIVE_SECONDS);
-
-const styles = () => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
   },
-});
+}));
 
-class Index extends Component {
-  componentDidMount() {
-    const {
-      match: {
-        params: { exerciseId },
-      },
-    } = this.props;
-    this.props.fetchExercise(exerciseId);
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchExercise(exerciseId);
-    });
-  }
+const Index = () => {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { exerciseId } = useParams();
+  const exercise = useStore((store) => store.getExercise(exerciseId));
 
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-  }
+  useDataLoader(() => {
+    dispatch(fetchExercise(exerciseId));
+  });
 
-  render() {
-    const { classes, exercise } = this.props;
-    if (exercise && exercise.exercise_name) {
-      return (
+  if (exercise) {
+    return (
         <div className={classes.root}>
           <TopBar />
-          <ExerciseHeader exercise={exercise} />
+          <ExerciseHeader/>
           <div className="clearfix" />
           <Switch>
             <Route exact path="/exercises/:exerciseId" render={errorWrapper(Exercise)}/>
             <Route exact path="/exercises/:exerciseId/audiences" render={errorWrapper(Audiences)}/>
-            <Route
-              exact
-              path="/exercises/:exerciseId/scenario"
-              render={(routeProps) => (
-                <Injects {...routeProps} exercise={exercise} />
-              )}
-            />
+            <Route exact path="/exercises/:exerciseId/scenario" render={errorWrapper(Injects)}/>
           </Switch>
         </div>
-      );
-    }
-    return <Loader />;
+    );
   }
-}
-
-Index.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  match: PropTypes.object,
-  exercise: PropTypes.object,
-  fetchExercise: PropTypes.func,
+  return <Loader />;
 };
 
-const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
-  const {
-    match: {
-      params: { exerciseId },
-    },
-  } = ownProps;
-  return {
-    exercise: browser.getExercise(exerciseId),
-  };
-};
-
-export default R.compose(
-  connect(select, { fetchExercise }),
-  inject18n,
-  withRouter,
-  withStyles(styles),
-)(Index);
+export default Index;
