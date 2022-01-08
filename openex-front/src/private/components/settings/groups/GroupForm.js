@@ -4,6 +4,7 @@ import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import { TextField } from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
+import { Switch } from '../../../../components/Switch';
 
 class GroupForm extends Component {
   validate(values) {
@@ -43,8 +44,23 @@ class GroupForm extends Component {
               fullWidth={true}
               multiline={true}
               rows={3}
-              label={t('Decription')}
+              label={t('Description')}
               style={{ marginTop: 20 }}
+            />
+            <Switch
+                name="group_default_user_assign"
+                label={t('Assign the group at user creation')}
+                style={{ marginTop: 20 }}
+            />
+            <Switch
+                name="group_default_exercise_observer"
+                label={t('Group will be "Observer" at exercise creation')}
+                style={{ marginTop: 20 }}
+            />
+            <Switch
+                name="group_default_exercise_planner"
+                label={t('Group will be "Planner" at exercise creation')}
+                style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
@@ -52,16 +68,14 @@ class GroupForm extends Component {
                 color="secondary"
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}
-                disabled={submitting}
-              >
+                disabled={submitting}>
                 {t('Cancel')}
               </Button>
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                disabled={pristine || submitting}
-              >
+                disabled={pristine || submitting}>
                 {editing ? t('Update') : t('Create')}
               </Button>
             </div>

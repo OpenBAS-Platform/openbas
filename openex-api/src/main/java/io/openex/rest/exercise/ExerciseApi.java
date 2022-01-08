@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.util.function.Tuples;
 
 import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.security.RolesAllowed;
@@ -55,6 +56,8 @@ public class ExerciseApi<T> extends RestBehavior {
 
     // region repositories
     private TagRepository tagRepository;
+    private GroupRepository groupRepository;
+    private GrantRepository grantRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
     private ExerciseLogRepository exerciseLogRepository;
@@ -70,6 +73,21 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setGrantRepository(GrantRepository grantRepository) {
+        this.grantRepository = grantRepository;
+    }
+
+    @Autowired
+    public void setGroupRepository(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
+    }
+
+    @Autowired
+    public void setDryrunService(DryrunService<T> dryrunService) {
+        this.dryrunService = dryrunService;
+    }
+
     @Autowired
     public void setInjectRepository(InjectRepository<T> injectRepository) {
         this.injectRepository = injectRepository;
@@ -190,11 +208,28 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region exercises
+    @Transactional
     @PostMapping("/api/exercises")
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         Exercise exercise = new Exercise();
         exercise.setUpdateAttributes(input);
         exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        // Find automatic groups to grants
+        List<Group> groups = fromIterable(groupRepository.findAll());
+        List<Grant> grants = groups.stream()
+                .filter(group -> group.getExercisesDefaultGrants().size() > 0)
+                .flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s)))
+                .map(tuple -> {
+                    Grant grant = new Grant();
+                    grant.setGroup(tuple.getT1());
+                    grant.setName(tuple.getT2());
+                    grant.setExercise(exercise);
+                    return grant;
+                }).toList();
+        if (grants.size() > 0) {
+            Iterable<Grant> exerciseGrants = grantRepository.saveAll(grants);
+            exercise.setGrants(fromIterable(exerciseGrants));
+        }
         return exerciseRepository.save(exercise);
     }
 

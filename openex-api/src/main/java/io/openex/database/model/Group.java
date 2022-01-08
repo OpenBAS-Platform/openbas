@@ -32,6 +32,16 @@ public class Group implements Base {
     @JsonProperty("group_description")
     private String description;
 
+    @Column(name = "group_default_user_assign")
+    @JsonProperty("group_default_user_assign")
+    private boolean defaultUserAssignation;
+
+    @JsonProperty("group_default_exercise_assign")
+    @Enumerated(EnumType.STRING)
+    @ElementCollection
+    @CollectionTable(name="groups_exercises_default_grants", joinColumns = @JoinColumn(name = "group_id"))
+    private List<Grant.GRANT_TYPE> exercisesDefaultGrants = new ArrayList<>();
+
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     @JsonProperty("group_grants")
     private List<Grant> grants = new ArrayList<>();
@@ -44,6 +54,18 @@ public class Group implements Base {
     @JsonProperty("group_users")
     @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
+
+    // region transient
+    @JsonProperty("group_default_exercise_planner")
+    public boolean isDefaultExercisePlanner() {
+        return exercisesDefaultGrants.contains(Grant.GRANT_TYPE.PLANNER);
+    }
+
+    @JsonProperty("group_default_exercise_observer")
+    public boolean isDefaultExerciseObserver() {
+        return exercisesDefaultGrants.contains(Grant.GRANT_TYPE.OBSERVER);
+    }
+    // endregion
 
     public String getId() {
         return id;
@@ -83,6 +105,22 @@ public class Group implements Base {
 
     public void setGrants(List<Grant> grants) {
         this.grants = grants;
+    }
+
+    public boolean isDefaultUserAssignation() {
+        return defaultUserAssignation;
+    }
+
+    public void setDefaultUserAssignation(boolean defaultUserAssignation) {
+        this.defaultUserAssignation = defaultUserAssignation;
+    }
+
+    public List<String> getExercisesDefaultGrants() {
+        return exercisesDefaultGrants.stream().map(Enum::name).toList();
+    }
+
+    public void setExercisesDefaultGrants(List<Grant.GRANT_TYPE> defaultExerciseAssignations) {
+        this.exercisesDefaultGrants = defaultExerciseAssignations;
     }
 
     @Override

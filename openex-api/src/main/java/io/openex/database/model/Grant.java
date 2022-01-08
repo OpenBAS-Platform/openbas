@@ -26,7 +26,8 @@ public class Grant implements Base {
 
     @Column(name = "grant_name")
     @JsonProperty("grant_name")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private GRANT_TYPE name;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "grant_group")
@@ -49,11 +50,11 @@ public class Grant implements Base {
     }
 
     public String getName() {
-        return name;
+        return name.name();
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = GRANT_TYPE.valueOf(name);
     }
 
     public Group getGroup() {

@@ -1,10 +1,13 @@
 package io.openex.rest.user;
 
+import io.openex.database.model.Group;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
+import io.openex.database.repository.GroupRepository;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
+import io.openex.database.specification.GroupSpecification;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.login.LoginUserInput;
 import io.openex.rest.user.form.user.CreateUserInput;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
@@ -29,9 +33,15 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 public class UserApi extends RestBehavior {
 
     private OrganizationRepository organizationRepository;
+    private GroupRepository groupRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
     private UserService userService;
+
+    @Autowired
+    public void setGroupRepository(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
+    }
 
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
@@ -94,6 +104,10 @@ public class UserApi extends RestBehavior {
         user.setPassword(userService.encodeUserPassword(input.getPassword()));
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
+        // Find automatic groups to assign
+        List<Group> assignableGroups = groupRepository.findAll(GroupSpecification.defaultUserAssignable());
+        user.setGroups(assignableGroups);
+        // Save the user
         User savedUser = userRepository.save(user);
         userService.createUserToken(savedUser);
         return savedUser;

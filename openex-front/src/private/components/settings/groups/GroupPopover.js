@@ -177,10 +177,13 @@ class GroupPopover extends Component {
   }
 
   render() {
-    const { classes, t, users } = this.props;
+    const {
+      classes, t, users, group,
+    } = this.props;
     const initialValues = R.pick(
-      ['group_name', 'group_description'],
-      this.props.group,
+      ['group_name', 'group_description', 'group_default_user_assign',
+        'group_default_exercise_planner', 'group_default_exercise_observer'],
+      group,
     );
     const { keyword } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -389,11 +392,11 @@ class GroupPopover extends Component {
                   const grantPlanner = R.find(
                     (g) => g.grant_exercise === exercise.exercise_id
                       && g.grant_name === 'PLANNER',
-                  )(this.props.group.group_grants);
+                  )(group.group_grants);
                   const grantObserver = R.find(
                     (g) => g.grant_exercise === exercise.exercise_id
                       && g.grant_name === 'OBSERVER',
-                  )(this.props.group.group_grants);
+                  )(group.group_grants);
                   const grantPlannerId = R.propOr(
                     null,
                     'grant_id',
