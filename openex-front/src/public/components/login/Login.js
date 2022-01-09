@@ -71,9 +71,11 @@ const Login = (props) => {
   return (
     <div className={classes.container} style={{ marginTop }}>
       <img src={logo} alt="logo" className={classes.logo} />
-      <Paper variant="outlined">
-        <LoginForm onSubmit={onSubmit} />
-      </Paper>
+      {isLocal && (
+        <Paper variant="outlined">
+          <LoginForm onSubmit={onSubmit} />
+        </Paper>
+      )}
       {isOpenId
         && (providers ?? []).map((provider) => (
           <div key={provider.provider_name}>

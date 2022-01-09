@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withStyles } from '@mui/styles';
+import Tooltip from '@mui/material/Tooltip';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -12,6 +13,7 @@ import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
+  CheckCircleOutlined,
   GroupOutlined,
 } from '@mui/icons-material';
 import inject18n from '../../../../components/i18n';
@@ -74,13 +76,31 @@ const inlineStylesHeaders = {
   },
   group_name: {
     float: 'left',
-    width: '30%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
   group_description: {
     float: 'left',
-    width: '50%',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  group_default_user_assign: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  group_default_exercise_observer: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  group_default_exercise_planner: {
+    float: 'left',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -94,7 +114,7 @@ const inlineStylesHeaders = {
 const inlineStyles = {
   group_name: {
     float: 'left',
-    width: '30%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -102,7 +122,31 @@ const inlineStyles = {
   },
   group_description: {
     float: 'left',
-    width: '50%',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  group_default_user_assign: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  group_default_exercise_observer: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  group_default_exercise_planner: {
+    float: 'left',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -189,7 +233,7 @@ class Groups extends Component {
 
   render() {
     const {
-      classes, groups, exercises, organizations, users,
+      classes, groups, exercises, organizations, users, t,
     } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -240,6 +284,21 @@ class Groups extends Component {
                 <div>
                   {this.sortHeader('group_name', 'Name', true)}
                   {this.sortHeader('group_description', 'Description', true)}
+                  {this.sortHeader(
+                    'group_default_user_assign',
+                    'Auto assign',
+                    true,
+                  )}
+                  {this.sortHeader(
+                    'group_default_exercise_observer',
+                    'Auto observer',
+                    true,
+                  )}
+                  {this.sortHeader(
+                    'group_default_exercise_planner',
+                    'Auto planner',
+                    true,
+                  )}
                   {this.sortHeader('group_users_number', 'Users', true)}
                 </div>
               }
@@ -269,6 +328,54 @@ class Groups extends Component {
                       style={inlineStyles.group_description}
                     >
                       {group.group_description}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_default_user_assign}
+                    >
+                      {group.group_default_user_assign ? (
+                        <Tooltip
+                          title={t(
+                            'The new users will automatically be assigned to this group.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_default_exercise_observer}
+                    >
+                      {group.group_default_exercise_observer ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have observer permission on new exercises.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.group_default_exercise_planner}
+                    >
+                      {group.group_default_exercise_planner ? (
+                        <Tooltip
+                          title={t(
+                            'This group will have planner permission on new exercises.',
+                          )}
+                        >
+                          <CheckCircleOutlined fontSize="small" />
+                        </Tooltip>
+                      ) : (
+                        '-'
+                      )}
                     </div>
                     <div
                       className={classes.bodyItem}

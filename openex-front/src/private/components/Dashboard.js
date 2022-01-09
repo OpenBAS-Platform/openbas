@@ -20,15 +20,19 @@ import {
   ContactMailOutlined,
   Kayaking,
 } from '@mui/icons-material';
+import Chart from 'react-apexcharts';
 import ItemTags from '../../components/ItemTags';
 import MiniMap from './MiniMap';
 import inject18n from '../../components/i18n';
 import { fetchStatistics } from '../../actions/Application';
 import { fetchExercises } from '../../actions/Exercise';
+import { fetchNextInjects } from '../../actions/Inject';
 import { fetchTags } from '../../actions/Tag';
+import { fetchOrganizations } from '../../actions/Organization';
 import { storeBrowser } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
+import { distributionChartOptions } from '../../utils/Charts';
 
 const styles = () => ({
   root: {
@@ -45,15 +49,16 @@ const styles = () => ({
     height: 300,
     overflow: 'hidden',
   },
-  graph: {
-    padding: '20px 20px 20px 0',
-    height: 400,
-    overflow: 'hidden',
-  },
-  map: {
+  paperMap: {
     padding: 0,
     height: 400,
     overflow: 'hidden',
+  },
+  paperChart: {
+    position: 'relative',
+    padding: '0 20px 0 0',
+    overflow: 'hidden',
+    height: 400,
   },
   title: {
     fontSize: 16,
@@ -87,12 +92,38 @@ const styles = () => ({
 const Dashboard = (props) => {
   useEffect(() => {
     props.fetchStatistics();
+    props.fetchOrganizations();
     props.fetchExercises();
     props.fetchTags();
+    props.fetchNextInjects();
   }, []);
   const {
-    classes, t, nsd, statistics, exercises,
+    classes,
+    t,
+    nsd,
+    statistics,
+    exercises,
+    organizations,
+    theme,
+    injects,
   } = props;
+  const topOrganizations = R.pipe(
+    R.sortWith([R.descend(R.prop('organization_injects_number'))]),
+    R.take(10),
+  )(organizations || []);
+  const distributionChartData = [
+    {
+      name: t('Number of injects'),
+      data: topOrganizations.map((a) => ({
+        x: a.organization_name,
+        y: a.organization_injects_number,
+      })),
+    },
+  ];
+  const maxInjectsNumber = Math.max(
+    ...(topOrganizations || []).map((a) => a.organization_injects_number),
+  );
+  const nextInjects = injects?.filter((i) => !i.inject_date);
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -210,275 +241,82 @@ const Dashboard = (props) => {
             {t('Next injects to send')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
-            <List style={{ paddingTop: 0 }}>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <NotificationsOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '50%' }}
-                      >
-                        Alert in our SIEM about unsual traffic
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '25%', paddingTop: 8 }}
-                      >
-                        <LinearProgress
-                          value={80}
-                          variant="determinate"
-                          style={{ width: '90%' }}
-                        />
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <div style={{ fontSize: 12, paddingTop: 2 }}>
-                          <Countdown date={Date.now() + 500000} />
-                          <span className={classes.since}>
-                            {t('before sending')}
-                          </span>
+            {nextInjects?.length > 0 ? (
+              <List style={{ paddingTop: 0 }}>
+                {nextInjects.map((inject) => (
+                  <ListItem
+                    key={inject.inject_id}
+                    dense={true}
+                    button={true}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    component={Link}
+                    to={'/exercises/'}
+                  >
+                    <ListItemIcon>
+                      <NotificationsOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '50%' }}
+                          >
+                            Alert in our SIEM about unsual traffic
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '25%', paddingTop: 8 }}
+                          >
+                            <LinearProgress
+                              value={80}
+                              variant="determinate"
+                              style={{ width: '90%' }}
+                            />
+                          </div>
+                          <div className={classes.bodyItem}>
+                            <div style={{ fontSize: 12, paddingTop: 2 }}>
+                              <Countdown date={Date.now() + 500000} />
+                              <span className={classes.since}>
+                                {t('before sending')}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <NotificationsOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '50%' }}
-                      >
-                        Malware discovered on 3 endpoints in support team
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '25%', paddingTop: 8 }}
-                      >
-                        <LinearProgress
-                          value={60}
-                          variant="determinate"
-                          style={{ width: '90%' }}
-                        />
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <div style={{ fontSize: 12, paddingTop: 2 }}>
-                          <Countdown date={Date.now() + 500000} />
-                          <span className={classes.since}>
-                            {t('before sending')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <NotificationsOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '50%' }}
-                      >
-                        Fire alarm has been triggered in building A
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '25%', paddingTop: 8 }}
-                      >
-                        <LinearProgress
-                          value={50}
-                          variant="determinate"
-                          style={{ width: '90%' }}
-                        />
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <div style={{ fontSize: 12, paddingTop: 2 }}>
-                          <Countdown date={Date.now() + 700000} />
-                          <span className={classes.since}>
-                            {t('before sending')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <NotificationsOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '50%' }}
-                      >
-                        Threat intelligence report from an international partner
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '25%', paddingTop: 8 }}
-                      >
-                        <LinearProgress
-                          value={50}
-                          variant="determinate"
-                          style={{ width: '90%' }}
-                        />
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <div style={{ fontSize: 12, paddingTop: 2 }}>
-                          <Countdown date={Date.now() + 800000} />
-                          <span className={classes.since}>
-                            {t('before sending')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <NotificationsOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '50%' }}
-                      >
-                        Terrorists posted an online video about the fire
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '25%', paddingTop: 8 }}
-                      >
-                        <LinearProgress
-                          value={50}
-                          variant="determinate"
-                          style={{ width: '90%' }}
-                        />
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <div style={{ fontSize: 12, paddingTop: 2 }}>
-                          <Countdown date={Date.now() + 800000} />
-                          <span className={classes.since}>
-                            {t('before sending')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-              <ListItem
-                dense={true}
-                button={true}
-                classes={{ root: classes.item }}
-                divider={true}
-                component={Link}
-                to={'/exercises/'}
-              >
-                <ListItemIcon>
-                  <NotificationsOutlined />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '50%' }}
-                      >
-                        New evidences found about the compromise of DCs
-                      </div>
-                      <div
-                        className={classes.bodyItem}
-                        style={{ width: '25%', paddingTop: 8 }}
-                      >
-                        <LinearProgress
-                          value={50}
-                          variant="determinate"
-                          style={{ width: '90%' }}
-                        />
-                      </div>
-                      <div className={classes.bodyItem}>
-                        <div style={{ fontSize: 12, paddingTop: 2 }}>
-                          <Countdown date={Date.now() + 900000} />
-                          <span className={classes.since}>
-                            {t('before sending')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                />
-              </ListItem>
-            </List>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Empty message={t('No injects to send in this platform.')} />
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="overline">
             {t('Organizations distribution across exercises')}
           </Typography>
-          <Paper variant="outlined" classes={{ root: classes.graph }}>
-            test
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {organizations.length > 0 ? (
+              <Chart
+                options={distributionChartOptions(theme, maxInjectsNumber < 2)}
+                series={distributionChartData}
+                type="bar"
+                width="100%"
+                height={50 + topOrganizations.length * 50}
+              />
+            ) : (
+              <Empty message={t('No organizations in this platform.')} />
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="overline">
             {t('Players distribution')}
           </Typography>
-          <Paper variant="outlined" classes={{ root: classes.map }}>
+          <Paper variant="outlined" classes={{ root: classes.paperMap }}>
             <MiniMap center={[48.8566969, 2.3514616]} zoom={2} />
           </Paper>
         </Grid>
@@ -494,6 +332,8 @@ Dashboard.propTypes = {
   fetchStatistics: PropTypes.func,
   fetchExercises: PropTypes.func,
   fetchTags: PropTypes.func,
+  fetchNextInjects: PropTypes.func,
+  injects: PropTypes.array,
   statistics: PropTypes.object,
   exercises: PropTypes.array,
 };
@@ -502,12 +342,20 @@ const select = (state) => {
   const browser = storeBrowser(state);
   return {
     exercises: browser.exercises,
+    organizations: browser.organizations,
     statistics: browser.statistics,
+    injects: browser.injects,
   };
 };
 
 export default R.compose(
-  connect(select, { fetchStatistics, fetchExercises, fetchTags }),
+  connect(select, {
+    fetchStatistics,
+    fetchExercises,
+    fetchTags,
+    fetchOrganizations,
+    fetchNextInjects,
+  }),
   inject18n,
   withTheme,
   withStyles(styles),

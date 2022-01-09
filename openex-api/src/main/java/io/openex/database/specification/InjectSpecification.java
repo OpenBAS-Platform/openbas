@@ -17,7 +17,6 @@ public class InjectSpecification {
                 cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable
                 cb.isNotNull(root.get("exercise").get("start")), // withStartDate
-                cb.equal(root.get("exercise").get("canceled"), false), // fromActiveExercise
                 cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
         );
     }

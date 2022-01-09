@@ -12,6 +12,11 @@ export const fetchInjects = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfInjects, uri)(dispatch);
 };
 
+export const fetchNextInjects = () => (dispatch) => {
+  const uri = '/api/injects/next';
+  return getReferential(schema.arrayOfInjects, uri)(dispatch);
+};
+
 export const fetchInject = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}`;
   return getReferential(schema.inject, uri)(dispatch);

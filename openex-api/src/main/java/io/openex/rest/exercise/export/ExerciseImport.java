@@ -23,9 +23,6 @@ public class ExerciseImport {
     @JsonProperty("exercise_end_date")
     private Date end;
 
-    @JsonProperty("exercise_canceled")
-    private boolean canceled;
-
     @JsonProperty("exercise_owner")
     private String owner;
 
@@ -82,14 +79,6 @@ public class ExerciseImport {
 
     public void setEnd(Date end) {
         this.end = end;
-    }
-
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
     }
 
     public String getOwner() {

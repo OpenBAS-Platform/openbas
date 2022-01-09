@@ -142,8 +142,22 @@ const i18n = {
         "Souhaitez-vous retirer l'audience du stimuli ?",
       'Do you want to delete this exercise?':
         'Souhaitez-vous supprimer cet exercice ?',
+      'Number of injects': 'Nombre de stimulis',
+      'No organizations in this platform':
+        'Aucune organisation dans cette plateforme.',
+      'No injects to send in this platform.':
+        'Aucun stimuli à envoyer dans cette plateforme.',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.':
         "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails des joueurs et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+      'Auto assign': 'Auto assignation',
+      'Auto observer': 'Auto observateur',
+      'Auto planner': 'Auto planificateur',
+      'The new users will automatically be assigned to this group.':
+        'Les nouveaux utilisateurs seront automatiquement assignés à ce groupe.',
+      'This group will have observer permission on new exercises.':
+        "Ce groupe aura la permission d'observateur sur les nouveaux exercices.",
+      'This group will have planner permission on new exercises.':
+        'Ce groupe aura la permission de planificateur sur les nouveaux exercices.',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_manual: 'Manuel (rappel)',

@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Tooltip from '@mui/material/Tooltip';
+import { InfoOutlined } from '@mui/icons-material';
 import { TextField } from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import { Switch } from '../../../../components/Switch';
@@ -47,35 +50,75 @@ class GroupForm extends Component {
               label={t('Description')}
               style={{ marginTop: 20 }}
             />
-            <Switch
-                name="group_default_user_assign"
-                label={t('Assign the group at user creation')}
-                style={{ marginTop: 20 }}
-            />
-            <Switch
-                name="group_default_exercise_observer"
-                label={t('Group will be "Observer" at exercise creation')}
-                style={{ marginTop: 20 }}
-            />
-            <Switch
-                name="group_default_exercise_planner"
-                label={t('Group will be "Planner" at exercise creation')}
-                style={{ marginTop: 20 }}
-            />
+            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+              <Grid item={true} xs={4} style={{ display: 'flex' }}>
+                <Switch
+                  name="group_default_user_assign"
+                  label={t('Auto assign')}
+                />
+                <Tooltip
+                  title={t(
+                    'The new users will automatically be assigned to this group.',
+                  )}
+                >
+                  <InfoOutlined
+                    fontSize="small"
+                    color="primary"
+                    style={{ marginTop: 8 }}
+                  />
+                </Tooltip>
+              </Grid>
+              <Grid item={true} xs={4} style={{ display: 'flex' }}>
+                <Switch
+                  name="group_default_exercise_observer"
+                  label={t('Auto observer')}
+                />
+                <Tooltip
+                  title={t(
+                    'This group will have observer permission on new exercises.',
+                  )}
+                >
+                  <InfoOutlined
+                    fontSize="small"
+                    color="primary"
+                    style={{ marginTop: 8 }}
+                  />
+                </Tooltip>
+              </Grid>
+              <Grid item={true} xs={4} style={{ display: 'flex' }}>
+                <Switch
+                  name="group_default_exercise_planner"
+                  label={t('Auto planner')}
+                />
+                <Tooltip
+                  title={t(
+                    'This group will have planner permission on new exercises.',
+                  )}
+                >
+                  <InfoOutlined
+                    fontSize="small"
+                    color="primary"
+                    style={{ marginTop: 8 }}
+                  />
+                </Tooltip>
+              </Grid>
+            </Grid>
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
                 variant="contained"
                 color="secondary"
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}
-                disabled={submitting}>
+                disabled={submitting}
+              >
                 {t('Cancel')}
               </Button>
               <Button
                 variant="contained"
                 color="primary"
                 type="submit"
-                disabled={pristine || submitting}>
+                disabled={pristine || submitting}
+              >
                 {editing ? t('Update') : t('Create')}
               </Button>
             </div>

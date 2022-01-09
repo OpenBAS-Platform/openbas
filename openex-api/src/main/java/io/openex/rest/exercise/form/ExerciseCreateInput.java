@@ -15,7 +15,6 @@ public class ExerciseCreateInput {
     @JsonProperty("exercise_name")
     private String name;
 
-    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 

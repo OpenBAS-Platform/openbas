@@ -9,6 +9,7 @@ import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
+import Animation from './animation/Animation';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useStore } from '../../../store';
@@ -40,6 +41,11 @@ const Index = () => {
             exact
             path="/exercises/:exerciseId"
             render={errorWrapper(Exercise)}
+          />
+          <Route
+            exact
+            path="/exercises/:exerciseId/animation"
+            render={errorWrapper(Animation)}
           />
           <Route
             exact

@@ -71,7 +71,7 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
     height: '100%',
   },
-  paperNoPadding: {
+  paperChart: {
     position: 'relative',
     padding: '0 20px 0 0',
     overflow: 'hidden',
@@ -130,17 +130,21 @@ const Exercise = () => {
       'exercise_mail_from',
     ]),
   )(exercise);
+  const topAudiences = R.pipe(
+    R.sortWith([R.descend(R.prop('audience_injects_number'))]),
+    R.take(6),
+  )(audiences || []);
   const distributionChartData = [
     {
       name: t('Number of injects'),
-      data: audiences?.map((a) => ({
+      data: topAudiences.map((a) => ({
         x: a.audience_name,
         y: a.audience_injects_number,
       })),
     },
   ];
   const maxInjectsNumber = Math.max(
-    ...(audiences || []).map((a) => a.audience_injects_number),
+    ...topAudiences.map((a) => a.audience_injects_number),
   );
   return (
     <div className={classes.root}>
@@ -290,13 +294,10 @@ const Exercise = () => {
           <Typography variant="overline">
             {t('Injects distribution')}
           </Typography>
-          <Paper variant="outlined" classes={{ root: classes.paperNoPadding }}>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {audiences.length > 0 ? (
               <Chart
-                options={distributionChartOptions(
-                  theme,
-                  maxInjectsNumber === 1,
-                )}
+                options={distributionChartOptions(theme, maxInjectsNumber < 2)}
                 series={distributionChartData}
                 type="bar"
                 width="100%"
