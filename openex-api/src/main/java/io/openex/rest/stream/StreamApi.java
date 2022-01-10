@@ -4,7 +4,9 @@ import io.openex.database.audit.BaseEvent;
 import io.openex.database.model.User;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +28,7 @@ public class StreamApi extends RestBehavior {
 
     public static final String EVENT_TYPE_MESSAGE = "message";
     public static final String EVENT_TYPE_PING = "ping";
+    public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
 
     private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
 
@@ -43,7 +46,7 @@ public class StreamApi extends RestBehavior {
     }
 
     @GetMapping(path = "/api/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Object> streamFlux() {
+    public ResponseEntity<Flux<Object>> streamFlux() {
         User user = currentUser();
         String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
         // Build the database event flux.
@@ -53,6 +56,9 @@ public class StreamApi extends RestBehavior {
         Flux<Object> ping = Flux.interval(Duration.ofSeconds(1))
                 .map(l -> ServerSentEvent.builder(now().getEpochSecond()).event(EVENT_TYPE_PING).build());
         // Merge the 2 flux to create the final one.
-        return Flux.merge(dataFlux, ping);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CACHE_CONTROL, "no-cache")
+                .header(X_ACCEL_BUFFERING, "no")
+                .body(Flux.merge(dataFlux, ping));
     }
 }

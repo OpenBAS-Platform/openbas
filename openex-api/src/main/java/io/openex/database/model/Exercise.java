@@ -14,7 +14,6 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.*;
 
-import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
 import static java.time.Instant.now;
@@ -107,8 +106,9 @@ public class Exercise implements Base {
     private List<Grant> grants = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @JsonProperty("exercise_injects")
     @Fetch(FetchMode.SUBSELECT)
-    @JsonIgnore
+    @JsonSerialize(using = MultiModelDeserializer.class)
     private List<Inject<?>> injects = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
@@ -174,17 +174,6 @@ public class Exercise implements Base {
     public long usersNumber() {
         return getAudiences().stream()
                 .mapToLong(audience -> audience.getUsers().size()).sum();
-    }
-
-    @JsonProperty("user_can_update")
-    public boolean isUserCanUpdate() {
-        User user = currentUser();
-        return user.isAdmin() || getPlanners().stream().anyMatch(u -> u.getId().equals(user.getId()));
-    }
-
-    @JsonProperty("user_can_delete")
-    public boolean isUserCanDelete() {
-        return currentUser().isAdmin();
     }
 
     @JsonProperty("exercise_next_possible_status")
