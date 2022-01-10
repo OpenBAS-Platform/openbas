@@ -26,6 +26,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import InjectIcon from '../injects/InjectIcon';
 import { splitDuration } from '../../../../utils/Time';
 import InjectPopover from '../injects/InjectPopover';
+import InjectStatus from '../injects/InjectStatus';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -425,18 +426,28 @@ const Animation = () => {
                           </div>
                           <div
                             className={classes.bodyItem}
-                            style={{ width: '25%', paddingTop: 8 }}
+                            style={{ width: '25%' }}
                           >
-                            <LinearProgress
-                              value={80}
-                              variant="determinate"
-                              style={{ width: '90%' }}
+                            <InjectStatus
+                              variant="list"
+                              status={inject.inject_status.status_name}
                             />
                           </div>
-                          <div className={classes.bodyItem}>
-                            <span className={classes.countdown}>
-                              <Countdown date={Date.now() + 500000} />
-                            </span>
+                          <div
+                            className={classes.bodyItem}
+                            style={{
+                              fontFamily: 'Consolas, monaco, monospace',
+                              fontSize: 12,
+                              paddingTop: 3,
+                              marginRight: 15,
+                              float: 'right',
+                            }}
+                          >
+                            {t('Executed in')}&nbsp;
+                            {(
+                              inject.inject_status.status_execution / 1000
+                            ).toFixed(2)}
+                            s
                           </div>
                         </div>
                       }

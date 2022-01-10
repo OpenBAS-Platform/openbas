@@ -177,6 +177,8 @@ const i18n = {
       body: 'Corps du mail',
       encrypted: 'Chiffrer ce mail',
       content: 'Contenu et explications',
+      'Executed in': 'Exécuté en',
+      Success: 'Succès',
       m: 'm',
       h: 'h',
       d: 'j',
