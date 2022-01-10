@@ -357,6 +357,7 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     }
 
     @Override
+    @JsonIgnore
     public boolean isGlobalInject() {
         return isAllAudiences();
     }

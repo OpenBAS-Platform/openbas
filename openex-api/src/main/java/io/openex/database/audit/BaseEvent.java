@@ -1,5 +1,6 @@
 package io.openex.database.audit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Base;
 import io.openex.database.model.User;
@@ -18,14 +19,13 @@ public class BaseEvent {
     @JsonProperty("instance")
     private Base instance;
 
-    public BaseEvent() {
-        // Default constructor
-    }
-
     public BaseEvent(String type, Base data) {
         this.type = type;
         this.instance = data;
-        String className = data.getClass().getSimpleName().toLowerCase();
+        Class<? extends Base> currentClass = data.getClass();
+        boolean isTargetClass = currentClass.getSuperclass().equals(Object.class);
+        Class<?> baseClass = isTargetClass ? currentClass : currentClass.getSuperclass();
+        String className = baseClass.getSimpleName().toLowerCase();
         this.attributeId = className + "_id";
         this.schema = className + "s";
     }
@@ -62,6 +62,7 @@ public class BaseEvent {
         this.instance = instance;
     }
 
+    @JsonIgnore
     public boolean isUserObserver(User listener) {
         return instance.isUserObserver(listener);
     }
