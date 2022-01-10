@@ -78,7 +78,7 @@ public class InjectHelper<T> {
     private boolean isInInjectableRange(Injection<?> injection) {
         Instant now = Instant.now();
         Instant start = now.minus(Duration.parse("PT1H"));
-        Instant injectWhen = injection.getDate().toInstant();
+        Instant injectWhen = injection.getDate().orElseThrow();
         return injectWhen.isAfter(start) && injectWhen.isBefore(now);
     }
 

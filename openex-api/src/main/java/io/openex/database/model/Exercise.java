@@ -10,24 +10,27 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.annotation.Nullable;
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.*;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.Grant.GRANT_TYPE.OBSERVER;
 import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
-import static java.util.Arrays.stream;
+import static java.time.Instant.now;
+import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "exercises")
 @EntityListeners(ModelBaseListener.class)
 public class Exercise implements Base {
 
-    private enum STATUS {
-        CANCELED,
+    public enum STATUS {
         SCHEDULED,
+        CANCELED,
         RUNNING,
+        PAUSED,
         FINISHED
     }
 
@@ -46,17 +49,26 @@ public class Exercise implements Base {
     @JsonProperty("exercise_description")
     private String description;
 
+    @Column(name = "exercise_status")
+    @JsonProperty("exercise_status")
+    @Enumerated(EnumType.STRING)
+    private STATUS status = STATUS.SCHEDULED;
+
     @Column(name = "exercise_subtitle")
     @JsonProperty("exercise_subtitle")
     private String subtitle;
 
+    @Column(name = "exercise_pause_date")
+    @JsonIgnore
+    private Instant currentPause;
+
     @Column(name = "exercise_start_date")
     @JsonProperty("exercise_start_date")
-    private Date start;
+    private Instant start;
 
     @Column(name = "exercise_end_date")
     @JsonProperty("exercise_end_date")
-    private Date end;
+    private Instant end;
 
     @ManyToOne
     @JoinColumn(name = "exercise_image")
@@ -78,11 +90,11 @@ public class Exercise implements Base {
 
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
-    private Date createdAt = new Date();
+    private Instant createdAt = now();
 
     @Column(name = "exercise_updated_at")
     @JsonProperty("exercise_updated_at")
-    private Date updatedAt = new Date();
+    private Instant updatedAt = now();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
@@ -104,6 +116,12 @@ public class Exercise implements Base {
     @JsonIgnore
     private List<Objective> objectives = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @JsonProperty("exercise_pauses")
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Pause> pauses = new ArrayList<>();
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "exercises_tags",
             joinColumns = @JoinColumn(name = "exercise_id"),
@@ -117,49 +135,33 @@ public class Exercise implements Base {
     @JsonProperty("exercise_injects_statistics")
     public Map<String, Long> getInjectStatistics() {
         Map<String, Long> stats = new HashMap<>();
-        Date now = new Date();
         long total = injects.size();
         stats.put("total_count", total);
-        long executed = injects.stream().filter(inject -> inject.getStatus() != null).count();
+        long executed = injects.stream().filter(inject -> inject.getStatus().isPresent()).count();
         stats.put("total_executed", executed);
-        stats.put("total_remaining", injects.stream().filter(inject -> inject.getStatus() == null).count());
-        stats.put("total_past", injects.stream().filter(inject -> inject.getDate().before(now)).count());
-        stats.put("total_future", injects.stream().filter(inject -> inject.getDate().after(now)).count());
+        stats.put("total_remaining", injects.stream().filter(Inject::isNotExecuted).count());
+        stats.put("total_past", injects.stream().filter(Inject::isPastInject).count());
+        stats.put("total_future", injects.stream().filter(Inject::isFutureInject).count());
         stats.put("total_progress", total > 0 ? (executed * 100 / total) : 0);
         return stats;
     }
 
-    @JsonProperty("exercise_status")
-    public String getStatus() {
-        Date now = new Date();
-        long totalCount = getInjects().size();
-        List<Inject<?>> injectsToExecute = getInjects().stream().filter(inject -> inject.getStatus() == null).toList();
-        long totalPastCount = injectsToExecute.stream().filter(inject -> inject.getDate().before(now)).count();
-        long totalFutureCount = injectsToExecute.stream().filter(inject -> inject.getDate().after(now)).count();
-        if (totalCount == 0 || (totalPastCount == 0 && totalFutureCount > 0)) {
-            return STATUS.SCHEDULED.name();
-        } else if (totalFutureCount > 0) {
-            return STATUS.RUNNING.name();
-        }
-        return STATUS.FINISHED.name();
-    }
-
-    private List<User> getUsersByType(String... types) {
+    private List<User> getUsersByType(Grant.GRANT_TYPE... types) {
         List<Grant> grants = getGrants();
         return grants.stream()
-                .filter(grant -> stream(types).anyMatch(s -> grant.getName().equals(s)))
+                .filter(grant -> asList(types).contains(grant.getName()))
                 .map(Grant::getGroup)
                 .flatMap(group -> group.getUsers().stream()).toList();
     }
 
     @JsonIgnore
     public List<User> getPlanners() {
-        return getUsersByType(PLANNER.name());
+        return getUsersByType(PLANNER);
     }
 
     @JsonIgnore
     public List<User> getObservers() {
-        return getUsersByType(PLANNER.name(), OBSERVER.name());
+        return getUsersByType(PLANNER, OBSERVER);
     }
 
     @JsonIgnore
@@ -184,6 +186,24 @@ public class Exercise implements Base {
     public boolean isUserCanDelete() {
         return currentUser().isAdmin();
     }
+
+    @JsonProperty("exercise_next_possible_status")
+    public List<STATUS> nextPossibleStatus() {
+        // FINISHED ?
+        if (STATUS.CANCELED.equals(status)) {
+            return List.of(STATUS.SCHEDULED); // Via reset
+        }
+        if (STATUS.SCHEDULED.equals(status)) {
+            return List.of(STATUS.RUNNING);
+        }
+        if (STATUS.RUNNING.equals(status)) {
+            return List.of(STATUS.CANCELED, STATUS.PAUSED);
+        }
+        if (STATUS.PAUSED.equals(status)) {
+            return List.of(STATUS.CANCELED, STATUS.RUNNING);
+        }
+        return List.of();
+    }
     // endregion
 
     public String getId() {
@@ -200,6 +220,14 @@ public class Exercise implements Base {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public STATUS getStatus() {
+        return status;
+    }
+
+    public void setStatus(STATUS status) {
+        this.status = status;
     }
 
     public String getHeader() {
@@ -242,35 +270,43 @@ public class Exercise implements Base {
         this.subtitle = subtitle;
     }
 
-    public @Nullable Date getStart() {
-        return start;
+    public Optional<Instant> getStart() {
+        return ofNullable(start);
     }
 
-    public void setStart(Date start) {
+    public void setStart(Instant start) {
         this.start = start;
     }
 
-    public @Nullable Date getEnd() {
-        return end;
+    public Optional<Instant> getEnd() {
+        return ofNullable(end);
     }
 
-    public Date getCreatedAt() {
+    public Optional<Instant> getCurrentPause() {
+        return ofNullable(currentPause);
+    }
+
+    public void setCurrentPause(Instant currentPause) {
+        this.currentPause = currentPause;
+    }
+
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(Instant end) {
         this.end = end;
     }
 
@@ -283,11 +319,23 @@ public class Exercise implements Base {
     }
 
     public List<Inject<?>> getInjects() {
-        return injects;
+        return injects.stream().sorted(Inject.executionComparator).toList();
     }
 
     public void setInjects(List<Inject<?>> injects) {
         this.injects = injects;
+    }
+
+    public List<Pause> getPauses() {
+        return pauses;
+    }
+
+    public void setPauses(List<Pause> pauses) {
+        this.pauses = pauses;
+    }
+
+    public void addPause(Pause pause) {
+        this.pauses.add(pause);
     }
 
     public List<Audience> getAudiences() {

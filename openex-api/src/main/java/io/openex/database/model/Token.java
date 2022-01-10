@@ -6,7 +6,7 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -31,7 +31,7 @@ public class Token implements Base {
 
     @Column(name = "token_created_at")
     @JsonProperty("token_created_at")
-    private Date created;
+    private Instant created;
 
     public String getId() {
         return id;
@@ -57,11 +57,11 @@ public class Token implements Base {
         this.value = value;
     }
 
-    public Date getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(Instant created) {
         this.created = created;
     }
 

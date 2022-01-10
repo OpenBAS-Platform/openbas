@@ -11,12 +11,13 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static java.time.Instant.now;
 import static java.util.stream.StreamSupport.stream;
 
 @Entity
@@ -40,11 +41,11 @@ public class Organization implements Base {
 
     @Column(name = "organization_created_at")
     @JsonProperty("organization_created_at")
-    private Date createdAt = new Date();
+    private Instant createdAt = now();
 
     @Column(name = "organization_updated_at")
     @JsonProperty("organization_updated_at")
-    private Date updatedAt = new Date();
+    private Instant updatedAt = now();
 
     @OneToMany(mappedBy = "organization", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -106,19 +107,19 @@ public class Organization implements Base {
         this.description = description;
     }
 
-    public Date getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

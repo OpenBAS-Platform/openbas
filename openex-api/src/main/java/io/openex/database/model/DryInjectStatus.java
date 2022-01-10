@@ -7,7 +7,7 @@ import io.openex.database.converter.StatusReportingConverter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -32,7 +32,7 @@ public class DryInjectStatus implements Base {
 
     @Column(name = "status_date")
     @JsonProperty("status_date")
-    private Date date;
+    private Instant date;
 
     @Column(name = "status_execution")
     @JsonProperty("status_execution")
@@ -67,11 +67,11 @@ public class DryInjectStatus implements Base {
         this.reporting = reporting;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

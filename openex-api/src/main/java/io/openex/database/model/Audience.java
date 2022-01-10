@@ -11,11 +11,13 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+
+import static java.time.Instant.now;
 
 @Entity
 @Table(name = "audiences")
@@ -48,11 +50,11 @@ public class Audience implements Base {
 
     @Column(name = "audience_created_at")
     @JsonProperty("audience_created_at")
-    private Date createdAt = new Date();
+    private Instant createdAt = now();
 
     @Column(name = "audience_updated_at")
     @JsonProperty("audience_updated_at")
-    private Date updatedAt = new Date();
+    private Instant updatedAt = now();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "audiences_tags",
@@ -128,19 +130,19 @@ public class Audience implements Base {
         this.enabled = enabled;
     }
 
-    public Date getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

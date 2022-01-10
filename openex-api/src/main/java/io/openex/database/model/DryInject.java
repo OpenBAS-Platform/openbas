@@ -10,10 +10,10 @@ import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.time.Instant;
+import java.util.*;
+
+import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "dryinjects")
@@ -39,7 +39,7 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
 
     @Column(name = "dryinject_date")
     @JsonProperty("dryinject_date")
-    private Date date;
+    private Instant date;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dryinject_dryrun")
@@ -104,11 +104,11 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
         this.run = run;
     }
 
-    public Date getDate() {
-        return date;
+    public Optional<Instant> getDate() {
+        return ofNullable(date);
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

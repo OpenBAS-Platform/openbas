@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+import static io.openex.config.AppConfig.EMAIL_FORMAT;
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
 public class UpdateProfileInput {
 
-    @Email
+    @Email(message = EMAIL_FORMAT)
     @JsonProperty("user_email")
     private String email;
 

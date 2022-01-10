@@ -7,7 +7,7 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -35,7 +35,7 @@ public class ComcheckStatus implements Base {
 
     @Column(name = "status_last_update")
     @JsonProperty("status_last_update")
-    private Date lastUpdate;
+    private Instant lastUpdate;
 
     @Column(name = "status_state")
     @JsonProperty("status_state")
@@ -74,11 +74,11 @@ public class ComcheckStatus implements Base {
         this.state = state;
     }
 
-    public Date getLastUpdate() {
+    public Instant getLastUpdate() {
         return lastUpdate;
     }
 
-    public void setLastUpdate(Date lastUpdate) {
+    public void setLastUpdate(Instant lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
 

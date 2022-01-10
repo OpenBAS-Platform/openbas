@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.database.model.basic.BasicInject;
-import io.openex.database.repository.AudienceRepository;
-import io.openex.database.repository.InjectRepository;
 import io.openex.helper.CryptoHelper;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
@@ -18,10 +16,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.openex.database.model.Grant.GRANT_TYPE.PLANNER;
+import static java.time.Instant.now;
 import static java.util.stream.StreamSupport.stream;
 
 @Entity
@@ -77,11 +77,11 @@ public class User implements Base, OAuth2User {
 
     @Column(name = "user_created_at")
     @JsonProperty("user_created_at")
-    private Date createdAt = new Date();
+    private Instant createdAt = now();
 
     @Column(name = "user_updated_at")
     @JsonProperty("user_updated_at")
-    private Date updatedAt = new Date();
+    private Instant updatedAt = now();
 
     @ManyToOne
     @JoinColumn(name = "user_organization")
@@ -163,7 +163,7 @@ public class User implements Base, OAuth2User {
     public boolean isPlanner() {
         return isAdmin() || getGroups().stream()
                 .flatMap(group -> group.getGrants().stream())
-                .anyMatch(grant -> PLANNER.name().equals(grant.getName()));
+                .anyMatch(grant -> PLANNER.equals(grant.getName()));
     }
 
     @JsonProperty("user_is_observer")
@@ -258,19 +258,19 @@ public class User implements Base, OAuth2User {
         this.admin = admin;
     }
 
-    public Date getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

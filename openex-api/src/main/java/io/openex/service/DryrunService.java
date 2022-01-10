@@ -14,8 +14,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.transaction.Transactional;
-import java.util.Date;
 import java.util.List;
+
+import static java.time.Instant.now;
 
 @Component
 public class DryrunService<T> {
@@ -49,7 +50,7 @@ public class DryrunService<T> {
         Dryrun run = new Dryrun();
         run.setSpeed(speed);
         run.setExercise(exercise);
-        run.setDate(new Date());
+        run.setDate(now());
         return dryRunRepository.save(run);
     }
 

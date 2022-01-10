@@ -2,6 +2,7 @@ package io.openex.config;
 
 import io.openex.database.model.User;
 import io.openex.database.repository.UserRepository;
+import io.openex.rest.user.form.user.CreateUserInput;
 import io.openex.security.OAuthRefererAuthenticationSuccessHandler;
 import io.openex.security.TokenAuthenticationFilter;
 import io.openex.service.UserService;
@@ -93,8 +94,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 String firstName = user.getAttribute("given_name");
                 String lastName = user.getAttribute("family_name");
                 Optional<User> optionalUser = userRepository.findByEmail(email);
-                return optionalUser.orElseGet(() ->
-                        userService.createOAuthUser(email, firstName, lastName));
+                CreateUserInput createUserInput = new CreateUserInput();
+                createUserInput.setEmail(email);
+                createUserInput.setFirstname(firstName);
+                createUserInput.setLastname(lastName);
+                createUserInput.setAdmin(false);
+                return optionalUser.orElseGet(() -> userService.createUser(createUserInput, 0));
             }
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("invalid_token", "User conversion fail", "")

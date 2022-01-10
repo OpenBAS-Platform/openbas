@@ -39,7 +39,8 @@ public class Group implements Base {
     @JsonProperty("group_default_exercise_assign")
     @Enumerated(EnumType.STRING)
     @ElementCollection
-    @CollectionTable(name="groups_exercises_default_grants", joinColumns = @JoinColumn(name = "group_id"))
+    @CollectionTable(name = "groups_exercises_default_grants",
+            joinColumns = @JoinColumn(name = "group_id"))
     private List<Grant.GRANT_TYPE> exercisesDefaultGrants = new ArrayList<>();
 
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
@@ -115,8 +116,8 @@ public class Group implements Base {
         this.defaultUserAssignation = defaultUserAssignation;
     }
 
-    public List<String> getExercisesDefaultGrants() {
-        return exercisesDefaultGrants.stream().map(Enum::name).toList();
+    public List<Grant.GRANT_TYPE> getExercisesDefaultGrants() {
+        return exercisesDefaultGrants;
     }
 
     public void setExercisesDefaultGrants(List<Grant.GRANT_TYPE> defaultExerciseAssignations) {

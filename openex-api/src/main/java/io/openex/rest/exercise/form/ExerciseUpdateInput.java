@@ -2,12 +2,13 @@ package io.openex.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
-import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+import static io.openex.config.AppConfig.*;
 
 public class ExerciseUpdateInput {
 
@@ -22,8 +23,10 @@ public class ExerciseUpdateInput {
     private String description;
 
     @JsonProperty("exercise_start_date")
-    private Date start;
+    @FutureOrPresent(message = NOW_FUTURE_MESSAGE)
+    private Instant start;
 
+    @Email(message = EMAIL_FORMAT)
     @JsonProperty("exercise_mail_from")
     private String mailFrom;
 
@@ -32,9 +35,6 @@ public class ExerciseUpdateInput {
 
     @JsonProperty("exercise_message_footer")
     private String messageFooter;
-
-    @JsonProperty("exercise_tags")
-    private List<String> tagIds = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -60,11 +60,11 @@ public class ExerciseUpdateInput {
         this.subtitle = subtitle;
     }
 
-    public Date getStart() {
-        return start;
+    public Instant getStart() {
+        return start != null ? start.truncatedTo(ChronoUnit.MINUTES) : null;
     }
 
-    public void setStart(Date start) {
+    public void setStart(Instant start) {
         this.start = start;
     }
 

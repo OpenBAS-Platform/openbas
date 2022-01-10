@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 @Repository
@@ -25,9 +25,9 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
             "join e.grants as grant " +
             "join grant.group.users as user " +
             "where user.id = :userId and u.createdAt < :creationDate")
-    long userCount(String userId, Date creationDate);
+    long userCount(String userId, Instant creationDate);
 
     @Override
     @Query("select count(distinct u) from User u where u.createdAt < :creationDate")
-    long globalCount(Date creationDate);
+    long globalCount(Instant creationDate);
 }

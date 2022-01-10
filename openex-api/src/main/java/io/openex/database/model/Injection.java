@@ -4,8 +4,9 @@ import io.openex.model.Execution;
 import io.openex.model.Executor;
 
 import javax.persistence.Transient;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
@@ -14,7 +15,7 @@ public abstract class Injection<T> {
 
     public abstract Exercise getExercise();
 
-    public abstract Date getDate();
+    public abstract Optional<Instant> getDate();
 
     public abstract T getContent();
 

@@ -2,45 +2,41 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
-@Table(name = "grants")
-public class Grant implements Base {
-
-    public enum GRANT_TYPE {
-        OBSERVER,
-        PLANNER
-    }
-
+@Table(name = "pauses")
+@EntityListeners(ModelBaseListener.class)
+public class Pause implements Base {
     @Id
-    @Column(name = "grant_id")
+    @Column(name = "pause_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("grant_id")
+    @JsonProperty("log_id")
     private String id;
 
-    @Column(name = "grant_name")
-    @JsonProperty("grant_name")
-    @Enumerated(EnumType.STRING)
-    private GRANT_TYPE name;
+    @Column(name = "pause_date")
+    @JsonProperty("pause_date")
+    private Instant date;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "grant_group")
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("grant_group")
-    private Group group;
+    @Column(name = "pause_duration")
+    @JsonProperty("pause_duration")
+    private Long duration = 0L;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "grant_exercise")
+    @ManyToOne
+    @JoinColumn(name = "pause_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("grant_exercise")
+    @JsonProperty("pause_exercise")
     private Exercise exercise;
 
+    @Override
     public String getId() {
         return id;
     }
@@ -49,20 +45,20 @@ public class Grant implements Base {
         this.id = id;
     }
 
-    public GRANT_TYPE getName() {
-        return name;
+    public Instant getDate() {
+        return date;
     }
 
-    public void setName(GRANT_TYPE name) {
-        this.name = name;
+    public void setDate(Instant date) {
+        this.date = date;
     }
 
-    public Group getGroup() {
-        return group;
+    public Optional<Long> getDuration() {
+        return Optional.ofNullable(duration);
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setDuration(Long duration) {
+        this.duration = duration;
     }
 
     public Exercise getExercise() {

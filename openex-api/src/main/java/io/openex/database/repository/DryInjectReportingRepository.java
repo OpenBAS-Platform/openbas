@@ -7,8 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.Optional;
+
+import static java.time.Instant.now;
 
 @Repository
 public interface DryInjectReportingRepository<T> extends CrudRepository<DryInjectStatus, String> {
@@ -19,7 +20,7 @@ public interface DryInjectReportingRepository<T> extends CrudRepository<DryInjec
     default void executionSave(Execution execution, DryInject<T> inject) {
         DryInjectStatus injectStatus = new DryInjectStatus();
         injectStatus.setDryInject(inject);
-        injectStatus.setDate(new Date());
+        injectStatus.setDate(now());
         injectStatus.setExecutionTime(execution.getExecution());
         injectStatus.setName(execution.getStatus().name());
         injectStatus.setReporting(execution.getReporting());

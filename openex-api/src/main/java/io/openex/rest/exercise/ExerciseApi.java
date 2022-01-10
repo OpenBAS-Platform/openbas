@@ -1,6 +1,7 @@
 package io.openex.rest.exercise;
 
 import io.openex.database.model.*;
+import io.openex.database.model.Exercise.STATUS;
 import io.openex.database.repository.*;
 import io.openex.database.specification.ComcheckSpecification;
 import io.openex.database.specification.DryRunSpecification;
@@ -15,6 +16,7 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
 import io.openex.service.FileService;
 import org.apache.commons.io.FileUtils;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +33,7 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.temporal.ChronoUnit;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -41,11 +43,14 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static io.openex.config.AppConfig.currentUser;
+import static io.openex.database.model.Exercise.STATUS.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.resolveRelation;
 import static java.io.File.createTempFile;
+import static java.time.Duration.between;
 import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.MINUTES;
 
 @RestController
 @RolesAllowed(ROLE_USER)
@@ -148,7 +153,7 @@ public class ExerciseApi<T> extends RestBehavior {
         log.setUpdateAttributes(createLogInput);
         log.setExercise(exercise);
         log.setUser(currentUser());
-        log.setDate(new Date());
+        log.setDate(now());
         return exerciseLogRepository.save(log);
     }
     // endregion
@@ -233,14 +238,6 @@ public class ExerciseApi<T> extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/start")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise startExercise(@PathVariable String exerciseId) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        exercise.setStart(Date.from(now().plus(10, ChronoUnit.SECONDS))); // Start in 10 sec
-        return exerciseRepository.save(exercise);
-    }
-
     @PutMapping("/api/exercises/{exerciseId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseInformation(@PathVariable String exerciseId,
@@ -286,6 +283,50 @@ public class ExerciseApi<T> extends RestBehavior {
         return currentUser().isAdmin() ?
                 exerciseRepository.findAll() :
                 exerciseRepository.findAllGranted(currentUser().getId());
+    }
+
+    @Transactional
+    @PutMapping("/api/exercises/{exerciseId}/status")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise changeExerciseStatus(@PathVariable String exerciseId, @Valid @RequestBody STATUS status) throws SchedulerException {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        // Check if next status is possible
+        List<STATUS> nextPossibleStatus = exercise.nextPossibleStatus();
+        if (!nextPossibleStatus.contains(status)) {
+            throw new UnsupportedOperationException("Exercise cant support moving to status " + status.name());
+        }
+        // In case of rescheduled of an exercise.
+        if (CANCELED.equals(exercise.getStatus()) && SCHEDULED.equals(status)) {
+            exercise.setStart(null);
+            exercise.setEnd(null);
+            List<Inject<?>> cleanInjects = exercise.getInjects().stream().peek(inject -> {
+                inject.setStatus(null);
+                inject.setOutcome(null);
+            }).toList();
+            exercise.setInjects(cleanInjects);
+        }
+        // In case of manual start
+        if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
+            Instant nextMinute = now().truncatedTo(MINUTES).plus(1, MINUTES);
+            exercise.setStart(nextMinute);
+        }
+        // If exercise move from pause to running state,
+        // we log the pause date to be able to recompute inject dates.
+        if (PAUSED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
+            exercise.setCurrentPause(null);
+            Instant lastPause = exercise.getCurrentPause().orElseThrow();
+            Pause pause = new Pause();
+            pause.setDate(lastPause);
+            pause.setExercise(exercise);
+            pause.setDuration(between(lastPause, now()).getSeconds());
+            exercise.addPause(pause);
+        }
+        // If pause is asked, just set the pause date.
+        if (RUNNING.equals(exercise.getStatus()) && PAUSED.equals(status)) {
+            exercise.setCurrentPause(Instant.now());
+        }
+        exercise.setStatus(status);
+        return exerciseRepository.save(exercise);
     }
     // endregion
 

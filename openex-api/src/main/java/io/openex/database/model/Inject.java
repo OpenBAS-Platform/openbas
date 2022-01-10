@@ -13,11 +13,10 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.time.Instant;
+import java.util.*;
 
+import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 
 @Entity
@@ -30,6 +29,13 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     public enum STATUS {
         SUCCESS
     }
+
+    public static Comparator<Inject<?>> executionComparator = (o1, o2) -> {
+        if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
+            return o1.getDate().get().compareTo(o2.getDate().get());
+        }
+        return o1.getId().compareTo(o2.getId());
+    };
 
     @Id
     @Column(name = "inject_id")
@@ -64,11 +70,11 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     @Column(name = "inject_created_at")
     @JsonProperty("inject_created_at")
-    private Date createdAt = new Date();
+    private Instant createdAt = now();
 
     @Column(name = "inject_updated_at")
     @JsonProperty("inject_updated_at")
-    private Date updatedAt = new Date();
+    private Instant updatedAt = now();
 
     @Column(name = "inject_all_audiences")
     @JsonProperty("inject_all_audiences")
@@ -143,18 +149,38 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     }
 
     @JsonIgnore
-    private Date computeInjectDate(int speed) {
-        Inject<?> dependsOnInject = getDependsOn();
+    private Instant computeInjectDate(Instant source, int speed) {
+        Optional<Inject<?>> dependsOnInject = ofNullable(getDependsOn());
         long duration = ofNullable(getDependsDuration()).orElse(0L) / speed;
-        Date dependingStart = dependsOnInject == null
-                ? getExercise().getStart() : dependsOnInject.computeInjectDate(speed);
-        Date start = ofNullable(dependingStart).orElse(new Date());
-        return Date.from(start.toInstant().plusSeconds(duration));
+        Instant dependingStart = dependsOnInject
+                .map(inject -> inject.computeInjectDate(source, speed))
+                .orElse(source);
+        Instant standardExecutionDate = dependingStart.plusSeconds(duration);
+        long pauseDelay = getExercise().getPauses().stream()
+                .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
+                .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
+        return standardExecutionDate.plusSeconds(pauseDelay);
     }
 
     @JsonProperty("inject_date")
-    public Date getDate() {
-        return computeInjectDate(1);
+    public Optional<Instant> getDate() {
+        return getExercise().getStart()
+                .map(source -> computeInjectDate(source, 1));
+    }
+
+    @JsonIgnore
+    public boolean isNotExecuted() {
+        return getStatus().isEmpty();
+    }
+
+    @JsonIgnore
+    public boolean isPastInject() {
+        return getDate().map(date -> date.isBefore(now())).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean isFutureInject() {
+        return getDate().map(date -> date.isAfter(now())).orElse(false);
     }
 
     @JsonIgnore
@@ -185,19 +211,19 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.enabled = enabled;
     }
 
-    public Date getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -226,8 +252,8 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.exercise = exercise;
     }
 
-    public InjectStatus getStatus() {
-        return status;
+    public Optional<InjectStatus> getStatus() {
+        return ofNullable(status);
     }
 
     public void setStatus(InjectStatus status) {
@@ -316,7 +342,7 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         dryInject.setType(getType());
         dryInject.setContent(getContent());
         dryInject.setRun(run);
-        dryInject.setDate(computeInjectDate(speed));
+        dryInject.setDate(computeInjectDate(run.getDate(), speed));
         return dryInject;
     }
 

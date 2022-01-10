@@ -18,9 +18,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
 import java.util.List;
 
+import static java.time.Instant.now;
 import static java.util.List.of;
 import static java.util.stream.StreamSupport.stream;
 
@@ -77,7 +77,7 @@ public class ComcheckApi extends RestBehavior {
                                        @Valid @RequestBody ComcheckInput comCheck) {
         // 01. Create the comcheck and get the ID
         Comcheck check = new Comcheck();
-        check.setStart(new Date());
+        check.setStart(now());
         check.setEnd(comCheck.getEnd());
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         check.setExercise(exercise);
@@ -91,7 +91,7 @@ public class ComcheckApi extends RestBehavior {
             comcheckStatus.setUser(u);
             comcheckStatus.setState(false);
             comcheckStatus.setComcheck(savedComcheck);
-            comcheckStatus.setLastUpdate(new Date());
+            comcheckStatus.setLastUpdate(now());
             return comcheckStatus;
         }).toList();
         Iterable<ComcheckStatus> savedStatus = comcheckStatusRepository.saveAll(comcheckStatuses);

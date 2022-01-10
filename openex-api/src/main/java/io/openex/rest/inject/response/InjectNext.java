@@ -2,7 +2,7 @@ package io.openex.rest.inject.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
+import java.time.Instant;
 
 public class InjectNext {
 
@@ -16,9 +16,9 @@ public class InjectNext {
     private String type;
 
     @JsonProperty("inject_date")
-    private Date date;
+    private Instant date;
 
-    public InjectNext(String title, String description, String type, Date date) {
+    public InjectNext(String title, String description, String type, Instant date) {
         this.title = title;
         this.description = description;
         this.type = type;
@@ -49,11 +49,11 @@ public class InjectNext {
         this.type = type;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 }

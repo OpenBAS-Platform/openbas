@@ -8,8 +8,8 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,7 +30,7 @@ public class Dryrun implements Base {
 
     @Column(name = "dryrun_date")
     @JsonProperty("dryrun_date")
-    private Date date;
+    private Instant date;
 
     @Column(name = "dryrun_status")
     @JsonProperty("dryrun_status")
@@ -65,11 +65,11 @@ public class Dryrun implements Base {
         this.id = id;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

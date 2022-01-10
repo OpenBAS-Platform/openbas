@@ -81,7 +81,7 @@ public class RestBehavior {
         return errorBag;
     }
 
-    protected <T> List<T> fromIterable(Iterable<T> results) {
+    public static <T> List<T> fromIterable(Iterable<T> results) {
         return stream(results.spliterator(), false).collect(Collectors.toList());
     }
 }

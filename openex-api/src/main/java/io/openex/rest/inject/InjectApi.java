@@ -24,7 +24,6 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -111,7 +110,8 @@ public class InjectApi<T> extends RestBehavior {
 
     @GetMapping("/api/exercises/{exerciseId}/injects")
     public Iterable<Inject<T>> exerciseInjects(@PathVariable String exerciseId) {
-        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId));
+        return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId))
+                .stream().sorted(Inject.executionComparator).toList();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
@@ -165,16 +165,16 @@ public class InjectApi<T> extends RestBehavior {
 
     @GetMapping("/api/injects/next")
     public List<InjectNext> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
-        Comparator<Inject<T>> injectComparator = Comparator.comparing(Inject::getDate);
         return injectRepository.findAll(InjectSpecification.executable()).stream()
                 // Keep only injects visible by the user
+                .filter(inject -> inject.getDate().isPresent())
                 .filter(inject -> inject.getExercise().isUserObserver(currentUser()))
                 // Order by near execution
-                .sorted(injectComparator.reversed())
+                .sorted(Inject.executionComparator)
                 // Keep only the expected size
                 .limit(size.orElse(MAX_NEXT_INJECTS))
                 // Map to NextInject to keep only useful information
-                .map(i -> new InjectNext(i.getTitle(), i.getDescription(), i.getType(), i.getDate()))
+                .map(i -> new InjectNext(i.getTitle(), i.getDescription(), i.getType(), i.getDate().get()))
                 // Collect the result
                 .toList();
     }

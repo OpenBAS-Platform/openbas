@@ -8,11 +8,11 @@ import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
 import io.openex.database.specification.AudienceSpecification;
-import io.openex.rest.audience.form.AudienceUpdateActivationInput;
 import io.openex.rest.audience.form.AudienceCreateInput;
+import io.openex.rest.audience.form.AudienceUpdateActivationInput;
+import io.openex.rest.audience.form.AudienceUpdateInput;
 import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.audience.form.AudienceUpdateInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
-import java.util.Date;
-
 import static io.openex.database.model.User.ROLE_USER;
+import static java.time.Instant.now;
 
 @RestController
 @RolesAllowed(ROLE_USER)
@@ -95,7 +94,7 @@ public class AudienceApi extends RestBehavior {
                                            @Valid @RequestBody AudienceUpdateInput input) {
         Audience audience = audienceRepository.findById(audienceId).orElseThrow();
         audience.setUpdateAttributes(input);
-        audience.setUpdatedAt(new Date());
+        audience.setUpdatedAt(now());
         audience.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return audienceRepository.save(audience);
     }

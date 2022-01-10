@@ -7,7 +7,7 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 @Entity
@@ -43,7 +43,7 @@ public class ExerciseLog implements Base {
 
     @Column(name = "log_date")
     @JsonProperty("log_date")
-    private Date date;
+    private Instant date;
 
     @Override
     public String getId() {
@@ -86,11 +86,11 @@ public class ExerciseLog implements Base {
         this.content = content;
     }
 
-    public Date getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 

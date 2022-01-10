@@ -3,7 +3,7 @@ package io.openex.rest.comcheck.form;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
+import java.time.Instant;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -14,7 +14,7 @@ public class ComcheckInput {
     private String audienceId;
 
     @JsonProperty("comcheck_end_date")
-    private Date end;
+    private Instant end;
 
     @JsonProperty("comcheck_subject")
     private String subject;
@@ -33,11 +33,11 @@ public class ComcheckInput {
         this.audienceId = audienceId;
     }
 
-    public Date getEnd() {
+    public Instant getEnd() {
         return end;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(Instant end) {
         this.end = end;
     }
 

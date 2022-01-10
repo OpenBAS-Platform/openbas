@@ -8,10 +8,12 @@ import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import static java.time.Instant.now;
 
 @Entity
 @Table(name = "comchecks")
@@ -26,11 +28,11 @@ public class Comcheck implements Base {
 
     @Column(name = "comcheck_start_date")
     @JsonProperty("comcheck_start_date")
-    private Date start;
+    private Instant start;
 
     @Column(name = "comcheck_end_date")
     @JsonProperty("comcheck_end_date")
-    private Date end;
+    private Instant end;
 
     @ManyToOne
     @JoinColumn(name = "comcheck_exercise")
@@ -50,7 +52,7 @@ public class Comcheck implements Base {
     // region transient
     @JsonProperty("comcheck_finished")
     public boolean isFinished() {
-        return new Date().after(getEnd()) || comcheckStatus.stream().allMatch(ComcheckStatus::isState);
+        return now().isAfter(getEnd()) || comcheckStatus.stream().allMatch(ComcheckStatus::isState);
     }
     // endregion
 
@@ -62,19 +64,19 @@ public class Comcheck implements Base {
         this.id = id;
     }
 
-    public Date getStart() {
+    public Instant getStart() {
         return start;
     }
 
-    public void setStart(Date start) {
+    public void setStart(Instant start) {
         this.start = start;
     }
 
-    public Date getEnd() {
+    public Instant getEnd() {
         return end;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(Instant end) {
         this.end = end;
     }
 

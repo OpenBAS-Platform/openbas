@@ -2,8 +2,8 @@ package io.openex.rest.exercise.export;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class ExerciseImport {
@@ -18,10 +18,10 @@ public class ExerciseImport {
     private String subtitle;
 
     @JsonProperty("exercise_start_date")
-    private Date start;
+    private Instant start;
 
     @JsonProperty("exercise_end_date")
-    private Date end;
+    private Instant end;
 
     @JsonProperty("exercise_owner")
     private String owner;
@@ -65,19 +65,19 @@ public class ExerciseImport {
         this.subtitle = subtitle;
     }
 
-    public Date getStart() {
+    public Instant getStart() {
         return start;
     }
 
-    public void setStart(Date start) {
+    public void setStart(Instant start) {
         this.start = start;
     }
 
-    public Date getEnd() {
+    public Instant getEnd() {
         return end;
     }
 
-    public void setEnd(Date end) {
+    public void setEnd(Instant end) {
         this.end = end;
     }
 

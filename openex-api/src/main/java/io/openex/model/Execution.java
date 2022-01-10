@@ -3,8 +3,9 @@ package io.openex.model;
 import io.openex.database.model.StatusReporting;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import static java.time.Instant.now;
 
 public class Execution {
     private final long startTime;
@@ -13,7 +14,7 @@ public class Execution {
 
     public Execution() {
         this.status = ExecutionStatus.SUCCESS;
-        this.startTime = new Date().getTime();
+        this.startTime = now().toEpochMilli();
     }
 
     public void addMessage(String mess) {
@@ -21,7 +22,7 @@ public class Execution {
     }
 
     public Integer getExecution() {
-        return (int) (new Date().getTime() - this.startTime);
+        return (int) (now().toEpochMilli() - this.startTime);
     }
 
     public ExecutionStatus getStatus() {

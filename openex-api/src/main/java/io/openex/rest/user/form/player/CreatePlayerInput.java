@@ -6,9 +6,11 @@ import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.openex.config.AppConfig.EMAIL_FORMAT;
+
 public class CreatePlayerInput {
 
-    @Email
+    @Email(message = EMAIL_FORMAT)
     @JsonProperty("user_email")
     private String email;
 
