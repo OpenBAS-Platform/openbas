@@ -109,7 +109,7 @@ const Dashboard = (props) => {
   } = props;
   const topOrganizations = R.pipe(
     R.sortWith([R.descend(R.prop('organization_injects_number'))]),
-    R.take(10),
+    R.take(7),
   )(organizations || []);
   const distributionChartData = [
     {

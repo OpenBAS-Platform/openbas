@@ -189,8 +189,10 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_next_possible_status")
     public List<STATUS> nextPossibleStatus() {
-        // FINISHED ?
         if (STATUS.CANCELED.equals(status)) {
+            return List.of(STATUS.SCHEDULED); // Via reset
+        }
+        if (STATUS.FINISHED.equals(status)) {
             return List.of(STATUS.SCHEDULED); // Via reset
         }
         if (STATUS.SCHEDULED.equals(status)) {

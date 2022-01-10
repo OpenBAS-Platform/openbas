@@ -154,8 +154,8 @@ const i18n = {
         'Aucune organisation dans cette plateforme.',
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
-      'Before starting the exercise, you can launch a comcheck to validate player email addresses and trigger a dryrun to send injects to the animation team.':
-        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails des joueurs et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+      'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
+        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'animation.",
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
       'Auto planner': 'Auto planificateur',
@@ -182,6 +182,13 @@ const i18n = {
       m: 'm',
       h: 'h',
       d: 'j',
+      'Do you want to change the status of this exercise?':
+        'Souhaitez-vous changer le statut de cet exercice ?',
+      Confirm: 'Confirmer',
+      'Sender email address': "Adresse email de l'expéditeur",
+      'Creation date': 'Date de création',
+      'Next inject': 'Prochain stimuli',
+      'Dangerous zone': 'Zone sensible',
     },
     en: {
       openex_email: 'Email',

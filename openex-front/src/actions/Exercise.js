@@ -25,6 +25,12 @@ export const updateExerciseTags = (exerciseId, data) => (dispatch) => putReferen
   data,
 )(dispatch);
 
+export const updateExerciseStatus = (exerciseId, status) => (dispatch) => putReferential(
+  schema.exercise,
+  `/api/exercises/${exerciseId}/status`,
+  status,
+)(dispatch);
+
 export const deleteExercise = (exerciseId) => (dispatch) => delReferential(
   `/api/exercises/${exerciseId}`,
   'exercises',

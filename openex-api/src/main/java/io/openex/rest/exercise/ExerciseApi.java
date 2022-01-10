@@ -288,7 +288,8 @@ public class ExerciseApi<T> extends RestBehavior {
     @Transactional
     @PutMapping("/api/exercises/{exerciseId}/status")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise changeExerciseStatus(@PathVariable String exerciseId, @Valid @RequestBody STATUS status) throws SchedulerException {
+    public Exercise changeExerciseStatus(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStatusInput input) {
+        STATUS status = input.getStatus();
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Check if next status is possible
         List<STATUS> nextPossibleStatus = exercise.nextPossibleStatus();
@@ -296,7 +297,7 @@ public class ExerciseApi<T> extends RestBehavior {
             throw new UnsupportedOperationException("Exercise cant support moving to status " + status.name());
         }
         // In case of rescheduled of an exercise.
-        if (CANCELED.equals(exercise.getStatus()) && SCHEDULED.equals(status)) {
+        if ((CANCELED.equals(exercise.getStatus()) || FINISHED.equals(exercise.getStatus())) && SCHEDULED.equals(status)) {
             exercise.setStart(null);
             exercise.setEnd(null);
             List<Inject<?>> cleanInjects = exercise.getInjects().stream().peek(inject -> {
@@ -313,8 +314,8 @@ public class ExerciseApi<T> extends RestBehavior {
         // If exercise move from pause to running state,
         // we log the pause date to be able to recompute inject dates.
         if (PAUSED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
-            exercise.setCurrentPause(null);
             Instant lastPause = exercise.getCurrentPause().orElseThrow();
+            exercise.setCurrentPause(null);
             Pause pause = new Pause();
             pause.setDate(lastPause);
             pause.setExercise(exercise);

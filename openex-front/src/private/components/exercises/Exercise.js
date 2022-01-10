@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 import { makeStyles, styled, useTheme } from '@mui/styles';
 import Typography from '@mui/material/Typography';
@@ -18,6 +18,8 @@ import {
   VideoSettingsOutlined,
   MarkEmailReadOutlined,
   CancelOutlined,
+  PauseOutlined,
+  RestartAltOutlined,
 } from '@mui/icons-material';
 import LinearProgress, {
   linearProgressClasses,
@@ -25,7 +27,14 @@ import LinearProgress, {
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
 import Countdown from 'react-countdown';
-import { updateExercise } from '../../../actions/Exercise';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import {
+  updateExercise,
+  updateExerciseStatus,
+} from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
 import { useStore } from '../../../store';
@@ -35,6 +44,7 @@ import { fetchAudiences } from '../../../actions/Audience';
 import Empty from '../../../components/Empty';
 import { distributionChartOptions } from '../../../utils/Charts';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { Transition } from '../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -113,13 +123,18 @@ const Exercise = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
+  const [openChangeStatus, setOpenChangeStatus] = useState(null);
   const { t, fldt } = useFormatter();
   const exercise = useStore((store) => store.getExercise(exerciseId));
   const { audiences } = exercise;
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
   });
-  const submitUpdate = (data) => updateExercise(exerciseId, data);
+  const submitUpdate = (data) => dispatch(updateExercise(exerciseId, data));
+  const submitUpdateStatus = (status) => {
+    dispatch(updateExerciseStatus(exerciseId, status));
+    setOpenChangeStatus(null);
+  };
   const initialValues = R.pipe(
     R.pick([
       'exercise_name',
@@ -147,6 +162,105 @@ const Exercise = () => {
   const maxInjectsNumber = Math.max(
     ...topAudiences.map((a) => a.audience_injects_number),
   );
+  const buttonExecution = () => {
+    switch (exercise.exercise_status) {
+      case 'SCHEDULED':
+        return (
+          <Button
+            variant="contained"
+            startIcon={<PlayArrowOutlined />}
+            color="success"
+            disabled={['FINISHED', 'CANCELED'].includes(
+              exercise.exercise_status,
+            )}
+            onClick={() => setOpenChangeStatus('RUNNING')}
+          >
+            {t('Start')}
+          </Button>
+        );
+      case 'RUNNING':
+        return (
+          <Button
+            variant="contained"
+            startIcon={<PauseOutlined />}
+            color="warning"
+            disabled={['FINISHED', 'CANCELED'].includes(
+              exercise.exercise_status,
+            )}
+            onClick={() => setOpenChangeStatus('PAUSED')}
+          >
+            {t('Pause')}
+          </Button>
+        );
+      case 'PAUSED':
+        return (
+          <Button
+            variant="contained"
+            startIcon={<PlayArrowOutlined />}
+            color="success"
+            disabled={['FINISHED', 'CANCELED'].includes(
+              exercise.exercise_status,
+            )}
+            onClick={() => setOpenChangeStatus('RUNNING')}
+          >
+            {t('Resume')}
+          </Button>
+        );
+      default:
+        return (
+          <Button
+            variant="contained"
+            startIcon={<PauseOutlined />}
+            color="warning"
+            disabled={['FINISHED', 'CANCELED'].includes(
+              exercise.exercise_status,
+            )}
+            onClick={() => setOpenChangeStatus('PAUSED')}
+          >
+            {t('Pause')}
+          </Button>
+        );
+    }
+  };
+  const buttonDangerous = () => {
+    switch (exercise.exercise_status) {
+      case 'RUNNING':
+      case 'PAUSED':
+        return (
+          <Button
+            variant="contained"
+            startIcon={<CancelOutlined />}
+            color="error"
+            onClick={() => setOpenChangeStatus('CANCELED')}
+          >
+            {t('Cancel')}
+          </Button>
+        );
+      case 'FINISHED':
+      case 'CANCELED':
+        return (
+          <Button
+            variant="contained"
+            startIcon={<RestartAltOutlined />}
+            color="warning"
+            onClick={() => setOpenChangeStatus('SCHEDULED')}
+          >
+            {t('Reset')}
+          </Button>
+        );
+      default:
+        return (
+          <Button
+            variant="contained"
+            startIcon={<CancelOutlined />}
+            color="error"
+            disabled={true}
+          >
+            {t('Cancel')}
+          </Button>
+        );
+    }
+  };
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
@@ -190,6 +304,7 @@ const Exercise = () => {
               <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Players')}</div>
+            <CheckCircleOutlineOutlined color="primary" sx={{ fontSize: 50 }} />
             <div className={classes.number}>
               {exercise?.exercise_users_number ?? '-'}
             </div>
@@ -215,7 +330,9 @@ const Exercise = () => {
                 {fldt(exercise.exercise_created_at)}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Sender mail address')}</Typography>
+                <Typography variant="h1">
+                  {t('Sender email address')}
+                </Typography>
                 {exercise.exercise_mail_from}
               </Grid>
             </Grid>
@@ -237,23 +354,11 @@ const Exercise = () => {
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Execution')}</Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<PlayArrowOutlined />}
-                  color="success"
-                >
-                  {t('Start')}
-                </Button>
+                {buttonExecution()}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Dangerous zone')}</Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<CancelOutlined />}
-                  color="error"
-                >
-                  {t('Cancel')}
-                </Button>
+                {buttonDangerous()}
               </Grid>
             </Grid>
           </Paper>
@@ -319,6 +424,34 @@ const Exercise = () => {
           </Paper>
         </Grid>
       </Grid>
+      <Dialog
+        open={Boolean(openChangeStatus)}
+        TransitionComponent={Transition}
+        onClose={() => setOpenChangeStatus(null)}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to change the status of this exercise?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setOpenChangeStatus(null)}
+          >
+            {t('Cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => submitUpdateStatus({ exercise_status: openChangeStatus })
+            }
+          >
+            {t('Confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

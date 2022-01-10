@@ -25,8 +25,8 @@ const styles = () => ({
 
 const inlineStyles = {
   white: {
-    backgroundColor: '#ffffff',
-    color: '#2b2b2b',
+    backgroundColor: 'rgb(231, 133, 109, 0.08)',
+    color: '#8d4e41',
   },
   green: {
     backgroundColor: 'rgba(76, 175, 80, 0.08)',
@@ -44,6 +44,10 @@ const inlineStyles = {
     backgroundColor: 'rgba(255, 152, 0, 0.08)',
     color: '#ff9800',
   },
+  grey: {
+    backgroundColor: 'rgba(96, 125, 139, 0.08)',
+    color: '#607d8b',
+  },
 };
 
 class ExerciseStatus extends Component {
@@ -53,6 +57,30 @@ class ExerciseStatus extends Component {
     } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (status) {
+      case 'SCHEDULED':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.blue}
+            label={t('Scheduled')}
+          />
+        );
+      case 'RUNNING':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.green}
+            label={t('Running')}
+          />
+        );
+      case 'PAUSED':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.orange}
+            label={t('Paused')}
+          />
+        );
       case 'CANCELED':
         return (
           <Chip
@@ -61,19 +89,11 @@ class ExerciseStatus extends Component {
             label={t('Canceled')}
           />
         );
-      case 'RUNNING':
-        return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.red}
-            label={t('Running')}
-          />
-        );
       case 'FINISHED':
         return (
           <Chip
             classes={{ root: style }}
-            style={inlineStyles.green}
+            style={inlineStyles.grey}
             label={t('Finished')}
           />
         );
