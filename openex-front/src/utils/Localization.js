@@ -37,6 +37,8 @@ const i18n = {
       'Create a new exercise': 'Créer un nouvel exercice',
       'Do you want to delete this player?':
         'Souhaitez-vous supprimer ce joueur ?',
+      'Do you want to delete this inject?':
+        'Souhaitez-vous supprimer ce stimuli ?',
       'Start date (optional)': 'Date de début (optionnel)',
       'Create a new player': 'Créer un nouveau joueur',
       'Update the player': 'Modifier le joueur',
@@ -166,7 +168,8 @@ const i18n = {
       'Processed injects': 'Stimulis traités',
       'Pending injects': 'Stimulis en attente',
       'No audience': 'Aucune audience',
-      'No processed injects in this exercise.': 'Aucun stimuli traité dans cet exercice.',
+      'No processed injects in this exercise.':
+        'Aucun stimuli traité dans cet exercice.',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_manual: 'Manuel (rappel)',

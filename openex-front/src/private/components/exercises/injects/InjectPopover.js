@@ -91,7 +91,7 @@ class InjectPopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteInject(this.props.inject.inject_id);
+    this.props.deleteInject(this.props.exerciseId, this.props.inject.inject_id);
     this.handleCloseDelete();
   }
 
