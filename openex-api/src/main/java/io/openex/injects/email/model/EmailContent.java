@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EmailContent implements AttachmentContent {
 
@@ -74,5 +75,19 @@ public class EmailContent implements AttachmentContent {
 
     public void setAttachments(List<InjectAttachment> attachments) {
         this.attachments = attachments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EmailContent that = (EmailContent) o;
+        return encrypted == that.encrypted && body.equals(that.body) && subject.equals(that.subject)
+                && attachments.equals(that.attachments);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(body, subject, encrypted, attachments);
     }
 }

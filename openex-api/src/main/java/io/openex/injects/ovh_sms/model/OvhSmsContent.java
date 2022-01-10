@@ -3,6 +3,8 @@ package io.openex.injects.ovh_sms.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.util.StringUtils;
 
+import java.util.Objects;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OvhSmsContent {
 
@@ -26,5 +28,18 @@ public class OvhSmsContent {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OvhSmsContent that = (OvhSmsContent) o;
+        return message.equals(that.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(message);
     }
 }
