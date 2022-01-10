@@ -27,6 +27,7 @@ import { storeBrowser } from '../../../../actions/Schema';
 import { fetchAudiences } from '../../../../actions/Audience';
 import CreateAudience from '../audiences/CreateAudience';
 import { truncate } from '../../../../utils/String';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 const styles = (theme) => ({
   createButton: {
@@ -117,7 +118,7 @@ class InjectAddAudiences extends Component {
 
   render() {
     const {
-      classes, t, audiences, injectAudiencesIds, exerciseId,
+      classes, t, audiences, injectAudiencesIds, exerciseId, exercise,
     } = this.props;
     const { keyword, audiencesIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -146,6 +147,7 @@ class InjectAddAudiences extends Component {
           divider={true}
           onClick={this.handleOpen.bind(this)}
           color="primary"
+          disabled={isExerciseReadOnly(exercise)}
         >
           <ListItemIcon color="primary">
             <ControlPointOutlined color="primary" />
@@ -253,6 +255,7 @@ class InjectAddAudiences extends Component {
 InjectAddAudiences.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   injectId: PropTypes.string,
   updateInjectAudiences: PropTypes.func,
   fetchAudiences: PropTypes.func,
@@ -266,6 +269,7 @@ const select = (state, ownProps) => {
   const { exerciseId } = ownProps;
   const exercise = browser.getExercise(exerciseId);
   return {
+    exercise,
     audiences: exercise.audiences,
     browser,
   };

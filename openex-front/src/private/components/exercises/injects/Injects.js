@@ -26,6 +26,7 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useStore } from '../../../../store';
+import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -71,9 +72,9 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 7,
     borderRadius: 0,
     width: 180,
-    backgroundColor: 'rgba(244, 67, 54, 0.08)',
-    color: '#f44336',
-    border: '1px solid #f44336',
+    backgroundColor: 'rgba(0, 177, 255, 0.08)',
+    color: '#00b1ff',
+    border: '1px solid #00b1ff',
   },
   drawerPaper: {
     minHeight: '100vh',
@@ -260,10 +261,6 @@ const Injects = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {filtering.filterAndSort(injects).map((inject) => {
-          const injectUsersNumber = inject?.inject_users_number ?? '-';
-          const impactedUsers = inject.inject_all_audiences
-            ? exercise.users.length
-            : injectUsersNumber;
           const duration = splitDuration(inject.inject_depends_duration || 0);
           return (
             <ListItem
@@ -300,15 +297,14 @@ const Injects = () => {
                         label={`${duration.days}
                             ${t('d')}, ${duration.hours}
                             ${t('h')}, ${duration.minutes}
-                            ${t('m')}, ${duration.seconds}
-                            ${t('s')}`}
+                            ${t('m')}`}
                       />
                     </div>
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.inject_players}
                     >
-                      {impactedUsers}
+                      {inject.inject_users_number}
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -321,7 +317,7 @@ const Injects = () => {
               />
               <ListItemSecondaryAction>
                 <InjectPopover
-                  exerciseId={exercise.exercise_id}
+                  exerciseId={exerciseId}
                   inject={inject}
                   injectTypes={injectTypes}
                 />
@@ -345,10 +341,12 @@ const Injects = () => {
           handleClose={() => setSelectedInject(null)}
         />
       </Drawer>
-      <CreateInject
-        injectTypes={injectTypes}
-        exerciseId={exercise.exercise_id}
-      />
+      {isExerciseUpdatable(exercise) && (
+        <CreateInject
+          injectTypes={injectTypes}
+          exerciseId={exercise.exercise_id}
+        />
+      )}
     </div>
   );
 };

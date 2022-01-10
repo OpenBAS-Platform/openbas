@@ -21,6 +21,7 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import AudiencePlayers from './AudiencePlayers';
 import { useStore } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
+import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -313,7 +314,9 @@ const Audiences = () => {
           handleClose={() => setSelectedAudience(null)}
         />
       </Drawer>
-      {exercise.user_can_update && <CreateAudience exerciseId={exerciseId} />}
+      {isExerciseUpdatable(exercise) && (
+        <CreateAudience exerciseId={exerciseId} />
+      )}
     </div>
   );
 };

@@ -34,6 +34,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../actions/Audience';
 import Empty from '../../../components/Empty';
 import { distributionChartOptions } from '../../../utils/Charts';
+import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -202,12 +203,12 @@ const Exercise = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Description')}</Typography>
-                {exercise.exercise_description || '-'}
+                <Typography variant="h1">{t('Subtitle')}</Typography>
+                {exercise.exercise_subtitle || '-'}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Start date')}</Typography>
-                {fldt(exercise.exercise_start_date) || t('Manual')}
+                <Typography variant="h1">{t('Description')}</Typography>
+                {exercise.exercise_description || '-'}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Creation date')}</Typography>
@@ -225,15 +226,14 @@ const Exercise = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
+                <Typography variant="h1">{t('Start date')}</Typography>
+                {fldt(exercise.exercise_start_date) || t('Manual')}
+              </Grid>
+              <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Next inject')}</Typography>
                 <div className={classes.countdown}>
                   <Countdown date={Date.now() + 500000} />
                 </div>
-              </Grid>
-              <Grid item={true} xs={6}>
-                <Alert severity="warning">
-                  {t('Cancelling the exercise is irreversible.')}
-                </Alert>
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Execution')}</Typography>
@@ -314,6 +314,7 @@ const Exercise = () => {
             <ExerciseParametersForm
               initialValues={initialValues}
               onSubmit={submitUpdate}
+              disabled={isExerciseReadOnly(exercise)}
             />
           </Paper>
         </Grid>

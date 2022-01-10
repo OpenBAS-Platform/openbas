@@ -28,6 +28,7 @@ import AudiencePopover from '../audiences/AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddAudiences from './InjectAddAudiences';
 import InjectContentForm from './InjectContentForm';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 const styles = (theme) => ({
   header: {
@@ -157,6 +158,7 @@ class InjectDefinition extends Component {
         'inject_title',
         'inject_type',
         'inject_description',
+        'inject_depends_duration',
         'inject_tags',
         'inject_content',
         'inject_all_audiences',
@@ -263,6 +265,7 @@ class InjectDefinition extends Component {
                   checked={R.propOr(false, 'inject_all_audiences', inject)}
                   onChange={this.toggleAll.bind(this)}
                   color="primary"
+                  disabled={isExerciseReadOnly(exercise)}
                 />
               }
               label={<strong>{t('All audiences')}</strong>}

@@ -27,19 +27,19 @@ const styles = () => ({
 
 const inlineStyles = {
   openex_email: {
-    backgroundColor: 'rgba(32, 58, 246, 0.08)',
-    color: '#203af6',
-    border: '1px solid #203af6',
+    backgroundColor: 'rgba(255, 87, 34, 0.08)',
+    color: '#ff5722',
+    border: '1px solid #ff5722',
   },
   openex_ovh_sms: {
-    backgroundColor: 'rgba(76, 175, 80, 0.08)',
-    color: '#4caf50',
-    border: '1px solid #4caf50',
+    backgroundColor: 'rgba(156, 39, 176, 0.08)',
+    color: '#9c27b0',
+    border: '1px solid #9c27b0',
   },
   openex_manual: {
-    backgroundColor: 'rgba(96, 125, 139, 0.08)',
-    color: '#607d8b',
-    border: '1px solid #607d8b',
+    backgroundColor: 'rgba(0, 150, 136, 0.08)',
+    color: '#009688',
+    border: '1px solid #009688',
   },
 };
 

@@ -9,7 +9,7 @@ import { useFormatter } from '../components/i18n';
 const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
   const { t } = useFormatter();
   const [order, setOrder] = useState({
-    sortBy: defaultSortKey,
+    sortBy: `${schema}_${defaultSortKey}`,
     orderAsc: true,
   });
   const [keyword, setKeyword] = useState('');

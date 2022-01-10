@@ -37,7 +37,6 @@ class InjectForm extends Component {
       'inject_depends_duration_days',
       'inject_depends_duration_hours',
       'inject_depends_duration_minutes',
-      'inject_depends_duration_seconds',
     ];
     requiredFields.forEach((field) => {
       if (R.isNil(values[field])) {
@@ -116,28 +115,21 @@ class InjectForm extends Component {
                 name="inject_depends_duration_days"
                 type="number"
                 label={t('Days')}
-                style={{ width: '15%' }}
+                style={{ width: '20%' }}
               />
               <TextField
                 variant="standard"
                 name="inject_depends_duration_hours"
                 type="number"
                 label={t('Hours')}
-                style={{ width: '15%' }}
+                style={{ width: '20%' }}
               />
               <TextField
                 variant="standard"
                 name="inject_depends_duration_minutes"
                 type="number"
                 label={t('Minutes')}
-                style={{ width: '15%' }}
-              />
-              <TextField
-                variant="standard"
-                name="inject_depends_duration_seconds"
-                type="number"
-                label={t('Seconds')}
-                style={{ width: '15%' }}
+                style={{ width: '20%' }}
               />
             </div>
             <div style={{ float: 'right', marginTop: 20 }}>

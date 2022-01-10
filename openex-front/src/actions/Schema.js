@@ -184,6 +184,8 @@ const _buildAudience = (state, aud) => {
   if (aud === undefined) return aud;
   return {
     ...aud,
+    // eslint-disable-next-line max-len
+    injects: R.values(state.referential.entities.injects).filter((n) => aud.audience_injects.includes(n.inject_id)),
     tags: aud.audience_tags
       .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])

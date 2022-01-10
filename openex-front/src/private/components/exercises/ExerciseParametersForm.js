@@ -19,7 +19,9 @@ class ExerciseParametersForm extends Component {
   }
 
   render() {
-    const { t, onSubmit, initialValues } = this.props;
+    const {
+      t, onSubmit, initialValues, disabled,
+    } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -39,6 +41,7 @@ class ExerciseParametersForm extends Component {
               name="exercise_mail_from"
               fullWidth={true}
               label={t('Mail sender address')}
+              disabled={disabled}
             />
             <TextField
               variant="standard"
@@ -48,6 +51,7 @@ class ExerciseParametersForm extends Component {
               rows={2}
               label={t('Messages header')}
               style={{ marginTop: 20 }}
+              disabled={disabled}
             />
             <TextField
               variant="standard"
@@ -57,6 +61,7 @@ class ExerciseParametersForm extends Component {
               rows={2}
               label={t('Messages footer')}
               style={{ marginTop: 20 }}
+              disabled={disabled}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
@@ -78,6 +83,7 @@ class ExerciseParametersForm extends Component {
 ExerciseParametersForm.propTypes = {
   t: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
 };
 
 export default inject18n(ExerciseParametersForm);

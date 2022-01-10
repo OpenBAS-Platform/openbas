@@ -21,6 +21,8 @@ import {
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -35,6 +37,7 @@ class InjectPopover extends Component {
       openEdit: false,
       openPopover: false,
       openTry: false,
+      openCopy: false,
     };
   }
 
@@ -62,14 +65,12 @@ class InjectPopover extends Component {
         'inject_depends_duration',
         data.inject_depends_duration_days * 3600 * 24
           + data.inject_depends_duration_hours * 3600
-          + data.inject_depends_duration_minutes * 60
-          + data.inject_depends_duration_seconds,
+          + data.inject_depends_duration_minutes * 60,
       ),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
       R.dissoc('inject_depends_duration_days'),
       R.dissoc('inject_depends_duration_hours'),
       R.dissoc('inject_depends_duration_minutes'),
-      R.dissoc('inject_depends_duration_seconds'),
     )(data);
     return this.props
       .updateInject(
@@ -115,7 +116,9 @@ class InjectPopover extends Component {
   }
 
   render() {
-    const { t, inject, injectTypes } = this.props;
+    const {
+      t, inject, injectTypes, exercise,
+    } = this.props;
     const injectTags = inject.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
@@ -130,6 +133,7 @@ class InjectPopover extends Component {
         'inject_description',
         'inject_tags',
         'inject_content',
+        'inject_audiences',
         'inject_all_audiences',
         'inject_country',
         'inject_city',
@@ -137,7 +141,6 @@ class InjectPopover extends Component {
       R.assoc('inject_depends_duration_days', duration.days),
       R.assoc('inject_depends_duration_hours', duration.hours),
       R.assoc('inject_depends_duration_minutes', duration.minutes),
-      R.assoc('inject_depends_duration_seconds', duration.seconds),
     )(inject);
     return (
       <div>
@@ -153,13 +156,19 @@ class InjectPopover extends Component {
           open={Boolean(this.state.anchorEl)}
           onClose={this.handlePopoverClose.bind(this)}
         >
-          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={isExerciseReadOnly(exercise)}
+          >
             {t('Update')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenTry.bind(this)}>
             {t('Try the inject')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={isExerciseReadOnly(exercise)}
+          >
             {t('Delete')}
           </MenuItem>
         </Menu>
@@ -243,13 +252,22 @@ class InjectPopover extends Component {
 InjectPopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   inject: PropTypes.object,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   injectTypes: PropTypes.array,
 };
 
+const select = (state, ownProps) => {
+  const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
+  return {
+    exercise: browser.getExercise(exerciseId),
+  };
+};
+
 export default R.compose(
-  connect(null, { updateInject, deleteInject, tryInject }),
+  connect(select, { updateInject, deleteInject, tryInject }),
   inject18n,
 )(InjectPopover);

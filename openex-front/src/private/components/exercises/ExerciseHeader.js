@@ -36,7 +36,7 @@ const useStyles = makeStyles(() => ({
   },
   tag: {
     overflow: 'hidden',
-    marginRight: 7,
+    marginLeft: 5,
   },
   tagsInput: {
     overflow: 'hidden',

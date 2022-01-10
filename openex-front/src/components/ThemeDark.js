@@ -6,8 +6,7 @@ export default () => ({
       main: '#00b1ff',
     },
     secondary: {
-      main: '#01478DFF',
-      transparent: 'rgba(0,130,209,0.2)',
+      main: '#e91e63',
     },
     background: {
       default: '#0a1929',
