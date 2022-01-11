@@ -134,8 +134,8 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     // region transient
     @JsonIgnore
     @Override
-    public boolean isUserObserver(User user) {
-        return getExercise().isUserObserver(user);
+    public boolean isUserHasAccess(User user) {
+        return getExercise().isUserHasAccess(user);
     }
 
     @JsonProperty("inject_users_number")

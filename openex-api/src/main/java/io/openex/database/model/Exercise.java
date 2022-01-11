@@ -151,10 +151,13 @@ public class Exercise implements Base {
         return grants.stream()
                 .filter(grant -> asList(types).contains(grant.getName()))
                 .map(Grant::getGroup)
-                .flatMap(group -> group.getUsers().stream()).toList();
+                .flatMap(group -> group.getUsers().stream())
+                .distinct()
+                .toList();
     }
 
-    @JsonIgnore
+    @JsonProperty("exercise_planners")
+    @JsonSerialize(using = MultiModelDeserializer.class)
     public List<User> getPlanners() {
         return getUsersByType(PLANNER);
     }
@@ -166,7 +169,7 @@ public class Exercise implements Base {
 
     @JsonIgnore
     @Override
-    public boolean isUserObserver(User user) {
+    public boolean isUserHasAccess(User user) {
         return user.isAdmin() || getObservers().stream().map(User::getId).anyMatch(u -> u.equals(user.getId()));
     }
 

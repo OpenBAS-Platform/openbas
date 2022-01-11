@@ -168,7 +168,7 @@ public class InjectApi<T> extends RestBehavior {
         return injectRepository.findAll(InjectSpecification.executable()).stream()
                 // Keep only injects visible by the user
                 .filter(inject -> inject.getDate().isPresent())
-                .filter(inject -> inject.getExercise().isUserObserver(currentUser()))
+                .filter(inject -> inject.getExercise().isUserHasAccess(currentUser()))
                 // Order by near execution
                 .sorted(Inject.executionComparator)
                 // Keep only the expected size

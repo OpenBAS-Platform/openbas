@@ -44,7 +44,7 @@ public class Tag implements Base {
 
     @JsonIgnore
     @Override
-    public boolean isUserObserver(User user) {
+    public boolean isUserHasAccess(User user) {
         return true;
     }
 

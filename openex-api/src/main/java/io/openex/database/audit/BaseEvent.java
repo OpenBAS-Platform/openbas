@@ -64,6 +64,6 @@ public class BaseEvent {
 
     @JsonIgnore
     public boolean isUserObserver(User listener) {
-        return instance.isUserObserver(listener);
+        return instance.isUserHasAccess(listener);
     }
 }

@@ -94,8 +94,8 @@ public class Audience implements Base {
 
     @JsonIgnore
     @Override
-    public boolean isUserObserver(User user) {
-        return getExercise().isUserObserver(user);
+    public boolean isUserHasAccess(User user) {
+        return getExercise().isUserHasAccess(user);
     }
     // endregion
 

@@ -153,7 +153,6 @@ export const arrayOfLogs = new schema.Array(log);
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
-const _resolveMe = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
 const _buildUser = (state, usr) => {
   if (usr === undefined) return usr;
   return {
@@ -171,6 +170,7 @@ const _buildUser = (state, usr) => {
     ),
   };
 };
+const _resolveMe = (state) => _buildUser(state, state.referential.entities.users[R.path(['logged', 'user'], state.app)]);
 const _buildOrganization = (state, org) => {
   if (org === undefined) return org;
   return {
@@ -219,11 +219,12 @@ const _buildExercise = (state, id, ex) => {
     (n) => n.inject_exercise === id,
     R.values(state.referential.entities.injects),
   ).map((a) => _buildInject(state, a));
+  const me = _resolveMe(state);
   return {
     ...ex,
     exercise_id: id,
-    user_can_update: _resolveMe(state)?.user_grants[id]?.user_can_update || false,
-    user_can_delete: _resolveMe(state)?.user_grants[id]?.user_can_delete || false,
+    user_can_update: me?.admin || (ex.exercise_planners || []).includes(me?.user_id),
+    user_can_delete: me?.admin,
     tags: ex.exercise_tags
       .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
@@ -267,7 +268,7 @@ export const storeBrowser = (state) => ({
       ([k, v]) => ({ [k]: v.setting_value }),
     ),
   ),
-  me: _buildUser(state, _resolveMe(state)),
+  me: _resolveMe(state),
   statistics: state.referential.entities.statistics?.openex,
   getUser(id) {
     return _buildUser(state, state.referential.entities.users[id]);
