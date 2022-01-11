@@ -1,7 +1,9 @@
 package io.openex.rest.user;
 
+import io.openex.database.model.Exercise;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
+import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TokenRepository;
 import io.openex.database.repository.UserRepository;
@@ -9,6 +11,8 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.me.UpdateProfileInput;
 import io.openex.rest.user.form.user.UpdatePasswordInput;
 import io.openex.rest.user.form.user.UpdateUserInfoInput;
+import io.openex.rest.user.response.BaseGrant;
+import io.openex.rest.user.response.UserWithGrants;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.config.AppConfig.updateSessionUser;
@@ -32,9 +39,15 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 public class MeApi extends RestBehavior {
 
     private OrganizationRepository organizationRepository;
+    private ExerciseRepository exerciseRepository;
     private TokenRepository tokenRepository;
     private UserRepository userRepository;
     private UserService userService;
+
+    @Autowired
+    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
 
     @Autowired
     public void setOrganizationRepository(OrganizationRepository organizationRepository) {
@@ -64,8 +77,18 @@ public class MeApi extends RestBehavior {
 
     @RolesAllowed(ROLE_USER)
     @GetMapping("/api/me")
-    public User me() {
-        return userRepository.findById(currentUser().getId()).orElseThrow();
+    public UserWithGrants me() {
+        User user = userRepository.findById(currentUser().getId()).orElseThrow();
+        Iterable<Exercise> exercises = user.isAdmin() ? exerciseRepository.findAll()
+                : exerciseRepository.findAllGranted(user.getId());
+        // Compute exercises grants.
+        Map<String, BaseGrant> userBaseGrants = fromIterable(exercises).stream()
+                .map(exercise -> {
+                    boolean userCanUpdate = user.isAdmin() || exercise.getPlanners().contains(user);
+                    return new BaseGrant(exercise.getId(), userCanUpdate, user.isAdmin());
+                }).collect(Collectors.toMap(BaseGrant::getBaseId, Function.identity()));
+        // Add more grants on different objects if needed.
+        return UserWithGrants.from(user, userBaseGrants);
     }
 
     @RolesAllowed(ROLE_USER)
