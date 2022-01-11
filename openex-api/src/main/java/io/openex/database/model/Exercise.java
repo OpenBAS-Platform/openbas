@@ -328,10 +328,6 @@ public class Exercise implements Base {
         this.pauses = pauses;
     }
 
-    public void addPause(Pause pause) {
-        this.pauses.add(pause);
-    }
-
     public List<Audience> getAudiences() {
         return audiences;
     }

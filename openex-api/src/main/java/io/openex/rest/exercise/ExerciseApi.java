@@ -8,6 +8,7 @@ import io.openex.database.specification.DryRunSpecification;
 import io.openex.database.specification.ExerciseLogSpecification;
 import io.openex.injects.base.AttachmentContent;
 import io.openex.injects.base.InjectAttachment;
+import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.exercise.export.ExerciseFileExport;
 import io.openex.rest.exercise.export.ExerciseFileImport;
 import io.openex.rest.exercise.export.ExerciseImport;
@@ -60,6 +61,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     // region repositories
     private TagRepository tagRepository;
+    private PauseRepository pauseRepository;
     private GroupRepository groupRepository;
     private GrantRepository grantRepository;
     private DocumentRepository documentRepository;
@@ -77,6 +79,11 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setPauseRepository(PauseRepository pauseRepository) {
+        this.pauseRepository = pauseRepository;
+    }
+
     @Autowired
     public void setGrantRepository(GrantRepository grantRepository) {
         this.grantRepository = grantRepository;
@@ -248,9 +255,13 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/start_date")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseInformation(@PathVariable String exerciseId,
-                                              @Valid @RequestBody ExerciseUpdateStartDateInput input) {
+    public Exercise updateExerciseStart(@PathVariable String exerciseId,
+                                        @Valid @RequestBody ExerciseUpdateStartDateInput input) throws InputValidationException {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        if (!exercise.getStatus().equals(SCHEDULED)) {
+            String message = "Change date is only possible in scheduling state";
+            throw new InputValidationException("exercise_start_date", message);
+        }
         exercise.setUpdateAttributes(input);
         return exerciseRepository.save(exercise);
     }
@@ -308,11 +319,12 @@ public class ExerciseApi<T> extends RestBehavior {
         if ((CANCELED.equals(exercise.getStatus()) || FINISHED.equals(exercise.getStatus())) && SCHEDULED.equals(status)) {
             exercise.setStart(null);
             exercise.setEnd(null);
-            List<Inject<?>> cleanInjects = exercise.getInjects().stream().peek(inject -> {
+            List<Inject<T>> exerciseInjects = injectRepository.findAllForExercise(exerciseId);
+            List<Inject<T>> cleanInjects = exerciseInjects.stream().peek(inject -> {
                 inject.setStatus(null);
                 inject.setOutcome(null);
             }).toList();
-            exercise.setInjects(cleanInjects);
+            injectRepository.saveAll(cleanInjects);
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
@@ -328,12 +340,13 @@ public class ExerciseApi<T> extends RestBehavior {
             pause.setDate(lastPause);
             pause.setExercise(exercise);
             pause.setDuration(between(lastPause, now()).getSeconds());
-            exercise.addPause(pause);
+            pauseRepository.save(pause);
         }
         // If pause is asked, just set the pause date.
         if (RUNNING.equals(exercise.getStatus()) && PAUSED.equals(status)) {
             exercise.setCurrentPause(Instant.now());
         }
+        exercise.setUpdatedAt(now());
         exercise.setStatus(status);
         return exerciseRepository.save(exercise);
     }

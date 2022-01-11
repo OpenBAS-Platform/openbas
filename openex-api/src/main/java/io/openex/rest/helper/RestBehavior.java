@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import io.openex.rest.exception.InputValidationException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,18 @@ public class RestBehavior {
             String errorMessage = error.getDefaultMessage();
             errorsBag.put(jsonFieldsMapping.get(fieldName), new ValidationContent(errorMessage));
         });
+        errors.setChildren(errorsBag);
+        bag.setErrors(errors);
+        return bag;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(InputValidationException.class)
+    public ValidationErrorBag handleInputValidationExceptions(InputValidationException ex) {
+        ValidationErrorBag bag = new ValidationErrorBag();
+        ValidationError errors = new ValidationError();
+        Map<String, ValidationContent> errorsBag = new HashMap<>();
+        errorsBag.put(ex.getField(), new ValidationContent(ex.getMessage()));
         errors.setChildren(errorsBag);
         bag.setErrors(errors);
         return bag;

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +17,9 @@ public interface InjectRepository<T> extends CrudRepository<Inject<T>, String>, 
 
     @NotNull
     Optional<Inject<T>> findById(@NotNull String id);
+
+    @Query(value = "select i from Inject i where i.exercise.id = :exerciseId")
+    List<Inject<T>> findAllForExercise(@Param("exerciseId") String exerciseId);
 
     @Override
     @Query("select count(distinct i) from Inject i " +

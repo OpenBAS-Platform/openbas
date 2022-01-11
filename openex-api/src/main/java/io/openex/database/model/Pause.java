@@ -2,7 +2,6 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -13,7 +12,6 @@ import java.util.Optional;
 
 @Entity
 @Table(name = "pauses")
-@EntityListeners(ModelBaseListener.class)
 public class Pause implements Base {
     @Id
     @Column(name = "pause_id")
