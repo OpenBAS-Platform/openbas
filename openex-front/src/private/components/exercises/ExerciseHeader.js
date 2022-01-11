@@ -77,7 +77,6 @@ const ExerciseHeader = () => {
       }),
     );
   };
-
   const { tags } = exercise;
   return (
     <div className={classes.container}>

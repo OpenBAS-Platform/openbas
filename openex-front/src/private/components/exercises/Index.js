@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import Exercise from './Exercise';
 import { fetchExercise } from '../../../actions/Exercise';
+import { fetchTags } from '../../../actions/Tag';
 import Loader from '../../../components/Loader';
 import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
@@ -25,8 +26,8 @@ const Index = () => {
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const exercise = useStore((store) => store.getExercise(exerciseId));
-
   useDataLoader(() => {
+    dispatch(fetchTags());
     dispatch(fetchExercise(exerciseId));
   });
 

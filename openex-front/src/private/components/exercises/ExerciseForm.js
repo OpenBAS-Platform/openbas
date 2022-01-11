@@ -64,16 +64,18 @@ class ExerciseForm extends Component {
                 style={{ marginTop: 20 }}
               />
             )}
-            <DateTimePicker
-              name="exercise_start_date"
-              label={t('Start date (optional)')}
-              autoOk={true}
-              textFieldProps={{
-                variant: 'standard',
-                fullWidth: true,
-                style: { marginTop: 20 },
-              }}
-            />
+            {!editing && (
+              <DateTimePicker
+                name="exercise_start_date"
+                label={t('Start date (optional)')}
+                autoOk={true}
+                textFieldProps={{
+                  variant: 'standard',
+                  fullWidth: true,
+                  style: { marginTop: 20 },
+                }}
+              />
+            )}
             {!editing && (
               <TagField
                 name="exercise_tags"

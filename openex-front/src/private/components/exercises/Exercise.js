@@ -45,6 +45,7 @@ import Empty from '../../../components/Empty';
 import { distributionChartOptions } from '../../../utils/Charts';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { Transition } from '../../../utils/Environment';
+import ExerciseDatePopover from './ExerciseDatePopover';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -140,7 +141,6 @@ const Exercise = () => {
       'exercise_name',
       'exercise_description',
       'exercise_subtitle',
-      'exercise_start_date',
       'exercise_message_header',
       'exercise_message_footer',
       'exercise_mail_from',
@@ -304,7 +304,6 @@ const Exercise = () => {
               <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Players')}</div>
-            <CheckCircleOutlineOutlined color="primary" sx={{ fontSize: 50 }} />
             <div className={classes.number}>
               {exercise?.exercise_users_number ?? '-'}
             </div>
@@ -343,7 +342,11 @@ const Exercise = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Start date')}</Typography>
+                <Typography variant="h1" style={{ float: 'left' }}>
+                  {t('Start date')}
+                </Typography>
+                <ExerciseDatePopover exercise={exercise} />
+                <div className="clearfix" />
                 {fldt(exercise.exercise_start_date) || t('Manual')}
               </Grid>
               <Grid item={true} xs={6}>

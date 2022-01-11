@@ -96,7 +96,6 @@ class ExercisePopover extends Component {
         'exercise_name',
         'exercise_subtitle',
         'exercise_description',
-        'exercise_start_date',
         'exercise_mail_from',
         'exercise_message_header',
         'exercise_message_footer',
