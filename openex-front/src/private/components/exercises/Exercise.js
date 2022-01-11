@@ -271,11 +271,11 @@ const Exercise = () => {
             style={{ display: 'flex' }}
           >
             <div className={classes.icon}>
-              {iconStatus(exercise.exercise_status)}
+              {iconStatus(exercise?.exercise_status)}
             </div>
             <div>
               <div className={classes.title}>{t('Status')}</div>
-              <ExerciseStatus status={exercise.exercise_status} />
+              <ExerciseStatus status={exercise?.exercise_status} />
             </div>
             <div className={classes.progress}>
               <BorderLinearProgress
@@ -318,21 +318,21 @@ const Exercise = () => {
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Subtitle')}</Typography>
-                {exercise.exercise_subtitle || '-'}
+                {exercise?.exercise_subtitle || '-'}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Description')}</Typography>
-                {exercise.exercise_description || '-'}
+                {exercise?.exercise_description || '-'}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Creation date')}</Typography>
-                {fldt(exercise.exercise_created_at)}
+                {fldt(exercise?.exercise_created_at)}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">
                   {t('Sender email address')}
                 </Typography>
-                {exercise.exercise_mail_from}
+                {exercise?.exercise_mail_from}
               </Grid>
             </Grid>
           </Paper>
@@ -347,7 +347,7 @@ const Exercise = () => {
                 </Typography>
                 <ExerciseDatePopover exercise={exercise} />
                 <div className="clearfix" />
-                {fldt(exercise.exercise_start_date) || t('Manual')}
+                {fldt(exercise?.exercise_start_date) || t('Manual')}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Next inject')}</Typography>
