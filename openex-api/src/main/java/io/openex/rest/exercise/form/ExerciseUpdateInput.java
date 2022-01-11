@@ -21,13 +21,13 @@ public class ExerciseUpdateInput {
 
     @Email(message = EMAIL_FORMAT)
     @JsonProperty("exercise_mail_from")
-    private String mailFrom;
+    private String replyTo;
 
     @JsonProperty("exercise_message_header")
-    private String messageHeader;
+    private String header;
 
     @JsonProperty("exercise_message_footer")
-    private String messageFooter;
+    private String footer;
 
     public String getName() {
         return name;
@@ -53,23 +53,27 @@ public class ExerciseUpdateInput {
         this.subtitle = subtitle;
     }
 
-    public String getMessageFooter() {
-        return messageFooter;
+    public String getReplyTo() {
+        return replyTo;
     }
 
-    public void setMessageFooter(String messageFooter) {
-        this.messageFooter = messageFooter;
+    public void setReplyTo(String replyTo) {
+        this.replyTo = replyTo;
     }
 
-    public String getMessageHeader() {
-        return messageHeader;
+    public String getHeader() {
+        return header;
     }
 
-    public String getMailFrom() {
-        return mailFrom;
+    public void setHeader(String header) {
+        this.header = header;
     }
 
-    public void setMailFrom(String mailFrom) {
-        this.mailFrom = mailFrom;
+    public String getFooter() {
+        return footer;
+    }
+
+    public void setFooter(String footer) {
+        this.footer = footer;
     }
 }
