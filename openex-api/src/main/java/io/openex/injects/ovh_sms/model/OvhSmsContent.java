@@ -35,7 +35,7 @@ public class OvhSmsContent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OvhSmsContent that = (OvhSmsContent) o;
-        return message.equals(that.message);
+        return Objects.equals(message, that.message);
     }
 
     @Override

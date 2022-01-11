@@ -82,8 +82,8 @@ public class EmailContent implements AttachmentContent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EmailContent that = (EmailContent) o;
-        return encrypted == that.encrypted && body.equals(that.body) && subject.equals(that.subject)
-                && attachments.equals(that.attachments);
+        return encrypted == that.encrypted && Objects.equals(body, that.body)
+                && Objects.equals(subject, that.subject) && Objects.equals(attachments, that.attachments);
     }
 
     @Override

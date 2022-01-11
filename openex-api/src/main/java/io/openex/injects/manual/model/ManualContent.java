@@ -22,7 +22,7 @@ public class ManualContent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ManualContent that = (ManualContent) o;
-        return content.equals(that.content);
+        return Objects.equals(content, that.content);
     }
 
     @Override
