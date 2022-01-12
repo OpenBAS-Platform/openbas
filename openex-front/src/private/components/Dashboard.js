@@ -123,7 +123,6 @@ const Dashboard = (props) => {
   const maxInjectsNumber = Math.max(
     ...(topOrganizations || []).map((a) => a.organization_injects_number),
   );
-  const nextInjects = injects?.filter((i) => !i.inject_date);
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
@@ -241,9 +240,9 @@ const Dashboard = (props) => {
             {t('Next injects to send')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
-            {nextInjects?.length > 0 ? (
+            {injects?.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
-                {nextInjects.map((inject) => (
+                {injects.map((inject) => (
                   <ListItem
                     key={inject.inject_id}
                     dense={true}
@@ -251,7 +250,7 @@ const Dashboard = (props) => {
                     classes={{ root: classes.item }}
                     divider={true}
                     component={Link}
-                    to={'/exercises/'}
+                    to={`/exercises/${inject.inject_exercise}/animation`}
                   >
                     <ListItemIcon>
                       <NotificationsOutlined />
@@ -263,7 +262,7 @@ const Dashboard = (props) => {
                             className={classes.bodyItem}
                             style={{ width: '50%' }}
                           >
-                            Alert in our SIEM about unsual traffic
+                            {inject.inject_title}
                           </div>
                           <div
                             className={classes.bodyItem}
@@ -344,7 +343,7 @@ const select = (state) => {
     exercises: browser.exercises,
     organizations: browser.organizations,
     statistics: browser.statistics,
-    injects: browser.injects,
+    injects: browser.next_injects,
   };
 };
 

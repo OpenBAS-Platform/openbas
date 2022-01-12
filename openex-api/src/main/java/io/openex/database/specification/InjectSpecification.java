@@ -14,6 +14,17 @@ public class InjectSpecification {
         return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
     }
 
+    public static <T> Specification<Inject<T>> next() {
+        return (root, query, cb) -> {
+            Path<Object> exercisePath = root.get("exercise");
+            return cb.and(
+                    cb.equal(root.get("enabled"), true), // isEnable
+                    cb.isNotNull(exercisePath.get("start")), // fromScheduled
+                    cb.isNull(root.join("status", JoinType.LEFT).get("name")) // notExecuted
+            );
+        };
+    }
+
     public static <T> Specification<Inject<T>> executable() {
         return (root, query, cb) -> {
             Path<Object> exercisePath = root.get("exercise");

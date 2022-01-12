@@ -70,7 +70,7 @@ export const tryInject = (injectId) => (dispatch) => {
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
 
 export const injectDone = (injectId) => (dispatch) => {
-  const data = { status: 'SUCCESS', message: ['Manual validation'] };
+  const data = { status: 'SUCCESS', message: 'Manual validation' };
   const uri = `/api/injects/${injectId}/status`;
-  return postReferential(null, uri, data)(dispatch);
+  return postReferential(schema.inject, uri, data)(dispatch);
 };

@@ -256,6 +256,12 @@ export const storeBrowser = (state) => ({
   users: R.values(state.referential.entities.users).map((usr) => _buildUser(state, usr)),
   tags: R.values(state.referential.entities.tags),
   groups: R.values(state.referential.entities.groups),
+  next_injects: R.take(10, R.sort(
+    (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime(),
+    R.values(state.referential.entities.injects)
+      .filter((i) => i.inject_date !== null)
+      .map((i) => _buildInject(state, i)),
+  )),
   inject_types: R.values(state.referential.entities.inject_types),
   // eslint-disable-next-line max-len
   organizations: R.values(state.referential.entities.organizations).map((org) => _buildOrganization(state, org)),

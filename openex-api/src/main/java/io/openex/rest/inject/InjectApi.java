@@ -1,12 +1,10 @@
 package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
-import io.openex.database.model.Audience;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Inject;
-import io.openex.database.model.InjectTypes;
+import io.openex.database.model.*;
 import io.openex.database.repository.AudienceRepository;
 import io.openex.database.repository.ExerciseRepository;
+import io.openex.database.repository.InjectReportingRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.InjectSpecification;
 import io.openex.model.ExecutableInject;
@@ -16,13 +14,14 @@ import io.openex.model.UserInjectContext;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.InjectInput;
 import io.openex.rest.inject.form.InjectUpdateActivationInput;
+import io.openex.rest.inject.form.InjectUpdateStatusInput;
 import io.openex.rest.inject.form.UpdateAudiencesInjectInput;
-import io.openex.rest.inject.response.InjectNext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +31,7 @@ import static io.openex.config.AppConfig.currentUser;
 import static io.openex.helper.DatabaseHelper.resolveRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.model.ExecutionStatus.ERROR;
+import static java.time.Instant.now;
 import static java.util.List.of;
 
 @RestController
@@ -41,9 +41,15 @@ public class InjectApi<T> extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private InjectRepository<T> injectRepository;
+    private InjectReportingRepository<T> injectReportingRepository;
     private AudienceRepository audienceRepository;
     private ApplicationContext context;
     private List<Contract> contracts;
+
+    @Autowired
+    public void setInjectReportingRepository(InjectReportingRepository<T> injectReportingRepository) {
+        this.injectReportingRepository = injectReportingRepository;
+    }
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -153,6 +159,23 @@ public class InjectApi<T> extends RestBehavior {
         return injectRepository.save(inject);
     }
 
+    @Transactional
+    @PostMapping("/api/injects/{injectId}/status")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject<T> setInjectStatus(@PathVariable String injectId,
+                                     @Valid @RequestBody InjectUpdateStatusInput input) {
+        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+        InjectStatus injectStatus = new InjectStatus();
+        injectStatus.setInject(inject);
+        injectStatus.setDate(now());
+        injectStatus.setName(input.getStatus());
+        injectStatus.setExecutionTime(0);
+        injectStatus.setReporting(new StatusReporting(of(input.getMessage())));
+        injectReportingRepository.save(injectStatus);
+        inject.setStatus(injectStatus);
+        return injectRepository.save(inject);
+    }
+
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Inject<T> updateInjectAudiences(@PathVariable String injectId,
@@ -164,8 +187,8 @@ public class InjectApi<T> extends RestBehavior {
     }
 
     @GetMapping("/api/injects/next")
-    public List<InjectNext> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
-        return injectRepository.findAll(InjectSpecification.executable()).stream()
+    public List<Inject<T>> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
+        return injectRepository.findAll(InjectSpecification.next()).stream()
                 // Keep only injects visible by the user
                 .filter(inject -> inject.getDate().isPresent())
                 .filter(inject -> inject.getExercise().isUserHasAccess(currentUser()))
@@ -173,8 +196,6 @@ public class InjectApi<T> extends RestBehavior {
                 .sorted(Inject.executionComparator)
                 // Keep only the expected size
                 .limit(size.orElse(MAX_NEXT_INJECTS))
-                // Map to NextInject to keep only useful information
-                .map(i -> new InjectNext(i.getTitle(), i.getDescription(), i.getType(), i.getDate().get()))
                 // Collect the result
                 .toList();
     }
