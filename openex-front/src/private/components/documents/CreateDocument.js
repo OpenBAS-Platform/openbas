@@ -41,7 +41,7 @@ const CreateDocument = (props) => {
       type: 'application/json',
     });
     formData.append('input', blob);
-    props.addDocument(formData).then(() => setOpen(false));
+    return props.addDocument(formData).then(() => setOpen(false));
   };
 
   return (

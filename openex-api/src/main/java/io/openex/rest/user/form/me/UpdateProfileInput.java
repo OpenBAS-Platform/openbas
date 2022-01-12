@@ -28,6 +28,9 @@ public class UpdateProfileInput {
     @JsonProperty("user_lang")
     private String lang;
 
+    @JsonProperty("user_theme")
+    private String theme;
+
     public String getEmail() {
         return email;
     }
@@ -67,4 +70,8 @@ public class UpdateProfileInput {
     public void setLang(String lang) {
         this.lang = lang;
     }
+
+    public String getTheme() { return theme; }
+
+    public void setTheme(String theme) { this.theme = theme; }
 }

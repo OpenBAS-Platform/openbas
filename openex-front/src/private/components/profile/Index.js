@@ -91,6 +91,7 @@ const Index = (props) => {
       'user_phone2',
       'user_pgp_key',
       'user_lang',
+      'user_theme',
     ]),
   )(user);
   const userToken = userTokens.length > 0 ? R.head(userTokens) : undefined;

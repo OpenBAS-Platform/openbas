@@ -15,7 +15,7 @@ import {
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import inject18n from '../../../components/i18n';
-import { fetchDocuments } from '../../../actions/Document';
+import { fetchDocuments, downloadDocument } from '../../../actions/Document';
 import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
@@ -249,6 +249,7 @@ class Documents extends Component {
           <ListItem
             classes={{ root: classes.itemHead }}
             divider={false}
+            button={true}
             style={{ paddingTop: 0 }}
           >
             <ListItemIcon>
@@ -279,6 +280,8 @@ class Documents extends Component {
               key={document.document_id}
               classes={{ root: classes.item }}
               divider={true}
+              button={true}
+              onClick={() => this.props.downloadDocument(document.document_id)}
             >
               <ListItemIcon>
                 <DescriptionOutlined />
@@ -333,6 +336,7 @@ Documents.propTypes = {
   nsdt: PropTypes.func,
   documents: PropTypes.array,
   fetchDocuments: PropTypes.func,
+  downloadDocument: PropTypes.func,
   userAdmin: PropTypes.bool,
 };
 
@@ -345,7 +349,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchDocuments }),
+  connect(select, { fetchDocuments, downloadDocument }),
   inject18n,
   withStyles(styles),
 )(Documents);

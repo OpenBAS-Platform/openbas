@@ -86,14 +86,14 @@ const useStyles = makeStyles(() => ({
   tickLabelTop: {
     position: 'absolute',
     left: -28,
-    top: '-8%',
+    top: -20,
     width: 100,
     fontSize: 10,
   },
   tickLabelBottom: {
     position: 'absolute',
     left: -28,
-    bottom: '-8%',
+    bottom: -20,
     width: 100,
     fontSize: 10,
   },

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
@@ -79,6 +80,7 @@ class DocumentForm extends Component {
                 color="primary"
                 type="submit"
                 disabled={pristine || submitting}
+                startIcon={submitting && <CircularProgress size={20} />}
               >
                 {editing ? t('Update') : t('Create')}
               </Button>

@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
 import Button from '@mui/material/Button';
+import FormHelperText from '@mui/material/FormHelperText';
 import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
 
@@ -21,20 +22,15 @@ const FileFieldInput = ({
     ...dropZoneProps,
   });
   const files = acceptedFiles.map((file) => (
-    <div key={file.path} style={{ float: 'left', margin: '8px 0 0 10px' }}>
+    <FormHelperText key={file.path} focused={true}>
       {file.path} - {bytesFormat(file.size).number}
       {bytesFormat(file.size).symbol}
-    </div>
+    </FormHelperText>
   ));
   return (
     <div {...getRootProps()} style={{ marginTop: 20 }}>
       <input {...getInputProps()} />
-      <Button
-        {...props}
-        variant="outlined"
-        color="primary"
-        style={{ float: 'left' }}
-      >
+      <Button {...props} variant="outlined" color="primary">
         {t('Select a file')}
       </Button>
       {files}
@@ -49,7 +45,9 @@ const FileField = ({ name, ...props }) => (
     <Field
       name={name}
       subscribe={{ touched: true, error: true }}
-      render={({ meta: { touched, error } }) => (touched && error ? <span>{error}</span> : null)
+      render={({ meta: { touched, error } }) => (touched && error ? (
+          <FormHelperText error={true}>{error}</FormHelperText>
+      ) : null)
       }
     />
   </>

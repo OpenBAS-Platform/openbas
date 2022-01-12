@@ -53,6 +53,24 @@ class UserForm extends Component {
             />
             <Select
               variant="standard"
+              label={t('Theme')}
+              name="user_theme"
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              disabled={true}
+            >
+              <MenuItem key="default" value="default">
+                {t('Default')}
+              </MenuItem>
+              <MenuItem key="dark" value="dark">
+                {t('Dark')}
+              </MenuItem>
+              <MenuItem key="light" value="light">
+                {t('Light')}
+              </MenuItem>
+            </Select>
+            <Select
+              variant="standard"
               label={t('Language')}
               name="user_lang"
               fullWidth={true}

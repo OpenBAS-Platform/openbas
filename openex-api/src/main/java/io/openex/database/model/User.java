@@ -51,6 +51,10 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_lang")
     private String lang = "auto";
 
+    @Column(name = "user_theme")
+    @JsonProperty("user_theme")
+    private String theme = "default";
+
     @Column(name = "user_email")
     @JsonProperty("user_email")
     private String email;
@@ -201,6 +205,10 @@ public class User implements Base, OAuth2User {
     public void setLang(String lang) {
         this.lang = lang;
     }
+
+    public String getTheme() { return theme; }
+
+    public void setTheme(String theme) { this.theme = theme; }
 
     public String getFirstname() {
         return firstname;

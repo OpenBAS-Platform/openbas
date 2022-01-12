@@ -5,6 +5,7 @@ import * as R from 'ramda';
 import { connect } from 'react-redux';
 import themeDark from './ThemeDark';
 import themeLight from './ThemeLight';
+import { storeBrowser } from '../actions/Schema';
 
 const AppThemeProvider = (props) => {
   const { children, userTheme, platformTheme } = props;
@@ -23,8 +24,10 @@ AppThemeProvider.propTypes = {
 };
 
 const select = (state) => {
-  const platformTheme = R.pathOr('auto', ['parameters', 'theme'], state.app);
-  const userTheme = R.pathOr('auto', ['logged', 'theme'], state.app);
+  const browser = storeBrowser(state);
+  const { settings, me } = browser;
+  const platformTheme = R.propOr('auto', 'platform_theme', settings);
+  const userTheme = R.propOr('auto', 'user_theme', me);
   return { platformTheme, userTheme };
 };
 
