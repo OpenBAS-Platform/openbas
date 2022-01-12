@@ -299,7 +299,7 @@ jobs:
             chmod a+x ~/.docker/cli-plugins/docker-buildx
             docker buildx install
             # Run binfmt
-            docker run --rm --privileged tonistiigi/binfmt:latest --install "$BUILDX_PLATFORMS" --reset -p yes
+            docker run --rm --privileged tonistiigi/binfmt:latest --install "$BUILDX_PLATFORMS"
             docker buildx create --name multiarch --driver docker-container --use
             docker buildx inspect --bootstrap
       - run:
