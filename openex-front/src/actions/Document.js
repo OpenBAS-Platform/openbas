@@ -4,7 +4,6 @@ import {
   postReferential,
   delReferential,
   putReferential,
-  fileDownload,
 } from '../utils/Action';
 
 export const fetchDocuments = () => (dispatch) => getReferential(schema.arrayOfDocuments, '/api/documents')(dispatch);
@@ -26,5 +25,3 @@ export const deleteDocument = (documentId) => (dispatch) => {
   const uri = `/api/documents/${documentId}`;
   return delReferential(uri, 'documents', documentId)(dispatch);
 };
-
-export const downloadDocument = (documentId) => (dispatch) => fileDownload(`/api/documents/${documentId}/file`)(dispatch);

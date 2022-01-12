@@ -269,6 +269,7 @@ const Injects = () => {
               divider={true}
               button={true}
               onClick={() => setSelectedInject(inject.inject_id)}
+              disabled={!inject.inject_enabled}
             >
               <ListItemIcon>
                 <InjectIcon type={inject.inject_type} />
@@ -320,6 +321,7 @@ const Injects = () => {
                   exerciseId={exerciseId}
                   inject={inject}
                   injectTypes={injectTypes}
+                  setSelectedInject={setSelectedInject}
                 />
               </ListItemSecondaryAction>
             </ListItem>

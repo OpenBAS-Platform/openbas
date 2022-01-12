@@ -67,11 +67,6 @@ export const tryInject = (injectId) => (dispatch) => {
   return getReferential(null, uri, null)(dispatch);
 };
 
-export const shiftAllInjects = (exerciseId, data) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/injects`;
-  return putReferential(schema.arrayOfInjects, uri, data)(dispatch);
-};
-
 export const fetchInjectTypes = () => (dispatch) => getReferential(schema.arrayOfInjectTypes, '/api/inject_types')(dispatch);
 
 export const injectDone = (injectId) => (dispatch) => {

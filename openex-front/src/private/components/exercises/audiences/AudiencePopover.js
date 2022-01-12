@@ -138,9 +138,11 @@ class AudiencePopover extends Component {
               {t('Remove from the inject')}
             </MenuItem>
           )}
-          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
-            {t('Delete')}
-          </MenuItem>
+          {!injectId && (
+            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+              {t('Delete')}
+            </MenuItem>
+          )}
         </Menu>
         <Dialog
           open={this.state.openDelete}

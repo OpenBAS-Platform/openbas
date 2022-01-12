@@ -14,11 +14,12 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import LinearProgress from '@mui/material/LinearProgress';
 import Countdown from 'react-countdown';
+import Drawer from '@mui/material/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useStore } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../../actions/Audience';
-import { fetchInjects } from '../../../../actions/Inject';
+import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -28,6 +29,7 @@ import { splitDuration } from '../../../../utils/Time';
 import InjectPopover from '../injects/InjectPopover';
 import InjectStatus from '../injects/InjectStatus';
 import { truncate } from '../../../../utils/String';
+import InjectDefinition from '../injects/InjectDefinition';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -124,6 +126,11 @@ const useStyles = makeStyles(() => ({
   countdown: {
     fontWeight: 600,
   },
+  drawerPaper: {
+    minHeight: '100vh',
+    width: '50%',
+    padding: 0,
+  },
 }));
 
 const date = Date.now();
@@ -132,14 +139,17 @@ const Animation = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
-  const { t } = useFormatter();
+  const { t, fndt } = useFormatter();
   const exercise = useStore((store) => store.getExercise(exerciseId));
+  const injectTypes = useStore((store) => store.inject_types);
   const { audiences, injects } = exercise;
+  const [selectedInject, setSelectedInject] = useState(null);
   const [currentDate, setCurrentDate] = useState(Date.now());
   useEffect(() => {
     setInterval(() => setCurrentDate(Date.now()), 1000);
   }, []);
   useDataLoader(() => {
+    dispatch(fetchInjectTypes());
     dispatch(fetchAudiences(exerciseId));
     dispatch(fetchInjects(exerciseId));
   });
@@ -168,8 +178,14 @@ const Animation = () => {
       }
     }
   });
-  const pendingInjects = injects.filter((i) => i.inject_status === null);
-  const processedInjects = injects.filter((i) => i.inject_status !== null);
+  const pendingInjects = R.sortWith(
+    [R.ascend(R.prop('inject_depends_duration'))],
+    injects.filter((i) => i.inject_status === null),
+  );
+  const processedInjects = R.sortWith(
+    [R.descend(R.prop('inject_depends_duration'))],
+    injects.filter((i) => i.inject_status !== null),
+  );
   return (
     <div className={classes.root}>
       <div className={classes.parameters}>
@@ -249,8 +265,8 @@ const Animation = () => {
                     className={classes.tick}
                     style={{
                       left: `${index * 5}%`,
-                      height: index % 5 === 0 ? '110%' : '100%',
-                      top: index % 5 === 0 ? '-5%' : 0,
+                      height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
+                      top: index % 5 === 0 ? -15 : 0,
                       borderRight:
                         index % 5 === 0
                           ? '1px solid rgba(255, 255, 255, 0.25)'
@@ -350,6 +366,8 @@ const Animation = () => {
                       dense={true}
                       classes={{ root: classes.item }}
                       divider={true}
+                      button={true}
+                      onClick={() => setSelectedInject(inject.inject_id)}
                     >
                       <ListItemIcon>
                         <InjectIcon
@@ -421,13 +439,13 @@ const Animation = () => {
                         <div>
                           <div
                             className={classes.bodyItem}
-                            style={{ width: '50%' }}
+                            style={{ width: '40%' }}
                           >
                             {inject.inject_title}
                           </div>
                           <div
                             className={classes.bodyItem}
-                            style={{ width: '25%' }}
+                            style={{ width: '20%' }}
                           >
                             <InjectStatus
                               variant="list"
@@ -444,11 +462,11 @@ const Animation = () => {
                               float: 'right',
                             }}
                           >
-                            {t('Executed in')}&nbsp;
+                            {fndt(inject.inject_status.status_date)} (
                             {(
                               inject.inject_status.status_execution / 1000
                             ).toFixed(2)}
-                            s
+                            s)
                           </div>
                         </div>
                       }
@@ -462,6 +480,21 @@ const Animation = () => {
           </Paper>
         </Grid>
       </Grid>
+      <Drawer
+        open={selectedInject !== null}
+        keepMounted={false}
+        anchor="right"
+        sx={{ zIndex: 1202 }}
+        classes={{ paper: classes.drawerPaper }}
+        onClose={() => setSelectedInject(null)}
+      >
+        <InjectDefinition
+          injectId={selectedInject}
+          exerciseId={exercise.exercise_id}
+          injectTypes={injectTypes}
+          handleClose={() => setSelectedInject(null)}
+        />
+      </Drawer>
     </div>
   );
 };

@@ -13,10 +13,13 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Alert from '@mui/material/Alert';
 import {
   updateInject,
   deleteInject,
   tryInject,
+  updateInjectActivation,
+  injectDone,
 } from '../../../../actions/Inject';
 import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
@@ -38,6 +41,9 @@ class InjectPopover extends Component {
       openPopover: false,
       openTry: false,
       openCopy: false,
+      openEnable: false,
+      openDisable: false,
+      openDone: false,
     };
   }
 
@@ -115,9 +121,76 @@ class InjectPopover extends Component {
     this.handleCloseTry();
   }
 
+  handleOpenEnable() {
+    this.setState({
+      openEnable: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseEnable() {
+    this.setState({
+      openEnable: false,
+    });
+  }
+
+  submitEnable() {
+    this.props.updateInjectActivation(
+      this.props.exerciseId,
+      this.props.inject.inject_id,
+      { inject_enabled: true },
+    );
+    this.handleCloseEnable();
+  }
+
+  handleOpenDisable() {
+    this.setState({
+      openDisable: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseDisable() {
+    this.setState({
+      openDisable: false,
+    });
+  }
+
+  submitDisable() {
+    this.props.updateInjectActivation(
+      this.props.exerciseId,
+      this.props.inject.inject_id,
+      { inject_enabled: false },
+    );
+    this.handleCloseDisable();
+  }
+
+  handleOpenDone() {
+    this.setState({
+      openDone: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseDone() {
+    this.setState({
+      openDone: false,
+    });
+  }
+
+  submitDone() {
+    this.props.injectDone(this.props.inject.inject_id);
+    this.handleCloseDone();
+  }
+
+  handleOpenEditContent() {
+    this.props.setSelectedInject(this.props.inject.inject_id);
+    this.handlePopoverClose();
+  }
+
   render() {
     const {
-      t, inject, injectTypes, exercise,
+      t, inject, injectTypes, exercise, setSelectedInject,
     } = this.props;
     const injectTags = inject.tags.map((tag) => ({
       id: tag.tag_id,
@@ -162,9 +235,42 @@ class InjectPopover extends Component {
           >
             {t('Update')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenTry.bind(this)}>
-            {t('Try the inject')}
-          </MenuItem>
+          {setSelectedInject && (
+            <MenuItem
+              onClick={this.handleOpenEditContent.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Update content')}
+            </MenuItem>
+          )}
+          {!inject.inject_status && inject.inject_type === 'openex_manual' && (
+            <MenuItem
+              onClick={this.handleOpenDone.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Mark as done')}
+            </MenuItem>
+          )}
+          {inject.inject_type !== 'openex_manual' && (
+            <MenuItem onClick={this.handleOpenTry.bind(this)}>
+              {t('Try the inject')}
+            </MenuItem>
+          )}
+          {inject.inject_enabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Disable')}
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Enable')}
+            </MenuItem>
+          )}
           <MenuItem
             onClick={this.handleOpenDelete.bind(this)}
             disabled={isExerciseReadOnly(exercise)}
@@ -224,7 +330,10 @@ class InjectPopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to try this inject?')}
+              <p>{t('Do you want to try this inject?')}</p>
+              <Alert severity="info">
+                {t('The inject will only be sent to you.')}
+              </Alert>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -244,6 +353,87 @@ class InjectPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openEnable}
+          onClose={this.handleCloseEnable.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to enable this inject?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              {t('Enable')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openDisable}
+          onClose={this.handleCloseDisable.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to disable this inject?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              {t('Disable')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openDone}
+          onClose={this.handleCloseDone.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to mark this inject as done?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseDone.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitDone.bind(this)}
+            >
+              {t('Mark')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -257,6 +447,9 @@ InjectPopover.propTypes = {
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
   injectTypes: PropTypes.array,
+  updateInjectActivation: PropTypes.func,
+  injectDone: PropTypes.func,
+  setSelectedInject: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
@@ -268,6 +461,12 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { updateInject, deleteInject, tryInject }),
+  connect(select, {
+    updateInject,
+    deleteInject,
+    tryInject,
+    updateInjectActivation,
+    injectDone,
+  }),
   inject18n,
 )(InjectPopover);

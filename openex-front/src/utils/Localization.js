@@ -201,6 +201,22 @@ const i18n = {
       textarea: 'Zone de texte',
       checkbox: 'Case à cocher',
       attachment: 'Fichier',
+      'Do you want to try this inject?': 'Souhaitez-vous tester ce stimuli ?',
+      'The inject will only be sent to you.':
+        'Le stimuli sera uniquement envoyé à vous même.',
+      Try: 'Tester',
+      Disable: 'Désactiver',
+      Enable: 'Activer',
+      'Mark as done': 'Marquer comme fait',
+      'Do you want to mark this inject as done?':
+        'Souhaitez-vous marquer ce stimuli comme fait ?',
+      Mark: 'Marquer',
+      'Do you want to disable this inject?':
+        'Souhaitez-vous désactiver ce stimuli ?',
+      'Do you want to enable this inject?':
+        'Souhaitez-vous activer ce stimuli ?',
+      Trigger: 'Déclencheur',
+      'Update content': 'Modifier le contenu',
     },
     en: {
       openex_email: 'Email',

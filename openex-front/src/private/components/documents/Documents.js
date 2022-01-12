@@ -15,7 +15,7 @@ import {
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import inject18n from '../../../components/i18n';
-import { fetchDocuments, downloadDocument } from '../../../actions/Document';
+import { fetchDocuments } from '../../../actions/Document';
 import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
@@ -281,7 +281,7 @@ class Documents extends Component {
               classes={{ root: classes.item }}
               divider={true}
               button={true}
-              component='a'
+              component="a"
               href={`/api/documents/${document.document_id}/file`}
             >
               <ListItemIcon>
@@ -337,7 +337,6 @@ Documents.propTypes = {
   nsdt: PropTypes.func,
   documents: PropTypes.array,
   fetchDocuments: PropTypes.func,
-  downloadDocument: PropTypes.func,
   userAdmin: PropTypes.bool,
 };
 
@@ -350,7 +349,7 @@ const select = (state) => {
 };
 
 export default R.compose(
-  connect(select, { fetchDocuments, downloadDocument }),
+  connect(select, { fetchDocuments }),
   inject18n,
   withStyles(styles),
 )(Documents);
