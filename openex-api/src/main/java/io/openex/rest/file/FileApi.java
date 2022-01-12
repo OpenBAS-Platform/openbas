@@ -12,11 +12,15 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @RestController
@@ -87,6 +91,16 @@ public class FileApi extends RestBehavior {
         document.setUpdateAttributes(input);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
+    }
+
+    @GetMapping("/api/documents/{documentId}/file")
+    public void downloadDocument(@PathVariable String documentId, HttpServletResponse response) throws IOException {
+        Document document = documentRepository.findById(documentId).orElseThrow();
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+        response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
+        response.setStatus(HttpServletResponse.SC_OK);
+        InputStream fileStream = fileService.getFile(document.getName()).orElseThrow();
+        fileStream.transferTo(response.getOutputStream());
     }
 
     @DeleteMapping("/api/documents/{documentId}")
