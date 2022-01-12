@@ -61,6 +61,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     // region repositories
     private TagRepository tagRepository;
+    private OutcomeRepository outcomeRepository;
     private PauseRepository pauseRepository;
     private GroupRepository groupRepository;
     private GrantRepository grantRepository;
@@ -71,6 +72,7 @@ public class ExerciseApi<T> extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private AudienceRepository audienceRepository;
     private InjectRepository<T> injectRepository;
+    private InjectReportingRepository<T> injectReportingRepository;
     // endregion
 
     // region services
@@ -79,6 +81,16 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setOutcomeRepository(OutcomeRepository outcomeRepository) {
+        this.outcomeRepository = outcomeRepository;
+    }
+
+    @Autowired
+    public void setInjectReportingRepository(InjectReportingRepository<T> injectReportingRepository) {
+        this.injectReportingRepository = injectReportingRepository;
+    }
+
     @Autowired
     public void setPauseRepository(PauseRepository pauseRepository) {
         this.pauseRepository = pauseRepository;
@@ -320,11 +332,14 @@ public class ExerciseApi<T> extends RestBehavior {
             exercise.setStart(null);
             exercise.setEnd(null);
             List<Inject<T>> exerciseInjects = injectRepository.findAllForExercise(exerciseId);
-            List<Inject<T>> cleanInjects = exerciseInjects.stream().peek(inject -> {
-                inject.setStatus(null);
-                inject.setOutcome(null);
-            }).toList();
-            injectRepository.saveAll(cleanInjects);
+            // Delete all exercise injects status
+            injectReportingRepository.deleteAll(exerciseInjects.stream()
+                    .map(Inject::getStatus).filter(Optional::isPresent)
+                    .map(Optional::get).toList());
+            // Delete all exercise injects outcomes
+            outcomeRepository.deleteAll(exerciseInjects.stream()
+                    .map(Inject::getOutcome).filter(Optional::isPresent)
+                    .map(Optional::get).toList());
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {

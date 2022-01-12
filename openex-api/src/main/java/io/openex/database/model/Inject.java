@@ -13,6 +13,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -156,10 +157,13 @@ public abstract class Inject<T> extends Injection<T> implements Base {
                 .map(inject -> inject.computeInjectDate(source, speed))
                 .orElse(source);
         Instant standardExecutionDate = dependingStart.plusSeconds(duration);
-        long pauseDelay = getExercise().getPauses().stream()
+        long previousPauseDelay = getExercise().getPauses().stream()
                 .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
                 .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
-        return standardExecutionDate.plusSeconds(pauseDelay);
+        long currentPauseDelay = exercise.getCurrentPause()
+                .map(last -> last.isBefore(standardExecutionDate) ? Duration.between(last, now()).getSeconds() : 0L)
+                .orElse(0L);
+        return standardExecutionDate.plusSeconds(previousPauseDelay + currentPauseDelay);
     }
 
     @JsonProperty("inject_date")
@@ -235,8 +239,8 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.type = type;
     }
 
-    public Outcome getOutcome() {
-        return outcome;
+    public Optional<Outcome> getOutcome() {
+        return ofNullable(outcome);
     }
 
     public void setOutcome(Outcome outcome) {
