@@ -189,6 +189,7 @@ const i18n = {
       'Creation date': 'Date de création',
       'Next inject': 'Prochain stimuli',
       'Dangerous zone': 'Zone sensible',
+      'Invalid user or password': "Nom d'utilisateur ou mot de passe incorrect",
     },
     en: {
       openex_email: 'Email',

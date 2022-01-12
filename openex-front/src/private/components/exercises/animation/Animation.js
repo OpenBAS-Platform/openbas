@@ -27,6 +27,7 @@ import InjectIcon from '../injects/InjectIcon';
 import { splitDuration } from '../../../../utils/Time';
 import InjectPopover from '../injects/InjectPopover';
 import InjectStatus from '../injects/InjectStatus';
+import { truncate } from '../../../../utils/String';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -196,7 +197,7 @@ const Animation = () => {
                 <div className={classes.name}>
                   <CastForEducationOutlined fontSize="small" />
                   &nbsp;&nbsp;
-                  {audience.audience_name}
+                  {truncate(audience.audience_name, 20)}
                 </div>
               </div>
             ))}
