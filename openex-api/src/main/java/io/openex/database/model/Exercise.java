@@ -167,6 +167,15 @@ public class Exercise implements Base {
         return getUsersByType(PLANNER, OBSERVER);
     }
 
+    @JsonProperty("exercise_next_inject_date")
+    public Optional<Instant> getNextInjectInstant() {
+        return getInjects().stream()
+                .filter(inject -> inject.getStatus().isEmpty())
+                .filter(inject -> inject.getDate().isPresent())
+                .filter(inject -> inject.getDate().get().isAfter(now()))
+                .findFirst().flatMap(Inject::getDate);
+    }
+
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
