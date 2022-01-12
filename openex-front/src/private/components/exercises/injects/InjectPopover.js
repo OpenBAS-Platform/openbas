@@ -243,7 +243,7 @@ class InjectPopover extends Component {
               {t('Update content')}
             </MenuItem>
           )}
-          {!inject.inject_status && inject.inject_type === 'openex_manual' && (
+          {!inject.inject_status && (
             <MenuItem
               onClick={this.handleOpenDone.bind(this)}
               disabled={isExerciseReadOnly(exercise)}
