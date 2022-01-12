@@ -3,8 +3,8 @@ import {
   getReferential,
   postReferential,
   delReferential,
-  fileSave,
   putReferential,
+  fileDownload,
 } from '../utils/Action';
 
 export const fetchDocuments = () => (dispatch) => getReferential(schema.arrayOfDocuments, '/api/documents')(dispatch);
@@ -27,4 +27,4 @@ export const deleteDocument = (documentId) => (dispatch) => {
   return delReferential(uri, 'documents', documentId)(dispatch);
 };
 
-export const downloadDocument = (documentId, documentName) => (dispatch) => fileSave(`/api/files/${documentId}`, documentName)(dispatch);
+export const downloadDocument = (documentId) => (dispatch) => fileDownload(`/api/documents/${documentId}/file`)(dispatch);

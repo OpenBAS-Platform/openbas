@@ -281,7 +281,8 @@ class Documents extends Component {
               classes={{ root: classes.item }}
               divider={true}
               button={true}
-              onClick={() => this.props.downloadDocument(document.document_id)}
+              component='a'
+              href={`/api/documents/${document.document_id}/file`}
             >
               <ListItemIcon>
                 <DescriptionOutlined />
