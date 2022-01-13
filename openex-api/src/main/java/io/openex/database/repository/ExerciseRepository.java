@@ -36,4 +36,10 @@ public interface ExerciseRepository extends CrudRepository<Exercise, String>, St
     @Override
     @Query("select count(distinct e) from Exercise e where e.createdAt < :creationDate")
     long globalCount(@Param("creationDate") Instant creationDate);
+
+    @Query(value = "select e.* from exercises e " +
+            "left join injects as inject on e.exercise_id = inject.inject_exercise " +
+            "left join injects_statuses as status on inject.inject_id = status.status_inject " +
+            "where e.exercise_status = 'RUNNING' group by e.exercise_id having count(status) = count(inject);", nativeQuery = true)
+    List<Exercise> thatMustBeFinished();
 }

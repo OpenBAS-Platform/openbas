@@ -183,10 +183,9 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/dryruns")
-    public Dryrun createDryrun(@PathVariable String exerciseId,
-                               @Valid @RequestBody DryRunCreateInput input) {
+    public Dryrun createDryrun(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        return dryrunService.provisionDryrun(exercise, input.getSpeed());
+        return dryrunService.provisionDryrun(exercise);
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
@@ -328,18 +327,13 @@ public class ExerciseApi<T> extends RestBehavior {
             throw new UnsupportedOperationException("Exercise cant support moving to status " + status.name());
         }
         // In case of rescheduled of an exercise.
-        if ((CANCELED.equals(exercise.getStatus()) || FINISHED.equals(exercise.getStatus())) && SCHEDULED.equals(status)) {
+        boolean isCloseState = CANCELED.equals(exercise.getStatus()) || FINISHED.equals(exercise.getStatus());
+        if (isCloseState && SCHEDULED.equals(status)) {
             exercise.setStart(null);
             exercise.setEnd(null);
-            List<Inject<T>> exerciseInjects = injectRepository.findAllForExercise(exerciseId);
-            // Delete all exercise injects status
-            injectReportingRepository.deleteAll(exerciseInjects.stream()
-                    .map(Inject::getStatus).filter(Optional::isPresent)
-                    .map(Optional::get).toList());
-            // Delete all exercise injects outcomes
-            outcomeRepository.deleteAll(exerciseInjects.stream()
-                    .map(Inject::getOutcome).filter(Optional::isPresent)
-                    .map(Optional::get).toList());
+            exercise.setCurrentPause(null);
+            injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
+                    .stream().peek(Inject::clean).toList());
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {

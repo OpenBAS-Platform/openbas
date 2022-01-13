@@ -1,9 +1,9 @@
 package io.openex.helper;
 
-import io.openex.database.model.Audience;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Injection;
-import io.openex.database.repository.*;
+import io.openex.database.model.*;
+import io.openex.database.repository.AudienceRepository;
+import io.openex.database.repository.DryInjectRepository;
+import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.DryInjectSpecification;
 import io.openex.database.specification.InjectSpecification;
 import io.openex.model.ExecutableInject;
@@ -28,18 +28,6 @@ public class InjectHelper<T> {
     private InjectRepository<T> injectRepository;
     private DryInjectRepository<T> dryInjectRepository;
     private AudienceRepository audienceRepository;
-    private InjectReportingRepository<T> injectReportingRepository;
-    private DryInjectReportingRepository<T> dryInjectReportingRepository;
-
-    @Autowired
-    public void setInjectReportingRepository(InjectReportingRepository<T> injectReportingRepository) {
-        this.injectReportingRepository = injectReportingRepository;
-    }
-
-    @Autowired
-    public void setDryInjectReportingRepository(DryInjectReportingRepository<T> dryInjectReportingRepository) {
-        this.dryInjectReportingRepository = dryInjectReportingRepository;
-    }
 
     @Autowired
     public void setAudienceRepository(AudienceRepository audienceRepository) {
@@ -84,20 +72,17 @@ public class InjectHelper<T> {
 
     @Transactional
     public List<ExecutableInject<T>> getInjectsToRun() {
-        // region injects
-        Stream<ExecutableInject<T>> injects = injectRepository.findAll(InjectSpecification.executable()).stream()
-                .map(i -> i.setStatusRepository(injectReportingRepository))
+        // Get injects
+        List<Inject<T>> executableInjects = injectRepository.findAll(InjectSpecification.executable());
+        Stream<ExecutableInject<T>> injects = executableInjects.stream()
                 .filter(this::isInInjectableRange)
                 .map(inject -> new ExecutableInject<>(inject, buildUsersFromInject(inject)));
-        // endregion
-        // region dry injects
-        Stream<ExecutableInject<T>> dryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable()).stream()
-                .map(i -> i.setStatusRepository(dryInjectReportingRepository))
+        // Get dry injects
+        List<DryInject<T>> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
+        Stream<ExecutableInject<T>> dryInjects = executableDryInjects.stream()
                 .filter(this::isInInjectableRange)
                 .map(inject -> new ExecutableInject<>(inject, buildUsersFromInject(inject)));
-        // endregion
+        // Combine injects and dry
         return concat(injects, dryInjects).collect(Collectors.toList());
     }
-
-
 }

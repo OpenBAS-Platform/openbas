@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.database.repository.InjectReportingRepository;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
-import io.openex.model.Execution;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -26,6 +24,8 @@ import static java.util.Optional.ofNullable;
 @DiscriminatorColumn(name = "inject_type")
 @EntityListeners(ModelBaseListener.class)
 public abstract class Inject<T> extends Injection<T> implements Base {
+
+    private static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
     public enum STATUS {
         SUCCESS
@@ -103,11 +103,11 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonProperty("inject_user")
     private User user;
 
-    @OneToOne(mappedBy = "inject", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonProperty("inject_status")
     private InjectStatus status;
 
-    @OneToOne(mappedBy = "inject", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonProperty("inject_outcome")
     private Outcome outcome;
 
@@ -129,14 +129,17 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
 
-    @Transient
-    private InjectReportingRepository<T> statusRepository;
-
     // region transient
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
         return getExercise().isUserHasAccess(user);
+    }
+
+    @JsonIgnore
+    public void clean() {
+        setStatus(null);
+        setOutcome(null);
     }
 
     @JsonProperty("inject_users_number")
@@ -169,7 +172,7 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonProperty("inject_date")
     public Optional<Instant> getDate() {
         return getExercise().getStart()
-                .map(source -> computeInjectDate(source, 1));
+                .map(source -> computeInjectDate(source, SPEED_STANDARD));
     }
 
     @JsonIgnore
@@ -185,17 +188,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonIgnore
     public boolean isFutureInject() {
         return getDate().map(date -> date.isAfter(now())).orElse(false);
-    }
-
-    @JsonIgnore
-    public Inject<T> setStatusRepository(InjectReportingRepository<T> statusRepository) {
-        this.statusRepository = statusRepository;
-        return this;
-    }
-
-    @Override
-    public void report(Execution execution) {
-        statusRepository.executionSave(execution, this);
     }
     // endregion
 
@@ -340,13 +332,13 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     protected abstract DryInject<T> toDry();
 
     @JsonIgnore
-    public DryInject<T> toDryInject(Dryrun run, int speed) {
+    public DryInject<T> toDryInject(Dryrun run) {
         DryInject<T> dryInject = toDry();
         dryInject.setTitle(getTitle());
         dryInject.setType(getType());
         dryInject.setContent(getContent());
         dryInject.setRun(run);
-        dryInject.setDate(computeInjectDate(run.getDate(), speed));
+        dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
         return dryInject;
     }
 

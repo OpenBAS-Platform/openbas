@@ -1,6 +1,5 @@
 package io.openex.database.model;
 
-import io.openex.model.Execution;
 import io.openex.model.Executor;
 
 import javax.persistence.Transient;
@@ -39,7 +38,4 @@ public abstract class Injection<T> {
 
     @Transient
     public abstract boolean isGlobalInject();
-
-    @Transient
-    public abstract void report(Execution execution);
 }

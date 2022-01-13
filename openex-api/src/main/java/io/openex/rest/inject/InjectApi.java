@@ -37,7 +37,7 @@ import static java.util.List.of;
 @RestController
 public class InjectApi<T> extends RestBehavior {
 
-    private static final int MAX_NEXT_INJECTS = 10;
+    private static final int MAX_NEXT_INJECTS = 6;
 
     private ExerciseRepository exerciseRepository;
     private InjectRepository<T> injectRepository;

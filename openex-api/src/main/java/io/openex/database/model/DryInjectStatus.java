@@ -2,17 +2,18 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.audit.ModelBaseListener;
 import io.openex.database.converter.StatusReportingConverter;
+import io.openex.model.Execution;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 
+import static java.time.Instant.now;
+
 @Entity
 @Table(name = "dryinjects_statuses")
-@EntityListeners(ModelBaseListener.class)
 public class DryInjectStatus implements Base {
     @Id
     @Column(name = "status_id")
@@ -42,6 +43,19 @@ public class DryInjectStatus implements Base {
     @JoinColumn(name = "status_dryinject")
     @JsonIgnore
     private DryInject<?> dryInject;
+
+    // region transient
+    @JsonIgnore
+    public static <T> DryInjectStatus fromExecution(Execution execution, DryInject<T> dry) {
+        DryInjectStatus injectStatus = new DryInjectStatus();
+        injectStatus.setDryInject(dry);
+        injectStatus.setDate(now());
+        injectStatus.setExecutionTime(execution.getExecution());
+        injectStatus.setName(execution.getStatus().name());
+        injectStatus.setReporting(execution.getReporting());
+        return injectStatus;
+    }
+    // endregion
 
     public String getId() {
         return id;

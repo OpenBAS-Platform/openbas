@@ -3,15 +3,15 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.database.repository.DryInjectReportingRepository;
 import io.openex.helper.MonoModelDeserializer;
-import io.openex.model.Execution;
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
@@ -47,7 +47,7 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
     @JsonProperty("dryinject_dryrun")
     private Dryrun run;
 
-    @OneToOne(mappedBy = "dryInject", fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonProperty("dryinject_status")
     private DryInjectStatus status;
 
@@ -63,22 +63,6 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
     public List<Audience> getAudiences() {
         return new ArrayList<>();
     }
-
-    // region transient
-    @Transient
-    private DryInjectReportingRepository<T> statusRepository;
-
-    @JsonIgnore
-    public DryInject<T> setStatusRepository(DryInjectReportingRepository<T> statusRepository) {
-        this.statusRepository = statusRepository;
-        return this;
-    }
-
-    @Override
-    public void report(Execution execution) {
-        statusRepository.executionSave(execution, this);
-    }
-    // endregion
 
     public String getId() {
         return id;
