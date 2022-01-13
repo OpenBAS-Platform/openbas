@@ -170,7 +170,10 @@ const _buildUser = (state, usr) => {
     ),
   };
 };
-const _resolveMe = (state) => _buildUser(state, state.referential.entities.users[R.path(['logged', 'user'], state.app)]);
+const _resolveMe = (state) => _buildUser(
+  state,
+  state.referential.entities.users[R.path(['logged', 'user'], state.app)],
+);
 const _buildOrganization = (state, org) => {
   if (org === undefined) return org;
   return {
@@ -219,11 +222,20 @@ const _buildExercise = (state, id, ex) => {
     (n) => n.inject_exercise === id,
     R.values(state.referential.entities.injects),
   ).map((a) => _buildInject(state, a));
+  const getDryruns = () => R.filter(
+    (n) => n.dryrun_exercise === id,
+    R.values(state.referential.entities.dryruns),
+  ).map((a) => _buildAudience(state, a));
+  const getComchecks = () => R.filter(
+    (n) => n.comcheck_exercise === id,
+    R.values(state.referential.entities.comchecks),
+  ).map((a) => _buildAudience(state, a));
   const me = _resolveMe(state);
   return {
     ...ex,
     exercise_id: id,
-    user_can_update: me?.admin || (ex.exercise_planners || []).includes(me?.user_id),
+    user_can_update:
+      me?.admin || (ex.exercise_planners || []).includes(me?.user_id),
     user_can_delete: me?.admin,
     tags: ex.exercise_tags
       .asMutable()
@@ -235,6 +247,8 @@ const _buildExercise = (state, id, ex) => {
     ),
     injects: getInjects(),
     audiences: getAudiences(),
+    comchecks: getComchecks(),
+    dryruns: getDryruns(),
     users: getAudiences()
       .map((a) => a.users)
       .flat(),
@@ -256,12 +270,15 @@ export const storeBrowser = (state) => ({
   users: R.values(state.referential.entities.users).map((usr) => _buildUser(state, usr)),
   tags: R.values(state.referential.entities.tags),
   groups: R.values(state.referential.entities.groups),
-  next_injects: R.take(10, R.sort(
-    (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime(),
-    R.values(state.referential.entities.injects)
-      .filter((i) => i.inject_date !== null)
-      .map((i) => _buildInject(state, i)),
-  )),
+  next_injects: R.take(
+    6,
+    R.sort(
+      (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime(),
+      R.values(state.referential.entities.injects)
+        .filter((i) => i.inject_date !== null)
+        .map((i) => _buildInject(state, i)),
+    ),
+  ),
   inject_types: R.values(state.referential.entities.inject_types),
   // eslint-disable-next-line max-len
   organizations: R.values(state.referential.entities.organizations).map((org) => _buildOrganization(state, org)),

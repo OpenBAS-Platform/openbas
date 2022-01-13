@@ -5,9 +5,9 @@ import {
   delReferential,
 } from '../utils/Action';
 
-export const fetchComchecks = (exerciseId, noloading) => (dispatch) => {
+export const fetchComchecks = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/comchecks`;
-  return getReferential(schema.arrayOfComchecks, uri, noloading)(dispatch);
+  return getReferential(schema.arrayOfComchecks, uri)(dispatch);
 };
 
 export const fetchComcheck = (exerciseId, comcheckId, noloading) => (dispatch) => {

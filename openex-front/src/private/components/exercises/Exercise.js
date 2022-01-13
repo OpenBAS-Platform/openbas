@@ -162,6 +162,9 @@ const Exercise = () => {
   const maxInjectsNumber = Math.max(
     ...topAudiences.map((a) => a.audience_injects_number),
   );
+  const nextInjectDate = exercise.exercise_next_inject_date
+    ? new Date(exercise.exercise_next_inject_date).getTime()
+    : Date.now();
   const buttonExecution = () => {
     switch (exercise.exercise_status) {
       case 'SCHEDULED':
@@ -352,7 +355,7 @@ const Exercise = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Next inject')}</Typography>
                 <div className={classes.countdown}>
-                  <Countdown date={Date.now() + 500000} />
+                  <Countdown date={nextInjectDate} />
                 </div>
               </Grid>
               <Grid item={true} xs={6}>

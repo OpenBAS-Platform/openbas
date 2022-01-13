@@ -11,6 +11,7 @@ import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
 import Animation from './animation/Animation';
+import Controls from './controls/Controls';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useStore } from '../../../store';
@@ -57,6 +58,16 @@ const Index = () => {
             exact
             path="/exercises/:exerciseId/scenario"
             render={errorWrapper(Injects)}
+          />
+          <Route
+              exact
+              path="/exercises/:exerciseId/controls"
+              render={errorWrapper(Controls)}
+          />
+          <Route
+              exact
+              path="/exercises/:exerciseId/scenario"
+              render={errorWrapper(Injects)}
           />
         </Switch>
       </div>

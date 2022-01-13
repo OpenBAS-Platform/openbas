@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
@@ -33,6 +33,7 @@ import { storeBrowser } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
 import { distributionChartOptions } from '../../utils/Charts';
+import InjectIcon from './exercises/injects/InjectIcon';
 
 const styles = () => ({
   root: {
@@ -87,7 +88,12 @@ const styles = () => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  countdown: {
+    fontWeight: 600,
+  },
 });
+
+const date = Date.now();
 
 const Dashboard = (props) => {
   useEffect(() => {
@@ -107,6 +113,10 @@ const Dashboard = (props) => {
     theme,
     injects,
   } = props;
+  const [currentDate, setCurrentDate] = useState(Date.now());
+  useEffect(() => {
+    setInterval(() => setCurrentDate(Date.now()), 1000);
+  }, []);
   const topOrganizations = R.pipe(
     R.sortWith([R.descend(R.prop('organization_injects_number'))]),
     R.take(7),
@@ -186,7 +196,7 @@ const Dashboard = (props) => {
           <Paper variant="outlined" classes={{ root: classes.list }}>
             {exercises.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
-                {exercises.map((exercise) => (
+                {R.take(6, exercises).map((exercise) => (
                   <ListItem
                     key={exercise.exercise_id}
                     dense={true}
@@ -242,51 +252,62 @@ const Dashboard = (props) => {
           <Paper variant="outlined" classes={{ root: classes.list }}>
             {injects?.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
-                {injects.map((inject) => (
-                  <ListItem
-                    key={inject.inject_id}
-                    dense={true}
-                    button={true}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                    component={Link}
-                    to={`/exercises/${inject.inject_exercise}/animation`}
-                  >
-                    <ListItemIcon>
-                      <NotificationsOutlined />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '50%' }}
-                          >
-                            {inject.inject_title}
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '25%', paddingTop: 8 }}
-                          >
-                            <LinearProgress
-                              value={80}
-                              variant="determinate"
-                              style={{ width: '90%' }}
-                            />
-                          </div>
-                          <div className={classes.bodyItem}>
-                            <div style={{ fontSize: 12, paddingTop: 2 }}>
-                              <Countdown date={Date.now() + 500000} />
-                              <span className={classes.since}>
-                                {t('before sending')}
+                {injects.map((inject) => {
+                  const injectDate = new Date(inject.inject_date).getTime();
+                  const remainingTime = injectDate - date;
+                  const currentRemainingTime = injectDate - currentDate;
+                  const percentRemaining = (currentRemainingTime * 100) / remainingTime;
+                  return (
+                    <ListItem
+                      key={inject.inject_id}
+                      dense={true}
+                      classes={{ root: classes.item }}
+                      divider={true}
+                      button={true}
+                      component={Link}
+                      to={`/exercises/${inject.inject_exercise}/animation`}
+                    >
+                      <ListItemIcon>
+                        <InjectIcon
+                          type={inject.inject_type}
+                          variant="inline"
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '50%' }}
+                            >
+                              {inject.inject_title}
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '25%', paddingTop: 8 }}
+                            >
+                              <LinearProgress
+                                value={100 - percentRemaining}
+                                variant="determinate"
+                                style={{ width: '90%' }}
+                              />
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ float: 'right', paddingRight: 20 }}
+                            >
+                              <span className={classes.countdown}>
+                                <Countdown
+                                  date={inject.inject_date || Date.now()}
+                                />
                               </span>
                             </div>
                           </div>
-                        </div>
-                      }
-                    />
-                  </ListItem>
-                ))}
+                        }
+                      />
+                    </ListItem>
+                  );
+                })}
               </List>
             ) : (
               <Empty message={t('No injects to send in this platform.')} />

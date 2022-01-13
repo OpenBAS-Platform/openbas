@@ -1,0 +1,131 @@
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import withStyles from '@mui/styles/withStyles';
+import Fab from '@mui/material/Fab';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import { Add, ControlPointOutlined } from '@mui/icons-material';
+import Slide from '@mui/material/Slide';
+import ListItem from '@mui/material/ListItem';
+import { ListItemIcon } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
+import ComcheckForm from './ComcheckForm';
+import { addAudience } from '../../../../actions/Audience';
+import inject18n from '../../../../components/i18n';
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const styles = (theme) => ({
+  createButton: {
+    position: 'fixed',
+    bottom: 30,
+    right: 30,
+  },
+  text: {
+    fontSize: 15,
+    color: theme.palette.primary.main,
+    fontWeight: 500,
+  },
+});
+
+class CreateControl extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { open: false };
+  }
+
+  handleOpen() {
+    this.setState({ open: true });
+  }
+
+  handleClose() {
+    this.setState({ open: false });
+  }
+
+  onSubmit(data) {
+    const inputValues = R.pipe(
+      R.assoc('audience_tags', R.pluck('id', data.audience_tags)),
+    )(data);
+    return this.props
+      .addAudience(this.props.exerciseId, inputValues)
+      .then((result) => {
+        if (result.result) {
+          if (this.props.onCreate) {
+            this.props.onCreate(result.result);
+          }
+          return this.handleClose();
+        }
+        return result;
+      });
+  }
+
+  render() {
+    const { classes, t, inline } = this.props;
+    return (
+      <div>
+        {inline === true ? (
+          <ListItem
+            button={true}
+            divider={true}
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+          >
+            <ListItemIcon color="primary">
+              <ControlPointOutlined color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={t('Launch a new comcheck')}
+              classes={{ primary: classes.text }}
+            />
+          </ListItem>
+        ) : (
+          <Fab
+            onClick={this.handleOpen.bind(this)}
+            color="primary"
+            aria-label="Add"
+            className={classes.createButton}
+          >
+            <Add />
+          </Fab>
+        )}
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          onClose={this.handleClose.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>{t('Create a new audience')}</DialogTitle>
+          <DialogContent>
+            <AudienceForm
+              onSubmit={this.onSubmit.bind(this)}
+              initialValues={{ audience_tags: [] }}
+              handleClose={this.handleClose.bind(this)}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+}
+
+CreateControl.propTypes = {
+  exerciseId: PropTypes.string,
+  classes: PropTypes.object,
+  t: PropTypes.func,
+  addAudience: PropTypes.func,
+  inline: PropTypes.bool,
+  onCreate: PropTypes.func,
+};
+
+export default R.compose(
+  connect(null, { addAudience }),
+  inject18n,
+  withStyles(styles),
+)(CreateControl);

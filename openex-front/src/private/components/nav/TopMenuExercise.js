@@ -133,15 +133,33 @@ class TopMenuExercise extends Component {
         </Button>
         <Button
           component={Link}
-          to={`/exercises/${exerciseId}/history`}
+          to={`/exercises/${exerciseId}/controls`}
           variant={
-            location.pathname === `/exercises/${exerciseId}/hthreatsistory`
+            location.pathname === `/exercises/${exerciseId}/controls`
               ? 'contained'
               : 'text'
           }
           size="small"
           color={
-            location.pathname === `/exercises/${exerciseId}/history`
+            location.pathname === `/exercises/${exerciseId}/controls`
+              ? 'secondary'
+              : 'inherit'
+          }
+          classes={{ root: classes.button }}
+        >
+          {t('Controls')}
+        </Button>
+        <Button
+          component={Link}
+          to={`/exercises/${exerciseId}/lessons`}
+          variant={
+            location.pathname === `/exercises/${exerciseId}/lessons`
+              ? 'contained'
+              : 'text'
+          }
+          size="small"
+          color={
+            location.pathname === `/exercises/${exerciseId}/lessons`
               ? 'secondary'
               : 'inherit'
           }

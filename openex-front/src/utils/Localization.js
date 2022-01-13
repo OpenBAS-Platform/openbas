@@ -217,6 +217,10 @@ const i18n = {
         'Souhaitez-vous activer ce stimuli ?',
       Trigger: 'Déclencheur',
       'Update content': 'Modifier le contenu',
+      Controls: 'Contrôles',
+      'Lessons learned': "Retour d'expérience",
+      Comchecks: 'Vérifications',
+      Dryruns: 'Simulations',
     },
     en: {
       openex_email: 'Email',
