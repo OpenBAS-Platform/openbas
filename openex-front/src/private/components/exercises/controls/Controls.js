@@ -6,9 +6,10 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import { useParams } from 'react-router-dom';
 import { useFormatter } from '../../../../components/i18n';
-import { useStore } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
+import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchComchecks } from '../../../../actions/Comcheck';
+import CreateControl from './CreateControl';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -30,9 +31,10 @@ const Controls = () => {
   const dispatch = useDispatch();
   const { t } = useFormatter();
   const { exerciseId } = useParams();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { dryruns, comchecks } = exercise;
+  // const exercise = useStore((store) => store.getExercise(exerciseId));
+  // const { dryruns, comchecks } = exercise;
   useDataLoader(() => {
+    dispatch(fetchAudiences(exerciseId));
     dispatch(fetchComchecks(exerciseId));
   });
   return (
@@ -51,6 +53,7 @@ const Controls = () => {
           </Paper>
         </Grid>
       </Grid>
+      <CreateControl exerciseId={exerciseId} />
     </div>
   );
 };

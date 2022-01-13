@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
 import { TextField } from '../../../../components/TextField';
+import { Select } from '../../../../components/Select';
 import inject18n from '../../../../components/i18n';
-import TagField from '../../../../components/TagField';
+import { DateTimePicker } from '../../../../components/DateTimePicker';
 
 class ComcheckForm extends Component {
   validate(values) {
@@ -26,7 +28,7 @@ class ComcheckForm extends Component {
 
   render() {
     const {
-      t, onSubmit, handleClose, initialValues, editing,
+      t, onSubmit, handleClose, initialValues, editing, audiences,
     } = this.props;
     return (
       <Form
@@ -40,30 +42,41 @@ class ComcheckForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, submitting, pristine }) => (
           <form id="comcheckForm" onSubmit={handleSubmit}>
-            <TextField
+            <Select
               variant="standard"
-              name="audience_name"
+              name="comcheck_audiences"
               fullWidth={true}
-              label={t('Name')}
+              multiple={true}
+              label={t('Audiences')}
+            >
+              {audiences.map((audience) => (
+                <MenuItem
+                  key={audience.audience_id}
+                  value={audience.audience_id}
+                >
+                  {audience.audience_name}
+                </MenuItem>
+              ))}
+            </Select>
+            <DateTimePicker
+              name="comcheck_end_date"
+              label={t('End date')}
+              autoOk={true}
+              textFieldProps={{
+                variant: 'standard',
+                fullWidth: true,
+                style: { marginTop: 20 },
+              }}
             />
             <TextField
               variant="standard"
-              name="audience_description"
+              name="comcheck_subject"
               fullWidth={true}
               multiline={true}
               rows={2}
-              label={t('Description')}
-              style={{ marginTop: 20 }}
-            />
-            <TagField
-              name="audience_tags"
-              label={t('Tags')}
-              values={values}
-              setFieldValue={form.mutators.setValue}
+              label={t('Subject')}
               style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>

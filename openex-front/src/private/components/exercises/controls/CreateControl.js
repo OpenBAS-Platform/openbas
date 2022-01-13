@@ -3,18 +3,23 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import Fab from '@mui/material/Fab';
+import SpeedDial from '@mui/material/SpeedDial';
+import SpeedDialIcon from '@mui/material/SpeedDialIcon';
+import SpeedDialAction from '@mui/material/SpeedDialAction';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import { Add, ControlPointOutlined } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
-import ListItem from '@mui/material/ListItem';
-import { ListItemIcon } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
-import ComcheckForm from './ComcheckForm';
-import { addAudience } from '../../../../actions/Audience';
+import {
+  VideoSettingsOutlined,
+  MarkEmailReadOutlined,
+} from '@mui/icons-material';
+import { withRouter } from 'react-router-dom';
+import { addComcheck } from '../../../../actions/Comcheck';
+import { addDryrun } from '../../../../actions/Dryrun';
 import inject18n from '../../../../components/i18n';
+import ComcheckForm from './ComcheckForm';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -37,76 +42,89 @@ const styles = (theme) => ({
 class CreateControl extends Component {
   constructor(props) {
     super(props);
-    this.state = { open: false };
+    this.state = { openComcheck: false, openDryrun: false };
   }
 
-  handleOpen() {
-    this.setState({ open: true });
+  handleOpenComcheck() {
+    this.setState({ openComcheck: true });
   }
 
-  handleClose() {
-    this.setState({ open: false });
+  handleCloseComcheck() {
+    this.setState({ openComcheck: false });
   }
 
-  onSubmit(data) {
-    const inputValues = R.pipe(
-      R.assoc('audience_tags', R.pluck('id', data.audience_tags)),
-    )(data);
+  onSubmitComcheck(data) {
     return this.props
-      .addAudience(this.props.exerciseId, inputValues)
-      .then((result) => {
-        if (result.result) {
-          if (this.props.onCreate) {
-            this.props.onCreate(result.result);
-          }
-          return this.handleClose();
-        }
-        return result;
-      });
+      .addComcheck(this.props.exerciseId, data)
+      .then(() => this.props.history.push('/exercises'));
+  }
+
+  handleOpenDryrun() {
+    this.setState({ openDryrun: true });
+  }
+
+  handleCloseDryrun() {
+    this.setState({ openDryrun: false });
+  }
+
+  onSubmitDryrun(data) {
+    return this.props
+      .addDryrun(this.props.exerciseId, data)
+      .then(() => this.props.history.push('/exercises'));
   }
 
   render() {
-    const { classes, t, inline } = this.props;
+    const { classes, t, audiences } = this.props;
     return (
       <div>
-        {inline === true ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-          >
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={t('Launch a new comcheck')}
-              classes={{ primary: classes.text }}
-            />
-          </ListItem>
-        ) : (
-          <Fab
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-            aria-label="Add"
-            className={classes.createButton}
-          >
-            <Add />
-          </Fab>
-        )}
+        <SpeedDial
+          classes={{ root: classes.createButton }}
+          icon={<SpeedDialIcon />}
+          ariaLabel={t('New control')}
+        >
+          <SpeedDialAction
+            icon={<VideoSettingsOutlined />}
+            tooltipTitle={t('New dryrun')}
+            onClick={this.handleOpenDryrun.bind(this)}
+          />
+          <SpeedDialAction
+            icon={<MarkEmailReadOutlined />}
+            tooltipTitle={t('New comcheck')}
+            onClick={this.handleOpenComcheck.bind(this)}
+          />
+        </SpeedDial>
         <Dialog
-          open={this.state.open}
+          open={this.state.openComcheck}
           TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
+          onClose={this.handleCloseComcheck.bind(this)}
           fullWidth={true}
           maxWidth="md"
         >
-          <DialogTitle>{t('Create a new audience')}</DialogTitle>
+          <DialogTitle>{t('Launch a new comcheck')}</DialogTitle>
           <DialogContent>
-            <AudienceForm
-              onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ audience_tags: [] }}
-              handleClose={this.handleClose.bind(this)}
+            <ComcheckForm
+              onSubmit={this.onSubmitComcheck.bind(this)}
+              initialValues={{
+                comcheck_audiences: [],
+                comcheck_subject: t('Communication check'),
+              }}
+              audiences={audiences}
+              handleClose={this.handleCloseComcheck.bind(this)}
+            />
+          </DialogContent>
+        </Dialog>
+        <Dialog
+          open={this.state.openDryrun}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDryrun.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>{t('Launch a new dryrun')}</DialogTitle>
+          <DialogContent>
+            <ComcheckForm
+              onSubmit={this.onSubmitDryrun.bind(this)}
+              handleClose={this.handleCloseDryrun.bind(this)}
             />
           </DialogContent>
         </Dialog>
@@ -117,15 +135,28 @@ class CreateControl extends Component {
 
 CreateControl.propTypes = {
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   classes: PropTypes.object,
   t: PropTypes.func,
-  addAudience: PropTypes.func,
-  inline: PropTypes.bool,
-  onCreate: PropTypes.func,
+  addComcheck: PropTypes.func,
+  addDryrun: PropTypes.func,
+  audiences: PropTypes.array,
+  history: PropTypes.object,
+};
+
+const select = (state, ownProps) => {
+  const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
+  const exercise = browser.getExercise(exerciseId);
+  return {
+    exercise,
+    audiences: exercise?.audiences,
+  };
 };
 
 export default R.compose(
-  connect(null, { addAudience }),
+  connect(select, { addComcheck, addDryrun }),
   inject18n,
+  withRouter,
   withStyles(styles),
 )(CreateControl);
