@@ -10,6 +10,7 @@ public class PlatformSetting {
     @JsonProperty("setting_value")
     private Object value;
 
+    @SuppressWarnings("unused")
     public PlatformSetting() {
         // Default constructor
     }

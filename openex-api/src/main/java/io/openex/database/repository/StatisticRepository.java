@@ -4,6 +4,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 
+@SuppressWarnings("EmptyMethod")
 public interface StatisticRepository {
 
     long globalCount(@Param("creationDate") Instant creationDate);

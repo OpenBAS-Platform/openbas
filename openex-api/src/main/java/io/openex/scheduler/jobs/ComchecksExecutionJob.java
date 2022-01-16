@@ -69,7 +69,7 @@ public class ComchecksExecutionJob implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) {
         Instant now = now();
         // 01. Manage expired comchecks.
         List<Comcheck> toExpired = comcheckRepository.thatMustBeExpired(now);
