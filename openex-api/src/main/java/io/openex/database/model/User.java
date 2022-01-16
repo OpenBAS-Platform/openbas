@@ -385,4 +385,9 @@ public class User implements Base, OAuth2User {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return email;
+    }
 }

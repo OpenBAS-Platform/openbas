@@ -368,4 +368,9 @@ public class Exercise implements Base {
     public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

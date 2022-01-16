@@ -30,7 +30,5 @@ public class V2_1__Relative_inject extends BaseJavaMigration {
                       ORDER BY inject_date) AS subquery
                 WHERE injects.inject_id = subquery.inject_id;
                 """);
-        // Delete the old column
-        // select.execute("ALTER TABLE injects DROP column inject_date;");
     }
 }

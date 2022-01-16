@@ -2,12 +2,11 @@ package io.openex.injects.email.service;
 
 import io.openex.database.model.Document;
 import io.openex.database.repository.DocumentRepository;
-import io.openex.helper.TemplateHelper;
+import io.openex.execution.Execution;
+import io.openex.execution.ExecutionContext;
+import io.openex.execution.ExecutionTrace;
 import io.openex.injects.base.InjectAttachment;
 import io.openex.injects.email.model.EmailAttachment;
-import io.openex.execution.Execution;
-import io.openex.execution.ExecutionTrace;
-import io.openex.execution.ExecutionContext;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -25,6 +24,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static io.openex.helper.TemplateHelper.buildContextualContent;
 
 @Component
 public class EmailService {
@@ -78,15 +79,16 @@ public class EmailService {
     public void sendEmail(ExecutionContext context, String from, boolean mustBeEncrypted,
                           String subject, String message, List<EmailAttachment> attachments) throws Exception {
         String email = context.getUser().getEmail();
-        String body = TemplateHelper.buildContextualContent(message, context);
+        String contextualSubject = buildContextualContent(subject, context);
+        String contextualBody = buildContextualContent(message, context);
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
-        mimeMessage.setSubject(subject);
+        mimeMessage.setSubject(contextualSubject);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         Multipart mailMultipart = new MimeMultipart("mixed");
         // Add mail content
         MimeBodyPart bodyPart = new MimeBodyPart();
-        bodyPart.setContent(body, "text/html;charset=utf-8");
+        bodyPart.setContent(contextualBody, "text/html;charset=utf-8");
         mailMultipart.addBodyPart(bodyPart);
         // Add Attachments
         for (EmailAttachment attachment : attachments) {

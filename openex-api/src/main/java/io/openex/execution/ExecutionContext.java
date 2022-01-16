@@ -12,6 +12,7 @@ public class ExecutionContext extends HashMap<String, Object> {
     public static final String USER = "user";
     public static final String EXERCISE = "exercise";
     public static final String AUDIENCES = "audiences";
+    public static final String COMCHECK = "comcheck";
 
     public ExecutionContext(User user, Exercise exercise, List<String> audiences) {
         this.put(USER, user);

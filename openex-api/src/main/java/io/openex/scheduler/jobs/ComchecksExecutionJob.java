@@ -6,14 +6,13 @@ import io.openex.database.model.ComcheckStatus;
 import io.openex.database.model.Exercise;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ComcheckStatusRepository;
+import io.openex.execution.*;
 import io.openex.injects.email.EmailExecutor;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.email.model.EmailInject;
-import io.openex.execution.*;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -24,6 +23,7 @@ import java.util.Map;
 
 import static io.openex.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
 import static io.openex.database.specification.ComcheckStatusSpecification.thatNeedExecution;
+import static io.openex.execution.ExecutionContext.COMCHECK;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -31,8 +31,6 @@ import static java.util.stream.Collectors.groupingBy;
 @DisallowConcurrentExecution
 public class ComchecksExecutionJob implements Job {
 
-    public static final String COMCHECK_LINK = "comcheck";
-    private final static String RC = "<br /><br />";
     private OpenExConfig openExConfig;
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
@@ -59,13 +57,19 @@ public class ComchecksExecutionJob implements Job {
     }
 
     private EmailInject buildComcheckEmail(Comcheck comCheck) {
-        EmailContent content = new EmailContent();
-        String link = "<a href='${" + COMCHECK_LINK + "}'>${" + COMCHECK_LINK + "}</a>";
-        content.setSubject("[" + comCheck.getExercise().getName() + "] " + comCheck.getSubject());
-        content.setBody(comCheck.getMessage() + RC + link + RC + comCheck.getSignature());
         EmailInject emailInject = new EmailInject();
+        EmailContent content = new EmailContent();
+        content.setSubject(comCheck.getSubject());
+        content.setBody(comCheck.getMessage());
         emailInject.setContent(content);
         return emailInject;
+    }
+
+    private ComcheckContext buildComcheckLink(ComcheckStatus status) {
+        ComcheckContext comcheckContext = new ComcheckContext();
+        String comCheckLink = openExConfig.getBaseUrl() + "/comcheck/" + status.getId();
+        comcheckContext.setUrl("<a href='" + comCheckLink + "'>" + comCheckLink + "</a>");
+        return comcheckContext;
     }
 
     @Override
@@ -84,9 +88,8 @@ public class ComchecksExecutionJob implements Job {
             Exercise exercise = comCheck.getExercise();
             List<ComcheckStatus> comcheckStatuses = entry.getValue();
             List<ExecutionContext> userInjectContexts = comcheckStatuses.stream().map(comcheckStatus -> {
-                String comCheckLink = openExConfig.getBaseUrl() + "/comcheck/" + comcheckStatus.getId();
                 ExecutionContext injectContext = new ExecutionContext(comcheckStatus.getUser(), exercise, "Comcheck");
-                injectContext.put(COMCHECK_LINK, comCheckLink); // Add specific inject variable for comcheck link
+                injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
                 return injectContext;
             }).toList();
             EmailInject emailInject = buildComcheckEmail(comCheck);

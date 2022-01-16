@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -140,11 +141,11 @@ class CreateControl extends Component {
               onSubmit={this.onSubmitComcheck.bind(this)}
               initialValues={{
                 comcheck_audiences: [],
-                comcheck_subject: t('Communication check'),
+                comcheck_subject: t('[${exercise.name}] Communication check'),
                 comcheck_message: `${t('Hello')},<br /><br />${t(
-                  'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
-                )}`,
-                comcheck_footer: `${t('Best regards')},<br />${t(
+                  'This is a communication check before the beginning of the exercise. Please click on the following link'
+                    + ' in order to confirm you successfully received this message: ${comcheck.url}',
+                )}<br /><br />${t('Best regards')},<br />${t(
                   'The exercise control team',
                 )}`,
               }}

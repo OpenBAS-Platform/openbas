@@ -19,7 +19,6 @@ class ComcheckForm extends Component {
       'comcheck_end_date',
       'comcheck_subject',
       'comcheck_message',
-      'comcheck_footer',
     ];
     requiredFields.forEach((field) => {
       if (!values[field]) {
@@ -95,13 +94,7 @@ class ComcheckForm extends Component {
               name="comcheck_message"
               label={t('Message')}
               fullWidth={true}
-              style={{ marginTop: 20, height: 200 }}
-            />
-            <EnrichedTextField
-              name="comcheck_footer"
-              label={t('Footer')}
-              fullWidth={true}
-              style={{ marginTop: 20, height: 200 }}
+              style={{ marginTop: 20, height: 400 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

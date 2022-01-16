@@ -17,10 +17,7 @@ public class ComcheckInput {
     @JsonProperty("comcheck_message")
     private String message;
 
-    @JsonProperty("comcheck_footer")
-    private String signature;
-
-    @JsonProperty("comcheck_audience")
+    @JsonProperty("comcheck_audiences")
     private List<String> audienceIds = new ArrayList<>();
 
     public List<String> getAudienceIds() {
@@ -53,13 +50,5 @@ public class ComcheckInput {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
     }
 }
