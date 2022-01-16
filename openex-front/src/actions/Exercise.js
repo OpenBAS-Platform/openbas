@@ -4,7 +4,6 @@ import {
   putReferential,
   postReferential,
   delReferential,
-  fileSave,
 } from '../utils/Action';
 
 export const fetchExercises = () => (dispatch) => getReferential(schema.arrayOfExercises, '/api/exercises')(dispatch);
@@ -43,16 +42,6 @@ export const deleteExercise = (exerciseId) => (dispatch) => delReferential(
   exerciseId,
 )(dispatch);
 
-export const exportExercise = (exerciseId, data) => (dispatch) => {
-  let uri = `/api/exercises/${exerciseId}/export?export_exercise=${data.exercise}&export_audience=${data.audience}&export_objective=${data.objective}&export_scenarios=${data.scenarios}&export_injects=${data.injects}&export_incidents=${data.incidents}`;
-
-  if (data.export_path !== undefined) {
-    uri += `&export_path=${data.export_path}`;
-    return getReferential(schema.exportExerciseResult, uri)(dispatch);
-  }
-  return fileSave(uri, 'export.xlsx')(dispatch);
-};
-
 export const importingExercise = (data) => (dispatch) => {
   const uri = '/api/exercises/import';
   return postReferential(schema.exercise, uri, data)(dispatch);
@@ -74,11 +63,6 @@ export const importingExercise = (data) => (dispatch) => {
 //
 //   return postReferential(schema.importExerciseResult, uri, data)(dispatch);
 // };
-
-export const exportInjectEml = (exerciseId) => (dispatch) => fileSave(
-  `/api/exercises/${exerciseId}/export/inject/eml`,
-  'openex_export_messages_eml.zip',
-)(dispatch);
 
 export const checkIfExerciseNameExist = (fileId) => (dispatch) => getReferential(
   schema.checkIfExerciseNameExistResult,

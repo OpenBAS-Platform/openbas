@@ -1,6 +1,5 @@
 import Immutable from 'seamless-immutable';
 import { FORM_ERROR } from 'final-form';
-import FileSaver from 'file-saver';
 import * as R from 'ramda';
 import * as Constants from '../constants/ActionTypes';
 import { api } from '../network';
@@ -24,12 +23,6 @@ const buildError = (data) => {
   );
   return errorsExtractor(data);
 };
-
-export const fileSave = (uri, filename) => () => api()
-  .get(uri, { responseType: 'blob' })
-  .then((response) => {
-    FileSaver.saveAs(response.data, filename);
-  });
 
 export const fileDownload = (uri) => () => api().get(uri, { responseType: 'blob' });
 

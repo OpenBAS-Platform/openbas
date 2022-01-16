@@ -1,7 +1,6 @@
 import * as schema from './Schema';
 import {
   getReferential,
-  fileSave,
   putReferential,
   postReferential,
   delReferential,
@@ -31,11 +30,6 @@ export const fetchInjectAudiences = (exerciseId, injectId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/injects/${injectId}/audiences`;
   return getReferential(schema.arrayOfAudiences, uri)(dispatch);
 };
-
-export const downloadExportInjects = (exerciseId) => (dispatch) => fileSave(
-  `/api/exercises/${exerciseId}/injects.xlsx`,
-  'injects.xlsx',
-)(dispatch);
 
 export const updateInject = (exerciseId, injectId, data) => (dispatch) => {
   const uri = `/api/injects/${exerciseId}/${injectId}`;
