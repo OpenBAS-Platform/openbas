@@ -74,5 +74,8 @@
     "not ie <= 11",
     "not op_mini all"
   ],
+  "resolutions": {
+    "mini-css-extract-plugin": "2.4.7"
+  },
   "main": "index.js"
 }
