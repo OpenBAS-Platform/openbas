@@ -15,6 +15,11 @@ import {
   MarkEmailReadOutlined,
 } from '@mui/icons-material';
 import { withRouter } from 'react-router-dom';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
 import { addComcheck } from '../../../../actions/Comcheck';
 import { addDryrun } from '../../../../actions/Dryrun';
 import inject18n from '../../../../components/i18n';
@@ -67,32 +72,61 @@ class CreateControl extends Component {
     this.setState({ openDryrun: false });
   }
 
-  onSubmitDryrun(data) {
+  submitDryrun() {
     return this.props
-      .addDryrun(this.props.exerciseId, data)
+      .addDryrun(this.props.exerciseId)
       .then(() => this.props.history.push('/exercises'));
   }
 
   render() {
-    const { classes, t, audiences } = this.props;
+    const {
+      classes, t, audiences, variant,
+    } = this.props;
     return (
       <div>
-        <SpeedDial
-          classes={{ root: classes.createButton }}
-          icon={<SpeedDialIcon />}
-          ariaLabel={t('New control')}
-        >
-          <SpeedDialAction
-            icon={<VideoSettingsOutlined />}
-            tooltipTitle={t('New dryrun')}
-            onClick={this.handleOpenDryrun.bind(this)}
-          />
-          <SpeedDialAction
-            icon={<MarkEmailReadOutlined />}
-            tooltipTitle={t('New comcheck')}
-            onClick={this.handleOpenComcheck.bind(this)}
-          />
-        </SpeedDial>
+        {variant === 'buttons' ? (
+          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+            <Grid item={true} xs={6}>
+              <Typography variant="h1">{t('Dryrun')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<VideoSettingsOutlined />}
+                color="info"
+                onClick={this.handleOpenDryrun.bind(this)}
+              >
+                {t('Launch')}
+              </Button>
+            </Grid>
+            <Grid item={true} xs={4}>
+              <Typography variant="h1">{t('Comcheck')}</Typography>
+              <Button
+                variant="contained"
+                startIcon={<MarkEmailReadOutlined />}
+                color="secondary"
+                onClick={this.handleOpenComcheck.bind(this)}
+              >
+                {t('Send')}
+              </Button>
+            </Grid>
+          </Grid>
+        ) : (
+          <SpeedDial
+            classes={{ root: classes.createButton }}
+            icon={<SpeedDialIcon />}
+            ariaLabel={t('New control')}
+          >
+            <SpeedDialAction
+              icon={<VideoSettingsOutlined />}
+              tooltipTitle={t('Launch a new dryrun')}
+              onClick={this.handleOpenDryrun.bind(this)}
+            />
+            <SpeedDialAction
+              icon={<MarkEmailReadOutlined />}
+              tooltipTitle={t('Send a new comcheck')}
+              onClick={this.handleOpenComcheck.bind(this)}
+            />
+          </SpeedDial>
+        )}
         <Dialog
           open={this.state.openComcheck}
           TransitionComponent={Transition}
@@ -100,13 +134,19 @@ class CreateControl extends Component {
           fullWidth={true}
           maxWidth="md"
         >
-          <DialogTitle>{t('Launch a new comcheck')}</DialogTitle>
+          <DialogTitle>{t('Send a new comcheck')}</DialogTitle>
           <DialogContent>
             <ComcheckForm
               onSubmit={this.onSubmitComcheck.bind(this)}
               initialValues={{
                 comcheck_audiences: [],
                 comcheck_subject: t('Communication check'),
+                comcheck_message: `${t('Hello')},<br /><br />${t(
+                  'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:',
+                )}`,
+                comcheck_footer: `${t('Best regards')},<br />${t(
+                  'The exercise control team',
+                )}`,
               }}
               audiences={audiences}
               handleClose={this.handleCloseComcheck.bind(this)}
@@ -117,16 +157,28 @@ class CreateControl extends Component {
           open={this.state.openDryrun}
           TransitionComponent={Transition}
           onClose={this.handleCloseDryrun.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
         >
-          <DialogTitle>{t('Launch a new dryrun')}</DialogTitle>
           <DialogContent>
-            <ComcheckForm
-              onSubmit={this.onSubmitDryrun.bind(this)}
-              handleClose={this.handleCloseDryrun.bind(this)}
-            />
+            <DialogContentText>
+              {t('Do you want to launch a new dryrun?')}
+            </DialogContentText>
           </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseDryrun.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitDryrun.bind(this)}
+            >
+              {t('Launch')}
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );
@@ -142,6 +194,7 @@ CreateControl.propTypes = {
   addDryrun: PropTypes.func,
   audiences: PropTypes.array,
   history: PropTypes.object,
+  variant: PropTypes.string,
 };
 
 const select = (state, ownProps) => {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
+import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,16 +8,18 @@ import { TextField } from '../../../../components/TextField';
 import { Select } from '../../../../components/Select';
 import inject18n from '../../../../components/i18n';
 import { DateTimePicker } from '../../../../components/DateTimePicker';
+import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 
 class ComcheckForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
     const requiredFields = [
-      'comcheck_audience',
+      'comcheck_audiences',
       'comcheck_end_date',
       'comcheck_subject',
       'comcheck_message',
+      'comcheck_footer',
     ];
     requiredFields.forEach((field) => {
       if (!values[field]) {
@@ -28,8 +31,9 @@ class ComcheckForm extends Component {
 
   render() {
     const {
-      t, onSubmit, handleClose, initialValues, editing, audiences,
+      t, onSubmit, handleClose, initialValues, audiences,
     } = this.props;
+    const audiencesbyId = R.indexBy(R.prop('audience_id'), audiences);
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -49,8 +53,18 @@ class ComcheckForm extends Component {
               name="comcheck_audiences"
               fullWidth={true}
               multiple={true}
+              displayEmpty={true}
               label={t('Audiences')}
+              renderValue={(v) => (v.length === 0 ? (
+                  <em>{t('All audiences')}</em>
+              ) : (
+                v.map((a) => audiencesbyId[a].audience_name).join(', ')
+              ))
+              }
             >
+              <MenuItem disabled value="">
+                <em>{t('All audiences')}</em>
+              </MenuItem>
               {audiences.map((audience) => (
                 <MenuItem
                   key={audience.audience_id}
@@ -74,10 +88,20 @@ class ComcheckForm extends Component {
               variant="standard"
               name="comcheck_subject"
               fullWidth={true}
-              multiline={true}
-              rows={2}
               label={t('Subject')}
               style={{ marginTop: 20 }}
+            />
+            <EnrichedTextField
+              name="comcheck_message"
+              label={t('Message')}
+              fullWidth={true}
+              style={{ marginTop: 20, height: 200 }}
+            />
+            <EnrichedTextField
+              name="comcheck_footer"
+              label={t('Footer')}
+              fullWidth={true}
+              style={{ marginTop: 20, height: 200 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
@@ -95,7 +119,7 @@ class ComcheckForm extends Component {
                 type="submit"
                 disabled={pristine || submitting}
               >
-                {editing ? t('Update') : t('Create')}
+                {t('Send')}
               </Button>
             </div>
           </form>

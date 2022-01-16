@@ -15,8 +15,6 @@ import {
   HighlightOffOutlined,
   CastOutlined,
   PlayArrowOutlined,
-  VideoSettingsOutlined,
-  MarkEmailReadOutlined,
   CancelOutlined,
   PauseOutlined,
   RestartAltOutlined,
@@ -46,6 +44,7 @@ import { distributionChartOptions } from '../../../utils/Charts';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { Transition } from '../../../utils/Environment';
 import ExerciseDatePopover from './ExerciseDatePopover';
+import CreateControl from './controls/CreateControl';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -377,28 +376,7 @@ const Exercise = () => {
                 'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.',
               )}
             </Alert>
-            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-              <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Dryrun')}</Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<VideoSettingsOutlined />}
-                  color="info"
-                >
-                  {t('Launch')}
-                </Button>
-              </Grid>
-              <Grid item={true} xs={4}>
-                <Typography variant="h1">{t('Comcheck')}</Typography>
-                <Button
-                  variant="contained"
-                  startIcon={<MarkEmailReadOutlined />}
-                  color="secondary"
-                >
-                  {t('Send')}
-                </Button>
-              </Grid>
-            </Grid>
+            <CreateControl exerciseId={exerciseId} variant="buttons" />
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>

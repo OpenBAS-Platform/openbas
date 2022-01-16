@@ -221,6 +221,17 @@ const i18n = {
       'Lessons learned': "Retour d'expérience",
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
+      'Send a new comcheck': 'Envoyer une nouvelle vérification',
+      'Launch a new dryrun': 'Démarrer une nouvelle simulation',
+      Hello: 'Bonjour',
+      Subject: 'Sujet',
+      'Communication check': 'Vérification des moyens de communication',
+      'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message:':
+        "Ceci est une vérification des moyens de communication avant le début de l'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès :",
+      'Best regards': 'Bien cordialement',
+      'The exercise control team': "L'équipe d'animation de l'exercice",
+      'Do you want to launch a new dryrun?':
+        'Souhaitez-vous lancer une nouvelle simulation ?',
     },
     en: {
       openex_email: 'Email',

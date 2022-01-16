@@ -16,7 +16,7 @@ const renderEnrichedTextField = ({
     </InputLabel>
     <CKEditor
       editor={ClassicEditor}
-      config={{ width: '100%', height: 300 }}
+      config={{ width: '100%' }}
       data={value}
       onChange={(event, editor) => {
         onChange(editor.getData());

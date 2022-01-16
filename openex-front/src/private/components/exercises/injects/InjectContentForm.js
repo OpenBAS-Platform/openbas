@@ -98,7 +98,7 @@ class InjectContentForm extends Component {
                         name={field.name}
                         label={t(field.name)}
                         fullWidth={true}
-                        style={{ marginTop: 20, minHeight: 300 }}
+                        style={{ marginTop: 20, height: 250 }}
                       />
                     );
                   case 'checkbox':
@@ -176,7 +176,7 @@ class InjectContentForm extends Component {
                     );
                 }
               })}
-              <div style={{ float: 'right', marginTop: 20 }}>
+              <div style={{ float: 'right', margin: '20px 0 20px 0' }}>
                 <Button
                   variant="contained"
                   color="primary"

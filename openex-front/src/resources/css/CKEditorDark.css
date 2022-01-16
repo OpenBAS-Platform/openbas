@@ -107,10 +107,13 @@
   --ck-color-link-default: #00b1ff;
 }
 
+.ck-editor, .ck-editor__main {
+  height: calc(100% - 30px) !important;
+}
+
 .ck-editor__editable {
   background-color: #263f59 !important;
-  min-height: 300px !important;
-  max-height: 500px !important;
+  height: 100% !important;
   overflow: auto !important;
 }
 

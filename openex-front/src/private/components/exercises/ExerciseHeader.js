@@ -24,7 +24,6 @@ import { useFormatter } from '../../../components/i18n';
 const useStyles = makeStyles(() => ({
   container: {
     width: '100%',
-    paddingBottom: 50,
   },
   title: {
     float: 'left',
@@ -35,11 +34,9 @@ const useStyles = makeStyles(() => ({
     float: 'right',
   },
   tag: {
-    overflow: 'hidden',
     marginLeft: 5,
   },
   tagsInput: {
-    overflow: 'hidden',
     width: 300,
     margin: '0 10px 0 10px',
     float: 'right',

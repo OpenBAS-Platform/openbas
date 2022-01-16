@@ -5,7 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import { Field } from 'react-final-form';
 
-const renderFromHelper = ({
+const renderHelper = ({
   touched,
   error,
   submitError,
@@ -35,9 +35,19 @@ const renderSelectField = ({
   ...others
 }) => (
   <FormControl error={touched && error} fullWidth={fullWidth} style={style}>
-    <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
-      {label}
-    </InputLabel>
+    {others.displayEmpty ? (
+      <InputLabel
+        shrink={true}
+        htmlFor={name}
+        variant={others.variant || 'standard'}
+      >
+        {label}
+      </InputLabel>
+    ) : (
+      <InputLabel htmlFor={name} variant={others.variant || 'standard'}>
+        {label}
+      </InputLabel>
+    )}
     <MUISelect
       onChange={(event) => {
         onChange(event.target.value);
@@ -54,7 +64,7 @@ const renderSelectField = ({
     >
       {children}
     </MUISelect>
-    {renderFromHelper({
+    {renderHelper({
       touched,
       error,
       submitError,
