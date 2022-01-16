@@ -2,8 +2,8 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.converter.StatusReportingConverter;
-import io.openex.model.Execution;
+import io.openex.database.converter.ExecutionConverter;
+import io.openex.execution.Execution;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -26,10 +26,10 @@ public class InjectStatus implements Base {
     @JsonProperty("status_name")
     private String name;
 
-    @Column(name = "status_message")
-    @Convert(converter = StatusReportingConverter.class)
-    @JsonProperty("status_message")
-    private StatusReporting reporting;
+    @Column(name = "status_reporting")
+    @Convert(converter = ExecutionConverter.class)
+    @JsonProperty("status_reporting")
+    private Execution reporting;
 
     @Column(name = "status_date")
     @JsonProperty("status_date")
@@ -49,9 +49,9 @@ public class InjectStatus implements Base {
         InjectStatus injectStatus = new InjectStatus();
         injectStatus.setInject(inject);
         injectStatus.setDate(now());
-        injectStatus.setExecutionTime(execution.getExecution());
+        injectStatus.setExecutionTime(execution.getExecutionTime());
         injectStatus.setName(execution.getStatus().name());
-        injectStatus.setReporting(execution.getReporting());
+        injectStatus.setReporting(execution);
         return injectStatus;
     }
     // endregion
@@ -72,11 +72,11 @@ public class InjectStatus implements Base {
         this.name = name;
     }
 
-    public StatusReporting getReporting() {
+    public Execution getReporting() {
         return reporting;
     }
 
-    public void setReporting(StatusReporting reporting) {
+    public void setReporting(Execution reporting) {
         this.reporting = reporting;
     }
 

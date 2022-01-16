@@ -1,13 +1,14 @@
-package io.openex.scheduler;
+package io.openex.scheduler.jobs;
 
 import io.openex.database.model.*;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.helper.InjectHelper;
-import io.openex.model.ExecutableInject;
-import io.openex.model.Execution;
-import io.openex.model.Executor;
+import io.openex.execution.ExecutableInject;
+import io.openex.execution.Execution;
+import io.openex.execution.Executor;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -22,7 +23,8 @@ import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
 
 @Component
-public class InjectsHandlingJob<T> implements Job {
+@DisallowConcurrentExecution
+public class InjectsExecutionJob<T> implements Job {
 
     private ApplicationContext context;
     private InjectHelper<T> injectHelper;

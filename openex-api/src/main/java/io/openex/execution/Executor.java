@@ -1,4 +1,6 @@
-package io.openex.model;
+package io.openex.execution;
+
+import static io.openex.execution.ExecutionTrace.traceError;
 
 public interface Executor<T> {
     void process(ExecutableInject<T> inject, Execution execution);
@@ -8,8 +10,9 @@ public interface Executor<T> {
         try {
             process(inject, execution);
         } catch (Exception e) {
-            execution.setStatus(ExecutionStatus.ERROR);
-            execution.addMessage(e.getMessage());
+            execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));
+        } finally {
+            execution.stop();
         }
         return execution;
     }

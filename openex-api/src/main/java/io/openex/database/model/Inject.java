@@ -27,10 +27,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     private static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
-    public enum STATUS {
-        SUCCESS
-    }
-
     public static Comparator<Inject<?>> executionComparator = (o1, o2) -> {
         if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
             return o1.getDate().get().compareTo(o2.getDate().get());

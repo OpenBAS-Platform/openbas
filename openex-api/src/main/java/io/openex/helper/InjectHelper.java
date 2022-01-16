@@ -6,8 +6,8 @@ import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.DryInjectSpecification;
 import io.openex.database.specification.InjectSpecification;
-import io.openex.model.ExecutableInject;
-import io.openex.model.UserInjectContext;
+import io.openex.execution.ExecutableInject;
+import io.openex.execution.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,21 +44,21 @@ public class InjectHelper<T> {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    public List<UserInjectContext> buildUsersFromInject(Injection<T> inject) {
+    public List<ExecutionContext> buildUsersFromInject(Injection<T> inject) {
         Exercise exercise = inject.getExercise();
         // Create stream from inject audiences
         Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
-        Stream<UserInjectContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
+        Stream<ExecutionContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
                 .flatMap(audience -> audience.getUsers().stream()
-                        .map(user -> new UserInjectContext(user, exercise, audience.getName())));
+                        .map(user -> new ExecutionContext(user, exercise, audience.getName())));
         // Create stream from animation group
-        Stream<UserInjectContext> animationUserStream = exercise.getObservers().stream()
-                .map(user -> new UserInjectContext(user, exercise, "Animation Group"));
+        Stream<ExecutionContext> animationUserStream = exercise.getObservers().stream()
+                .map(user -> new ExecutionContext(user, exercise, "Animation Group"));
         // Build result
-        Stream<UserInjectContext> usersStream = concat(injectUserStream, animationUserStream);
+        Stream<ExecutionContext> usersStream = concat(injectUserStream, animationUserStream);
         return usersStream
-                .collect(groupingBy(UserInjectContext::getUser)).entrySet().stream()
-                .map(entry -> new UserInjectContext(entry.getKey(), exercise,
+                .collect(groupingBy(ExecutionContext::getUser)).entrySet().stream()
+                .map(entry -> new ExecutionContext(entry.getKey(), exercise,
                         entry.getValue().stream().flatMap(ua -> ua.getAudiences().stream()).toList()))
                 .toList();
     }

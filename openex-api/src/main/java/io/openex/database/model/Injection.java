@@ -1,6 +1,6 @@
 package io.openex.database.model;
 
-import io.openex.model.Executor;
+import io.openex.execution.Executor;
 
 import javax.persistence.Transient;
 import java.time.Instant;

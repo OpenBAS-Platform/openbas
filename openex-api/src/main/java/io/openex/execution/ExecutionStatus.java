@@ -1,4 +1,4 @@
-package io.openex.model;
+package io.openex.execution;
 
 public enum ExecutionStatus {
     PARTIAL,

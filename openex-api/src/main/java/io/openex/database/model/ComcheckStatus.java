@@ -9,11 +9,22 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
+
+import static io.openex.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
+import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "comchecks_statuses")
 @EntityListeners(ModelBaseListener.class)
 public class ComcheckStatus implements Base {
+
+    public enum CHECK_STATUS {
+        RUNNING,
+        SUCCESS,
+        FAILURE
+    }
+
     @Id
     @Column(name = "status_id")
     @GeneratedValue(generator = "UUID")
@@ -21,25 +32,46 @@ public class ComcheckStatus implements Base {
     @JsonProperty("status_id")
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_user")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("status_user")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_comcheck")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("status_comcheck")
     private Comcheck comcheck;
 
-    @Column(name = "status_last_update")
-    @JsonProperty("status_last_update")
-    private Instant lastUpdate;
+    @Column(name = "status_sent_date")
+    @JsonProperty("status_sent_date")
+    private Instant lastSent;
 
-    @Column(name = "status_state")
+    @Column(name = "status_receive_date")
+    @JsonProperty("status_receive_date")
+    private Instant receiveDate;
+
+    @Column(name = "status_sent_retry")
+    @JsonProperty("status_sent_retry")
+    private int sentNumber = 0;
+
+    public ComcheckStatus() {
+        // Default constructor
+    }
+
+    public ComcheckStatus(User user) {
+        this.user = user;
+    }
+
+    // region transient
     @JsonProperty("status_state")
-    private boolean state;
+    public CHECK_STATUS getState() {
+        return getReceiveDate().map(receive -> CHECK_STATUS.SUCCESS)
+                .orElseGet(() -> EXPIRED.equals(getComcheck().getState())
+                        ? CHECK_STATUS.FAILURE : CHECK_STATUS.RUNNING);
+    }
+    // endregion
 
     @Override
     public String getId() {
@@ -66,20 +98,28 @@ public class ComcheckStatus implements Base {
         this.comcheck = comcheck;
     }
 
-    public boolean isState() {
-        return state;
+    public Optional<Instant> getLastSent() {
+        return ofNullable(lastSent);
     }
 
-    public void setState(boolean state) {
-        this.state = state;
+    public void setLastSent(Instant lastSent) {
+        this.lastSent = lastSent;
     }
 
-    public Instant getLastUpdate() {
-        return lastUpdate;
+    public int getSentNumber() {
+        return sentNumber;
     }
 
-    public void setLastUpdate(Instant lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setSentNumber(int sentNumber) {
+        this.sentNumber = sentNumber;
+    }
+
+    public Optional<Instant> getReceiveDate() {
+        return ofNullable(receiveDate);
+    }
+
+    public void setReceiveDate(Instant receiveDate) {
+        this.receiveDate = receiveDate;
     }
 
     @Override

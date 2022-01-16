@@ -3,16 +3,19 @@ package io.openex.injects.ovh_sms;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import io.openex.database.model.Injection;
+import io.openex.database.model.User;
 import io.openex.injects.ovh_sms.form.OvhSmsForm;
 import io.openex.injects.ovh_sms.model.OvhSmsContent;
 import io.openex.injects.ovh_sms.service.OvhSmsService;
-import io.openex.model.*;
+import io.openex.execution.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.openex.execution.ExecutionTrace.traceError;
+import static io.openex.execution.ExecutionTrace.traceSuccess;
 
 @Component
 public class OvhSmsExecutor implements Executor<OvhSmsContent> {
@@ -31,30 +34,24 @@ public class OvhSmsExecutor implements Executor<OvhSmsContent> {
     @Override
     public void process(ExecutableInject<OvhSmsContent> injection, Execution execution) {
         Injection<OvhSmsContent> inject = injection.getInject();
-        String message = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
-        List<UserInjectContext> users = injection.getUsers();
-        int numberOfExpected = users.size();
-        AtomicInteger errors = new AtomicInteger(0);
+        String smsMessage = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
+        List<ExecutionContext> users = injection.getUsers();
         users.stream().parallel().forEach(context -> {
-            String phone = context.getUser().getPhone();
-            String email = context.getUser().getEmail();
+            User user = context.getUser();
+            String phone = user.getPhone();
+            String email = user.getEmail();
             if (!StringUtils.hasLength(phone)) {
-                errors.incrementAndGet();
-                execution.addMessage("Sms fail for " + email + ": no phone number");
+                String message = "Sms fail for " + email + ": no phone number";
+                execution.addTrace(traceSuccess(user.getId(), message));
             } else {
                 try {
-                    String callResult = smsService.sendSms(context, phone, message);
-                    execution.addMessage("Sms sent to " + email + " through " + phone + " (" + callResult + ")");
+                    String callResult = smsService.sendSms(context, phone, smsMessage);
+                    String message = "Sms sent to " + email + " through " + phone + " (" + callResult + ")";
+                    execution.addTrace(traceSuccess(user.getId(), message));
                 } catch (Exception e) {
-                    errors.incrementAndGet();
-                    execution.addMessage(e.getMessage());
+                    execution.addTrace(traceError(user.getId(), e.getMessage(), e));
                 }
             }
         });
-        int numberOfErrors = errors.get();
-        if (numberOfErrors > 0) {
-            ExecutionStatus status = numberOfErrors == numberOfExpected ? ExecutionStatus.ERROR : ExecutionStatus.PARTIAL;
-            execution.setStatus(status);
-        }
     }
 }

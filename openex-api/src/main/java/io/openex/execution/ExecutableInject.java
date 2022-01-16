@@ -1,4 +1,4 @@
-package io.openex.model;
+package io.openex.execution;
 
 import io.openex.database.model.Injection;
 
@@ -6,9 +6,9 @@ import java.util.List;
 
 public class ExecutableInject<T> {
     private Injection<T> inject;
-    private List<UserInjectContext> users;
+    private List<ExecutionContext> users;
 
-    public ExecutableInject(Injection<T> inject, List<UserInjectContext> users) {
+    public ExecutableInject(Injection<T> inject, List<ExecutionContext> users) {
         this.inject = inject;
         this.users = users;
     }
@@ -21,11 +21,11 @@ public class ExecutableInject<T> {
         this.inject = inject;
     }
 
-    public List<UserInjectContext> getUsers() {
+    public List<ExecutionContext> getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserInjectContext> users) {
+    public void setUsers(List<ExecutionContext> users) {
         this.users = users;
     }
 }

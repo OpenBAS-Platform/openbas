@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface InjectReportingRepository<T> extends CrudRepository<InjectStatus, String> {
+public interface InjectReportingRepository extends CrudRepository<InjectStatus, String> {
 
     @NotNull
     Optional<InjectStatus> findById(@NotNull String id);

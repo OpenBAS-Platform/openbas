@@ -3,7 +3,7 @@ package io.openex.injects.ovh_sms.model;
 import io.openex.database.model.DryInject;
 import io.openex.injects.ovh_sms.OvhSmsExecutor;
 import io.openex.injects.ovh_sms.converter.OvhSmsContentConverter;
-import io.openex.model.Executor;
+import io.openex.execution.Executor;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;

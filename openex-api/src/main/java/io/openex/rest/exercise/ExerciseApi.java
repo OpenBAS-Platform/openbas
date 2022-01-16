@@ -61,7 +61,6 @@ public class ExerciseApi<T> extends RestBehavior {
 
     // region repositories
     private TagRepository tagRepository;
-    private OutcomeRepository outcomeRepository;
     private PauseRepository pauseRepository;
     private GroupRepository groupRepository;
     private GrantRepository grantRepository;
@@ -72,7 +71,6 @@ public class ExerciseApi<T> extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private AudienceRepository audienceRepository;
     private InjectRepository<T> injectRepository;
-    private InjectReportingRepository<T> injectReportingRepository;
     // endregion
 
     // region services
@@ -81,16 +79,6 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
-    @Autowired
-    public void setOutcomeRepository(OutcomeRepository outcomeRepository) {
-        this.outcomeRepository = outcomeRepository;
-    }
-
-    @Autowired
-    public void setInjectReportingRepository(InjectReportingRepository<T> injectReportingRepository) {
-        this.injectReportingRepository = injectReportingRepository;
-    }
-
     @Autowired
     public void setPauseRepository(PauseRepository pauseRepository) {
         this.pauseRepository = pauseRepository;
@@ -331,7 +319,10 @@ public class ExerciseApi<T> extends RestBehavior {
         if (isCloseState && SCHEDULED.equals(status)) {
             exercise.setStart(null);
             exercise.setEnd(null);
+            // Reset pauses
             exercise.setCurrentPause(null);
+            pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
+            // Reset injects status and outcome
             injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
                     .stream().peek(Inject::clean).toList());
         }

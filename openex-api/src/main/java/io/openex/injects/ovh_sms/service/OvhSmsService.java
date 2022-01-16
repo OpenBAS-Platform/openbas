@@ -3,7 +3,7 @@ package io.openex.injects.ovh_sms.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.helper.TemplateHelper;
 import io.openex.injects.ovh_sms.config.OvhSmsConfig;
-import io.openex.model.UserInjectContext;
+import io.openex.execution.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,7 +49,7 @@ public class OvhSmsService {
         this.config = config;
     }
 
-    public String sendSms(UserInjectContext context, String phone, String message) throws Exception {
+    public String sendSms(ExecutionContext context, String phone, String message) throws Exception {
         String userEmail = context.getUser().getEmail();
         System.out.println("Sending sms to " + userEmail + " - " + phone);
         String smsMessage = TemplateHelper.buildContextualContent(message, context);

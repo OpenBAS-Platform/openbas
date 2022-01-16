@@ -5,7 +5,7 @@ import io.openex.database.model.DryInject;
 import io.openex.database.model.Inject;
 import io.openex.injects.email.EmailExecutor;
 import io.openex.injects.email.converter.EmailContentConverter;
-import io.openex.model.Executor;
+import io.openex.execution.Executor;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
+import io.openex.execution.ExecutionStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -52,7 +53,7 @@ public class Dryrun implements Base {
         List<DryInject<?>> injects = getInjects();
         return injects.stream().allMatch(dryInject -> {
             DryInjectStatus status = dryInject.getStatus();
-            return status != null && Inject.STATUS.SUCCESS.name().equals(status.getName());
+            return status != null && ExecutionStatus.SUCCESS.equals(status.getName());
         });
     }
     // endregion

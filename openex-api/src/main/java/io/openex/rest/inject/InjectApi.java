@@ -7,10 +7,10 @@ import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectReportingRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.InjectSpecification;
-import io.openex.model.ExecutableInject;
-import io.openex.model.Execution;
-import io.openex.model.Executor;
-import io.openex.model.UserInjectContext;
+import io.openex.execution.ExecutableInject;
+import io.openex.execution.Execution;
+import io.openex.execution.Executor;
+import io.openex.execution.ExecutionContext;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.InjectInput;
 import io.openex.rest.inject.form.InjectUpdateActivationInput;
@@ -30,9 +30,8 @@ import java.util.stream.Collectors;
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.helper.DatabaseHelper.resolveRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
-import static io.openex.model.ExecutionStatus.ERROR;
+import static io.openex.execution.ExecutionTrace.traceSuccess;
 import static java.time.Instant.now;
-import static java.util.List.of;
 
 @RestController
 public class InjectApi<T> extends RestBehavior {
@@ -41,13 +40,13 @@ public class InjectApi<T> extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private InjectRepository<T> injectRepository;
-    private InjectReportingRepository<T> injectReportingRepository;
+    private InjectReportingRepository injectReportingRepository;
     private AudienceRepository audienceRepository;
     private ApplicationContext context;
     private List<Contract> contracts;
 
     @Autowired
-    public void setInjectReportingRepository(InjectReportingRepository<T> injectReportingRepository) {
+    public void setInjectReportingRepository(InjectReportingRepository injectReportingRepository) {
         this.injectReportingRepository = injectReportingRepository;
     }
 
@@ -83,21 +82,15 @@ public class InjectApi<T> extends RestBehavior {
     }
 
     @GetMapping("/api/injects/try/{injectId}")
-    public Execution execute(@PathVariable String injectId) {
-        Optional<Inject<T>> injectOptional = injectRepository.findById(injectId);
-        if (injectOptional.isEmpty()) {
-            Execution execution = new Execution();
-            execution.setStatus(ERROR);
-            execution.setMessage(of("Inject to try not found"));
-            return execution;
-        }
-        Inject<T> inject = injectOptional.get();
-        UserInjectContext userInjectContext = new UserInjectContext(currentUser(),
-                inject.getExercise(), "Direct test");
-        ExecutableInject<T> injection = new ExecutableInject<>(inject, of(userInjectContext));
+    public InjectStatus execute(@PathVariable String injectId) {
+        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+        List<ExecutionContext> userInjectContexts = List.of(new ExecutionContext(currentUser(),
+                inject.getExercise(), "Direct test"));
+        ExecutableInject<T> injection = new ExecutableInject<>(inject, userInjectContexts);
         Class<? extends Executor<T>> executorClass = inject.executor();
         Executor<T> executor = context.getBean(executorClass);
-        return executor.execute(injection);
+        Execution execution = executor.execute(injection);
+        return InjectStatus.fromExecution(execution, inject);
     }
 
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
@@ -170,7 +163,9 @@ public class InjectApi<T> extends RestBehavior {
         injectStatus.setDate(now());
         injectStatus.setName(input.getStatus());
         injectStatus.setExecutionTime(0);
-        injectStatus.setReporting(new StatusReporting(of(input.getMessage())));
+        Execution execution = new Execution();
+        execution.addTrace(traceSuccess(currentUser().getId(), input.getMessage()));
+        injectStatus.setReporting(execution);
         injectReportingRepository.save(injectStatus);
         inject.setStatus(injectStatus);
         return injectRepository.save(inject);

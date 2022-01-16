@@ -2,8 +2,9 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.converter.StatusReportingConverter;
-import io.openex.model.Execution;
+import io.openex.database.converter.ExecutionConverter;
+import io.openex.execution.Execution;
+import io.openex.execution.ExecutionStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -24,12 +25,13 @@ public class DryInjectStatus implements Base {
 
     @Column(name = "status_name")
     @JsonProperty("status_name")
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private ExecutionStatus name;
 
-    @Column(name = "status_message")
-    @Convert(converter = StatusReportingConverter.class)
-    @JsonProperty("status_message")
-    private StatusReporting reporting;
+    @Column(name = "status_reporting")
+    @Convert(converter = ExecutionConverter.class)
+    @JsonProperty("status_reporting")
+    private Execution reporting;
 
     @Column(name = "status_date")
     @JsonProperty("status_date")
@@ -50,9 +52,9 @@ public class DryInjectStatus implements Base {
         DryInjectStatus injectStatus = new DryInjectStatus();
         injectStatus.setDryInject(dry);
         injectStatus.setDate(now());
-        injectStatus.setExecutionTime(execution.getExecution());
-        injectStatus.setName(execution.getStatus().name());
-        injectStatus.setReporting(execution.getReporting());
+        injectStatus.setExecutionTime(execution.getExecutionTime());
+        injectStatus.setName(execution.getStatus());
+        injectStatus.setReporting(execution);
         return injectStatus;
     }
     // endregion
@@ -65,19 +67,19 @@ public class DryInjectStatus implements Base {
         this.id = id;
     }
 
-    public String getName() {
+    public ExecutionStatus getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(ExecutionStatus name) {
         this.name = name;
     }
 
-    public StatusReporting getReporting() {
+    public Execution getReporting() {
         return reporting;
     }
 
-    public void setReporting(StatusReporting reporting) {
+    public void setReporting(Execution reporting) {
         this.reporting = reporting;
     }
 

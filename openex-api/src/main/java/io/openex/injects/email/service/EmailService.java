@@ -5,8 +5,9 @@ import io.openex.database.repository.DocumentRepository;
 import io.openex.helper.TemplateHelper;
 import io.openex.injects.base.InjectAttachment;
 import io.openex.injects.email.model.EmailAttachment;
-import io.openex.model.Execution;
-import io.openex.model.UserInjectContext;
+import io.openex.execution.Execution;
+import io.openex.execution.ExecutionTrace;
+import io.openex.execution.ExecutionContext;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
@@ -23,13 +24,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Optional;
 
 @Component
 public class EmailService {
 
-    private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
     private DocumentRepository documentRepository;
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
@@ -60,24 +59,25 @@ public class EmailService {
         List<EmailAttachment> resolved = new ArrayList<>();
         for (InjectAttachment attachment : attachments) {
             String documentId = attachment.getId();
+            Optional<Document> askedDocument = documentRepository.findById(documentId);
             try {
-                Document doc = documentRepository.findById(documentId).orElseThrow();
+                Document doc = askedDocument.orElseThrow();
                 InputStream fileInputStream = fileService.getFile(doc.getName()).orElseThrow();
                 byte[] content = IOUtils.toByteArray(fileInputStream);
                 resolved.add(new EmailAttachment(doc.getName(), content, doc.getType()));
             } catch (Exception e) {
                 // Can't fetch the attachments, ignore
-                execution.addMessage("Error getting content for " + documentId);
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                String docInfo = askedDocument.map(Document::getName).orElse(documentId);
+                String message = "Error getting document " + docInfo;
+                execution.addTrace(ExecutionTrace.traceError(getClass().getSimpleName(), message, e));
             }
         }
         return resolved;
     }
 
-    public void sendEmail(UserInjectContext context, String from, boolean mustBeEncrypted,
+    public void sendEmail(ExecutionContext context, String from, boolean mustBeEncrypted,
                           String subject, String message, List<EmailAttachment> attachments) throws Exception {
         String email = context.getUser().getEmail();
-        System.out.println("Sending mail to " + email);
         String body = TemplateHelper.buildContextualContent(message, context);
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
