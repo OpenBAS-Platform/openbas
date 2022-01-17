@@ -52,10 +52,6 @@ public class Comcheck implements Base {
     @JsonProperty("comcheck_message")
     private String message;
 
-    @Column(name = "comcheck_signature")
-    @JsonProperty("comcheck_signature")
-    private String signature;
-
     @ManyToOne
     @JoinColumn(name = "comcheck_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -105,14 +101,6 @@ public class Comcheck implements Base {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
     }
 
     public Exercise getExercise() {
