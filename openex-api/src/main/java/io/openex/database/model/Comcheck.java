@@ -63,6 +63,13 @@ public class Comcheck implements Base {
     @JsonProperty("comcheck_status")
     private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
 
+    // region transient
+    @JsonProperty("comcheck_users_number")
+    public long usersNumber() {
+        return getComcheckStatus().size(); // One status for each user.
+    }
+    // endregion
+
     public String getId() {
         return id;
     }
