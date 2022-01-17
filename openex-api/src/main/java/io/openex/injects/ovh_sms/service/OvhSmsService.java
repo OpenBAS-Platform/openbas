@@ -50,8 +50,6 @@ public class OvhSmsService {
     }
 
     public String sendSms(ExecutionContext context, String phone, String message) throws Exception {
-        String userEmail = context.getUser().getEmail();
-        System.out.println("Sending sms to " + userEmail + " - " + phone);
         String smsMessage = buildContextualContent(message, context);
         URL QUERY = new URL("https://eu.api.ovh.com/1.0/sms/" + config.getService() + "/jobs");
         String isoMessage = new String(smsMessage.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
