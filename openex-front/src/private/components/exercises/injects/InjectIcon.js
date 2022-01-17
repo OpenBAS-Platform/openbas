@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { deepOrange, purple, teal } from '@mui/material/colors';
 import {
   EmailOutlined,
   SmsOutlined,
@@ -31,7 +30,7 @@ const iconSelector = (type, variant, fontSize) => {
         <EmailOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: deepOrange[500] }}
+          sx={{ color: '#8bc34a' }}
         />
       );
     case 'openex_ovh_sms':
@@ -39,7 +38,7 @@ const iconSelector = (type, variant, fontSize) => {
         <SmsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: purple[500] }}
+          sx={{ color: '#aa00ff' }}
         />
       );
     case 'openex_manual':
@@ -47,7 +46,7 @@ const iconSelector = (type, variant, fontSize) => {
         <NotificationsActiveOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: teal[500] }}
+          sx={{ color: '#009688' }}
         />
       );
     default:

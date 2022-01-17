@@ -240,7 +240,7 @@ class InjectPopover extends Component {
               onClick={this.handleOpenEditContent.bind(this)}
               disabled={isExerciseReadOnly(exercise)}
             >
-              {t('Update content')}
+              {t('Manage content')}
             </MenuItem>
           )}
           {!inject.inject_status && (

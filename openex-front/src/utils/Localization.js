@@ -69,6 +69,7 @@ const i18n = {
       'Update the tag': 'Modifier le tag',
       'Manage grants': 'Gérer les permissions',
       'Manage users': 'Gérer les utilisateurs',
+      'Manage players': 'Gérer les joueurs',
       'Do you want to delete this user?':
         'Souhaitez-vous supprimer cet utilisateur ?',
       'Do you want to delete this group?':
@@ -216,8 +217,12 @@ const i18n = {
         'Souhaitez-vous désactiver ce stimuli ?',
       'Do you want to enable this inject?':
         'Souhaitez-vous activer ce stimuli ?',
+      'Do you want to disable this audience?':
+        'Souhaitez-vous désactiver cette audience ?',
+      'Do you want to enable this audience?':
+        'Souhaitez-vous activer cette audience ?',
       Trigger: 'Déclencheur',
-      'Update content': 'Modifier le contenu',
+      'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
       'Lessons learned': "Retour d'expérience",
       Comchecks: 'Vérifications',
@@ -226,13 +231,16 @@ const i18n = {
       'Launch a new dryrun': 'Démarrer une nouvelle simulation',
       Hello: 'Bonjour',
       Subject: 'Sujet',
-      '[${exercise.name}] Communication check': '[${exercise.name}] Vérification des moyens de communication',
+      '[${exercise.name}] Communication check':
+        '[${exercise.name}] Vérification des moyens de communication',
       'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: ${comcheck.url}':
         "Ceci est une vérification des moyens de communication avant le début de l'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : ${comcheck.url}",
       'Best regards': 'Bien cordialement',
       'The exercise control team': "L'équipe d'animation de l'exercice",
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
+      'Add tags to this exercise': 'Ajouter des tags à cet exercice',
+      message: 'Message',
     },
     en: {
       openex_email: 'Email',
@@ -248,6 +256,7 @@ const i18n = {
       textarea: 'Text area',
       checkbox: 'Checkbox',
       attachment: 'File',
+      message: 'Message',
     },
   },
 };

@@ -1,25 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import * as R from 'ramda';
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import Slide from '@mui/material/Slide';
-import {
-  AddOutlined,
-  CloseOutlined,
-  DoneOutlined,
-  MoreVertRounded,
-} from '@mui/icons-material';
+import { AddOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { Form } from 'react-final-form';
 import { useParams } from 'react-router-dom';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 import { updateExerciseTags } from '../../../actions/Exercise';
 import TagField from '../../../components/TagField';
 import ExercisePopover from './ExercisePopover';
 import { useStore } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
+import { Transition } from '../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -30,7 +28,6 @@ const useStyles = makeStyles(() => ({
     textTransform: 'uppercase',
   },
   tags: {
-    overflow: 'hidden',
     float: 'right',
   },
   tag: {
@@ -49,11 +46,9 @@ const ExerciseHeader = () => {
   const { exerciseId } = useParams();
   const dispatch = useDispatch();
   const exercise = useStore((store) => store.getExercise(exerciseId));
-  const [openTags, setOpenTags] = useState(false);
   const [openTagAdd, setOpenTagAdd] = useState(false);
-
+  const containerRef = useRef(null);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
-  const handleToggleOpenTags = () => setOpenTags(!openTags);
 
   const deleteTag = (tagId) => {
     const tags = exercise.tags.filter((tag) => tag.tag_id !== tagId);
@@ -76,7 +71,7 @@ const ExerciseHeader = () => {
   };
   const { tags } = exercise;
   return (
-    <div className={classes.container}>
+    <div className={classes.container} ref={containerRef}>
       <Typography
         variant="h5"
         gutterBottom={true}
@@ -94,46 +89,25 @@ const ExerciseHeader = () => {
             onDelete={() => deleteTag(tag.tag_id)}
           />
         ))}
-        {tags.length > 5 ? (
-          <Button
+        <div style={{ float: 'left', marginTop: -5 }}>
+          <IconButton
+            style={{ float: 'left' }}
             color="primary"
-            aria-label="More"
-            onClick={handleToggleOpenTags}
-            style={{ fontSize: 14 }}
+            aria-label="Tag"
+            onClick={handleToggleAddTag}
           >
-            <MoreVertRounded />
-            &nbsp;&nbsp;{t('More')}
-          </Button>
-        ) : (
-          <div style={{ float: 'left', marginTop: -5 }}>
-            {openTagAdd && (
-              <IconButton
-                style={{ float: 'left' }}
-                color="primary"
-                aria-label="Tag"
-                type="submit"
-                form="tagsForm"
-              >
-                <DoneOutlined />
-              </IconButton>
-            )}
-            <IconButton
-              style={{ float: 'left' }}
-              color="primary"
-              aria-label="Tag"
-              onClick={handleToggleAddTag}
-            >
-              {openTagAdd ? <CloseOutlined /> : <AddOutlined />}
-            </IconButton>
-          </div>
-        )}
-        <Slide
-          direction="left"
-          in={openTagAdd}
-          mountOnEnter={true}
-          unmountOnExit={true}
+            {<AddOutlined />}
+          </IconButton>
+        </div>
+        <Dialog
+          TransitionComponent={Transition}
+          open={openTagAdd}
+          onClose={handleToggleAddTag}
+          fullWidth={true}
+          maxWidth="xs"
         >
-          <div className={classes.tagsInput}>
+          <DialogTitle>{t('Add tags to this exercise')}</DialogTitle>
+          <DialogContent>
             <Form
               keepDirtyOnReinitialize={true}
               initialValues={{ exercise_tags: [] }}
@@ -144,20 +118,40 @@ const ExerciseHeader = () => {
                 },
               }}
             >
-              {({ handleSubmit, form, values }) => (
+              {({
+                handleSubmit, values, submitting, pristine,
+              }) => (
                 <form id="tagsForm" onSubmit={handleSubmit}>
                   <TagField
                     name="exercise_tags"
                     values={values}
                     label={null}
                     placeholder={t('Tags')}
-                    setFieldValue={form.mutators.setValue}
                   />
+                  <div style={{ float: 'right', marginTop: 20 }}>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleToggleAddTag}
+                      disabled={pristine || submitting}
+                      style={{ marginRight: 10 }}
+                    >
+                      {t('Cancel')}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      disabled={pristine || submitting}
+                    >
+                      {t('Add')}
+                    </Button>
+                  </div>
                 </form>
               )}
             </Form>
-          </div>
-        </Slide>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

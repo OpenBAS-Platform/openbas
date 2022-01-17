@@ -13,10 +13,16 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { updateAudience, deleteAudience } from '../../../../actions/Audience';
+import {
+  updateAudience,
+  deleteAudience,
+  updateAudienceActivation,
+} from '../../../../actions/Audience';
 import { updateInjectAudiences } from '../../../../actions/Inject';
 import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { storeBrowser } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -30,6 +36,8 @@ class AudiencePopover extends Component {
       openDelete: false,
       openEdit: false,
       openRemove: false,
+      openEnable: false,
+      openDisable: false,
       openPopover: false,
     };
   }
@@ -105,8 +113,59 @@ class AudiencePopover extends Component {
     this.handleCloseRemove();
   }
 
+  handleOpenEnable() {
+    this.setState({
+      openEnable: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseEnable() {
+    this.setState({
+      openEnable: false,
+    });
+  }
+
+  submitEnable() {
+    this.props.updateAudienceActivation(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      { audience_enabled: true },
+    );
+    this.handleCloseEnable();
+  }
+
+  handleOpenDisable() {
+    this.setState({
+      openDisable: true,
+    });
+    this.handlePopoverClose();
+  }
+
+  handleCloseDisable() {
+    this.setState({
+      openDisable: false,
+    });
+  }
+
+  submitDisable() {
+    this.props.updateAudienceActivation(
+      this.props.exerciseId,
+      this.props.audience.audience_id,
+      { audience_enabled: false },
+    );
+    this.handleCloseDisable();
+  }
+
+  handleOpenEditPlayers() {
+    this.props.setSelectedAudience(this.props.audience.audience_id);
+    this.handlePopoverClose();
+  }
+
   render() {
-    const { t, audience, injectId } = this.props;
+    const {
+      t, audience, injectId, setSelectedAudience, exercise,
+    } = this.props;
     const audienceTags = audience.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
@@ -133,9 +192,32 @@ class AudiencePopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
+          {setSelectedAudience && (
+            <MenuItem
+              onClick={this.handleOpenEditPlayers.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Manage players')}
+            </MenuItem>
+          )}
           {injectId && (
             <MenuItem onClick={this.handleOpenRemove.bind(this)}>
               {t('Remove from the inject')}
+            </MenuItem>
+          )}
+          {audience.audience_enabled ? (
+            <MenuItem
+              onClick={this.handleOpenDisable.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Disable')}
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={this.handleOpenEnable.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
+              {t('Enable')}
             </MenuItem>
           )}
           {!injectId && (
@@ -215,6 +297,60 @@ class AudiencePopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openEnable}
+          onClose={this.handleCloseEnable.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to enable this audience?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseEnable.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitEnable.bind(this)}
+            >
+              {t('Enable')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openDisable}
+          onClose={this.handleCloseDisable.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to disable this audience?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseDisable.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitDisable.bind(this)}
+            >
+              {t('Disable')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -223,15 +359,31 @@ class AudiencePopover extends Component {
 AudiencePopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   audience: PropTypes.object,
   updateAudience: PropTypes.func,
+  updateAudienceActivation: PropTypes.func,
   deleteAudience: PropTypes.func,
   updateInjectAudiences: PropTypes.func,
   injectId: PropTypes.string,
   injectAudiencesIds: PropTypes.string,
+  setSelectedAudience: PropTypes.func,
+};
+
+const select = (state, ownProps) => {
+  const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
+  return {
+    exercise: browser.getExercise(exerciseId),
+  };
 };
 
 export default R.compose(
-  connect(null, { updateAudience, deleteAudience, updateInjectAudiences }),
+  connect(select, {
+    updateAudience,
+    deleteAudience,
+    updateInjectAudiences,
+    updateAudienceActivation,
+  }),
   inject18n,
 )(AudiencePopover);

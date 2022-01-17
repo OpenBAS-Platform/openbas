@@ -27,6 +27,7 @@ import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useStore } from '../../../../store';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
+import ItemBoolean from '../../../../components/ItemBoolean';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -108,7 +109,13 @@ const headerStyles = {
     fontSize: 12,
     fontWeight: '700',
   },
-  inject_players: {
+  inject_users_number: {
+    float: 'left',
+    width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  inject_enabled: {
     float: 'left',
     width: '15%',
     fontSize: 12,
@@ -146,7 +153,15 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  inject_players: {
+  inject_users_number: {
+    float: 'left',
+    width: '10%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  inject_enabled: {
     float: 'left',
     width: '15%',
     height: 20,
@@ -244,9 +259,15 @@ const Injects = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'inject_players',
+                  'inject_users_number',
                   'Players',
-                  false,
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'inject_enabled',
+                  'Status',
+                  true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
@@ -269,7 +290,6 @@ const Injects = () => {
               divider={true}
               button={true}
               onClick={() => setSelectedInject(inject.inject_id)}
-              disabled={!inject.inject_enabled}
             >
               <ListItemIcon>
                 <InjectIcon type={inject.inject_type} />
@@ -281,7 +301,7 @@ const Injects = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.inject_type}
                     >
-                      <InjectType variant="list" status={inject.inject_type} />
+                      <InjectType variant="list" type={inject.inject_type} />
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -303,9 +323,21 @@ const Injects = () => {
                     </div>
                     <div
                       className={classes.bodyItem}
-                      style={inlineStyles.inject_players}
+                      style={inlineStyles.inject_users_number}
                     >
                       {inject.inject_users_number}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.inject_enabled}
+                    >
+                      <ItemBoolean
+                        status={inject.inject_enabled}
+                        label={
+                          inject.inject_enabled ? t('Enabled') : t('Disabled')
+                        }
+                        variant="list"
+                      />
                     </div>
                     <div
                       className={classes.bodyItem}

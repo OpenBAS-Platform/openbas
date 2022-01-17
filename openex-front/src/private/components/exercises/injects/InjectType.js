@@ -27,14 +27,14 @@ const styles = () => ({
 
 const inlineStyles = {
   openex_email: {
-    backgroundColor: 'rgba(255, 87, 34, 0.08)',
-    color: '#ff5722',
-    border: '1px solid #ff5722',
+    backgroundColor: 'rgba(139, 195, 74, 0.08)',
+    color: '#8bc34a',
+    border: '1px solid #8bc34a',
   },
   openex_ovh_sms: {
-    backgroundColor: 'rgba(156, 39, 176, 0.08)',
-    color: '#9c27b0',
-    border: '1px solid #9c27b0',
+    backgroundColor: 'rgba(170, 0, 255, 0.08)',
+    color: '#aa00ff',
+    border: '1px solid #aa00ff',
   },
   openex_manual: {
     backgroundColor: 'rgba(0, 150, 136, 0.08)',
@@ -46,10 +46,10 @@ const inlineStyles = {
 class InjectType extends Component {
   render() {
     const {
-      t, status, classes, variant,
+      t, type, classes, variant,
     } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
-    switch (status) {
+    switch (type) {
       case 'openex_email':
         return (
           <Chip
@@ -62,7 +62,7 @@ class InjectType extends Component {
         return (
           <Chip
             classes={{ root: style }}
-            style={inlineStyles.red}
+            style={inlineStyles.openex_ovh_sms}
             label={t('OVH SMS')}
           />
         );
@@ -81,7 +81,7 @@ class InjectType extends Component {
 InjectType.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
-  status: PropTypes.string,
+  type: PropTypes.string,
 };
 
 export default R.compose(inject18n, withStyles(styles))(InjectType);

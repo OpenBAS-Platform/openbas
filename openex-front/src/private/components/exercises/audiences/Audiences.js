@@ -227,7 +227,7 @@ const Audiences = () => {
                 {filtering.buildHeader(
                   'audience_enabled',
                   'Status',
-                  false,
+                  true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
@@ -295,7 +295,11 @@ const Audiences = () => {
               }
             />
             <ListItemSecondaryAction>
-              <AudiencePopover exerciseId={exerciseId} audience={audience} />
+              <AudiencePopover
+                exerciseId={exerciseId}
+                audience={audience}
+                setSelectedAudience={setSelectedAudience}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}
