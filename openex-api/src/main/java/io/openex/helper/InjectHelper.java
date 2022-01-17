@@ -49,6 +49,7 @@ public class InjectHelper<T> {
         // Create stream from inject audiences
         Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
         Stream<ExecutionContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
+                .filter(Audience::isEnabled)
                 .flatMap(audience -> audience.getUsers().stream()
                         .map(user -> new ExecutionContext(user, exercise, audience.getName())));
         // Create stream from animation group
