@@ -105,10 +105,6 @@ public class User implements Base, OAuth2User {
     @JsonProperty("users_city")
     private String city;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Token> tokens = new ArrayList<>();
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_groups",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -136,8 +132,18 @@ public class User implements Base, OAuth2User {
     @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Token> tokens = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @JsonIgnore
+    @Fetch(FetchMode.SUBSELECT)
+    private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
+
     // region transient
     private transient List<BasicInject> injects = new ArrayList<>();
+
     public void resolveInjects(Iterable<BasicInject> injects) {
         this.injects = stream(injects.spliterator(), false)
                 .filter(inject -> inject.isAllAudiences() || inject.getAudiences().stream()
@@ -155,7 +161,6 @@ public class User implements Base, OAuth2User {
     public long getUserInjectsNumber() {
         return injects.size();
     }
-    // endregion
 
     @JsonProperty("user_gravatar")
     public String getGravatar() {
@@ -179,6 +184,14 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_is_manager")
     public boolean isManager() {
         return isPlanner() || isObserver();
+    }
+
+    @JsonProperty("user_last_comcheck")
+    public Optional<Instant> lastComcheck() {
+        return getComcheckStatuses().stream()
+                .filter(comcheckStatus -> comcheckStatus.getReceiveDate().isPresent())
+                .map(comcheckStatus -> comcheckStatus.getReceiveDate().get())
+                .min(Instant::compareTo);
     }
     // endregion
 
@@ -206,9 +219,13 @@ public class User implements Base, OAuth2User {
         this.lang = lang;
     }
 
-    public String getTheme() { return theme; }
+    public String getTheme() {
+        return theme;
+    }
 
-    public void setTheme(String theme) { this.theme = theme; }
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
 
     public String getFirstname() {
         return firstname;
@@ -344,6 +361,14 @@ public class User implements Base, OAuth2User {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<ComcheckStatus> getComcheckStatuses() {
+        return comcheckStatuses;
+    }
+
+    public void setComcheckStatuses(List<ComcheckStatus> comcheckStatuses) {
+        this.comcheckStatuses = comcheckStatuses;
     }
 
     @Override
