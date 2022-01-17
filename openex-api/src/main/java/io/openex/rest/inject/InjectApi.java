@@ -2,10 +2,7 @@ package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
-import io.openex.database.repository.AudienceRepository;
-import io.openex.database.repository.ExerciseRepository;
-import io.openex.database.repository.InjectReportingRepository;
-import io.openex.database.repository.InjectRepository;
+import io.openex.database.repository.*;
 import io.openex.database.specification.InjectSpecification;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
@@ -42,8 +39,14 @@ public class InjectApi<T> extends RestBehavior {
     private InjectRepository<T> injectRepository;
     private InjectReportingRepository injectReportingRepository;
     private AudienceRepository audienceRepository;
+    private TagRepository tagRepository;
     private ApplicationContext context;
     private List<Contract> contracts;
+
+    @Autowired
+    public void setTagRepository(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
 
     @Autowired
     public void setInjectReportingRepository(InjectReportingRepository injectReportingRepository) {
@@ -104,6 +107,7 @@ public class InjectApi<T> extends RestBehavior {
         // Set dependencies
         inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+        inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return injectRepository.save(inject);
     }
 
@@ -134,6 +138,7 @@ public class InjectApi<T> extends RestBehavior {
         inject.setExercise(exercise);
         inject.setDependsOn(resolveRelation(input.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
+        inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return injectRepository.save(inject);
     }
 

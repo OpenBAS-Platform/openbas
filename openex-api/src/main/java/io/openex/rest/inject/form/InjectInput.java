@@ -41,6 +41,9 @@ public abstract class InjectInput<T> {
     @JsonProperty("inject_city")
     private String city;
 
+    @JsonProperty("inject_tags")
+    private List<String> tagIds;
+
     public String getTitle() {
         return title;
     }
@@ -123,6 +126,14 @@ public abstract class InjectInput<T> {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public List<String> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<String> tagIds) {
+        this.tagIds = tagIds;
     }
 
     public abstract Inject<T> injectInstance();
