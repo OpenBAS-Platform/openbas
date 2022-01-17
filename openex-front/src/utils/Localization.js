@@ -227,6 +227,8 @@ const i18n = {
       'Lessons learned': "Retour d'expérience",
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
+      'Messages header': 'En-tête des messages',
+      'Messages footer': 'Pied des messages',
       'Send a new comcheck': 'Envoyer une nouvelle vérification',
       'Launch a new dryrun': 'Démarrer une nouvelle simulation',
       Hello: 'Bonjour',

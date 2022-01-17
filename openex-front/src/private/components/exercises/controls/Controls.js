@@ -13,8 +13,8 @@ import CreateControl from './CreateControl';
 
 const useStyles = makeStyles(() => ({
   root: {
-    flexGrow: 1,
     marginTop: -20,
+    flexGrow: 1,
     paddingBottom: 50,
   },
   paper: {
@@ -40,13 +40,13 @@ const Controls = () => {
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
-        <Grid item={true} xs={6}>
+        <Grid item={true} xs={6} style={{ marginTop: -10 }}>
           <Typography variant="overline">{t('Dryruns')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             test
           </Paper>
         </Grid>
-        <Grid item={true} xs={6}>
+        <Grid item={true} xs={6} style={{ marginTop: -10 }}>
           <Typography variant="overline">{t('Comchecks')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             test

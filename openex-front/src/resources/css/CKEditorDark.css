@@ -125,9 +125,13 @@
 }
 
 .ck-editor__editable {
-  background-color: #263f59 !important;
+  background-color: transparent !important;
   height: 100% !important;
   overflow: auto !important;
+}
+
+.ck-button {
+  font-size: 11px !important;
 }
 
 .ck-editor__editable h2 {

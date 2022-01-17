@@ -30,12 +30,11 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
 
 const useStyles = makeStyles((theme) => ({
-  parameters: {
-    float: 'left',
-    marginTop: -10,
-  },
   container: {
     marginTop: 10,
+  },
+  parameters: {
+    float: 'left',
   },
   itemHead: {
     textTransform: 'uppercase',

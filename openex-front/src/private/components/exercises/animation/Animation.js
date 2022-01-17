@@ -35,6 +35,7 @@ const useStyles = makeStyles(() => ({
   root: {
     width: '100%',
     flexGrow: 1,
+    marginTop: 10,
     paddingBottom: 50,
     overflowX: 'hidden',
   },

@@ -26,7 +26,6 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 const useStyles = makeStyles((theme) => ({
   parameters: {
     float: 'left',
-    marginTop: -10,
   },
   container: {
     marginTop: 10,
