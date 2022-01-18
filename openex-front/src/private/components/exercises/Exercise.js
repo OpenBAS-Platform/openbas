@@ -161,11 +161,11 @@ const Exercise = () => {
   const maxInjectsNumber = Math.max(
     ...topAudiences.map((a) => a.audience_injects_number),
   );
-  const nextInjectDate = exercise.exercise_next_inject_date
+  const nextInjectDate = exercise?.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
     : Date.now();
   const buttonExecution = () => {
-    switch (exercise.exercise_status) {
+    switch (exercise?.exercise_status) {
       case 'SCHEDULED':
         return (
           <Button
@@ -173,7 +173,7 @@ const Exercise = () => {
             startIcon={<PlayArrowOutlined />}
             color="success"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
+              exercise?.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
@@ -187,7 +187,7 @@ const Exercise = () => {
             startIcon={<PauseOutlined />}
             color="warning"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
+              exercise?.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
@@ -201,7 +201,7 @@ const Exercise = () => {
             startIcon={<PlayArrowOutlined />}
             color="success"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
+              exercise?.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
@@ -215,7 +215,7 @@ const Exercise = () => {
             startIcon={<PauseOutlined />}
             color="warning"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
+              exercise?.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
@@ -225,7 +225,7 @@ const Exercise = () => {
     }
   };
   const buttonDangerous = () => {
-    switch (exercise.exercise_status) {
+    switch (exercise?.exercise_status) {
       case 'RUNNING':
       case 'PAUSED':
         return (

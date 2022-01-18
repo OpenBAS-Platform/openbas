@@ -87,10 +87,12 @@ export default () => ({
             borderTopRightRadius: 'inherit',
           },
           pre: {
-            background: '#01478DFF',
+            color: '#ffffff !important',
+            background: '#01478DFF !important',
           },
           code: {
-            background: '#01478DFF',
+            color: '#ffffff !important',
+            background: '#01478DFF !important',
           },
           '.react-mde': {
             border: '0 !important',
