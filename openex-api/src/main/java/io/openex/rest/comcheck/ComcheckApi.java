@@ -20,7 +20,6 @@ import static java.time.Instant.now;
 @RestController
 public class ComcheckApi extends RestBehavior {
 
-
     private ComcheckRepository comcheckRepository;
     private AudienceRepository audienceRepository;
     private ExerciseRepository exerciseRepository;
