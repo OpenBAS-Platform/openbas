@@ -260,6 +260,7 @@ const i18n = {
       'Your communication check is': 'Votre test de communication est',
       successfull: 'un succès',
       'Verification done at': 'Vérification faite le',
+      'No dryrun in this exercise.': 'Aucune simulation dans cet exercice.',
     },
     en: {
       openex_email: 'Email',

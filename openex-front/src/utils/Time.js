@@ -2,6 +2,8 @@ export const ONE_MINUTE = 60 * 1000;
 export const FIVE_SECONDS = 5000;
 export const ONE_SECOND = 1000;
 
+const minTwoDigits = (n) => (n < 10 ? '0' : '') + n;
+
 export const splitDuration = (duration = 0) => {
   let delta = duration;
   const days = Math.floor(delta / 86400);
@@ -12,10 +14,10 @@ export const splitDuration = (duration = 0) => {
   delta -= minutes * 60;
   const seconds = delta % 60;
   return {
-    days,
-    hours,
-    minutes,
-    seconds,
+    days: minTwoDigits(days),
+    hours: minTwoDigits(hours),
+    minutes: minTwoDigits(minutes),
+    seconds: minTwoDigits(seconds),
   };
 };
 

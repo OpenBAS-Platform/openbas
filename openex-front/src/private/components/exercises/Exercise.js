@@ -24,7 +24,6 @@ import LinearProgress, {
 } from '@mui/material/LinearProgress';
 import * as R from 'ramda';
 import { useDispatch } from 'react-redux';
-import Countdown from 'react-countdown';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
@@ -40,6 +39,7 @@ import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../actions/Audience';
 import Empty from '../../../components/Empty';
+import Countdown from '../../../components/Countdown';
 import { distributionChartOptions } from '../../../utils/Charts';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 import { Transition } from '../../../utils/Environment';

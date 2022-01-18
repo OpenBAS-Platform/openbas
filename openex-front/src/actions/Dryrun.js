@@ -5,14 +5,14 @@ import {
   delReferential,
 } from '../utils/Action';
 
-export const fetchDryruns = (exerciseId, noloading) => (dispatch) => {
+export const fetchDryruns = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/dryruns`;
-  return getReferential(schema.arrayOfDryruns, uri, noloading)(dispatch);
+  return getReferential(schema.arrayOfDryruns, uri)(dispatch);
 };
 
-export const fetchDryrun = (exerciseId, dryrunId, noloading) => (dispatch) => {
+export const fetchDryrun = (exerciseId, dryrunId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/dryruns/${dryrunId}`;
-  return getReferential(schema.dryrun, uri, noloading)(dispatch);
+  return getReferential(schema.dryrun, uri)(dispatch);
 };
 
 export const addDryrun = (exerciseId, data) => (dispatch) => {

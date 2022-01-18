@@ -26,6 +26,8 @@ import { useStore } from '../../../../store';
 import Empty from '../../../../components/Empty';
 import ComcheckState from './ComcheckState';
 import { Transition } from '../../../../utils/Environment';
+import DryrunStatus from './DryrunStatus';
+import { deleteDryrun, fetchDryruns } from '../../../../actions/Dryrun';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -62,15 +64,21 @@ const Controls = () => {
   const { t, nsd } = useFormatter();
   const { exerciseId } = useParams();
   const [openComcheckDelete, setOpenComcheckDelete] = useState(null);
+  const [openDryrunDelete, setOpenDryrunDelete] = useState(null);
   const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { comchecks } = exercise;
+  const { dryruns, comchecks } = exercise;
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
     dispatch(fetchComchecks(exerciseId));
+    dispatch(fetchDryruns(exerciseId));
   });
   const submitComcheckDelete = () => {
     dispatch(deleteComcheck(exerciseId, openComcheckDelete));
     setOpenComcheckDelete(null);
+  };
+  const submitDryrunDelete = () => {
+    dispatch(deleteDryrun(exerciseId, openDryrunDelete));
+    setOpenDryrunDelete(null);
   };
   return (
     <div className={classes.root}>
@@ -78,7 +86,70 @@ const Controls = () => {
         <Grid item={true} xs={6} style={{ marginTop: -10 }}>
           <Typography variant="overline">{t('Dryruns')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            test
+            {dryruns.length > 0 ? (
+              <List style={{ paddingTop: 0 }}>
+                {dryruns.map((dryrun) => (
+                  <ListItem
+                    key={dryrun.dryrun_id}
+                    dense={true}
+                    button={true}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    component={Link}
+                    to={`/exercises/${exercise.exercise_id}/controls/dryruns/${dryrun.dryrun_id}`}
+                  >
+                    <ListItemIcon>
+                      <VideoSettingsOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '30%' }}
+                          >
+                            {nsd(dryrun.dryrun_date)}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '15%' }}
+                          >
+                            {dryrun.dryrun_speed}x
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '20%' }}
+                          >
+                            <span style={{ fontWeight: 600 }}>
+                              {dryrun.dryrun_injects_number}
+                            </span>
+                            <span style={{ fontSize: 20 }}>&nbsp;</span>
+                            {t('injects')}
+                          </div>
+                          <div className={classes.bodyItem}>
+                            <DryrunStatus
+                              status={dryrun.dryrun_status}
+                              variant="list"
+                            />
+                          </div>
+                        </div>
+                      }
+                    />
+                    <ListItemSecondaryAction style={{ paddingTop: 4 }}>
+                      <IconButton
+                        onClick={() => setOpenComcheckDelete(dryrun.dryrun_id)}
+                        aria-haspopup="true"
+                        size="large"
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Empty message={t('No dryrun in this exercise.')} />
+            )}
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: -10 }}>
@@ -173,6 +244,33 @@ const Controls = () => {
             variant="contained"
             color="primary"
             onClick={submitComcheckDelete}
+          >
+            {t('Delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={Boolean(openDryrunDelete)}
+        TransitionComponent={Transition}
+        onClose={() => setOpenDryrunDelete(null)}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to delete this dryrun?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => setOpenDryrunDelete(null)}
+          >
+            {t('Cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={submitDryrunDelete}
           >
             {t('Delete')}
           </Button>

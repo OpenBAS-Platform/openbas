@@ -232,6 +232,17 @@ const _buildComcheck = (state, com) => {
       .map((s) => _buildComcheckStatus(state, s)),
   };
 };
+const _buildDryrun = (state, id, dry) => {
+  if (dry === undefined) return dry;
+  const getDryinjects = () => R.filter(
+    (n) => n.dryinject_dryrun === id,
+    R.values(state.referential.entities.dryinjects),
+  );
+  return {
+    ...dry,
+    dryinjects: getDryinjects(),
+  };
+};
 const _buildExercise = (state, id, ex) => {
   if (ex === undefined) return ex;
   const getAudiences = () => R.filter(
@@ -245,7 +256,7 @@ const _buildExercise = (state, id, ex) => {
   const getDryruns = () => R.filter(
     (n) => n.dryrun_exercise === id,
     R.values(state.referential.entities.dryruns),
-  ).map((a) => _buildAudience(state, a));
+  ).map((d) => _buildDryrun(state, d.dryrun_id, d));
   const getComchecks = () => R.filter(
     (n) => n.comcheck_exercise === id,
     R.values(state.referential.entities.comchecks),
@@ -321,6 +332,9 @@ export const storeBrowser = (state) => ({
   },
   getComcheck(id) {
     return _buildComcheck(state, state.referential.entities.comchecks[id]);
+  },
+  getDryrun(id) {
+    return _buildDryrun(state, id, state.referential.entities.dryruns[id]);
   },
   getComcheckStatus(id) {
     return state.referential.entities.comchecks_statuses[id];
