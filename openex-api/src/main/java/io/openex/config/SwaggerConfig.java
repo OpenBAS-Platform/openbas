@@ -1,15 +1,19 @@
 package io.openex.config;
 
+import com.fasterxml.classmate.TypeResolver;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.AlternateTypeRules;
 import springfox.documentation.schema.ScalarType;
 import springfox.documentation.service.ParameterType;
 import springfox.documentation.spi.DocumentationType;
@@ -18,12 +22,22 @@ import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
 import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class SwaggerConfig {
+
+    private TypeResolver typeResolver;
+
+    @Autowired
+    public void setTypeResolver(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+    }
 
     @Bean
     public static BeanPostProcessor springfoxHandlerProviderBeanPostProcessor() {
@@ -72,6 +86,13 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("io.openex"))
                 .paths(PathSelectors.any())
                 .build()
+                .alternateTypeRules(
+                        AlternateTypeRules.newRule(
+                                typeResolver.resolve(Optional.class, Instant.class),
+                                typeResolver.resolve(Date.class),
+                                Ordered.HIGHEST_PRECEDENCE
+                        ))
+                .genericModelSubstitutes(Optional.class)
                 .globalRequestParameters(List.of(parameterBuilder.build()));
     }
 }
