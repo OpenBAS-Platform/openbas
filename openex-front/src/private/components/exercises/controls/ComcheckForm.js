@@ -95,7 +95,7 @@ class ComcheckForm extends Component {
               name="comcheck_message"
               label={t('Message')}
               fullWidth={true}
-              style={{ marginTop: 20, height: 400 }}
+              style={{ marginTop: 20, height: 300 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

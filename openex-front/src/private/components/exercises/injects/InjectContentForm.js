@@ -60,7 +60,7 @@ class InjectContentForm extends Component {
       return <Loader variant="inElement" />;
     }
     return (
-      <div style={{ marginTop: -20 }}>
+      <div style={{ marginTop: -20, overflowX: 'hidden' }}>
         <Form
           keepDirtyOnReinitialize={true}
           initialValues={initialValues}

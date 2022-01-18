@@ -20,7 +20,7 @@ const renderEnrichedTextField = ({
   const platformLang = platformLanguage !== 'auto' ? platformLanguage : locale;
   const lang = userLanguage !== 'auto' ? userLanguage : platformLang;
   return (
-    <div style={{ ...style, overflow: 'hidden' }}>
+    <div style={style}>
       <InputLabel variant="standard" shrink={true}>
         {label}
       </InputLabel>

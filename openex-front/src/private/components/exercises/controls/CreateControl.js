@@ -138,7 +138,7 @@ class CreateControl extends Component {
           maxWidth="md"
         >
           <DialogTitle>{t('Send a new comcheck')}</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ overflowX: 'hidden' }}>
             <ComcheckForm
               onSubmit={this.onSubmitComcheck.bind(this)}
               initialValues={{
