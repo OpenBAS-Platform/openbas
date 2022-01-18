@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
-import IndexComcheck from './components/comcheck/Index';
+import Comcheck from './components/comcheck/Comcheck';
 import Login from './components/login/Login';
 import { errorWrapper } from '../components/Error';
 
@@ -37,7 +37,7 @@ const Index = () => {
           <Route
             exact
             path="/comcheck/:statusId"
-            render={errorWrapper(IndexComcheck)}
+            render={errorWrapper(Comcheck)}
           />
           <Route component={Login} />
         </Switch>

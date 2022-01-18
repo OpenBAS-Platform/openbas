@@ -18,3 +18,8 @@ export const splitDuration = (duration = 0) => {
     seconds,
   };
 };
+
+// eslint-disable-next-line max-len
+export const progression = (now, startDate, endDate) => (now > endDate
+  ? 100
+  : Math.round(((now - startDate) / (endDate - startDate)) * 100));

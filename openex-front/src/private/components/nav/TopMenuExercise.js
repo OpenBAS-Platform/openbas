@@ -135,13 +135,13 @@ class TopMenuExercise extends Component {
           component={Link}
           to={`/exercises/${exerciseId}/controls`}
           variant={
-            location.pathname === `/exercises/${exerciseId}/controls`
+            location.pathname.includes(`/exercises/${exerciseId}/controls`)
               ? 'contained'
               : 'text'
           }
           size="small"
           color={
-            location.pathname === `/exercises/${exerciseId}/controls`
+            location.pathname.includes(`/exercises/${exerciseId}/controls`)
               ? 'secondary'
               : 'inherit'
           }

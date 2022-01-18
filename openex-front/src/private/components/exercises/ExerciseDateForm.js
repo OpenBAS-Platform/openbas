@@ -27,6 +27,7 @@ class ExerciseDateForm extends Component {
               name="exercise_start_date"
               label={t('Start date (optional)')}
               autoOk={true}
+              minDateTime={new Date()}
               textFieldProps={{
                 variant: 'standard',
                 fullWidth: true,

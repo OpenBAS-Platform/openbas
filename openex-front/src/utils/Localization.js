@@ -36,6 +36,10 @@ const i18n = {
       'End date': 'Date de fin',
       Tags: 'Tags',
       'Create a new exercise': 'Créer un nouvel exercice',
+      'Do you want to delete this audience?':
+        'Souhaitez-vous supprimer cette audience ?',
+      'Do you want to delete this comcheck?':
+        'Souhaitez-vous supprimer cette vérification ?',
       'Do you want to delete this player?':
         'Souhaitez-vous supprimer ce joueur ?',
       'Do you want to delete this inject?':
@@ -242,7 +246,20 @@ const i18n = {
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
+      'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
+      None: 'Aucune',
       message: 'Message',
+      Pending: 'En attente',
+      State: 'Etat',
+      'Sent date': "Date d'envoi",
+      'Received date': 'Date de réception',
+      'Communication check': 'Vérification des moyens de communication',
+      Running: 'En cours',
+      Failure: 'Echec',
+      Expired: 'Expiré',
+      'Your communication check is': 'Votre test de communication est',
+      successfull: 'un succès',
+      'Verification done at': 'Vérification faite le',
     },
     en: {
       openex_email: 'Email',
@@ -259,6 +276,7 @@ const i18n = {
       checkbox: 'Checkbox',
       attachment: 'File',
       message: 'Message',
+      Running: 'On-going',
     },
   },
 };

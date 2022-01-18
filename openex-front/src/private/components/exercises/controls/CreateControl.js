@@ -62,7 +62,9 @@ class CreateControl extends Component {
   onSubmitComcheck(data) {
     return this.props
       .addComcheck(this.props.exerciseId, data)
-      .then(() => this.props.history.push('/exercises'));
+      .then((result) => this.props.history.push(
+        `/exercises/${this.props.exerciseId}/controls/comchecks/${result.result}`,
+      ));
   }
 
   handleOpenDryrun() {

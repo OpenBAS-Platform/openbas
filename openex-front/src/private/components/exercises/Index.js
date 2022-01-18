@@ -12,6 +12,7 @@ import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
 import Animation from './animation/Animation';
 import Controls from './controls/Controls';
+import Comcheck from './controls/Comcheck';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useStore } from '../../../store';
@@ -60,14 +61,19 @@ const Index = () => {
             render={errorWrapper(Injects)}
           />
           <Route
-              exact
-              path="/exercises/:exerciseId/controls"
-              render={errorWrapper(Controls)}
+            exact
+            path="/exercises/:exerciseId/controls"
+            render={errorWrapper(Controls)}
           />
           <Route
-              exact
-              path="/exercises/:exerciseId/scenario"
-              render={errorWrapper(Injects)}
+            exact
+            path="/exercises/:exerciseId/controls/comchecks/:comcheckId"
+            render={errorWrapper(Comcheck)}
+          />
+          <Route
+            exact
+            path="/exercises/:exerciseId/scenario"
+            render={errorWrapper(Injects)}
           />
         </Switch>
       </div>

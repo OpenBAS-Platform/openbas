@@ -77,6 +77,7 @@ class ComcheckForm extends Component {
               name="comcheck_end_date"
               label={t('End date')}
               autoOk={true}
+              minDateTime={new Date()}
               textFieldProps={{
                 variant: 'standard',
                 fullWidth: true,

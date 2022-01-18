@@ -212,6 +212,26 @@ const _buildInject = (state, inj) => {
       .map((a) => _buildAudience(state, a)),
   };
 };
+const _buildComcheckStatus = (state, sta) => {
+  if (sta === undefined) return sta;
+  return {
+    ...sta,
+    user: _buildUser(state, state.referential.entities.users[sta.status_user]),
+  };
+};
+const _buildComcheck = (state, com) => {
+  if (com === undefined) return com;
+  return {
+    ...com,
+    status: com.comcheck_status
+      .asMutable()
+      .map(
+        (statusId) => state.referential.entities.comchecks_statuses[statusId],
+      )
+      .filter((s) => s !== undefined)
+      .map((s) => _buildComcheckStatus(state, s)),
+  };
+};
 const _buildExercise = (state, id, ex) => {
   if (ex === undefined) return ex;
   const getAudiences = () => R.filter(
@@ -229,7 +249,7 @@ const _buildExercise = (state, id, ex) => {
   const getComchecks = () => R.filter(
     (n) => n.comcheck_exercise === id,
     R.values(state.referential.entities.comchecks),
-  ).map((a) => _buildAudience(state, a));
+  ).map((c) => _buildComcheck(state, c));
   const me = _resolveMe(state);
   return {
     ...ex,
@@ -298,6 +318,12 @@ export const storeBrowser = (state) => ({
   },
   getExercise(id) {
     return _buildExercise(state, id, state.referential.entities.exercises[id]);
+  },
+  getComcheck(id) {
+    return _buildComcheck(state, state.referential.entities.comchecks[id]);
+  },
+  getComcheckStatus(id) {
+    return state.referential.entities.comchecks_statuses[id];
   },
   getAudience(id) {
     return _buildAudience(state, state.referential.entities.audiences[id]);
