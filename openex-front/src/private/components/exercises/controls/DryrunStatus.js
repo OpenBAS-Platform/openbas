@@ -25,10 +25,6 @@ const styles = () => ({
 });
 
 const inlineStyles = {
-  white: {
-    backgroundColor: 'rgb(231, 133, 109, 0.08)',
-    color: '#8d4e41',
-  },
   green: {
     backgroundColor: 'rgba(76, 175, 80, 0.08)',
     color: '#4caf50',
@@ -37,67 +33,34 @@ const inlineStyles = {
     backgroundColor: 'rgba(92, 123, 245, 0.08)',
     color: '#5c7bf5',
   },
-  red: {
-    backgroundColor: 'rgba(244, 67, 54, 0.08)',
-    color: '#f44336',
-  },
-  orange: {
-    backgroundColor: 'rgba(255, 152, 0, 0.08)',
-    color: '#ff9800',
-  },
-  grey: {
-    backgroundColor: 'rgba(96, 125, 139, 0.08)',
-    color: '#607d8b',
-  },
 };
 
 class DryrunStatus extends Component {
   render() {
     const {
-      t, status, classes, variant,
+      t, finished, classes, variant,
     } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
-    switch (status) {
-      case 'RUNNING':
-        return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.blue}
-            label={t('Running')}
-          />
-        );
-      case 'EXPIRED':
-        return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.orange}
-            label={t('Expired')}
-          />
-        );
-      case 'FINISHED':
-        return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.green}
-            label={t('Finished')}
-          />
-        );
-      default:
-        return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.blue}
-            label={t('Running')}
-          />
-        );
-    }
+    return finished ? (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.blue}
+        label={t('Running')}
+      />
+    ) : (
+      <Chip
+        classes={{ root: style }}
+        style={inlineStyles.blue}
+        label={t('Running')}
+      />
+    );
   }
 }
 
 DryrunStatus.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
-  status: PropTypes.string,
+  finished: PropTypes.bool,
 };
 
 export default R.compose(inject18n, withStyles(styles))(DryrunStatus);

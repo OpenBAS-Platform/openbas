@@ -30,6 +30,7 @@ import InjectPopover from '../injects/InjectPopover';
 import InjectStatus from '../injects/InjectStatus';
 import { truncate } from '../../../../utils/String';
 import InjectDefinition from '../injects/InjectDefinition';
+import InjectStatusDetails from '../injects/InjectStatusDetails';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -460,7 +461,6 @@ const Animation = () => {
                               fontSize: 12,
                               paddingTop: 3,
                               marginRight: 15,
-                              float: 'right',
                             }}
                           >
                             {fndt(inject.inject_status.status_date)} (
@@ -472,6 +472,9 @@ const Animation = () => {
                         </div>
                       }
                     />
+                    <ListItemSecondaryAction>
+                      <InjectStatusDetails status={inject.inject_status} />
+                    </ListItemSecondaryAction>
                   </ListItem>
                 ))}
               </List>

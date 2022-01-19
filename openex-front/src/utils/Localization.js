@@ -261,6 +261,7 @@ const i18n = {
       successfull: 'un succès',
       'Verification done at': 'Vérification faite le',
       'No dryrun in this exercise.': 'Aucune simulation dans cet exercice.',
+      'Do you want to delete this dryrun?': 'Souhaitez-vous supprimer cette simulation ?',
     },
     en: {
       openex_email: 'Email',

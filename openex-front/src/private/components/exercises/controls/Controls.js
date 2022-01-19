@@ -9,7 +9,11 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { VideoSettingsOutlined, DeleteOutlined } from '@mui/icons-material';
+import {
+  VideoSettingsOutlined,
+  DeleteOutlined,
+  MarkEmailReadOutlined,
+} from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
 import Dialog from '@mui/material/Dialog';
@@ -109,12 +113,14 @@ const Controls = () => {
                             style={{ width: '30%' }}
                           >
                             {nsd(dryrun.dryrun_date)}
+                            <span style={{ fontSize: 20 }}>&nbsp;</span>
                           </div>
                           <div
                             className={classes.bodyItem}
                             style={{ width: '15%' }}
                           >
-                            {dryrun.dryrun_speed}x
+                            <span style={{ fontSize: 20 }}>&nbsp;</span>
+                            <code>{dryrun.dryrun_speed}x</code>
                           </div>
                           <div
                             className={classes.bodyItem}
@@ -128,7 +134,7 @@ const Controls = () => {
                           </div>
                           <div className={classes.bodyItem}>
                             <DryrunStatus
-                              status={dryrun.dryrun_status}
+                              finished={dryrun.dryrun_finished}
                               variant="list"
                             />
                           </div>
@@ -137,7 +143,7 @@ const Controls = () => {
                     />
                     <ListItemSecondaryAction style={{ paddingTop: 4 }}>
                       <IconButton
-                        onClick={() => setOpenComcheckDelete(dryrun.dryrun_id)}
+                        onClick={() => setOpenDryrunDelete(dryrun.dryrun_id)}
                         aria-haspopup="true"
                         size="large"
                       >
@@ -168,7 +174,7 @@ const Controls = () => {
                     to={`/exercises/${exercise.exercise_id}/controls/comchecks/${comcheck.comcheck_id}`}
                   >
                     <ListItemIcon>
-                      <VideoSettingsOutlined />
+                      <MarkEmailReadOutlined />
                     </ListItemIcon>
                     <ListItemText
                       primary={

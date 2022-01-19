@@ -1,9 +1,9 @@
 import * as schema from './Schema';
 import { getReferential, postReferential } from '../utils/Action';
 
-export const fetchDryinjects = (exerciseId, dryrunId, noloading) => (dispatch) => {
+export const fetchDryinjects = (exerciseId, dryrunId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/dryruns/${dryrunId}/dryinjects`;
-  return getReferential(schema.arrayOfDryinjects, uri, noloading)(dispatch);
+  return getReferential(schema.arrayOfDryinjects, uri)(dispatch);
 };
 
 export const dryinjectDone = (dryinjectId) => (dispatch) => {

@@ -78,7 +78,9 @@ class CreateControl extends Component {
   submitDryrun() {
     return this.props
       .addDryrun(this.props.exerciseId)
-      .then(() => this.props.history.push('/exercises'));
+      .then((result) => this.props.history.push(
+        `/exercises/${this.props.exerciseId}/controls/dryruns/${result.result}`,
+      ));
   }
 
   render() {

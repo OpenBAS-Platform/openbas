@@ -12,6 +12,7 @@ import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
 import Animation from './animation/Animation';
 import Controls from './controls/Controls';
+import Dryrun from './controls/Dryrun';
 import Comcheck from './controls/Comcheck';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
@@ -64,6 +65,11 @@ const Index = () => {
             exact
             path="/exercises/:exerciseId/controls"
             render={errorWrapper(Controls)}
+          />
+          <Route
+            exact
+            path="/exercises/:exerciseId/controls/dryruns/:dryrunId"
+            render={errorWrapper(Dryrun)}
           />
           <Route
             exact
