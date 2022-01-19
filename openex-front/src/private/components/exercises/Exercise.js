@@ -161,11 +161,11 @@ const Exercise = () => {
   const maxInjectsNumber = Math.max(
     ...topAudiences.map((a) => a.audience_injects_number),
   );
-  const nextInjectDate = exercise?.exercise_next_inject_date
+  const nextInjectDate = exercise.exercise_next_inject_date
     ? new Date(exercise.exercise_next_inject_date).getTime()
     : Date.now();
   const buttonExecution = () => {
-    switch (exercise?.exercise_status) {
+    switch (exercise.exercise_status) {
       case 'SCHEDULED':
         return (
           <Button
@@ -173,7 +173,7 @@ const Exercise = () => {
             startIcon={<PlayArrowOutlined />}
             color="success"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise?.exercise_status,
+              exercise.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
@@ -187,7 +187,7 @@ const Exercise = () => {
             startIcon={<PauseOutlined />}
             color="warning"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise?.exercise_status,
+              exercise.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
@@ -201,7 +201,7 @@ const Exercise = () => {
             startIcon={<PlayArrowOutlined />}
             color="success"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise?.exercise_status,
+              exercise.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
@@ -215,7 +215,7 @@ const Exercise = () => {
             startIcon={<PauseOutlined />}
             color="warning"
             disabled={['FINISHED', 'CANCELED'].includes(
-              exercise?.exercise_status,
+              exercise.exercise_status,
             )}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
@@ -225,7 +225,7 @@ const Exercise = () => {
     }
   };
   const buttonDangerous = () => {
-    switch (exercise?.exercise_status) {
+    switch (exercise.exercise_status) {
       case 'RUNNING':
       case 'PAUSED':
         return (
@@ -273,16 +273,16 @@ const Exercise = () => {
             style={{ display: 'flex' }}
           >
             <div className={classes.icon}>
-              {iconStatus(exercise?.exercise_status)}
+              {iconStatus(exercise.exercise_status)}
             </div>
             <div>
               <div className={classes.title}>{t('Status')}</div>
-              <ExerciseStatus status={exercise?.exercise_status} />
+              <ExerciseStatus status={exercise.exercise_status} />
             </div>
             <div className={classes.progress}>
               <BorderLinearProgress
                 value={
-                  exercise?.exercise_injects_statistics?.total_progress ?? 0
+                  exercise.exercise_injects_statistics?.total_progress ?? 0
                 }
                 variant="determinate"
               />
@@ -296,7 +296,7 @@ const Exercise = () => {
             </div>
             <div className={classes.title}>{t('Injects')}</div>
             <div className={classes.number}>
-              {exercise?.exercise_injects_statistics?.total_count ?? '-'}
+              {exercise.exercise_injects_statistics?.total_count ?? '-'}
             </div>
           </Paper>
         </Grid>
@@ -307,7 +307,7 @@ const Exercise = () => {
             </div>
             <div className={classes.title}>{t('Players')}</div>
             <div className={classes.number}>
-              {exercise?.exercise_users_number ?? '-'}
+              {exercise.exercise_users_number ?? '-'}
             </div>
           </Paper>
         </Grid>
@@ -320,21 +320,21 @@ const Exercise = () => {
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Subtitle')}</Typography>
-                {exercise?.exercise_subtitle || '-'}
+                {exercise.exercise_subtitle || '-'}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Description')}</Typography>
-                {exercise?.exercise_description || '-'}
+                {exercise.exercise_description || '-'}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Creation date')}</Typography>
-                {fldt(exercise?.exercise_created_at)}
+                {fldt(exercise.exercise_created_at)}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">
                   {t('Sender email address')}
                 </Typography>
-                {exercise?.exercise_mail_from}
+                {exercise.exercise_mail_from}
               </Grid>
             </Grid>
           </Paper>
@@ -349,7 +349,7 @@ const Exercise = () => {
                 </Typography>
                 <ExerciseDatePopover exercise={exercise} />
                 <div className="clearfix" />
-                {fldt(exercise?.exercise_start_date) || t('Manual')}
+                {fldt(exercise.exercise_start_date) || t('Manual')}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Next inject')}</Typography>
@@ -415,7 +415,7 @@ const Exercise = () => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to change the status of this exercise?')}
+            {t('Do you want to change the status of this exercise')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

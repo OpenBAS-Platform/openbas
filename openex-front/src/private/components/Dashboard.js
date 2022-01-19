@@ -131,7 +131,7 @@ const Dashboard = (props) => {
     },
   ];
   const maxInjectsNumber = Math.max(
-    ...(topOrganizations || []).map((a) => a.organization_injects_number),
+    ...topOrganizations.map((a) => a.organization_injects_number),
   );
   return (
     <div className={classes.root}>

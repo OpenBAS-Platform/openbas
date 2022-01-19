@@ -25,7 +25,6 @@ const UserForm = (props) => {
     });
     return errors;
   };
-
   return (
     <Form
       keepDirtyOnReinitialize={true}
@@ -122,7 +121,7 @@ const UserForm = (props) => {
             <Button
               variant="contained"
               color="secondary"
-              onClick={handleClose.bind(this)}
+              onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
             >

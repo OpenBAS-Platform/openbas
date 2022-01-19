@@ -33,7 +33,6 @@ const Index = () => {
     dispatch(fetchTags());
     dispatch(fetchExercise(exerciseId));
   });
-
   if (exercise) {
     return (
       <div className={classes.root}>

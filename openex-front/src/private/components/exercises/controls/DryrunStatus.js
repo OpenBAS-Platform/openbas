@@ -44,8 +44,8 @@ class DryrunStatus extends Component {
     return finished ? (
       <Chip
         classes={{ root: style }}
-        style={inlineStyles.blue}
-        label={t('Running')}
+        style={inlineStyles.green}
+        label={t('Finished')}
       />
     ) : (
       <Chip
