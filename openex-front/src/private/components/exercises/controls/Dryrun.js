@@ -5,10 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch } from 'react-redux';
-import {
-  CastOutlined,
-  CheckCircleOutlineOutlined,
-} from '@mui/icons-material';
+import { CastOutlined, CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -381,7 +378,7 @@ const Dryrun = () => {
                     >
                       <InjectStatus
                         variant="list"
-                        status={dryinject.dryinject_status.status_name}
+                        status={dryinject.dryinject_status?.status_name}
                       />
                     </div>
                     <div
@@ -394,10 +391,11 @@ const Dryrun = () => {
                         float: 'left',
                       }}
                     >
-                      {fndt(dryinject.dryinject_status.status_date)} (
-                      {(
-                        dryinject.dryinject_status.status_execution / 1000
-                      ).toFixed(2)}
+                      {fndt(dryinject.dryinject_status?.status_date)} (
+                      {dryinject.dryinject_status
+                        && (
+                          dryinject.dryinject_status.status_execution / 1000
+                        ).toFixed(2)}
                       s)
                     </div>
                   </div>

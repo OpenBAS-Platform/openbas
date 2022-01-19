@@ -12,7 +12,11 @@ const Countdown = ({ date }) => {
   }
   const [currentDate, setCurrentDate] = useState(Math.round(Date.now() / 1000));
   useEffect(() => {
-    setInterval(() => setCurrentDate(Math.round(Date.now() / 1000)), 1000);
+    const intervalId = setInterval(
+      () => setCurrentDate(Math.round(Date.now() / 1000)),
+      1000,
+    );
+    return () => clearInterval(intervalId);
   }, []);
   const duration = splitDuration(
     dateInSeconds > currentDate ? dateInSeconds - currentDate : 0,

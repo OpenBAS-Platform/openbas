@@ -115,7 +115,8 @@ const Dashboard = (props) => {
   } = props;
   const [currentDate, setCurrentDate] = useState(Date.now());
   useEffect(() => {
-    setInterval(() => setCurrentDate(Date.now()), 1000);
+    const intervalId = setInterval(() => setCurrentDate(Date.now()), 1000);
+    return () => clearInterval(intervalId);
   }, []);
   const topOrganizations = R.pipe(
     R.sortWith([R.descend(R.prop('organization_injects_number'))]),
@@ -319,7 +320,7 @@ const Dashboard = (props) => {
             {t('Organizations distribution across exercises')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {organizations.length > 0 ? (
+            {topOrganizations.length > 0 ? (
               <Chart
                 options={distributionChartOptions(theme, maxInjectsNumber < 2)}
                 series={distributionChartData}

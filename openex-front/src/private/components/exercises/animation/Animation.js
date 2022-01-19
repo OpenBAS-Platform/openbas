@@ -451,7 +451,7 @@ const Animation = () => {
                           >
                             <InjectStatus
                               variant="list"
-                              status={inject.inject_status.status_name}
+                              status={inject.inject_status?.status_name}
                             />
                           </div>
                           <div
