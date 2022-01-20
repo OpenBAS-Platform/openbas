@@ -60,6 +60,11 @@ public class Dryrun implements Base {
         List<DryInject<?>> injects = getInjects();
         return injects.stream().allMatch(dryInject -> dryInject.getStatus() != null);
     }
+
+    @JsonProperty("dryrun_users_number")
+    public long usersNumber() {
+        return getUsers().size();
+    }
     // endregion
 
     public String getId() {
