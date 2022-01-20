@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
-import io.openex.execution.ExecutionStatus;
+import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -33,10 +35,6 @@ public class Dryrun implements Base {
     @JsonProperty("dryrun_date")
     private Instant date;
 
-    @Column(name = "dryrun_status")
-    @JsonProperty("dryrun_status")
-    private boolean status;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dryrun_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -47,14 +45,20 @@ public class Dryrun implements Base {
     @JsonIgnore
     private List<DryInject<?>> injects = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "dryruns_users",
+            joinColumns = @JoinColumn(name = "dryrun_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("dryrun_users")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<User> users = new ArrayList<>();
+
     // region transient
     @JsonProperty("dryrun_finished")
     public boolean isFinished() {
         List<DryInject<?>> injects = getInjects();
-        return injects.stream().allMatch(dryInject -> {
-            DryInjectStatus status = dryInject.getStatus();
-            return status != null && ExecutionStatus.SUCCESS.equals(status.getName());
-        });
+        return injects.stream().allMatch(dryInject -> dryInject.getStatus() != null);
     }
     // endregion
 
@@ -82,14 +86,6 @@ public class Dryrun implements Base {
         this.speed = speed;
     }
 
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
     public Exercise getExercise() {
         return exercise;
     }
@@ -104,6 +100,14 @@ public class Dryrun implements Base {
 
     public void setInjects(List<DryInject<?>> injects) {
         this.injects = injects;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     @Override

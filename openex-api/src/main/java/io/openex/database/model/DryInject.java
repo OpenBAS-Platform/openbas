@@ -58,12 +58,6 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
         return getRun().getExercise();
     }
 
-    @Override
-    @JsonProperty("dryinject_audiences")
-    public List<Audience> getAudiences() {
-        return new ArrayList<>();
-    }
-
     public String getId() {
         return id;
     }

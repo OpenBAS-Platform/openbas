@@ -13,6 +13,7 @@ import io.openex.injects.email.model.EmailInject;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -73,41 +74,45 @@ public class ComchecksExecutionJob implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) {
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         Instant now = now();
-        // 01. Manage expired comchecks.
-        List<Comcheck> toExpired = comcheckRepository.thatMustBeExpired(now);
-        comcheckRepository.saveAll(toExpired.stream()
-                .peek(comcheck -> comcheck.setState(EXPIRED)).toList());
-        // 02. Send all required statuses
-        List<ComcheckStatus> allStatuses = comcheckStatusRepository.findAll(thatNeedExecution());
-        Map<Comcheck, List<ComcheckStatus>> byComchecks = allStatuses.stream().collect(groupingBy(ComcheckStatus::getComcheck));
-        byComchecks.entrySet().stream().parallel().forEach(entry -> {
-            Comcheck comCheck = entry.getKey();
-            // Send the email to users
-            Exercise exercise = comCheck.getExercise();
-            List<ComcheckStatus> comcheckStatuses = entry.getValue();
-            List<ExecutionContext> userInjectContexts = comcheckStatuses.stream().map(comcheckStatus -> {
-                ExecutionContext injectContext = new ExecutionContext(comcheckStatus.getUser(), exercise, "Comcheck");
-                injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
-                return injectContext;
-            }).toList();
-            EmailInject emailInject = buildComcheckEmail(comCheck);
-            ExecutableInject<EmailContent> injection = new ExecutableInject<>(emailInject, userInjectContexts);
-            EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
-            Execution execution = emailExecutor.execute(injection);
-            // Save the status sent date
-            List<String> usersSuccessfullyNotified = execution.getTraces().stream()
-                    .filter(executionTrace -> executionTrace.getStatus().equals(ExecutionStatus.SUCCESS))
-                    .map(ExecutionTrace::getIdentifier).toList();
-            List<ComcheckStatus> statusToUpdate = comcheckStatuses.stream()
-                    .filter(comcheckStatus -> usersSuccessfullyNotified.contains(comcheckStatus.getUser().getId()))
-                    .toList();
-            if (statusToUpdate.size() > 0) {
-                comcheckStatusRepository.saveAll(statusToUpdate.stream()
-                        .peek(comcheckStatus -> comcheckStatus.setLastSent(now))
-                        .toList());
-            }
-        });
+        try {
+            // 01. Manage expired comchecks.
+            List<Comcheck> toExpired = comcheckRepository.thatMustBeExpired(now);
+            comcheckRepository.saveAll(toExpired.stream()
+                    .peek(comcheck -> comcheck.setState(EXPIRED)).toList());
+            // 02. Send all required statuses
+            List<ComcheckStatus> allStatuses = comcheckStatusRepository.findAll(thatNeedExecution());
+            Map<Comcheck, List<ComcheckStatus>> byComchecks = allStatuses.stream().collect(groupingBy(ComcheckStatus::getComcheck));
+            byComchecks.entrySet().stream().parallel().forEach(entry -> {
+                Comcheck comCheck = entry.getKey();
+                // Send the email to users
+                Exercise exercise = comCheck.getExercise();
+                List<ComcheckStatus> comcheckStatuses = entry.getValue();
+                List<ExecutionContext> userInjectContexts = comcheckStatuses.stream().map(comcheckStatus -> {
+                    ExecutionContext injectContext = new ExecutionContext(comcheckStatus.getUser(), exercise, "Comcheck");
+                    injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
+                    return injectContext;
+                }).toList();
+                EmailInject emailInject = buildComcheckEmail(comCheck);
+                ExecutableInject<EmailContent> injection = new ExecutableInject<>(emailInject, userInjectContexts);
+                EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
+                Execution execution = emailExecutor.execute(injection);
+                // Save the status sent date
+                List<String> usersSuccessfullyNotified = execution.getTraces().stream()
+                        .filter(executionTrace -> executionTrace.getStatus().equals(ExecutionStatus.SUCCESS))
+                        .map(ExecutionTrace::getIdentifier).toList();
+                List<ComcheckStatus> statusToUpdate = comcheckStatuses.stream()
+                        .filter(comcheckStatus -> usersSuccessfullyNotified.contains(comcheckStatus.getUser().getId()))
+                        .toList();
+                if (statusToUpdate.size() > 0) {
+                    comcheckStatusRepository.saveAll(statusToUpdate.stream()
+                            .peek(comcheckStatus -> comcheckStatus.setLastSent(now))
+                            .toList());
+                }
+            });
+        } catch (Exception e) {
+            throw new JobExecutionException(e);
+        }
     }
 }

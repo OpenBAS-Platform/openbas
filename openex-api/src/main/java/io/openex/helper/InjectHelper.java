@@ -17,8 +17,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
+import static io.openex.rest.helper.RestBehavior.fromIterable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Stream.concat;
 
@@ -44,20 +44,24 @@ public class InjectHelper<T> {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    public List<ExecutionContext> buildUsersFromInject(Injection<T> inject) {
-        Exercise exercise = inject.getExercise();
-        // Create stream from inject audiences
-        Iterable<Audience> audiences = inject.isGlobalInject() ? audienceRepository.findAll() : inject.getAudiences();
-        Stream<ExecutionContext> injectUserStream = StreamSupport.stream(audiences.spliterator(), false)
-                .filter(Audience::isEnabled)
-                .flatMap(audience -> audience.getUsers().stream()
-                        .map(user -> new ExecutionContext(user, exercise, audience.getName())));
-        // Create stream from animation group
-        Stream<ExecutionContext> animationUserStream = exercise.getObservers().stream()
-                .map(user -> new ExecutionContext(user, exercise, "Animation Group"));
-        // Build result
-        Stream<ExecutionContext> usersStream = concat(injectUserStream, animationUserStream);
-        return usersStream
+    public Stream<ExecutionContext> getUsersFromInjection(Injection<T> injection) {
+        Exercise exercise = injection.getExercise();
+        if (injection instanceof DryInject dryInject) {
+            return dryInject.getRun().getUsers().stream()
+                    .map(user -> new ExecutionContext(user, exercise, "Dryrun"));
+        } else if (injection instanceof Inject inject) {
+            List<Audience> audiences = inject.isGlobalInject() ?
+                    fromIterable(audienceRepository.findAll()) : inject.getAudiences();
+            return audiences.stream().filter(Audience::isEnabled)
+                    .flatMap(audience -> audience.getUsers().stream()
+                            .map(user -> new ExecutionContext(user, exercise, audience.getName())));
+        }
+        throw new UnsupportedOperationException("Unsupported type of Injection");
+    }
+
+    public List<ExecutionContext> buildUsersFromInjection(Injection<T> injection) {
+        Exercise exercise = injection.getExercise();
+        return getUsersFromInjection(injection)
                 .collect(groupingBy(ExecutionContext::getUser)).entrySet().stream()
                 .map(entry -> new ExecutionContext(entry.getKey(), exercise,
                         entry.getValue().stream().flatMap(ua -> ua.getAudiences().stream()).toList()))
@@ -77,12 +81,12 @@ public class InjectHelper<T> {
         List<Inject<T>> executableInjects = injectRepository.findAll(InjectSpecification.executable());
         Stream<ExecutableInject<T>> injects = executableInjects.stream()
                 .filter(this::isInInjectableRange)
-                .map(inject -> new ExecutableInject<>(inject, buildUsersFromInject(inject)));
+                .map(inject -> new ExecutableInject<>(inject, buildUsersFromInjection(inject)));
         // Get dry injects
         List<DryInject<T>> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
         Stream<ExecutableInject<T>> dryInjects = executableDryInjects.stream()
                 .filter(this::isInInjectableRange)
-                .map(inject -> new ExecutableInject<>(inject, buildUsersFromInject(inject)));
+                .map(inject -> new ExecutableInject<>(inject, buildUsersFromInjection(inject)));
         // Combine injects and dry
         return concat(injects, dryInjects).collect(Collectors.toList());
     }

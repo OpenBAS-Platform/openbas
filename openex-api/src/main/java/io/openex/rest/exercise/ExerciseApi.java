@@ -61,6 +61,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     // region repositories
     private TagRepository tagRepository;
+    private UserRepository userRepository;
     private PauseRepository pauseRepository;
     private GroupRepository groupRepository;
     private GrantRepository grantRepository;
@@ -79,6 +80,11 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @Autowired
     public void setPauseRepository(PauseRepository pauseRepository) {
         this.pauseRepository = pauseRepository;
@@ -171,12 +177,18 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/dryruns")
-    public Dryrun createDryrun(@PathVariable String exerciseId) {
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Dryrun createDryrun(@PathVariable String exerciseId,
+                               @Valid @RequestBody DryrunCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        return dryrunService.provisionDryrun(exercise);
+        List<String> userIds = input.getUserIds();
+        List<User> users = userIds.size() == 0 ?
+                List.of(currentUser()) : fromIterable(userRepository.findAllById(userIds));
+        return dryrunService.provisionDryrun(exercise, users);
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
     public Dryrun dryrun(@PathVariable String exerciseId,
                          @PathVariable String dryrunId) {
         Specification<Dryrun> filters = DryRunSpecification
@@ -185,11 +197,13 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteDryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
         dryRunRepository.deleteById(dryrunId);
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
+    @PostAuthorize("isExerciseObserver(#exerciseId)")
     public List<DryInject<?>> dryrunInjects(@PathVariable String exerciseId,
                                             @PathVariable String dryrunId) {
         return dryrun(exerciseId, dryrunId).getInjects();

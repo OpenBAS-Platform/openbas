@@ -8,6 +8,9 @@ public interface Executor<T> {
     default Execution execute(ExecutableInject<T> inject) {
         Execution execution = new Execution();
         try {
+            if (inject.getUsers().size() == 0) {
+                throw new UnsupportedOperationException("Inject need at least one user");
+            }
             process(inject, execution);
         } catch (Exception e) {
             execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));

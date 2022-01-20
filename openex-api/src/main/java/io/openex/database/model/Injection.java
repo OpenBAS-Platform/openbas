@@ -4,7 +4,6 @@ import io.openex.execution.Executor;
 
 import javax.persistence.Transient;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
@@ -23,8 +22,6 @@ public abstract class Injection<T> {
     public abstract Class<? extends Executor<T>> executor();
 
     public abstract String getType();
-
-    public abstract List<Audience> getAudiences();
 
     @Transient
     public String getHeader() {

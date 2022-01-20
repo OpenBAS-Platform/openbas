@@ -276,6 +276,14 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.description = description;
     }
 
+    public List<Audience> getAudiences() {
+        return audiences;
+    }
+
+    public void setAudiences(List<Audience> audiences) {
+        this.audiences = audiences;
+    }
+
     public String getCountry() {
         return country;
     }
@@ -336,16 +344,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         dryInject.setRun(run);
         dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
         return dryInject;
-    }
-
-    @Override
-    @JsonProperty("inject_audiences")
-    public List<Audience> getAudiences() {
-        return audiences;
-    }
-
-    public void setAudiences(List<Audience> audiences) {
-        this.audiences = audiences;
     }
 
     @Override

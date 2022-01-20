@@ -1,9 +1,6 @@
 package io.openex.service;
 
-import io.openex.database.model.DryInject;
-import io.openex.database.model.Dryrun;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Inject;
+import io.openex.database.model.*;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.DryRunRepository;
 import io.openex.database.repository.InjectRepository;
@@ -48,20 +45,21 @@ public class DryrunService<T> {
                 .toList();
     }
 
-    private Dryrun createDryRun(Exercise exercise) {
+    private Dryrun createDryRun(Exercise exercise, List<User> users) {
         Dryrun run = new Dryrun();
         run.setSpeed(SPEED_DRYRUN);
         run.setExercise(exercise);
         run.setDate(now());
+        run.setUsers(users);
         return dryRunRepository.save(run);
     }
 
     @Transactional
-    public Dryrun provisionDryrun(Exercise exercise) {
+    public Dryrun provisionDryrun(Exercise exercise, List<User> users) {
         Specification<Inject<T>> injectFilters = InjectSpecification.forDryrun(exercise.getId());
         List<Inject<T>> injects = injectRepository.findAll(injectFilters);
         Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
-        Dryrun dryrun = createDryRun(exercise);
+        Dryrun dryrun = createDryRun(exercise, users);
         List<? extends DryInject<T>> dryInjects = toDryInjects(injects, dryrun);
         dryInjectRepository.saveAll(dryInjects);
         return dryrun;

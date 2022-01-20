@@ -70,7 +70,6 @@ public class ComcheckApi extends RestBehavior {
         comcheckRepository.deleteById(comcheckId);
     }
 
-
     @Transactional
     @PostMapping("/api/exercises/{exerciseId}/comchecks")
     public Comcheck communicationCheck(@PathVariable String exerciseId,
