@@ -372,6 +372,11 @@ public class User implements Base, OAuth2User {
     }
 
     @Override
+    public boolean isUserHasAccess(User user) {
+        return user.getId().equals(getId());
+    }
+
+    @Override
     @JsonIgnore
     public Map<String, Object> getAttributes() {
         HashMap<String, Object> attributes = new HashMap<>();
