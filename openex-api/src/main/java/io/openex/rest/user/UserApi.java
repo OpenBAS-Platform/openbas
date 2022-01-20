@@ -1,5 +1,6 @@
 package io.openex.rest.user;
 
+import io.openex.config.SessionManager;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -27,6 +29,9 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 
 @RestController
 public class UserApi extends RestBehavior {
+
+    @Resource
+    private SessionManager sessionManager;
 
     private OrganizationRepository organizationRepository;
     private UserRepository userRepository;
@@ -99,12 +104,15 @@ public class UserApi extends RestBehavior {
         user.setUpdateAttributes(input);
         user.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        sessionManager.refreshUserSessions(savedUser);
+        return savedUser;
     }
 
     @RolesAllowed(ROLE_ADMIN)
     @DeleteMapping("/api/users/{userId}")
     public void deleteUser(@PathVariable String userId) {
+        sessionManager.invalidateUserSession(userId);
         userRepository.deleteById(userId);
     }
 }

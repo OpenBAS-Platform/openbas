@@ -1,5 +1,6 @@
 package io.openex.rest.user;
 
+import io.openex.config.SessionManager;
 import io.openex.database.model.User;
 import io.openex.database.model.basic.BasicInject;
 import io.openex.database.repository.OrganizationRepository;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -22,6 +24,9 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 
 @RestController
 public class PlayerApi extends RestBehavior {
+
+    @Resource
+    private SessionManager sessionManager;
 
     private OrganizationRepository organizationRepository;
     private BasicInjectRepository basicInjectRepository;
@@ -95,6 +100,7 @@ public class PlayerApi extends RestBehavior {
         if (!currentUser().isAdmin() && user.isManager()) {
             throw new UnsupportedOperationException("You dont have the right to delete this user");
         }
+        sessionManager.invalidateUserSession(userId);
         userRepository.deleteById(userId);
     }
 }

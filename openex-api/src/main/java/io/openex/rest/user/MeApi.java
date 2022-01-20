@@ -1,5 +1,6 @@
 package io.openex.rest.user;
 
+import io.openex.config.SessionManager;
 import io.openex.database.model.Token;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
@@ -18,18 +19,21 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.config.AppConfig.updateSessionUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.database.specification.TokenSpecification.fromUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 
 @RestController
 public class MeApi extends RestBehavior {
+
+    @Resource
+    private SessionManager sessionManager;
 
     private OrganizationRepository organizationRepository;
     private TokenRepository tokenRepository;
@@ -76,7 +80,7 @@ public class MeApi extends RestBehavior {
         user.setUpdateAttributes(input);
         user.setOrganization(updateRelation(input.getOrganizationId(), user.getOrganization(), organizationRepository));
         User savedUser = userRepository.save(user);
-        updateSessionUser(savedUser);
+        sessionManager.refreshUserSessions(savedUser);
         return savedUser;
     }
 
@@ -87,7 +91,7 @@ public class MeApi extends RestBehavior {
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
         user.setUpdateAttributes(input);
         User savedUser = userRepository.save(user);
-        updateSessionUser(savedUser);
+        sessionManager.refreshUserSessions(savedUser);
         return savedUser;
     }
 

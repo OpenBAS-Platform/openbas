@@ -9,8 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.openex.database.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -35,11 +33,6 @@ public class AppConfig {
         }
         assert principal instanceof User;
         return (User) principal;
-    }
-
-    public static void updateSessionUser(User user) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Bean
