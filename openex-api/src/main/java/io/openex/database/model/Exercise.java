@@ -179,7 +179,7 @@ public class Exercise implements Base {
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
-        return user.isAdmin() || getObservers().stream().map(User::getId).anyMatch(u -> u.equals(user.getId()));
+        return user.isAdmin() || getObservers().contains(user);
     }
 
     @JsonProperty("exercise_users_number")
