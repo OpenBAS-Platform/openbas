@@ -133,7 +133,7 @@ const ExerciseHeader = () => {
                       variant="contained"
                       color="secondary"
                       onClick={handleToggleAddTag}
-                      disabled={pristine || submitting}
+                      disabled={submitting}
                       style={{ marginRight: 10 }}
                     >
                       {t('Cancel')}

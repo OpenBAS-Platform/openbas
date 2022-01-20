@@ -14,6 +14,7 @@ import Animation from './animation/Animation';
 import Controls from './controls/Controls';
 import Dryrun from './controls/Dryrun';
 import Comcheck from './controls/Comcheck';
+import Lessons from './lessons/Lessons';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useStore } from '../../../store';
@@ -79,6 +80,11 @@ const Index = () => {
             exact
             path="/exercises/:exerciseId/scenario"
             render={errorWrapper(Injects)}
+          />
+          <Route
+            exact
+            path="/exercises/:exerciseId/lessons"
+            render={errorWrapper(Lessons)}
           />
         </Switch>
       </div>

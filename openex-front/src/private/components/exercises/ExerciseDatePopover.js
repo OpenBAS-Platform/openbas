@@ -7,17 +7,12 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
-import Slide from '@mui/material/Slide';
 import { EditOutlined } from '@mui/icons-material';
 import { withStyles } from '@mui/styles';
 import { updateExerciseStartDate } from '../../../actions/Exercise';
 import inject18n from '../../../components/i18n';
 import ExerciseDateForm from './ExerciseDateForm';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import { Transition } from '../../../utils/Environment';
 
 const styles = () => ({
   button: {
@@ -66,8 +61,6 @@ class ExerciseDatePopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
         >
           <DialogTitle>{t('Update the exercise')}</DialogTitle>
           <DialogContent>

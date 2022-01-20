@@ -384,13 +384,13 @@ const Exercise = () => {
             {t('Injects distribution')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {audiences.length > 0 ? (
+            {topAudiences.length > 0 ? (
               <Chart
                 options={distributionChartOptions(theme, maxInjectsNumber < 2)}
                 series={distributionChartData}
                 type="bar"
                 width="100%"
-                height={50 + audiences.length * 50}
+                height={50 + topAudiences.length * 50}
               />
             ) : (
               <Empty message={t('No audiences in this exercise.')} />

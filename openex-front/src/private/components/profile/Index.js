@@ -170,7 +170,7 @@ const Index = (props) => {
 
 Index.propTypes = {
   user: PropTypes.object,
-  organizations: PropTypes.object,
+  organizations: PropTypes.array,
   fetchOrganizations: PropTypes.func,
   updateUser: PropTypes.func,
   updateUserPassword: PropTypes.func,

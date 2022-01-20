@@ -148,7 +148,8 @@ const Animation = () => {
   const [selectedInject, setSelectedInject] = useState(null);
   const [currentDate, setCurrentDate] = useState(Date.now());
   useEffect(() => {
-    setInterval(() => setCurrentDate(Date.now()), 1000);
+    const intervalId = setInterval(() => setCurrentDate(Date.now()), 1000);
+    return () => clearInterval(intervalId);
   }, []);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
@@ -410,6 +411,7 @@ const Animation = () => {
                         <InjectPopover
                           inject={inject}
                           exerciseId={exerciseId}
+                          setSelectedInject={setSelectedInject}
                         />
                       </ListItemSecondaryAction>
                     </ListItem>

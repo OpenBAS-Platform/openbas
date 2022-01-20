@@ -165,7 +165,6 @@ const Audiences = () => {
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
   });
-
   return (
     <div className={classes.container}>
       <div className={classes.parameters}>

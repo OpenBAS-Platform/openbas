@@ -9,6 +9,18 @@ import inject18n from '../../../components/i18n';
 import OrganizationField from '../../../components/OrganizationField';
 
 class UserForm extends Component {
+  validate(values) {
+    const { t } = this.props;
+    const errors = {};
+    const requiredFields = ['user_email'];
+    requiredFields.forEach((field) => {
+      if (!values[field]) {
+        errors[field] = t('This field is required.');
+      }
+    });
+    return errors;
+  }
+
   render() {
     const { t, onSubmit, initialValues } = this.props;
     return (
@@ -16,6 +28,7 @@ class UserForm extends Component {
         keepDirtyOnReinitialize={true}
         onSubmit={onSubmit}
         initialValues={initialValues}
+        validate={this.validate.bind(this)}
         mutators={{
           setValue: ([field, value], state, { changeValue }) => {
             changeValue(state, field, () => value);
