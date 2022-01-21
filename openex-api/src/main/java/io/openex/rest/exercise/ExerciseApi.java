@@ -184,6 +184,13 @@ public class ExerciseApi<T> extends RestBehavior {
         log.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return logRepository.save(log);
     }
+
+    @DeleteMapping("/api/exercises/{exerciseId}/logs/{logId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteLog(@PathVariable String logId) {
+        logRepository.deleteById(logId);
+    }
+
     // endregion
 
     // region dryruns
