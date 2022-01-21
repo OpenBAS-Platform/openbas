@@ -261,7 +261,19 @@ const i18n = {
       successfull: 'un succès',
       'Verification done at': 'Vérification faite le',
       'No dryrun in this exercise.': 'Aucune simulation dans cet exercice.',
-      'Do you want to delete this dryrun?': 'Souhaitez-vous supprimer cette simulation ?',
+      'Do you want to delete this dryrun?':
+        'Souhaitez-vous supprimer cette simulation ?',
+      'Overall objectives score': 'Score global des objectifs',
+      'Exercise logs': "Journal d'exercice",
+      'Poll replies': 'Réponses au sondage',
+      Objectives: 'Objectifs',
+      'Create a new objective': 'Créer un nouvel objectif',
+      'Update the objective': "Modifier l'objectif",
+      'Do you want to delete this objective?':
+        'Souhaitez-vous supprimer cet objectif ?',
+      'Write an entry': 'Ecrire une entrée',
+      'Do you want to delete this log?':
+        'Souhaitez-vous supprimer cette entrée ?',
     },
     en: {
       openex_email: 'Email',

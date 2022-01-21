@@ -6,9 +6,9 @@ import {
   delReferential,
 } from '../utils/Action';
 
-export const fetchLogs = (exerciseId, noloading) => (dispatch) => {
+export const fetchLogs = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/logs`;
-  return getReferential(schema.arrayOfLogs, uri, noloading)(dispatch);
+  return getReferential(schema.arrayOfLogs, uri)(dispatch);
 };
 
 export const fetchLog = (exerciseId, logId) => (dispatch) => {

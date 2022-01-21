@@ -1,5 +1,4 @@
 import * as schema from './Schema';
-import * as Constants from '../constants/ActionTypes';
 import {
   delReferential,
   getReferential,
@@ -26,16 +25,7 @@ export const updateUserPassword = (userId, password) => (dispatch) => putReferen
   user_plain_password: password,
 })(dispatch);
 
-export const updateUser = (userId, data) => (dispatch) => putReferential(
-  schema.user,
-  `/api/users/${userId}`,
-  data,
-)(dispatch).then((finalData) => {
-  dispatch({
-    type: Constants.LANG_UPDATE_ON_USER_CHANGE,
-    payload: finalData,
-  });
-});
+export const updateUser = (userId, data) => (dispatch) => putReferential(schema.user, `/api/users/${userId}`, data)(dispatch);
 
 export const deleteUser = (userId) => (dispatch) => delReferential(`/api/users/${userId}`, 'users', userId)(dispatch);
 // endregion
@@ -47,16 +37,7 @@ export const updateMePassword = (password) => (dispatch) => putReferential(schem
   user_plain_password: password,
 })(dispatch);
 
-export const updateMeProfile = (data) => (dispatch) => putReferential(
-  schema.user,
-  '/api/me/profile',
-  data,
-)(dispatch).then((finalData) => {
-  dispatch({
-    type: Constants.LANG_UPDATE_ON_USER_CHANGE,
-    payload: finalData,
-  });
-});
+export const updateMeProfile = (data) => (dispatch) => putReferential(schema.user, '/api/me/profile', data)(dispatch);
 
 export const updateMeInformation = (data) => (dispatch) => putReferential(schema.user, '/api/me/information', data)(dispatch);
 // endregion

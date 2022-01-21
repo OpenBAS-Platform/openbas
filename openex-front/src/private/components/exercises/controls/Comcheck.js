@@ -223,7 +223,8 @@ const Comcheck = () => {
   const dispatch = useDispatch();
   const [currentDate, setCurrentDate] = useState(new Date());
   useEffect(() => {
-    setInterval(() => setCurrentDate(new Date()), 1000);
+    const intervalId = setInterval(() => setCurrentDate(new Date()), 1000);
+    return () => clearInterval(intervalId);
   }, []);
   const { nsdt, fldt, t } = useFormatter();
   const { exerciseId, comcheckId } = useParams();

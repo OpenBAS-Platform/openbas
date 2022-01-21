@@ -465,10 +465,11 @@ const Animation = () => {
                               marginRight: 15,
                             }}
                           >
-                            {fndt(inject.inject_status.status_date)} (
-                            {(
-                              inject.inject_status.status_execution / 1000
-                            ).toFixed(2)}
+                            {fndt(inject.inject_status?.status_date)} (
+                            {inject.inject_status
+                              && (
+                                inject.inject_status.status_execution / 1000
+                              ).toFixed(2)}
                             s)
                           </div>
                         </div>

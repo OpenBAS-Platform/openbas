@@ -92,6 +92,15 @@ export const objective = new schema.Entity(
 );
 export const arrayOfObjectives = new schema.Array(objective);
 
+export const objectiveEvaluation = new schema.Entity(
+  'objectives_evaluations',
+  {},
+  { idAttribute: 'objective_evaluation_id' },
+);
+export const arrayOfObjectiveEvaluations = new schema.Array(
+  objectiveEvaluation,
+);
+
 export const comcheck = new schema.Entity(
   'comchecks',
   {},
@@ -243,8 +252,27 @@ const _buildDryrun = (state, id, dry) => {
     dryinjects: getDryinjects(),
   };
 };
+const _buildLog = (state, lo) => {
+  if (lo === undefined) return lo;
+  return {
+    ...lo,
+    tags: lo.log_tags
+      .asMutable()
+      .map((tagId) => state.referential.entities.tags[tagId])
+      .filter((t) => t !== undefined),
+    user: _buildUser(state, state.referential.entities.users[lo.log_user]),
+  };
+};
 const _buildExercise = (state, id, ex) => {
   if (ex === undefined) return ex;
+  const getObjectives = () => R.filter(
+    (n) => n.objective_exercise === id,
+    R.values(state.referential.entities.objectives),
+  );
+  const getLogs = () => R.filter(
+    (n) => n.log_exercise === id,
+    R.values(state.referential.entities.logs),
+  ).map((l) => _buildLog(state, l));
   const getAudiences = () => R.filter(
     (n) => n.audience_exercise === id,
     R.values(state.referential.entities.audiences),
@@ -272,10 +300,8 @@ const _buildExercise = (state, id, ex) => {
       .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
-    objectives: R.filter(
-      (n) => n.objective_exercise === id,
-      R.values(state.referential.entities.objectives),
-    ),
+    logs: getLogs(),
+    objectives: getObjectives(),
     injects: getInjects(),
     audiences: getAudiences(),
     comchecks: getComchecks(),

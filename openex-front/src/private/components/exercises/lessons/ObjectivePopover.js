@@ -1,0 +1,164 @@
+import React, { Component } from 'react';
+import * as PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import * as R from 'ramda';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import { MoreVert } from '@mui/icons-material';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import {
+  updateObjective,
+  deleteObjective,
+} from '../../../../actions/Objective';
+import ObjectiveForm from './ObjectiveForm';
+import inject18n from '../../../../components/i18n';
+import { Transition } from '../../../../utils/Environment';
+
+class ObjectivePopover extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      openDelete: false,
+      openEdit: false,
+      openPopover: false,
+    };
+  }
+
+  handlePopoverOpen(event) {
+    event.stopPropagation();
+    this.setState({ anchorEl: event.currentTarget });
+  }
+
+  handlePopoverClose() {
+    this.setState({ anchorEl: null });
+  }
+
+  handleOpenEdit() {
+    this.setState({ openEdit: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseEdit() {
+    this.setState({ openEdit: false });
+  }
+
+  onSubmitEdit(data) {
+    const inputValues = R.pipe(
+      R.assoc('objective_tags', R.pluck('id', data.objective_tags)),
+    )(data);
+    return this.props
+      .updateObjective(this.props.objective.objective_id, inputValues)
+      .then(() => this.handleCloseEdit());
+  }
+
+  handleOpenDelete() {
+    this.setState({ openDelete: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseDelete() {
+    this.setState({ openDelete: false });
+  }
+
+  submitDelete() {
+    this.props.deleteObjective(
+      this.props.exerciseId,
+      this.props.objective.objective_id,
+    );
+    this.handleCloseDelete();
+  }
+
+  render() {
+    const { t, objective } = this.props;
+    const initialValues = R.pick(
+      ['objective_title', 'objective_description', 'objective_priority'],
+      objective,
+    );
+    return (
+      <div>
+        <IconButton
+          onClick={this.handlePopoverOpen.bind(this)}
+          aria-haspopup="true"
+          size="large"
+        >
+          <MoreVert />
+        </IconButton>
+        <Menu
+          anchorEl={this.state.anchorEl}
+          open={Boolean(this.state.anchorEl)}
+          onClose={this.handlePopoverClose.bind(this)}
+        >
+          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+            {t('Update')}
+          </MenuItem>
+          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+            {t('Delete')}
+          </MenuItem>
+        </Menu>
+        <Dialog
+          open={this.state.openDelete}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseDelete.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to delete this objective?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseDelete.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitDelete.bind(this)}
+            >
+              {t('Delete')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          TransitionComponent={Transition}
+          open={this.state.openEdit}
+          onClose={this.handleCloseEdit.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+        >
+          <DialogTitle>{t('Update the objective')}</DialogTitle>
+          <DialogContent>
+            <ObjectiveForm
+              initialValues={initialValues}
+              editing={true}
+              onSubmit={this.onSubmitEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
+            />
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+}
+
+ObjectivePopover.propTypes = {
+  t: PropTypes.func,
+  exerciseId: PropTypes.string,
+  objective: PropTypes.object,
+  updateObjective: PropTypes.func,
+  deleteObjective: PropTypes.func,
+};
+
+export default R.compose(
+  connect(null, { updateObjective, deleteObjective }),
+  inject18n,
+)(ObjectivePopover);
