@@ -10,10 +10,12 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 
+import static java.time.Instant.now;
+
 @Entity
 @Table(name = "logs")
 @EntityListeners(ModelBaseListener.class)
-public class ExerciseLog implements Base {
+public class Log implements Base {
     @Id
     @Column(name = "log_id")
     @GeneratedValue(generator = "UUID")
@@ -41,9 +43,13 @@ public class ExerciseLog implements Base {
     @JsonProperty("log_content")
     private String content;
 
-    @Column(name = "log_date")
-    @JsonProperty("log_date")
-    private Instant date;
+    @Column(name = "log_created_at")
+    @JsonProperty("evaluation_created_at")
+    private Instant created = now();
+
+    @Column(name = "log_updated_at")
+    @JsonProperty("evaluation_updated_at")
+    private Instant updated = now();
 
     @Override
     public String getId() {
@@ -86,12 +92,20 @@ public class ExerciseLog implements Base {
         this.content = content;
     }
 
-    public Instant getDate() {
-        return date;
+    public Instant getCreated() {
+        return created;
     }
 
-    public void setDate(Instant date) {
-        this.date = date;
+    public void setCreated(Instant created) {
+        this.created = created;
+    }
+
+    public Instant getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Instant updated) {
+        this.updated = updated;
     }
 
     @Override

@@ -103,10 +103,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonProperty("inject_status")
     private InjectStatus status;
 
-    @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonProperty("inject_outcome")
-    private Outcome outcome;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "injects_tags",
             joinColumns = @JoinColumn(name = "inject_id"),
@@ -135,7 +131,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JsonIgnore
     public void clean() {
         setStatus(null);
-        setOutcome(null);
     }
 
     @JsonProperty("inject_users_number")
@@ -225,14 +220,6 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public Optional<Outcome> getOutcome() {
-        return ofNullable(outcome);
-    }
-
-    public void setOutcome(Outcome outcome) {
-        this.outcome = outcome;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package io.openex.database.repository;
 
-import io.openex.database.model.Outcome;
+import io.openex.database.model.Log;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface OutcomeRepository extends CrudRepository<Outcome, String>, JpaSpecificationExecutor<Outcome> {
+public interface LogRepository extends CrudRepository<Log, String>, JpaSpecificationExecutor<Log> {
 
     @NotNull
-    Optional<Outcome> findById(@NotNull String id);
+    Optional<Log> findById(@NotNull String id);
 }

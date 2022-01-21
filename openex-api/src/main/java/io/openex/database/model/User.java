@@ -373,7 +373,7 @@ public class User implements Base, OAuth2User {
 
     @Override
     public boolean isUserHasAccess(User user) {
-        return user.getId().equals(getId());
+        return user.isAdmin() || user.getId().equals(getId());
     }
 
     @Override

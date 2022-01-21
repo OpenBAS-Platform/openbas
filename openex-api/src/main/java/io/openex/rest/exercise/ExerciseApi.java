@@ -67,7 +67,7 @@ public class ExerciseApi<T> extends RestBehavior {
     private GrantRepository grantRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
-    private ExerciseLogRepository exerciseLogRepository;
+    private LogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
     private AudienceRepository audienceRepository;
@@ -141,7 +141,7 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @Autowired
-    public void setExerciseLogRepository(ExerciseLogRepository exerciseLogRepository) {
+    public void setExerciseLogRepository(LogRepository exerciseLogRepository) {
         this.exerciseLogRepository = exerciseLogRepository;
     }
 
@@ -153,19 +153,18 @@ public class ExerciseApi<T> extends RestBehavior {
 
     // region logs
     @GetMapping("/api/exercises/{exercise}/logs")
-    public Iterable<ExerciseLog> logs(@PathVariable String exercise) {
+    public Iterable<Log> logs(@PathVariable String exercise) {
         return exerciseLogRepository.findAll(ExerciseLogSpecification.fromExercise(exercise));
     }
 
     @PostMapping("/api/exercises/{exerciseId}/logs")
-    public ExerciseLog createLog(@PathVariable String exerciseId,
-                                 @Valid @RequestBody LogCreateInput createLogInput) {
+    public Log createLog(@PathVariable String exerciseId,
+                         @Valid @RequestBody LogCreateInput createLogInput) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        ExerciseLog log = new ExerciseLog();
+        Log log = new Log();
         log.setUpdateAttributes(createLogInput);
         log.setExercise(exercise);
         log.setUser(currentUser());
-        log.setDate(now());
         return exerciseLogRepository.save(log);
     }
     // endregion
