@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -37,6 +42,19 @@ public class Objective implements Base {
     @Column(name = "objective_priority")
     @JsonProperty("objective_priority")
     private Short priority;
+
+    @OneToMany(mappedBy = "objective", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("objective_evaluations")
+    private List<Evaluation> evaluations = new ArrayList<>();
+
+    // region transient
+    @JsonProperty("objective_score")
+    public Double getEvaluationAverage() {
+        return getEvaluations().stream().mapToDouble(Evaluation::getScore).average().orElse(0D);
+    }
+    // endregion
 
     public String getId() {
         return id;
@@ -76,6 +94,14 @@ public class Objective implements Base {
 
     public void setPriority(Short priority) {
         this.priority = priority;
+    }
+
+    public List<Evaluation> getEvaluations() {
+        return evaluations;
+    }
+
+    public void setEvaluations(List<Evaluation> evaluations) {
+        this.evaluations = evaluations;
     }
 
     @Override

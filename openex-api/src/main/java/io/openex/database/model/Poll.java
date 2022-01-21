@@ -49,6 +49,7 @@ public class Poll implements Base {
     @OneToMany(mappedBy = "poll", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
     @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("poll_answers")
     private List<Answer> answers = new ArrayList<>();
 
     public String getId() {
