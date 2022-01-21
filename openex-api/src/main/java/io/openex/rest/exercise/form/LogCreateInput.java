@@ -2,6 +2,9 @@ package io.openex.rest.exercise.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LogCreateInput {
 
     @JsonProperty("log_title")
@@ -9,6 +12,9 @@ public class LogCreateInput {
 
     @JsonProperty("log_content")
     private String content;
+
+    @JsonProperty("log_tags")
+    private List<String> tagIds = new ArrayList<>();
 
     public String getTitle() {
         return title;
@@ -24,5 +30,13 @@ public class LogCreateInput {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<String> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<String> tagIds) {
+        this.tagIds = tagIds;
     }
 }

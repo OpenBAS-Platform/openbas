@@ -4,10 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MultiModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
@@ -44,12 +49,21 @@ public class Log implements Base {
     private String content;
 
     @Column(name = "log_created_at")
-    @JsonProperty("evaluation_created_at")
+    @JsonProperty("log_created_at")
     private Instant created = now();
 
     @Column(name = "log_updated_at")
-    @JsonProperty("evaluation_updated_at")
+    @JsonProperty("log_updated_at")
     private Instant updated = now();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "logs_tags",
+            joinColumns = @JoinColumn(name = "log_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("log_tags")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Tag> tags = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -90,6 +104,14 @@ public class Log implements Base {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public Instant getCreated() {

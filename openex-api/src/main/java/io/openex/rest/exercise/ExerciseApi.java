@@ -60,6 +60,7 @@ public class ExerciseApi<T> extends RestBehavior {
     private final static String EXPORT_ENTRY_ATTACHMENT = "Attachment";
 
     // region repositories
+    private LogRepository logRepository;
     private TagRepository tagRepository;
     private UserRepository userRepository;
     private PauseRepository pauseRepository;
@@ -80,6 +81,11 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setLogRepository(LogRepository logRepository) {
+        this.logRepository = logRepository;
+    }
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -159,13 +165,24 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/logs")
     public Log createLog(@PathVariable String exerciseId,
-                         @Valid @RequestBody LogCreateInput createLogInput) {
+                         @Valid @RequestBody LogCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Log log = new Log();
-        log.setUpdateAttributes(createLogInput);
+        log.setUpdateAttributes(input);
         log.setExercise(exercise);
+        log.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         log.setUser(currentUser());
         return exerciseLogRepository.save(log);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/logs/{logId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Log updateLog(@PathVariable String logId,
+                         @Valid @RequestBody LogCreateInput input) {
+        Log log = logRepository.findById(logId).orElseThrow();
+        log.setUpdateAttributes(input);
+        log.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        return logRepository.save(log);
     }
     // endregion
 
