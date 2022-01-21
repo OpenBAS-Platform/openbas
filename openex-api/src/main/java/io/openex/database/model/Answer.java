@@ -94,6 +94,11 @@ public class Answer implements Base {
     }
 
     @Override
+    public boolean isUserHasAccess(User user) {
+        return getPoll().isUserHasAccess(user);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
