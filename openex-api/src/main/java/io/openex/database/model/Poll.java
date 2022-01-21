@@ -52,6 +52,13 @@ public class Poll implements Base {
     @JsonProperty("poll_answers")
     private List<Answer> answers = new ArrayList<>();
 
+    // region transient
+    @JsonProperty("poll_answers_number")
+    public long getAnswersNumber() {
+        return getAnswers().size();
+    }
+    // endregion
+
     public String getId() {
         return id;
     }

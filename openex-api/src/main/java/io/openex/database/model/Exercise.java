@@ -111,10 +111,20 @@ public class Exercise implements Base {
     @JsonSerialize(using = MultiModelDeserializer.class)
     private List<Inject<?>> injects = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
     @JsonIgnore
     private List<Objective> objectives = new ArrayList<>();
+
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
+    private List<Log> logs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonIgnore
+    private List<Poll> polls = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @JsonProperty("exercise_pauses")
@@ -184,8 +194,22 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_users_number")
     public long usersNumber() {
-        return getAudiences().stream()
-                .mapToLong(audience -> audience.getUsers().size()).sum();
+        return getAudiences().stream().mapToLong(audience -> audience.getUsers().size()).sum();
+    }
+
+    @JsonProperty("exercise_score")
+    public Double getEvaluationAverage() {
+        return getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average().orElse(0D);
+    }
+
+    @JsonProperty("exercise_logs_number")
+    public long getLogsNumber() {
+        return getLogs().size();
+    }
+
+    @JsonProperty("exercise_answers_number")
+    public long getAnswersNumber() {
+        return getPolls().stream().mapToLong(Poll::getAnswersNumber).sum();
     }
 
     @JsonProperty("exercise_next_possible_status")
@@ -359,6 +383,22 @@ public class Exercise implements Base {
 
     public void setObjectives(List<Objective> objectives) {
         this.objectives = objectives;
+    }
+
+    public List<Log> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<Log> logs) {
+        this.logs = logs;
+    }
+
+    public List<Poll> getPolls() {
+        return polls;
+    }
+
+    public void setPolls(List<Poll> polls) {
+        this.polls = polls;
     }
 
     public List<Tag> getTags() {
