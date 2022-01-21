@@ -190,7 +190,6 @@ public class ExerciseApi<T> extends RestBehavior {
     public void deleteLog(@PathVariable String logId) {
         logRepository.deleteById(logId);
     }
-
     // endregion
 
     // region dryruns

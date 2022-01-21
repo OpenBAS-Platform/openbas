@@ -79,6 +79,11 @@ public class Objective implements Base {
     }
 
     @Override
+    public boolean isUserHasAccess(User user) {
+        return getExercise().isUserHasAccess(user);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
