@@ -30,6 +30,9 @@ import { useDispatch } from 'react-redux';
 import LinearProgress from '@mui/material/LinearProgress';
 import * as R from 'ramda';
 import IconButton from '@mui/material/IconButton';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
 import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
 import { useStore } from '../../../../store';
@@ -42,6 +45,8 @@ import LogPopover from './LogPopover';
 import { resolveUserName } from '../../../../utils/String';
 import ItemTags from '../../../../components/ItemTags';
 import LogForm from './LogForm';
+import { Transition } from '../../../../utils/Environment';
+import ObjectiveEvaluations from './ObjectiveEvaluations';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -90,7 +95,8 @@ const Lessons = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
-  const [open, setOpen] = useState(false);
+  const [openCreateLog, setOpenCreateLog] = useState(false);
+  const [openEvaluation, setOpenEvaluation] = useState(null);
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
@@ -105,13 +111,12 @@ const Lessons = () => {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }, 400);
   };
-  const handleToggleWrite = () => setOpen(!open);
+  const handleToggleWrite = () => setOpenCreateLog(!openCreateLog);
   useEffect(() => {
-    if (open) {
+    if (openCreateLog) {
       scrollToBottom();
     }
-  }, [open]);
-  // eslint-disable-next-line max-len
+  }, [openCreateLog]);
   const submitCreateLog = (data, action) => {
     const inputValues = R.pipe(
       R.assoc('log_tags', R.pluck('id', data.log_tags)),
@@ -179,11 +184,17 @@ const Lessons = () => {
             {objectives.length > 0 ? (
               <List style={{ padding: 0 }}>
                 {objectives.map((objective) => (
-                  <ListItem divider={true} key={objective.objective_id}>
+                  <ListItem
+                    key={objective.objective_id}
+                    divider={true}
+                    button={true}
+                    onClick={() => setOpenEvaluation(objective.objective_id)}
+                  >
                     <ListItemIcon>
                       <FlagOutlined />
                     </ListItemIcon>
                     <ListItemText
+                      style={{ width: '50%' }}
                       primary={objective.objective_title}
                       secondary={objective.objective_description}
                     />
@@ -191,16 +202,19 @@ const Lessons = () => {
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        width: 200,
+                        width: '30%',
                         marginRight: 1,
                       }}
                     >
                       <Box sx={{ width: '100%', mr: 1 }}>
-                        <LinearProgress variant="determinate" value={50} />
+                        <LinearProgress
+                          variant="determinate"
+                          value={objective.objective_score}
+                        />
                       </Box>
                       <Box sx={{ minWidth: 35 }}>
                         <Typography variant="body2" color="text.secondary">
-                          50%
+                          {objective.objective_score}%
                         </Typography>
                       </Box>
                     </Box>
@@ -228,19 +242,20 @@ const Lessons = () => {
             {objectives.length > 0 ? (
               <List style={{ padding: 0 }}>
                 {objectives.map((objective) => (
-                  <ListItem divider={true} key={objective.objective_id}>
+                  <ListItem key={objective.objective_id} divider={true}>
                     <ListItemIcon>
                       <BallotOutlined />
                     </ListItemIcon>
                     <ListItemText
                       primary={objective.objective_title}
                       secondary={objective.objective_description}
+                      style={{ width: '60%' }}
                     />
                     <Box
                       sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        width: 200,
+                        width: '20%',
                         marginRight: 1,
                       }}
                     >
@@ -329,7 +344,7 @@ const Lessons = () => {
         ))}
         <Accordion
           style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
-          expanded={open}
+          expanded={openCreateLog}
           onChange={handleToggleWrite}
           variant="outlined"
         >
@@ -344,13 +359,28 @@ const Lessons = () => {
             <LogForm
               initialValues={{ log_tags: [] }}
               onSubmit={submitCreateLog}
-              handleClose={() => setOpen(false)}
+              handleClose={() => setOpenCreateLog(false)}
             />
           </AccordionDetails>
         </Accordion>
         <div style={{ marginTop: 100 }} />
         <div ref={bottomRef} />
       </div>
+      <Dialog
+        TransitionComponent={Transition}
+        open={Boolean(openEvaluation)}
+        onClose={() => setOpenEvaluation(null)}
+        fullWidth={true}
+        maxWidth="md"
+      >
+        <DialogTitle>{t('Objective evalution')}</DialogTitle>
+        <DialogContent>
+          <ObjectiveEvaluations
+            objectiveId={openEvaluation}
+            handleClose={setOpenEvaluation}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

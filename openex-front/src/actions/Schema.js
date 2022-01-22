@@ -9,19 +9,6 @@ export const document = new schema.Entity(
 );
 export const arrayOfDocuments = new schema.Array(document);
 
-export const fileSheet = new schema.Array();
-
-export const checkIfExerciseNameExistResult = new schema.Object(
-  'check_if_exercise_name_exist',
-);
-
-export const objectOfStatistics = new schema.Object('object_of_statistics');
-
-export const importExerciseResult = new schema.Object('import_exercise_result');
-export const exportExerciseResult = new schema.Object('export_exercise_result');
-export const testsDeleteUsers = new schema.Object('delete_users_result');
-export const changeDuration = new schema.Object('change_duration');
-
 export const tag = new schema.Entity('tags', {}, { idAttribute: 'tag_id' });
 export const arrayOfTags = new schema.Array(tag);
 
@@ -92,14 +79,22 @@ export const objective = new schema.Entity(
 );
 export const arrayOfObjectives = new schema.Array(objective);
 
-export const objectiveEvaluation = new schema.Entity(
-  'objectives_evaluations',
+export const evaluation = new schema.Entity(
+  'evaluations',
   {},
-  { idAttribute: 'objective_evaluation_id' },
+  { idAttribute: 'evaluation_id' },
 );
-export const arrayOfObjectiveEvaluations = new schema.Array(
-  objectiveEvaluation,
+export const arrayOfEvaluations = new schema.Array(evaluation);
+
+export const poll = new schema.Entity('polls', {}, { idAttribute: 'poll_id' });
+export const arrayOfPolls = new schema.Array(poll);
+
+export const answer = new schema.Entity(
+  'answers',
+  {},
+  { idAttribute: 'answer_id' },
 );
+export const arrayOfAnswers = new schema.Array(answer);
 
 export const comcheck = new schema.Entity(
   'comchecks',
@@ -135,13 +130,6 @@ export const audience = new schema.Entity(
   { idAttribute: 'audience_id' },
 );
 export const arrayOfAudiences = new schema.Array(audience);
-
-export const event = new schema.Entity(
-  'events',
-  {},
-  { idAttribute: 'event_id' },
-);
-export const arrayOfEvents = new schema.Array(event);
 
 export const inject = new schema.Entity(
   'injects',
@@ -263,12 +251,30 @@ const _buildLog = (state, lo) => {
     user: _buildUser(state, state.referential.entities.users[lo.log_user]),
   };
 };
+const _buildEvaluation = (state, eva) => {
+  if (eva === undefined) return eva;
+  return {
+    ...eva,
+    user: _buildUser(state, state.referential.entities.users[eva.eval_user]),
+  };
+};
+const _buildObjective = (state, id, obj) => {
+  if (obj === undefined) return obj;
+  const getEvaluations = () => R.filter(
+    (n) => n.evaluation_objective === id,
+    R.values(state.referential.entities.evaluations),
+  ).map((e) => _buildEvaluation(state, e));
+  return {
+    ...obj,
+    evaluations: getEvaluations(),
+  };
+};
 const _buildExercise = (state, id, ex) => {
   if (ex === undefined) return ex;
   const getObjectives = () => R.filter(
     (n) => n.objective_exercise === id,
     R.values(state.referential.entities.objectives),
-  );
+  ).map((o) => _buildObjective(state, o.objective_id, o));
   const getLogs = () => R.filter(
     (n) => n.log_exercise === id,
     R.values(state.referential.entities.logs),
@@ -355,6 +361,9 @@ export const storeBrowser = (state) => ({
   },
   getExercise(id) {
     return _buildExercise(state, id, state.referential.entities.exercises[id]);
+  },
+  getObjective(id) {
+    return _buildObjective(state, id, state.referential.entities.objectives[id]);
   },
   getComcheck(id) {
     return _buildComcheck(state, state.referential.entities.comchecks[id]);

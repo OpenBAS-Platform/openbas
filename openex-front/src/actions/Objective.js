@@ -11,11 +11,6 @@ export const fetchObjectives = (exerciseId) => (dispatch) => {
   return getReferential(schema.arrayOfObjectives, uri)(dispatch);
 };
 
-export const fetchObjectivesEvaluations = (exerciseId, objectiveId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/evaluations`;
-  return getReferential(schema.arrayOfObjectives, uri)(dispatch);
-};
-
 export const fetchObjective = (exerciseId, objectiveId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}`;
   return getReferential(schema.objective, uri)(dispatch);

@@ -1,0 +1,146 @@
+import React, { useState } from 'react';
+import Box from '@mui/material/Box';
+import { HowToVoteOutlined } from '@mui/icons-material';
+import Typography from '@mui/material/Typography';
+import Slider from '@mui/material/Slider';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import LinearProgress from '@mui/material/LinearProgress';
+import Button from '@mui/material/Button';
+import * as R from 'ramda';
+import { useFormatter } from '../../../../components/i18n';
+import { useStore } from '../../../../store';
+import useDataLoader from '../../../../utils/ServerSideEvent';
+import {
+  addEvaluation,
+  fetchEvaluations,
+  updateEvaluation,
+} from '../../../../actions/Evaluation';
+import { resolveUserName } from '../../../../utils/String';
+import Loader from '../../../../components/Loader';
+
+const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
+  const dispatch = useDispatch();
+  const { t } = useFormatter();
+  const [value, setValue] = useState(null);
+  // Fetching data
+  const { exerciseId } = useParams();
+  const objective = useStore((store) => store.getObjective(objectiveId));
+  const me = useStore((store) => store.me);
+  if (!objective) {
+    return <Loader />;
+  }
+  const { evaluations } = objective;
+  useDataLoader(() => {
+    dispatch(fetchEvaluations(exerciseId, objectiveId));
+  });
+  const currentUserEvaluation = R.head(
+    R.filter((n) => n.evaluation_user === me.user_id, evaluations),
+  );
+  const submitEvaluation = () => {
+    const data = {
+      evaluation_score: value,
+      evaluation_user: me.user_id,
+    };
+    if (currentUserEvaluation) {
+      return dispatch(
+        updateEvaluation(
+          exerciseId,
+          objectiveId,
+          currentUserEvaluation.evaluation_id,
+          data,
+        ),
+      ).then((result) => {
+        if (result.result) {
+          return handleClose(null);
+        }
+        return result;
+      });
+    }
+    return dispatch(addEvaluation(exerciseId, objectiveId, data)).then(
+      (result) => {
+        if (result.result) {
+          return handleClose(null);
+        }
+        return result;
+      },
+    );
+  };
+  return (
+    <div>
+      <List style={{ padding: 0 }}>
+        {evaluations.map((evaluation) => (
+          <ListItem key={evaluation.evaluation_id} divider={true}>
+            <ListItemIcon>
+              <HowToVoteOutlined />
+            </ListItemIcon>
+            <ListItemText
+              style={{ width: '50%' }}
+              primary={resolveUserName(evaluation.user)}
+            />
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '30%',
+                marginRight: 1,
+              }}
+            >
+              <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress
+                  variant="determinate"
+                  value={evaluation.score}
+                />
+              </Box>
+              <Box sx={{ minWidth: 35 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {evaluation.score}%
+                </Typography>
+              </Box>
+            </Box>
+          </ListItem>
+        ))}
+      </List>
+      <Box
+        sx={{
+          width: '100%',
+          marginTop: '60px',
+          padding: '0 5px 0 5px',
+        }}
+      >
+        <Slider
+          aria-label={t('Score')}
+          defaultValue={
+            currentUserEvaluation ? currentUserEvaluation.evaluation_score : 10
+          }
+          value={value}
+          onChange={(_, val) => setValue(val)}
+          valueLabelDisplay="auto"
+          step={5}
+          marks={true}
+          min={10}
+          max={100}
+        />
+      </Box>
+      <div style={{ float: 'right', marginTop: 20 }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => handleClose(null)}
+          style={{ marginRight: 10 }}
+        >
+          {t('Cancel')}
+        </Button>
+        <Button variant="contained" color="primary" onClick={submitEvaluation}>
+          {t('Evaluate')}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default ObjectiveEvaluations;

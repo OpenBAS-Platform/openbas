@@ -46,30 +46,3 @@ export const importingExercise = (data) => (dispatch) => {
   const uri = '/api/exercises/import';
   return postReferential(schema.exercise, uri, data)(dispatch);
 };
-
-// export const importExercise = (fileId, data) => (dispatch) => {
-//   const uri = `/api/exercises/import?file=${fileId}&import_exercise=${data.exercise}
-//   &import_audience=${data.audience}&import_objective=${data.objective}&import_scenarios
-//   =${data.scenarios}&import_injects=${data.injects}&import_incidents=${data.incidents}`;
-//
-//   return postReferential(schema.importExerciseResult, uri, data)(dispatch);
-// };
-
-// export const importExerciseFromPath = (data) => (dispatch) => {
-//   const uri = `/api/exercises/import?import_exercise=${data.exercise}
-//   &import_audience=${data.audience}&import_objective=${data.objective}
-//   &import_scenarios=${data.scenarios}&import_injects=${data.injects}
-//   &import_incidents=${data.incidents}&import_path=${data.import_path}`;
-//
-//   return postReferential(schema.importExerciseResult, uri, data)(dispatch);
-// };
-
-export const checkIfExerciseNameExist = (fileId) => (dispatch) => getReferential(
-  schema.checkIfExerciseNameExistResult,
-  `/api/exercises/import/check/exercise/${fileId}`,
-)(dispatch);
-
-export const getStatisticsForExercise = (exerciseId, data) => (dispatch) => getReferential(
-  schema.objectOfStatistics,
-  `/api/exercises/${exerciseId}/statistics?interval=${data.value}`,
-)(dispatch);
