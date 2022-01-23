@@ -1,5 +1,6 @@
 package io.openex.rest.exercise;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.*;
 import io.openex.database.model.Exercise.STATUS;
 import io.openex.database.repository.*;
@@ -9,14 +10,13 @@ import io.openex.database.specification.ExerciseLogSpecification;
 import io.openex.injects.base.AttachmentContent;
 import io.openex.injects.base.InjectAttachment;
 import io.openex.rest.exception.InputValidationException;
-import io.openex.rest.exercise.export.ExerciseFileExport;
-import io.openex.rest.exercise.export.ExerciseFileImport;
-import io.openex.rest.exercise.export.ExerciseImport;
+import io.openex.rest.exercise.exports.ExerciseExportMixins;
+import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
 import io.openex.service.FileService;
-import org.apache.commons.io.FileUtils;
+import io.openex.service.ImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -25,29 +25,26 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.util.function.Tuples;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.Exercise.STATUS.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
-import static io.openex.helper.DatabaseHelper.resolveRelation;
-import static java.io.File.createTempFile;
+import static io.openex.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
+import static io.openex.service.ImportService.EXPORT_ENTRY_EXERCISE;
 import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.MINUTES;
@@ -55,9 +52,6 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @RestController
 @RolesAllowed(ROLE_USER)
 public class ExerciseApi<T> extends RestBehavior {
-
-    private final static String EXPORT_ENTRY_EXERCISE = "Exercise";
-    private final static String EXPORT_ENTRY_ATTACHMENT = "Attachment";
 
     // region repositories
     private LogRepository logRepository;
@@ -71,7 +65,7 @@ public class ExerciseApi<T> extends RestBehavior {
     private LogRepository exerciseLogRepository;
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
-    private AudienceRepository audienceRepository;
+    private ImportService importService;
     private InjectRepository<T> injectRepository;
     // endregion
 
@@ -81,6 +75,11 @@ public class ExerciseApi<T> extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setImportService(ImportService importService) {
+        this.importService = importService;
+    }
+
     @Autowired
     public void setLogRepository(LogRepository logRepository) {
         this.logRepository = logRepository;
@@ -119,11 +118,6 @@ public class ExerciseApi<T> extends RestBehavior {
     @Autowired
     public void setFileService(FileService fileService) {
         this.fileService = fileService;
-    }
-
-    @Autowired
-    public void setAudienceRepository(AudienceRepository audienceRepository) {
-        this.audienceRepository = audienceRepository;
     }
 
     @Autowired
@@ -388,59 +382,25 @@ public class ExerciseApi<T> extends RestBehavior {
     }
     // endregion
 
+
     // region import/export
-    private void handleDataImport(InputStream inputStream) throws IOException {
-        @SuppressWarnings("unchecked")
-        ExerciseFileImport<T> dataImport = mapper.readValue(inputStream, ExerciseFileImport.class);
-        // Create tags
-        Map<String, Tag> tagMap = fromIterable(tagRepository.findAll()).stream().collect(
-                Collectors.toMap(Tag::getName, Function.identity()));
-        List<Tag> tagsToCreate = dataImport.getTags().stream()
-                .filter(tagImport -> tagMap.get(tagImport.getName()) == null)
-                .map(tagImport -> {
-                    Tag tag = new Tag();
-                    tag.setUpdateAttributes(tagImport);
-                    return tag;
-                }).toList();
-        List<Tag> createdTags = fromIterable(tagRepository.saveAll(tagsToCreate));
-        List<Tag> tagsToRemap = dataImport.getTags().stream()
-                .filter(tagImport -> tagMap.get(tagImport.getName()) != null)
-                .map(tagImport -> tagMap.get(tagImport.getName())).toList();
-        List<Tag> exerciseTags = Stream.concat(createdTags.stream(), tagsToRemap.stream()).toList();
-        // Create exercise
-        ExerciseImport inputExercise = dataImport.getExercise();
-        Exercise exerciseToSave = new Exercise();
-        exerciseToSave.setUpdateAttributes(inputExercise);
-        exerciseToSave.setTags(exerciseTags);
-        exerciseToSave.setImage(resolveRelation(inputExercise.getImage(), documentRepository));
-        Exercise exercise = exerciseRepository.save(exerciseToSave);
-        // Create audiences
-        List<Audience> audiences = dataImport.getAudiences().stream()
-                .map(audienceImport -> {
-                    Audience audience = new Audience();
-                    audience.setUpdateAttributes(audienceImport);
-                    audience.setExercise(exercise);
-                    // audience.setUsers();
-                    return audience;
-                }).toList();
-        audienceRepository.saveAll(audiences);
-        // Create injects
-        List<Inject<T>> injects = dataImport.getInjects().stream().map(injectInput -> {
-            Inject<T> inject = injectInput.toInject();
-            inject.setExercise(exercise);
-            inject.setDependsOn(resolveRelation(injectInput.getDependsOn(), injectRepository));
-            inject.setAudiences(fromIterable(audienceRepository.findAllById(injectInput.getAudiences())));
-            // inject.setUser(resolveRelation(injectInput.geUser(), userRepository));
-            return inject;
-        }).toList();
-        injectRepository.saveAll(injects);
-    }
+
 
     @GetMapping("/api/exercises/{exerciseId}/export")
     @PostAuthorize("isExerciseObserver(#exerciseId)")
-    public void exerciseExport(@PathVariable String exerciseId, HttpServletResponse response) throws IOException {
+    public void exerciseExport(@PathVariable String exerciseId,
+                               @RequestParam(required = false) boolean isWithPlayers,
+                               HttpServletResponse response) throws IOException {
+        // Setup the mapper for export
+        ObjectMapper objectMapper = mapper.copy();
+        if (!isWithPlayers) {
+            objectMapper.addMixIn(ExerciseFileExport.class, ExerciseExportMixins.ExerciseFileExport.class);
+        }
+        // Start exporting exercise
         ExerciseFileExport importExport = new ExerciseFileExport();
+        importExport.setVersion(1);
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
         // Build the response
         String zipName = exercise.getName() + "_" + now().toString() + ".zip";
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
@@ -449,16 +409,44 @@ public class ExerciseApi<T> extends RestBehavior {
         // Build the export
         importExport.setExercise(exercise);
         List<Tag> exerciseTags = new ArrayList<>(exercise.getTags());
+        // Objectives
+        List<Objective> objectives = exercise.getObjectives();
+        importExport.setObjectives(objectives);
+        objectMapper.addMixIn(Objective.class, ExerciseExportMixins.Objective.class);
+        // Polls
+        List<Poll> polls = exercise.getPolls();
+        importExport.setPolls(polls);
+        objectMapper.addMixIn(Poll.class, ExerciseExportMixins.Poll.class);
         // Audiences
         List<Audience> audiences = exercise.getAudiences();
         importExport.setAudiences(audiences);
+        objectMapper.addMixIn(Audience.class, isWithPlayers
+                ? ExerciseExportMixins.Audience.class : ExerciseExportMixins.EmptyAudience.class);
         exerciseTags.addAll(audiences.stream().flatMap(audience -> audience.getTags().stream()).toList());
+        if (isWithPlayers) {
+            // players
+            List<User> players = audiences.stream()
+                    .flatMap(audience -> audience.getUsers().stream())
+                    .distinct().toList();
+            exerciseTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
+            importExport.setUsers(players);
+            objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
+            // organizations
+            List<Organization> organizations = players.stream()
+                    .map(User::getOrganization)
+                    .filter(Objects::nonNull).toList();
+            exerciseTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());
+            importExport.setOrganizations(organizations);
+            objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
+        }
         // Injects
         List<Inject<?>> injects = exercise.getInjects();
         exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
         importExport.setInjects(injects);
+        objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
         // Tags
         importExport.setTags(exerciseTags);
+        objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
         // Documents
         List<String> documentIds = injects.stream()
                 .map(Injection::getContent)
@@ -471,7 +459,7 @@ public class ExerciseApi<T> extends RestBehavior {
         ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");
         zipEntry.setComment(EXPORT_ENTRY_EXERCISE);
         zipExport.putNextEntry(zipEntry);
-        zipExport.write(mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
+        zipExport.write(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(importExport));
         zipExport.closeEntry();
         documentIds.forEach(docId -> {
             Document doc = documentRepository.findById(docId).orElseThrow();
@@ -494,34 +482,10 @@ public class ExerciseApi<T> extends RestBehavior {
         zipExport.close();
     }
 
-    @Transactional
     @PostMapping("/api/exercises/import")
     @RolesAllowed(ROLE_ADMIN)
     public void exerciseImport(@RequestPart("file") MultipartFile file) throws Exception {
-        // 01. Use a temporary file.
-        File tempFile = createTempFile("openex-import-" + now().getEpochSecond(), ".zip");
-        FileUtils.copyInputStreamToFile(file.getInputStream(), tempFile);
-        // 02. Use this file to load zip with information
-        ZipFile zipFile = new ZipFile(tempFile);
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-        // Iter on each element to process it.
-        while (entries.hasMoreElements()) {
-            ZipEntry entry = entries.nextElement();
-            String entryType = entry.getComment();
-            InputStream zipInputStream = zipFile.getInputStream(entry);
-            switch (entryType) {
-                case EXPORT_ENTRY_EXERCISE -> handleDataImport(zipInputStream);
-                case EXPORT_ENTRY_ATTACHMENT -> {
-                    String entryName = entry.getName();
-                    String contentType = new MimetypesFileTypeMap().getContentType(entryName);
-                    fileService.uploadFile(entryName, zipInputStream, entry.getSize(), contentType);
-                }
-                default -> throw new UnsupportedOperationException("Cant import type " + entryType);
-            }
-        }
-        // 03. Delete the temporary file
-        //noinspection ResultOfMethodCallIgnored
-        tempFile.delete();
+        importService.handleFileImport(file);
     }
     // endregion
 }

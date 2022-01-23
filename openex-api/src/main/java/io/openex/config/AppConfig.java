@@ -11,9 +11,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Component
 @EnableAsync
+@EnableTransactionManagement
 public class AppConfig {
 
     private final static String ANONYMOUS_USER = "anonymousUser";
