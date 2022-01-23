@@ -25,7 +25,7 @@ public class Poll implements Base {
     @Column(name = "poll_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("objective_id")
+    @JsonProperty("poll_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.EAGER)

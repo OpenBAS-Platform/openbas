@@ -102,7 +102,7 @@ public class User implements Base, OAuth2User {
     private String country;
 
     @Column(name = "user_city")
-    @JsonProperty("users_city")
+    @JsonProperty("user_city")
     private String city;
 
     @ManyToMany(fetch = FetchType.EAGER)
