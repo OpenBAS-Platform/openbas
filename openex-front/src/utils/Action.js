@@ -24,8 +24,6 @@ const buildError = (data) => {
   return errorsExtractor(data);
 };
 
-export const fileDownload = (uri) => () => api().get(uri, { responseType: 'blob' });
-
 export const simpleCall = (uri) => api().get(uri);
 
 export const getReferential = (schema, uri, noloading) => (dispatch) => {

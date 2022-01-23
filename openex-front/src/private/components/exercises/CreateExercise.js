@@ -7,12 +7,11 @@ import Fab from '@mui/material/Fab';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import { Add, ImportExport } from '@mui/icons-material';
+import { Add } from '@mui/icons-material';
 import Slide from '@mui/material/Slide';
 import ExerciseForm from './ExerciseForm';
 import { addExercise, importingExercise } from '../../../actions/Exercise';
 import inject18n from '../../../components/i18n';
-import ExerciseImportForm from './ExerciseImportForm';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -25,30 +24,24 @@ const styles = () => ({
     bottom: 30,
     right: 30,
   },
-  importButton: {
-    display: 'none',
-    position: 'fixed',
-    bottom: 30,
-    right: 120,
-  },
 });
 
 class CreateExercise extends Component {
   constructor(props) {
     super(props);
-    this.state = { open: false, openImport: false };
+    this.state = { open: false };
   }
 
   handleOpen() {
-    this.setState({ open: true, openImport: false });
+    this.setState({ open: true });
   }
 
   handleOpenImport() {
-    this.setState({ open: false, openImport: true });
+    this.setState({ open: false });
   }
 
   handleClose() {
-    this.setState({ open: false, openImport: false });
+    this.setState({ open: false });
   }
 
   onSubmit(data) {
@@ -58,12 +51,6 @@ class CreateExercise extends Component {
     return this.props
       .addExercise(inputValues)
       .then((result) => (result.result ? this.handleClose() : result));
-  }
-
-  onSubmitImport(data) {
-    const formData = new FormData();
-    formData.append('file', data.document_file[0]);
-    this.props.importingExercise(formData).then(() => this.handleClose());
   }
 
   render() {
@@ -90,29 +77,6 @@ class CreateExercise extends Component {
             <ExerciseForm
               onSubmit={this.onSubmit.bind(this)}
               initialValues={{ exercise_tags: [] }}
-              handleClose={this.handleClose.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
-        <Fab
-          onClick={this.handleOpenImport.bind(this)}
-          color="primary"
-          aria-label="Add"
-          className={classes.importButton}
-        >
-          <ImportExport />
-        </Fab>
-        <Dialog
-          open={this.state.openImport}
-          TransitionComponent={Transition}
-          onClose={this.handleClose.bind(this)}
-          fullWidth={true}
-          maxWidth="md"
-        >
-          <DialogTitle>{t('Import an exercise')}</DialogTitle>
-          <DialogContent>
-            <ExerciseImportForm
-              onSubmit={this.onSubmitImport.bind(this)}
               handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>

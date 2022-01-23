@@ -44,5 +44,5 @@ export const deleteExercise = (exerciseId) => (dispatch) => delReferential(
 
 export const importingExercise = (data) => (dispatch) => {
   const uri = '/api/exercises/import';
-  return postReferential(schema.exercise, uri, data)(dispatch);
+  return postReferential(null, uri, data)(dispatch);
 };
