@@ -2,31 +2,25 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
-import Fab from '@mui/material/Fab';
+import withStyles from '@mui/styles/withStyles';
+import IconButton from '@mui/material/IconButton';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import Slide from '@mui/material/Slide';
-import withStyles from '@mui/styles/withStyles';
 import { Add } from '@mui/icons-material';
-import { addUser } from '../../../../actions/User';
-import UserForm from './UserForm';
+import PollForm from './PollForm';
+import { addPoll } from '../../../../actions/Poll';
 import inject18n from '../../../../components/i18n';
+import { Transition } from '../../../../utils/Environment';
 
 const styles = () => ({
   createButton: {
-    position: 'fixed',
-    bottom: 30,
-    right: 30,
+    float: 'left',
+    marginTop: -6,
   },
 });
 
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
-
-class CreateUser extends Component {
+class CreatePoll extends Component {
   constructor(props) {
     super(props);
     this.state = { open: false };
@@ -41,17 +35,8 @@ class CreateUser extends Component {
   }
 
   onSubmit(data) {
-    const inputValues = R.pipe(
-      R.assoc(
-        'user_organization',
-        data.user_organization && data.user_organization.id
-          ? data.user_organization.id
-          : data.user_organization,
-      ),
-      R.assoc('user_tags', R.pluck('id', data.user_tags)),
-    )(data);
     return this.props
-      .addUser(inputValues)
+      .addPoll(this.props.exerciseId, data)
       .then((result) => (result.result ? this.handleClose() : result));
   }
 
@@ -59,14 +44,14 @@ class CreateUser extends Component {
     const { classes, t } = this.props;
     return (
       <div>
-        <Fab
+        <IconButton
           onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
           className={classes.createButton}
         >
-          <Add />
-        </Fab>
+          <Add color="secondary" />
+        </IconButton>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -74,12 +59,11 @@ class CreateUser extends Component {
           fullWidth={true}
           maxWidth="md"
         >
-          <DialogTitle>{t('Create a new user')}</DialogTitle>
+          <DialogTitle>{t('Create a new poll')}</DialogTitle>
           <DialogContent>
-            <UserForm
-              editing={false}
+            <PollForm
+              initialValues={{ poll_priority: 1 }}
               onSubmit={this.onSubmit.bind(this)}
-              initialValues={{ user_tags: [] }}
               handleClose={this.handleClose.bind(this)}
             />
           </DialogContent>
@@ -89,14 +73,15 @@ class CreateUser extends Component {
   }
 }
 
-CreateUser.propTypes = {
+CreatePoll.propTypes = {
+  classes: PropTypes.object,
   t: PropTypes.func,
-  organizations: PropTypes.array,
-  addUser: PropTypes.func,
+  exerciseId: PropTypes.string,
+  addPoll: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { addUser }),
+  connect(null, { addPoll }),
   inject18n,
   withStyles(styles),
-)(CreateUser);
+)(CreatePoll);

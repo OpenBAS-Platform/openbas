@@ -10,7 +10,6 @@ import SpeedDialAction from '@mui/material/SpeedDialAction';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import Slide from '@mui/material/Slide';
 import {
   VideoSettingsOutlined,
   MarkEmailReadOutlined,
@@ -19,18 +18,14 @@ import { withRouter } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
 import { addComcheck } from '../../../../actions/Comcheck';
 import { addDryrun } from '../../../../actions/Dryrun';
 import inject18n from '../../../../components/i18n';
 import ComcheckForm from './ComcheckForm';
 import { storeBrowser } from '../../../../actions/Schema';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import { Transition } from '../../../../utils/Environment';
+import DryrunForm from './DryrunForm';
+import { resolveUserName } from '../../../../utils/String';
 
 const styles = (theme) => ({
   createButton: {
@@ -75,9 +70,12 @@ class CreateControl extends Component {
     this.setState({ openDryrun: false });
   }
 
-  submitDryrun() {
+  onSubmitDryrun(data) {
+    const inputValues = R.pipe(
+      R.assoc('dryrun_users', R.pluck('id', data.dryrun_users)),
+    )(data);
     return this.props
-      .addDryrun(this.props.exerciseId, { dryrun_users: [] })
+      .addDryrun(this.props.exerciseId, inputValues)
       .then((result) => this.props.history.push(
         `/exercises/${this.props.exerciseId}/controls/dryruns/${result.result}`,
       ));
@@ -85,7 +83,7 @@ class CreateControl extends Component {
 
   render() {
     const {
-      classes, t, audiences, variant,
+      classes, t, audiences, variant, me,
     } = this.props;
     return (
       <div>
@@ -162,28 +160,19 @@ class CreateControl extends Component {
           open={this.state.openDryrun}
           TransitionComponent={Transition}
           onClose={this.handleCloseDryrun.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
         >
+          <DialogTitle>{t('Launch a new dryrun')}</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              {t('Do you want to launch a new dryrun?')}
-            </DialogContentText>
+            <DryrunForm
+              initialValues={{
+                dryrun_users: [{ id: me.user_id, label: resolveUserName(me) }],
+              }}
+              onSubmit={this.onSubmitDryrun.bind(this)}
+              handleClose={this.handleCloseDryrun.bind(this)}
+            />
           </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseDryrun.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitDryrun.bind(this)}
-            >
-              {t('Launch')}
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     );
@@ -198,6 +187,7 @@ CreateControl.propTypes = {
   addComcheck: PropTypes.func,
   addDryrun: PropTypes.func,
   audiences: PropTypes.array,
+  me: PropTypes.object,
   history: PropTypes.object,
   variant: PropTypes.string,
 };
@@ -208,6 +198,7 @@ const select = (state, ownProps) => {
   const exercise = browser.getExercise(exerciseId);
   return {
     exercise,
+    me: browser.me,
     audiences: exercise?.audiences,
   };
 };

@@ -47,6 +47,8 @@ import ItemTags from '../../../../components/ItemTags';
 import LogForm from './LogForm';
 import { Transition } from '../../../../utils/Environment';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
+import CreatePoll from './CreatePoll';
+import PollPopover from './PollPopover';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -96,12 +98,12 @@ const Lessons = () => {
   const theme = useTheme();
   const { t, nsdt } = useFormatter();
   const [openCreateLog, setOpenCreateLog] = useState(false);
-  const [openEvaluation, setOpenEvaluation] = useState(null);
+  const [selectedObjective, setSelectedObjective] = useState(null);
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
   const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { objectives, logs } = exercise;
+  const { objectives, logs, polls } = exercise;
   useDataLoader(() => {
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchLogs(exerciseId));
@@ -141,7 +143,7 @@ const Lessons = () => {
               <SportsScoreOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Overall objectives score')}</div>
-            <div className={classes.number}>80%</div>
+            <div className={classes.number}>{exercise.exercise_score}%</div>
           </Paper>
         </Grid>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
@@ -150,7 +152,9 @@ const Lessons = () => {
               <SpeakerNotesOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Exercise logs')}</div>
-            <div className={classes.number}>0</div>
+            <div className={classes.number}>
+              {exercise.exercise_logs_number}
+            </div>
           </Paper>
         </Grid>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
@@ -159,7 +163,9 @@ const Lessons = () => {
               <BallotOutlined color="primary" sx={{ fontSize: 50 }} />
             </div>
             <div className={classes.title}>{t('Poll replies')}</div>
-            <div className={classes.number}>0</div>
+            <div className={classes.number}>
+              {exercise.exercise_answers_number}
+            </div>
           </Paper>
         </Grid>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
@@ -188,7 +194,7 @@ const Lessons = () => {
                     key={objective.objective_id}
                     divider={true}
                     button={true}
-                    onClick={() => setOpenEvaluation(objective.objective_id)}
+                    onClick={() => setSelectedObjective(objective.objective_id)}
                   >
                     <ListItemIcon>
                       <FlagOutlined />
@@ -236,19 +242,18 @@ const Lessons = () => {
           <Typography variant="overline" style={{ float: 'left' }}>
             {t('Polls')}
           </Typography>
-          <CreateObjective exerciseId={exerciseId} />
+          <CreatePoll exerciseId={exerciseId} />
           <div className="clearfix" />
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {objectives.length > 0 ? (
+            {polls.length > 0 ? (
               <List style={{ padding: 0 }}>
-                {objectives.map((objective) => (
-                  <ListItem key={objective.objective_id} divider={true}>
+                {polls.map((poll) => (
+                  <ListItem key={poll.poll_id} divider={true}>
                     <ListItemIcon>
                       <BallotOutlined />
                     </ListItemIcon>
                     <ListItemText
-                      primary={objective.objective_title}
-                      secondary={objective.objective_description}
+                      primary={poll.poll_question}
                       style={{ width: '60%' }}
                     />
                     <Box
@@ -269,16 +274,13 @@ const Lessons = () => {
                       </Box>
                     </Box>
                     <ListItemSecondaryAction>
-                      <ObjectivePopover
-                        exerciseId={exerciseId}
-                        objective={objective}
-                      />
+                      <PollPopover exerciseId={exerciseId} poll={poll} />
                     </ListItemSecondaryAction>
                   </ListItem>
                 ))}
               </List>
             ) : (
-              <Empty message={t('No objectives in this exercise.')} />
+              <Empty message={t('No polls in this exercise.')} />
             )}
           </Paper>
         </Grid>
@@ -315,7 +317,8 @@ const Lessons = () => {
                       float: 'left',
                       fontDecoration: 'none',
                       textTransform: 'none',
-                      paddingTop: 2,
+                      paddingTop: 5,
+                      fontSize: 15,
                     }}
                   >
                     <strong>{resolveUserName(log.user)}</strong>&nbsp;
@@ -368,16 +371,17 @@ const Lessons = () => {
       </div>
       <Dialog
         TransitionComponent={Transition}
-        open={Boolean(openEvaluation)}
-        onClose={() => setOpenEvaluation(null)}
+        keepMounted={false}
+        open={selectedObjective !== null}
+        onClose={() => setSelectedObjective(null)}
         fullWidth={true}
         maxWidth="md"
       >
-        <DialogTitle>{t('Objective evalution')}</DialogTitle>
+        <DialogTitle>{t('Objective achievement evalution')}</DialogTitle>
         <DialogContent>
           <ObjectiveEvaluations
-            objectiveId={openEvaluation}
-            handleClose={setOpenEvaluation}
+            objectiveId={selectedObjective}
+            handleClose={() => setSelectedObjective(null)}
           />
         </DialogContent>
       </Dialog>

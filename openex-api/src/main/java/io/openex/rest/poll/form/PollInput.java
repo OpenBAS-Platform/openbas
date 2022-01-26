@@ -2,7 +2,7 @@ package io.openex.rest.poll.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PollCreateInput {
+public class PollInput {
 
     @JsonProperty("poll_question")
     private String question;

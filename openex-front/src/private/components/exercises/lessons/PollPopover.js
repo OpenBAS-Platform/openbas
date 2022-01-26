@@ -12,15 +12,12 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import {
-  updateObjective,
-  deleteObjective,
-} from '../../../../actions/Objective';
-import ObjectiveForm from './ObjectiveForm';
+import { updatePoll, deletePoll } from '../../../../actions/Poll';
+import PollForm from './PollForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
 
-class ObjectivePopover extends Component {
+class PollPopover extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,11 +47,7 @@ class ObjectivePopover extends Component {
 
   onSubmitEdit(data) {
     return this.props
-      .updateObjective(
-        this.props.exerciseId,
-        this.props.objective.objective_id,
-        data,
-      )
+      .updatePoll(this.props.exerciseId, this.props.poll.poll_id, data)
       .then(() => this.handleCloseEdit());
   }
 
@@ -68,19 +61,13 @@ class ObjectivePopover extends Component {
   }
 
   submitDelete() {
-    this.props.deleteObjective(
-      this.props.exerciseId,
-      this.props.objective.objective_id,
-    );
+    this.props.deletePoll(this.props.exerciseId, this.props.poll.poll_id);
     this.handleCloseDelete();
   }
 
   render() {
-    const { t, objective } = this.props;
-    const initialValues = R.pick(
-      ['objective_title', 'objective_description', 'objective_priority'],
-      objective,
-    );
+    const { t, poll } = this.props;
+    const initialValues = R.pick(['poll_question'], poll);
     return (
       <div>
         <IconButton
@@ -109,7 +96,7 @@ class ObjectivePopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to delete this objective?')}
+              {t('Do you want to delete this poll?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -136,9 +123,9 @@ class ObjectivePopover extends Component {
           fullWidth={true}
           maxWidth="md"
         >
-          <DialogTitle>{t('Update the objective')}</DialogTitle>
+          <DialogTitle>{t('Update the poll')}</DialogTitle>
           <DialogContent>
-            <ObjectiveForm
+            <PollForm
               initialValues={initialValues}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
@@ -151,15 +138,15 @@ class ObjectivePopover extends Component {
   }
 }
 
-ObjectivePopover.propTypes = {
+PollPopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
-  objective: PropTypes.object,
-  updateObjective: PropTypes.func,
-  deleteObjective: PropTypes.func,
+  poll: PropTypes.object,
+  updatePoll: PropTypes.func,
+  deletePoll: PropTypes.func,
 };
 
 export default R.compose(
-  connect(null, { updateObjective, deleteObjective }),
+  connect(null, { updatePoll, deletePoll }),
   inject18n,
-)(ObjectivePopover);
+)(PollPopover);

@@ -6,7 +6,6 @@ import Fab from '@mui/material/Fab';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import Slide from '@mui/material/Slide';
 import withStyles from '@mui/styles/withStyles';
 import { Add, ControlPointOutlined } from '@mui/icons-material';
 import { ListItemIcon } from '@mui/material';
@@ -15,6 +14,7 @@ import ListItem from '@mui/material/ListItem';
 import { addPlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
+import { Transition } from '../../../utils/Environment';
 
 const styles = (theme) => ({
   createButton: {
@@ -28,11 +28,6 @@ const styles = (theme) => ({
     fontWeight: 500,
   },
 });
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 class CreatePlayer extends Component {
   constructor(props) {

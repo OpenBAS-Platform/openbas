@@ -377,7 +377,6 @@ class AudiencesPlayers extends Component {
                         />
                         )}
                     </div>
-
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.user_organization}

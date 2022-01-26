@@ -5,7 +5,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch } from 'react-redux';
-import { CastOutlined, CheckCircleOutlineOutlined } from '@mui/icons-material';
+import {
+  PersonOutlined,
+  CastOutlined,
+  CheckCircleOutlineOutlined,
+} from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -17,6 +21,7 @@ import Chip from '@mui/material/Chip';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import SearchFilter from '../../../../components/SearchFilter';
 import { fetchTags } from '../../../../actions/Tag';
+import { fetchUsers } from '../../../../actions/User';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useStore } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -29,6 +34,7 @@ import InjectIcon from '../injects/InjectIcon';
 import InjectType from '../injects/InjectType';
 import InjectStatus from '../injects/InjectStatus';
 import InjectStatusDetails from '../injects/InjectStatusDetails';
+import { resolveUserName } from '../../../../utils/String';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -76,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     position: 'relative',
-    padding: '20px 20px 0 20px',
+    padding: 20,
     overflow: 'hidden',
     height: '100%',
   },
@@ -114,13 +120,13 @@ const headerStyles = {
   },
   dryinject_type: {
     float: 'left',
-    width: '15%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
   dryinject_title: {
     float: 'left',
-    width: '30%',
+    width: '35%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -146,7 +152,7 @@ const headerStyles = {
 const inlineStyles = {
   dryinject_type: {
     float: 'left',
-    width: '15%',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -154,7 +160,7 @@ const inlineStyles = {
   },
   dryinject_title: {
     float: 'left',
-    width: '30%',
+    width: '35%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -212,8 +218,10 @@ const Dryrun = () => {
   // Fetching data
   const dryrun = useStore((store) => store.getDryrun(dryrunId));
   const dryinjects = dryrun ? dryrun.dryinjects : [];
+  const users = dryrun ? dryrun.users : [];
   useDataLoader(() => {
     dispatch(fetchTags());
+    dispatch(fetchUsers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));
   });
@@ -226,10 +234,30 @@ const Dryrun = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Start date')}</Typography>
                 {fldt(dryrun?.dryrun_date)}
+                <Typography variant="h1" style={{ marginTop: 20 }}>
+                  {t('Speed')}
+                </Typography>
+                <code>{dryrun?.dryrun_speed}x</code>
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Speed')}</Typography>
-                {dryrun?.dryrun_speed}x
+                <Typography variant="h1" style={{ marginBottom: 0 }}>
+                  {t('Dryrun recipients')}
+                </Typography>
+                <List>
+                  {users.map((user) => (
+                    <ListItem
+                      key={user.user_id}
+                      divider={true}
+                      dense={true}
+                      style={{ paddingLeft: 0 }}
+                    >
+                      <ListItemIcon>
+                        <PersonOutlined />
+                      </ListItemIcon>
+                      <ListItemText primary={resolveUserName(user)} />
+                    </ListItem>
+                  ))}
+                </List>
               </Grid>
             </Grid>
           </Paper>

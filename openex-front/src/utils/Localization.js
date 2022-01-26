@@ -59,7 +59,6 @@ const i18n = {
       Parameters: 'Paramètres',
       'Default theme': 'Thème par défaut',
       'Default language': 'Langue par défaut',
-      'Create a user': 'Créer un utilisateur',
       Administrator: 'Administrateur',
       Automatic: 'Automatique',
       'Passwords do no match': 'Les mots de passe ne correspondent pas',
@@ -261,9 +260,14 @@ const i18n = {
       successfull: 'un succès',
       'Verification done at': 'Vérification faite le',
       'No dryrun in this exercise.': 'Aucune simulation dans cet exercice.',
+      'No objectives in this exercise.': 'Aucun objectif dans cet exercice.',
+      'No polls in this exercise.': 'Aucun sondage dans cet exercice',
       'Do you want to delete this dryrun?':
         'Souhaitez-vous supprimer cette simulation ?',
       'Overall objectives score': 'Score global des objectifs',
+      'Do you want to delete this poll?':
+        'Souhaitez-vous supprimer ce sondage ?',
+      'Update the poll': 'Modifier le sondage',
       'Exercise logs': "Journal d'exercice",
       'Poll replies': 'Réponses au sondage',
       Objectives: 'Objectifs',
@@ -274,6 +278,16 @@ const i18n = {
       'Write an entry': 'Ecrire une entrée',
       'Do you want to delete this log?':
         'Souhaitez-vous supprimer cette entrée ?',
+      'Objective achievement evalution':
+        "Evaluation de l'atteinte de l'objectif",
+      Evaluate: 'Evaluer',
+      'My evaluation': 'Mon évaluation',
+      Priority: 'Priorité',
+      Polls: 'Sondages',
+      'Create a new poll': 'Créer un nouveau sondage',
+      'Update the log': "Modifier l'entrée",
+      'Create a new user': 'Créer un nouvel utilisateur',
+      'Dryrun recipients': 'Destinataires de la simulation',
     },
     en: {
       openex_email: 'Email',

@@ -27,14 +27,12 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const dispatch = useDispatch();
   const { t } = useFormatter();
   const [value, setValue] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   // Fetching data
   const { exerciseId } = useParams();
   const objective = useStore((store) => store.getObjective(objectiveId));
   const me = useStore((store) => store.me);
-  if (!objective) {
-    return <Loader />;
-  }
-  const { evaluations } = objective;
+  const evaluations = objective ? objective.evaluations : [];
   useDataLoader(() => {
     dispatch(fetchEvaluations(exerciseId, objectiveId));
   });
@@ -42,9 +40,9 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
     R.filter((n) => n.evaluation_user === me.user_id, evaluations),
   );
   const submitEvaluation = () => {
+    setSubmitting(true);
     const data = {
       evaluation_score: value,
-      evaluation_user: me.user_id,
     };
     if (currentUserEvaluation) {
       return dispatch(
@@ -56,7 +54,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
         ),
       ).then((result) => {
         if (result.result) {
-          return handleClose(null);
+          return handleClose();
         }
         return result;
       });
@@ -64,23 +62,62 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
     return dispatch(addEvaluation(exerciseId, objectiveId, data)).then(
       (result) => {
         if (result.result) {
-          return handleClose(null);
+          return handleClose();
         }
         return result;
       },
     );
   };
+  if (!objective) {
+    return <Loader />;
+  }
   return (
     <div>
-      <List style={{ padding: 0 }}>
-        {evaluations.map((evaluation) => (
-          <ListItem key={evaluation.evaluation_id} divider={true}>
+      {evaluations.length > 0 ? (
+        <List style={{ padding: 0 }}>
+          {evaluations.map((evaluation) => (
+            <ListItem key={evaluation.evaluation_id} divider={true}>
+              <ListItemIcon>
+                <HowToVoteOutlined />
+              </ListItemIcon>
+              <ListItemText
+                style={{ width: '50%' }}
+                primary={resolveUserName(evaluation.user)}
+              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '30%',
+                  marginRight: 1,
+                }}
+              >
+                <Box sx={{ width: '100%', mr: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={evaluation.evaluation_score}
+                  />
+                </Box>
+                <Box sx={{ minWidth: 35 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {evaluation.evaluation_score}%
+                  </Typography>
+                </Box>
+              </Box>
+            </ListItem>
+          ))}
+        </List>
+      ) : (
+        <List style={{ padding: 0 }}>
+          <ListItem divider={true}>
             <ListItemIcon>
               <HowToVoteOutlined />
             </ListItemIcon>
             <ListItemText
               style={{ width: '50%' }}
-              primary={resolveUserName(evaluation.user)}
+              primary={
+                <i>{t('There is no evaluation for this objective yet')}</i>
+              }
             />
             <Box
               sx={{
@@ -91,33 +128,32 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
               }}
             >
               <Box sx={{ width: '100%', mr: 1 }}>
-                <LinearProgress
-                  variant="determinate"
-                  value={evaluation.score}
-                />
+                <LinearProgress variant="determinate" value={0} />
               </Box>
               <Box sx={{ minWidth: 35 }}>
                 <Typography variant="body2" color="text.secondary">
-                  {evaluation.score}%
+                  -
                 </Typography>
               </Box>
             </Box>
           </ListItem>
-        ))}
-      </List>
+        </List>
+      )}
       <Box
         sx={{
           width: '100%',
-          marginTop: '60px',
+          marginTop: '30px',
           padding: '0 5px 0 5px',
         }}
       >
+        <Typography variant="overline">{t('My evaluation')}</Typography>
         <Slider
           aria-label={t('Score')}
-          defaultValue={
-            currentUserEvaluation ? currentUserEvaluation.evaluation_score : 10
+          value={
+            value === null
+              ? currentUserEvaluation?.evaluation_score || 10
+              : value
           }
-          value={value}
           onChange={(_, val) => setValue(val)}
           valueLabelDisplay="auto"
           step={5}
@@ -130,12 +166,18 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
         <Button
           variant="contained"
           color="secondary"
-          onClick={() => handleClose(null)}
+          onClick={handleClose}
           style={{ marginRight: 10 }}
+          disabled={submitting}
         >
           {t('Cancel')}
         </Button>
-        <Button variant="contained" color="primary" onClick={submitEvaluation}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={submitEvaluation}
+          disabled={submitting}
+        >
           {t('Evaluate')}
         </Button>
       </div>

@@ -5,7 +5,6 @@ import { withStyles } from '@mui/styles';
 import { compose } from 'ramda';
 import Button from '@mui/material/Button';
 import inject18n from '../../../components/i18n';
-import ImportUploader from '../exercises/ImportUploader';
 
 const styles = (theme) => ({
   button: {
@@ -30,24 +29,23 @@ class TopMenuExercises extends Component {
   render() {
     const { t, location, classes } = this.props;
     return (
-            <div className={classes.bar}>
-                  <Button
-                      component={Link}
-                      to="/"
-                      variant={location.pathname === '/exercises' ? 'contained' : 'text'}
-                      size="small"
-                      color={location.pathname === '/exercises' ? 'secondary' : 'inherit'}
-                      classes={{ root: classes.button }}>
-                      {t('Exercises')}
-                  </Button>
-              {
-                /*
+      <div className={classes.bar}>
+        <Button
+          component={Link}
+          to="/"
+          variant={location.pathname === '/exercises' ? 'contained' : 'text'}
+          size="small"
+          color={location.pathname === '/exercises' ? 'secondary' : 'inherit'}
+          classes={{ root: classes.button }}
+        >
+          {t('Exercises')}
+        </Button>
+        {/*
                 <Button component={ImportUploader} classes={{root: classes.button}}>
                   {t('Import exercise')}
                 </Button>
-                */
-              }
-            </div>
+                */}
+      </div>
     );
   }
 }

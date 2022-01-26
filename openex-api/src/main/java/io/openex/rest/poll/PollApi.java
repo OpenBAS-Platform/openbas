@@ -8,8 +8,8 @@ import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.PollRepository;
 import io.openex.database.specification.PollSpecification;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.poll.form.AnswerCreateInput;
-import io.openex.rest.poll.form.PollCreateInput;
+import io.openex.rest.poll.form.AnswerInput;
+import io.openex.rest.poll.form.PollInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,11 +49,20 @@ public class PollApi extends RestBehavior {
     @PostMapping("/api/exercises/{exerciseId}/polls")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Poll createPoll(@PathVariable String exerciseId,
-                           @Valid @RequestBody PollCreateInput input) {
+                           @Valid @RequestBody PollInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Poll poll = new Poll();
         poll.setUpdateAttributes(input);
         poll.setExercise(exercise);
+        return pollRepository.save(poll);
+    }
+
+    @PutMapping("/api/exercises/{exerciseId}/polls/{pollId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Poll updatePoll(@PathVariable String pollId,
+                           @Valid @RequestBody PollInput input) {
+        Poll poll = pollRepository.findById(pollId).orElseThrow();
+        poll.setUpdateAttributes(input);
         return pollRepository.save(poll);
     }
 
@@ -65,16 +74,26 @@ public class PollApi extends RestBehavior {
     // endregion
 
     // region answers
-    @PostMapping("/api/exercises/{exerciseId}/answers")
+    @PostMapping("/api/exercises/{exerciseId}/polls/{pollId}/answers")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Answer createAnswer(@Valid @RequestBody AnswerCreateInput input) {
+    public Answer createAnswer(@PathVariable String pollId,
+                               @Valid @RequestBody AnswerInput input) {
         Answer answer = new Answer();
         answer.setUpdateAttributes(input);
-        answer.setPoll(resolveRelation(input.getPollId(), pollRepository));
+        answer.setPoll(resolveRelation(pollId, pollRepository));
         return answerRepository.save(answer);
     }
 
-    @DeleteMapping("/api/exercises/{exerciseId}/answers/{answerId}")
+    @PutMapping("/api/exercises/{exerciseId}/polls/{pollId}/answers/{answerId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Answer updatePoll(@PathVariable String answerId,
+                             @Valid @RequestBody AnswerInput input) {
+        Answer answer = answerRepository.findById(answerId).orElseThrow();
+        answer.setUpdateAttributes(input);
+        return answerRepository.save(answer);
+    }
+
+    @DeleteMapping("/api/exercises/{exerciseId}/polls/{pollId}/answers/{answerId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteAnswer(@PathVariable String answerId) {
         answerRepository.deleteById(answerId);

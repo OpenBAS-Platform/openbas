@@ -2,7 +2,7 @@ package io.openex.rest.objective.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ObjectiveCreateInput {
+public class ObjectiveInput {
 
     @JsonProperty("objective_title")
     private String title;

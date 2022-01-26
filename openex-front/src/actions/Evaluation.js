@@ -7,7 +7,7 @@ import {
 } from '../utils/Action';
 
 export const fetchEvaluations = (exerciseId, objectiveId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/evalutions`;
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/evaluations`;
   return getReferential(schema.arrayOfEvaluations, uri)(dispatch);
 };
 
@@ -22,6 +22,6 @@ export const addEvaluation = (exerciseId, objectiveId, data) => (dispatch) => {
 };
 
 export const deleteEvaluation = (exerciseId, objectiveId, evaluationId) => (dispatch) => {
-  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/evaluation/${evaluationId}`;
+  const uri = `/api/exercises/${exerciseId}/objectives/${objectiveId}/evaluations/${evaluationId}`;
   return delReferential(uri, 'evaluations', evaluationId)(dispatch);
 };

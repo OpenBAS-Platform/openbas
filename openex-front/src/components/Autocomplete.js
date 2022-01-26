@@ -13,50 +13,59 @@ const renderAutocomplete = ({
   fullWidth,
   style,
   openCreate,
+  noMargin,
   ...others
-}) => (
-  <div style={{ position: 'relative' }}>
-    <MuiAutocomplete
-      label={label}
-      selectOnFocus={true}
-      autoHighlight={true}
-      clearOnBlur={false}
-      clearOnEscape={false}
-      onInputChange={(event, value) => {
-        if (others.freeSolo) {
+}) => {
+  let top = 30;
+  if (placeholder) {
+    top = -5;
+  } else if (noMargin) {
+    top = 10;
+  }
+  return (
+    <div style={{ position: 'relative' }}>
+      <MuiAutocomplete
+        label={label}
+        selectOnFocus={true}
+        autoHighlight={true}
+        clearOnBlur={false}
+        clearOnEscape={false}
+        onInputChange={(event, value) => {
+          if (others.freeSolo) {
+            onChange(value);
+          }
+        }}
+        onChange={(event, value) => {
           onChange(value);
-        }
-      }}
-      onChange={(event, value) => {
-        onChange(value);
-      }}
-      {...inputProps}
-      {...others}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          variant={others.variant || 'standard'}
-          label={label}
-          placeholder={placeholder}
-          fullWidth={fullWidth}
-          style={style}
-          error={touched && invalid}
-          helperText={touched && error}
-        />
+        }}
+        {...inputProps}
+        {...others}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant={others.variant || 'standard'}
+            label={label}
+            placeholder={placeholder}
+            fullWidth={fullWidth}
+            style={style}
+            error={touched && invalid}
+            helperText={touched && error}
+          />
+        )}
+      />
+      {typeof openCreate === 'function' && (
+        <IconButton
+          onClick={() => openCreate()}
+          edge="end"
+          style={{ position: 'absolute', top, right: 35 }}
+        >
+          <AddOutlined />
+        </IconButton>
       )}
-    />
-    {typeof openCreate === 'function' && (
-      <IconButton
-        onClick={() => openCreate()}
-        edge="end"
-        style={{ position: 'absolute', top: placeholder ? -5 : 30, right: 35 }}
-      >
-        <AddOutlined />
-      </IconButton>
-    )}
-  </div>
-);
+    </div>
+  );
+};
 
 // eslint-disable-next-line import/prefer-default-export
 export const Autocomplete = (props) => (

@@ -238,6 +238,9 @@ const _buildDryrun = (state, id, dry) => {
   return {
     ...dry,
     dryinjects: getDryinjects(),
+    users: R.values(state.referential.entities.users)
+      .filter((n) => dry.dryrun_users.includes(n.user_id))
+      .map((u) => _buildUser(state, u)),
   };
 };
 const _buildLog = (state, lo) => {
@@ -255,7 +258,10 @@ const _buildEvaluation = (state, eva) => {
   if (eva === undefined) return eva;
   return {
     ...eva,
-    user: _buildUser(state, state.referential.entities.users[eva.eval_user]),
+    user: _buildUser(
+      state,
+      state.referential.entities.users[eva.evaluation_user],
+    ),
   };
 };
 const _buildObjective = (state, id, obj) => {
@@ -269,12 +275,37 @@ const _buildObjective = (state, id, obj) => {
     evaluations: getEvaluations(),
   };
 };
+const _buildAnswer = (state, ans) => {
+  if (ans === undefined) return ans;
+  return {
+    ...ans,
+    user: _buildUser(
+      state,
+      state.referential.entities.users[ans.evaluation_user],
+    ),
+  };
+};
+const _buildPoll = (state, id, pol) => {
+  if (pol === undefined) return pol;
+  const getAnswers = () => R.filter(
+    (n) => n.answer_poll === id,
+    R.values(state.referential.entities.answers),
+  ).map((e) => _buildAnswer(state, e));
+  return {
+    ...pol,
+    answers: getAnswers(),
+  };
+};
 const _buildExercise = (state, id, ex) => {
   if (ex === undefined) return ex;
   const getObjectives = () => R.filter(
     (n) => n.objective_exercise === id,
     R.values(state.referential.entities.objectives),
   ).map((o) => _buildObjective(state, o.objective_id, o));
+  const getPolls = () => R.filter(
+    (n) => n.poll_exercise === id,
+    R.values(state.referential.entities.polls),
+  ).map((p) => _buildPoll(state, p.poll_id, p));
   const getLogs = () => R.filter(
     (n) => n.log_exercise === id,
     R.values(state.referential.entities.logs),
@@ -308,6 +339,7 @@ const _buildExercise = (state, id, ex) => {
       .filter((t) => t !== undefined),
     logs: getLogs(),
     objectives: getObjectives(),
+    polls: getPolls(),
     injects: getInjects(),
     audiences: getAudiences(),
     comchecks: getComchecks(),
@@ -363,7 +395,11 @@ export const storeBrowser = (state) => ({
     return _buildExercise(state, id, state.referential.entities.exercises[id]);
   },
   getObjective(id) {
-    return _buildObjective(state, id, state.referential.entities.objectives[id]);
+    return _buildObjective(
+      state,
+      id,
+      state.referential.entities.objectives[id],
+    );
   },
   getComcheck(id) {
     return _buildComcheck(state, state.referential.entities.comchecks[id]);

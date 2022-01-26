@@ -20,7 +20,7 @@ public class Evaluation implements Base {
     @Column(name = "evaluation_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("objective_id")
+    @JsonProperty("evaluation_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.EAGER)

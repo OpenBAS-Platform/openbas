@@ -40,10 +40,6 @@ export default () => ({
       fontSize: 16,
       letterSpacing: 1.2,
     },
-    h5: {
-      fontSize: 15,
-      marginTop: 5,
-    },
   },
   components: {
     MuiCssBaseline: {
