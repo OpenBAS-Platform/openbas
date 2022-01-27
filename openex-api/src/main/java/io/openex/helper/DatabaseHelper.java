@@ -23,11 +23,15 @@ public class DatabaseHelper {
         return null;
     }
 
-    public static <T> T resolveRelation(String inputRelationId, CrudRepository<T, String> repository) {
+    public static <T> T resolveOptionalRelation(String inputRelationId, CrudRepository<T, String> repository) {
         if (hasLength(inputRelationId)) {
             Optional<T> existingEntity = repository.findById(inputRelationId);
             return existingEntity.orElse(null);
         }
         return null;
+    }
+
+    public static <T> T resolveRelation(String inputRelationId, CrudRepository<T, String> repository) {
+        return repository.findById(inputRelationId).orElseThrow();
     }
 }

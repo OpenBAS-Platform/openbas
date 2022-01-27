@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
-import static io.openex.helper.DatabaseHelper.resolveRelation;
+import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 import static java.time.Instant.now;
@@ -136,7 +136,7 @@ public class InjectApi<T> extends RestBehavior {
         // Set dependencies
         inject.setUser(currentUser());
         inject.setExercise(exercise);
-        inject.setDependsOn(resolveRelation(input.getDependsOn(), injectRepository));
+        inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return injectRepository.save(inject);

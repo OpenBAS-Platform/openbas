@@ -10,9 +10,12 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static java.time.Instant.now;
 
 @Entity
 @Table(name = "objectives")
@@ -42,6 +45,14 @@ public class Objective implements Base {
     @Column(name = "objective_priority")
     @JsonProperty("objective_priority")
     private Short priority;
+
+    @Column(name = "objective_created_at")
+    @JsonProperty("objective_created_at")
+    private Instant createdAt = now();
+
+    @Column(name = "objective_updated_at")
+    @JsonProperty("objective_updated_at")
+    private Instant updatedAt = now();
 
     @OneToMany(mappedBy = "objective", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
@@ -94,6 +105,22 @@ public class Objective implements Base {
 
     public void setPriority(Short priority) {
         this.priority = priority;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public List<Evaluation> getEvaluations() {

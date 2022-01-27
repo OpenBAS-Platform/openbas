@@ -199,7 +199,8 @@ public class Exercise implements Base {
 
     @JsonProperty("exercise_score")
     public Double getEvaluationAverage() {
-        return getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average().orElse(0D);
+        double evaluationAverage = getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average().orElse(0D);
+        return Math.round(evaluationAverage * 100.0) / 100.0;
     }
 
     @JsonProperty("exercise_logs_number")

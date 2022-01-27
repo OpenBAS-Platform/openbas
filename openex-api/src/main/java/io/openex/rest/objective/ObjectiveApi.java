@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import static io.openex.config.AppConfig.currentUser;
@@ -63,7 +64,7 @@ public class ObjectiveApi extends RestBehavior {
     @PutMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Objective updateObjective(@PathVariable String objectiveId,
-                                           @Valid @RequestBody ObjectiveInput input) {
+                                     @Valid @RequestBody ObjectiveInput input) {
         Objective objective = objectiveRepository.findById(objectiveId).orElseThrow();
         objective.setUpdateAttributes(input);
         return objectiveRepository.save(objective);
@@ -89,22 +90,40 @@ public class ObjectiveApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Evaluation createEvaluation(@PathVariable String objectiveId,
+    @Transactional
+    public Evaluation createEvaluation(@PathVariable String exerciseId,
+                                       @PathVariable String objectiveId,
                                        @Valid @RequestBody EvaluationInput input) {
         Evaluation evaluation = new Evaluation();
         evaluation.setUpdateAttributes(input);
-        evaluation.setObjective(resolveRelation(objectiveId, objectiveRepository));
+        Objective objective = resolveRelation(objectiveId, objectiveRepository);
+        evaluation.setObjective(objective);
         evaluation.setUser(currentUser());
-        return evaluationRepository.save(evaluation);
+        Evaluation result = evaluationRepository.save(evaluation);
+        objective.setUpdatedAt(now());
+        objectiveRepository.save(objective);
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setUpdatedAt(now());
+        exerciseRepository.save(exercise);
+        return result;
     }
 
     @PutMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Evaluation updateEvaluation(@PathVariable String evaluationId,
-                                     @Valid @RequestBody EvaluationInput input) {
+    public Evaluation updateEvaluation(@PathVariable String exerciseId,
+                                       @PathVariable String objectiveId,
+                                       @PathVariable String evaluationId,
+                                       @Valid @RequestBody EvaluationInput input) {
         Evaluation evaluation = evaluationRepository.findById(evaluationId).orElseThrow();
         evaluation.setUpdateAttributes(input);
-        return evaluationRepository.save(evaluation);
+        Evaluation result = evaluationRepository.save(evaluation);
+        Objective objective = objectiveRepository.findById(objectiveId).orElseThrow();
+        objective.setUpdatedAt(now());
+        objectiveRepository.save(objective);
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setUpdatedAt(now());
+        exerciseRepository.save(exercise);
+        return result;
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")

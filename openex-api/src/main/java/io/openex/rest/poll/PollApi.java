@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import static io.openex.helper.DatabaseHelper.resolveRelation;
+import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 
 @RestController
 public class PollApi extends RestBehavior {
@@ -80,7 +80,7 @@ public class PollApi extends RestBehavior {
                                @Valid @RequestBody AnswerInput input) {
         Answer answer = new Answer();
         answer.setUpdateAttributes(input);
-        answer.setPoll(resolveRelation(pollId, pollRepository));
+        answer.setPoll(resolveOptionalRelation(pollId, pollRepository));
         return answerRepository.save(answer);
     }
 
