@@ -12,7 +12,7 @@ const styles = () => ({
     height: 30,
     margin: '0 7px 7px 0',
     borderRadius: 5,
-    width: 130,
+    width: 140,
   },
   chipInList: {
     fontSize: 12,
@@ -21,7 +21,7 @@ const styles = () => ({
     float: 'left',
     marginRight: 7,
     borderRadius: 5,
-    width: 80,
+    width: 100,
   },
 });
 
@@ -40,6 +40,11 @@ const inlineStyles = {
     backgroundColor: 'rgba(0, 150, 136, 0.08)',
     color: '#009688',
     border: '1px solid #009688',
+  },
+  openex_mastodon: {
+    backgroundColor: 'rgba(233, 30, 99, 0.08)',
+    color: '#e91e63',
+    border: '1px solid #e91e63',
   },
 };
 
@@ -64,6 +69,14 @@ class InjectType extends Component {
             classes={{ root: style }}
             style={inlineStyles.openex_ovh_sms}
             label={t('OVH SMS')}
+          />
+        );
+      case 'openex_mastodon':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.openex_mastodon}
+            label={t('Mastodon')}
           />
         );
       default:

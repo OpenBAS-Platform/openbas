@@ -25,6 +25,7 @@ public class OvhSmsService {
     private static final String METHOD = "POST";
     @Resource
     private ObjectMapper mapper;
+
     private OvhSmsConfig config;
 
     @SuppressWarnings({"StringBufferMayBeStringBuilder", "ForLoopReplaceableByForEach", "ConstantConditions"})

@@ -6,6 +6,7 @@ import {
   NotificationsActiveOutlined,
   HelpOutlined,
 } from '@mui/icons-material';
+import { Mastodon } from 'mdi-material-ui';
 
 const iconSelector = (type, variant, fontSize) => {
   let style = {};
@@ -47,6 +48,14 @@ const iconSelector = (type, variant, fontSize) => {
           style={style}
           fontSize={fontSize}
           sx={{ color: '#009688' }}
+        />
+      );
+    case 'openex_mastodon':
+      return (
+        <Mastodon
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: '#e91e63' }}
         />
       );
     default:
