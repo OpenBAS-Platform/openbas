@@ -35,7 +35,6 @@ public class InjectApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private InjectRepository injectRepository;
     private InjectDocumentRepository injectDocumentRepository;
-    private InjectReportingRepository injectReportingRepository;
     private AudienceRepository audienceRepository;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
@@ -55,11 +54,6 @@ public class InjectApi extends RestBehavior {
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
         this.tagRepository = tagRepository;
-    }
-
-    @Autowired
-    public void setInjectReportingRepository(InjectReportingRepository injectReportingRepository) {
-        this.injectReportingRepository = injectReportingRepository;
     }
 
     @Autowired
@@ -190,6 +184,7 @@ public class InjectApi extends RestBehavior {
     public Inject setInjectStatus(@PathVariable String injectId,
                                   @Valid @RequestBody InjectUpdateStatusInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
+        // build status
         InjectStatus injectStatus = new InjectStatus();
         injectStatus.setInject(inject);
         injectStatus.setDate(now());
@@ -197,8 +192,9 @@ public class InjectApi extends RestBehavior {
         injectStatus.setExecutionTime(0);
         Execution execution = new Execution();
         execution.addTrace(traceSuccess(currentUser().getId(), input.getMessage()));
+        execution.stop();
         injectStatus.setReporting(execution);
-        injectReportingRepository.save(injectStatus);
+        // Save status for inject
         inject.setStatus(injectStatus);
         return injectRepository.save(inject);
     }
