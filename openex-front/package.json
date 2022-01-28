@@ -61,8 +61,8 @@
     "node": ">= 14.* < 17.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --max-old-space-size=8192 start",
+    "build": "react-scripts --max-old-space-size=8192 build",
     "lint": "eslint .",
     "test": "react-scripts test --coverage --watchAll=false"
   },

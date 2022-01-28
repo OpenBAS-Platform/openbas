@@ -65,7 +65,7 @@ public class Comcheck implements Base {
 
     // region transient
     @JsonProperty("comcheck_users_number")
-    public long usersNumber() {
+    public long getUsersNumber() {
         return getComcheckStatus().size(); // One status for each user.
     }
     // endregion

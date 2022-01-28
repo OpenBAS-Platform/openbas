@@ -82,8 +82,8 @@ public class Audience implements Base {
     // region transient
     @JsonProperty("audience_injects")
     @JsonSerialize(using = MultiModelDeserializer.class)
-    public List<Inject<?>> getInjects() {
-        Predicate<Inject<?>> selectedInject = inject -> inject.isGlobalInject() || inject.getAudiences().contains(this);
+    public List<Inject> getInjects() {
+        Predicate<Inject> selectedInject = inject -> inject.isAllAudiences() || inject.getAudiences().contains(this);
         return getExercise().getInjects().stream().filter(selectedInject).distinct().toList();
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = "inject_type", visible = true)
-public abstract class InjectInput<T> {
+public abstract class InjectInput {
 
     @JsonProperty("inject_title")
     private String title;
@@ -29,11 +29,11 @@ public abstract class InjectInput<T> {
     @JsonProperty("inject_audiences")
     private List<String> audiences = new ArrayList<>();
 
+    @JsonProperty("inject_documents")
+    private List<InjectDocumentInput> documents = new ArrayList<>();
+
     @JsonProperty("inject_all_audiences")
     private boolean allAudiences = false;
-
-    @JsonProperty("inject_content")
-    private T content;
 
     @JsonProperty("inject_country")
     private String country;
@@ -76,14 +76,6 @@ public abstract class InjectInput<T> {
         this.audiences = audiences;
     }
 
-    public T getContent() {
-        return content;
-    }
-
-    public void setContent(T content) {
-        this.content = content;
-    }
-
     public boolean getAllAudiences() {
         return allAudiences;
     }
@@ -94,6 +86,14 @@ public abstract class InjectInput<T> {
 
     public boolean isAllAudiences() {
         return allAudiences;
+    }
+
+    public List<InjectDocumentInput> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<InjectDocumentInput> documents) {
+        this.documents = documents;
     }
 
     public String getDependsOn() {
@@ -136,15 +136,14 @@ public abstract class InjectInput<T> {
         this.tagIds = tagIds;
     }
 
-    public abstract Inject<T> injectInstance();
+    public abstract Inject init();
 
-    public Inject<T> toInject() {
-        Inject<T> inject = injectInstance();
+    public Inject toInject() {
+        Inject inject = init();
         inject.setTitle(getTitle());
         inject.setDescription(getDescription());
         inject.setDependsDuration(getDependsDuration());
         inject.setType(getType());
-        inject.setContent(getContent());
         inject.setAllAudiences(getAllAudiences());
         inject.setCountry(getCountry());
         inject.setCity(getCity());

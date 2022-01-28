@@ -1,10 +1,11 @@
 package io.openex.injects.manual.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.model.InjectContent;
 
 import java.util.Objects;
 
-public class ManualContent {
+public class ManualContent extends InjectContent {
 
     @JsonProperty("content")
     private String content;

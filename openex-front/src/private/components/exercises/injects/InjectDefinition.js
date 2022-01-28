@@ -152,7 +152,7 @@ class InjectDefinition extends Component {
     this.props.fetchInjectAudiences(exerciseId, injectId);
   }
 
-  buildIinitialValues() {
+  buildInitialValues() {
     return R.pick(
       [
         'inject_title',
@@ -170,7 +170,7 @@ class InjectDefinition extends Component {
   }
 
   toggleAll() {
-    const initialValues = this.buildIinitialValues();
+    const initialValues = this.buildInitialValues();
     const inputValues = R.assoc(
       'inject_all_audiences',
       !initialValues.inject_all_audiences,
@@ -214,8 +214,17 @@ class InjectDefinition extends Component {
   }
 
   onSubmitContent(data) {
-    const initialValues = this.buildIinitialValues();
-    const inputValues = { ...initialValues, inject_content: data };
+    const initialValues = this.buildInitialValues();
+    const { attachments } = data;
+    const content = R.dissoc('attachments', data);
+    const injectDocuments = attachments
+      .map((a) => ({ inject_document_id: a.document_id, inject_document_attached: true }));
+    const inputValues = {
+      ...initialValues,
+      inject_documents: injectDocuments,
+      inject_content: content,
+    };
+    console.log(inputValues);
     return this.props
       .updateInject(
         this.props.exerciseId,
@@ -239,6 +248,7 @@ class InjectDefinition extends Component {
     } = this.props;
     const sort = R.sortWith([R.ascend(R.prop('audience_name'))]);
     const sortedAudiences = sort(audiences);
+    const x = { ...(inject?.inject_content ?? {}), attachments: inject.inject_documents };
     return (
       <div>
         <div className={classes.header}>
@@ -413,7 +423,7 @@ class InjectDefinition extends Component {
             {t('Inject data')}
           </Typography>
           <InjectContentForm
-            initialValues={R.propOr({}, 'inject_content', inject)}
+            initialValues={x}
             type={R.propOr('-', 'inject_type', inject)}
             onSubmit={this.onSubmitContent.bind(this)}
             injectTypes={injectTypes}

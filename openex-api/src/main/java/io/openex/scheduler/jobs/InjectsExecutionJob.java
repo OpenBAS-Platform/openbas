@@ -24,21 +24,21 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Component
 @DisallowConcurrentExecution
-public class InjectsExecutionJob<T> implements Job {
+public class InjectsExecutionJob implements Job {
 
     private ApplicationContext context;
-    private InjectHelper<T> injectHelper;
-    private DryInjectRepository<T> dryInjectRepository;
-    private InjectRepository<T> injectRepository;
+    private InjectHelper injectHelper;
+    private DryInjectRepository dryInjectRepository;
+    private InjectRepository injectRepository;
     private ExerciseRepository exerciseRepository;
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 
     @Autowired
-    public void setDryInjectRepository(DryInjectRepository<T> dryInjectRepository) {
+    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
         this.dryInjectRepository = dryInjectRepository;
     }
 
@@ -53,7 +53,7 @@ public class InjectsExecutionJob<T> implements Job {
     }
 
     @Autowired
-    public void setInjectHelper(InjectHelper<T> injectHelper) {
+    public void setInjectHelper(InjectHelper injectHelper) {
         this.injectHelper = injectHelper;
     }
 
@@ -66,27 +66,27 @@ public class InjectsExecutionJob<T> implements Job {
                 exercise.setStatus(Exercise.STATUS.RUNNING);
                 exerciseRepository.save(exercise);
             });
-            List<ExecutableInject<T>> injects = injectHelper.getInjectsToRun();
+            List<ExecutableInject<?>> injects = injectHelper.getInjectsToRun();
             // Get all injects to execute grouped by exercise.
-            Map<String, List<ExecutableInject<T>>> byExercises = injects.stream()
+            Map<String, List<ExecutableInject<?>>> byExercises = injects.stream()
                     .collect(groupingBy(ex -> ex.getInject().getExercise().getId()));
             // Execute injects in parallel for each exercise.
             byExercises.values().stream().parallel().forEach(executableInjects -> {
                 // Execute each inject for the exercise in order.
                 executableInjects.forEach(executableInject -> {
-                    Injection<T> inject = executableInject.getInject();
-                    Class<? extends Executor<T>> executorClass = inject.executor();
-                    Executor<T> executor = context.getBean(executorClass);
+                    Injection inject = executableInject.getInject();
+                    Class<? extends Executor<?>> executorClass = inject.executor();
+                    Executor<? extends Inject> executor = context.getBean(executorClass);
                     Execution execution = executor.execute(executableInject);
                     // Report inject execution
                     if (inject instanceof Inject) {
-                        Inject<T> executedInject = injectRepository.findById(inject.getId()).orElseThrow();
+                        Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
                         executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
                         injectRepository.save(executedInject);
                     }
                     // Report dry inject execution
                     if (inject instanceof DryInject) {
-                        DryInject<T> executedDry = dryInjectRepository.findById(inject.getId()).orElseThrow();
+                        DryInject executedDry = dryInjectRepository.findById(inject.getId()).orElseThrow();
                         executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
                         dryInjectRepository.save(executedDry);
                     }

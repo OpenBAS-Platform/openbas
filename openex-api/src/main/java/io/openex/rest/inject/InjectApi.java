@@ -6,13 +6,10 @@ import io.openex.database.repository.*;
 import io.openex.database.specification.InjectSpecification;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
-import io.openex.execution.Executor;
 import io.openex.execution.ExecutionContext;
+import io.openex.execution.Executor;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.inject.form.InjectInput;
-import io.openex.rest.inject.form.InjectUpdateActivationInput;
-import io.openex.rest.inject.form.InjectUpdateStatusInput;
-import io.openex.rest.inject.form.UpdateAudiencesInjectInput;
+import io.openex.rest.inject.form.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -25,23 +22,35 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
+import static io.openex.execution.ExecutionTrace.traceSuccess;
 import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
-import static io.openex.execution.ExecutionTrace.traceSuccess;
 import static java.time.Instant.now;
 
 @RestController
-public class InjectApi<T> extends RestBehavior {
+public class InjectApi extends RestBehavior {
 
     private static final int MAX_NEXT_INJECTS = 6;
 
     private ExerciseRepository exerciseRepository;
-    private InjectRepository<T> injectRepository;
+    private InjectRepository injectRepository;
+    private InjectDocumentRepository injectDocumentRepository;
     private InjectReportingRepository injectReportingRepository;
     private AudienceRepository audienceRepository;
     private TagRepository tagRepository;
+    private DocumentRepository documentRepository;
     private ApplicationContext context;
     private List<Contract> contracts;
+
+    @Autowired
+    public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
+        this.injectDocumentRepository = injectDocumentRepository;
+    }
+
+    @Autowired
+    public void setDocumentRepository(DocumentRepository documentRepository) {
+        this.documentRepository = documentRepository;
+    }
 
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
@@ -69,7 +78,7 @@ public class InjectApi<T> extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 
@@ -80,45 +89,63 @@ public class InjectApi<T> extends RestBehavior {
 
     @GetMapping("/api/inject_types")
     public List<InjectTypes> injectTypes() {
-        return contracts.stream().filter(Contract::expose)
-                .map(Contract::toRest).collect(Collectors.toList());
+        return contracts.stream().filter(Contract::expose).map(Contract::toRest).collect(Collectors.toList());
     }
 
     @GetMapping("/api/injects/try/{injectId}")
     public InjectStatus execute(@PathVariable String injectId) {
-        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
         List<ExecutionContext> userInjectContexts = List.of(new ExecutionContext(currentUser(),
                 inject.getExercise(), "Direct test"));
-        ExecutableInject<T> injection = new ExecutableInject<>(inject, userInjectContexts);
-        Class<? extends Executor<T>> executorClass = inject.executor();
-        Executor<T> executor = context.getBean(executorClass);
+        ExecutableInject<?> injection = new ExecutableInject<>(inject, userInjectContexts);
+        Class<? extends Executor<?>> executorClass = inject.executor();
+        Executor<?> executor = context.getBean(executorClass);
         Execution execution = executor.execute(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
 
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject<T> updateInject(@PathVariable String exerciseId,
-                                  @PathVariable String injectId,
-                                  @Valid @RequestBody InjectInput<T> input) {
-        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+    @Transactional
+    public Inject updateInject(@PathVariable String exerciseId,
+                               @PathVariable String injectId,
+                               @Valid @RequestBody InjectInput input) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
         inject.setUpdateAttributes(input);
-        inject.setContent(input.getContent());
         // Set dependencies
         inject.setDependsOn(updateRelation(input.getDependsOn(), inject.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        List<InjectDocumentInput> documents = input.getDocuments();
+        List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
+        List<String> currentDocumentIds = inject.getDocuments().stream()
+                .map(document -> document.getDocument().getId()).toList();
+        // To delete
+        inject.getDocuments().stream()
+                .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
+                .forEach(injectDoc -> injectDocumentRepository.delete(injectDoc));
+        // To add
+        documents.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
+            Optional<Document> doc = documentRepository.findById(in.getDocumentId());
+            if (doc.isPresent()) {
+                InjectDocument injectDocument = new InjectDocument();
+                injectDocument.setInject(inject);
+                injectDocument.setDocument(doc.get());
+                injectDocument.setAttached(in.isAttached());
+                injectDocumentRepository.save(injectDocument);
+            }
+        });
         return injectRepository.save(inject);
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects")
-    public Iterable<Inject<T>> exerciseInjects(@PathVariable String exerciseId) {
+    public Iterable<Inject> exerciseInjects(@PathVariable String exerciseId) {
         return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId))
                 .stream().sorted(Inject.executionComparator).toList();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
-    public Inject<T> exerciseInject(@PathVariable String injectId) {
+    public Inject exerciseInject(@PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow();
     }
 
@@ -128,11 +155,11 @@ public class InjectApi<T> extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
-    public Inject<T> createInject(@PathVariable String exerciseId,
-                                  @Valid @RequestBody InjectInput<T> input) {
+    public Inject createInject(@PathVariable String exerciseId,
+                               @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Get common attributes
-        Inject<T> inject = input.toInject();
+        Inject inject = input.toInject();
         // Set dependencies
         inject.setUser(currentUser());
         inject.setExercise(exercise);
@@ -150,9 +177,9 @@ public class InjectApi<T> extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject<T> updateInjectActivation(@PathVariable String injectId,
-                                            @Valid @RequestBody InjectUpdateActivationInput input) {
-        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+    public Inject updateInjectActivation(@PathVariable String injectId,
+                                         @Valid @RequestBody InjectUpdateActivationInput input) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());
         return injectRepository.save(inject);
     }
@@ -160,9 +187,9 @@ public class InjectApi<T> extends RestBehavior {
     @Transactional
     @PostMapping("/api/injects/{injectId}/status")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject<T> setInjectStatus(@PathVariable String injectId,
-                                     @Valid @RequestBody InjectUpdateStatusInput input) {
-        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+    public Inject setInjectStatus(@PathVariable String injectId,
+                                  @Valid @RequestBody InjectUpdateStatusInput input) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
         InjectStatus injectStatus = new InjectStatus();
         injectStatus.setInject(inject);
         injectStatus.setDate(now());
@@ -178,16 +205,16 @@ public class InjectApi<T> extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject<T> updateInjectAudiences(@PathVariable String injectId,
-                                           @Valid @RequestBody UpdateAudiencesInjectInput input) {
-        Inject<T> inject = injectRepository.findById(injectId).orElseThrow();
+    public Inject updateInjectAudiences(@PathVariable String injectId,
+                                        @Valid @RequestBody UpdateAudiencesInjectInput input) {
+        Inject inject = injectRepository.findById(injectId).orElseThrow();
         Iterable<Audience> injectAudiences = audienceRepository.findAllById(input.getAudienceIds());
         inject.setAudiences(fromIterable(injectAudiences));
         return injectRepository.save(inject);
     }
 
     @GetMapping("/api/injects/next")
-    public List<Inject<T>> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
+    public List<Inject> nextInjectsToExecute(@RequestParam Optional<Integer> size) {
         return injectRepository.findAll(InjectSpecification.next()).stream()
                 // Keep only injects visible by the user
                 .filter(inject -> inject.getDate().isPresent())

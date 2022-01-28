@@ -23,11 +23,11 @@ import static java.util.Optional.ofNullable;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "inject_type")
 @EntityListeners(ModelBaseListener.class)
-public abstract class Inject<T> extends Injection<T> implements Base {
+public abstract class Inject extends Injection implements Base {
 
     private static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
-    public static Comparator<Inject<?>> executionComparator = (o1, o2) -> {
+    public static Comparator<Inject> executionComparator = (o1, o2) -> {
         if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
             return o1.getDate().get().compareTo(o2.getDate().get());
         }
@@ -87,7 +87,7 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @JoinColumn(name = "inject_depends_from_another")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_depends_on")
-    private Inject<?> dependsOn;
+    private Inject dependsOn;
 
     @Column(name = "inject_depends_duration")
     @JsonProperty("inject_depends_duration")
@@ -121,6 +121,11 @@ public abstract class Inject<T> extends Injection<T> implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
 
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER)
+    @JsonProperty("inject_documents")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<InjectDocument> documents = new ArrayList<>();
+
     // region transient
     @JsonIgnore
     @Override
@@ -145,7 +150,7 @@ public abstract class Inject<T> extends Injection<T> implements Base {
 
     @JsonIgnore
     private Instant computeInjectDate(Instant source, int speed) {
-        Optional<Inject<?>> dependsOnInject = ofNullable(getDependsOn());
+        Optional<Inject> dependsOnInject = ofNullable(getDependsOn());
         long duration = ofNullable(getDependsDuration()).orElse(0L) / speed;
         Instant dependingStart = dependsOnInject
                 .map(inject -> inject.computeInjectDate(source, speed))
@@ -295,11 +300,11 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.user = user;
     }
 
-    public Inject<?> getDependsOn() {
+    public Inject getDependsOn() {
         return dependsOn;
     }
 
-    public void setDependsOn(Inject<?> dependsOn) {
+    public void setDependsOn(Inject dependsOn) {
         this.dependsOn = dependsOn;
     }
 
@@ -319,24 +324,22 @@ public abstract class Inject<T> extends Injection<T> implements Base {
         this.tags = tags;
     }
 
-    @JsonIgnore
-    protected abstract DryInject<T> toDry();
-
-    @JsonIgnore
-    public DryInject<T> toDryInject(Dryrun run) {
-        DryInject<T> dryInject = toDry();
-        dryInject.setTitle(getTitle());
-        dryInject.setType(getType());
-        dryInject.setContent(getContent());
-        dryInject.setRun(run);
-        dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
-        return dryInject;
+    @Override
+    public List<InjectDocument> getDocuments() {
+        return documents;
     }
 
-    @Override
+    public void setInjectDocuments(List<InjectDocument> documents) {
+        this.documents = documents;
+    }
+
     @JsonIgnore
-    public boolean isGlobalInject() {
-        return isAllAudiences();
+    public DryInject toDryInject(Dryrun run) {
+        DryInject dryInject = new DryInject();
+        dryInject.setRun(run);
+        dryInject.setInject(this);
+        dryInject.setDate(computeInjectDate(run.getDate(), run.getSpeed()));
+        return dryInject;
     }
 
     @Override

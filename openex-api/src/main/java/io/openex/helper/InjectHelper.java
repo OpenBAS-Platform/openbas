@@ -23,10 +23,10 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Stream.concat;
 
 @Component
-public class InjectHelper<T> {
+public class InjectHelper {
 
-    private InjectRepository<T> injectRepository;
-    private DryInjectRepository<T> dryInjectRepository;
+    private InjectRepository injectRepository;
+    private DryInjectRepository dryInjectRepository;
     private AudienceRepository audienceRepository;
 
     @Autowired
@@ -35,22 +35,22 @@ public class InjectHelper<T> {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 
     @Autowired
-    public void setDryInjectRepository(DryInjectRepository<T> dryInjectRepository) {
+    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    public Stream<ExecutionContext> getUsersFromInjection(Injection<T> injection) {
+    public Stream<ExecutionContext> getUsersFromInjection(Injection injection) {
         Exercise exercise = injection.getExercise();
         if (injection instanceof DryInject dryInject) {
             return dryInject.getRun().getUsers().stream()
                     .map(user -> new ExecutionContext(user, exercise, "Dryrun"));
         } else if (injection instanceof Inject inject) {
-            List<Audience> audiences = inject.isGlobalInject() ?
+            List<Audience> audiences = inject.isAllAudiences() ?
                     fromIterable(audienceRepository.findAll()) : inject.getAudiences();
             return audiences.stream().filter(Audience::isEnabled)
                     .flatMap(audience -> audience.getUsers().stream()
@@ -59,7 +59,7 @@ public class InjectHelper<T> {
         throw new UnsupportedOperationException("Unsupported type of Injection");
     }
 
-    public List<ExecutionContext> buildUsersFromInjection(Injection<T> injection) {
+    public List<ExecutionContext> buildUsersFromInjection(Inject injection) {
         Exercise exercise = injection.getExercise();
         return getUsersFromInjection(injection)
                 .collect(groupingBy(ExecutionContext::getUser)).entrySet().stream()
@@ -68,7 +68,7 @@ public class InjectHelper<T> {
                 .toList();
     }
 
-    private boolean isInInjectableRange(Injection<?> injection) {
+    private boolean isInInjectableRange(Injection injection) {
         Instant now = Instant.now();
         Instant start = now.minus(Duration.parse("PT1H"));
         Instant injectWhen = injection.getDate().orElseThrow();
@@ -76,17 +76,20 @@ public class InjectHelper<T> {
     }
 
     @Transactional
-    public List<ExecutableInject<T>> getInjectsToRun() {
+    public List<ExecutableInject<?>> getInjectsToRun() {
         // Get injects
-        List<Inject<T>> executableInjects = injectRepository.findAll(InjectSpecification.executable());
-        Stream<ExecutableInject<T>> injects = executableInjects.stream()
+        List<Inject> executableInjects = injectRepository.findAll(InjectSpecification.executable());
+        Stream<ExecutableInject<?>> injects = executableInjects.stream()
                 .filter(this::isInInjectableRange)
                 .map(inject -> new ExecutableInject<>(inject, buildUsersFromInjection(inject)));
         // Get dry injects
-        List<DryInject<T>> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
-        Stream<ExecutableInject<T>> dryInjects = executableDryInjects.stream()
+        List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
+        Stream<ExecutableInject<?>> dryInjects = executableDryInjects.stream()
                 .filter(this::isInInjectableRange)
-                .map(inject -> new ExecutableInject<>(inject, buildUsersFromInjection(inject)));
+                .map(inject -> {
+                    Inject injectInject = inject.getInject();
+                    return new ExecutableInject<>(injectInject, buildUsersFromInjection(injectInject));
+                });
         // Combine injects and dry
         return concat(injects, dryInjects).collect(Collectors.toList());
     }

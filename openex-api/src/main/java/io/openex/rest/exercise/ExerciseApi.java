@@ -7,8 +7,6 @@ import io.openex.database.repository.*;
 import io.openex.database.specification.ComcheckSpecification;
 import io.openex.database.specification.DryRunSpecification;
 import io.openex.database.specification.ExerciseLogSpecification;
-import io.openex.injects.base.AttachmentContent;
-import io.openex.injects.base.InjectAttachment;
 import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
@@ -51,7 +49,7 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 
 @RestController
 @RolesAllowed(ROLE_USER)
-public class ExerciseApi<T> extends RestBehavior {
+public class ExerciseApi extends RestBehavior {
 
     // region repositories
     private LogRepository logRepository;
@@ -66,11 +64,11 @@ public class ExerciseApi<T> extends RestBehavior {
     private DryRunRepository dryRunRepository;
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
-    private InjectRepository<T> injectRepository;
+    private InjectRepository injectRepository;
     // endregion
 
     // region services
-    private DryrunService<T> dryrunService;
+    private DryrunService dryrunService;
     private FileService fileService;
     // endregion
 
@@ -106,12 +104,12 @@ public class ExerciseApi<T> extends RestBehavior {
     }
 
     @Autowired
-    public void setDryrunService(DryrunService<T> dryrunService) {
+    public void setDryrunService(DryrunService dryrunService) {
         this.dryrunService = dryrunService;
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 
@@ -220,7 +218,7 @@ public class ExerciseApi<T> extends RestBehavior {
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
     @PostAuthorize("isExerciseObserver(#exerciseId)")
-    public List<DryInject<?>> dryrunInjects(@PathVariable String exerciseId,
+    public List<DryInject> dryrunInjects(@PathVariable String exerciseId,
                                             @PathVariable String dryrunId) {
         return dryrun(exerciseId, dryrunId).getInjects();
     }
@@ -440,7 +438,7 @@ public class ExerciseApi<T> extends RestBehavior {
             objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);
         }
         // Injects
-        List<Inject<?>> injects = exercise.getInjects();
+        List<Inject> injects = exercise.getInjects();
         exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
         importExport.setInjects(injects);
         objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
@@ -449,11 +447,8 @@ public class ExerciseApi<T> extends RestBehavior {
         objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
         // Documents
         List<String> documentIds = injects.stream()
-                .map(Injection::getContent)
-                .filter(content -> content instanceof AttachmentContent)
-                .map(content -> (AttachmentContent) content)
-                .flatMap(attachmentContent -> attachmentContent.getAttachments().stream())
-                .map(InjectAttachment::getId).toList();
+                .flatMap(inject -> inject.getDocuments().stream())
+                .map(document -> document.getDocument().getId()).toList();
         // Build the zip
         ZipOutputStream zipExport = new ZipOutputStream(response.getOutputStream());
         ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");

@@ -16,16 +16,16 @@ import java.util.List;
 import static java.time.Instant.now;
 
 @Component
-public class DryrunService<T> {
+public class DryrunService {
 
     private static final int SPEED_DRYRUN = 100; // 100x faster.
 
     private DryRunRepository dryRunRepository;
-    private InjectRepository<T> injectRepository;
-    private DryInjectRepository<T> dryInjectRepository;
+    private InjectRepository injectRepository;
+    private DryInjectRepository dryInjectRepository;
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 
@@ -35,11 +35,11 @@ public class DryrunService<T> {
     }
 
     @Autowired
-    public void setDryInjectRepository(DryInjectRepository<T> dryInjectRepository) {
+    public void setDryInjectRepository(DryInjectRepository dryInjectRepository) {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    private List<? extends DryInject<T>> toDryInjects(List<Inject<T>> injects, Dryrun dryrun) {
+    private List<? extends DryInject> toDryInjects(List<Inject> injects, Dryrun dryrun) {
         return injects.stream()
                 .map(inject -> inject.toDryInject(dryrun))
                 .toList();
@@ -56,11 +56,11 @@ public class DryrunService<T> {
 
     @Transactional
     public Dryrun provisionDryrun(Exercise exercise, List<User> users) {
-        Specification<Inject<T>> injectFilters = InjectSpecification.forDryrun(exercise.getId());
-        List<Inject<T>> injects = injectRepository.findAll(injectFilters);
+        Specification<Inject> injectFilters = InjectSpecification.forDryrun(exercise.getId());
+        List<Inject> injects = injectRepository.findAll(injectFilters);
         Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
         Dryrun dryrun = createDryRun(exercise, users);
-        List<? extends DryInject<T>> dryInjects = toDryInjects(injects, dryrun);
+        List<? extends DryInject> dryInjects = toDryInjects(injects, dryrun);
         dryInjectRepository.saveAll(dryInjects);
         return dryrun;
     }

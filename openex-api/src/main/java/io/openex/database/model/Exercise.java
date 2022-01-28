@@ -109,7 +109,7 @@ public class Exercise implements Base {
     @JsonProperty("exercise_injects")
     @Fetch(FetchMode.SUBSELECT)
     @JsonSerialize(using = MultiModelDeserializer.class)
-    private List<Inject<?>> injects = new ArrayList<>();
+    private List<Inject> injects = new ArrayList<>();
 
     @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
@@ -346,11 +346,11 @@ public class Exercise implements Base {
         this.image = image;
     }
 
-    public List<Inject<?>> getInjects() {
+    public List<Inject> getInjects() {
         return injects.stream().sorted(Inject.executionComparator).toList();
     }
 
-    public void setInjects(List<Inject<?>> injects) {
+    public void setInjects(List<Inject> injects) {
         this.injects = injects;
     }
 

@@ -42,10 +42,10 @@ public class InjectStatus implements Base {
     @OneToOne
     @JoinColumn(name = "status_inject")
     @JsonIgnore
-    private Inject<?> inject;
+    private Inject inject;
 
     // region transient
-    public static <T> InjectStatus fromExecution(Execution execution, Inject<T> inject) {
+    public static InjectStatus fromExecution(Execution execution, Inject inject) {
         InjectStatus injectStatus = new InjectStatus();
         injectStatus.setInject(inject);
         injectStatus.setDate(now());
@@ -96,11 +96,11 @@ public class InjectStatus implements Base {
         this.executionTime = executionTime;
     }
 
-    public Inject<?> getInject() {
+    public Inject getInject() {
         return inject;
     }
 
-    public void setInject(Inject<?> inject) {
+    public void setInject(Inject inject) {
         this.inject = inject;
     }
 

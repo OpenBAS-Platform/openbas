@@ -95,7 +95,7 @@ public class ComchecksExecutionJob implements Job {
                     return injectContext;
                 }).toList();
                 EmailInject emailInject = buildComcheckEmail(comCheck);
-                ExecutableInject<EmailContent> injection = new ExecutableInject<>(emailInject, userInjectContexts);
+                ExecutableInject<?> injection = new ExecutableInject<>(emailInject, userInjectContexts);
                 EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
                 Execution execution = emailExecutor.execute(injection);
                 // Save the status sent date

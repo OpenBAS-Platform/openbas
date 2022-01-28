@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface InjectRepository<T> extends CrudRepository<Inject<T>, String>, JpaSpecificationExecutor<Inject<T>>, StatisticRepository {
+public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpecificationExecutor<Inject>, StatisticRepository {
 
     @NotNull
-    Optional<Inject<T>> findById(@NotNull String id);
+    Optional<Inject> findById(@NotNull String id);
 
     @Query(value = "select i from Inject i where i.exercise.id = :exerciseId")
-    List<Inject<T>> findAllForExercise(@Param("exerciseId") String exerciseId);
+    List<Inject> findAllForExercise(@Param("exerciseId") String exerciseId);
 
     @Modifying
     @Query(value = "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city," +

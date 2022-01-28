@@ -1,15 +1,12 @@
 package io.openex.injects.email.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.injects.base.AttachmentContent;
-import io.openex.injects.base.InjectAttachment;
+import io.openex.database.model.InjectContent;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-public class EmailContent implements AttachmentContent {
+public class EmailContent extends InjectContent {
 
     private static final String HEADER_DIV = "<div style=\"text-align: center; margin-bottom: 10px;\">";
     private static final String FOOTER_DIV = "<div style=\"text-align: center; margin-top: 10px;\">";
@@ -24,9 +21,6 @@ public class EmailContent implements AttachmentContent {
 
     @JsonProperty("encrypted")
     private boolean encrypted;
-
-    @JsonProperty("attachments")
-    private List<InjectAttachment> attachments = new ArrayList<>();
 
     public EmailContent() {
         // For mapper
@@ -69,25 +63,16 @@ public class EmailContent implements AttachmentContent {
     }
 
     @Override
-    public List<InjectAttachment> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<InjectAttachment> attachments) {
-        this.attachments = attachments;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EmailContent that = (EmailContent) o;
         return encrypted == that.encrypted && Objects.equals(body, that.body)
-                && Objects.equals(subject, that.subject) && Objects.equals(attachments, that.attachments);
+                && Objects.equals(subject, that.subject);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(body, subject, encrypted, attachments);
+        return Objects.hash(body, subject, encrypted);
     }
 }

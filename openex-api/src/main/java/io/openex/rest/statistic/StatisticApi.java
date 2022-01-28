@@ -18,11 +18,11 @@ import java.time.temporal.ChronoUnit;
 import static io.openex.config.AppConfig.currentUser;
 
 @RestController
-public class StatisticApi<T> extends RestBehavior {
+public class StatisticApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private UserRepository userRepository;
-    private InjectRepository<T> injectRepository;
+    private InjectRepository injectRepository;
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -35,7 +35,7 @@ public class StatisticApi<T> extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository<T> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 

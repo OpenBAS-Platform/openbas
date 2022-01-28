@@ -30,7 +30,7 @@ public class ExerciseFileExport {
     private List<Organization> organizations = new ArrayList<>();
 
     @JsonProperty("exercise_injects")
-    private List<Inject<?>> injects = new ArrayList<>();
+    private List<Inject> injects = new ArrayList<>();
 
     @JsonProperty("exercise_tags")
     private List<Tag> tags = new ArrayList<>();
@@ -83,11 +83,11 @@ public class ExerciseFileExport {
         this.objectives = objectives;
     }
 
-    public List<Inject<?>> getInjects() {
+    public List<Inject> getInjects() {
         return injects;
     }
 
-    public void setInjects(List<Inject<?>> injects) {
+    public void setInjects(List<Inject> injects) {
         this.injects = injects;
     }
 

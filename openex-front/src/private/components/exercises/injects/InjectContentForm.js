@@ -163,6 +163,8 @@ class InjectContentForm extends Component {
                         )}
                       </Field>
                     );
+                  case 'audience':
+                    return <div/>;
                   default:
                     return (
                       <TextField
