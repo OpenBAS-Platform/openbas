@@ -380,10 +380,7 @@ public class ExerciseApi extends RestBehavior {
     }
     // endregion
 
-
     // region import/export
-
-
     @GetMapping("/api/exercises/{exerciseId}/export")
     @PostAuthorize("isExerciseObserver(#exerciseId)")
     public void exerciseExport(@PathVariable String exerciseId,

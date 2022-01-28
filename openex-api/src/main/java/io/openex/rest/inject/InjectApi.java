@@ -100,7 +100,7 @@ public class InjectApi extends RestBehavior {
         ExecutableInject<?> injection = new ExecutableInject<>(inject, userInjectContexts);
         Class<? extends Executor<?>> executorClass = inject.executor();
         Executor<?> executor = context.getBean(executorClass);
-        Execution execution = executor.execute(injection);
+        Execution execution = executor.execute(injection, false);
         return InjectStatus.fromExecution(execution, inject);
     }
 

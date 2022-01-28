@@ -97,7 +97,7 @@ public class ComchecksExecutionJob implements Job {
                 EmailInject emailInject = buildComcheckEmail(comCheck);
                 ExecutableInject<?> injection = new ExecutableInject<>(emailInject, userInjectContexts);
                 EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
-                Execution execution = emailExecutor.execute(injection);
+                Execution execution = emailExecutor.execute(injection, false);
                 // Save the status sent date
                 List<String> usersSuccessfullyNotified = execution.getTraces().stream()
                         .filter(executionTrace -> executionTrace.getStatus().equals(ExecutionStatus.SUCCESS))

@@ -4,10 +4,10 @@ import io.openex.database.model.*;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
-import io.openex.helper.InjectHelper;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
 import io.openex.execution.Executor;
+import io.openex.helper.InjectHelper;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -74,19 +74,20 @@ public class InjectsExecutionJob implements Job {
             byExercises.values().stream().parallel().forEach(executableInjects -> {
                 // Execute each inject for the exercise in order.
                 executableInjects.forEach(executableInject -> {
-                    Injection inject = executableInject.getInject();
+                    Inject inject = executableInject.getInject();
+                    Injection source = executableInject.getSource();
                     Class<? extends Executor<?>> executorClass = inject.executor();
                     Executor<? extends Inject> executor = context.getBean(executorClass);
-                    Execution execution = executor.execute(executableInject);
+                    Execution execution = executor.execute(executableInject, true);
                     // Report inject execution
-                    if (inject instanceof Inject) {
-                        Inject executedInject = injectRepository.findById(inject.getId()).orElseThrow();
+                    if (source instanceof Inject) {
+                        Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();
                         executedInject.setStatus(InjectStatus.fromExecution(execution, executedInject));
                         injectRepository.save(executedInject);
                     }
                     // Report dry inject execution
-                    if (inject instanceof DryInject) {
-                        DryInject executedDry = dryInjectRepository.findById(inject.getId()).orElseThrow();
+                    if (source instanceof DryInject) {
+                        DryInject executedDry = dryInjectRepository.findById(source.getId()).orElseThrow();
                         executedDry.setStatus(DryInjectStatus.fromExecution(execution, executedDry));
                         dryInjectRepository.save(executedDry);
                     }

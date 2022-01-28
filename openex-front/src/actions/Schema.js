@@ -231,10 +231,8 @@ const _buildComcheck = (state, com) => {
 };
 const _buildDryrun = (state, id, dry) => {
   if (dry === undefined) return dry;
-  const getDryinjects = () => R.filter(
-    (n) => n.dryinject_dryrun === id,
-    R.values(state.referential.entities.dryinjects),
-  );
+  const getDryinjects = () => R.values(state.referential.entities.dryinjects)
+    .filter((n) => n.dryinject_dryrun === id);
   return {
     ...dry,
     dryinjects: getDryinjects(),
