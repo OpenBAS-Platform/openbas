@@ -16,7 +16,7 @@ export const entitiesInitializer = Immutable({
     polls: Immutable({}),
     answers: Immutable({}),
     comchecks: Immutable({}),
-    comchecks_statuses: Immutable({}),
+    comcheckstatuses: Immutable({}),
     dryruns: Immutable({}),
     dryinjects: Immutable({}),
     audiences: Immutable({}),

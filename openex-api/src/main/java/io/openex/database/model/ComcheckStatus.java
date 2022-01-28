@@ -29,31 +29,31 @@ public class ComcheckStatus implements Base {
     @Column(name = "status_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("status_id")
+    @JsonProperty("comcheckstatus_id")
     private String id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_user")
     @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("status_user")
+    @JsonProperty("comcheckstatus_user")
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_comcheck")
     @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("status_comcheck")
+    @JsonProperty("comcheckstatus_comcheck")
     private Comcheck comcheck;
 
     @Column(name = "status_sent_date")
-    @JsonProperty("status_sent_date")
+    @JsonProperty("comcheckstatus_sent_date")
     private Instant lastSent;
 
     @Column(name = "status_receive_date")
-    @JsonProperty("status_receive_date")
+    @JsonProperty("comcheckstatus_receive_date")
     private Instant receiveDate;
 
     @Column(name = "status_sent_retry")
-    @JsonProperty("status_sent_retry")
+    @JsonProperty("comcheckstatus_sent_retry")
     private int sentNumber = 0;
 
     public ComcheckStatus() {
@@ -65,7 +65,7 @@ public class ComcheckStatus implements Base {
     }
 
     // region transient
-    @JsonProperty("status_state")
+    @JsonProperty("comcheckstatus_state")
     public CHECK_STATUS getState() {
         return getReceiveDate().map(receive -> CHECK_STATUS.SUCCESS)
                 .orElseGet(() -> EXPIRED.equals(getComcheck().getState())

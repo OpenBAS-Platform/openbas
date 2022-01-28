@@ -249,9 +249,9 @@ const Comcheck = () => {
   });
   const players = statuses.map((s) => ({
     ...s.user,
-    user_status_state: s.status_state,
-    user_status_sent_date: s.status_sent_date,
-    user_status_receive_date: s.status_receive_date,
+    user_status_state: s.comcheckstatus_state,
+    user_status_sent_date: s.comcheckstatus_sent_date,
+    user_status_receive_date: s.comcheckstatus_receive_date,
   }));
   return (
     <div className={classes.root}>
@@ -261,11 +261,11 @@ const Comcheck = () => {
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Start date')}</Typography>
-                {fldt(comcheck?.comcheck_start_date)}
+                {fldt(comcheck?.comcheckstatus_start_date)}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('End date')}</Typography>
-                {fldt(comcheck?.comcheck_end_date)}
+                {fldt(comcheck?.comcheckstatus_end_date)}
               </Grid>
             </Grid>
           </Paper>
@@ -277,18 +277,18 @@ const Comcheck = () => {
             style={{ display: 'flex' }}
           >
             <div className={classes.icon}>
-              {iconStatus(comcheck?.comcheck_state)}
+              {iconStatus(comcheck?.comcheckstatus_state)}
             </div>
             <div>
               <div className={classes.title}>{t('Comcheck')}</div>
-              <ComcheckState state={comcheck?.comcheck_state} />
+              <ComcheckState state={comcheck?.comcheckstatus_state} />
             </div>
             <div className={classes.progress}>
               <BorderLinearProgress
                 value={progression(
                   currentDate,
-                  Date.parse(comcheck?.comcheck_start_date),
-                  Date.parse(comcheck?.comcheck_end_date),
+                  Date.parse(comcheck?.comcheckstatus_start_date),
+                  Date.parse(comcheck?.comcheckstatus_end_date),
                 )}
                 variant="determinate"
               />

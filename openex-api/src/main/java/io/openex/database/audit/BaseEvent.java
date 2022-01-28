@@ -27,7 +27,7 @@ public class BaseEvent {
         Class<?> baseClass = isTargetClass ? currentClass : currentClass.getSuperclass();
         String className = baseClass.getSimpleName().toLowerCase();
         this.attributeId = className + "_id";
-        this.schema = className + "s";
+        this.schema = className + (className.endsWith("s") ? "es" : "s");
     }
 
     public String getType() {

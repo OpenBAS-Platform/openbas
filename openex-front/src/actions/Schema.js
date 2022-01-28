@@ -104,9 +104,9 @@ export const comcheck = new schema.Entity(
 export const arrayOfComchecks = new schema.Array(comcheck);
 
 export const comcheckStatus = new schema.Entity(
-  'comchecks_statuses',
+  'comcheckstatuses',
   {},
-  { idAttribute: 'status_id' },
+  { idAttribute: 'comcheckstatus_id' },
 );
 export const arrayOfComcheckStatuses = new schema.Array(comcheckStatus);
 
@@ -213,18 +213,16 @@ const _buildComcheckStatus = (state, sta) => {
   if (sta === undefined) return sta;
   return {
     ...sta,
-    user: _buildUser(state, state.referential.entities.users[sta.status_user]),
+    user: _buildUser(state, state.referential.entities.users[sta.comcheckstatus_user]),
   };
 };
 const _buildComcheck = (state, com) => {
   if (com === undefined) return com;
   return {
     ...com,
-    status: com.comcheck_status
+    status: com.comcheck_statuses
       .asMutable()
-      .map(
-        (statusId) => state.referential.entities.comchecks_statuses[statusId],
-      )
+      .map((statusId) => state.referential.entities.comcheckstatuses[statusId])
       .filter((s) => s !== undefined)
       .map((s) => _buildComcheckStatus(state, s)),
   };
@@ -406,7 +404,7 @@ export const storeBrowser = (state) => ({
     return _buildDryrun(state, id, state.referential.entities.dryruns[id]);
   },
   getComcheckStatus(id) {
-    return state.referential.entities.comchecks_statuses[id];
+    return state.referential.entities.comcheckstatuses[id];
   },
   getAudience(id) {
     return _buildAudience(state, state.referential.entities.audiences[id]);

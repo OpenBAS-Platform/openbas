@@ -60,7 +60,7 @@ public class Comcheck implements Base {
 
     @OneToMany(mappedBy = "comcheck", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonSerialize(using = MultiModelDeserializer.class)
-    @JsonProperty("comcheck_status")
+    @JsonProperty("comcheck_statuses")
     private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
 
     // region transient
