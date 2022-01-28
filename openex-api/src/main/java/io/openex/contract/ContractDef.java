@@ -27,6 +27,11 @@ public class ContractDef {
         return this;
     }
 
+    public ContractDef mandatory(String field, ContractType type, ContractCardinality cardinality) {
+        fields.add(new ContractField(field, type, cardinality, true));
+        return this;
+    }
+
     public ContractDef optional(String field, ContractType type) {
         fields.add(new ContractField(field, type, false));
         return this;

@@ -44,11 +44,11 @@ public class DryInjectStatus implements Base {
     @OneToOne
     @JoinColumn(name = "status_dryinject")
     @JsonIgnore
-    private DryInject<?> dryInject;
+    private DryInject dryInject;
 
     // region transient
     @JsonIgnore
-    public static <T> DryInjectStatus fromExecution(Execution execution, DryInject<T> dry) {
+    public static DryInjectStatus fromExecution(Execution execution, DryInject dry) {
         DryInjectStatus injectStatus = new DryInjectStatus();
         injectStatus.setDryInject(dry);
         injectStatus.setDate(now());
@@ -99,11 +99,11 @@ public class DryInjectStatus implements Base {
         this.executionTime = executionTime;
     }
 
-    public DryInject<?> getDryInject() {
+    public DryInject getDryInject() {
         return dryInject;
     }
 
-    public void setDryInject(DryInject<?> dryInject) {
+    public void setDryInject(DryInject dryInject) {
         this.dryInject = dryInject;
     }
 

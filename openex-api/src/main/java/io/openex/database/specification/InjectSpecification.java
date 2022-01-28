@@ -10,11 +10,11 @@ import javax.persistence.criteria.Path;
 
 public class InjectSpecification {
 
-    public static <T> Specification<Inject<T>> fromExercise(String exerciseId) {
+    public static Specification<Inject> fromExercise(String exerciseId) {
         return (root, query, cb) -> cb.equal(root.get("exercise").get("id"), exerciseId);
     }
 
-    public static <T> Specification<Inject<T>> next() {
+    public static Specification<Inject> next() {
         return (root, query, cb) -> {
             Path<Object> exercisePath = root.get("exercise");
             return cb.and(
@@ -25,7 +25,7 @@ public class InjectSpecification {
         };
     }
 
-    public static <T> Specification<Inject<T>> executable() {
+    public static Specification<Inject> executable() {
         return (root, query, cb) -> {
             Path<Object> exercisePath = root.get("exercise");
             return cb.and(
@@ -38,7 +38,7 @@ public class InjectSpecification {
         };
     }
 
-    public static <T> Specification<Inject<T>> forDryrun(String exerciseId) {
+    public static Specification<Inject> forDryrun(String exerciseId) {
         return (root, query, cb) -> cb.and(
                 cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable

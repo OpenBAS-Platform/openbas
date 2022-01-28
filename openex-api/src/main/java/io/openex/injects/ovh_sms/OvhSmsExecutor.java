@@ -1,13 +1,12 @@
 package io.openex.injects.ovh_sms;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import io.openex.database.model.Injection;
 import io.openex.database.model.User;
-import io.openex.injects.ovh_sms.form.OvhSmsForm;
-import io.openex.injects.ovh_sms.model.OvhSmsContent;
+import io.openex.execution.ExecutableInject;
+import io.openex.execution.Execution;
+import io.openex.execution.ExecutionContext;
+import io.openex.execution.Executor;
+import io.openex.injects.ovh_sms.model.OvhSmsInject;
 import io.openex.injects.ovh_sms.service.OvhSmsService;
-import io.openex.execution.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -18,13 +17,9 @@ import static io.openex.execution.ExecutionTrace.traceError;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 
 @Component
-public class OvhSmsExecutor implements Executor<OvhSmsContent> {
+public class OvhSmsExecutor implements Executor<OvhSmsInject> {
 
     private OvhSmsService smsService;
-
-    public OvhSmsExecutor(ObjectMapper mapper) {
-        mapper.registerSubtypes(new NamedType(OvhSmsForm.class, OvhSmsContract.NAME));
-    }
 
     @Autowired
     public void setSmsService(OvhSmsService smsService) {
@@ -32,8 +27,8 @@ public class OvhSmsExecutor implements Executor<OvhSmsContent> {
     }
 
     @Override
-    public void process(ExecutableInject<OvhSmsContent> injection, Execution execution) {
-        Injection<OvhSmsContent> inject = injection.getInject();
+    public void process(ExecutableInject<OvhSmsInject> injection, Execution execution) {
+        OvhSmsInject inject = injection.getInject();
         String smsMessage = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
         List<ExecutionContext> users = injection.getUsers();
         users.stream().parallel().forEach(context -> {

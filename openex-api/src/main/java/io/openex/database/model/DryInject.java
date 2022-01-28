@@ -3,24 +3,23 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.execution.Executor;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.of;
 
 @Entity
 @Table(name = "dryinjects")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "dryinject_type")
 @EntityListeners(ModelBaseListener.class)
-public abstract class DryInject<T> extends Injection<T> implements Base {
+public class DryInject extends Injection implements Base {
 
     @Id
     @Column(name = "dryinject_id")
@@ -28,14 +27,6 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @JsonProperty("dryinject_id")
     private String id;
-
-    @Column(name = "dryinject_title")
-    @JsonProperty("dryinject_title")
-    private String title;
-
-    @Column(name = "dryinject_type", insertable = false, updatable = false)
-    @JsonProperty("dryinject_type")
-    private String type;
 
     @Column(name = "dryinject_date")
     @JsonProperty("dryinject_date")
@@ -46,6 +37,12 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("dryinject_dryrun")
     private Dryrun run;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "dryinject_inject")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("dryinject_inject")
+    private Inject inject;
 
     @OneToOne(mappedBy = "dryInject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonProperty("dryinject_status")
@@ -58,20 +55,22 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
         return getRun().getExercise();
     }
 
+    @Override
+    public Class<? extends Executor<?>> executor() {
+        return getInject().executor();
+    }
+
+    @Override
+    public List<InjectDocument> getDocuments() {
+        return getInject().getDocuments();
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public Dryrun getRun() {
@@ -82,8 +81,16 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
         this.run = run;
     }
 
+    public Inject getInject() {
+        return inject;
+    }
+
+    public void setInject(Inject inject) {
+        this.inject = inject;
+    }
+
     public Optional<Instant> getDate() {
-        return ofNullable(date);
+        return of(date);
     }
 
     public void setDate(Instant date) {
@@ -96,19 +103,6 @@ public abstract class DryInject<T> extends Injection<T> implements Base {
 
     public void setStatus(DryInjectStatus status) {
         this.status = status;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    @Override
-    public boolean isGlobalInject() {
-        return false;
     }
 
     @Override

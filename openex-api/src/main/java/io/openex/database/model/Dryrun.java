@@ -43,7 +43,7 @@ public class Dryrun implements Base {
 
     @OneToMany(mappedBy = "run", fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<DryInject<?>> injects = new ArrayList<>();
+    private List<DryInject> injects = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "dryruns_users",
@@ -57,12 +57,12 @@ public class Dryrun implements Base {
     // region transient
     @JsonProperty("dryrun_finished")
     public boolean isFinished() {
-        List<DryInject<?>> injects = getInjects();
+        List<DryInject> injects = getInjects();
         return injects.stream().allMatch(dryInject -> dryInject.getStatus() != null);
     }
 
     @JsonProperty("dryrun_users_number")
-    public long usersNumber() {
+    public long getUsersNumber() {
         return getUsers().size();
     }
     // endregion
@@ -99,11 +99,11 @@ public class Dryrun implements Base {
         this.exercise = exercise;
     }
 
-    public List<DryInject<?>> getInjects() {
+    public List<DryInject> getInjects() {
         return injects;
     }
 
-    public void setInjects(List<DryInject<?>> injects) {
+    public void setInjects(List<DryInject> injects) {
         this.injects = injects;
     }
 

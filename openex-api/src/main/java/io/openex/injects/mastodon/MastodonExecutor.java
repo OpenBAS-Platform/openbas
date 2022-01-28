@@ -1,14 +1,13 @@
 package io.openex.injects.mastodon;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import io.openex.database.model.Injection;
+import io.openex.database.model.Document;
+import io.openex.database.model.InjectDocument;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
 import io.openex.execution.Executor;
-import io.openex.injects.mastodon.form.MastodonForm;
 import io.openex.injects.mastodon.model.MastodonAttachment;
 import io.openex.injects.mastodon.model.MastodonContent;
+import io.openex.injects.mastodon.model.MastodonInject;
 import io.openex.injects.mastodon.service.MastodonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,13 +18,9 @@ import static io.openex.execution.ExecutionTrace.traceError;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 
 @Component
-public class MastodonExecutor implements Executor<MastodonContent> {
+public class MastodonExecutor implements Executor<MastodonInject> {
 
     private MastodonService mastodonService;
-
-    public MastodonExecutor(ObjectMapper mapper) {
-        mapper.registerSubtypes(new NamedType(MastodonForm.class, MastodonContract.NAME));
-    }
 
     @Autowired
     public void setMastodonService(MastodonService mastodonService) {
@@ -33,12 +28,14 @@ public class MastodonExecutor implements Executor<MastodonContent> {
     }
 
     @Override
-    public void process(ExecutableInject<MastodonContent> injection, Execution execution) {
-        Injection<MastodonContent> inject = injection.getInject();
+    public void process(ExecutableInject<MastodonInject> injection, Execution execution) {
+        MastodonInject inject = injection.getInject();
         MastodonContent content = inject.getContent();
-        String token = inject.getContent().getToken();
-        String status = inject.getContent().buildStatus(inject.getFooter(), inject.getHeader());
-        List<MastodonAttachment> attachments = mastodonService.resolveAttachments(execution, content.getAttachments());
+        String token = content.getToken();
+        String status = content.buildStatus(inject.getFooter(), inject.getHeader());
+        List<Document> documents = inject.getDocuments().stream()
+                .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
+        List<MastodonAttachment> attachments = mastodonService.resolveAttachments(execution, documents);
         try {
             String callResult = mastodonService.sendStatus(execution, token, status, attachments);
             String message = "Mastodon status sent (" + callResult + ")";

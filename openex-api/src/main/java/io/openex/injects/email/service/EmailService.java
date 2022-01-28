@@ -5,7 +5,6 @@ import io.openex.database.repository.DocumentRepository;
 import io.openex.execution.Execution;
 import io.openex.execution.ExecutionContext;
 import io.openex.execution.ExecutionTrace;
-import io.openex.injects.base.InjectAttachment;
 import io.openex.injects.email.model.EmailAttachment;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
@@ -56,9 +55,9 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
-    public List<EmailAttachment> resolveAttachments(Execution execution, List<InjectAttachment> attachments) {
+    public List<EmailAttachment> resolveAttachments(Execution execution, List<Document> attachments) {
         List<EmailAttachment> resolved = new ArrayList<>();
-        for (InjectAttachment attachment : attachments) {
+        for (Document attachment : attachments) {
             String documentId = attachment.getId();
             Optional<Document> askedDocument = documentRepository.findById(documentId);
             try {

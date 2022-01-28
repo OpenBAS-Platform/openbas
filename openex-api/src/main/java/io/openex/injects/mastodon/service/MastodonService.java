@@ -1,17 +1,15 @@
 package io.openex.injects.mastodon.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.handler.codec.http.HttpStatusClass;
 import io.openex.database.model.Document;
 import io.openex.database.repository.DocumentRepository;
 import io.openex.execution.Execution;
 import io.openex.execution.ExecutionTrace;
-import io.openex.injects.base.InjectAttachment;
 import io.openex.injects.mastodon.config.MastodonConfig;
 import io.openex.injects.mastodon.model.MastodonAttachment;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
-import org.apache.hc.client5.http.classic.*;
+import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.ByteArrayBody;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,9 +55,9 @@ public class MastodonService {
         this.config = config;
     }
 
-    public List<MastodonAttachment> resolveAttachments(Execution execution, List<InjectAttachment> attachments) {
+    public List<MastodonAttachment> resolveAttachments(Execution execution, List<Document> attachments) {
         List<MastodonAttachment> resolved = new ArrayList<>();
-        for (InjectAttachment attachment : attachments) {
+        for (Document attachment : attachments) {
             String documentId = attachment.getId();
             Optional<Document> askedDocument = documentRepository.findById(documentId);
             try {

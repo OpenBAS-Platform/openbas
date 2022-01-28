@@ -4,24 +4,21 @@ import io.openex.execution.Executor;
 
 import javax.persistence.Transient;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-public abstract class Injection<T> {
+public abstract class Injection {
     public abstract String getId();
 
     public abstract Exercise getExercise();
 
     public abstract Optional<Instant> getDate();
 
-    public abstract T getContent();
+    public abstract Class<? extends Executor<?>> executor();
 
-    public abstract void setContent(T content);
-
-    public abstract Class<? extends Executor<T>> executor();
-
-    public abstract String getType();
+    public abstract List<InjectDocument> getDocuments();
 
     @Transient
     public String getHeader() {
@@ -32,7 +29,4 @@ public abstract class Injection<T> {
     public String getFooter() {
         return ofNullable(getExercise()).map(Exercise::getFooter).orElse("");
     }
-
-    @Transient
-    public abstract boolean isGlobalInject();
 }

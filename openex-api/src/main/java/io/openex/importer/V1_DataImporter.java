@@ -16,14 +16,7 @@ import static io.openex.rest.helper.RestBehavior.fromIterable;
 @Component
 public class V1_DataImporter implements Importer {
 
-    private static class BaseHolder implements Base {
-
-        private String id;
-
-        public BaseHolder(String id) {
-            this.id = id;
-        }
-
+    private record BaseHolder(String id) implements Base {
         @Override
         public String getId() {
             return id;
@@ -35,7 +28,7 @@ public class V1_DataImporter implements Importer {
     private AudienceRepository audienceRepository;
     private ObjectiveRepository objectiveRepository;
     private PollRepository pollRepository;
-    private InjectRepository<?> injectRepository;
+    private InjectRepository injectRepository;
 
     @Autowired
     public void setPollRepository(PollRepository pollRepository) {
@@ -48,7 +41,7 @@ public class V1_DataImporter implements Importer {
     }
 
     @Autowired
-    public void setInjectRepository(InjectRepository<?> injectRepository) {
+    public void setInjectRepository(InjectRepository injectRepository) {
         this.injectRepository = injectRepository;
     }
 

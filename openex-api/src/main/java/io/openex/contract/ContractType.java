@@ -12,5 +12,7 @@ public enum ContractType {
     @JsonProperty("richtextarea")
     Richtextarea,
     @JsonProperty("attachment")
-    Attachment
+    Attachment,
+    @JsonProperty("audience")
+    Audience
 }

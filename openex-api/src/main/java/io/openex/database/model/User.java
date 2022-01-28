@@ -187,7 +187,7 @@ public class User implements Base, OAuth2User {
     }
 
     @JsonProperty("user_last_comcheck")
-    public Optional<Instant> lastComcheck() {
+    public Optional<Instant> getLastComcheck() {
         return getComcheckStatuses().stream()
                 .filter(comcheckStatus -> comcheckStatus.getReceiveDate().isPresent())
                 .map(comcheckStatus -> comcheckStatus.getReceiveDate().get())
