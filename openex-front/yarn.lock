@@ -6203,11 +6203,6 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-mdi-material-ui@7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/mdi-material-ui/-/mdi-material-ui-7.1.0.tgz#58213ccf7d5a9175e4135e831b8aa5987ce593ab"
-  integrity sha512-mm0oFn1kwi64s4EZ8IDAg4TGE2BGu57KyOKe5j0+7zKAFBpm4UyAE43lffsyh0OOMyqskd7PMvIN2fNgft3Z7w==
-
 mdn-data@2.0.14:
   version "2.0.14"
   resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.14.tgz#7113fc4281917d63ce29b43446f701e68c25ba50"
