@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.execution.Executor;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
@@ -23,7 +24,7 @@ import static java.util.Optional.ofNullable;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "inject_type")
 @EntityListeners(ModelBaseListener.class)
-public abstract class Inject extends Injection implements Base {
+public abstract class Inject implements Base, Injection {
 
     private static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
@@ -126,7 +127,19 @@ public abstract class Inject extends Injection implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectDocument> documents = new ArrayList<>();
 
+    public abstract Class<? extends Executor<?>> executor();
+
     // region transient
+    @Transient
+    public String getHeader() {
+        return ofNullable(getExercise()).map(Exercise::getHeader).orElse("");
+    }
+
+    @Transient
+    public String getFooter() {
+        return ofNullable(getExercise()).map(Exercise::getFooter).orElse("");
+    }
+
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
@@ -324,7 +337,6 @@ public abstract class Inject extends Injection implements Base {
         this.tags = tags;
     }
 
-    @Override
     public List<InjectDocument> getDocuments() {
         return documents;
     }

@@ -11,8 +11,6 @@ import io.openex.execution.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +42,7 @@ public class InjectHelper {
         this.dryInjectRepository = dryInjectRepository;
     }
 
-    public Stream<ExecutionContext> getUsersFromInjection(Injection injection) {
+    private Stream<ExecutionContext> getUsersFromInjection(Injection injection) {
         Exercise exercise = injection.getExercise();
         if (injection instanceof DryInject dryInject) {
             return dryInject.getRun().getUsers().stream()
@@ -59,7 +57,7 @@ public class InjectHelper {
         throw new UnsupportedOperationException("Unsupported type of Injection");
     }
 
-    public List<ExecutionContext> buildUsersFromInjection(Inject injection) {
+    private List<ExecutionContext> usersFromInjection(Injection injection) {
         Exercise exercise = injection.getExercise();
         return getUsersFromInjection(injection)
                 .collect(groupingBy(ExecutionContext::getUser)).entrySet().stream()
@@ -68,28 +66,25 @@ public class InjectHelper {
                 .toList();
     }
 
-    private boolean isInInjectableRange(Injection injection) {
+    private boolean isBeforeOrEqualsNow(Injection injection) {
         Instant now = Instant.now();
-        Instant start = now.minus(Duration.parse("PT1H"));
         Instant injectWhen = injection.getDate().orElseThrow();
-        return injectWhen.isAfter(start) && injectWhen.isBefore(now);
+        return injectWhen.equals(now) || injectWhen.isBefore(now);
     }
 
-    @Transactional
     public List<ExecutableInject<?>> getInjectsToRun() {
         // Get injects
         List<Inject> executableInjects = injectRepository.findAll(InjectSpecification.executable());
         Stream<ExecutableInject<?>> injects = executableInjects.stream()
-                .filter(this::isInInjectableRange)
-                .map(inject -> new ExecutableInject<>(inject, buildUsersFromInjection(inject)));
+                .filter(this::isBeforeOrEqualsNow)
+                .sorted(Inject.executionComparator)
+                .map(inject -> new ExecutableInject<>(inject, usersFromInjection(inject)));
         // Get dry injects
         List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
         Stream<ExecutableInject<?>> dryInjects = executableDryInjects.stream()
-                .filter(this::isInInjectableRange)
-                .map(inject -> {
-                    Inject injectInject = inject.getInject();
-                    return new ExecutableInject<>(injectInject, buildUsersFromInjection(injectInject));
-                });
+                .filter(this::isBeforeOrEqualsNow)
+                .sorted(DryInject.executionComparator)
+                .map(dry -> new ExecutableInject<>(dry, dry.getInject(), usersFromInjection(dry)));
         // Combine injects and dry
         return concat(injects, dryInjects).collect(Collectors.toList());
     }

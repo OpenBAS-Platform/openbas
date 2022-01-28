@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { makeStyles, styled } from '@mui/styles';
+import React from 'react';
+import { makeStyles } from '@mui/styles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -13,9 +13,6 @@ import {
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import LinearProgress, {
-  linearProgressClasses,
-} from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
@@ -28,13 +25,13 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { fetchDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
 import DryrunStatus from './DryrunStatus';
-import { progression } from '../../../../utils/Time';
 import { fetchDryinjects } from '../../../../actions/Dryinject';
 import InjectIcon from '../injects/InjectIcon';
 import InjectType from '../injects/InjectType';
 import InjectStatus from '../injects/InjectStatus';
 import InjectStatusDetails from '../injects/InjectStatusDetails';
 import { resolveUserName } from '../../../../utils/String';
+import DryrunProgress from './DryrunProgress';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -190,24 +187,10 @@ const inlineStyles = {
   },
 };
 
-const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 10,
-  borderRadius: 5,
-  [`& .${linearProgressClasses.bar}`]: {
-    borderRadius: 5,
-    backgroundColor: theme.palette.primary.main,
-  },
-}));
-
 const Dryrun = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const [currentDate, setCurrentDate] = useState(new Date());
-  useEffect(() => {
-    const intervalId = setInterval(() => setCurrentDate(new Date()), 1000);
-    return () => clearInterval(intervalId);
-  }, []);
   const {
     nsdt, fldt, t, fndt,
   } = useFormatter();
@@ -283,14 +266,7 @@ const Dryrun = () => {
               <DryrunStatus finished={dryrun?.dryrun_finished} />
             </div>
             <div className={classes.progress}>
-              <BorderLinearProgress
-                value={progression(
-                  currentDate,
-                  Date.parse(dryrun?.dryrun_start_date),
-                  Date.parse(dryrun?.dryrun_end_date),
-                )}
-                variant="determinate"
-              />
+              <DryrunProgress start={dryrun?.dryrun_start_date} end={dryrun?.dryrun_end_date} />
             </div>
           </Paper>
         </Grid>
@@ -372,7 +348,7 @@ const Dryrun = () => {
               divider={true}
             >
               <ListItemIcon>
-                <InjectIcon type={dryinject.dryinject_type} />
+                <InjectIcon type={dryinject.dryinject_inject.inject_type} />
               </ListItemIcon>
               <ListItemText
                 primary={
@@ -383,14 +359,14 @@ const Dryrun = () => {
                     >
                       <InjectType
                         variant="list"
-                        type={dryinject.dryinject_type}
+                        type={dryinject.dryinject_inject.inject_type}
                       />
                     </div>
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.dryinject_title}
                     >
-                      {dryinject.dryinject_title}
+                      {dryinject.dryinject_inject.inject_title}
                     </div>
                     <div
                       className={classes.bodyItem}

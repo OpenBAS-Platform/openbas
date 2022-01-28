@@ -3,13 +3,12 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.execution.Executor;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.List;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,9 +16,10 @@ import static java.util.Optional.of;
 
 @Entity
 @Table(name = "dryinjects")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EntityListeners(ModelBaseListener.class)
-public class DryInject extends Injection implements Base {
+public class DryInject implements Base, Injection {
+
+    public static Comparator<DryInject> executionComparator = Comparator.comparing(o -> o.getDate().orElseThrow());
 
     @Id
     @Column(name = "dryinject_id")
@@ -40,7 +40,6 @@ public class DryInject extends Injection implements Base {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "dryinject_inject")
-    @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("dryinject_inject")
     private Inject inject;
 
@@ -49,20 +48,15 @@ public class DryInject extends Injection implements Base {
     private DryInjectStatus status;
 
     @Override
-    @JsonProperty("dryinject_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("dryinject_exercise")
     public Exercise getExercise() {
-        return getRun().getExercise();
+        return getInject().getExercise();
     }
 
     @Override
-    public Class<? extends Executor<?>> executor() {
-        return getInject().executor();
-    }
-
-    @Override
-    public List<InjectDocument> getDocuments() {
-        return getInject().getDocuments();
+    public Optional<Instant> getDate() {
+        return of(date);
     }
 
     public String getId() {
@@ -87,10 +81,6 @@ public class DryInject extends Injection implements Base {
 
     public void setInject(Inject inject) {
         this.inject = inject;
-    }
-
-    public Optional<Instant> getDate() {
-        return of(date);
     }
 
     public void setDate(Instant date) {

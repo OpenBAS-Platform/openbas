@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "dryruns")
@@ -64,6 +65,16 @@ public class Dryrun implements Base {
     @JsonProperty("dryrun_users_number")
     public long getUsersNumber() {
         return getUsers().size();
+    }
+
+    @JsonProperty("dryrun_start_date")
+    public Optional<Instant> getRunStart() {
+        return getInjects().stream().min(DryInject.executionComparator).flatMap(DryInject::getDate);
+    }
+
+    @JsonProperty("dryrun_end_date")
+    public Optional<Instant> getRunEnd() {
+        return getInjects().stream().max(DryInject.executionComparator).flatMap(DryInject::getDate);
     }
     // endregion
 
