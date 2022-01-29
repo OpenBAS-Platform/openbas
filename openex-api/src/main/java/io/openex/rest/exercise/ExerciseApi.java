@@ -15,6 +15,7 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
 import io.openex.service.FileService;
 import io.openex.service.ImportService;
+import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
@@ -70,9 +71,15 @@ public class ExerciseApi extends RestBehavior {
     // region services
     private DryrunService dryrunService;
     private FileService fileService;
+    private InjectService injectService;
     // endregion
 
     // region setters
+    @Autowired
+    public void setInjectService(InjectService injectService) {
+        this.injectService = injectService;
+    }
+
     @Autowired
     public void setImportService(ImportService importService) {
         this.importService = importService;
@@ -219,7 +226,7 @@ public class ExerciseApi extends RestBehavior {
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
     @PostAuthorize("isExerciseObserver(#exerciseId)")
     public List<DryInject> dryrunInjects(@PathVariable String exerciseId,
-                                            @PathVariable String dryrunId) {
+                                         @PathVariable String dryrunId) {
         return dryrun(exerciseId, dryrunId).getInjects();
     }
     // endregion
@@ -323,18 +330,34 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }
 
-    @GetMapping("/api/exercises")
-    @RolesAllowed(ROLE_USER)
-    public Iterable<Exercise> exercises() {
-        return currentUser().isAdmin() ?
-                exerciseRepository.findAll() :
-                exerciseRepository.findAllGranted(currentUser().getId());
+    @Transactional
+    @DeleteMapping("/api/exercises/{exerciseId}/{documentId}")
+    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    public Exercise deleteDocument(@PathVariable String exerciseId, @PathVariable String documentId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        exercise.setUpdatedAt(now());
+        Document doc = documentRepository.findById(documentId).orElseThrow();
+        List<Exercise> docExercises = doc.getExercises().stream()
+                .filter(ex -> !ex.getId().equals(exerciseId)).toList();
+        if (docExercises.size() == 0) {
+            // Document is no longer associate to any exercise, delete it
+            documentRepository.delete(doc);
+            // All associations with this document will be automatically cleanup.
+        } else {
+            // Document associated to other exercise, cleanup
+            doc.setExercises(docExercises);
+            documentRepository.save(doc);
+            // Delete document from all exercise injects
+            injectService.cleanInjectsDocExercise(exerciseId, documentId);
+        }
+        return exerciseRepository.save(exercise);
     }
 
     @Transactional
     @PutMapping("/api/exercises/{exerciseId}/status")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise changeExerciseStatus(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStatusInput input) {
+    public Exercise changeExerciseStatus(@PathVariable String exerciseId,
+                                         @Valid @RequestBody ExerciseUpdateStatusInput input) {
         STATUS status = input.getStatus();
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Check if next status is possible
@@ -377,6 +400,14 @@ public class ExerciseApi extends RestBehavior {
         exercise.setUpdatedAt(now());
         exercise.setStatus(status);
         return exerciseRepository.save(exercise);
+    }
+
+    @GetMapping("/api/exercises")
+    @RolesAllowed(ROLE_USER)
+    public Iterable<Exercise> exercises() {
+        return currentUser().isAdmin() ?
+                exerciseRepository.findAll() :
+                exerciseRepository.findAllGranted(currentUser().getId());
     }
     // endregion
 

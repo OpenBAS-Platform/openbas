@@ -1,16 +1,18 @@
-package io.openex.rest.file;
+package io.openex.rest.document;
 
 import io.openex.database.model.Document;
+import io.openex.database.model.Exercise;
 import io.openex.database.model.Tag;
 import io.openex.database.model.User;
 import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.TagRepository;
-import io.openex.rest.file.form.DocumentCreateInput;
-import io.openex.rest.file.form.DocumentTagUpdateInput;
-import io.openex.rest.file.form.DocumentUpdateInput;
+import io.openex.rest.document.form.DocumentCreateInput;
+import io.openex.rest.document.form.DocumentTagUpdateInput;
+import io.openex.rest.document.form.DocumentUpdateInput;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.FileService;
+import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -28,12 +30,18 @@ import java.util.Optional;
 import static io.openex.config.AppConfig.currentUser;
 
 @RestController
-public class FileApi extends RestBehavior {
+public class DocumentApi extends RestBehavior {
 
     private FileService fileService;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
+    private InjectService injectService;
+
+    @Autowired
+    public void setInjectService(InjectService injectService) {
+        this.injectService = injectService;
+    }
 
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
@@ -108,13 +116,21 @@ public class FileApi extends RestBehavior {
         return documentRepository.save(document);
     }
 
+    @Transactional
     @PutMapping("/api/documents/{documentId}")
     public Document updateDocumentInformation(@PathVariable String documentId,
                                               @Valid @RequestBody DocumentUpdateInput input) {
         Document document = resolveDocument(documentId).orElseThrow();
         document.setUpdateAttributes(input);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        // Get removed exercises
+        List<String> askIds = input.getExerciseIds();
+        List<Exercise> removedExercises = document.getExercises().stream()
+                .filter(exercise -> !askIds.contains(exercise.getId())).toList();
         document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+        // In case of exercise removal, all inject doc attachment for exercise
+        removedExercises.forEach(exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
+        // Save and return
         return documentRepository.save(document);
     }
 

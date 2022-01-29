@@ -1,4 +1,4 @@
-package io.openex.rest.file.form;
+package io.openex.rest.document.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -8,13 +8,13 @@ import java.util.List;
 
 import static io.openex.config.AppConfig.EMPTY_MESSAGE;
 
-public class DocumentUpdateInput {
+public class DocumentCreateInput {
 
     @JsonProperty("document_description")
     private String description;
 
     @JsonProperty("document_tags")
-    private List<String> tagIds;
+    private List<String> tagIds = new ArrayList<>();
 
     @NotEmpty(message = EMPTY_MESSAGE)
     @JsonProperty("document_exercises")
