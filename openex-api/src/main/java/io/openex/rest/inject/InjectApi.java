@@ -104,6 +104,7 @@ public class InjectApi extends RestBehavior {
     public Inject updateInject(@PathVariable String exerciseId,
                                @PathVariable String injectId,
                                @Valid @RequestBody InjectInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         inject.setUpdateAttributes(input);
         // Set dependencies
@@ -119,16 +120,24 @@ public class InjectApi extends RestBehavior {
                 .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
                 .forEach(injectDoc -> injectDocumentRepository.delete(injectDoc));
         // To add
-        documents.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
-            Optional<Document> doc = documentRepository.findById(in.getDocumentId());
-            if (doc.isPresent()) {
-                InjectDocument injectDocument = new InjectDocument();
-                injectDocument.setInject(inject);
-                injectDocument.setDocument(doc.get());
-                injectDocument.setAttached(in.isAttached());
-                injectDocumentRepository.save(injectDocument);
-            }
-        });
+        documents.stream()
+                .filter(doc -> !currentDocumentIds.contains(doc.getDocumentId()))
+                .forEach(in -> {
+                    Optional<Document> doc = documentRepository.findById(in.getDocumentId());
+                    if (doc.isPresent()) {
+                        InjectDocument injectDocument = new InjectDocument();
+                        injectDocument.setInject(inject);
+                        Document document = doc.get();
+                        injectDocument.setDocument(document);
+                        injectDocument.setAttached(in.isAttached());
+                        injectDocumentRepository.save(injectDocument);
+                        // If Document not yet linked directly to the exercise, attached it
+                        if (!document.getExercises().contains(exercise)) {
+                            exercise.getDocuments().add(document);
+                            exerciseRepository.save(exercise);
+                        }
+                    }
+                });
         return injectRepository.save(inject);
     }
 
