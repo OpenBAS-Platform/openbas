@@ -54,6 +54,7 @@ class DocumentPopover extends Component {
   onSubmitEdit(data) {
     const inputValues = R.pipe(
       R.assoc('document_tags', R.pluck('id', data.document_tags)),
+      R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
     )(data);
     return this.props
       .updateDocument(this.props.document.document_id, inputValues)
@@ -81,13 +82,19 @@ class DocumentPopover extends Component {
       label: tag.tag_name,
       color: tag.tag_color,
     }));
+    const documentExercises = document.exercises.map((ex) => ({
+      id: ex.exercise_id,
+      label: ex.exercise_name,
+    }));
     const initialValues = R.pipe(
       R.assoc('document_tags', documentTags),
+      R.assoc('document_exercises', documentExercises),
       R.pick([
         'document_name',
         'document_description',
         'document_type',
         'document_tags',
+        'document_exercises',
       ]),
     )(document);
     return (

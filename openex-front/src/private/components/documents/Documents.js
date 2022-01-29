@@ -7,7 +7,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { connect } from 'react-redux';
-import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
@@ -16,7 +15,6 @@ import {
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import inject18n from '../../../components/i18n';
 import { fetchDocuments } from '../../../actions/Document';
-import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -24,8 +22,6 @@ import { storeBrowser } from '../../../actions/Schema';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
-
-const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   parameters: {
@@ -80,7 +76,13 @@ const inlineStylesHeaders = {
   },
   document_description: {
     float: 'left',
-    width: '30%',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_exercises: {
+    float: 'left',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -109,7 +111,15 @@ const inlineStyles = {
   },
   document_description: {
     float: 'left',
-    width: '30%',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_exercises: {
+    float: 'left',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -146,13 +156,6 @@ class Documents extends Component {
 
   componentDidMount() {
     this.props.fetchDocuments();
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchDocuments();
-    });
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
   }
 
   handleSearch(value) {
@@ -268,6 +271,7 @@ class Documents extends Component {
                 <div>
                   {this.sortHeader('document_name', 'Name', true)}
                   {this.sortHeader('document_description', 'Description', true)}
+                  {this.sortHeader('document_exercises', '# Exercises', true)}
                   {this.sortHeader('document_type', 'Type', true)}
                   {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
@@ -290,31 +294,19 @@ class Documents extends Component {
               <ListItemText
                 primary={
                   <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.document_name}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.document_name}>
                       {document.document_name}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.document_description}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.document_description}>
                       {document.document_description}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.document_type}
-                    >
-                      <DocumentType
-                        type={document.document_type}
-                        variant="list"
-                      />
+                    <div className={classes.bodyItem} style={inlineStyles.document_exercises}>
+                      {document.document_exercises.length}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.document_tags}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.document_type}>
+                      <DocumentType type={document.document_type} variant="list"/>
+                    </div>
+                    <div className={classes.bodyItem} style={inlineStyles.document_tags}>
                       <ItemTags variant="list" tags={document.tags} />
                     </div>
                   </div>

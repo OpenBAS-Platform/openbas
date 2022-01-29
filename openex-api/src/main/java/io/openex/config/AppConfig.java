@@ -21,6 +21,7 @@ public class AppConfig {
     private final static String ANONYMOUS_USER = "anonymousUser";
 
     // Validations
+    public final static String EMPTY_MESSAGE = "This list cannot be empty.";
     public final static String MANDATORY_MESSAGE = "This value should not be blank.";
     public final static String NOW_FUTURE_MESSAGE = "This date must be now or in the future.";
     public final static String EMAIL_FORMAT = "This field must be a valid email.";

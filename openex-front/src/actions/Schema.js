@@ -354,6 +354,11 @@ const _buildDocument = (state, id, doc) => {
       .asMutable()
       .map((tagId) => state.referential.entities.tags[tagId])
       .filter((t) => t !== undefined),
+    exercises: doc.document_exercises
+      .asMutable()
+      .map((exId) => state.referential.entities.exercises[exId])
+      .filter((t) => t !== undefined)
+      .map((ex) => _buildExercise(state, ex.exercise_id, ex)),
   };
 };
 export const storeBrowser = (state) => ({

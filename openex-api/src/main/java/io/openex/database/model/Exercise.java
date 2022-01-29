@@ -141,6 +141,15 @@ public class Exercise implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "exercises_documents",
+            joinColumns = @JoinColumn(name = "exercise_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("exercise_documents")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Document> documents = new ArrayList<>();
+
     // region transient
     @JsonProperty("exercise_injects_statistics")
     public Map<String, Long> getInjectStatistics() {
@@ -400,6 +409,14 @@ public class Exercise implements Base {
 
     public void setPolls(List<Poll> polls) {
         this.polls = polls;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 
     public List<Tag> getTags() {
