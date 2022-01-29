@@ -32,10 +32,6 @@ public class Document implements Base {
     @JsonProperty("document_description")
     private String description;
 
-    @Column(name = "document_path")
-    @JsonProperty("document_path")
-    private String path;
-
     @Column(name = "document_type")
     @JsonProperty("document_type")
     private String type;
@@ -48,6 +44,15 @@ public class Document implements Base {
     @JsonProperty("document_tags")
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "exercises_documents",
+            joinColumns = @JoinColumn(name = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "exercise_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("document_exercises")
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Exercise> exercises = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -73,14 +78,6 @@ public class Document implements Base {
         this.description = description;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getType() {
         return type;
     }
@@ -95,6 +92,14 @@ public class Document implements Base {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
     }
 
     @Override

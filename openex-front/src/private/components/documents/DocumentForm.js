@@ -7,14 +7,18 @@ import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
 import TagField from '../../../components/TagField';
 import FileField from '../../../components/FileField';
+import ExerciseField from '../../../components/ExerciseField';
 
 class DocumentForm extends Component {
   validate(values) {
     const { t, editing } = this.props;
     const errors = {};
-    const requiredFields = editing ? [] : ['document_file'];
+    const requiredFields = editing ? ['document_exercises'] : ['document_file', 'document_exercises'];
     requiredFields.forEach((field) => {
-      if (!values[field]) {
+      const data = values[field];
+      if (Array.isArray(data) && data.length === 0) {
+        errors[field] = t('This field is required.');
+      } else if (!data) {
         errors[field] = t('This field is required.');
       }
     });
@@ -48,6 +52,13 @@ class DocumentForm extends Component {
               multiline={true}
               rows={2}
               label={t('Description')}
+            />
+            <ExerciseField
+              name="document_exercises"
+              values={values}
+              label={t('Exercises')}
+              setFieldValue={form.mutators.setValue}
+              style={{ marginTop: 20 }}
             />
             <TagField
               name="document_tags"

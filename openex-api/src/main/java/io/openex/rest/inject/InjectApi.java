@@ -154,9 +154,9 @@ public class InjectApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Get common attributes
         Inject inject = input.toInject();
-        // Set dependencies
         inject.setUser(currentUser());
         inject.setExercise(exercise);
+        // Set dependencies
         inject.setDependsOn(resolveOptionalRelation(input.getDependsOn(), injectRepository));
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));

@@ -2,9 +2,10 @@ package io.openex.rest.file;
 
 import io.openex.database.model.Document;
 import io.openex.database.model.Tag;
+import io.openex.database.model.User;
 import io.openex.database.repository.DocumentRepository;
+import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.TagRepository;
-import io.openex.database.specification.DocumentSpecification;
 import io.openex.rest.file.form.DocumentCreateInput;
 import io.openex.rest.file.form.DocumentTagUpdateInput;
 import io.openex.rest.file.form.DocumentUpdateInput;
@@ -22,6 +23,9 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
+
+import static io.openex.config.AppConfig.currentUser;
 
 @RestController
 public class FileApi extends RestBehavior {
@@ -29,6 +33,12 @@ public class FileApi extends RestBehavior {
     private FileService fileService;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
+    private ExerciseRepository exerciseRepository;
+
+    @Autowired
+    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
 
     @Autowired
     public void setTagRepository(TagRepository tagRepository) {
@@ -45,6 +55,15 @@ public class FileApi extends RestBehavior {
         this.fileService = fileService;
     }
 
+    private Optional<Document> resolveDocument(String documentId) {
+        User user = currentUser();
+        if (user.isAdmin()) {
+            return documentRepository.findById(documentId);
+        } else {
+            return documentRepository.findByIdGranted(documentId, user.getId());
+        }
+    }
+
     @Transactional
     @PostMapping("/api/documents")
     public Document uploadDocument(@Valid @RequestPart("input") DocumentCreateInput input,
@@ -53,8 +72,8 @@ public class FileApi extends RestBehavior {
         Document document = new Document();
         document.setName(file.getOriginalFilename());
         document.setDescription(input.getDescription());
+        document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
-        document.setPath("minio");
         document.setType(file.getContentType());
         return documentRepository.save(document);
     }
@@ -62,24 +81,29 @@ public class FileApi extends RestBehavior {
     @GetMapping("/api/documents")
     public List<Document> documents() {
         Sort sorting = Sort.by(Sort.Direction.DESC, "id");
-        return documentRepository.findAll(DocumentSpecification.onlyMinio(), sorting);
+        User user = currentUser();
+        if (user.isAdmin()) {
+            return documentRepository.findAll(null, sorting);
+        } else {
+            return documentRepository.findAllGranted(user.getId());
+        }
     }
 
     @GetMapping("/api/documents/{documentId}")
     public Document document(@PathVariable String documentId) {
-        return documentRepository.findById(documentId).orElseThrow();
+        return resolveDocument(documentId).orElseThrow();
     }
 
     @GetMapping("/api/documents/{documentId}/tags")
     public List<Tag> documentTags(@PathVariable String documentId) {
-        Document document = documentRepository.findById(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow();
         return document.getTags();
     }
 
     @PutMapping("/api/documents/{documentId}/tags")
     public Document documentTags(@PathVariable String documentId,
                                  @RequestBody DocumentTagUpdateInput input) {
-        Document document = documentRepository.findById(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow();
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
     }
@@ -87,15 +111,16 @@ public class FileApi extends RestBehavior {
     @PutMapping("/api/documents/{documentId}")
     public Document updateDocumentInformation(@PathVariable String documentId,
                                               @Valid @RequestBody DocumentUpdateInput input) {
-        Document document = documentRepository.findById(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow();
         document.setUpdateAttributes(input);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
         return documentRepository.save(document);
     }
 
     @GetMapping("/api/documents/{documentId}/file")
     public void downloadDocument(@PathVariable String documentId, HttpServletResponse response) throws IOException {
-        Document document = documentRepository.findById(documentId).orElseThrow();
+        Document document = resolveDocument(documentId).orElseThrow();
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
         response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
         response.setStatus(HttpServletResponse.SC_OK);
@@ -105,6 +130,7 @@ public class FileApi extends RestBehavior {
 
     @DeleteMapping("/api/documents/{documentId}")
     public void deleteDocument(@PathVariable String documentId) {
-        documentRepository.deleteById(documentId);
+        Document document = resolveDocument(documentId).orElseThrow();
+        documentRepository.delete(document);
     }
 }

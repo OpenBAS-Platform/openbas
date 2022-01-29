@@ -34,6 +34,7 @@ const CreateDocument = (props) => {
   const onSubmit = (data) => {
     const inputValues = R.pipe(
       R.assoc('document_tags', R.pluck('id', data.document_tags)),
+      R.assoc('document_exercises', R.pluck('id', data.document_exercises)),
     )(data);
     const formData = new FormData();
     formData.append('file', data.document_file[0]);
@@ -65,7 +66,7 @@ const CreateDocument = (props) => {
         <DialogContent>
           <DocumentForm
             onSubmit={onSubmit}
-            initialValues={{ document_tags: [] }}
+            initialValues={{ document_tags: [], document_exercises: [] }}
             handleClose={() => setOpen(false)}
           />
         </DialogContent>
