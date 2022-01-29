@@ -341,7 +341,7 @@ public abstract class Inject implements Base, Injection {
         return documents;
     }
 
-    public void setInjectDocuments(List<InjectDocument> documents) {
+    public void setDocuments(List<InjectDocument> documents) {
         this.documents = documents;
     }
 

@@ -7,7 +7,7 @@ import io.openex.database.repository.InjectRepository;
 import io.openex.database.specification.InjectSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.transaction.Transactional;
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.time.Instant.now;
 
-@Component
+@Service
 public class DryrunService {
 
     private static final int SPEED_DRYRUN = 100; // 100x faster.

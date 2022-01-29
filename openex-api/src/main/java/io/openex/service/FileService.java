@@ -7,13 +7,13 @@ import io.minio.PutObjectArgs;
 import io.openex.config.MinioConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.Optional;
 
-@Component
+@Service
 public class FileService {
 
     private MinioConfig minioConfig;

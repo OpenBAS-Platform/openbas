@@ -10,7 +10,7 @@ import io.openex.rest.user.form.user.CreateUserInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
@@ -22,7 +22,7 @@ import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.rest.helper.RestBehavior.fromIterable;
 import static java.time.Instant.now;
 
-@Component
+@Service
 public class UserService {
 
     private final Argon2PasswordEncoder passwordEncoder = new Argon2PasswordEncoder();

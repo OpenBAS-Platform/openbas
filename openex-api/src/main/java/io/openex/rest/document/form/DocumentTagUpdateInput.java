@@ -1,4 +1,4 @@
-package io.openex.rest.file.form;
+package io.openex.rest.document.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
