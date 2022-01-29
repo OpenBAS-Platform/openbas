@@ -179,6 +179,7 @@ const i18n = {
         'Aucun stimuli traité dans cet exercice.',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
+      openex_mastodon: 'Mastodon',
       openex_manual: 'Manuel (rappel)',
       subject: 'Sujet du mail',
       body: 'Corps du mail',
@@ -292,6 +293,7 @@ const i18n = {
     en: {
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
+      openex_mastodon: 'Mastodon',
       openex_manual: 'Manual (reminder)',
       subject: 'Email subject',
       body: 'Email body',
