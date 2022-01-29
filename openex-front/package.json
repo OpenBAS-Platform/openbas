@@ -21,6 +21,7 @@
     "history": "4.10.1",
     "http-proxy-middleware": "2.0.1",
     "leaflet": "1.7.1",
+    "mdi-material-ui": "7.1.0",
     "moment": "2.29.1",
     "moment-timezone": "0.5.34",
     "normalizr": "3.6.1",
