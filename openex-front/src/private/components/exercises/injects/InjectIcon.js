@@ -6,7 +6,7 @@ import {
   NotificationsActiveOutlined,
   HelpOutlined,
 } from '@mui/icons-material';
-import { Mastodon } from 'mdi-material-ui';
+import { Mastodon } from '@mdi/js';
 
 const iconSelector = (type, variant, fontSize) => {
   let style = {};
