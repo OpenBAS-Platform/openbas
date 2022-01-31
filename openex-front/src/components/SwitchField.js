@@ -13,7 +13,7 @@ const renderSwitch = ({
   style,
   ...others
 }) => (
-  <FormGroup row={true} style={style}>
+  <FormGroup row={true} style={{ ...style, marginLeft: 5 }}>
     <FormControlLabel
       control={
         <MuiSwitch
@@ -32,6 +32,6 @@ const renderSwitch = ({
 );
 
 // eslint-disable-next-line import/prefer-default-export
-export const Switch = (props) => (
+export const SwitchField = (props) => (
   <Field name={props.name} component={renderSwitch} {...props} />
 );

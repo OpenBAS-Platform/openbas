@@ -38,7 +38,6 @@ export default () => ({
       color: '#00b1ff',
       fontWeight: 600,
       fontSize: 16,
-      letterSpacing: 1.2,
     },
   },
   components: {

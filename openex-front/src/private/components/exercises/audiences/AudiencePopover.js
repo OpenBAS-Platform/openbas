@@ -9,7 +9,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -18,16 +17,11 @@ import {
   deleteAudience,
   updateAudienceActivation,
 } from '../../../../actions/Audience';
-import { updateInjectAudiences } from '../../../../actions/Inject';
 import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { storeBrowser } from '../../../../actions/Schema';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import { Transition } from '../../../../utils/Environment';
 
 class AudiencePopover extends Component {
   constructor(props) {
@@ -100,16 +94,7 @@ class AudiencePopover extends Component {
   }
 
   submitRemove() {
-    this.props.updateInjectAudiences(
-      this.props.exerciseId,
-      this.props.injectId,
-      {
-        inject_audiences: R.filter(
-          (n) => n !== this.props.audience.audience_id,
-          this.props.injectAudiencesIds,
-        ),
-      },
-    );
+    this.props.onRemoveAudience(this.props.audience.audience_id);
     this.handleCloseRemove();
   }
 
@@ -164,7 +149,7 @@ class AudiencePopover extends Component {
 
   render() {
     const {
-      t, audience, injectId, setSelectedAudience, exercise,
+      t, audience, setSelectedAudience, exercise, onRemoveAudience,
     } = this.props;
     const audienceTags = audience.tags.map((tag) => ({
       id: tag.tag_id,
@@ -200,11 +185,6 @@ class AudiencePopover extends Component {
               {t('Manage players')}
             </MenuItem>
           )}
-          {injectId && (
-            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
-              {t('Remove from the inject')}
-            </MenuItem>
-          )}
           {audience.audience_enabled ? (
             <MenuItem
               onClick={this.handleOpenDisable.bind(this)}
@@ -220,7 +200,12 @@ class AudiencePopover extends Component {
               {t('Enable')}
             </MenuItem>
           )}
-          {!injectId && (
+          {onRemoveAudience && (
+            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
+              {t('Remove from the inject')}
+            </MenuItem>
+          )}
+          {!onRemoveAudience && (
             <MenuItem onClick={this.handleOpenDelete.bind(this)}>
               {t('Delete')}
             </MenuItem>
@@ -364,10 +349,8 @@ AudiencePopover.propTypes = {
   updateAudience: PropTypes.func,
   updateAudienceActivation: PropTypes.func,
   deleteAudience: PropTypes.func,
-  updateInjectAudiences: PropTypes.func,
-  injectId: PropTypes.string,
-  injectAudiencesIds: PropTypes.string,
   setSelectedAudience: PropTypes.func,
+  onRemoveAudience: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
@@ -382,7 +365,6 @@ export default R.compose(
   connect(select, {
     updateAudience,
     deleteAudience,
-    updateInjectAudiences,
     updateAudienceActivation,
   }),
   inject18n,

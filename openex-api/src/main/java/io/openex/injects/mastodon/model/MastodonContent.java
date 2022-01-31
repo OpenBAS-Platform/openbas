@@ -49,7 +49,7 @@ public class MastodonContent extends InjectContent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MastodonContent that = (MastodonContent) o;
-        return token.equals(that.token) && status.equals(that.status);
+        return Objects.equals(token, that.token) && Objects.equals(status, that.status);
     }
 
     @Override

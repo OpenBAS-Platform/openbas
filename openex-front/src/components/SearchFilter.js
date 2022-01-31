@@ -69,10 +69,12 @@ class SearchFilter extends Component {
               <Search />
             </InputAdornment>
           ),
-          classes: !fullWidth && {
-            root: searchInput,
-            focused: searchInputFocused,
-          },
+          classes: !fullWidth
+            ? {
+              root: searchInput,
+              focused: searchInputFocused,
+            }
+            : null,
         }}
         classes={fullWidth ? null : { root: classes.searchRoot }}
         autoComplete="off"

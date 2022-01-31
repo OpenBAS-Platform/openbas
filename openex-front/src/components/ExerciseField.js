@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { PersonOutlined } from '@mui/icons-material';
+import { Kayaking } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import { makeStyles } from '@mui/styles';
 import { Autocomplete } from './Autocomplete';
@@ -35,34 +35,36 @@ const ExerciseField = (props) => {
   const {
     name, onKeyDown, style, label, placeholder, noMargin,
   } = props;
-  const exerciseOptions = (exercises || [])
-    .map((n) => ({ id: n.exercise_id, label: n.exercise_name }));
+  const exerciseOptions = (exercises || []).map((n) => ({
+    id: n.exercise_id,
+    label: n.exercise_name,
+  }));
 
   return (
-      <div>
-        <Autocomplete
-          variant="standard"
-          size="small"
-          name={name}
-          noMargin={noMargin}
-          fullWidth={true}
-          multiple={true}
-          label={label}
-          placeholder={placeholder}
-          options={exerciseOptions}
-          style={style}
-          onKeyDown={onKeyDown}
-          renderOption={(renderProps, option) => (
-            <Box component="li" {...renderProps}>
-              <div className={classes.icon}>
-                <PersonOutlined />
-              </div>
-              <div className={classes.text}>{option.label}</div>
-            </Box>
-          )}
-          classes={{ clearIndicator: classes.autoCompleteIndicator }}
-        />
-      </div>
+    <div>
+      <Autocomplete
+        variant="standard"
+        size="small"
+        name={name}
+        noMargin={noMargin}
+        fullWidth={true}
+        multiple={true}
+        label={label}
+        placeholder={placeholder}
+        options={exerciseOptions}
+        style={style}
+        onKeyDown={onKeyDown}
+        renderOption={(renderProps, option) => (
+          <Box component="li" {...renderProps}>
+            <div className={classes.icon}>
+              <Kayaking />
+            </div>
+            <div className={classes.text}>{option.label}</div>
+          </Box>
+        )}
+        classes={{ clearIndicator: classes.autoCompleteIndicator }}
+      />
+    </div>
   );
 };
 
