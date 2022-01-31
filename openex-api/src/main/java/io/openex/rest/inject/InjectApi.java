@@ -144,6 +144,14 @@ public class InjectApi extends RestBehavior {
                         }
                     }
                 });
+        // Remap the attached boolean
+        injectDocuments.forEach(injectDoc -> {
+            Optional<InjectDocumentInput> inputInjectDoc = input.getDocuments().stream()
+                    .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId()))
+                    .findFirst();
+            Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
+            injectDoc.setAttached(attached);
+        });
         inject.setDocuments(injectDocuments);
         return injectRepository.save(inject);
     }
