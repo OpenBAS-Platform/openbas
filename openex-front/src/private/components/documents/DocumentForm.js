@@ -13,7 +13,9 @@ class DocumentForm extends Component {
   validate(values) {
     const { t, editing } = this.props;
     const errors = {};
-    const requiredFields = editing ? ['document_exercises'] : ['document_file', 'document_exercises'];
+    const requiredFields = editing
+      ? ['document_exercises']
+      : ['document_file', 'document_exercises'];
     requiredFields.forEach((field) => {
       const data = values[field];
       if (Array.isArray(data) && data.length === 0) {
@@ -27,7 +29,7 @@ class DocumentForm extends Component {
 
   render() {
     const {
-      t, editing, onSubmit, initialValues, handleClose,
+      t, editing, onSubmit, initialValues, handleClose, hideExercises,
     } = this.props;
     return (
       <Form
@@ -53,13 +55,15 @@ class DocumentForm extends Component {
               rows={2}
               label={t('Description')}
             />
-            <ExerciseField
-              name="document_exercises"
-              values={values}
-              label={t('Exercises')}
-              setFieldValue={form.mutators.setValue}
-              style={{ marginTop: 20 }}
-            />
+            {!hideExercises && (
+              <ExerciseField
+                name="document_exercises"
+                values={values}
+                label={t('Exercises')}
+                setFieldValue={form.mutators.setValue}
+                style={{ marginTop: 20 }}
+              />
+            )}
             <TagField
               name="document_tags"
               values={values}
@@ -108,6 +112,7 @@ DocumentForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
+  hideExercises: PropTypes.bool,
 };
 
 export default inject18n(DocumentForm);

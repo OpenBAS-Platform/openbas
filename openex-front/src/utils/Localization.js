@@ -293,6 +293,10 @@ const i18n = {
       Yes: 'Oui',
       No: 'Non',
       'Not applicable': 'Non applicable',
+      'Enable attachment': 'Activer la pièce jointe',
+      'Disable attachment': 'Désativer la pièce jointe',
+      'Do you want to remove the document from the inject?':
+        'Souhaitez-vous retirer ce document du stimuli ?',
     },
     en: {
       openex_email: 'Email',

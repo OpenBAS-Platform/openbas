@@ -85,8 +85,15 @@ class DocumentPopover extends Component {
     this.handleCloseRemove();
   }
 
+  handleToggleAttachement() {
+    this.props.onToggleAttach(this.props.document.document_id);
+    this.handlePopoverClose();
+  }
+
   render() {
-    const { t, document, onRemoveDocument } = this.props;
+    const {
+      t, document, onRemoveDocument, onToggleAttach, attached,
+    } = this.props;
     const documentTags = document.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
@@ -124,6 +131,11 @@ class DocumentPopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
+          {onToggleAttach && (
+            <MenuItem onClick={this.handleToggleAttachement.bind(this)}>
+              {attached ? t('Disable attachment') : t('Enable attachment')}
+            </MenuItem>
+          )}
           {onRemoveDocument && (
             <MenuItem onClick={this.handleOpenRemove.bind(this)}>
               {t('Remove from the inject')}
@@ -173,6 +185,7 @@ class DocumentPopover extends Component {
           <DialogContent>
             <DocumentForm
               initialValues={initialValues}
+              hideExercises={!!onRemoveDocument}
               editing={true}
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
@@ -225,6 +238,8 @@ DocumentPopover.propTypes = {
   userAdmin: PropTypes.bool,
   tags: PropTypes.object,
   onRemoveDocument: PropTypes.func,
+  onToggleAttach: PropTypes.func,
+  attached: PropTypes.bool,
 };
 
 export default R.compose(
