@@ -349,6 +349,23 @@ class InjectDefinition extends Component {
       .then(() => this.props.handleClose());
   }
 
+  validate(values) {
+    const { t, injectTypes, inject } = this.props;
+    const errors = {};
+    const injectType = R.head(
+      injectTypes.filter((i) => i.type === inject.inject_type),
+    );
+    if (injectType && Array.isArray(injectType.fields)) {
+      injectType.fields.forEach((field) => {
+        const value = values[field.name];
+        if (field.mandatory && !value) {
+          errors[field.name] = t('This field is required.');
+        }
+      });
+    }
+    return errors;
+  }
+
   render() {
     const {
       t,
@@ -415,7 +432,7 @@ class InjectDefinition extends Component {
             <CloseRounded />
           </IconButton>
           <Typography variant="h6" classes={{ root: classes.title }}>
-            {R.propOr('-', 'inject_title', inject)}
+            {inject.inject_title}
           </Typography>
           <div className="clearfix" />
         </div>
