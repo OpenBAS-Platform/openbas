@@ -15,7 +15,7 @@
 
 OpenEx is an open source platform allowing organizations to plan, schedule and conduct crisis exercises. OpenEx is an [ISO 22398](http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=50294) compliant product and has been designed as a modern web application including a RESTFul API and an UX oriented frontend.
 
-![Screenshot](https://www.openex.io/wp-content/uploads/2021/01/screenshot.png "Screenshot")
+![Screenshot](https://www.openex.io/wp-content/uploads/2022/01/screenshot.png "Screenshot")
 
 ## Objective
 
