@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static io.openex.config.AppConfig.currentUser;
+
 @Entity
 @Table(name = "documents")
 @EntityListeners(ModelBaseListener.class)
@@ -95,7 +97,7 @@ public class Document implements Base {
     }
 
     public List<Exercise> getExercises() {
-        return exercises;
+        return exercises.stream().filter(exercise -> exercise.isUserHasAccess(currentUser())).toList();
     }
 
     public void setExercises(List<Exercise> exercises) {
