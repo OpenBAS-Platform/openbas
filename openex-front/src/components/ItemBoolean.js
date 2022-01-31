@@ -44,7 +44,7 @@ const inlineStyles = {
 class ItemBoolean extends Component {
   render() {
     const {
-      classes, label, status, variant, t, reverse, onClick, disabled,
+      classes, label, status, variant, t, reverse, onClick,
     } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     if (status === true) {
@@ -64,7 +64,6 @@ class ItemBoolean extends Component {
           style={inlineStyles.grey}
           label={t('N/A')}
           onClick={onClick ? onClick.bind(this) : null}
-          disabled={disabled}
         />
       );
     }

@@ -217,10 +217,6 @@ const Dryrun = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Start date')}</Typography>
                 {fldt(dryrun?.dryrun_date)}
-                <Typography variant="h1" style={{ marginTop: 20 }}>
-                  {t('Speed')}
-                </Typography>
-                <code>{dryrun?.dryrun_speed}x</code>
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h1" style={{ marginBottom: 0 }}>
