@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static io.openex.config.AppConfig.currentUser;
 
@@ -124,10 +125,12 @@ public class DocumentApi extends RestBehavior {
         document.setUpdateAttributes(input);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         // Get removed exercises
-        List<String> askIds = input.getExerciseIds();
+        Stream<String> askIdsStream = document.getExercises().stream()
+                .filter(exercise -> !exercise.isUserHasAccess(currentUser())).map(Exercise::getId);
+        List<String> askIds = Stream.concat(askIdsStream, input.getExerciseIds().stream()).distinct().toList();
         List<Exercise> removedExercises = document.getExercises().stream()
                 .filter(exercise -> !askIds.contains(exercise.getId())).toList();
-        document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+        document.setExercises(fromIterable(exerciseRepository.findAllById(askIds)));
         // In case of exercise removal, all inject doc attachment for exercise
         removedExercises.forEach(exercise -> injectService.cleanInjectsDocExercise(exercise.getId(), documentId));
         // Save and return
