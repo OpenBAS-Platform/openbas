@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,9 +99,9 @@ public class InjectApi extends RestBehavior {
         return InjectStatus.fromExecution(execution, inject);
     }
 
+    @Transactional
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    @Transactional
     public Inject updateInject(@PathVariable String exerciseId,
                                @PathVariable String injectId,
                                @Valid @RequestBody InjectInput input) {
@@ -115,10 +116,14 @@ public class InjectApi extends RestBehavior {
         List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
         List<String> currentDocumentIds = inject.getDocuments().stream()
                 .map(document -> document.getDocument().getId()).toList();
+        List<InjectDocument> injectDocuments = new ArrayList<>(inject.getDocuments());
         // To delete
         inject.getDocuments().stream()
                 .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
-                .forEach(injectDoc -> injectDocumentRepository.delete(injectDoc));
+                .forEach(injectDoc -> {
+                    injectDocuments.remove(injectDoc);
+                    injectDocumentRepository.delete(injectDoc);
+                });
         // To add
         documents.stream()
                 .filter(doc -> !currentDocumentIds.contains(doc.getDocumentId()))
@@ -130,7 +135,8 @@ public class InjectApi extends RestBehavior {
                         Document document = doc.get();
                         injectDocument.setDocument(document);
                         injectDocument.setAttached(in.isAttached());
-                        injectDocumentRepository.save(injectDocument);
+                        InjectDocument savedInjectDoc = injectDocumentRepository.save(injectDocument);
+                        injectDocuments.add(savedInjectDoc);
                         // If Document not yet linked directly to the exercise, attached it
                         if (!document.getExercises().contains(exercise)) {
                             exercise.getDocuments().add(document);
@@ -138,6 +144,7 @@ public class InjectApi extends RestBehavior {
                         }
                     }
                 });
+        inject.setDocuments(injectDocuments);
         return injectRepository.save(inject);
     }
 
