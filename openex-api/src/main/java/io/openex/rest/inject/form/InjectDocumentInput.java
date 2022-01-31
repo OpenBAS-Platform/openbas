@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class InjectDocumentInput {
 
-    @JsonProperty("inject_document_id")
+    @JsonProperty("document_id")
     private String documentId;
 
-    @JsonProperty("inject_document_attached")
+    @JsonProperty("document_attached")
     private boolean attached = true;
 
     public String getDocumentId() {

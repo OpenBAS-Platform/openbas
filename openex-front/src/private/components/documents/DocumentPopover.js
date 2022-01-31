@@ -9,7 +9,6 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -17,11 +16,7 @@ import { updateDocument, deleteDocument } from '../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
 import { storeBrowser } from '../../../actions/Schema';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import { Transition } from '../../../utils/Environment';
 
 class DocumentPopover extends Component {
   constructor(props) {
@@ -30,6 +25,7 @@ class DocumentPopover extends Component {
       openDelete: false,
       openEdit: false,
       openPopover: false,
+      openRemove: false,
     };
   }
 
@@ -75,8 +71,22 @@ class DocumentPopover extends Component {
     this.handleCloseDelete();
   }
 
+  handleOpenRemove() {
+    this.setState({ openRemove: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseRemove() {
+    this.setState({ openRemove: false });
+  }
+
+  submitRemove() {
+    this.props.onRemoveDocument(this.props.document.document_id);
+    this.handleCloseRemove();
+  }
+
   render() {
-    const { t, document } = this.props;
+    const { t, document, onRemoveDocument } = this.props;
     const documentTags = document.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
@@ -114,9 +124,16 @@ class DocumentPopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
-            {t('Delete')}
-          </MenuItem>
+          {onRemoveDocument && (
+            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
+              {t('Remove from the inject')}
+            </MenuItem>
+          )}
+          {!onRemoveDocument && (
+            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+              {t('Delete')}
+            </MenuItem>
+          )}
         </Menu>
         <Dialog
           open={this.state.openDelete}
@@ -162,6 +179,33 @@ class DocumentPopover extends Component {
             />
           </DialogContent>
         </Dialog>
+        <Dialog
+          open={this.state.openRemove}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseRemove.bind(this)}
+        >
+          <DialogContent>
+            <DialogContentText>
+              {t('Do you want to remove the document from the inject?')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseRemove.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitRemove.bind(this)}
+            >
+              {t('Remove')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -180,6 +224,7 @@ DocumentPopover.propTypes = {
   deleteDocument: PropTypes.func,
   userAdmin: PropTypes.bool,
   tags: PropTypes.object,
+  onRemoveDocument: PropTypes.func,
 };
 
 export default R.compose(

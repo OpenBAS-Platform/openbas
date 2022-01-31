@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { InfoOutlined } from '@mui/icons-material';
 import { TextField } from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
-import { Switch } from '../../../../components/Switch';
+import { SwitchField } from '../../../../components/SwitchField';
 
 class GroupForm extends Component {
   validate(values) {
@@ -52,7 +52,7 @@ class GroupForm extends Component {
             />
             <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
               <Grid item={true} xs={4} style={{ display: 'flex' }}>
-                <Switch
+                <SwitchField
                   name="group_default_user_assign"
                   label={t('Auto assign')}
                 />
@@ -69,7 +69,7 @@ class GroupForm extends Component {
                 </Tooltip>
               </Grid>
               <Grid item={true} xs={4} style={{ display: 'flex' }}>
-                <Switch
+                <SwitchField
                   name="group_default_exercise_observer"
                   label={t('Auto observer')}
                 />
@@ -86,7 +86,7 @@ class GroupForm extends Component {
                 </Tooltip>
               </Grid>
               <Grid item={true} xs={4} style={{ display: 'flex' }}>
-                <Switch
+                <SwitchField
                   name="group_default_exercise_planner"
                   label={t('Auto planner')}
                 />

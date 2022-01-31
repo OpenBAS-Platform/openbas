@@ -12,7 +12,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { DescriptionOutlined } from '@mui/icons-material';
+import { ControlPointOutlined, DescriptionOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
@@ -23,6 +23,7 @@ import { storeBrowser } from '../../../../actions/Schema';
 import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 const styles = (theme) => ({
   createButton: {
@@ -94,11 +95,11 @@ class InjectAddDocuments extends Component {
   }
 
   submitAddDocuments() {
-    this.props.onChange(
-      R.uniq([
-        ...this.props.injectDocumentsIds,
-        ...this.state.documentsIds,
-      ]).map((i) => this.props.browser.getDocument(i)),
+    this.props.handleAddDocuments(
+      this.state.documentsIds.map((n) => ({
+        document_id: n,
+        document_attached: false,
+      })),
     );
     this.handleClose();
   }
@@ -109,7 +110,7 @@ class InjectAddDocuments extends Component {
 
   render() {
     const {
-      classes, t, documents, injectDocumentsIds, exerciseId,
+      classes, t, documents, injectDocumentsIds, exerciseId, exercise,
     } = this.props;
     const { keyword, documentsIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -125,14 +126,23 @@ class InjectAddDocuments extends Component {
       R.take(5),
     )(documents);
     return (
-      <div style={{ marginTop: 20 }}>
-        <Button
-          variant="outlined"
-          color="primary"
+      <div>
+        <ListItem
+          classes={{ root: classes.item }}
+          button={true}
+          divider={true}
           onClick={this.handleOpen.bind(this)}
+          color="primary"
+          disabled={isExerciseReadOnly(exercise)}
         >
-          {t('Add attachments')}
-        </Button>
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Add documents')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItem>
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
@@ -147,7 +157,7 @@ class InjectAddDocuments extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add attachments in this inject')}</DialogTitle>
+          <DialogTitle>{t('Add documents in this inject')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
@@ -234,12 +244,15 @@ InjectAddDocuments.propTypes = {
   documents: PropTypes.array,
   injectDocumentsIds: PropTypes.array,
   browser: PropTypes.object,
-  onChange: PropTypes.func,
+  handleAddDocuments: PropTypes.func,
 };
 
-const select = (state) => {
+const select = (state, ownProps) => {
   const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
+  const exercise = browser.getExercise(exerciseId);
   return {
+    exercise,
     documents: browser.documents,
     browser,
   };

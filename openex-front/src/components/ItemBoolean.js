@@ -13,7 +13,7 @@ const styles = () => ({
     marginRight: 7,
     textTransform: 'uppercase',
     borderRadius: '0',
-    width: 90,
+    width: 130,
   },
   chipInList: {
     fontSize: 12,
@@ -35,16 +35,16 @@ const inlineStyles = {
     backgroundColor: 'rgba(244, 67, 54, 0.08)',
     color: '#f44336',
   },
-  blue: {
-    backgroundColor: 'rgba(92, 123, 245, 0.08)',
-    color: '#5c7bf5',
+  grey: {
+    backgroundColor: 'rgba(176, 176, 176, 0.08)',
+    color: '#b0b0b0',
   },
 };
 
 class ItemBoolean extends Component {
   render() {
     const {
-      classes, label, status, variant, t, reverse,
+      classes, label, status, variant, t, reverse, onClick, disabled,
     } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     if (status === true) {
@@ -53,6 +53,7 @@ class ItemBoolean extends Component {
           classes={{ root: style }}
           style={reverse ? inlineStyles.red : inlineStyles.green}
           label={label}
+          onClick={onClick ? onClick.bind(this) : null}
         />
       );
     }
@@ -60,8 +61,10 @@ class ItemBoolean extends Component {
       return (
         <Chip
           classes={{ root: style }}
-          style={inlineStyles.blue}
-          label={t('Not applicable')}
+          style={inlineStyles.grey}
+          label={t('N/A')}
+          onClick={onClick ? onClick.bind(this) : null}
+          disabled={disabled}
         />
       );
     }
@@ -70,6 +73,7 @@ class ItemBoolean extends Component {
         classes={{ root: style }}
         style={reverse ? inlineStyles.green : inlineStyles.red}
         label={label}
+        onClick={onClick ? onClick.bind(this) : null}
       />
     );
   }
@@ -81,6 +85,7 @@ ItemBoolean.propTypes = {
   label: PropTypes.string,
   variant: PropTypes.string,
   reverse: PropTypes.bool,
+  onClick: PropTypes.func,
 };
 
 export default R.compose(inject18n, withStyles(styles))(ItemBoolean);

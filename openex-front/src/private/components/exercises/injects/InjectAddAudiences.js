@@ -3,7 +3,6 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@mui/material/Button';
-import Slide from '@mui/material/Slide';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -20,7 +19,6 @@ import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { updateInjectAudiences } from '../../../../actions/Inject';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
@@ -28,6 +26,7 @@ import { fetchAudiences } from '../../../../actions/Audience';
 import CreateAudience from '../audiences/CreateAudience';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { Transition } from '../../../../utils/Environment';
 
 const styles = (theme) => ({
   createButton: {
@@ -54,11 +53,6 @@ const styles = (theme) => ({
     fontWeight: 500,
   },
 });
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 class InjectAddAudiences extends Component {
   constructor(props) {
@@ -99,16 +93,7 @@ class InjectAddAudiences extends Component {
   }
 
   submitAddAudiences() {
-    this.props.updateInjectAudiences(
-      this.props.exerciseId,
-      this.props.injectId,
-      {
-        inject_audiences: R.uniq([
-          ...this.props.injectAudiencesIds,
-          ...this.state.audiencesIds,
-        ]),
-      },
-    );
+    this.props.handleAddAudiences(this.state.audiencesIds);
     this.handleClose();
   }
 
@@ -256,12 +241,12 @@ InjectAddAudiences.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
-  injectId: PropTypes.string,
-  updateInjectAudiences: PropTypes.func,
   fetchAudiences: PropTypes.func,
+  handleAddAudiences: PropTypes.func,
   organizations: PropTypes.array,
   audiences: PropTypes.array,
   injectAudiencesIds: PropTypes.array,
+  attachment: PropTypes.bool,
 };
 
 const select = (state, ownProps) => {
@@ -276,7 +261,7 @@ const select = (state, ownProps) => {
 };
 
 export default R.compose(
-  connect(select, { updateInjectAudiences, fetchAudiences }),
+  connect(select, { fetchAudiences }),
   inject18n,
   withStyles(styles),
 )(InjectAddAudiences);
