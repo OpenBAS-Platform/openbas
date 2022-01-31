@@ -13,7 +13,7 @@ public class ContractDef {
         //private constructor
     }
 
-    public static ContractDef build() {
+    public static ContractDef contractBuilder() {
         return new ContractDef();
     }
 
@@ -42,7 +42,7 @@ public class ContractDef {
         return this;
     }
 
-    public List<ContractField> getFields() {
+    public List<ContractField> build() {
         return fields;
     }
 }

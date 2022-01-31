@@ -1,10 +1,10 @@
 package io.openex.injects.ovh_sms;
 
 import io.openex.database.model.User;
+import io.openex.execution.BasicExecutor;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
 import io.openex.execution.ExecutionContext;
-import io.openex.execution.Executor;
 import io.openex.injects.ovh_sms.model.OvhSmsInject;
 import io.openex.injects.ovh_sms.service.OvhSmsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import static io.openex.execution.ExecutionTrace.traceError;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 
 @Component
-public class OvhSmsExecutor implements Executor<OvhSmsInject> {
+public class OvhSmsExecutor extends BasicExecutor<OvhSmsInject> {
 
     private OvhSmsService smsService;
 

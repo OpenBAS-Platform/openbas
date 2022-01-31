@@ -10,6 +10,7 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Executor;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
+import io.openex.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -20,7 +21,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
@@ -40,7 +40,7 @@ public class InjectApi extends RestBehavior {
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ApplicationContext context;
-    private List<Contract> contracts;
+    private ContractService contractService;
 
     @Autowired
     public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
@@ -68,8 +68,8 @@ public class InjectApi extends RestBehavior {
     }
 
     @Autowired
-    public void setContracts(List<Contract> contracts) {
-        this.contracts = contracts;
+    public void setContractService(ContractService contractService) {
+        this.contractService = contractService;
     }
 
     @Autowired
@@ -83,8 +83,8 @@ public class InjectApi extends RestBehavior {
     }
 
     @GetMapping("/api/inject_types")
-    public List<InjectTypes> injectTypes() {
-        return contracts.stream().filter(Contract::expose).map(Contract::toRest).collect(Collectors.toList());
+    public List<Contract> injectTypes() {
+        return contractService.getContracts();
     }
 
     @GetMapping("/api/injects/try/{injectId}")
@@ -95,7 +95,7 @@ public class InjectApi extends RestBehavior {
         ExecutableInject<?> injection = new ExecutableInject<>(inject, userInjectContexts);
         Class<? extends Executor<?>> executorClass = inject.executor();
         Executor<?> executor = context.getBean(executorClass);
-        Execution execution = executor.execute(injection, false);
+        Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
 

@@ -1,16 +1,12 @@
 package io.openex.contract;
 
-import io.openex.database.model.InjectTypes;
+import java.util.List;
 
-public abstract class Contract {
+public interface Contract {
 
-    public abstract boolean expose();
+    boolean isExpose();
 
-    public abstract String id();
+    String getType();
 
-    public abstract ContractDef definition();
-
-    public InjectTypes toRest() {
-        return new InjectTypes(id(), definition().getFields());
-    }
+    List<ContractField> getFields();
 }

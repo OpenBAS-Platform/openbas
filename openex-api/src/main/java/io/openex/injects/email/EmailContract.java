@@ -3,15 +3,18 @@ package io.openex.injects.email;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import io.openex.contract.Contract;
-import io.openex.contract.ContractDef;
+import io.openex.contract.ContractField;
 import io.openex.injects.email.model.EmailForm;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 import static io.openex.contract.ContractCardinality.Multiple;
+import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractType.*;
 
 @Component
-public class EmailContract extends Contract {
+public class EmailContract implements Contract {
 
     public static final String NAME = "openex_email";
 
@@ -20,22 +23,23 @@ public class EmailContract extends Contract {
     }
 
     @Override
-    public boolean expose() {
+    public boolean isExpose() {
         return true;
     }
 
     @Override
-    public String id() {
+    public String getType() {
         return NAME;
     }
 
     @Override
-    public ContractDef definition() {
-        return ContractDef.build()
+    public List<ContractField> getFields() {
+        return contractBuilder()
                 .mandatory("audiences", Audience, Multiple)
                 .mandatory("subject")
                 .mandatory("body", Richtextarea)
                 .optional("encrypted", Checkbox)
-                .optional("attachments", Attachment, Multiple);
+                .optional("attachments", Attachment, Multiple)
+                .build();
     }
 }

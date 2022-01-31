@@ -78,7 +78,7 @@ public class InjectsExecutionJob implements Job {
                     Injection source = executableInject.getSource();
                     Class<? extends Executor<?>> executorClass = inject.executor();
                     Executor<? extends Inject> executor = context.getBean(executorClass);
-                    Execution execution = executor.execute(executableInject, true);
+                    Execution execution = executor.executeInRange(executableInject);
                     // Report inject execution
                     if (source instanceof Inject) {
                         Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();

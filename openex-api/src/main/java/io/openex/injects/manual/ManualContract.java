@@ -3,14 +3,17 @@ package io.openex.injects.manual;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import io.openex.contract.Contract;
-import io.openex.contract.ContractDef;
+import io.openex.contract.ContractField;
 import io.openex.injects.manual.model.ManualForm;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+import static io.openex.contract.ContractDef.contractBuilder;
 import static io.openex.contract.ContractType.Textarea;
 
 @Component
-public class ManualContract extends Contract {
+public class ManualContract implements Contract {
 
     public static final String NAME = "openex_manual";
 
@@ -19,17 +22,19 @@ public class ManualContract extends Contract {
     }
 
     @Override
-    public boolean expose() {
+    public boolean isExpose() {
         return true;
     }
 
     @Override
-    public String id() {
+    public String getType() {
         return NAME;
     }
 
     @Override
-    public ContractDef definition() {
-        return ContractDef.build().mandatory("content", Textarea);
+    public List<ContractField> getFields() {
+        return contractBuilder()
+                .mandatory("content", Textarea)
+                .build();
     }
 }

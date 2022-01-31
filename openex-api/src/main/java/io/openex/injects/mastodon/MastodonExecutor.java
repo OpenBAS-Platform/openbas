@@ -2,9 +2,9 @@ package io.openex.injects.mastodon;
 
 import io.openex.database.model.Document;
 import io.openex.database.model.InjectDocument;
+import io.openex.execution.BasicExecutor;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
-import io.openex.execution.Executor;
 import io.openex.injects.mastodon.model.MastodonAttachment;
 import io.openex.injects.mastodon.model.MastodonContent;
 import io.openex.injects.mastodon.model.MastodonInject;
@@ -18,7 +18,7 @@ import static io.openex.execution.ExecutionTrace.traceError;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 
 @Component
-public class MastodonExecutor implements Executor<MastodonInject> {
+public class MastodonExecutor extends BasicExecutor<MastodonInject> {
 
     private MastodonService mastodonService;
 
