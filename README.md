@@ -46,7 +46,7 @@ All you need to install the OpenEx platform can be found in the [official docume
 <p align="left">
   <a href="https://medium.com/@samuel.hassine" alt="Samuel Hassine"><img src="https://www.luatix.org/wp-content/uploads/2021/10/sam-circle-1.png" width="80" /></a>
   <a href="https://medium.com/@julien.richard" alt="Julien Richard"><img src="https://www.luatix.org/wp-content/uploads/2021/10/julien.png" width="80" /></a>
-  <a href="https://www.ssi.gouv.fr" alt="ANSSI"><img src="https://www.luatix.org/wp-content/uploads/2020/04/Anssi.png" width="80" /></a>
+  <a href="https://www.ssi.gouv.fr" alt="ANSSI"><img src="https://www.luatix.org/wp-content/uploads/2020/04/Anssi.png" width="82" /></a>
 </p>
 
 ### Sponsors
