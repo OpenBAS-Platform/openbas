@@ -3,7 +3,6 @@ import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Button from '@mui/material/Button';
-import Slide from '@mui/material/Slide';
 import Chip from '@mui/material/Chip';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -24,6 +23,7 @@ import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { Transition } from '../../../../utils/Environment';
 
 const styles = (theme) => ({
   createButton: {
@@ -50,11 +50,6 @@ const styles = (theme) => ({
     fontWeight: 500,
   },
 });
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 class InjectAddDocuments extends Component {
   constructor(props) {

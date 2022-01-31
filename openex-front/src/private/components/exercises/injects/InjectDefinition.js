@@ -207,8 +207,8 @@ class InjectDefinition extends Component {
     super(props);
     this.state = {
       allAudiences: props.inject.inject_all_audiences,
-      audiencesIds: props.inject.inject_audiences,
-      documents: props.inject.inject_documents,
+      audiencesIds: props.inject.inject_audiences.asMutable(),
+      documents: props.inject.inject_documents.asMutable(),
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -356,12 +356,14 @@ class InjectDefinition extends Component {
       injectTypes.filter((i) => i.type === inject.inject_type),
     );
     if (injectType && Array.isArray(injectType.fields)) {
-      injectType.fields.forEach((field) => {
-        const value = values[field.name];
-        if (field.mandatory && !value) {
-          errors[field.name] = t('This field is required.');
-        }
-      });
+      injectType.fields
+        .filter((f) => !['audiences', 'attachments'].includes(f.name))
+        .forEach((field) => {
+          const value = values[field.name];
+          if (field.mandatory && !value) {
+            errors[field.name] = t('This field is required.');
+          }
+        });
     }
     return errors;
   }
@@ -441,6 +443,7 @@ class InjectDefinition extends Component {
             keepDirtyOnReinitialize={true}
             initialValues={inject.inject_content}
             onSubmit={this.onSubmit.bind(this)}
+            validate={this.validate.bind(this)}
             mutators={{
               setValue: ([field, value], state, { changeValue }) => {
                 changeValue(state, field, () => value);
@@ -819,6 +822,12 @@ class InjectDefinition extends Component {
                             onRemoveDocument={this.handleRemoveDocument.bind(
                               this,
                             )}
+                            onToggleAttach={
+                              hasAttachments
+                                ? this.toggleAttachment.bind(this)
+                                : null
+                            }
+                            attached={document.document_attached}
                           />
                         </ListItemSecondaryAction>
                       </ListItem>
