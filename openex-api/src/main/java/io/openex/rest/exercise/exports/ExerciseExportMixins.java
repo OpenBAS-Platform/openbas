@@ -84,6 +84,7 @@ public class ExerciseExportMixins {
             "user_id",
             "user_firstname",
             "user_lastname",
+            "user_lang",
             "user_email",
             "user_phone",
             "user_pgp_key",

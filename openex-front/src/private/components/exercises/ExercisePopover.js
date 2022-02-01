@@ -77,9 +77,9 @@ class ExercisePopover extends Component {
     this.setState({ openDelete: false });
   }
 
-  handleExport() {
+  handleExport(withPlayer) {
     const link = document.createElement('a');
-    link.href = `/api/exercises/${this.props.exercise.exercise_id}/export?isWithPlayers=false`;
+    link.href = `/api/exercises/${this.props.exercise.exercise_id}/export?isWithPlayers=${withPlayer}`;
     link.click();
     this.handlePopoverClose();
   }
@@ -127,11 +127,12 @@ class ExercisePopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
-          {
-          <MenuItem onClick={this.handleExport.bind(this)}>
-            {t('Export')}
+          <MenuItem onClick={this.handleExport.bind(this, true)}>
+            {t('Export (with players)')}
           </MenuItem>
-          }
+          <MenuItem onClick={this.handleExport.bind(this, false)}>
+            {t('Export (no players)')}
+          </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>

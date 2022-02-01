@@ -34,7 +34,19 @@ public class V1_DataImporter implements Importer {
     private ObjectiveRepository objectiveRepository;
     private PollRepository pollRepository;
     private InjectRepository injectRepository;
+    private OrganizationRepository organizationRepository;
+    private UserRepository userRepository;
     private InjectDocumentRepository injectDocumentRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setOrganizationRepository(OrganizationRepository organizationRepository) {
+        this.organizationRepository = organizationRepository;
+    }
 
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
@@ -131,6 +143,17 @@ public class V1_DataImporter implements Importer {
         }
     }
 
+    private List<Tag> computeTagsCompletion(List<Tag> existingTags, List<String> lookingIds, Map<String, Base> baseIds) {
+        List<Tag> tags = new ArrayList<>(existingTags);
+        List<Tag> tagsForOrganization = lookingIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
+        tagsForOrganization.forEach(inputTag -> {
+            if (!tags.contains(inputTag)) {
+                tags.add(inputTag);
+            }
+        });
+        return tags;
+    }
+
     @Override
     public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences) {
         Map<String, Base> baseIds = new HashMap<>();
@@ -193,14 +216,7 @@ public class V1_DataImporter implements Importer {
                 });
                 document.setExercises(exercises);
                 // Compute tags
-                List<Tag> tags = new ArrayList<>(document.getTags());
-                List<Tag> inputTags = fromIterable(tagRepository.findAllById(documentTagIds));
-                inputTags.forEach(inputTag -> {
-                    if (!tags.contains(inputTag)) {
-                        tags.add(inputTag);
-                    }
-                });
-                document.setTags(tags);
+                document.setTags(computeTagsCompletion(document.getTags(), documentTagIds, baseIds));
                 Document savedDocument = documentRepository.save(document);
                 baseIds.put(id, savedDocument);
             } else {
@@ -221,6 +237,76 @@ public class V1_DataImporter implements Importer {
             }
         });
 
+        // ------------ Handling organizations
+        if (importNode.get("exercise_organizations") != null) {
+            Map<String, Organization> existingOrganizationsByName = fromIterable(organizationRepository.findAll()).stream().collect(
+                    Collectors.toMap(Organization::getName, Function.identity()));
+            Iterator<JsonNode> exerciseOrganizations = importNode.get("exercise_organizations").elements();
+            exerciseOrganizations.forEachRemaining(nodeOrganization -> {
+                String id = nodeOrganization.get("organization_id").textValue();
+                String name = nodeOrganization.get("organization_name").textValue();
+                String description = nodeOrganization.get("organization_description").textValue();
+                List<String> organizationTagIds = resolveJsonIds(nodeOrganization, "organization_tags");
+                if (existingOrganizationsByName.containsKey(name)) {
+                    Organization organization = existingOrganizationsByName.get(name);
+                    organization.setTags(computeTagsCompletion(organization.getTags(), organizationTagIds, baseIds));
+                    Organization savedOrganization = organizationRepository.save(organization);
+                    baseIds.put(id, savedOrganization);
+                } else {
+                    Organization organization = new Organization();
+                    organization.setName(name);
+                    organization.setDescription(description);
+                    organization.setTags(computeTagsCompletion(List.of(), organizationTagIds, baseIds));
+                    Organization savedOrganization = organizationRepository.save(organization);
+                    baseIds.put(id, savedOrganization);
+                }
+            });
+        }
+
+        // ------------ Handling users
+        if (importNode.get("exercise_users") != null) {
+            Map<String, User> existingUsersByEmail = fromIterable(userRepository.findAll()).stream().collect(
+                    Collectors.toMap(User::getEmail, Function.identity()));
+            Iterator<JsonNode> exerciseUsers = importNode.get("exercise_users").elements();
+            exerciseUsers.forEachRemaining(nodeUser -> {
+                String id = nodeUser.get("user_id").textValue();
+                String email = nodeUser.get("user_email").textValue();
+                String firstname = nodeUser.get("user_firstname").textValue();
+                String lastname = nodeUser.get("user_lastname").textValue();
+                String lang = nodeUser.get("user_lang").textValue();
+                String phone = nodeUser.get("user_phone").textValue();
+                String pgpKey = nodeUser.get("user_pgp_key").textValue();
+                String organizationId = nodeUser.get("user_organization").textValue();
+                String country = nodeUser.get("user_country").textValue();
+                String city = nodeUser.get("user_city").textValue();
+                List<String> userTagIds = resolveJsonIds(nodeUser, "user_tags");
+                if (existingUsersByEmail.containsKey(email)) {
+                    User user = existingUsersByEmail.get(email);
+                    user.setTags(computeTagsCompletion(user.getTags(), userTagIds, baseIds));
+                    User savedUser = userRepository.save(user);
+                    baseIds.put(id, savedUser);
+                } else {
+                    User user = new User();
+                    user.setEmail(email);
+                    user.setFirstname(firstname);
+                    user.setLastname(lastname);
+                    user.setLang(lang);
+                    user.setPhone(phone);
+                    user.setPgpKey(pgpKey);
+                    user.setPhone(phone);
+                    Base userOrganization = baseIds.get(organizationId);
+                    if (userOrganization != null) {
+                        user.setOrganization((Organization) userOrganization);
+                    }
+                    user.setCountry(country);
+                    user.setCity(city);
+                    user.setTags(computeTagsCompletion(List.of(), userTagIds, baseIds));
+                    User savedUser = userRepository.save(user);
+                    baseIds.put(id, savedUser);
+                }
+            });
+        }
+
         // ------------ Handling audiences
         Iterator<JsonNode> exerciseAudiences = importNode.get("exercise_audiences").elements();
         exerciseAudiences.forEachRemaining(nodeAudience -> {
@@ -228,9 +314,15 @@ public class V1_DataImporter implements Importer {
             Audience audience = new Audience();
             audience.setName(nodeAudience.get("audience_name").textValue());
             audience.setDescription(nodeAudience.get("audience_description").textValue());
+            // Tags
             List<String> audienceTagIds = resolveJsonIds(nodeAudience, "audience_tags");
             List<Tag> tagsForAudience = audienceTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
             audience.setTags(tagsForAudience);
+            // Users
+            List<String> audienceUserIds = resolveJsonIds(nodeAudience, "audience_users");
+            List<User> usersForAudience = audienceUserIds.stream().map(baseIds::get).map(base -> (User) base).toList();
+            audience.setUsers(usersForAudience);
+            // Finalize
             audience.setExercise(savedExercise);
             Audience savedAudience = audienceRepository.save(audience);
             baseIds.put(id, savedAudience);
