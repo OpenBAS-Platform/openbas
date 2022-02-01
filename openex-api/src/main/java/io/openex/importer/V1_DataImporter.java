@@ -3,9 +3,12 @@ package io.openex.importer;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
+import io.openex.service.DocumentService;
+import io.openex.service.ImportEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -23,12 +26,30 @@ public class V1_DataImporter implements Importer {
         }
     }
 
+    private DocumentService documentService;
+    private DocumentRepository documentRepository;
     private TagRepository tagRepository;
     private ExerciseRepository exerciseRepository;
     private AudienceRepository audienceRepository;
     private ObjectiveRepository objectiveRepository;
     private PollRepository pollRepository;
     private InjectRepository injectRepository;
+    private InjectDocumentRepository injectDocumentRepository;
+
+    @Autowired
+    public void setDocumentRepository(DocumentRepository documentRepository) {
+        this.documentRepository = documentRepository;
+    }
+
+    @Autowired
+    public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
+        this.injectDocumentRepository = injectDocumentRepository;
+    }
+
+    @Autowired
+    public void setDocumentService(DocumentService documentService) {
+        this.documentService = documentService;
+    }
 
     @Autowired
     public void setPollRepository(PollRepository pollRepository) {
@@ -79,15 +100,25 @@ public class V1_DataImporter implements Importer {
             injectRepository.importSave(injectId, title, description, country, city, type, allAudiences,
                     true, exercise.getId(), dependsOn, dependsDuration, content);
             baseIds.put(id, new BaseHolder(injectId));
+            // Tags
             List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
             injectTagIds.forEach(tagId -> {
                 String remappedId = baseIds.get(tagId).getId();
                 injectRepository.addTag(injectId, remappedId);
             });
+            // Audiences
             List<String> injectAudienceIds = resolveJsonIds(injectNode, "inject_audiences");
             injectAudienceIds.forEach(audienceId -> {
                 String remappedId = baseIds.get(audienceId).getId();
                 injectRepository.addAudience(injectId, remappedId);
+            });
+            // Documents
+            List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
+            injectDocuments.forEach(jsonNode -> {
+                String docId = jsonNode.get("document_id").textValue();
+                String documentId = baseIds.get(docId).getId();
+                boolean docAttached = jsonNode.get("document_attached").booleanValue();
+                injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
             });
         });
         // Looking for child of created injects
@@ -101,7 +132,7 @@ public class V1_DataImporter implements Importer {
     }
 
     @Override
-    public void importData(JsonNode importNode) {
+    public void importData(JsonNode importNode, Map<String, ImportEntry> docReferences) {
         Map<String, Base> baseIds = new HashMap<>();
         // ------------ Handling tags
         Stream<JsonNode> tagsStream = resolveJsonElements(importNode, "exercise_tags");
@@ -137,6 +168,58 @@ public class V1_DataImporter implements Importer {
         List<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
         exercise.setTags(tagsForExercise);
         Exercise savedExercise = exerciseRepository.save(exercise);
+
+        // ------------ Handling documents
+        Iterator<JsonNode> exerciseDocuments = importNode.get("exercise_documents").elements();
+        exerciseDocuments.forEachRemaining(nodeDoc -> {
+            String id = nodeDoc.get("document_id").textValue();
+            String name = nodeDoc.get("document_name").textValue();
+            String description = nodeDoc.get("document_description").textValue();
+            String target = nodeDoc.get("document_target").textValue();
+            List<String> documentTagIds = resolveJsonIds(nodeDoc, "document_tags");
+            ImportEntry entry = docReferences.get(target);
+            List<String> exerciseIds = List.of(savedExercise.getId());
+            String contentType = new MimetypesFileTypeMap().getContentType(entry.getEntry().getName());
+            Optional<Document> targetDocument = documentRepository.findByTarget(target);
+            if (targetDocument.isPresent()) {
+                Document document = targetDocument.get();
+                // Compute exercises
+                List<Exercise> exercises = new ArrayList<>(document.getExercises());
+                List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(exerciseIds));
+                inputExercises.forEach(inputExercise -> {
+                    if (!exercises.contains(inputExercise)) {
+                        exercises.add(inputExercise);
+                    }
+                });
+                document.setExercises(exercises);
+                // Compute tags
+                List<Tag> tags = new ArrayList<>(document.getTags());
+                List<Tag> inputTags = fromIterable(tagRepository.findAllById(documentTagIds));
+                inputTags.forEach(inputTag -> {
+                    if (!tags.contains(inputTag)) {
+                        tags.add(inputTag);
+                    }
+                });
+                document.setTags(tags);
+                Document savedDocument = documentRepository.save(document);
+                baseIds.put(id, savedDocument);
+            } else {
+                try {
+                    documentService.uploadFile(target, entry.getData(), entry.getEntry().getSize(), contentType);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                Document document = new Document();
+                document.setTarget(target);
+                document.setName(name);
+                document.setDescription(description);
+                document.setExercises(fromIterable(exerciseRepository.findAllById(exerciseIds)));
+                document.setTags(fromIterable(tagRepository.findAllById(documentTagIds)));
+                document.setType(contentType);
+                Document savedDocument = documentRepository.save(document);
+                baseIds.put(id, savedDocument);
+            }
+        });
 
         // ------------ Handling audiences
         Iterator<JsonNode> exerciseAudiences = importNode.get("exercise_audiences").elements();

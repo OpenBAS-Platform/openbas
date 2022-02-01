@@ -12,7 +12,7 @@ import io.openex.rest.document.form.DocumentCreateInput;
 import io.openex.rest.document.form.DocumentTagUpdateInput;
 import io.openex.rest.document.form.DocumentUpdateInput;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.FileService;
+import io.openex.service.DocumentService;
 import io.openex.service.InjectService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -37,7 +37,7 @@ import static io.openex.config.AppConfig.currentUser;
 @RestController
 public class DocumentApi extends RestBehavior {
 
-    private FileService fileService;
+    private DocumentService fileService;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
@@ -70,7 +70,7 @@ public class DocumentApi extends RestBehavior {
     }
 
     @Autowired
-    public void setFileService(FileService fileService) {
+    public void setFileService(DocumentService fileService) {
         this.fileService = fileService;
     }
 
@@ -83,7 +83,6 @@ public class DocumentApi extends RestBehavior {
         }
     }
 
-    @Transactional
     @PostMapping("/api/documents")
     public Document uploadDocument(@Valid @RequestPart("input") DocumentCreateInput input,
                                    @RequestPart("file") MultipartFile file) throws Exception {

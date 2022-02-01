@@ -13,7 +13,7 @@ import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.service.DryrunService;
-import io.openex.service.FileService;
+import io.openex.service.DocumentService;
 import io.openex.service.ImportService;
 import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +70,7 @@ public class ExerciseApi extends RestBehavior {
 
     // region services
     private DryrunService dryrunService;
-    private FileService fileService;
+    private DocumentService fileService;
     private InjectService injectService;
     // endregion
 
@@ -121,7 +121,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Autowired
-    public void setFileService(FileService fileService) {
+    public void setFileService(DocumentService fileService) {
         this.fileService = fileService;
     }
 
@@ -434,6 +434,8 @@ public class ExerciseApi extends RestBehavior {
         response.setStatus(HttpServletResponse.SC_OK);
         // Build the export
         importExport.setExercise(exercise);
+        importExport.setDocuments(exercise.getDocuments());
+        objectMapper.addMixIn(Document.class, ExerciseExportMixins.Document.class);
         List<Tag> exerciseTags = new ArrayList<>(exercise.getTags());
         // Objectives
         List<Objective> objectives = exercise.getObjectives();
@@ -470,13 +472,12 @@ public class ExerciseApi extends RestBehavior {
         exerciseTags.addAll(injects.stream().flatMap(inject -> inject.getTags().stream()).toList());
         importExport.setInjects(injects);
         objectMapper.addMixIn(Inject.class, ExerciseExportMixins.Inject.class);
-        // Tags
-        importExport.setTags(exerciseTags);
-        objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
         // Documents
-        List<String> documentIds = injects.stream()
-                .flatMap(inject -> inject.getDocuments().stream())
-                .map(document -> document.getDocument().getId()).toList();
+        List<String> documentIds = exercise.getDocuments().stream().map(Document::getId).toList();
+        exerciseTags.addAll(exercise.getDocuments().stream().flatMap(doc -> doc.getTags().stream()).toList());
+        // Tags
+        importExport.setTags(exerciseTags.stream().distinct().toList());
+        objectMapper.addMixIn(Tag.class, ExerciseExportMixins.Tag.class);
         // Build the zip
         ZipOutputStream zipExport = new ZipOutputStream(response.getOutputStream());
         ZipEntry zipEntry = new ZipEntry(exercise.getName() + ".json");
@@ -489,7 +490,7 @@ public class ExerciseApi extends RestBehavior {
             Optional<InputStream> docStream = fileService.getFile(doc);
             if (docStream.isPresent()) {
                 try {
-                    ZipEntry zipDoc = new ZipEntry(doc.getName());
+                    ZipEntry zipDoc = new ZipEntry(doc.getTarget());
                     zipDoc.setComment(EXPORT_ENTRY_ATTACHMENT);
                     byte[] data = docStream.get().readAllBytes();
                     zipExport.putNextEntry(zipDoc);

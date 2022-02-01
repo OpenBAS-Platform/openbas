@@ -127,11 +127,10 @@ class ExercisePopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
-          {/*
+          {
           <MenuItem onClick={this.handleExport.bind(this)}>
             {t('Export')}
           </MenuItem>
-          */
           }
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
