@@ -17,6 +17,9 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Jp
     @NotNull
     Optional<Document> findById(@NotNull String id);
 
+    @NotNull
+    Optional<Document> findByTarget(@NotNull String target);
+
     @Query("select d from Document d " +
             "join d.exercises as exercise " +
             "join exercise.grants as grant " +

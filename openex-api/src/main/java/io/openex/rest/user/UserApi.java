@@ -1,7 +1,6 @@
 package io.openex.rest.user;
 
 import io.openex.config.SessionManager;
-import io.openex.database.model.Token;
 import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
@@ -13,7 +12,6 @@ import io.openex.rest.user.form.user.UpdatePasswordInput;
 import io.openex.rest.user.form.user.UpdateUserInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
@@ -64,12 +62,8 @@ public class UserApi extends RestBehavior {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (userService.isUserPasswordValid(user, input.getPassword())) {
-                Optional<Token> token = user.getTokens().stream().findFirst();
-                if (token.isPresent()) {
-                    return ResponseEntity.ok()
-                            .header(HttpHeaders.SET_COOKIE, userService.buildLoginCookie(token.get().getValue()))
-                            .body(user);
-                }
+                userService.createUserSession(user);
+                return ResponseEntity.ok().body(user);
             }
         }
         throw new AccessDeniedException("Invalid credentials");

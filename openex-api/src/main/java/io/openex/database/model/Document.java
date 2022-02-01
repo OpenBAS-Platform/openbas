@@ -30,6 +30,10 @@ public class Document implements Base {
     @JsonProperty("document_name")
     private String name;
 
+    @Column(name = "document_target")
+    @JsonProperty("document_target")
+    private String target;
+
     @Column(name = "document_description")
     @JsonProperty("document_description")
     private String description;
@@ -56,6 +60,11 @@ public class Document implements Base {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<Exercise> exercises = new ArrayList<>();
 
+    @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
+    @JsonProperty("inject_documents")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<InjectDocument> documents = new ArrayList<>();
+
     public String getId() {
         return id;
     }
@@ -70,6 +79,14 @@ public class Document implements Base {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 
     public String getDescription() {
@@ -102,6 +119,14 @@ public class Document implements Base {
 
     public void setExercises(List<Exercise> exercises) {
         this.exercises = exercises;
+    }
+
+    public List<InjectDocument> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<InjectDocument> documents) {
+        this.documents = documents;
     }
 
     @Override

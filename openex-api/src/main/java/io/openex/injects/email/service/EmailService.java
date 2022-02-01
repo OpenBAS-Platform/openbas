@@ -44,7 +44,6 @@ public class EmailService {
         this.fileService = fileService;
     }
 
-
     @Autowired
     public void setEmailSender(JavaMailSender emailSender) {
         this.emailSender = emailSender;
@@ -62,7 +61,7 @@ public class EmailService {
             Optional<Document> askedDocument = documentRepository.findById(documentId);
             try {
                 Document doc = askedDocument.orElseThrow();
-                InputStream fileInputStream = fileService.getFile(doc.getName()).orElseThrow();
+                InputStream fileInputStream = fileService.getFile(doc).orElseThrow();
                 byte[] content = IOUtils.toByteArray(fileInputStream);
                 resolved.add(new EmailAttachment(doc.getName(), content, doc.getType()));
             } catch (Exception e) {

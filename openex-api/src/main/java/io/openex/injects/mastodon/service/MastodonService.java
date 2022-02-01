@@ -62,7 +62,7 @@ public class MastodonService {
             Optional<Document> askedDocument = documentRepository.findById(documentId);
             try {
                 Document doc = askedDocument.orElseThrow();
-                InputStream fileInputStream = fileService.getFile(doc.getName()).orElseThrow();
+                InputStream fileInputStream = fileService.getFile(doc).orElseThrow();
                 byte[] content = IOUtils.toByteArray(fileInputStream);
                 resolved.add(new MastodonAttachment(doc.getName(), content, doc.getType()));
             } catch (Exception e) {

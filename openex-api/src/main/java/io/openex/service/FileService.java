@@ -1,10 +1,8 @@
 package io.openex.service;
 
-import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.openex.config.MinioConfig;
+import io.openex.database.model.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
@@ -39,16 +37,24 @@ public class FileService {
                         .build());
     }
 
-    public void uploadFile(MultipartFile file) throws Exception {
-        uploadFile(file.getOriginalFilename(), file.getInputStream(), file.getSize(), file.getContentType());
+    public void deleteFile(String name) throws Exception {
+        minioClient.removeObject(RemoveObjectArgs
+                .builder()
+                .bucket(minioConfig.getBucket())
+                .object(name)
+                .build());
     }
 
-    public Optional<InputStream> getFile(String fileName) {
+    public void uploadFile(String name, MultipartFile file) throws Exception {
+        uploadFile(name, file.getInputStream(), file.getSize(), file.getContentType());
+    }
+
+    public Optional<InputStream> getFile(Document document) {
         try {
             GetObjectResponse objectStream = minioClient.getObject(
                     GetObjectArgs.builder()
                             .bucket(minioConfig.getBucket())
-                            .object(fileName)
+                            .object(document.getTarget())
                             .build());
             InputStreamResource streamResource = new InputStreamResource(objectStream);
             return Optional.of(streamResource.getInputStream());

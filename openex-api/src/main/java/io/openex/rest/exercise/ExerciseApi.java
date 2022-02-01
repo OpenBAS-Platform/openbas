@@ -486,7 +486,7 @@ public class ExerciseApi extends RestBehavior {
         zipExport.closeEntry();
         documentIds.forEach(docId -> {
             Document doc = documentRepository.findById(docId).orElseThrow();
-            Optional<InputStream> docStream = fileService.getFile(doc.getName());
+            Optional<InputStream> docStream = fileService.getFile(doc);
             if (docStream.isPresent()) {
                 try {
                     ZipEntry zipDoc = new ZipEntry(doc.getName());

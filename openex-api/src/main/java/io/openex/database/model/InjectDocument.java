@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "injects_documents")
@@ -19,7 +18,8 @@ public class InjectDocument implements Base {
     @ManyToOne
     @MapsId("injectId")
     @JoinColumn(name = "inject_id")
-    @JsonIgnore
+    @JsonProperty("inject_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
     private Inject inject;
 
     @ManyToOne

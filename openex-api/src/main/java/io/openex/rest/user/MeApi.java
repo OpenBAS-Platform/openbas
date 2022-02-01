@@ -12,7 +12,6 @@ import io.openex.rest.user.form.user.UpdatePasswordInput;
 import io.openex.rest.user.form.user.UpdateUserInfoInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -63,7 +62,7 @@ public class MeApi extends RestBehavior {
     @RolesAllowed(ROLE_USER)
     @GetMapping("/api/logout")
     public ResponseEntity<Object> logout() {
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, userService.buildLogoutCookie()).build();
+        return ResponseEntity.ok().build();
     }
 
     @RolesAllowed(ROLE_USER)
