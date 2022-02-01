@@ -7,7 +7,7 @@ import io.openex.execution.Execution;
 import io.openex.execution.ExecutionTrace;
 import io.openex.injects.mastodon.config.MastodonConfig;
 import io.openex.injects.mastodon.model.MastodonAttachment;
-import io.openex.service.FileService;
+import io.openex.service.DocumentService;
 import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -32,7 +32,7 @@ import java.util.Optional;
 public class MastodonService {
 
     private DocumentRepository documentRepository;
-    private FileService fileService;
+    private DocumentService fileService;
 
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
@@ -40,7 +40,7 @@ public class MastodonService {
     }
 
     @Autowired
-    public void setFileService(FileService fileService) {
+    public void setFileService(DocumentService fileService) {
         this.fileService = fileService;
     }
 

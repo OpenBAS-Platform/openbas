@@ -35,6 +35,9 @@ public class ExerciseFileExport {
     @JsonProperty("exercise_tags")
     private List<Tag> tags = new ArrayList<>();
 
+    @JsonProperty("exercise_documents")
+    private List<Document> documents = new ArrayList<>();
+
     public int getVersion() {
         return version;
     }
@@ -105,5 +108,13 @@ public class ExerciseFileExport {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 }

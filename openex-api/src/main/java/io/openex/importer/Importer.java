@@ -1,9 +1,11 @@
 package io.openex.importer;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.openex.service.ImportEntry;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Spliterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -12,7 +14,7 @@ import static java.util.Spliterators.spliteratorUnknownSize;
 
 public interface Importer {
 
-    void importData(JsonNode importNode);
+    void importData(JsonNode importNode, Map<String, ImportEntry> docReferences);
 
     default Stream<JsonNode> resolveJsonElements(JsonNode node, String key) {
         Iterator<JsonNode> elements = node.get(key).elements();

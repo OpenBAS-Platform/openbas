@@ -6,7 +6,7 @@ import io.openex.execution.Execution;
 import io.openex.execution.ExecutionContext;
 import io.openex.execution.ExecutionTrace;
 import io.openex.injects.email.model.EmailAttachment;
-import io.openex.service.FileService;
+import io.openex.service.DocumentService;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class EmailService {
     private DocumentRepository documentRepository;
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
-    private FileService fileService;
+    private DocumentService fileService;
 
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
@@ -40,7 +40,7 @@ public class EmailService {
     }
 
     @Autowired
-    public void setFileService(FileService fileService) {
+    public void setFileService(DocumentService fileService) {
         this.fileService = fileService;
     }
 

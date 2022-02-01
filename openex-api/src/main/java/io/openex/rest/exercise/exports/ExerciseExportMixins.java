@@ -19,8 +19,19 @@ public class ExerciseExportMixins {
             "exercise_message_footer",
             "exercise_mail_from",
             "exercise_tags",
+            "exercise_documents",
     })
     public static class Exercise {
+    }
+
+    @JsonIncludeProperties(value = {
+            "document_id",
+            "document_name",
+            "document_target",
+            "document_description",
+            "document_tags",
+    })
+    public static class Document {
     }
 
     @JsonIncludeProperties(value = {
@@ -62,6 +73,7 @@ public class ExerciseExportMixins {
             "inject_depends_on",
             "inject_depends_duration",
             "inject_tags",
+            "inject_documents",
             "inject_audiences",
             "inject_content",
     })
