@@ -428,7 +428,8 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
         // Build the response
-        String zipName = exercise.getName() + "_" + now().toString() + ".zip";
+        String zipName = (exercise.getName() + "_" + now().toString()) + "_"
+                + (isWithPlayers ? "(with_players)" : "(no_players)") + ".zip";
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
         response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
         response.setStatus(HttpServletResponse.SC_OK);

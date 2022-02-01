@@ -17,7 +17,11 @@ public interface Importer {
     void importData(JsonNode importNode, Map<String, ImportEntry> docReferences);
 
     default Stream<JsonNode> resolveJsonElements(JsonNode node, String key) {
-        Iterator<JsonNode> elements = node.get(key).elements();
+        JsonNode dataNode = node.get(key);
+        if (dataNode == null) {
+            return Stream.empty();
+        }
+        Iterator<JsonNode> elements = dataNode.elements();
         Spliterator<JsonNode> elementsSplit = spliteratorUnknownSize(elements, Spliterator.ORDERED);
         return StreamSupport.stream(elementsSplit, false);
     }
