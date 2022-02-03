@@ -54,7 +54,7 @@ public class DryrunService {
         return dryRunRepository.save(run);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     public Dryrun provisionDryrun(Exercise exercise, List<User> users) {
         Specification<Inject> injectFilters = InjectSpecification.forDryrun(exercise.getId());
         List<Inject> injects = injectRepository.findAll(injectFilters);

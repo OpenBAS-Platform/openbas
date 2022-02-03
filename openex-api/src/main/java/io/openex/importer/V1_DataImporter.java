@@ -223,7 +223,7 @@ public class V1_DataImporter implements Importer {
                 try {
                     documentService.uploadFile(target, entry.getData(), entry.getEntry().getSize(), contentType);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    throw new ImportException(e);
                 }
                 Document document = new Document();
                 document.setTarget(target);

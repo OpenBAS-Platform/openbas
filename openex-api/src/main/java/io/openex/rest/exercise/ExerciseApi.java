@@ -12,8 +12,8 @@ import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.DryrunService;
 import io.openex.service.DocumentService;
+import io.openex.service.DryrunService;
 import io.openex.service.ImportService;
 import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -253,7 +253,7 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region exercises
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/exercises")
     public Exercise createExercise(@Valid @RequestBody ExerciseCreateInput input) {
         Exercise exercise = new Exercise();
@@ -330,7 +330,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @DeleteMapping("/api/exercises/{exerciseId}/{documentId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise deleteDocument(@PathVariable String exerciseId, @PathVariable String documentId) {
@@ -353,7 +353,7 @@ public class ExerciseApi extends RestBehavior {
         return exerciseRepository.save(exercise);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/exercises/{exerciseId}/status")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise changeExerciseStatus(@PathVariable String exerciseId,

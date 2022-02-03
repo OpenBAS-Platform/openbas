@@ -99,7 +99,7 @@ public class InjectApi extends RestBehavior {
         return InjectStatus.fromExecution(execution, inject);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInject(@PathVariable String exerciseId,
@@ -202,7 +202,7 @@ public class InjectApi extends RestBehavior {
         return injectRepository.save(inject);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/injects/{injectId}/status")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
     public Inject setInjectStatus(@PathVariable String injectId,

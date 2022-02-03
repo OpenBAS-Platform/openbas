@@ -108,7 +108,7 @@ public class GroupApi extends RestBehavior {
         return groupRepository.save(group);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @RolesAllowed(ROLE_ADMIN)
     @PostMapping("/api/groups/{groupId}/grants")
     public Grant groupGrant(@PathVariable String groupId, @Valid @RequestBody GroupGrantInput input) {

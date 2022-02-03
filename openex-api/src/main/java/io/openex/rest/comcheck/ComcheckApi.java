@@ -45,7 +45,7 @@ public class ComcheckApi extends RestBehavior {
         this.exerciseRepository = exerciseRepository;
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @GetMapping("/api/comcheck/{comcheckStatusId}")
     public ComcheckStatus checkValidation(@PathVariable String comcheckStatusId) {
         ComcheckStatus comcheckStatus = comcheckStatusRepository.findById(comcheckStatusId).orElseThrow();
@@ -70,7 +70,7 @@ public class ComcheckApi extends RestBehavior {
         comcheckRepository.deleteById(comcheckId);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/exercises/{exerciseId}/comchecks")
     public Comcheck communicationCheck(@PathVariable String exerciseId,
                                        @Valid @RequestBody ComcheckInput comCheck) {

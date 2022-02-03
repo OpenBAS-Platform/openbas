@@ -90,7 +90,7 @@ public class ObjectiveApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
     @PostAuthorize("isExercisePlanner(#exerciseId)")
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     public Evaluation createEvaluation(@PathVariable String exerciseId,
                                        @PathVariable String objectiveId,
                                        @Valid @RequestBody EvaluationInput input) {

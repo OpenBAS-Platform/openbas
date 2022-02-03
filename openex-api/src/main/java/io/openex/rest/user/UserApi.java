@@ -84,7 +84,7 @@ public class UserApi extends RestBehavior {
         return userRepository.save(user);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @RolesAllowed(ROLE_ADMIN)
     @PostMapping("/api/users")
     public User createUser(@Valid @RequestBody CreateUserInput input) {
