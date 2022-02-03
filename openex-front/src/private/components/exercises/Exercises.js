@@ -1,34 +1,25 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import React from 'react';
+import { makeStyles } from '@mui/styles';
+import { useDispatch } from 'react-redux';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { interval } from 'rxjs';
-import {
-  ArrowDropDownOutlined,
-  ArrowDropUpOutlined,
-  Kayaking,
-  ChevronRightOutlined,
-} from '@mui/icons-material';
+import { ChevronRightOutlined, Kayaking } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import inject18n from '../../../components/i18n';
+import { useFormatter } from '../../../components/i18n';
 import { fetchExercises } from '../../../actions/Exercise';
-import { FIVE_SECONDS } from '../../../utils/Time';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import CreateExercise from './CreateExercise';
-import { storeBrowser } from '../../../actions/Schema';
 import ExerciseStatus from './ExerciseStatus';
+import { useStore } from '../../../store';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import useSearchAnFilter from '../../../utils/SortingFiltering';
 
-const interval$ = interval(FIVE_SECONDS);
-
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   parameters: {
     float: 'left',
     marginTop: -10,
@@ -66,9 +57,9 @@ const styles = (theme) => ({
   icon: {
     color: theme.palette.primary.main,
   },
-});
+}));
 
-const inlineStylesHeaders = {
+const headerStyles = {
   iconSort: {
     position: 'absolute',
     margin: '0 0 0 5px',
@@ -150,117 +141,32 @@ const inlineStyles = {
   },
 };
 
-class Exercises extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      sortBy: 'exercise_name',
-      orderAsc: true,
-      keyword: '',
-      tags: [],
-    };
-  }
-
-  componentDidMount() {
-    this.props.fetchExercises();
-    this.subscription = interval$.subscribe(() => {
-      this.props.fetchExercises();
-    });
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe();
-  }
-
-  handleSearch(value) {
-    this.setState({ keyword: value });
-  }
-
-  handleAddTag(value) {
-    if (value) {
-      this.setState({ tags: R.uniq(R.append(value, this.state.tags)) });
-    }
-  }
-
-  handleRemoveTag(value) {
-    this.setState({ tags: R.filter((n) => n.id !== value, this.state.tags) });
-  }
-
-  reverseBy(field) {
-    this.setState({ sortBy: field, orderAsc: !this.state.orderAsc });
-  }
-
-  sortHeader(field, label, isSortable) {
-    const { t } = this.props;
-    const { orderAsc, sortBy } = this.state;
-    const sortComponent = orderAsc ? (
-      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
-    ) : (
-      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
-    );
-    if (isSortable) {
-      return (
-        <div
-          style={inlineStylesHeaders[field]}
-          onClick={this.reverseBy.bind(this, field)}
-        >
-          <span>{t(label)}</span>
-          {sortBy === field ? sortComponent : ''}
-        </div>
-      );
-    }
-    return (
-      <div style={inlineStylesHeaders[field]}>
-        <span>{t(label)}</span>
-      </div>
-    );
-  }
-
-  render() {
-    const {
-      nsdt, t, classes, exercises, userAdmin,
-    } = this.props;
-    const {
-      keyword, sortBy, orderAsc, tags,
-    } = this.state;
-    const filterByKeyword = (n) => keyword === ''
-      || (n.exercise_name || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.exercise_subtitle || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.exercise_description || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1;
-    const sort = R.sortWith(
-      orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
-    );
-    const sortedExercises = R.pipe(
-      R.filter(
-        (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n.exercise_tags || []),
-            R.pluck('id', tags),
-          ),
-      ),
-      R.filter(filterByKeyword),
-      sort,
-    )(exercises);
-    return (
+const Exercises = () => {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { t, nsdt } = useFormatter();
+  const exercises = useStore((store) => store.exercises);
+  const userAdmin = useStore((store) => store.me?.admin ?? false);
+  const searchColumns = ['name', 'subtitle'];
+  const filtering = useSearchAnFilter('exercise', 'name', searchColumns);
+  useDataLoader(() => {
+    dispatch(fetchExercises());
+  });
+  return (
       <div className={classes.container}>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
               small={true}
-              onChange={this.handleSearch.bind(this)}
-              keyword={keyword}
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
             />
           </div>
           <div style={{ float: 'left', marginRight: 20 }}>
             <TagsFilter
-              onAddTag={this.handleAddTag.bind(this)}
-              onRemoveTag={this.handleRemoveTag.bind(this)}
-              currentTags={tags}
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
             />
           </div>
         </div>
@@ -285,25 +191,24 @@ class Exercises extends Component {
             <ListItemText
               primary={
                 <div>
-                  {this.sortHeader('exercise_name', 'Name', true)}
-                  {this.sortHeader('exercise_subtitle', 'Subtitle', true)}
-                  {this.sortHeader('exercise_start_date', 'Start date', true)}
-                  {this.sortHeader('exercise_status', 'Status', true)}
-                  {this.sortHeader('exercise_tags', 'Tags', true)}
+                  {filtering.buildHeader('exercise_name', 'Name', true, headerStyles)}
+                  {filtering.buildHeader('exercise_subtitle', 'Subtitle', true, headerStyles)}
+                  {filtering.buildHeader('exercise_start_date', 'Start date', true, headerStyles)}
+                  {filtering.buildHeader('exercise_status', 'Status', true, headerStyles)}
+                  {filtering.buildHeader('exercise_tags', 'Tags', true, headerStyles)}
                 </div>
               }
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {sortedExercises.map((exercise) => (
+          {filtering.filterAndSort(exercises).map((exercise) => (
             <ListItem
               key={exercise.exercise_id}
               classes={{ root: classes.item }}
               divider={true}
               button={true}
               component={Link}
-              to={`/exercises/${exercise.exercise_id}`}
-            >
+              to={`/exercises/${exercise.exercise_id}`}>
               <ListItemIcon>
                 <Kayaking />
               </ListItemIcon>
@@ -358,28 +263,7 @@ class Exercises extends Component {
         </List>
         {userAdmin && <CreateExercise />}
       </div>
-    );
-  }
-}
-
-Exercises.propTypes = {
-  t: PropTypes.func,
-  nsdt: PropTypes.func,
-  exercises: PropTypes.array,
-  fetchExercises: PropTypes.func,
-  userAdmin: PropTypes.bool,
+  );
 };
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  return {
-    exercises: browser.exercises,
-    userAdmin: browser.me?.admin,
-  };
-};
-
-export default R.compose(
-  connect(select, { fetchExercises }),
-  inject18n,
-  withStyles(styles),
-)(Exercises);
+export default Exercises;
