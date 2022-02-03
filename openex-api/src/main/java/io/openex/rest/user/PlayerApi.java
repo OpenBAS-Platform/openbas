@@ -67,7 +67,7 @@ public class PlayerApi extends RestBehavior {
                 .peek(user -> user.resolveInjects(injects)).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/players")
     @PostAuthorize("isPlanner()")
     public User createPlayer(@Valid @RequestBody CreatePlayerInput input) {

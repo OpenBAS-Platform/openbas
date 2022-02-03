@@ -153,7 +153,7 @@ public class DocumentApi extends RestBehavior {
         return documentRepository.save(document);
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/documents/{documentId}")
     public Document updateDocumentInformation(@PathVariable String documentId,
                                               @Valid @RequestBody DocumentUpdateInput input) {
@@ -183,7 +183,7 @@ public class DocumentApi extends RestBehavior {
         fileStream.transferTo(response.getOutputStream());
     }
 
-    @Transactional
+    @Transactional(rollbackOn = Exception.class)
     @DeleteMapping("/api/documents/{documentId}")
     public void deleteDocument(@PathVariable String documentId) throws Exception {
         Document document = resolveDocument(documentId).orElseThrow();
