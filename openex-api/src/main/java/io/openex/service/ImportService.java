@@ -67,11 +67,14 @@ public class ImportService {
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
                 String entryType = entry.getComment();
+                if (entryType == null) {
+                    throw new UnsupportedOperationException("Import file is using an incorrect format.");
+                }
                 InputStream zipInputStream = zipFile.getInputStream(entry);
                 switch (entryType) {
                     case EXPORT_ENTRY_EXERCISE -> dataImports.add(zipInputStream);
                     case EXPORT_ENTRY_ATTACHMENT -> docReferences.put(entry.getName(), new ImportEntry(entry, zipInputStream));
-                    default -> throw new UnsupportedOperationException("Cant import type " + entryType);
+                    default -> throw new UnsupportedOperationException("Import file contains an unsupported type: " + entryType);
                 }
             }
             // 02. Iter on each element to import
