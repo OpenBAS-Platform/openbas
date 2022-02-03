@@ -73,6 +73,10 @@ public class SessionManager {
         });
     }
 
+    public boolean isSessionAvailable(String sessionId) {
+        return sessions.containsKey(sessionId);
+    }
+
     public void refreshUserSessions(User user) {
         getUserSessions(user.getId()).forEach(httpSession -> {
             Optional<SecurityContext> context = extractSecurityContext(httpSession);
