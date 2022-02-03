@@ -41,6 +41,9 @@ jobs:
       - run: 
           working_directory: ~/openex/openex-api
           command: mvn install -DskipTests
+      - slack/notify:
+          event: fail
+          template: basic_fail_1              
       - persist_to_workspace:
           root: ~/
           paths:
@@ -312,7 +315,8 @@ jobs:
           no_output_timeout: 30
       - slack/notify:
           event: fail
-          template: basic_fail_1          
+          template: basic_fail_1   
+                 
   notify:
     docker:
       - image: 'cimg/base:stable'
