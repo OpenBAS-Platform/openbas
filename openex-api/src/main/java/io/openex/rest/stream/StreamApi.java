@@ -1,5 +1,6 @@
 package io.openex.rest.stream;
 
+import io.openex.config.SessionManager;
 import io.openex.database.audit.BaseEvent;
 import io.openex.database.model.User;
 import io.openex.rest.helper.RestBehavior;
@@ -16,6 +17,7 @@ import reactor.core.publisher.FluxSink;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,12 +32,17 @@ public class StreamApi extends RestBehavior {
     public static final String EVENT_TYPE_PING = "ping";
     public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
 
+    @Resource
+    private SessionManager sessionManager;
+
     private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
 
     @EventListener
     public void listenDatabaseUpdate(BaseEvent event) {
-        consumers.values().stream().parallel()
-                .forEach(tupleFlux -> {
+        consumers.entrySet().stream()
+                .filter(entry -> sessionManager.isSessionAvailable(entry.getKey()))
+                .parallel().forEach(entry -> {
+                    Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
                     User listener = tupleFlux.getT1();
                     if (event.isUserObserver(listener)) {
                         ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
