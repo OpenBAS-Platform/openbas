@@ -12,10 +12,10 @@ const listeners = new Map();
 const useDataLoader = (loader = () => {}) => {
   const sseConnect = () => {
     sseClient = new EventSource('/api/stream', { withCredentials: true });
-    const autoConnectTest = setInterval(() => {
+    const autoReConnect = setInterval(() => {
       const current = new Date().getTime();
       if (current - lastPingDate > EVENT_PING_MAX_TIME) {
-        clearInterval(autoConnectTest);
+        clearInterval(autoReConnect);
         sseClient.close();
         sseConnect();
       }
@@ -46,7 +46,7 @@ const useDataLoader = (loader = () => {}) => {
       lastPingDate = event.data * 1000;
     });
     sseClient.onerror = () => {
-      clearInterval(autoConnectTest);
+      clearInterval(autoReConnect);
       sseClient.close();
       sseConnect();
     };
@@ -60,7 +60,13 @@ const useDataLoader = (loader = () => {}) => {
       loader();
     }
     return () => {
+      // Remove the listener
       listeners.delete(loader);
+      // If its the last one, disconnect the stream
+      if (listeners.size === 0) {
+        sseClient.close();
+        sseClient = undefined;
+      }
     };
   }, []);
 };
