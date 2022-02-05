@@ -415,7 +415,7 @@ const Exercise = () => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to change the status of this exercise')}
+            {t('Do you want to change the status of this exercise?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

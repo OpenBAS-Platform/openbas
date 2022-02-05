@@ -10,24 +10,32 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { withStyles } from '@mui/styles';
-import { updateExercise, deleteExercise } from '../../../actions/Exercise';
-import ExerciseForm from './ExerciseForm';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import TableBody from '@mui/material/TableBody';
+import Checkbox from '@mui/material/Checkbox';
 import inject18n from '../../../components/i18n';
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
+import ExerciseForm from './ExerciseForm';
+import { updateExercise, deleteExercise } from '../../../actions/Exercise';
+import { Transition } from '../../../utils/Environment';
 
 const styles = () => ({
   button: {
     float: 'left',
     margin: '-8px 0 0 5px',
+  },
+  tableHeader: {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
+  tableCell: {
+    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
   },
 });
 
@@ -37,8 +45,14 @@ class ExercisePopover extends Component {
     this.state = {
       openDelete: false,
       openEdit: false,
+      openExport: false,
       openPopover: false,
+      exportPlayers: false,
     };
+  }
+
+  handleToggleExportPlayers() {
+    this.setState({ exportPlayers: !this.state.exportPlayers });
   }
 
   handlePopoverOpen(event) {
@@ -77,17 +91,27 @@ class ExercisePopover extends Component {
     this.setState({ openDelete: false });
   }
 
-  handleExport(withPlayer) {
-    const link = document.createElement('a');
-    link.href = `/api/exercises/${this.props.exercise.exercise_id}/export?isWithPlayers=${withPlayer}`;
-    link.click();
-    this.handlePopoverClose();
-  }
-
   submitDelete() {
     this.props.deleteExercise(this.props.exercise.exercise_id);
     this.handleCloseDelete();
     this.props.history.push('/exercises');
+  }
+
+  handleOpenExport() {
+    this.setState({ openExport: true });
+    this.handlePopoverClose();
+  }
+
+  handleCloseExport() {
+    this.setState({ openExport: false });
+  }
+
+  submitExport() {
+    const { exportPlayers } = this.state;
+    const link = document.createElement('a');
+    link.href = `/api/exercises/${this.props.exercise.exercise_id}/export?isWithPlayers=${exportPlayers}`;
+    link.click();
+    this.handleCloseExport();
   }
 
   render() {
@@ -127,11 +151,8 @@ class ExercisePopover extends Component {
           <MenuItem onClick={this.handleOpenEdit.bind(this)}>
             {t('Update')}
           </MenuItem>
-          <MenuItem onClick={this.handleExport.bind(this, true)}>
-            {t('Export (with players)')}
-          </MenuItem>
-          <MenuItem onClick={this.handleExport.bind(this, false)}>
-            {t('Export (no players)')}
+          <MenuItem onClick={this.handleOpenExport.bind(this)}>
+            {t('Export')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
@@ -180,6 +201,84 @@ class ExercisePopover extends Component {
               handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
+        </Dialog>
+        <Dialog
+          open={this.state.openExport}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseExport.bind(this)}
+        >
+          <DialogTitle>{t('Export the exercise')}</DialogTitle>
+          <DialogContent>
+            <Table selectable={false} size="small">
+              <TableHead adjustForCheckbox={false} displaySelectAll={false}>
+                <TableRow>
+                  <TableCell classes={{ root: classes.tableHeader }}>
+                    {t('Elements')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableHeader }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    {t('Export')}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody displayRowCheckbox={false}>
+                <TableRow>
+                  <TableCell classes={{ root: classes.tableCell }}>
+                    {t('Scenario (including attached files)')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableCell }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    <Checkbox checked={true} disabled={true} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell classes={{ root: classes.tableCell }}>
+                    {t('Audiences')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableCell }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    <Checkbox checked={true} disabled={true} />
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell classes={{ root: classes.tableCell }}>
+                    {t('Players')}
+                  </TableCell>
+                  <TableCell
+                    classes={{ root: classes.tableCell }}
+                    style={{ textAlign: 'center' }}
+                  >
+                    <Checkbox
+                      checked={this.state.exportPlayers}
+                      onChange={this.handleToggleExportPlayers.bind(this)}
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={this.handleCloseExport.bind(this)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.submitExport.bind(this)}
+            >
+              {t('Export')}
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     );

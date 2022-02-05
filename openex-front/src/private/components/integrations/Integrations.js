@@ -16,6 +16,7 @@ import {
   FormatIndentIncreaseOutlined,
   ToggleOnOutlined,
   DescriptionOutlined,
+  CastForEducationOutlined,
 } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
 import { useStore } from '../../../store';
@@ -46,6 +47,8 @@ const iconField = (type) => {
       return <ToggleOnOutlined color="primary" />;
     case 'attachment':
       return <DescriptionOutlined color="primary" />;
+    case 'audience':
+      return <CastForEducationOutlined color="primary" />;
     default:
       return <HelpOutlined color="primary" />;
   }

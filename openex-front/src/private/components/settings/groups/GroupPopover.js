@@ -8,7 +8,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Button from '@mui/material/Button';
-import Slide from '@mui/material/Slide';
 import Chip from '@mui/material/Chip';
 import Avatar from '@mui/material/Avatar';
 import Checkbox from '@mui/material/Checkbox';
@@ -39,6 +38,7 @@ import GroupForm from './GroupForm';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeBrowser } from '../../../../actions/Schema';
+import { Transition } from '../../../../utils/Environment';
 
 const styles = () => ({
   box: {
@@ -58,11 +58,6 @@ const styles = () => ({
     borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
   },
 });
-
-const Transition = React.forwardRef((props, ref) => (
-  <Slide direction="up" ref={ref} {...props} />
-));
-Transition.displayName = 'TransitionSlide';
 
 class GroupPopover extends Component {
   constructor(props) {

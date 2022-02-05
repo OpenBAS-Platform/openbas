@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import { AccountCircleOutlined } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import { logout } from '../../../actions/Application';
 import logo from '../../../resources/images/logo_openex_horizontal_small.png';
 import inject18n from '../../../components/i18n';
@@ -21,6 +22,7 @@ import TopMenuPlayers from './TopMenuPlayers';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
 import TopMenuIntegrations from './TopMenuIntegrations';
+import ImportUploader from '../exercises/ImportUploader';
 
 const styles = (theme) => ({
   appBar: {
@@ -67,10 +69,6 @@ const styles = (theme) => ({
     float: 'left',
     marginRight: 5,
     paddingTop: 9,
-  },
-  button: {
-    display: 'table-cell',
-    float: 'left',
   },
 });
 
@@ -119,6 +117,7 @@ class TopBar extends Component {
             {location.pathname.includes('/settings') && <TopMenuSettings />}
           </div>
           <div className={classes.barRight}>
+            <Button component={ImportUploader}>{t('Import exercise')}</Button>
             <IconButton onClick={this.handleOpen.bind(this)} size="small">
               <AccountCircleOutlined />
             </IconButton>
