@@ -122,13 +122,14 @@ public class GroupApi extends RestBehavior {
         grant.setGroup(group);
         grant.setExercise(exercise);
         Grant savedGrant = grantRepository.save(grant);
+        exercise.getGrants().add(savedGrant);
         exerciseRepository.save(exercise);
         return savedGrant;
     }
 
     @RolesAllowed(ROLE_ADMIN)
     @DeleteMapping("/api/grants/{grantId}")
-    public void deleteTag(@PathVariable String grantId) {
+    public void deleteGrant(@PathVariable String grantId) {
         grantRepository.deleteById(grantId);
     }
 
