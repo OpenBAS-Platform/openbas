@@ -117,7 +117,9 @@ class TopBar extends Component {
             {location.pathname.includes('/settings') && <TopMenuSettings />}
           </div>
           <div className={classes.barRight}>
-            <Button component={ImportUploader}>{t('Import exercise')}</Button>
+            <Button component={ImportUploader}>
+              {t('Import exercise')}
+            </Button>
             <IconButton onClick={this.handleOpen.bind(this)} size="small">
               <AccountCircleOutlined />
             </IconButton>
@@ -146,23 +148,12 @@ class TopBar extends Component {
 
 TopBar.propTypes = {
   classes: PropTypes.object,
-  userGravatar: PropTypes.string,
   logout: PropTypes.func,
   location: PropTypes.object,
 };
 
-const select = (state) => {
-  const userId = R.path(['logged', 'user'], state.app);
-  return {
-    userGravatar: R.path(
-      [userId, 'user_gravatar'],
-      state.referential.entities.users,
-    ),
-  };
-};
-
 export default R.compose(
-  connect(select, { logout }),
+  connect(null, { logout }),
   inject18n,
   withRouter,
   withStyles(styles),

@@ -18,7 +18,7 @@ import Chip from '@mui/material/Chip';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import SearchFilter from '../../../../components/SearchFilter';
 import { fetchTags } from '../../../../actions/Tag';
-import { fetchUsers } from '../../../../actions/User';
+import { fetchPlayers } from '../../../../actions/User';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useStore } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
@@ -204,7 +204,7 @@ const Dryrun = () => {
   const users = dryrun ? dryrun.users : [];
   useDataLoader(() => {
     dispatch(fetchTags());
-    dispatch(fetchUsers());
+    dispatch(fetchPlayers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));
   });

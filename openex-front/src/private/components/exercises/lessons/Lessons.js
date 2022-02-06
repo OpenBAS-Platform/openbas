@@ -49,6 +49,7 @@ import { Transition } from '../../../../utils/Environment';
 import ObjectiveEvaluations from './ObjectiveEvaluations';
 import CreatePoll from './CreatePoll';
 import PollPopover from './PollPopover';
+import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -184,7 +185,9 @@ const Lessons = () => {
           <Typography variant="overline" style={{ float: 'left' }}>
             {t('Objectives')}
           </Typography>
-          <CreateObjective exerciseId={exerciseId} />
+          {isExerciseUpdatable(exercise, true) && (
+            <CreateObjective exerciseId={exerciseId} />
+          )}
           <div className="clearfix" />
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {objectives.length > 0 ? (
@@ -242,7 +245,9 @@ const Lessons = () => {
           <Typography variant="overline" style={{ float: 'left' }}>
             {t('Polls')}
           </Typography>
-          <CreatePoll exerciseId={exerciseId} />
+          {isExerciseUpdatable(exercise, true) && (
+            <CreatePoll exerciseId={exerciseId} />
+          )}
           <div className="clearfix" />
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {polls.length > 0 ? (
@@ -290,13 +295,15 @@ const Lessons = () => {
         <Typography variant="overline" style={{ float: 'left' }}>
           {t('Exercise logs')}
         </Typography>
-        <IconButton
-          color="secondary"
-          onClick={handleToggleWrite}
-          style={{ margin: '-3px 0 0 5px' }}
-        >
-          <EditOutlined fontSize="small" />
-        </IconButton>
+        {isExerciseUpdatable(exercise, true) && (
+          <IconButton
+            color="secondary"
+            onClick={handleToggleWrite}
+            style={{ margin: '-3px 0 0 5px' }}
+          >
+            <EditOutlined fontSize="small" />
+          </IconButton>
+        )}
         {logs.map((log) => (
           <Card
             key={log.log_id}
@@ -345,27 +352,29 @@ const Lessons = () => {
             </CardContent>
           </Card>
         ))}
-        <Accordion
-          style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
-          expanded={openCreateLog}
-          onChange={handleToggleWrite}
-          variant="outlined"
-        >
-          <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
-            <Typography className={classes.heading}>
-              <RateReviewOutlined />
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails style={{ width: '100%', paddingBottom: 80 }}>
-            <LogForm
-              initialValues={{ log_tags: [] }}
-              onSubmit={submitCreateLog}
-              handleClose={() => setOpenCreateLog(false)}
-            />
-          </AccordionDetails>
-        </Accordion>
+        {isExerciseUpdatable(exercise, true) && (
+          <Accordion
+            style={{ margin: `${logs.length > 0 ? '30' : '5'}px 0 30px 0` }}
+            expanded={openCreateLog}
+            onChange={handleToggleWrite}
+            variant="outlined"
+          >
+            <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+              <Typography className={classes.heading}>
+                <RateReviewOutlined />
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <span style={{ fontWeight: 500 }}>{t('Write an entry')}</span>
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails style={{ width: '100%', paddingBottom: 80 }}>
+              <LogForm
+                initialValues={{ log_tags: [] }}
+                onSubmit={submitCreateLog}
+                handleClose={() => setOpenCreateLog(false)}
+              />
+            </AccordionDetails>
+          </Accordion>
+        )}
         <div style={{ marginTop: 100 }} />
         <div ref={bottomRef} />
       </div>

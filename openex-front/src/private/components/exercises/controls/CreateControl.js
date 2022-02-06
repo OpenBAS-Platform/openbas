@@ -26,6 +26,7 @@ import { storeBrowser } from '../../../../actions/Schema';
 import { Transition } from '../../../../utils/Environment';
 import DryrunForm from './DryrunForm';
 import { resolveUserName } from '../../../../utils/String';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 const styles = (theme) => ({
   createButton: {
@@ -83,7 +84,7 @@ class CreateControl extends Component {
 
   render() {
     const {
-      classes, t, audiences, variant, me,
+      classes, t, audiences, variant, me, exercise,
     } = this.props;
     return (
       <div>
@@ -96,6 +97,7 @@ class CreateControl extends Component {
                 startIcon={<VideoSettingsOutlined />}
                 color="info"
                 onClick={this.handleOpenDryrun.bind(this)}
+                disabled={isExerciseReadOnly(exercise)}
               >
                 {t('Launch')}
               </Button>
@@ -107,6 +109,7 @@ class CreateControl extends Component {
                 startIcon={<MarkEmailReadOutlined />}
                 color="secondary"
                 onClick={this.handleOpenComcheck.bind(this)}
+                disabled={isExerciseReadOnly(exercise)}
               >
                 {t('Send')}
               </Button>
@@ -117,6 +120,7 @@ class CreateControl extends Component {
             classes={{ root: classes.createButton }}
             icon={<SpeedDialIcon />}
             ariaLabel={t('New control')}
+            hidden={isExerciseReadOnly(exercise)}
           >
             <SpeedDialAction
               icon={<VideoSettingsOutlined />}

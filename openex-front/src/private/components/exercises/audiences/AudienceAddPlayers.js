@@ -26,6 +26,7 @@ import { storeBrowser } from '../../../../actions/Schema';
 import { fetchPlayers } from '../../../../actions/User';
 import CreatePlayer from '../../players/CreatePlayer';
 import { resolveUserName, truncate } from '../../../../utils/String';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 const styles = () => ({
   createButton: {
@@ -105,7 +106,7 @@ class AudienceAddPlayers extends Component {
 
   render() {
     const {
-      classes, t, users, audienceUsersIds,
+      classes, t, users, audienceUsersIds, exercise,
     } = this.props;
     const { keyword, usersIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -128,6 +129,7 @@ class AudienceAddPlayers extends Component {
           color="primary"
           aria-label="Add"
           className={classes.createButton}
+          disabled={isExerciseReadOnly(exercise)}
         >
           <Add />
         </Fab>
@@ -231,6 +233,7 @@ class AudienceAddPlayers extends Component {
 AudienceAddPlayers.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   audienceId: PropTypes.string,
   updateAudiencePlayers: PropTypes.func,
   fetchPlayers: PropTypes.func,
@@ -239,10 +242,12 @@ AudienceAddPlayers.propTypes = {
   audienceUsersIds: PropTypes.array,
 };
 
-const select = (state) => {
+const select = (state, ownProps) => {
   const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
   const { users, organizations } = browser;
   return {
+    exercise: browser.getExercise(exerciseId),
     users,
     organizations,
     browser,

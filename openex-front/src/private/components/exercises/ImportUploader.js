@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { withRouter } from 'react-router-dom';
 import { useFormatter } from '../../../components/i18n';
 import { importingExercise } from '../../../actions/Exercise';
+import { useStore } from '../../../store';
 
 const ImportUploader = (props) => {
   const { color, history } = props;
@@ -15,6 +16,7 @@ const ImportUploader = (props) => {
   const uploadRef = useRef(null);
   const [upload, setUpload] = useState(null);
   const handleOpenUpload = () => uploadRef.current.click();
+  const userAdmin = useStore((store) => store.me?.admin ?? false);
   const handleUpload = (file) => {
     setUpload(true);
     const formData = new FormData();
@@ -63,6 +65,7 @@ const ImportUploader = (props) => {
             aria-haspopup="true"
             size="small"
             style={{ marginRight: 10 }}
+            disabled={!userAdmin}
           >
             <CloudUploadOutlined />
           </IconButton>

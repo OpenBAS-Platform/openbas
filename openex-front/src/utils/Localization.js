@@ -174,6 +174,8 @@ const i18n = {
       'No audience': 'Aucune audience',
       'No processed injects in this exercise.':
         'Aucun stimuli traité dans cet exercice.',
+      'No pending injects in this exercise.':
+        'Aucun stimuli en attente dans cet exercice.',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_mastodon: 'Mastodon',
@@ -305,7 +307,8 @@ const i18n = {
       Export: 'Exporter',
       'Export the exercise': 'Exporter cet exercice',
       Elements: 'Eléments',
-      'Scenario (including attached files)': 'Scénario (fichiers joints inclus)',
+      'Scenario (including attached files)':
+        'Scénario (fichiers joints inclus)',
     },
     en: {
       openex_email: 'Email',

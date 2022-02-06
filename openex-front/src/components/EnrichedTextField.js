@@ -16,12 +16,13 @@ const renderEnrichedTextField = ({
   style,
   platformLanguage,
   userLanguage,
+  disabled,
 }) => {
   const platformLang = platformLanguage !== 'auto' ? platformLanguage : locale;
   const lang = userLanguage !== 'auto' ? userLanguage : platformLang;
   return (
     <div style={style}>
-      <InputLabel variant="standard" shrink={true}>
+      <InputLabel variant="standard" shrink={true} disabled={disabled}>
         {label}
       </InputLabel>
       <CKEditor
@@ -34,6 +35,7 @@ const renderEnrichedTextField = ({
         onChange={(event, editor) => {
           onChange(editor.getData());
         }}
+        disabled={disabled}
       />
     </div>
   );

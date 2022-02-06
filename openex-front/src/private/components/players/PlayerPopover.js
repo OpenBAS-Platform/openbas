@@ -18,6 +18,7 @@ import { updatePlayer, deletePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
 import { storeBrowser } from '../../../actions/Schema';
+import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -107,7 +108,7 @@ class PlayerPopover extends Component {
 
   render() {
     const {
-      t, userAdmin, user, organizations, audienceId,
+      t, userAdmin, user, organizations, audienceId, exercise,
     } = this.props;
     const userOrganizationValue = user.organization;
     const userOrganization = userOrganizationValue
@@ -153,7 +154,10 @@ class PlayerPopover extends Component {
             {t('Update')}
           </MenuItem>
           {audienceId && (
-            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
+            <MenuItem
+              onClick={this.handleOpenRemove.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
               {t('Remove from the audience')}
             </MenuItem>
           )}
@@ -248,14 +252,17 @@ PlayerPopover.propTypes = {
   tags: PropTypes.object,
   userAdmin: PropTypes.bool,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   audienceId: PropTypes.string,
   audienceUsersIds: PropTypes.array,
 };
 
-const select = (state) => {
+const select = (state, ownProps) => {
   const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
   return {
     userAdmin: browser.me?.admin,
+    exercise: browser.getExercise(exerciseId),
   };
 };
 

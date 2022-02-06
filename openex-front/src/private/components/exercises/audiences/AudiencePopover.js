@@ -174,14 +174,14 @@ class AudiencePopover extends Component {
           open={Boolean(this.state.anchorEl)}
           onClose={this.handlePopoverClose.bind(this)}
         >
-          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={isExerciseReadOnly(exercise)}
+          >
             {t('Update')}
           </MenuItem>
           {setSelectedAudience && (
-            <MenuItem
-              onClick={this.handleOpenEditPlayers.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
+            <MenuItem onClick={this.handleOpenEditPlayers.bind(this)}>
               {t('Manage players')}
             </MenuItem>
           )}
@@ -201,12 +201,18 @@ class AudiencePopover extends Component {
             </MenuItem>
           )}
           {onRemoveAudience && (
-            <MenuItem onClick={this.handleOpenRemove.bind(this)}>
+            <MenuItem
+              onClick={this.handleOpenRemove.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
               {t('Remove from the inject')}
             </MenuItem>
           )}
           {!onRemoveAudience && (
-            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+            <MenuItem
+              onClick={this.handleOpenDelete.bind(this)}
+              disabled={isExerciseReadOnly(exercise)}
+            >
               {t('Delete')}
             </MenuItem>
           )}

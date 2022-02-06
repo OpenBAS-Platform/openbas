@@ -280,7 +280,10 @@ const Dashboard = (props) => {
                             >
                               <ProgressBarCountdown
                                 date={inject.inject_date}
-                                paused={exercise?.exercise_status === 'PAUSED'}
+                                paused={
+                                  exercise?.exercise_status === 'PAUSED'
+                                  || exercise?.exercise_status === 'CANCELED'
+                                }
                               />
                             </div>
                             <div

@@ -13,6 +13,7 @@ import { updateExerciseStartDate } from '../../../actions/Exercise';
 import inject18n from '../../../components/i18n';
 import ExerciseDateForm from './ExerciseDateForm';
 import { Transition } from '../../../utils/Environment';
+import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const styles = () => ({
   button: {
@@ -54,8 +55,10 @@ class ExerciseDatePopover extends Component {
           onClick={this.handleOpenEdit.bind(this)}
           aria-haspopup="true"
           size="large"
+          disabled={isExerciseReadOnly(exercise)}
+          color="secondary"
         >
-          <EditOutlined color="secondary" fontSize="small" />
+          <EditOutlined fontSize="small" />
         </IconButton>
         <Dialog
           TransitionComponent={Transition}

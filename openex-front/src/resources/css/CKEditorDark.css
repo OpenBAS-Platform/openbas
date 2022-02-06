@@ -65,8 +65,8 @@
   --ck-color-input-border: hsl(257, 3%, 43%) !important;
   --ck-color-input-text: hsl(0, 0%, 98%) !important;
   --ck-color-input-disabled-background: hsl(255, 4%, 21%) !important;
-  --ck-color-input-disabled-border: hsl(250, 3%, 38%) !important;
-  --ck-color-input-disabled-text: hsl(0, 0%, 78%) !important;
+  --ck-color-input-disabled-border: rgba(255, 255, 255, 0.5) !important;
+  --ck-color-input-disabled-text: hsl(240, 3%, 31%) !important;
 
   /* -- Overrides the default .ck-labeled-field-view class colors. ---------------------------- */
 
@@ -144,4 +144,8 @@
 
 .ck-editor__editable h4 {
   font-size: 25px !important;
+}
+
+.ck-read-only {
+  color: rgba(255, 255, 255, 0.5) !important;
 }

@@ -24,6 +24,7 @@ import inject18n from '../../../components/i18n';
 import ExerciseForm from './ExerciseForm';
 import { updateExercise, deleteExercise } from '../../../actions/Exercise';
 import { Transition } from '../../../utils/Environment';
+import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const styles = () => ({
   button: {
@@ -148,13 +149,19 @@ class ExercisePopover extends Component {
           open={Boolean(this.state.anchorEl)}
           onClose={this.handlePopoverClose.bind(this)}
         >
-          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+          <MenuItem
+            onClick={this.handleOpenEdit.bind(this)}
+            disabled={isExerciseReadOnly(exercise, true)}
+          >
             {t('Update')}
           </MenuItem>
           <MenuItem onClick={this.handleOpenExport.bind(this)}>
             {t('Export')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+          <MenuItem
+            onClick={this.handleOpenDelete.bind(this)}
+            disabled={isExerciseReadOnly(exercise, true)}
+          >
             {t('Delete')}
           </MenuItem>
         </Menu>

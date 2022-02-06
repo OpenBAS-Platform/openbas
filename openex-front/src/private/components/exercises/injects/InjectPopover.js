@@ -236,10 +236,7 @@ class InjectPopover extends Component {
             {t('Update')}
           </MenuItem>
           {setSelectedInject && (
-            <MenuItem
-              onClick={this.handleOpenEditContent.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
-            >
+            <MenuItem onClick={this.handleOpenEditContent.bind(this)}>
               {t('Manage content')}
             </MenuItem>
           )}

@@ -351,60 +351,60 @@ const Animation = () => {
             {pendingInjects.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
                 {pendingInjects.map((inject) => (
-                    <ListItem
-                      key={inject.inject_id}
-                      dense={true}
-                      classes={{ root: classes.item }}
-                      divider={true}
-                      button={true}
-                      onClick={() => setSelectedInject(inject.inject_id)}
-                    >
-                      <ListItemIcon>
-                        <InjectIcon
-                          type={inject.inject_type}
-                          variant="inline"
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '50%' }}
-                            >
-                              {inject.inject_title}
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{ width: '20%', paddingTop: 8 }}
-                            >
-                              <ProgressBarCountdown
-                                date={inject.inject_date}
-                                paused={exercise?.exercise_status === 'PAUSED'}
-                              />
-                            </div>
-                            <div
-                              className={classes.bodyItem}
-                              style={{
-                                fontFamily: 'Consolas, monaco, monospace',
-                                fontSize: 12,
-                                paddingTop: 3,
-                                marginRight: 15,
-                              }}
-                            >
-                              {fndt(inject.inject_date)}
-                            </div>
+                  <ListItem
+                    key={inject.inject_id}
+                    dense={true}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    button={true}
+                    onClick={() => setSelectedInject(inject.inject_id)}
+                  >
+                    <ListItemIcon>
+                      <InjectIcon type={inject.inject_type} variant="inline" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '50%' }}
+                          >
+                            {inject.inject_title}
                           </div>
-                        }
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '20%', paddingTop: 8 }}
+                          >
+                            <ProgressBarCountdown
+                              date={inject.inject_date}
+                              paused={
+                                exercise?.exercise_status === 'PAUSED'
+                                || exercise?.exercise_status === 'CANCELED'
+                              }
+                            />
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{
+                              fontFamily: 'Consolas, monaco, monospace',
+                              fontSize: 12,
+                              paddingTop: 3,
+                              marginRight: 15,
+                            }}
+                          >
+                            {fndt(inject.inject_date)}
+                          </div>
+                        </div>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <InjectPopover
+                        inject={inject}
+                        exerciseId={exerciseId}
+                        setSelectedInject={setSelectedInject}
                       />
-                      <ListItemSecondaryAction>
-                        <InjectPopover
-                          inject={inject}
-                          exerciseId={exerciseId}
-                          setSelectedInject={setSelectedInject}
-                        />
-                      </ListItemSecondaryAction>
-                    </ListItem>
+                    </ListItemSecondaryAction>
+                  </ListItem>
                 ))}
               </List>
             ) : (

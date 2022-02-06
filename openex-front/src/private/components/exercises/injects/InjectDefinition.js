@@ -668,6 +668,7 @@ class InjectDefinition extends Component {
                               rows={3}
                               label={t(field.name)}
                               style={{ marginTop: 20 }}
+                              disabled={isExerciseReadOnly(exercise)}
                             />
                           );
                         case 'richtextarea':
@@ -678,6 +679,7 @@ class InjectDefinition extends Component {
                               label={t(field.name)}
                               fullWidth={true}
                               style={{ marginTop: 20, height: 250 }}
+                              disabled={isExerciseReadOnly(exercise)}
                             />
                           );
                         case 'checkbox':
@@ -687,6 +689,7 @@ class InjectDefinition extends Component {
                               name={field.name}
                               label={t(field.name)}
                               style={{ marginTop: 10 }}
+                              disabled={isExerciseReadOnly(exercise)}
                             />
                           );
                         default:
@@ -698,6 +701,7 @@ class InjectDefinition extends Component {
                               fullWidth={true}
                               label={t(field.name)}
                               style={{ marginTop: 20 }}
+                              disabled={isExerciseReadOnly(exercise)}
                             />
                           );
                       }
@@ -846,7 +850,7 @@ class InjectDefinition extends Component {
                     variant="contained"
                     color="primary"
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || isExerciseReadOnly(exercise)}
                   >
                     {t('Update')}
                   </Button>

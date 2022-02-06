@@ -18,6 +18,7 @@ import ExercisePopover from './ExercisePopover';
 import { useStore } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { Transition } from '../../../utils/Environment';
+import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -86,7 +87,11 @@ const ExerciseHeader = () => {
             key={tag.tag_id}
             classes={{ root: classes.tag }}
             label={tag.tag_name}
-            onDelete={() => deleteTag(tag.tag_id)}
+            onDelete={
+              isExerciseReadOnly(exercise, true)
+                ? null
+                : () => deleteTag(tag.tag_id)
+            }
           />
         ))}
         <div style={{ float: 'left', marginTop: -5 }}>
@@ -95,6 +100,7 @@ const ExerciseHeader = () => {
             color="primary"
             aria-label="Tag"
             onClick={handleToggleAddTag}
+            disabled={isExerciseReadOnly(exercise, true)}
           >
             {<AddOutlined />}
           </IconButton>

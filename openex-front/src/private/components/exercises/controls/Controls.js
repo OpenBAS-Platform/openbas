@@ -32,6 +32,7 @@ import ComcheckState from './ComcheckState';
 import { Transition } from '../../../../utils/Environment';
 import DryrunStatus from './DryrunStatus';
 import { deleteDryrun, fetchDryruns } from '../../../../actions/Dryrun';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -146,6 +147,7 @@ const Controls = () => {
                         onClick={() => setOpenDryrunDelete(dryrun.dryrun_id)}
                         aria-haspopup="true"
                         size="large"
+                        disabled={isExerciseReadOnly(exercise, true)}
                       >
                         <DeleteOutlined />
                       </IconButton>
@@ -214,6 +216,7 @@ const Controls = () => {
                         }
                         aria-haspopup="true"
                         size="large"
+                        disabled={isExerciseReadOnly(exercise, true)}
                       >
                         <DeleteOutlined />
                       </IconButton>

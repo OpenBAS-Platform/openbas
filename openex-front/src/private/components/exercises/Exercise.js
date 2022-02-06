@@ -172,9 +172,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PlayArrowOutlined />}
             color="success"
-            disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
-            )}
+            disabled={isExerciseReadOnly(exercise, true)}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
             {t('Start')}
@@ -186,9 +184,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PauseOutlined />}
             color="warning"
-            disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
-            )}
+            disabled={isExerciseReadOnly(exercise, true)}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
             {t('Pause')}
@@ -200,9 +196,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PlayArrowOutlined />}
             color="success"
-            disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
-            )}
+            disabled={isExerciseReadOnly(exercise, true)}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
             {t('Resume')}
@@ -214,9 +208,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PauseOutlined />}
             color="warning"
-            disabled={['FINISHED', 'CANCELED'].includes(
-              exercise.exercise_status,
-            )}
+            disabled={true}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
             {t('Pause')}
@@ -233,6 +225,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<CancelOutlined />}
             color="error"
+            disabled={isExerciseReadOnly(exercise, true)}
             onClick={() => setOpenChangeStatus('CANCELED')}
           >
             {t('Cancel')}
@@ -245,6 +238,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<RestartAltOutlined />}
             color="warning"
+            disabled={isExerciseReadOnly(exercise, true)}
             onClick={() => setOpenChangeStatus('SCHEDULED')}
           >
             {t('Reset')}
@@ -356,7 +350,10 @@ const Exercise = () => {
                 <div className={classes.countdown}>
                   <Countdown
                     date={nextInjectDate}
-                    paused={exercise.exercise_status === 'PAUSED'}
+                    paused={
+                      exercise?.exercise_status === 'PAUSED'
+                      || exercise?.exercise_status === 'CANCELED'
+                    }
                   />
                 </div>
               </Grid>
