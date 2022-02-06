@@ -39,7 +39,7 @@ public class StreamApi extends RestBehavior {
                     String currentSessionId = entry.getKey();
                     Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
                     User listener = tupleFlux.getT1();
-                    boolean isValidSession = !event.getSessionId().equals(currentSessionId);
+                    boolean isValidSession = !currentSessionId.equals(event.getSessionId());
                     if (isValidSession && event.isUserObserver(listener)) {
                         ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
                                 .event(EVENT_TYPE_MESSAGE).build();

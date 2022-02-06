@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Base;
 import io.openex.database.model.User;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
 public class BaseEvent {
@@ -26,7 +27,8 @@ public class BaseEvent {
     public BaseEvent(String type, Base data) {
         this.type = type;
         this.instance = data;
-        this.sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        this.sessionId = requestAttributes != null ? requestAttributes.getSessionId() : null;
         Class<? extends Base> currentClass = data.getClass();
         boolean isTargetClass = currentClass.getSuperclass().equals(Object.class);
         Class<?> baseClass = isTargetClass ? currentClass : currentClass.getSuperclass();
