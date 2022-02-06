@@ -303,7 +303,7 @@ const i18n = {
         'Souhaitez-vous retirer ce document du stimuli ?',
       'Import an exercise': 'Importer un exercice',
       Export: 'Exporter',
-      'Export the exercise': 'Expoter cet exercice',
+      'Export the exercise': 'Exporter cet exercice',
       Elements: 'Eléments',
       'Scenario (including attached files)': 'Scénario (fichiers joints inclus)',
     },

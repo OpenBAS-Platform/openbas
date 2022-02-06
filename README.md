@@ -3,7 +3,7 @@
 </h1>
 <p align="center">
   <a href="https://www.openex.io" alt="Website"><img src="https://img.shields.io/badge/website-openex.io-blue.svg" /></a>
-  <a href="https://www.notion.so/luatix/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0" alt="Documentation"><img src="https://img.shields.io/badge/Documentation-Notion-orange.svg" /></a>
+  <a href="https://luatix.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0" alt="Documentation"><img src="https://img.shields.io/badge/Documentation-Notion-orange.svg" /></a>
   <a href="https://slack.luatix.org" alt="Slack"><img src="https://slack.luatix.org/badge.svg" /></a>
   <a href="https://cloud.drone.io/OpenEx-Platform/openex"><img src="https://cloud.drone.io/api/badges/OpenEx-Platform/openex/status.svg" /></a>
   <a href="https://codecov.io/gh/OpenEx-Platform/openex"><img src="https://codecov.io/gh/OpenEx-Platform/openex/graph/badge.svg" /></a>
@@ -23,9 +23,11 @@ The goal is to create a powerful, reliable and open source tool to effectively p
 
 OpenEx aims to respond to these issues, which not only concern state services but also many private organizations. With different modules (scenarios, audiences, simulations, verification of means of communication, encryption, etc.), the platform offers advantages such as collaborative work, real-time monitoring, statistics or the management of feedback.
 
+Finally, OpenEx supports different types of inject, allowing the tool to be integrated with emails, SMS platforms, social medias, alarm systems, etc. All currently supported integration can be found in the [OpenEx ecosystem](https://luatix.notion.site/OpenEx-Ecosystem-30d8eb73d7d04611843e758ddef8941b).
+
 ## Documentation and demonstration
 
-If you want to know more on OpenEx, you can read the [documentation on the tool](https://www.notion.so/luatix/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). If you wish to discover how the OpenEx platform is working, a [demonstration instance](https://demo.openex.io) is available and open to everyone. This instance is reset every night and is based on reference data maintained by the OpenEx developers.
+If you want to know more on OpenEx, you can read the [documentation on the tool](https://luatix.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). If you wish to discover how the OpenEx platform is working, a [demonstration instance](https://demo.openex.io) is available and open to everyone. This instance is reset every night and is based on reference data maintained by the OpenEx developers.
 
 ## Releases download
 
@@ -33,11 +35,11 @@ The releases are available on the [Github releases page](https://github.com/Open
 
 ## Installation
 
-All you need to install the OpenEx platform can be found in the [official documentation](https://www.notion.so/luatix/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). For installation, you can:
+All you need to install the OpenEx platform can be found in the [official documentation](https://luatix.notion.site/OpenEx-Public-Knowledge-Base-bbc835446e9140999d6f2e10d96c2ee0). For installation, you can:
 
-* [Deploy the VM template](https://www.notion.so/luatix/Virtual-machine-template-7a01e6731c13453ab0547e88a6967119)
-* [Use Docker](https://www.notion.so/luatix/Using-Docker-99d79e4abaa6401d9aa68a8064aaee78) (recommended)
-* [Install manually](https://www.notion.so/luatix/Manual-deployment-eaacdd186f884d2f90af4ba5cdd15847)
+* [Deploy the VM template](https://luatix.notion.site/Virtual-machine-template-7a01e6731c13453ab0547e88a6967119)
+* [Use Docker](https://luatix.notion.site/Using-Docker-99d79e4abaa6401d9aa68a8064aaee78) (recommended)
+* [Install manually](https://luatix.notion.site/Manual-deployment-eaacdd186f884d2f90af4ba5cdd15847)
 
 ## Luatix's members
 
@@ -85,7 +87,7 @@ To help you get you familiar with our contribution process, we have a list of [b
 
 ### Development
 
-If you want to actively help OpenEx, we created a [dedicated documentation](https://www.notion.so/luatix/Environment-setup-7b7754139072490aa9cb01f798ba8d5b) about the deployment of a development environement and how to start the source code modification.
+If you want to actively help OpenEx, we created a [dedicated documentation](https://luatix.notion.site/Environment-setup-7b7754139072490aa9cb01f798ba8d5b) about the deployment of a development environement and how to start the source code modification.
 
 ## Community
 
