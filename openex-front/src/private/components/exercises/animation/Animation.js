@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -12,14 +12,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
-import LinearProgress from '@mui/material/LinearProgress';
 import Drawer from '@mui/material/Drawer';
 import { useFormatter } from '../../../../components/i18n';
 import { useStore } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
-import Countdown from '../../../../components/Countdown';
 import Empty from '../../../../components/Empty';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -31,6 +29,7 @@ import InjectStatus from '../injects/InjectStatus';
 import { truncate } from '../../../../utils/String';
 import InjectDefinition from '../injects/InjectDefinition';
 import InjectStatusDetails from '../injects/InjectStatusDetails';
+import ProgressBarCountdown from '../../../../components/ProgressBarCountdown';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -126,7 +125,7 @@ const useStyles = makeStyles(() => ({
     textOverflow: 'ellipsis',
   },
   countdown: {
-    fontWeight: 600,
+    fontWeight: 400,
   },
   drawerPaper: {
     minHeight: '100vh',
@@ -134,8 +133,6 @@ const useStyles = makeStyles(() => ({
     padding: 0,
   },
 }));
-
-const date = Date.now();
 
 const Animation = () => {
   const classes = useStyles();
@@ -146,11 +143,6 @@ const Animation = () => {
   const injectTypes = useStore((store) => store.inject_types);
   const { audiences, injects } = exercise;
   const [selectedInject, setSelectedInject] = useState(null);
-  const [currentDate, setCurrentDate] = useState(Date.now());
-  useEffect(() => {
-    const intervalId = setInterval(() => setCurrentDate(Date.now()), 1000);
-    return () => clearInterval(intervalId);
-  }, []);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
     dispatch(fetchAudiences(exerciseId));
@@ -358,12 +350,7 @@ const Animation = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {pendingInjects.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
-                {pendingInjects.map((inject) => {
-                  const injectDate = new Date(inject.inject_date).getTime();
-                  const remainingTime = injectDate - date;
-                  const currentRemainingTime = injectDate - currentDate;
-                  const percentRemaining = (currentRemainingTime * 100) / remainingTime;
-                  return (
+                {pendingInjects.map((inject) => (
                     <ListItem
                       key={inject.inject_id}
                       dense={true}
@@ -389,20 +376,23 @@ const Animation = () => {
                             </div>
                             <div
                               className={classes.bodyItem}
-                              style={{ width: '25%', paddingTop: 8 }}
+                              style={{ width: '20%', paddingTop: 8 }}
                             >
-                              <LinearProgress
-                                value={100 - percentRemaining}
-                                variant="determinate"
-                                style={{ width: '90%' }}
+                              <ProgressBarCountdown
+                                date={inject.inject_date}
+                                paused={exercise?.exercise_status === 'PAUSED'}
                               />
                             </div>
-                            <div className={classes.bodyItem}>
-                              <span className={classes.countdown}>
-                                <Countdown
-                                  date={inject.inject_date || Date.now()}
-                                />
-                              </span>
+                            <div
+                              className={classes.bodyItem}
+                              style={{
+                                fontFamily: 'Consolas, monaco, monospace',
+                                fontSize: 12,
+                                paddingTop: 3,
+                                marginRight: 15,
+                              }}
+                            >
+                              {fndt(inject.inject_date)}
                             </div>
                           </div>
                         }
@@ -415,8 +405,7 @@ const Animation = () => {
                         />
                       </ListItemSecondaryAction>
                     </ListItem>
-                  );
-                })}
+                ))}
               </List>
             ) : (
               <Empty message={t('No pending injects in this exercise.')} />

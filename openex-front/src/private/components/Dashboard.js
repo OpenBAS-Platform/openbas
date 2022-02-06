@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Link } from 'react-router-dom';
@@ -11,7 +11,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import LinearProgress from '@mui/material/LinearProgress';
 import {
   RowingOutlined,
   NotificationsOutlined,
@@ -34,6 +33,7 @@ import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
 import { distributionChartOptions } from '../../utils/Charts';
 import InjectIcon from './exercises/injects/InjectIcon';
+import ProgressBarCountdown from '../../components/ProgressBarCountdown';
 
 const styles = () => ({
   root: {
@@ -93,8 +93,6 @@ const styles = () => ({
   },
 });
 
-const date = Date.now();
-
 const Dashboard = (props) => {
   useEffect(() => {
     props.fetchStatistics();
@@ -112,12 +110,8 @@ const Dashboard = (props) => {
     organizations,
     theme,
     injects,
+    browser,
   } = props;
-  const [currentDate, setCurrentDate] = useState(Date.now());
-  useEffect(() => {
-    const intervalId = setInterval(() => setCurrentDate(Date.now()), 1000);
-    return () => clearInterval(intervalId);
-  }, []);
   const topOrganizations = R.pipe(
     R.sortWith([R.descend(R.prop('organization_injects_number'))]),
     R.take(7),
@@ -254,10 +248,7 @@ const Dashboard = (props) => {
             {injects?.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
                 {injects.map((inject) => {
-                  const injectDate = new Date(inject.inject_date).getTime();
-                  const remainingTime = injectDate - date;
-                  const currentRemainingTime = injectDate - currentDate;
-                  const percentRemaining = (currentRemainingTime * 100) / remainingTime;
+                  const exercise = browser.getExercise(inject.inject_exercise);
                   return (
                     <ListItem
                       key={inject.inject_id}
@@ -287,21 +278,26 @@ const Dashboard = (props) => {
                               className={classes.bodyItem}
                               style={{ width: '25%', paddingTop: 8 }}
                             >
-                              <LinearProgress
-                                value={100 - percentRemaining}
-                                variant="determinate"
-                                style={{ width: '90%' }}
+                              <ProgressBarCountdown
+                                date={inject.inject_date}
+                                paused={exercise?.exercise_status === 'PAUSED'}
                               />
                             </div>
                             <div
                               className={classes.bodyItem}
-                              style={{ float: 'right', paddingRight: 20 }}
+                              style={{
+                                paddingTop: 3,
+                                marginRight: 15,
+                                float: 'right',
+                                paddingRight: 20,
+                                fontFamily: 'Consolas, monaco, monospace',
+                                fontSize: 12,
+                              }}
                             >
-                              <span className={classes.countdown}>
-                                <Countdown
-                                  date={inject.inject_date || Date.now()}
-                                />
-                              </span>
+                              <Countdown
+                                date={inject.inject_date}
+                                paused={exercise?.exercise_status === 'PAUSED'}
+                              />
                             </div>
                           </div>
                         }
@@ -357,6 +353,7 @@ Dashboard.propTypes = {
   injects: PropTypes.array,
   statistics: PropTypes.object,
   exercises: PropTypes.array,
+  browser: PropTypes.object,
 };
 
 const select = (state) => {
@@ -366,6 +363,7 @@ const select = (state) => {
     organizations: browser.organizations,
     statistics: browser.statistics,
     injects: browser.next_injects,
+    browser,
   };
 };
 

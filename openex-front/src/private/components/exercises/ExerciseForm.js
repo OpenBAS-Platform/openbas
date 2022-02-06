@@ -53,17 +53,15 @@ class ExerciseForm extends Component {
               label={t('Subtitle')}
               style={{ marginTop: 20 }}
             />
-            {editing && (
-              <TextField
-                variant="standard"
-                name="exercise_description"
-                fullWidth={true}
-                multiline={true}
-                rows={2}
-                label={t('Description')}
-                style={{ marginTop: 20 }}
-              />
-            )}
+            <TextField
+              variant="standard"
+              name="exercise_description"
+              fullWidth={true}
+              multiline={true}
+              rows={2}
+              label={t('Description')}
+              style={{ marginTop: 20 }}
+            />
             {!editing && (
               <DateTimePicker
                 name="exercise_start_date"

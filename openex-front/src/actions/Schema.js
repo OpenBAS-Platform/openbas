@@ -213,7 +213,10 @@ const _buildComcheckStatus = (state, sta) => {
   if (sta === undefined) return sta;
   return {
     ...sta,
-    user: _buildUser(state, state.referential.entities.users[sta.comcheckstatus_user]),
+    user: _buildUser(
+      state,
+      state.referential.entities.users[sta.comcheckstatus_user],
+    ),
   };
 };
 const _buildComcheck = (state, com) => {
@@ -229,8 +232,9 @@ const _buildComcheck = (state, com) => {
 };
 const _buildDryrun = (state, id, dry) => {
   if (dry === undefined) return dry;
-  const getDryinjects = () => R.values(state.referential.entities.dryinjects)
-    .filter((n) => n.dryinject_dryrun === id);
+  const getDryinjects = () => R.values(state.referential.entities.dryinjects).filter(
+    (n) => n.dryinject_dryrun === id,
+  );
   return {
     ...dry,
     dryinjects: getDryinjects(),
@@ -371,7 +375,7 @@ export const storeBrowser = (state) => ({
     R.sort(
       (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime(),
       R.values(state.referential.entities.injects)
-        .filter((i) => i.inject_date !== null)
+        .filter((i) => i.inject_date !== null && i.inject_status === null)
         .map((i) => _buildInject(state, i)),
     ),
   ),

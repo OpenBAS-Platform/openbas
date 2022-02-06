@@ -354,7 +354,10 @@ const Exercise = () => {
               <Grid item={true} xs={6}>
                 <Typography variant="h1">{t('Next inject')}</Typography>
                 <div className={classes.countdown}>
-                  <Countdown date={nextInjectDate} />
+                  <Countdown
+                    date={nextInjectDate}
+                    paused={exercise.exercise_status === 'PAUSED'}
+                  />
                 </div>
               </Grid>
               <Grid item={true} xs={6}>
