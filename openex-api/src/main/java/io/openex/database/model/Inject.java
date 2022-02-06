@@ -12,10 +12,10 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
+import static java.time.Duration.between;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 
@@ -163,19 +163,26 @@ public abstract class Inject implements Base, Injection {
 
     @JsonIgnore
     private Instant computeInjectDate(Instant source, int speed) {
+        // Compute origin execution date
         Optional<Inject> dependsOnInject = ofNullable(getDependsOn());
         long duration = ofNullable(getDependsDuration()).orElse(0L) / speed;
         Instant dependingStart = dependsOnInject
                 .map(inject -> inject.computeInjectDate(source, speed))
                 .orElse(source);
         Instant standardExecutionDate = dependingStart.plusSeconds(duration);
+        // Compute execution dates with previous terminated pauses
         long previousPauseDelay = getExercise().getPauses().stream()
                 .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
                 .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
+        Instant afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);
+        // Add current pause duration in date computation if needed
         long currentPauseDelay = exercise.getCurrentPause()
-                .map(last -> last.isBefore(standardExecutionDate) ? Duration.between(last, now()).getSeconds() : 0L)
+                .map(last -> last.isBefore(afterPausesExecutionDate) ? between(last, now()).getSeconds() : 0L)
                 .orElse(0L);
-        return standardExecutionDate.plusSeconds(previousPauseDelay + currentPauseDelay);
+        long globalPauseDelay = previousPauseDelay + currentPauseDelay;
+        long minuteAlignModulo = globalPauseDelay % 60;
+        long alignedPauseDelay = minuteAlignModulo > 0 ? globalPauseDelay + (60 - minuteAlignModulo) : globalPauseDelay;
+        return standardExecutionDate.plusSeconds(alignedPauseDelay);
     }
 
     @JsonProperty("inject_date")
