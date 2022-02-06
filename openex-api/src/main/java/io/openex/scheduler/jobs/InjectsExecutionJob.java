@@ -64,14 +64,17 @@ public class InjectsExecutionJob implements Job {
             List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
             exercises.stream().parallel().forEach(exercise -> {
                 exercise.setStatus(Exercise.STATUS.RUNNING);
+                exercise.setUpdatedAt(now());
                 exerciseRepository.save(exercise);
             });
             List<ExecutableInject<?>> injects = injectHelper.getInjectsToRun();
             // Get all injects to execute grouped by exercise.
-            Map<String, List<ExecutableInject<?>>> byExercises = injects.stream()
-                    .collect(groupingBy(ex -> ex.getInject().getExercise().getId()));
+            Map<Exercise, List<ExecutableInject<?>>> byExercises = injects.stream()
+                    .collect(groupingBy(ex -> ex.getInject().getExercise()));
             // Execute injects in parallel for each exercise.
-            byExercises.values().stream().parallel().forEach(executableInjects -> {
+            byExercises.entrySet().stream().parallel().forEach(entry -> {
+                Exercise exercise = entry.getKey();
+                List<ExecutableInject<?>> executableInjects = entry.getValue();
                 // Execute each inject for the exercise in order.
                 executableInjects.forEach(executableInject -> {
                     Inject inject = executableInject.getInject();
@@ -92,11 +95,17 @@ public class InjectsExecutionJob implements Job {
                         dryInjectRepository.save(executedDry);
                     }
                 });
+                // Update the exercise
+                exercise.setUpdatedAt(now());
+                exerciseRepository.save(exercise);
             });
             // Change status of finished exercises.
             List<Exercise> mustBeFinishedExercises = exerciseRepository.thatMustBeFinished();
             exerciseRepository.saveAll(mustBeFinishedExercises.stream()
-                    .peek(exercise -> exercise.setStatus(Exercise.STATUS.FINISHED)).toList());
+                    .peek(exercise -> {
+                        exercise.setStatus(Exercise.STATUS.FINISHED);
+                        exercise.setUpdatedAt(now());
+                    }).toList());
         } catch (Exception e) {
             throw new JobExecutionException(e);
         }
