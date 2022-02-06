@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Base;
 import io.openex.database.model.User;
+import org.springframework.web.context.request.RequestContextHolder;
 
 public class BaseEvent {
+
+    @JsonIgnore
+    private final String sessionId;
 
     @JsonProperty("event_type")
     private String type;
@@ -22,12 +26,17 @@ public class BaseEvent {
     public BaseEvent(String type, Base data) {
         this.type = type;
         this.instance = data;
+        this.sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
         Class<? extends Base> currentClass = data.getClass();
         boolean isTargetClass = currentClass.getSuperclass().equals(Object.class);
         Class<?> baseClass = isTargetClass ? currentClass : currentClass.getSuperclass();
         String className = baseClass.getSimpleName().toLowerCase();
         this.attributeId = className + "_id";
         this.schema = className + (className.endsWith("s") ? "es" : "s");
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 
     public String getType() {
