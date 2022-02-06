@@ -13,7 +13,7 @@ import io.openex.rest.inject.form.*;
 import io.openex.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -101,7 +101,7 @@ public class InjectApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject updateInject(@PathVariable String exerciseId,
                                @PathVariable String injectId,
                                @Valid @RequestBody InjectInput input) {
@@ -188,14 +188,15 @@ public class InjectApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteInject(@PathVariable String injectId) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
         injectRepository.deleteById(injectId);
     }
 
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/activation")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject updateInjectActivation(@PathVariable String injectId,
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject updateInjectActivation(@PathVariable String exerciseId,
+                                         @PathVariable String injectId,
                                          @Valid @RequestBody InjectUpdateActivationInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         inject.setEnabled(input.isEnabled());
@@ -204,8 +205,9 @@ public class InjectApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/injects/{injectId}/status")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject setInjectStatus(@PathVariable String injectId,
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject setInjectStatus(@PathVariable String exerciseId,
+                                  @PathVariable String injectId,
                                   @Valid @RequestBody InjectUpdateStatusInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         // build status
@@ -224,8 +226,9 @@ public class InjectApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject updateInjectAudiences(@PathVariable String injectId,
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Inject updateInjectAudiences(@PathVariable String exerciseId,
+                                        @PathVariable String injectId,
                                         @Valid @RequestBody UpdateAudiencesInjectInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         Iterable<Audience> injectAudiences = audienceRepository.findAllById(input.getAudienceIds());

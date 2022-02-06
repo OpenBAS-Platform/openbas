@@ -12,7 +12,7 @@ import io.openex.rest.user.form.player.CreatePlayerInput;
 import io.openex.rest.user.form.player.UpdatePlayerInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -60,7 +60,7 @@ public class PlayerApi extends RestBehavior {
     }
 
     @GetMapping("/api/players")
-    @PostAuthorize("isObserver()")
+    @PreAuthorize("isObserver()")
     public Iterable<User> players() {
         Iterable<BasicInject> injects = basicInjectRepository.findAll();
         return fromIterable(userRepository.findAll()).stream()
@@ -69,7 +69,7 @@ public class PlayerApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @PostMapping("/api/players")
-    @PostAuthorize("isPlanner()")
+    @PreAuthorize("isPlanner()")
     public User createPlayer(@Valid @RequestBody CreatePlayerInput input) {
         User user = new User();
         user.setUpdateAttributes(input);
@@ -81,7 +81,7 @@ public class PlayerApi extends RestBehavior {
     }
 
     @PutMapping("/api/players/{userId}")
-    @PostAuthorize("isPlanner()")
+    @PreAuthorize("isPlanner()")
     public User updatePlayer(@PathVariable String userId, @Valid @RequestBody UpdatePlayerInput input) {
         User user = userRepository.findById(userId).orElseThrow();
         if (!currentUser().isAdmin() && user.isManager()) {
@@ -94,7 +94,7 @@ public class PlayerApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/players/{userId}")
-    @PostAuthorize("isPlanner()")
+    @PreAuthorize("isPlanner()")
     public void deletePlayer(@PathVariable String userId) {
         User user = userRepository.findById(userId).orElseThrow();
         if (!currentUser().isAdmin() && user.isManager()) {

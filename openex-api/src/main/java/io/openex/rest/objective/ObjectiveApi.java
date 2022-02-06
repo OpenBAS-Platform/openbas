@@ -12,7 +12,7 @@ import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.objective.form.EvaluationInput;
 import io.openex.rest.objective.form.ObjectiveInput;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -51,7 +51,7 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/objectives")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Objective createObjective(@PathVariable String exerciseId,
                                      @Valid @RequestBody ObjectiveInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -62,8 +62,9 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Objective updateObjective(@PathVariable String objectiveId,
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Objective updateObjective(@PathVariable String exerciseId,
+                                     @PathVariable String objectiveId,
                                      @Valid @RequestBody ObjectiveInput input) {
         Objective objective = objectiveRepository.findById(objectiveId).orElseThrow();
         objective.setUpdateAttributes(input);
@@ -71,8 +72,8 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteObjective(@PathVariable String objectiveId) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteObjective(@PathVariable String exerciseId, @PathVariable String objectiveId) {
         objectiveRepository.deleteById(objectiveId);
     }
     // endregion
@@ -89,7 +90,7 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     @Transactional(rollbackOn = Exception.class)
     public Evaluation createEvaluation(@PathVariable String exerciseId,
                                        @PathVariable String objectiveId,
@@ -109,7 +110,7 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Evaluation updateEvaluation(@PathVariable String exerciseId,
                                        @PathVariable String objectiveId,
                                        @PathVariable String evaluationId,
@@ -127,8 +128,8 @@ public class ObjectiveApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteEvaluation(@PathVariable String evaluationId) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteEvaluation(@PathVariable String exerciseId, @PathVariable String evaluationId) {
         evaluationRepository.deleteById(evaluationId);
     }
     // endregion

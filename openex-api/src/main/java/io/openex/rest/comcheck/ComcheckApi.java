@@ -8,7 +8,7 @@ import io.openex.database.repository.ExerciseRepository;
 import io.openex.rest.comcheck.form.ComcheckInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
@@ -65,8 +65,8 @@ public class ComcheckApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/comchecks/{comcheckId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteComcheck(@PathVariable String comcheckId) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteComcheck(@PathVariable String exerciseId, @PathVariable String comcheckId) {
         comcheckRepository.deleteById(comcheckId);
     }
 

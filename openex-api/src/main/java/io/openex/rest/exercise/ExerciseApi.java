@@ -19,7 +19,7 @@ import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.util.function.Tuples;
@@ -175,8 +175,9 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/logs/{logId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Log updateLog(@PathVariable String logId,
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Log updateLog(@PathVariable String exerciseId,
+                         @PathVariable String logId,
                          @Valid @RequestBody LogCreateInput input) {
         Log log = logRepository.findById(logId).orElseThrow();
         log.setUpdateAttributes(input);
@@ -185,8 +186,8 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/logs/{logId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteLog(@PathVariable String logId) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteLog(@PathVariable String exerciseId, @PathVariable String logId) {
         logRepository.deleteById(logId);
     }
     // endregion
@@ -198,7 +199,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/dryruns")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Dryrun createDryrun(@PathVariable String exerciseId,
                                @Valid @RequestBody DryrunCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -209,7 +210,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Dryrun dryrun(@PathVariable String exerciseId,
                          @PathVariable String dryrunId) {
         Specification<Dryrun> filters = DryRunSpecification
@@ -218,13 +219,13 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteDryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
         dryRunRepository.deleteById(dryrunId);
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public List<DryInject> dryrunInjects(@PathVariable String exerciseId,
                                          @PathVariable String dryrunId) {
         return dryrun(exerciseId, dryrunId).getInjects();
@@ -279,7 +280,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseInformation(@PathVariable String exerciseId,
                                               @Valid @RequestBody ExerciseUpdateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -288,7 +289,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/start_date")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseStart(@PathVariable String exerciseId,
                                         @Valid @RequestBody ExerciseUpdateStartDateInput input) throws InputValidationException {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -301,7 +302,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/tags")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseTags(@PathVariable String exerciseId,
                                        @Valid @RequestBody ExerciseUpdateTagsInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -310,7 +311,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/image")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise updateExerciseImage(@PathVariable String exerciseId,
                                         @Valid @RequestBody ExerciseUpdateImageInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -319,20 +320,20 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteExercise(@PathVariable String exerciseId) {
         exerciseRepository.deleteById(exerciseId);
     }
 
     @GetMapping("/api/exercises/{exerciseId}")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Exercise exercise(@PathVariable String exerciseId) {
         return exerciseRepository.findById(exerciseId).orElseThrow();
     }
 
     @Transactional(rollbackOn = Exception.class)
     @DeleteMapping("/api/exercises/{exerciseId}/{documentId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise deleteDocument(@PathVariable String exerciseId, @PathVariable String documentId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdatedAt(now());
@@ -355,7 +356,7 @@ public class ExerciseApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/exercises/{exerciseId}/status")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Exercise changeExerciseStatus(@PathVariable String exerciseId,
                                          @Valid @RequestBody ExerciseUpdateStatusInput input) {
         STATUS status = input.getStatus();
@@ -413,7 +414,7 @@ public class ExerciseApi extends RestBehavior {
 
     // region import/export
     @GetMapping("/api/exercises/{exerciseId}/export")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public void exerciseExport(@PathVariable String exerciseId,
                                @RequestParam(required = false) boolean isWithPlayers,
                                HttpServletResponse response) throws IOException {

@@ -14,7 +14,7 @@ import io.openex.rest.audience.form.AudienceUpdateInput;
 import io.openex.rest.audience.form.UpdateUsersAudienceInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -53,25 +53,25 @@ public class AudienceApi extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exerciseId}/audiences")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Audience> getAudiences(@PathVariable String exerciseId) {
         return audienceRepository.findAll(AudienceSpecification.fromExercise(exerciseId));
     }
 
     @GetMapping("/api/exercises/{exerciseId}/audiences/{audienceId}")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
-    public Audience getAudience(@PathVariable String audienceId) {
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Audience getAudience(@PathVariable String exerciseId, @PathVariable String audienceId) {
         return audienceRepository.findById(audienceId).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/players")
-    @PostAuthorize("isExerciseObserver(#exerciseId)")
-    public Iterable<User> getAudiencePlayers(@PathVariable String audienceId) {
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<User> getAudiencePlayers(@PathVariable String exerciseId, @PathVariable String audienceId) {
         return audienceRepository.findById(audienceId).orElseThrow().getUsers();
     }
 
     @PostMapping("/api/exercises/{exerciseId}/audiences")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Audience createAudience(@PathVariable String exerciseId,
                                    @Valid @RequestBody AudienceCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
@@ -83,15 +83,16 @@ public class AudienceApi extends RestBehavior {
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/audiences/{audienceId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public void deleteAudience(@PathVariable String audienceId) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public void deleteAudience(@PathVariable String exerciseId, @PathVariable String audienceId) {
         audienceRepository.deleteById(audienceId);
     }
 
     @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Audience updateAudience(@PathVariable String audienceId,
-                                           @Valid @RequestBody AudienceUpdateInput input) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Audience updateAudience(@PathVariable String exerciseId,
+                                   @PathVariable String audienceId,
+                                   @Valid @RequestBody AudienceUpdateInput input) {
         Audience audience = audienceRepository.findById(audienceId).orElseThrow();
         audience.setUpdateAttributes(input);
         audience.setUpdatedAt(now());
@@ -100,9 +101,11 @@ public class AudienceApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/players")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Audience updateAudienceUsers(@PathVariable String audienceId,
-                                        @Valid @RequestBody UpdateUsersAudienceInput input) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Audience updateAudienceUsers(
+            @PathVariable String exerciseId,
+            @PathVariable String audienceId,
+            @Valid @RequestBody UpdateUsersAudienceInput input) {
         Audience audience = audienceRepository.findById(audienceId).orElseThrow();
         Iterable<User> audienceUsers = userRepository.findAllById(input.getUserIds());
         audience.setUsers(fromIterable(audienceUsers));
@@ -110,9 +113,11 @@ public class AudienceApi extends RestBehavior {
     }
 
     @PutMapping("/api/exercises/{exerciseId}/audiences/{audienceId}/activation")
-    @PostAuthorize("isExercisePlanner(#exerciseId)")
-    public Audience updateAudienceActivation(@PathVariable String audienceId,
-                                             @Valid @RequestBody AudienceUpdateActivationInput input) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public Audience updateAudienceActivation(
+            @PathVariable String exerciseId,
+            @PathVariable String audienceId,
+            @Valid @RequestBody AudienceUpdateActivationInput input) {
         Audience audience = audienceRepository.findById(audienceId).orElseThrow();
         audience.setEnabled(input.isEnabled());
         return audienceRepository.save(audience);
