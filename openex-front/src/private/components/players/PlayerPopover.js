@@ -136,6 +136,8 @@ class PlayerPopover extends Component {
         'user_tags',
       ]),
     )(user);
+    const canDelete = user.user_email !== 'admin@openex.io' && (userAdmin || !user.user_admin);
+    const canUpdateEmail = user.user_email !== 'admin@openex.io' && (userAdmin || !user.user_admin);
     return (
       <div>
         <IconButton
@@ -161,7 +163,7 @@ class PlayerPopover extends Component {
               {t('Remove from the audience')}
             </MenuItem>
           )}
-          {userAdmin && (
+          {canDelete && (
             <MenuItem onClick={this.handleOpenDelete.bind(this)}>
               {t('Delete')}
             </MenuItem>
@@ -209,6 +211,7 @@ class PlayerPopover extends Component {
               organizations={organizations}
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
+              canUpdateEmail={canUpdateEmail}
             />
           </DialogContent>
         </Dialog>

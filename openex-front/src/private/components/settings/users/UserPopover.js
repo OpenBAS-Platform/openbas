@@ -149,9 +149,11 @@ class UserPopover extends Component {
           <MenuItem onClick={this.handleOpenEditPassword.bind(this)}>
             {t('Update password')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
-            {t('Delete')}
-          </MenuItem>
+          {user.user_email !== 'admin@openex.io' && (
+            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+              {t('Delete')}
+            </MenuItem>
+          )}
         </Menu>
         <Dialog
           open={this.state.openDelete}

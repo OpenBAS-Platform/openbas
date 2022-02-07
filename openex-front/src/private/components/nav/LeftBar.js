@@ -121,37 +121,35 @@ const LeftBar = ({
         <ListItemText primary={t('Documents')} />
       </MenuItem>
     </MenuList>
-    {userAdmin && (
-      <div>
-        <Divider />
-        <MenuList component="nav">
-          <MenuItem
-            component={Link}
-            to="/integrations"
-            selected={location.pathname === '/integrations'}
-            dense={false}
-            classes={{ root: classes.menuItem }}
-          >
-            <ListItemIcon style={{ minWidth: 35 }}>
-              <ExtensionOutlined />
-            </ListItemIcon>
-            <ListItemText primary={t('Integrations')} />
-          </MenuItem>
-          <MenuItem
-            component={Link}
-            to="/settings"
-            selected={location.pathname.includes('/settings')}
-            dense={false}
-            classes={{ root: classes.menuItem }}
-          >
-            <ListItemIcon style={{ minWidth: 35 }}>
-              <SettingsOutlined />
-            </ListItemIcon>
-            <ListItemText primary={t('Settings')} />
-          </MenuItem>
-        </MenuList>
-      </div>
-    )}
+    <Divider />
+    <MenuList component="nav">
+      <MenuItem
+        component={Link}
+        to="/integrations"
+        selected={location.pathname === '/integrations'}
+        dense={false}
+        classes={{ root: classes.menuItem }}
+      >
+        <ListItemIcon style={{ minWidth: 35 }}>
+          <ExtensionOutlined />
+        </ListItemIcon>
+        <ListItemText primary={t('Integrations')} />
+      </MenuItem>
+      {userAdmin && (
+        <MenuItem
+          component={Link}
+          to="/settings"
+          selected={location.pathname.includes('/settings')}
+          dense={false}
+          classes={{ root: classes.menuItem }}
+        >
+          <ListItemIcon style={{ minWidth: 35 }}>
+            <SettingsOutlined />
+          </ListItemIcon>
+          <ListItemText primary={t('Settings')} />
+        </MenuItem>
+      )}
+    </MenuList>
   </Drawer>
 );
 

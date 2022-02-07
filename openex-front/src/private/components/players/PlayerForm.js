@@ -22,7 +22,7 @@ class PlayerForm extends Component {
 
   render() {
     const {
-      t, onSubmit, initialValues, editing, handleClose,
+      t, onSubmit, initialValues, editing, handleClose, canUpdateEmail,
     } = this.props;
     return (
       <Form
@@ -45,6 +45,7 @@ class PlayerForm extends Component {
               name="user_email"
               fullWidth={true}
               label={t('Email address')}
+              disabled={editing && !canUpdateEmail}
             />
             <TextField
               variant="standard"
@@ -133,6 +134,7 @@ PlayerForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
+  canUpdateEmail: PropTypes.bool,
 };
 
 export default inject18n(PlayerForm);

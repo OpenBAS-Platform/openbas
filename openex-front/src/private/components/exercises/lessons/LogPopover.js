@@ -16,6 +16,8 @@ import { updateLog, deleteLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
+import { storeBrowser } from '../../../../actions/Schema';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 class LogPopover extends Component {
   constructor(props) {
@@ -69,7 +71,7 @@ class LogPopover extends Component {
   }
 
   render() {
-    const { t, log } = this.props;
+    const { t, log, exercise } = this.props;
     const logTags = log.tags.map((tag) => ({
       id: tag.tag_id,
       label: tag.tag_name,
@@ -85,6 +87,7 @@ class LogPopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
+          disabled={isExerciseReadOnly(exercise, true)}
         >
           <MoreVert />
         </IconButton>
@@ -152,12 +155,21 @@ class LogPopover extends Component {
 LogPopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   log: PropTypes.object,
   updateLog: PropTypes.func,
   deleteLog: PropTypes.func,
 };
 
+const select = (state, ownProps) => {
+  const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
+  return {
+    exercise: browser.getExercise(exerciseId),
+  };
+};
+
 export default R.compose(
-  connect(null, { updateLog, deleteLog }),
+  connect(select, { updateLog, deleteLog }),
   inject18n,
 )(LogPopover);

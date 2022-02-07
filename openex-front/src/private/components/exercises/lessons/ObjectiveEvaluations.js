@@ -22,6 +22,10 @@ import {
 } from '../../../../actions/Evaluation';
 import { resolveUserName } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
+import {
+  isExerciseReadOnly,
+  isExerciseUpdatable,
+} from '../../../../utils/Exercise';
 
 const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const dispatch = useDispatch();
@@ -30,6 +34,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const [submitting, setSubmitting] = useState(false);
   // Fetching data
   const { exerciseId } = useParams();
+  const exercise = useStore((store) => store.getExercise(exerciseId));
   const objective = useStore((store) => store.getObjective(objectiveId));
   const me = useStore((store) => store.me);
   const evaluations = objective ? objective.evaluations : [];
@@ -139,47 +144,51 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
           </ListItem>
         </List>
       )}
-      <Box
-        sx={{
-          width: '100%',
-          marginTop: '30px',
-          padding: '0 5px 0 5px',
-        }}
-      >
-        <Typography variant="overline">{t('My evaluation')}</Typography>
-        <Slider
-          aria-label={t('Score')}
-          value={
-            value === null
-              ? currentUserEvaluation?.evaluation_score || 10
-              : value
-          }
-          onChange={(_, val) => setValue(val)}
-          valueLabelDisplay="auto"
-          step={5}
-          marks={true}
-          min={10}
-          max={100}
-        />
-      </Box>
+      {isExerciseUpdatable(exercise, true) && (
+        <Box
+          sx={{
+            width: '100%',
+            marginTop: '30px',
+            padding: '0 5px 0 5px',
+          }}
+        >
+          <Typography variant="overline">{t('My evaluation')}</Typography>
+          <Slider
+            aria-label={t('Score')}
+            value={
+              value === null
+                ? currentUserEvaluation?.evaluation_score || 10
+                : value
+            }
+            onChange={(_, val) => setValue(val)}
+            valueLabelDisplay="auto"
+            step={5}
+            marks={true}
+            min={10}
+            max={100}
+          />
+        </Box>
+      )}
       <div style={{ float: 'right', marginTop: 20 }}>
         <Button
           variant="contained"
           color="secondary"
           onClick={handleClose}
-          style={{ marginRight: 10 }}
+          style={{ marginRight: isExerciseUpdatable(exercise, true) ? 10 : 0 }}
           disabled={submitting}
         >
-          {t('Cancel')}
+          {isExerciseUpdatable(exercise, true) ? t('Cancel') : t('Close')}
         </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={submitEvaluation}
-          disabled={submitting}
-        >
-          {t('Evaluate')}
-        </Button>
+        {isExerciseUpdatable(exercise, true) && (
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={submitEvaluation}
+            disabled={submitting}
+          >
+            {t('Evaluate')}
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -19,6 +19,8 @@ import {
 import ObjectiveForm from './ObjectiveForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
+import { storeBrowser } from '../../../../actions/Schema';
+import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 class ObjectivePopover extends Component {
   constructor(props) {
@@ -76,7 +78,7 @@ class ObjectivePopover extends Component {
   }
 
   render() {
-    const { t, objective } = this.props;
+    const { t, objective, exercise } = this.props;
     const initialValues = R.pick(
       ['objective_title', 'objective_description', 'objective_priority'],
       objective,
@@ -87,6 +89,7 @@ class ObjectivePopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
+          disabled={isExerciseReadOnly(exercise, true)}
         >
           <MoreVert />
         </IconButton>
@@ -154,12 +157,21 @@ class ObjectivePopover extends Component {
 ObjectivePopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
+  exercise: PropTypes.object,
   objective: PropTypes.object,
   updateObjective: PropTypes.func,
   deleteObjective: PropTypes.func,
 };
 
+const select = (state, ownProps) => {
+  const browser = storeBrowser(state);
+  const { exerciseId } = ownProps;
+  return {
+    exercise: browser.getExercise(exerciseId),
+  };
+};
+
 export default R.compose(
-  connect(null, { updateObjective, deleteObjective }),
+  connect(select, { updateObjective, deleteObjective }),
   inject18n,
 )(ObjectivePopover);

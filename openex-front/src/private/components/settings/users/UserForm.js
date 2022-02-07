@@ -46,6 +46,7 @@ const UserForm = (props) => {
             name="user_email"
             fullWidth={true}
             label={t('Email address')}
+            disabled={initialValues.user_email === 'admin@openex.io'}
           />
           <TextField
             variant="standard"
@@ -116,6 +117,7 @@ const UserForm = (props) => {
             name="user_admin"
             label={t('Administrator')}
             style={{ marginTop: 20 }}
+            disabled={initialValues.user_email === 'admin@openex.io'}
           />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
