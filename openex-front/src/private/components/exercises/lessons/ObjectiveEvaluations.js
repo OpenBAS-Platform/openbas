@@ -22,10 +22,7 @@ import {
 } from '../../../../actions/Evaluation';
 import { resolveUserName } from '../../../../utils/String';
 import Loader from '../../../../components/Loader';
-import {
-  isExerciseReadOnly,
-  isExerciseUpdatable,
-} from '../../../../utils/Exercise';
+import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
 const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const dispatch = useDispatch();
