@@ -262,7 +262,10 @@ const Dryrun = () => {
               <DryrunStatus finished={dryrun?.dryrun_finished} />
             </div>
             <div className={classes.progress}>
-              <DryrunProgress start={dryrun?.dryrun_start_date} end={dryrun?.dryrun_end_date} />
+              <DryrunProgress
+                start={dryrun?.dryrun_start_date}
+                end={dryrun?.dryrun_end_date}
+              />
             </div>
           </Paper>
         </Grid>

@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';

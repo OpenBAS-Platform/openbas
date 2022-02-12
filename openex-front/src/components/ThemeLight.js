@@ -13,7 +13,6 @@ export default () => ({
       default: '#0a1929',
       paper: '#001e3c',
       header: '#071a2e',
-      area: '#',
     },
   },
   typography: {

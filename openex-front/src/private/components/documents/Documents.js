@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -294,19 +294,37 @@ class Documents extends Component {
               <ListItemText
                 primary={
                   <div>
-                    <div className={classes.bodyItem} style={inlineStyles.document_name}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_name}
+                    >
                       {document.document_name}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.document_description}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_description}
+                    >
                       {document.document_description}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.document_exercises}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_exercises}
+                    >
                       {document.document_exercises.length}
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.document_type}>
-                      <DocumentType type={document.document_type} variant="list"/>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_type}
+                    >
+                      <DocumentType
+                        type={document.document_type}
+                        variant="list"
+                      />
                     </div>
-                    <div className={classes.bodyItem} style={inlineStyles.document_tags}>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.document_tags}
+                    >
                       <ItemTags variant="list" tags={document.tags} />
                     </div>
                   </div>

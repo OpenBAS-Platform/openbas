@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { withRouter, Link } from 'react-router-dom';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import Drawer from '@mui/material/Drawer';
 import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';

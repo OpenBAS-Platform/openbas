@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import Paper from '@mui/material/Paper';
 import * as R from 'ramda';
 import Button from '@mui/material/Button';
@@ -26,18 +26,9 @@ const styles = () => ({
     borderTopLeftRadius: '10px',
     borderTopRightRadius: '10px',
   },
-  login: {
-    borderRadius: '10px',
-    paddingBottom: '15px',
-  },
   logo: {
     width: 200,
     margin: '0px 0px 50px 0px',
-  },
-  subtitle: {
-    color: '#ffffff',
-    fontWeight: 400,
-    fontSize: 18,
   },
 });
 

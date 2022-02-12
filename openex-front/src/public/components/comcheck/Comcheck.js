@@ -76,14 +76,17 @@ const Comcheck = () => {
           {t('Your communication check is')}
           &nbsp;
           <strong>
-            {status?.comcheckstatus_receive_date ? t('successfull') : t('failed')}
+            {status?.comcheckstatus_receive_date
+              ? t('successfull')
+              : t('failed')}
           </strong>
           .
           <br />
           <CheckCircleOutlineOutlined color="success" sx={{ fontSize: 50 }} />
           <br />
           <pre>
-            {t('Verification done at')} {fldt(status?.comcheckstatus_receive_date)}.
+            {t('Verification done at')}{' '}
+            {fldt(status?.comcheckstatus_receive_date)}.
           </pre>
         </div>
       </Paper>

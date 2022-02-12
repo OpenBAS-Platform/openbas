@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -117,9 +117,7 @@ class TopBar extends Component {
             {location.pathname.includes('/settings') && <TopMenuSettings />}
           </div>
           <div className={classes.barRight}>
-            <Button component={ImportUploader}>
-              {t('Import exercise')}
-            </Button>
+            <Button component={ImportUploader}>{t('Import exercise')}</Button>
             <IconButton onClick={this.handleOpen.bind(this)} size="small">
               <AccountCircleOutlined />
             </IconButton>

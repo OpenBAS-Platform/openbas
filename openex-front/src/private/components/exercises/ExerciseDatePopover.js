@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import { EditOutlined } from '@mui/icons-material';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { updateExerciseStartDate } from '../../../actions/Exercise';
 import inject18n from '../../../components/i18n';
 import ExerciseDateForm from './ExerciseDateForm';

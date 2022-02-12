@@ -153,116 +153,142 @@ const Exercises = () => {
     dispatch(fetchExercises());
   });
   return (
-      <div className={classes.container}>
-        <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchFilter
-              small={true}
-              onChange={filtering.handleSearch}
-              keyword={filtering.keyword}
-            />
-          </div>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <TagsFilter
-              onAddTag={filtering.handleAddTag}
-              onRemoveTag={filtering.handleRemoveTag}
-              currentTags={filtering.tags}
-            />
-          </div>
+    <div className={classes.container}>
+      <div className={classes.parameters}>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <SearchFilter
+            small={true}
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
         </div>
-        <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <TagsFilter
+            onAddTag={filtering.handleAddTag}
+            onRemoveTag={filtering.handleRemoveTag}
+            currentTags={filtering.tags}
+          />
+        </div>
+      </div>
+      <div className="clearfix" />
+      <List classes={{ root: classes.container }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon>
+            <span
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
+              #
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <div>
+                {filtering.buildHeader(
+                  'exercise_name',
+                  'Name',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'exercise_subtitle',
+                  'Subtitle',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'exercise_start_date',
+                  'Start date',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'exercise_status',
+                  'Status',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'exercise_tags',
+                  'Tags',
+                  true,
+                  headerStyles,
+                )}
+              </div>
+            }
+          />
+          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+        </ListItem>
+        {filtering.filterAndSort(exercises).map((exercise) => (
           <ListItem
-            classes={{ root: classes.itemHead }}
-            divider={false}
-            style={{ paddingTop: 0 }}
+            key={exercise.exercise_id}
+            classes={{ root: classes.item }}
+            divider={true}
+            button={true}
+            component={Link}
+            to={`/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <span
-                style={{
-                  padding: '0 8px 0 8px',
-                  fontWeight: 700,
-                  fontSize: 12,
-                }}
-              >
-                #
-              </span>
+              <Kayaking />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
-                  {filtering.buildHeader('exercise_name', 'Name', true, headerStyles)}
-                  {filtering.buildHeader('exercise_subtitle', 'Subtitle', true, headerStyles)}
-                  {filtering.buildHeader('exercise_start_date', 'Start date', true, headerStyles)}
-                  {filtering.buildHeader('exercise_status', 'Status', true, headerStyles)}
-                  {filtering.buildHeader('exercise_tags', 'Tags', true, headerStyles)}
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_name}
+                  >
+                    {exercise.exercise_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_subtitle}
+                  >
+                    {exercise.exercise_subtitle}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_start_date}
+                  >
+                    {exercise.exercise_start_date ? (
+                      nsdt(exercise.exercise_start_date)
+                    ) : (
+                      <i>{t('Manual')}</i>
+                    )}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_start_date}
+                  >
+                    <ExerciseStatus
+                      variant="list"
+                      status={exercise.exercise_status}
+                    />
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.exercise_tags}
+                  >
+                    <ItemTags variant="list" tags={exercise.tags} />
+                  </div>
                 </div>
               }
             />
-            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+            <ListItemSecondaryAction>
+              <ChevronRightOutlined />
+            </ListItemSecondaryAction>
           </ListItem>
-          {filtering.filterAndSort(exercises).map((exercise) => (
-            <ListItem
-              key={exercise.exercise_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              button={true}
-              component={Link}
-              to={`/exercises/${exercise.exercise_id}`}>
-              <ListItemIcon>
-                <Kayaking />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.exercise_name}
-                    >
-                      {exercise.exercise_name}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.exercise_subtitle}
-                    >
-                      {exercise.exercise_subtitle}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
-                    >
-                      {exercise.exercise_start_date ? (
-                        nsdt(exercise.exercise_start_date)
-                      ) : (
-                        <i>{t('Manual')}</i>
-                      )}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.exercise_start_date}
-                    >
-                      <ExerciseStatus
-                        variant="list"
-                        status={exercise.exercise_status}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.exercise_tags}
-                    >
-                      <ItemTags variant="list" tags={exercise.tags} />
-                    </div>
-                  </div>
-                }
-              />
-              <ListItemSecondaryAction>
-                <ChevronRightOutlined />
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-        {userAdmin && <CreateExercise />}
-      </div>
+        ))}
+      </List>
+      {userAdmin && <CreateExercise />}
+    </div>
   );
 };
 

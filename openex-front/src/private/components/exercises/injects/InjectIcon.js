@@ -52,11 +52,7 @@ const iconSelector = (type, variant, fontSize) => {
       );
     case 'openex_mastodon':
       return (
-        <Mastodon
-          style={style}
-          fontSize={fontSize}
-          sx={{ color: '#e91e63' }}
-        />
+        <Mastodon style={style} fontSize={fontSize} sx={{ color: '#e91e63' }} />
       );
     default:
       return <HelpOutlined style={style} fontSize={fontSize} />;

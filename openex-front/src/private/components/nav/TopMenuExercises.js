@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Link, withRouter } from 'react-router-dom';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { compose } from 'ramda';
 import Button from '@mui/material/Button';
 import inject18n from '../../../components/i18n';

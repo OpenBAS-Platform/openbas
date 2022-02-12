@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/styles';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import LinearProgress, {
+  linearProgressClasses,
+} from '@mui/material/LinearProgress';
 import { progression } from '../../../../utils/Time';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
@@ -20,7 +22,10 @@ const DryrunProgress = ({ start, end }) => {
     return () => clearInterval(intervalId);
   }, []);
   return (
-      <BorderLinearProgress value={progression(currentDate, Date.parse(start), Date.parse(end))} variant="determinate"/>
+    <BorderLinearProgress
+      value={progression(currentDate, Date.parse(start), Date.parse(end))}
+      variant="determinate"
+    />
   );
 };
 

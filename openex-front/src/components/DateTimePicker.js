@@ -9,28 +9,28 @@ const renderDateTimePicker = ({
   textFieldProps,
   ...others
 }) => (
-    <KeyboardDateTimePicker
-      {...inputProps}
-      {...others}
-      ampm={false}
-      format="yyyy-MM-dd HH:mm:ss"
-      value={value ? new Date(value) : null}
-      disabled={submitting}
-      onBlur={() => onBlur(value ? new Date(value).toISOString() : null)}
-      error={error && touched}
-      onChange={(date) => (Date.parse(date)
-        ? inputProps.onChange(date.toISOString())
-        : inputProps.onChange(null))
-      }
-      renderInput={(props) => (
-        <TextField
-          {...props}
-          {...textFieldProps}
-          error={Boolean(touched && error)}
-          helperText={touched && error}
-        />
-      )}
-    />
+  <KeyboardDateTimePicker
+    {...inputProps}
+    {...others}
+    ampm={false}
+    format="yyyy-MM-dd HH:mm:ss"
+    value={value ? new Date(value) : null}
+    disabled={submitting}
+    onBlur={() => onBlur(value ? new Date(value).toISOString() : null)}
+    error={error && touched}
+    onChange={(date) => (Date.parse(date)
+      ? inputProps.onChange(date.toISOString())
+      : inputProps.onChange(null))
+    }
+    renderInput={(props) => (
+      <TextField
+        {...props}
+        {...textFieldProps}
+        error={Boolean(touched && error)}
+        helperText={touched && error}
+      />
+    )}
+  />
 );
 
 // eslint-disable-next-line import/prefer-default-export

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import Chip from '@mui/material/Chip';
 import inject18n from './i18n';
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import Tooltip from '@mui/material/Tooltip';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';

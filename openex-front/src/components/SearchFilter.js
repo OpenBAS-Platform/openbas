@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Search } from '@mui/icons-material';

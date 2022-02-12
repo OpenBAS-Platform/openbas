@@ -1,7 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';

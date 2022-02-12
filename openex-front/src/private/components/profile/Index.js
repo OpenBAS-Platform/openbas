@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import * as R from 'ramda';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
 import {

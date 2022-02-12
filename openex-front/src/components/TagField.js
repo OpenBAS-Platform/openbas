@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as R from 'ramda';
 import { LabelOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
-import { withStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
 import { connect } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
