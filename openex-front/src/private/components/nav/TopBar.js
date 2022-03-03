@@ -53,11 +53,6 @@ const styles = (theme) => ({
     verticalAlign: 'middle',
     height: '100%',
   },
-  barContainer: {
-    display: 'table-cell',
-    float: 'left',
-    paddingTop: 10,
-  },
   divider: {
     display: 'table-cell',
     float: 'left',
