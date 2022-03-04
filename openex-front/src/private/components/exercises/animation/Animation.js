@@ -483,6 +483,7 @@ const Animation = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedInject(null)}
+        elevation={1}
       >
         <InjectDefinition
           injectId={selectedInject}

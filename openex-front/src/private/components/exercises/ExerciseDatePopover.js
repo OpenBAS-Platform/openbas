@@ -64,6 +64,7 @@ class ExerciseDatePopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Update the exercise')}</DialogTitle>
           <DialogContent>

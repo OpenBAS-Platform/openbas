@@ -116,6 +116,7 @@ class OrganizationPopover extends Component {
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -145,6 +146,7 @@ class OrganizationPopover extends Component {
           onClose={this.handleCloseEdit.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Update the organization')}</DialogTitle>
           <DialogContent>

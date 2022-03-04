@@ -140,6 +140,7 @@ class CreateControl extends Component {
           onClose={this.handleCloseComcheck.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Send a new comcheck')}</DialogTitle>
           <DialogContent style={{ overflowX: 'hidden' }}>
@@ -166,6 +167,7 @@ class CreateControl extends Component {
           onClose={this.handleCloseDryrun.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Launch a new dryrun')}</DialogTitle>
           <DialogContent>

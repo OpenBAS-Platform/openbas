@@ -279,6 +279,7 @@ class InjectPopover extends Component {
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -308,6 +309,7 @@ class InjectPopover extends Component {
           onClose={this.handleCloseEdit.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Update the inject')}</DialogTitle>
           <DialogContent>
@@ -324,6 +326,7 @@ class InjectPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openTry}
           onClose={this.handleCloseTry.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -354,6 +357,7 @@ class InjectPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEnable}
           onClose={this.handleCloseEnable.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -381,6 +385,7 @@ class InjectPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openDisable}
           onClose={this.handleCloseDisable.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -408,6 +413,7 @@ class InjectPopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openDone}
           onClose={this.handleCloseDone.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>

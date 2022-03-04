@@ -111,6 +111,7 @@ const ExerciseHeader = () => {
           onClose={handleToggleAddTag}
           fullWidth={true}
           maxWidth="xs"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Add tags to this exercise')}</DialogTitle>
           <DialogContent>

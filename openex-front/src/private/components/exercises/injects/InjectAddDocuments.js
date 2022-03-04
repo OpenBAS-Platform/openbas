@@ -146,6 +146,7 @@ class InjectAddDocuments extends Component {
           fullWidth={true}
           maxWidth="md"
           PaperProps={{
+            elevation: 1,
             sx: {
               minHeight: 540,
               maxHeight: 540,

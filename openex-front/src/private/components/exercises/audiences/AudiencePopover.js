@@ -221,6 +221,7 @@ class AudiencePopover extends Component {
           open={this.state.openDelete}
           TransitionComponent={Transition}
           onClose={this.handleCloseDelete.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -250,6 +251,7 @@ class AudiencePopover extends Component {
           onClose={this.handleCloseEdit.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Update the audience')}</DialogTitle>
           <DialogContent>
@@ -265,6 +267,7 @@ class AudiencePopover extends Component {
           open={this.state.openRemove}
           TransitionComponent={Transition}
           onClose={this.handleCloseRemove.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -292,6 +295,7 @@ class AudiencePopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openEnable}
           onClose={this.handleCloseEnable.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>
@@ -319,6 +323,7 @@ class AudiencePopover extends Component {
           TransitionComponent={Transition}
           open={this.state.openDisable}
           onClose={this.handleCloseDisable.bind(this)}
+          PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
             <DialogContentText>

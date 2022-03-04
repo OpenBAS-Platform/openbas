@@ -235,6 +235,7 @@ const Controls = () => {
         open={Boolean(openComcheckDelete)}
         TransitionComponent={Transition}
         onClose={() => setOpenComcheckDelete(null)}
+        PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
           <DialogContentText>
@@ -262,6 +263,7 @@ const Controls = () => {
         open={Boolean(openDryrunDelete)}
         TransitionComponent={Transition}
         onClose={() => setOpenDryrunDelete(null)}
+        PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
           <DialogContentText>

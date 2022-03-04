@@ -4,7 +4,6 @@ import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
-import { EnrichedTextField } from '../../../components/EnrichedTextField';
 
 class ExerciseParametersForm extends Component {
   validate(values) {
@@ -44,18 +43,24 @@ class ExerciseParametersForm extends Component {
               label={t('Sender email address')}
               disabled={disabled}
             />
-            <EnrichedTextField
+            <TextField
+              variant="standard"
               name="exercise_message_header"
               label={t('Messages header')}
+              multiline={true}
               fullWidth={true}
-              style={{ marginTop: 20, height: 150 }}
+              rows={3}
+              style={{ marginTop: 20 }}
               disabled={disabled}
             />
-            <EnrichedTextField
+            <TextField
+              variant="standard"
               name="exercise_message_footer"
               label={t('Messages footer')}
+              multiline={true}
               fullWidth={true}
-              style={{ marginTop: 20, height: 150 }}
+              rows={3}
+              style={{ marginTop: 20 }}
               disabled={disabled}
             />
             <div style={{ float: 'right', marginTop: 20 }}>

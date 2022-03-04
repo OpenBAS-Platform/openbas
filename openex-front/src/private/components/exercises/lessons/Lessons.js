@@ -385,6 +385,7 @@ const Lessons = () => {
         onClose={() => setSelectedObjective(null)}
         fullWidth={true}
         maxWidth="md"
+        PaperProps={{ elevation: 1 }}
       >
         <DialogTitle>{t('Objective achievement evalution')}</DialogTitle>
         <DialogContent>

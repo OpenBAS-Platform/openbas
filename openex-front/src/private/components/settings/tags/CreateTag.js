@@ -64,6 +64,7 @@ class CreateTag extends Component {
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
           maxWidth="md"
+          PaperProps={{ elevation: 1 }}
         >
           <DialogTitle>{t('Create a new tag')}</DialogTitle>
           <DialogContent>

@@ -58,7 +58,7 @@
     "redux-logger": "3.0.6"
   },
   "engines": {
-    "node": ">= 14.* < 17.0.0"
+    "node": ">= 16.*"
   },
   "scripts": {
     "start": "react-scripts --max-old-space-size=8192 start",

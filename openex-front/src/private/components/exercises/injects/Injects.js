@@ -31,7 +31,7 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 
 const useStyles = makeStyles((theme) => ({
   container: {
-    marginTop: 10,
+    margin: '10px 0 50px 0',
   },
   parameters: {
     float: 'left',
@@ -366,6 +366,7 @@ const Injects = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedInject(null)}
+        elevation={1}
       >
         <InjectDefinition
           injectId={selectedInject}

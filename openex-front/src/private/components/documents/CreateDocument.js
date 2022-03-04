@@ -88,6 +88,7 @@ const CreateDocument = (props) => {
         fullWidth={true}
         maxWidth="md"
         onClose={() => setOpen(false)}
+        PaperProps={{ elevation: 1 }}
       >
         <DialogTitle>{t('Create a new document')}</DialogTitle>
         <DialogContent>

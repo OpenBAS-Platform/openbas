@@ -118,7 +118,7 @@ class AudienceAddPlayers extends Component {
         !== -1
       || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.user_organization || '')
+      || R.propOr('-', 'organization_name', n.organization)
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(users);
@@ -141,6 +141,7 @@ class AudienceAddPlayers extends Component {
           fullWidth={true}
           maxWidth="md"
           PaperProps={{
+            elevation: 1,
             sx: {
               minHeight: 540,
               maxHeight: 540,

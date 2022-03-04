@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     float: 'left',
   },
   container: {
-    marginTop: 10,
+    margin: '10px 0 50px 0',
   },
   itemHead: {
     textTransform: 'uppercase',
@@ -309,6 +309,7 @@ const Audiences = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedAudience(null)}
+        elevation={1}
       >
         <AudiencePlayers
           audienceId={selectedAudience}

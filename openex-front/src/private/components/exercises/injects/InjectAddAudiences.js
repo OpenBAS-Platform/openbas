@@ -107,17 +107,9 @@ class InjectAddAudiences extends Component {
     } = this.props;
     const { keyword, audiencesIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.audience_email || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.audience_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.audience_firstname || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.audience_lastname || '')
-        .toLowerCase()
-        .indexOf(keyword.toLowerCase()) !== -1
-      || (n.audience_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
-        !== -1
-      || (n.audience_organization || '')
+      || (n.audience_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
     const filteredAudiences = R.pipe(
@@ -150,6 +142,7 @@ class InjectAddAudiences extends Component {
           fullWidth={true}
           maxWidth="md"
           PaperProps={{
+            elevation: 1,
             sx: {
               minHeight: 540,
               maxHeight: 540,

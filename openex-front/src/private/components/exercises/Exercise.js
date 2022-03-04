@@ -412,6 +412,7 @@ const Exercise = () => {
         open={Boolean(openChangeStatus)}
         TransitionComponent={Transition}
         onClose={() => setOpenChangeStatus(null)}
+        PaperProps={{ elevation: 1 }}
       >
         <DialogContent>
           <DialogContentText>
