@@ -1,20 +1,27 @@
-export default () => ({
-  fontFamily: 'Roboto, sans-serif',
+export default (
+  logo = null,
+  background = null,
+  paper = null,
+  nav = null,
+  primary = null,
+  secondary = null,
+  accent = null,
+) => ({
+  logo: logo || `${window.BASE_PATH}/static/logo_text.png`,
   palette: {
     mode: 'dark',
-    primary: {
-      main: '#00b1ff',
-    },
-    secondary: {
-      main: '#e91e63',
-    },
+    primary: { main: primary || '#00b1ff' },
+    secondary: { main: secondary || '#ec407a' },
     background: {
-      default: '#0a1929',
-      paper: '#001e3c',
-      header: '#071a2e',
+      default: background || '#0a1929',
+      paper: paper || '#001e3c',
+      nav: nav || '#071a2e',
+      accent: accent || '#01478d',
+      shadow: 'rgba(255, 255, 255, 0)',
     },
   },
   typography: {
+    fontFamily: '"IBM Plex Sans", sans-serif',
     body2: {
       fontSize: '0.8rem',
     },
@@ -27,52 +34,85 @@ export default () => ({
     h1: {
       margin: '0 0 10px 0',
       padding: 0,
-      color: '#00b1ff',
+      color: primary || '#00b1ff',
       fontWeight: 400,
-      fontSize: 13,
+      fontSize: 22,
     },
     h2: {
       margin: '0 0 10px 0',
       padding: 0,
-      color: '#00b1ff',
-      fontWeight: 600,
+      fontWeight: 500,
       fontSize: 16,
+      textTransform: 'uppercase',
+    },
+    h3: {
+      margin: '0 0 10px 0',
+      padding: 0,
+      color: primary || '#00b1ff',
+      fontWeight: 400,
+      fontSize: 13,
+    },
+    h4: {
+      margin: '0 0 10px 0',
+      padding: 0,
+      textTransform: 'uppercase',
+      fontSize: 12,
+      fontWeight: 500,
+      color: '#a8a8a8',
+    },
+    h5: {
+      fontWeight: 400,
+      fontSize: 13,
+      textTransform: 'uppercase',
+      marginTop: -4,
+    },
+    h6: {
+      fontWeight: 400,
+      fontSize: 18,
+      color: primary || '#00b1ff',
     },
   },
   components: {
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: 'rgba(0,0,0,0.7)',
+        },
+      },
+    },
     MuiCssBaseline: {
       styleOverrides: {
         body: {
           scrollbarColor: '#6b6b6b #2b2b2b',
           '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
-            backgroundColor: '#001e3c',
+            backgroundColor: paper || '#001e3c',
           },
           '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
             borderRadius: 8,
-            backgroundColor: '#01478DFF',
+            backgroundColor: accent || '#01478d',
             minHeight: 24,
-            border: '3px solid #001e3c',
+            border: `3px solid ${paper || '#001e3c'}`,
           },
           '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus':
             {
-              backgroundColor: '#01478DFF',
+              backgroundColor: accent || '#01478d',
             },
           '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active':
             {
-              backgroundColor: '#01478DFF',
+              backgroundColor: accent || '#01478d',
             },
           '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover':
             {
-              backgroundColor: '#01478DFF',
+              backgroundColor: accent || '#01478d',
             },
           '&::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
-            backgroundColor: '#01478DFF',
+            backgroundColor: accent || '#01478d',
           },
           html: {
             WebkitFontSmoothing: 'auto',
           },
           a: {
-            color: '#00b1ff',
+            color: primary || '#00b1ff',
           },
           'input:-webkit-autofill': {
             WebkitAnimation: 'autofill 0s forwards',
@@ -86,28 +126,29 @@ export default () => ({
           },
           pre: {
             color: '#ffffff !important',
-            background: '#01478DFF !important',
+            background: `${accent || '#01478d'} !important`,
           },
           code: {
+            fontFamily: 'Consolas, monaco, monospace',
             color: '#ffffff !important',
-            background: '#01478DFF !important',
+            background: `${accent || '#01478d'} !important`,
+            padding: 3,
+            fontSize: 12,
+            fontWeight: 400,
           },
           '.react-mde': {
             border: '0 !important',
-            borderBottom: '1px solid #b9bfc1 !important',
-            '&:hover': {
-              borderBottom: '2px solid #ffffff !important',
-              marginBottom: '-1px !important',
-            },
           },
-          '.error .react-mde': {
+          '.error .react-mde textarea': {
             border: '0 !important',
             borderBottom: '2px solid #f44336 !important',
-            marginBottom: '-1px !important',
             '&:hover': {
               border: '0 !important',
               borderBottom: '2px solid #f44336 !important',
-              marginBottom: '-1px !important',
+            },
+            '&:focus': {
+              border: '0 !important',
+              borderBottom: '2px solid #f44336 !important',
             },
           },
           '.mde-header': {
@@ -116,17 +157,29 @@ export default () => ({
             color: '#ffffff !important',
           },
           '.mde-header-item button': {
+            fontFamily: '"IBM Plex Sans", sans-serif',
             color: '#ffffff !important',
           },
           '.mde-tabs button': {
+            fontFamily: '"IBM Plex Sans", sans-serif',
             color: '#ffffff !important',
           },
           '.mde-textarea-wrapper textarea': {
+            fontFamily: '"IBM Plex Sans", sans-serif',
+            fontSize: 13,
             color: '#ffffff',
-            backgroundColor: '#14262c',
+            background: 'transparent',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.7) !important',
+            transition: 'borderBottom .3s',
+            '&:hover': {
+              borderBottom: '2px solid #ffffff !important',
+            },
+            '&:focus': {
+              borderBottom: `2px solid #${primary || '00b1ff'} !important`,
+            },
           },
           '.react-grid-placeholder': {
-            backgroundColor: 'rgba(0, 188, 212, 0.8) !important',
+            backgroundColor: `${accent || '#01478d'} !important`,
           },
           '.react_time_range__track': {
             backgroundColor: 'rgba(1, 226, 255, 0.1) !important',
@@ -137,7 +190,11 @@ export default () => ({
             backgroundColor: '#00bcd4 !important',
           },
           '.leaflet-container': {
-            backgroundColor: '#0a1929 !important',
+            backgroundColor: `${paper || '#001e3c'} !important`,
+          },
+          '.react-grid-item .react-resizable-handle::after': {
+            borderRight: '2px solid rgba(255, 255, 255, 0.4) !important',
+            borderBottom: '2px solid rgba(255, 255, 255, 0.4) !important',
           },
         },
       },

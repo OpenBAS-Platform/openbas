@@ -142,6 +142,7 @@ const Animation = () => {
   const exercise = useStore((store) => store.getExercise(exerciseId));
   const injectTypes = useStore((store) => store.inject_types);
   const { audiences, injects } = exercise;
+  const sortedAudiences = R.sortWith([R.ascend(R.prop('audience_name'))], audiences);
   const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
@@ -203,7 +204,7 @@ const Animation = () => {
       {audiences.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
-            {audiences.map((audience) => (
+            {sortedAudiences.map((audience) => (
               <div key={audience.audience_id} className={classes.lineName}>
                 <div className={classes.name}>
                   <CastForEducationOutlined fontSize="small" />
@@ -214,7 +215,7 @@ const Animation = () => {
             ))}
           </div>
           <div className={classes.timeline}>
-            {audiences.map((audience, index) => {
+            {sortedAudiences.map((audience, index) => {
               const injectsGroupedByTick = byTick(
                 filtering.filterAndSort(audience.injects),
               );

@@ -1,3 +1,4 @@
+import 'typeface-ibm-plex-sans';
 import 'typeface-roboto';
 import React from 'react';
 import ReactDOM from 'react-dom';
