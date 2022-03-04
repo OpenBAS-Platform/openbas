@@ -347,7 +347,7 @@ const Animation = () => {
       <div className="clearfix" />
       <Grid container={true} spacing={3} style={{ marginTop: 50 }}>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">{t('Pending injects')}</Typography>
+          <Typography variant="h4">{t('Pending injects')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {pendingInjects.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
@@ -414,7 +414,7 @@ const Animation = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">{t('Processed injects')}</Typography>
+          <Typography variant="h4">{t('Processed injects')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {processedInjects.length > 0 ? (
               <List style={{ paddingTop: 0 }}>

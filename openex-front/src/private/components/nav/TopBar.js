@@ -29,7 +29,7 @@ const styles = (theme) => ({
     width: '100%',
     zIndex: theme.zIndex.drawer + 1,
     background: 0,
-    backgroundColor: theme.palette.background.header,
+    backgroundColor: theme.palette.background.nav,
     paddingTop: theme.spacing(0.2),
   },
   flex: {
@@ -44,7 +44,7 @@ const styles = (theme) => ({
   },
   menuContainer: {
     float: 'left',
-    marginLeft: 40,
+    marginLeft: 30,
   },
   barRight: {
     position: 'absolute',
@@ -89,7 +89,12 @@ class TopBar extends Component {
   render() {
     const { classes, t, location } = this.props;
     return (
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar
+        position="fixed"
+        className={classes.appBar}
+        variant="elevation"
+        elevation={1}
+      >
         <Toolbar>
           <div className={classes.logoContainer}>
             <Link to="/">

@@ -89,7 +89,7 @@ const Controls = () => {
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={6} style={{ marginTop: -10 }}>
-          <Typography variant="overline">{t('Dryruns')}</Typography>
+          <Typography variant="h4">{t('Dryruns')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {dryruns.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
@@ -161,7 +161,7 @@ const Controls = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: -10 }}>
-          <Typography variant="overline">{t('Comchecks')}</Typography>
+          <Typography variant="h4">{t('Comchecks')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {comchecks.length > 0 ? (
               <List style={{ paddingTop: 0 }}>

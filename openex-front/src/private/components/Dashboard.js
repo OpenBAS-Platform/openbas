@@ -187,7 +187,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">{t('Recent exercises')}</Typography>
+          <Typography variant="h4">{t('Recent exercises')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
             {exercises.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
@@ -241,7 +241,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">
+          <Typography variant="h4">
             {t('Next injects to send')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
@@ -315,7 +315,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">
+          <Typography variant="h4">
             {t('Organizations distribution across exercises')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
@@ -333,7 +333,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline">
+          <Typography variant="h4">
             {t('Players distribution')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperMap }}>

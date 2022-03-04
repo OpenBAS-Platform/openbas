@@ -149,7 +149,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
             padding: '0 5px 0 5px',
           }}
         >
-          <Typography variant="overline">{t('My evaluation')}</Typography>
+          <Typography variant="h4">{t('My evaluation')}</Typography>
           <Slider
             aria-label={t('Score')}
             value={

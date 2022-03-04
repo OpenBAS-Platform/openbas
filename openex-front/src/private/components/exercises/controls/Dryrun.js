@@ -215,11 +215,11 @@ const Dryrun = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Start date')}</Typography>
+                <Typography variant="h3">{t('Start date')}</Typography>
                 {fldt(dryrun?.dryrun_date)}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1" style={{ marginBottom: 0 }}>
+                <Typography variant="h3" style={{ marginBottom: 0 }}>
                   {t('Dryrun recipients')}
                 </Typography>
                 <List>

@@ -91,7 +91,7 @@ class CreateControl extends Component {
         {variant === 'buttons' ? (
           <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
             <Grid item={true} xs={6}>
-              <Typography variant="h1">{t('Dryrun')}</Typography>
+              <Typography variant="h3">{t('Dryrun')}</Typography>
               <Button
                 variant="contained"
                 startIcon={<VideoSettingsOutlined />}
@@ -103,7 +103,7 @@ class CreateControl extends Component {
               </Button>
             </Grid>
             <Grid item={true} xs={4}>
-              <Typography variant="h1">{t('Comcheck')}</Typography>
+              <Typography variant="h3">{t('Comcheck')}</Typography>
               <Button
                 variant="contained"
                 startIcon={<MarkEmailReadOutlined />}

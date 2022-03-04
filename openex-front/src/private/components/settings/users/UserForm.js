@@ -121,8 +121,6 @@ const UserForm = (props) => {
           />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
-              variant="contained"
-              color="secondary"
               onClick={handleClose}
               style={{ marginRight: 10 }}
               disabled={submitting}
@@ -130,8 +128,7 @@ const UserForm = (props) => {
               {t('Cancel')}
             </Button>
             <Button
-              variant="contained"
-              color="primary"
+              color="secondary"
               type="submit"
               disabled={pristine || submitting}
             >

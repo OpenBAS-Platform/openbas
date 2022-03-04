@@ -27,7 +27,7 @@ const styles = (theme) => ({
     minHeight: '100vh',
     width: 180,
     background: 0,
-    backgroundColor: theme.palette.background.header,
+    backgroundColor: theme.palette.background.nav,
   },
   menuList: {
     height: '100%',

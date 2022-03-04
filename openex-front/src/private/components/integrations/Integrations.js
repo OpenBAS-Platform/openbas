@@ -73,7 +73,7 @@ const Integrations = () => {
             xs={6}
             style={{ marginBottom: 30 }}
           >
-            <Typography variant="overline">{t(injectType.type)}</Typography>
+            <Typography variant="h4">{t(injectType.type)}</Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <List style={{ paddingTop: 0 }}>
                 {injectType.fields.map((field) => (

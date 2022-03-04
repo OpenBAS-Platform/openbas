@@ -99,8 +99,6 @@ class ComcheckForm extends Component {
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
-                variant="contained"
-                color="secondary"
                 onClick={handleClose.bind(this)}
                 style={{ marginRight: 10 }}
                 disabled={submitting}
@@ -108,8 +106,7 @@ class ComcheckForm extends Component {
                 {t('Cancel')}
               </Button>
               <Button
-                variant="contained"
-                color="primary"
+                color="secondary"
                 type="submit"
                 disabled={pristine || submitting}
               >

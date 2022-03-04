@@ -260,11 +260,11 @@ const Comcheck = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Start date')}</Typography>
+                <Typography variant="h3">{t('Start date')}</Typography>
                 {fldt(comcheck?.comcheckstatus_start_date)}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('End date')}</Typography>
+                <Typography variant="h3">{t('End date')}</Typography>
                 {fldt(comcheck?.comcheckstatus_end_date)}
               </Grid>
             </Grid>

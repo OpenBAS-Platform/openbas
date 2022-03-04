@@ -309,23 +309,23 @@ const Exercise = () => {
       <br />
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={4}>
-          <Typography variant="overline">{t('Information')}</Typography>
+          <Typography variant="h4">{t('Information')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Subtitle')}</Typography>
+                <Typography variant="h3">{t('Subtitle')}</Typography>
                 {exercise.exercise_subtitle || '-'}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Description')}</Typography>
+                <Typography variant="h3">{t('Description')}</Typography>
                 {exercise.exercise_description || '-'}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Creation date')}</Typography>
+                <Typography variant="h3">{t('Creation date')}</Typography>
                 {fldt(exercise.exercise_created_at)}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">
+                <Typography variant="h3">
                   {t('Sender email address')}
                 </Typography>
                 {exercise.exercise_mail_from}
@@ -334,11 +334,11 @@ const Exercise = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={4}>
-          <Typography variant="overline">{t('Execution')}</Typography>
+          <Typography variant="h4">{t('Execution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
-                <Typography variant="h1" style={{ float: 'left' }}>
+                <Typography variant="h3" style={{ float: 'left' }}>
                   {t('Start date')}
                 </Typography>
                 <ExerciseDatePopover exercise={exercise} />
@@ -346,7 +346,7 @@ const Exercise = () => {
                 {fldt(exercise.exercise_start_date) || t('Manual')}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Next inject')}</Typography>
+                <Typography variant="h3">{t('Next inject')}</Typography>
                 <div className={classes.countdown}>
                   <Countdown
                     date={nextInjectDate}
@@ -358,18 +358,18 @@ const Exercise = () => {
                 </div>
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Execution')}</Typography>
+                <Typography variant="h3">{t('Execution')}</Typography>
                 {buttonExecution()}
               </Grid>
               <Grid item={true} xs={6}>
-                <Typography variant="h1">{t('Dangerous zone')}</Typography>
+                <Typography variant="h3">{t('Dangerous zone')}</Typography>
                 {buttonDangerous()}
               </Grid>
             </Grid>
           </Paper>
         </Grid>
         <Grid item={true} xs={4}>
-          <Typography variant="overline">{t('Control')}</Typography>
+          <Typography variant="h4">{t('Control')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Alert severity="info">
               {t(
@@ -380,7 +380,7 @@ const Exercise = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
-          <Typography variant="overline">
+          <Typography variant="h4">
             {t('Injects distribution')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
@@ -398,7 +398,7 @@ const Exercise = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
-          <Typography variant="overline">{t('Settings')}</Typography>
+          <Typography variant="h4">{t('Settings')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <ExerciseParametersForm
               initialValues={initialValues}

@@ -182,7 +182,7 @@ const Lessons = () => {
       <br />
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={6}>
-          <Typography variant="overline" style={{ float: 'left' }}>
+          <Typography variant="h4" style={{ float: 'left' }}>
             {t('Objectives')}
           </Typography>
           {isExerciseUpdatable(exercise, true) && (
@@ -242,7 +242,7 @@ const Lessons = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="overline" style={{ float: 'left' }}>
+          <Typography variant="h4" style={{ float: 'left' }}>
             {t('Polls')}
           </Typography>
           {isExerciseUpdatable(exercise, true) && (
@@ -292,7 +292,7 @@ const Lessons = () => {
       </Grid>
       <br />
       <div style={{ marginTop: 40 }}>
-        <Typography variant="overline" style={{ float: 'left' }}>
+        <Typography variant="h4" style={{ float: 'left' }}>
           {t('Exercise logs')}
         </Typography>
         {isExerciseUpdatable(exercise, true) && (
