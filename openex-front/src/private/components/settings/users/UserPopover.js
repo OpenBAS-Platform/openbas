@@ -1,6 +1,5 @@
-import React, { Component } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -19,44 +18,37 @@ import {
   updateUserPassword,
 } from '../../../../actions/User';
 import UserForm from './UserForm';
-import inject18n from '../../../../components/i18n';
+import { useFormatter } from '../../../../components/i18n';
 import UserPasswordForm from './UserPasswordForm';
-import { storeBrowser } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
 
-class UserPopover extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      openDelete: false,
-      openEdit: false,
-      openEditPassword: false,
-    };
-  }
+const UserPopover = ({ user, organizations }) => {
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openEditPassword, setOpenEditPassword] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const dispatch = useDispatch();
+  const { t } = useFormatter();
 
-  handlePopoverOpen(event) {
+  const handlePopoverOpen = (event) => {
     event.stopPropagation();
-    this.setState({ anchorEl: event.currentTarget });
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
-  handlePopoverClose() {
-    this.setState({ anchorEl: null });
-  }
+  const handlePopoverClose = () => setAnchorEl(null);
 
-  handleOpenEdit() {
-    this.setState({ openEdit: true });
-    this.handlePopoverClose();
-  }
+  const handleOpenEdit = () => {
+    setOpenEdit(true);
+    handlePopoverClose();
+  };
 
-  handleCloseEdit() {
-    this.setState({ openEdit: false });
-  }
+  const handleCloseEdit = () => setOpenEdit(false);
 
-  onSubmitEdit(data) {
+  const onSubmitEdit = (data) => {
     const inputValues = R.pipe(
       R.assoc(
         'user_organization',
@@ -66,99 +58,83 @@ class UserPopover extends Component {
       ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
-    return this.props
-      .updateUser(this.props.user.user_id, inputValues)
-      .then(() => this.handleCloseEdit());
-  }
+    dispatch(updateUser(user.user_id, inputValues))
+      .then(() => handleCloseEdit());
+  };
 
-  handleOpenEditPassword() {
-    this.setState({ openEditPassword: true });
-    this.handlePopoverClose();
-  }
+  const handleOpenEditPassword = () => {
+    setOpenEditPassword(true);
+    handlePopoverClose();
+  };
 
-  handleCloseEditPassword() {
-    this.setState({ openEditPassword: false });
-  }
+  const handleCloseEditPassword = () => setOpenEditPassword(false);
 
-  onSubmitEditPassword(data) {
-    return this.props
-      .updateUserPassword(this.props.user.user_id, data.user_plain_password)
-      .then(() => this.handleCloseEditPassword());
-  }
+  const onSubmitEditPassword = (data) => {
+    dispatch(updateUserPassword(user.user_id, data.user_plain_password))
+      .then(() => handleCloseEditPassword());
+  };
 
-  handleOpenDelete() {
-    this.setState({ openDelete: true });
-    this.handlePopoverClose();
-  }
+  const handleOpenDelete = () => {
+    setOpenDelete(true);
+    handlePopoverClose();
+  };
 
-  handleCloseDelete() {
-    this.setState({ openDelete: false });
-  }
+  const handleCloseDelete = () => setOpenDelete(false);
 
-  submitDelete() {
-    this.props.deleteUser(this.props.user.user_id);
-    this.handleCloseDelete();
-  }
+  const submitDelete = () => {
+    dispatch(deleteUser(user.user_id));
+    handleCloseDelete();
+  };
 
-  render() {
-    const { t, user, organizations } = this.props;
-    const userOrganizationValue = user.organization;
-    const userOrganization = userOrganizationValue
-      ? {
-        id: userOrganizationValue.organization_id,
-        label: userOrganizationValue.organization_name,
-      }
-      : null;
-    const userTags = user.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
-    const initialValues = R.pipe(
-      R.assoc('user_organization', userOrganization),
-      R.assoc('user_tags', userTags),
-      R.pick([
-        'user_firstname',
-        'user_lastname',
-        'user_email',
-        'user_organization',
-        'user_phone',
-        'user_phone2',
-        'user_pgp_key',
-        'user_tags',
-        'user_admin',
-      ]),
-    )(user);
-    return (
+  const org = user.organization;
+  const userOrganization = org ? { id: org.organization_id, label: org.organization_name } : null;
+  const userTags = user.tags.map((tag) => ({
+    id: tag.tag_id,
+    label: tag.tag_name,
+    color: tag.tag_color,
+  }));
+  const initialValues = R.pipe(
+    R.assoc('user_organization', userOrganization),
+    R.assoc('user_tags', userTags),
+    R.pick([
+      'user_firstname',
+      'user_lastname',
+      'user_email',
+      'user_organization',
+      'user_phone',
+      'user_phone2',
+      'user_pgp_key',
+      'user_tags',
+      'user_admin',
+    ]),
+  )(user);
+  return (
       <div>
-        <IconButton
-          onClick={this.handlePopoverOpen.bind(this)}
+        <IconButton onClick={handlePopoverOpen}
           aria-haspopup="true"
-          size="large"
-        >
+          size="large">
           <MoreVert />
         </IconButton>
         <Menu
-          anchorEl={this.state.anchorEl}
-          open={Boolean(this.state.anchorEl)}
-          onClose={this.handlePopoverClose.bind(this)}
-        >
-          <MenuItem onClick={this.handleOpenEdit.bind(this)}>
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handlePopoverClose}>
+          <MenuItem onClick={handleOpenEdit}>
             {t('Update')}
           </MenuItem>
-          <MenuItem onClick={this.handleOpenEditPassword.bind(this)}>
+          <MenuItem onClick={handleOpenEditPassword}>
             {t('Update password')}
           </MenuItem>
           {user.user_email !== 'admin@openex.io' && (
-            <MenuItem onClick={this.handleOpenDelete.bind(this)}>
+            <MenuItem onClick={handleOpenDelete}>
               {t('Delete')}
             </MenuItem>
           )}
         </Menu>
         <Dialog
-          open={this.state.openDelete}
+          open={openDelete}
           TransitionComponent={Transition}
-          onClose={this.handleCloseDelete.bind(this)}
+          onClose={handleCloseDelete}
           PaperProps={{ elevation: 1 }}
         >
           <DialogContent>
@@ -170,23 +146,21 @@ class UserPopover extends Component {
             <Button
               variant="contained"
               color="secondary"
-              onClick={this.handleCloseDelete.bind(this)}
-            >
+              onClick={handleCloseDelete}>
               {t('Cancel')}
             </Button>
             <Button
               variant="contained"
               color="primary"
-              onClick={this.submitDelete.bind(this)}
-            >
+              onClick={submitDelete}>
               {t('Delete')}
             </Button>
           </DialogActions>
         </Dialog>
         <Dialog
           TransitionComponent={Transition}
-          open={this.state.openEdit}
-          onClose={this.handleCloseEdit.bind(this)}
+          open={openEdit}
+          onClose={handleCloseEdit}
           fullWidth={true}
           maxWidth="md"
           PaperProps={{ elevation: 1 }}
@@ -197,47 +171,28 @@ class UserPopover extends Component {
               initialValues={initialValues}
               editing={true}
               organizations={organizations}
-              onSubmit={this.onSubmitEdit.bind(this)}
-              handleClose={this.handleCloseEdit.bind(this)}
+              onSubmit={onSubmitEdit}
+              handleClose={handleCloseEdit}
             />
           </DialogContent>
         </Dialog>
         <Dialog
           TransitionComponent={Transition}
-          open={this.state.openEditPassword}
-          onClose={this.handleCloseEditPassword.bind(this)}
+          open={openEditPassword}
+          onClose={handleCloseEditPassword}
           fullWidth={true}
           maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
+          PaperProps={{ elevation: 1 }}>
           <DialogTitle>{t('Update the user password')}</DialogTitle>
           <DialogContent>
             <UserPasswordForm
-              onSubmit={this.onSubmitEditPassword.bind(this)}
-              handleClose={this.handleCloseEditPassword.bind(this)}
+              onSubmit={onSubmitEditPassword}
+              handleClose={handleCloseEditPassword}
             />
           </DialogContent>
         </Dialog>
       </div>
-    );
-  }
-}
-
-UserPopover.propTypes = {
-  t: PropTypes.func,
-  user: PropTypes.object,
-  updateUser: PropTypes.func,
-  updateUserPassword: PropTypes.func,
-  deleteUser: PropTypes.func,
-  organizations: PropTypes.array,
+  );
 };
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  return { organizations: browser.organizations };
-};
-
-export default R.compose(
-  connect(select, { updateUser, updateUserPassword, deleteUser }),
-  inject18n,
-)(UserPopover);
+export default UserPopover;

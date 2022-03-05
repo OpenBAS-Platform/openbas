@@ -185,11 +185,7 @@ const Injects = () => {
   const [selectedInject, setSelectedInject] = useState(null);
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
-  const filtering = useSearchAnFilter(
-    'inject',
-    'depends_duration',
-    searchColumns,
-  );
+  const filtering = useSearchAnFilter('inject', 'depends_duration', searchColumns);
   // Fetching data
   const { exerciseId } = useParams();
   const exercise = useStore((store) => store.getExercise(exerciseId));
