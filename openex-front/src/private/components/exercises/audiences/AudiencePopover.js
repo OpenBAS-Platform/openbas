@@ -20,7 +20,6 @@ import {
 import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { storeBrowser } from '../../../../actions/Schema';
 import { Transition } from '../../../../utils/Environment';
 
 class AudiencePopover extends Component {
@@ -364,16 +363,8 @@ AudiencePopover.propTypes = {
   onRemoveAudience: PropTypes.func,
 };
 
-const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
-  const { exerciseId } = ownProps;
-  return {
-    exercise: browser.getExercise(exerciseId),
-  };
-};
-
 export default R.compose(
-  connect(select, {
+  connect(null, {
     updateAudience,
     deleteAudience,
     updateAudienceActivation,

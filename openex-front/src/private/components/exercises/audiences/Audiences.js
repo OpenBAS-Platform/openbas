@@ -295,6 +295,7 @@ const Audiences = () => {
             <ListItemSecondaryAction>
               <AudiencePopover
                 exerciseId={exerciseId}
+                exercise={exercise}
                 audience={audience}
                 setSelectedAudience={setSelectedAudience}
               />

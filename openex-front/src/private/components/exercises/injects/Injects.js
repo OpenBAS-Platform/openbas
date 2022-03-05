@@ -372,6 +372,7 @@ const Injects = () => {
         <InjectDefinition
           injectId={selectedInject}
           exerciseId={exercise.exercise_id}
+          exercise={exercise}
           injectTypes={injectTypes}
           handleClose={() => setSelectedInject(null)}
         />

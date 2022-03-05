@@ -624,6 +624,7 @@ class InjectDefinition extends Component {
                               <ListItemSecondaryAction>
                                 <AudiencePopover
                                   exerciseId={exerciseId}
+                                  exercise={exercise}
                                   audience={audience}
                                   onRemoveAudience={this.handleRemoveAudience.bind(
                                     this,
@@ -882,13 +883,11 @@ InjectDefinition.propTypes = {
 
 const select = (state, ownProps) => {
   const browser = storeBrowser(state);
-  const { injectId, exerciseId } = ownProps;
+  const { injectId } = ownProps;
   const inject = browser.getInject(injectId);
-  const exercise = browser.getExercise(exerciseId);
   return {
     browser,
     inject,
-    exercise,
   };
 };
 
