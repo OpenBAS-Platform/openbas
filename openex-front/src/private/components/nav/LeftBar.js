@@ -45,12 +45,24 @@ const styles = (theme) => ({
   },
   toolbar: theme.mixins.toolbar,
   menuItem: {
-    height: 40,
-    padding: '6px 10px 6px 10px',
+    height: 35,
+    fontWeight: 500,
+    fontSize: 14,
   },
   menuItemNested: {
-    height: 40,
-    padding: '6px 10px 6px 25px',
+    height: 30,
+    paddingLeft: 35,
+  },
+  menuItemText: {
+    paddingTop: 1,
+    fontWeight: 500,
+    fontSize: 14,
+  },
+  menuItemNestedText: {
+    paddingTop: 1,
+    fontWeight: 500,
+    fontSize: 14,
+    color: theme.palette.text.secondary,
   },
 });
 
@@ -64,61 +76,76 @@ const LeftBar = ({
         component={Link}
         to="/"
         selected={location.pathname === '/'}
-        dense={false}
+        dense={true}
         classes={{ root: classes.menuItem }}
       >
-        <ListItemIcon style={{ minWidth: 35 }}>
-          <DashboardOutlined />
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <DashboardOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText primary={t('Dashboard')} />
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Dashboard')}
+        />
       </MenuItem>
       <MenuItem
         component={Link}
         to="/exercises"
         selected={location.pathname.includes('/exercises')}
-        dense={false}
+        dense={true}
         classes={{ root: classes.menuItem }}
       >
-        <ListItemIcon style={{ minWidth: 35 }}>
-          <RowingOutlined />
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <RowingOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText primary={t('Exercises')} />
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Exercises')}
+        />
       </MenuItem>
       <MenuItem
         component={Link}
         to="/players"
         selected={location.pathname === '/players'}
-        dense={false}
+        dense={true}
         classes={{ root: classes.menuItem }}
       >
-        <ListItemIcon style={{ minWidth: 35 }}>
-          <GroupsOutlined />
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <GroupsOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText primary={t('Players')} />
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Players')}
+        />
       </MenuItem>
       <MenuItem
         component={Link}
         to="/organizations"
         selected={location.pathname === '/organizations'}
-        dense={false}
+        dense={true}
         classes={{ root: classes.menuItem }}
       >
-        <ListItemIcon style={{ minWidth: 35 }}>
-          <DomainOutlined />
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <DomainOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText primary={t('Organizations')} />
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Organizations')}
+        />
       </MenuItem>
       <MenuItem
         component={Link}
         to="/documents"
         selected={location.pathname === '/documents'}
-        dense={false}
+        dense={true}
         classes={{ root: classes.menuItem }}
       >
-        <ListItemIcon style={{ minWidth: 35 }}>
-          <DescriptionOutlined />
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <DescriptionOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText primary={t('Documents')} />
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Documents')}
+        />
       </MenuItem>
     </MenuList>
     <Divider />
@@ -127,26 +154,32 @@ const LeftBar = ({
         component={Link}
         to="/integrations"
         selected={location.pathname === '/integrations'}
-        dense={false}
+        dense={true}
         classes={{ root: classes.menuItem }}
       >
-        <ListItemIcon style={{ minWidth: 35 }}>
-          <ExtensionOutlined />
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <ExtensionOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText primary={t('Integrations')} />
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Integrations')}
+        />
       </MenuItem>
       {userAdmin && (
         <MenuItem
           component={Link}
           to="/settings"
           selected={location.pathname.includes('/settings')}
-          dense={false}
+          dense={true}
           classes={{ root: classes.menuItem }}
         >
-          <ListItemIcon style={{ minWidth: 35 }}>
-            <SettingsOutlined />
+          <ListItemIcon style={{ minWidth: 30 }}>
+            <SettingsOutlined fontSize="small" color="primary" />
           </ListItemIcon>
-          <ListItemText primary={t('Settings')} />
+          <ListItemText
+            classes={{ primary: classes.menuItemText }}
+            primary={t('Settings')}
+          />
         </MenuItem>
       )}
     </MenuList>
