@@ -646,7 +646,7 @@ class InjectDefinition extends Component {
                 )}
                 <Typography
                   variant="h2"
-                  style={{ marginTop: hasAudiences ? 20 : 0 }}
+                  style={{ marginTop: hasAudiences ? 30 : 0 }}
                 >
                   {t('Inject data')}
                 </Typography>
@@ -708,7 +708,7 @@ class InjectDefinition extends Component {
                     })}
                 </div>
                 <div>
-                  <Typography variant="h2" style={{ marginTop: 20 }}>
+                  <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}
                   </Typography>
                   <List>
