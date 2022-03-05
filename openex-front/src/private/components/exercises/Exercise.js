@@ -380,9 +380,7 @@ const Exercise = () => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: 30 }}>
-          <Typography variant="h4">
-            {t('Injects distribution')}
-          </Typography>
+          <Typography variant="h4">{t('Injects distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {topAudiences.length > 0 ? (
               <Chart

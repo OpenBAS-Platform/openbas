@@ -142,7 +142,10 @@ const Animation = () => {
   const exercise = useStore((store) => store.getExercise(exerciseId));
   const injectTypes = useStore((store) => store.inject_types);
   const { audiences, injects } = exercise;
-  const sortedAudiences = R.sortWith([R.ascend(R.prop('audience_name'))], audiences);
+  const sortedAudiences = R.sortWith(
+    [R.ascend(R.prop('audience_name'))],
+    audiences,
+  );
   const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());

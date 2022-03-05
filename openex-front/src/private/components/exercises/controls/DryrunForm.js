@@ -53,11 +53,7 @@ class DryrunForm extends Component {
               >
                 {t('Cancel')}
               </Button>
-              <Button
-                color="secondary"
-                type="submit"
-                disabled={submitting}
-              >
+              <Button color="secondary" type="submit" disabled={submitting}>
                 {t('Launch')}
               </Button>
             </div>

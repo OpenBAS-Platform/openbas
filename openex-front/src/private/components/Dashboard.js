@@ -241,9 +241,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="h4">
-            {t('Next injects to send')}
-          </Typography>
+          <Typography variant="h4">{t('Next injects to send')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.list }}>
             {injects?.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
@@ -333,9 +331,7 @@ const Dashboard = (props) => {
           </Paper>
         </Grid>
         <Grid item={true} xs={6}>
-          <Typography variant="h4">
-            {t('Players distribution')}
-          </Typography>
+          <Typography variant="h4">{t('Players distribution')}</Typography>
           <Paper variant="outlined" classes={{ root: classes.paperMap }}>
             <MiniMap center={[48.8566969, 2.3514616]} zoom={2} />
           </Paper>
