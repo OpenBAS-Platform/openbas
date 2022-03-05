@@ -36,8 +36,6 @@ class ExerciseDateForm extends Component {
             <div style={{ float: 'right', marginTop: 20 }}>
               {handleClose && (
                 <Button
-                  variant="contained"
-                  color="secondary"
                   onClick={handleClose.bind(this)}
                   disabled={pristine || submitting}
                   style={{ marginRight: 10 }}
@@ -46,8 +44,7 @@ class ExerciseDateForm extends Component {
                 </Button>
               )}
               <Button
-                variant="contained"
-                color="primary"
+                color="secondary"
                 type="submit"
                 disabled={pristine || submitting}
               >

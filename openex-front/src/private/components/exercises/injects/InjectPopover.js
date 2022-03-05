@@ -337,18 +337,10 @@ class InjectPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseTry.bind(this)}
-            >
+            <Button onClick={this.handleCloseTry.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitTry.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitTry.bind(this)}>
               {t('Try')}
             </Button>
           </DialogActions>
@@ -365,18 +357,10 @@ class InjectPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseEnable.bind(this)}
-            >
+            <Button onClick={this.handleCloseEnable.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitEnable.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitEnable.bind(this)}>
               {t('Enable')}
             </Button>
           </DialogActions>
@@ -393,18 +377,10 @@ class InjectPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseDisable.bind(this)}
-            >
+            <Button onClick={this.handleCloseDisable.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitDisable.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitDisable.bind(this)}>
               {t('Disable')}
             </Button>
           </DialogActions>
@@ -421,18 +397,10 @@ class InjectPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseDone.bind(this)}
-            >
+            <Button onClick={this.handleCloseDone.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitDone.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitDone.bind(this)}>
               {t('Mark')}
             </Button>
           </DialogActions>

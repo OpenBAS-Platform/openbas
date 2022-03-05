@@ -43,6 +43,9 @@ const useStyles = makeStyles(() => ({
     marginTop: 60,
     paddingRight: 40,
   },
+  parameters: {
+    float: 'left',
+  },
   names: {
     float: 'left',
     width: '10%',

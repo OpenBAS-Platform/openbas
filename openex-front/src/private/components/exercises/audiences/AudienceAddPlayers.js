@@ -136,7 +136,6 @@ class AudienceAddPlayers extends Component {
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
-          keepMounted={true}
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
           maxWidth="md"
@@ -210,18 +209,8 @@ class AudienceAddPlayers extends Component {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleClose.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitAddUsers.bind(this)}
-            >
+            <Button onClick={this.handleClose.bind(this)}>{t('Cancel')}</Button>
+            <Button color="secondary" onClick={this.submitAddUsers.bind(this)}>
               {t('Add')}
             </Button>
           </DialogActions>

@@ -180,7 +180,7 @@ const Lessons = () => {
         </Grid>
       </Grid>
       <br />
-      <Grid container={true} spacing={3}>
+      <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
         <Grid item={true} xs={6}>
           <Typography variant="h4" style={{ float: 'left' }}>
             {t('Objectives')}
@@ -299,7 +299,8 @@ const Lessons = () => {
           <IconButton
             color="secondary"
             onClick={handleToggleWrite}
-            style={{ margin: '-3px 0 0 5px' }}
+            size="large"
+            style={{ margin: '-15px 0 0 5px' }}
           >
             <EditOutlined fontSize="small" />
           </IconButton>

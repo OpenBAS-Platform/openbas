@@ -29,7 +29,7 @@ import { isExerciseReadOnly } from '../../../utils/Exercise';
 const styles = () => ({
   button: {
     float: 'left',
-    margin: '-8px 0 0 5px',
+    margin: '-10px 0 0 5px',
   },
   tableHeader: {
     borderBottom: '1px solid rgba(255, 255, 255, 0.15)',

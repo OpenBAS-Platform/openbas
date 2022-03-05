@@ -141,7 +141,6 @@ class InjectAddDocuments extends Component {
         <Dialog
           open={this.state.open}
           TransitionComponent={Transition}
-          keepMounted={true}
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
           maxWidth="md"
@@ -213,16 +212,9 @@ class InjectAddDocuments extends Component {
             </Grid>
           </DialogContent>
           <DialogActions>
+            <Button onClick={this.handleClose.bind(this)}>{t('Cancel')}</Button>
             <Button
-              variant="contained"
               color="secondary"
-              onClick={this.handleClose.bind(this)}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
               onClick={this.submitAddDocuments.bind(this)}
             >
               {t('Add')}

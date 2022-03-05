@@ -16,7 +16,7 @@ import { Transition } from '../../../../utils/Environment';
 const styles = () => ({
   createButton: {
     float: 'left',
-    marginTop: -6,
+    marginTop: -15,
   },
 });
 
@@ -45,12 +45,13 @@ class CreatePoll extends Component {
     return (
       <div>
         <IconButton
-          onClick={this.handleOpen.bind(this)}
-          color="primary"
+          color="secondary"
           aria-label="Add"
-          className={classes.createButton}
+          onClick={this.handleOpen.bind(this)}
+          classes={{ root: classes.createButton }}
+          size="large"
         >
-          <Add color="secondary" />
+          <Add fontSize="small" />
         </IconButton>
         <Dialog
           open={this.state.open}
