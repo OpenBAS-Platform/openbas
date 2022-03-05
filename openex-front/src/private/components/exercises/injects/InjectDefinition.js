@@ -665,7 +665,7 @@ class InjectDefinition extends Component {
                               name={field.name}
                               fullWidth={true}
                               multiline={true}
-                              rows={3}
+                              rows={10}
                               label={t(field.name)}
                               style={{ marginTop: 20 }}
                               disabled={isExerciseReadOnly(exercise)}
