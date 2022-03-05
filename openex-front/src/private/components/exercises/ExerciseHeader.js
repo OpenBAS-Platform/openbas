@@ -74,7 +74,7 @@ const ExerciseHeader = () => {
   return (
     <div className={classes.container} ref={containerRef}>
       <Typography
-        variant="h5"
+        variant="h1"
         gutterBottom={true}
         classes={{ root: classes.title }}
       >

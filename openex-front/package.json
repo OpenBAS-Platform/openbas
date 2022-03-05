@@ -44,6 +44,7 @@
     "reselect": "4.1.5",
     "rxjs": "7.5.2",
     "seamless-immutable": "7.1.4",
+    "typeface-ibm-plex-sans": "^1.1.13",
     "typeface-roboto": "1.1.13"
   },
   "devDependencies": {
