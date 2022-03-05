@@ -8,9 +8,10 @@ import inject18n from '../../../components/i18n';
 
 const styles = (theme) => ({
   button: {
-    marginRight: theme.spacing(1),
-    padding: '2px 5px 2px 5px',
+    marginRight: theme.spacing(2),
+    padding: '0 5px 0 5px',
     minHeight: 20,
+    minWidth: 20,
     textTransform: 'none',
   },
 });
@@ -28,7 +29,7 @@ class TopMenuOrganizations extends Component {
           }
           size="small"
           color={
-            location.pathname === '/organizations' ? 'secondary' : 'inherit'
+            location.pathname === '/organizations' ? 'secondary' : 'primary'
           }
           classes={{ root: classes.button }}
         >

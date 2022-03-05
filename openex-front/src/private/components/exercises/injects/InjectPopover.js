@@ -25,7 +25,6 @@ import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
-import { storeBrowser } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -423,16 +422,8 @@ InjectPopover.propTypes = {
   setSelectedInject: PropTypes.func,
 };
 
-const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
-  const { exerciseId } = ownProps;
-  return {
-    exercise: browser.getExercise(exerciseId),
-  };
-};
-
 export default R.compose(
-  connect(select, {
+  connect(null, {
     updateInject,
     deleteInject,
     tryInject,

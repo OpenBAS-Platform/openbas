@@ -350,6 +350,7 @@ const Injects = () => {
               <ListItemSecondaryAction>
                 <InjectPopover
                   exerciseId={exerciseId}
+                  exercise={exercise}
                   inject={inject}
                   injectTypes={injectTypes}
                   setSelectedInject={setSelectedInject}

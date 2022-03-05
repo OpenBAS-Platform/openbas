@@ -408,6 +408,7 @@ const Animation = () => {
                       <InjectPopover
                         inject={inject}
                         exerciseId={exerciseId}
+                        exercise={exercise}
                         setSelectedInject={setSelectedInject}
                       />
                     </ListItemSecondaryAction>

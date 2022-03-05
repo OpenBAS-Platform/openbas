@@ -10,15 +10,13 @@ import inject18n from '../../../components/i18n';
 const styles = (theme) => ({
   buttonHome: {
     marginRight: theme.spacing(2),
-    padding: '2px 5px 2px 5px',
+    padding: '0 5px 0 5px',
     minHeight: 20,
     textTransform: 'none',
-    color: '#666666',
-    backgroundColor: '#ffffff',
   },
   button: {
     marginRight: theme.spacing(2),
-    padding: '2px 5px 2px 5px',
+    padding: '0 5px 0 5px',
     minHeight: 20,
     minWidth: 20,
     textTransform: 'none',
@@ -49,14 +47,14 @@ class TopMenuExercise extends Component {
           to="/exercises"
           variant="contained"
           size="small"
-          color="inherit"
+          color="primary"
           classes={{ root: classes.buttonHome }}
         >
           <RowingOutlined className={classes.icon} fontSize="small" />
           {t('Exercises')}
         </Button>
         <ArrowForwardIosOutlined
-          color="inherit"
+          color="primary"
           classes={{ root: classes.arrow }}
         />
         <Button
@@ -71,7 +69,7 @@ class TopMenuExercise extends Component {
           color={
             location.pathname === `/exercises/${exerciseId}`
               ? 'secondary'
-              : 'inherit'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >
@@ -89,7 +87,7 @@ class TopMenuExercise extends Component {
           color={
             location.pathname.includes(`/exercises/${exerciseId}/animation`)
               ? 'secondary'
-              : 'inherit'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >
@@ -107,7 +105,7 @@ class TopMenuExercise extends Component {
           color={
             location.pathname.includes(`/exercises/${exerciseId}/audiences`)
               ? 'secondary'
-              : 'inherit'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >
@@ -125,7 +123,7 @@ class TopMenuExercise extends Component {
           color={
             location.pathname === `/exercises/${exerciseId}/scenario`
               ? 'secondary'
-              : 'inherit'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >
@@ -143,7 +141,7 @@ class TopMenuExercise extends Component {
           color={
             location.pathname.includes(`/exercises/${exerciseId}/controls`)
               ? 'secondary'
-              : 'inherit'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >
@@ -161,7 +159,7 @@ class TopMenuExercise extends Component {
           color={
             location.pathname === `/exercises/${exerciseId}/lessons`
               ? 'secondary'
-              : 'inherit'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >

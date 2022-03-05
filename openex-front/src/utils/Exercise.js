@@ -1,4 +1,7 @@
 export const isExerciseReadOnly = (exercise, overrideStatus = false) => {
+  if (!exercise) {
+    return true;
+  }
   if (overrideStatus) {
     return exercise.user_can_update === false;
   }

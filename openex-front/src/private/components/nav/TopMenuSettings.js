@@ -9,7 +9,7 @@ import inject18n from '../../../components/i18n';
 const styles = (theme) => ({
   button: {
     marginRight: theme.spacing(2),
-    padding: '2px 5px 2px 5px',
+    padding: '0 5px 0 5px',
     minHeight: 20,
     minWidth: 20,
     textTransform: 'none',
@@ -26,7 +26,7 @@ const TopMenuSettings = ({ t, location, classes }) => (
       to="/settings"
       variant={location.pathname === '/settings' ? 'contained' : 'text'}
       size="small"
-      color={location.pathname === '/settings' ? 'secondary' : 'inherit'}
+      color={location.pathname === '/settings' ? 'secondary' : 'primary'}
       classes={{ root: classes.button }}
     >
       {t('Parameters')}
@@ -39,7 +39,7 @@ const TopMenuSettings = ({ t, location, classes }) => (
       }
       size="small"
       color={
-        location.pathname.includes('/settings/users') ? 'secondary' : 'inherit'
+        location.pathname.includes('/settings/users') ? 'secondary' : 'primary'
       }
       classes={{ root: classes.button }}
     >
@@ -53,7 +53,7 @@ const TopMenuSettings = ({ t, location, classes }) => (
       }
       size="small"
       color={
-        location.pathname.includes('/settings/groups') ? 'secondary' : 'inherit'
+        location.pathname.includes('/settings/groups') ? 'secondary' : 'primary'
       }
       classes={{ root: classes.button }}
     >
@@ -67,7 +67,7 @@ const TopMenuSettings = ({ t, location, classes }) => (
       }
       size="small"
       color={
-        location.pathname.includes('/settings/tags') ? 'secondary' : 'inherit'
+        location.pathname.includes('/settings/tags') ? 'secondary' : 'primary'
       }
       classes={{ root: classes.button }}
     >

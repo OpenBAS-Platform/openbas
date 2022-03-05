@@ -8,9 +8,10 @@ import inject18n from '../../../components/i18n';
 
 const styles = (theme) => ({
   button: {
-    marginRight: theme.spacing(1),
-    padding: '2px 5px 2px 5px',
+    marginRight: theme.spacing(2),
+    padding: '0 5px 0 5px',
     minHeight: 20,
+    minWidth: 20,
     textTransform: 'none',
   },
 });
@@ -25,7 +26,7 @@ class TopMenuDashboard extends Component {
           to="/"
           variant={location.pathname === '/players' ? 'contained' : 'text'}
           size="small"
-          color={location.pathname === '/players' ? 'secondary' : 'inherit'}
+          color={location.pathname === '/players' ? 'secondary' : 'primary'}
           classes={{ root: classes.button }}
         >
           {t('Players')}
