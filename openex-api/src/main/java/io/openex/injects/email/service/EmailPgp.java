@@ -29,8 +29,7 @@ public class EmailPgp {
         if (!hasLength(user.getPgpKey())) {
             throw new IllegalArgumentException(user.getEmail() + " has no PGP public key");
         }
-        byte[] pgpKey = Base64.decode(userPgpKey);
-        InputStream in = new ByteArrayInputStream(pgpKey);
+        InputStream in = new ByteArrayInputStream(userPgpKey.getBytes());
         InputStream decoderStream = PGPUtil.getDecoderStream(in);
         PGPPublicKeyRing keyRing = new JcaPGPPublicKeyRing(decoderStream);
         Spliterator<PGPPublicKey> splitIterator = spliteratorUnknownSize(keyRing.getPublicKeys(), Spliterator.ORDERED);
