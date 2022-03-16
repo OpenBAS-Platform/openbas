@@ -46,7 +46,7 @@ const styles = (theme) => ({
   },
   closeButton: {
     position: 'absolute',
-    top: 15,
+    top: 12,
     left: 5,
     color: 'inherit',
   },
@@ -430,8 +430,10 @@ class InjectDefinition extends Component {
             aria-label="Close"
             className={classes.closeButton}
             onClick={handleClose.bind(this)}
+            size="large"
+            color="primary"
           >
-            <CloseRounded />
+            <CloseRounded fontSize="small" color="primary" />
           </IconButton>
           <Typography variant="h6" classes={{ root: classes.title }}>
             {inject.inject_title}
