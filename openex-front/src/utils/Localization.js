@@ -64,6 +64,8 @@ const i18n = {
       'Passwords do no match': 'Les mots de passe ne correspondent pas',
       'Update the user password': "Modifier le mot de passe de l'utilisateur",
       'Update password': 'Modifier le mot de passe',
+      'Current password': 'Mot de passe actuel',
+      'New password': 'Nouveau mot de passe',
       Users: 'Utilisateurs',
       Groups: 'Groupes',
       'Create a new group': 'Créer un groupe',

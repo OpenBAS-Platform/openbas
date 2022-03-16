@@ -71,7 +71,10 @@ const Index = (props) => {
   };
 
   const onUpdateInformation = (data) => props.updateMeInformation(data);
-  const onUpdatePassword = (data) => props.updateMePassword(data.user_plain_password);
+  const onUpdatePassword = (data) => props.updateMePassword(
+    data.user_current_password,
+    data.user_plain_password,
+  );
 
   const userOrganizationValue = user.organization;
   const userOrganization = userOrganizationValue

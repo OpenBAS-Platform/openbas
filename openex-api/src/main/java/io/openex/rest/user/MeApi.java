@@ -6,7 +6,9 @@ import io.openex.database.model.User;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TokenRepository;
 import io.openex.database.repository.UserRepository;
+import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.user.form.me.UpdateMePasswordInput;
 import io.openex.rest.user.form.me.UpdateProfileInput;
 import io.openex.rest.user.form.user.UpdatePasswordInput;
 import io.openex.rest.user.form.user.UpdateUserInfoInput;
@@ -96,11 +98,15 @@ public class MeApi extends RestBehavior {
 
     @RolesAllowed(ROLE_USER)
     @PutMapping("/api/me/password")
-    public User updatePassword(@Valid @RequestBody UpdatePasswordInput input) {
+    public User updatePassword(@Valid @RequestBody UpdateMePasswordInput input) throws InputValidationException {
         User currentUser = currentUser();
         User user = userRepository.findById(currentUser.getId()).orElseThrow();
-        user.setPassword(userService.encodeUserPassword(input.getPassword()));
-        return userRepository.save(user);
+        if (userService.isUserPasswordValid(user, input.getCurrentPassword())) {
+            user.setPassword(userService.encodeUserPassword(input.getPassword()));
+            return userRepository.save(user);
+        } else {
+            throw new InputValidationException("user_current_password", "Bad current password");
+        }
     }
 
     @RolesAllowed(ROLE_USER)

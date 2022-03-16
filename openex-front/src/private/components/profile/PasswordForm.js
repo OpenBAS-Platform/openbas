@@ -27,10 +27,18 @@ class PasswordForm extends Component {
           <form id="passwordForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
+              name="user_current_password"
+              fullWidth={true}
+              type="password"
+              label={t('Current password')}
+            />
+            <TextField
+              variant="standard"
               name="user_plain_password"
               fullWidth={true}
               type="password"
-              label={t('Password')}
+              label={t('New password')}
+              style={{ marginTop: 20 }}
             />
             <TextField
               variant="standard"
