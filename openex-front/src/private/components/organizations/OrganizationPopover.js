@@ -19,7 +19,6 @@ import {
 } from '../../../actions/Organization';
 import OrganizationForm from './OrganizationForm';
 import inject18n from '../../../components/i18n';
-import { storeHelper } from '../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
