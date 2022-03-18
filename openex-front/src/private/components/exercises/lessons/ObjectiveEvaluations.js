@@ -13,7 +13,7 @@ import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
 import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import {
   addEvaluation,
@@ -31,10 +31,16 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const [submitting, setSubmitting] = useState(false);
   // Fetching data
   const { exerciseId } = useParams();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const objective = useStore((store) => store.getObjective(objectiveId));
-  const me = useStore((store) => store.me);
-  const evaluations = objective ? objective.evaluations : [];
+  // eslint-disable-next-line
+  const { me, exercise, objective, evaluations, usersMap } = useHelper((helper) => {
+    return {
+      me: helper.getMe(),
+      usersMap: helper.getUsersMap(),
+      exercise: helper.getExercise(exerciseId),
+      objective: helper.getObjective(objectiveId),
+      evaluations: helper.getObjectiveEvaluations(objectiveId),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchEvaluations(exerciseId, objectiveId));
   });
@@ -84,7 +90,7 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
               </ListItemIcon>
               <ListItemText
                 style={{ width: '50%' }}
-                primary={resolveUserName(evaluation.user)}
+                primary={resolveUserName(usersMap[evaluation.evaluation_user])}
               />
               <Box
                 sx={{

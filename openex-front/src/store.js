@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import Immutable from 'seamless-immutable';
 import createRootReducer from './reducers/Root';
 import { entitiesInitializer } from './reducers/Referential';
-import { storeBrowser } from './actions/Schema';
+import { storeHelper } from './actions/Schema';
 
 // Default application state
 const initialState = {
@@ -39,6 +39,6 @@ const initStore = () => {
 };
 
 // eslint-disable-next-line max-len
-export const useStore = (selector) => useSelector((state) => selector(storeBrowser(state)), R.equals);
+export const useHelper = (selector) => useSelector((state) => selector(storeHelper(state)), R.equals);
 
 export const store = initStore();

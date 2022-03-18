@@ -22,7 +22,7 @@ import Fab from '@mui/material/Fab';
 import { updateAudiencePlayers } from '../../../../actions/Audience';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { fetchPlayers } from '../../../../actions/User';
 import CreatePlayer from '../../players/CreatePlayer';
 import { resolveUserName, truncate } from '../../../../utils/String';
@@ -106,7 +106,7 @@ class AudienceAddPlayers extends Component {
 
   render() {
     const {
-      classes, t, users, audienceUsersIds, exercise,
+      classes, t, usersMap, audienceUsersIds, exercise, organizationsMap,
     } = this.props;
     const { keyword, usersIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -121,16 +121,14 @@ class AudienceAddPlayers extends Component {
       || R.propOr('-', 'organization_name', n.organization)
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(users);
+    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(R.values(usersMap));
     return (
       <div>
-        <Fab
-          onClick={this.handleOpen.bind(this)}
+        <Fab onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
           className={classes.createButton}
-          disabled={isExerciseReadOnly(exercise)}
-        >
+          disabled={isExerciseReadOnly(exercise)}>
           <Add />
         </Fab>
         <Dialog
@@ -153,17 +151,12 @@ class AudienceAddPlayers extends Component {
               <Grid item={true} xs={8}>
                 <SearchFilter
                   onChange={this.handleSearchUsers.bind(this)}
-                  fullWidth={true}
-                />
+                  fullWidth={true}/>
                 <List>
                   {filteredUsers.map((user) => {
                     const disabled = usersIds.includes(user.user_id)
                       || audienceUsersIds.includes(user.user_id);
-                    const organizationName = R.propOr(
-                      '-',
-                      'organization_name',
-                      user.organization,
-                    );
+                    const organizationName = organizationsMap[user.user_organization]?.organization_name ?? '-';
                     return (
                       <ListItem
                         key={user.user_id}
@@ -171,8 +164,7 @@ class AudienceAddPlayers extends Component {
                         button={true}
                         divider={true}
                         dense={true}
-                        onClick={this.addUser.bind(this, user.user_id)}
-                      >
+                        onClick={this.addUser.bind(this, user.user_id)}>
                         <ListItemIcon>
                           <PersonOutlined />
                         </ListItemIcon>
@@ -192,7 +184,7 @@ class AudienceAddPlayers extends Component {
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
                   {this.state.usersIds.map((userId) => {
-                    const user = this.props.browser.getUser(userId);
+                    const user = usersMap[userId];
                     const userGravatar = R.propOr('-', 'user_gravatar', user);
                     return (
                       <Chip
@@ -228,19 +220,17 @@ AudienceAddPlayers.propTypes = {
   updateAudiencePlayers: PropTypes.func,
   fetchPlayers: PropTypes.func,
   organizations: PropTypes.array,
-  users: PropTypes.array,
+  usersMap: PropTypes.object,
   audienceUsersIds: PropTypes.array,
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { exerciseId } = ownProps;
-  const { users, organizations } = browser;
   return {
-    exercise: browser.getExercise(exerciseId),
-    users,
-    organizations,
-    browser,
+    exercise: helper.getExercise(exerciseId),
+    usersMap: helper.getUsersMap(),
+    organizationsMap: helper.getOrganizationsMap(),
   };
 };
 

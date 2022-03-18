@@ -19,7 +19,6 @@ import {
 import ObjectiveForm from './ObjectiveForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
-import { storeBrowser } from '../../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 class ObjectivePopover extends Component {
@@ -158,22 +157,13 @@ class ObjectivePopover extends Component {
 
 ObjectivePopover.propTypes = {
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
   exercise: PropTypes.object,
   objective: PropTypes.object,
   updateObjective: PropTypes.func,
   deleteObjective: PropTypes.func,
 };
 
-const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
-  const { exerciseId } = ownProps;
-  return {
-    exercise: browser.getExercise(exerciseId),
-  };
-};
-
 export default R.compose(
-  connect(select, { updateObjective, deleteObjective }),
+  connect(null, { updateObjective, deleteObjective }),
   inject18n,
 )(ObjectivePopover);

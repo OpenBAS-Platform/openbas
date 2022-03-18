@@ -189,13 +189,16 @@ class InjectPopover extends Component {
 
   render() {
     const {
-      t, inject, injectTypes, exercise, setSelectedInject,
+      t, inject, injectTypes, exercise, setSelectedInject, tagsMap,
     } = this.props;
-    const injectTags = inject.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
+    const injectTags = inject.inject_tags.map((tagId) => {
+      const tag = tagsMap[tagId];
+      return {
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      };
+    });
     const duration = splitDuration(inject.inject_depends_duration || 0);
     const initialValues = R.pipe(
       R.assoc('inject_tags', injectTags),
@@ -413,6 +416,7 @@ InjectPopover.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
   exercise: PropTypes.object,
+  tagsMap: PropTypes.object,
   inject: PropTypes.object,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,

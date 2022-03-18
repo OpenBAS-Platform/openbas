@@ -26,7 +26,7 @@ import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import ItemTags from '../../../../components/ItemTags';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import InjectAddAudiences from './InjectAddAudiences';
@@ -207,8 +207,8 @@ class InjectDefinition extends Component {
     super(props);
     this.state = {
       allAudiences: props.inject.inject_all_audiences,
-      audiencesIds: props.inject.inject_audiences.asMutable(),
-      documents: props.inject.inject_documents.asMutable(),
+      audiencesIds: props.inject.inject_audiences,
+      documents: props.inject.inject_documents,
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -377,7 +377,8 @@ class InjectDefinition extends Component {
       exerciseId,
       exercise,
       injectTypes,
-      browser,
+      audiencesMap,
+      documentsMap,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -395,7 +396,7 @@ class InjectDefinition extends Component {
       injectTypes.filter((i) => i.type === inject.inject_type),
     );
     const audiences = audiencesIds
-      .map((a) => browser.getAudience(a))
+      .map((a) => audiencesMap[a])
       .filter((a) => a !== undefined);
     const sortAudiences = R.sortWith(
       audiencesOrderAsc
@@ -404,9 +405,9 @@ class InjectDefinition extends Component {
     );
     const sortedAudiences = sortAudiences(audiences);
     const docs = documents
-      .map((d) => (browser.getDocument(d.document_id)
+      .map((d) => (documentsMap[d.document_id]
         ? {
-          ...browser.getDocument(d.document_id),
+          ...documentsMap[d.document_id],
           document_attached: d.document_attached,
         }
         : undefined))
@@ -617,7 +618,7 @@ class InjectDefinition extends Component {
                                     >
                                       <ItemTags
                                         variant="list"
-                                        tags={audience.tags}
+                                        tags={audience.audience_tags}
                                       />
                                     </div>
                                   </div>
@@ -790,7 +791,7 @@ class InjectDefinition extends Component {
                                 className={classes.bodyItem}
                                 style={inlineStyles.document_tags}
                               >
-                                <ItemTags variant="list" tags={document.tags} />
+                                <ItemTags variant="list" tags={document.document_tags} />
                               </div>
                               <div
                                 className={classes.bodyItem}
@@ -874,8 +875,6 @@ InjectDefinition.propTypes = {
   exercise: PropTypes.object,
   injectId: PropTypes.string,
   inject: PropTypes.object,
-  audiences: PropTypes.array,
-  browser: PropTypes.object,
   fetchInjectAudiences: PropTypes.func,
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
@@ -884,13 +883,12 @@ InjectDefinition.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { injectId } = ownProps;
-  const inject = browser.getInject(injectId);
-  return {
-    browser,
-    inject,
-  };
+  const inject = helper.getInject(injectId);
+  const documentsMap = helper.getDocumentsMap();
+  const audiencesMap = helper.getAudiencesMap();
+  return { inject, documentsMap, audiencesMap };
 };
 
 export default R.compose(

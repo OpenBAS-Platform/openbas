@@ -16,7 +16,7 @@ import { updateLog, deleteLog } from '../../../../actions/Log';
 import LogForm from './LogForm';
 import inject18n from '../../../../components/i18n';
 import { Transition } from '../../../../utils/Environment';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 
 class LogPopover extends Component {
@@ -71,12 +71,17 @@ class LogPopover extends Component {
   }
 
   render() {
-    const { t, log, exercise } = this.props;
-    const logTags = log.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
+    const {
+      t, log, exercise, tagsMap,
+    } = this.props;
+    const logTags = log.log_tags.map((tagId) => {
+      const tag = tagsMap[tagId];
+      return {
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      };
+    });
     const initialValues = R.pipe(
       R.assoc('log_tags', logTags),
       R.pick(['log_title', 'log_content', 'log_tags']),
@@ -164,10 +169,11 @@ LogPopover.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { exerciseId } = ownProps;
   return {
-    exercise: browser.getExercise(exerciseId),
+    exercise: helper.getExercise(exerciseId),
+    tagsMap: helper.getTagsMap(),
   };
 };
 

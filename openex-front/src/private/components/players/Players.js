@@ -16,7 +16,7 @@ import TagsFilter from '../../../components/TagsFilter';
 import SearchFilter from '../../../components/SearchFilter';
 import { fetchTags } from '../../../actions/Tag';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles((theme) => ({
@@ -153,7 +153,10 @@ const Players = () => {
   ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
   // Fetching data
-  const users = useStore((store) => store.users);
+  const { users, organizationsMap } = useHelper((helper) => ({
+    users: helper.getUsers(),
+    organizationsMap: helper.getOrganizationsMap(),
+  }));
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
@@ -263,13 +266,13 @@ const Players = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_organization}
                   >
-                    {user.organization?.organization_name || '-'}
+                    {organizationsMap[user.user_organization]?.organization_name || '-'}
                   </div>
                   <div
                     className={classes.bodyItem}
                     style={inlineStyles.user_tags}
                   >
-                    <ItemTags variant="list" tags={user.tags} />
+                    <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
               }

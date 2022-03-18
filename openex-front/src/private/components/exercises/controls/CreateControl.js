@@ -22,7 +22,7 @@ import { addComcheck } from '../../../../actions/Comcheck';
 import { addDryrun } from '../../../../actions/Dryrun';
 import inject18n from '../../../../components/i18n';
 import ComcheckForm from './ComcheckForm';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { Transition } from '../../../../utils/Environment';
 import DryrunForm from './DryrunForm';
 import { resolveUserName } from '../../../../utils/String';
@@ -199,14 +199,12 @@ CreateControl.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { exerciseId } = ownProps;
-  const exercise = browser.getExercise(exerciseId);
-  return {
-    exercise,
-    me: browser.me,
-    audiences: exercise?.audiences,
-  };
+  const exercise = helper.getExercise(exerciseId);
+  const audiences = helper.getExerciseAudiences(exerciseId);
+  const me = helper.getMe();
+  return { exercise, me, audiences };
 };
 
 export default R.compose(

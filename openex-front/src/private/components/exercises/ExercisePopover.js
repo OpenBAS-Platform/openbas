@@ -116,12 +116,17 @@ class ExercisePopover extends Component {
   }
 
   render() {
-    const { t, exercise, classes } = this.props;
-    const exerciseTags = exercise.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
+    const {
+      t, exercise, tagsMap, classes,
+    } = this.props;
+    const exerciseTags = exercise.exercise_tags.map((tagId) => {
+      const tag = tagsMap[tagId];
+      return {
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      };
+    });
     const initialValues = R.pipe(
       R.assoc('exercise_tags', exerciseTags),
       R.pick([
@@ -299,6 +304,7 @@ ExercisePopover.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
   exercise: PropTypes.object,
+  tagsMap: PropTypes.object,
   updateExercise: PropTypes.func,
   deleteExercise: PropTypes.func,
   history: PropTypes.object,

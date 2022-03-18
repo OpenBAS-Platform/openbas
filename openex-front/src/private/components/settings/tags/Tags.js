@@ -20,7 +20,7 @@ import { FIVE_SECONDS } from '../../../../utils/Time';
 import SearchFilter from '../../../../components/SearchFilter';
 import CreateTag from './CreateTag';
 import TagPopover from './TagPopover';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -261,10 +261,8 @@ Tags.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  return {
-    tags: browser.tags,
-  };
+  const helper = storeHelper(state);
+  return { tags: helper.getTags() };
 };
 
 export default R.compose(

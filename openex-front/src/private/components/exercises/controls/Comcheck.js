@@ -25,7 +25,7 @@ import TagsFilter from '../../../../components/TagsFilter';
 import SearchFilter from '../../../../components/SearchFilter';
 import { fetchTags } from '../../../../actions/Tag';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import {
   fetchComcheck,
@@ -237,9 +237,14 @@ const Comcheck = () => {
     'organization',
   ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
+  // eslint-disable-next-line arrow-body-style
+  const { comcheck, statuses } = useHelper((helper) => {
+    return {
+      comcheck: helper.getComcheck(comcheckId),
+      statuses: helper.getComcheckStatuses(comcheckId),
+    };
+  });
   // Fetching data
-  const comcheck = useStore((store) => store.getComcheck(comcheckId));
-  const statuses = comcheck ? comcheck.status : [];
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
@@ -274,8 +279,7 @@ const Comcheck = () => {
           <Paper
             variant="outlined"
             classes={{ root: classes.metric }}
-            style={{ display: 'flex' }}
-          >
+            style={{ display: 'flex' }}>
             <div className={classes.icon}>
               {iconStatus(comcheck?.comcheckstatus_state)}
             </div>
@@ -406,7 +410,7 @@ const Comcheck = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.user_tags}
                     >
-                      <ItemTags variant="list" tags={user.tags} />
+                      <ItemTags variant="list" tags={user.user_tags} />
                     </div>
                     <div
                       className={classes.bodyItem}

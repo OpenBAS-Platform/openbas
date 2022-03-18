@@ -28,7 +28,7 @@ import { fetchExercises } from '../../actions/Exercise';
 import { fetchNextInjects } from '../../actions/Inject';
 import { fetchTags } from '../../actions/Tag';
 import { fetchOrganizations } from '../../actions/Organization';
-import { storeBrowser } from '../../actions/Schema';
+import { storeHelper } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
 import { distributionChartOptions } from '../../utils/Charts';
@@ -106,12 +106,12 @@ const Dashboard = (props) => {
     t,
     nsd,
     statistics,
-    exercises,
+    exercisesMap,
     organizations,
     theme,
     injects,
-    browser,
   } = props;
+  const exercises = Object.values(exercisesMap);
   const topOrganizations = R.pipe(
     R.sortWith([R.descend(R.prop('organization_injects_number'))]),
     R.take(7),
@@ -227,7 +227,7 @@ const Dashboard = (props) => {
                             className={classes.bodyItem}
                             style={{ width: '40%' }}
                           >
-                            <ItemTags variant="list" tags={exercise.tags} />
+                            <ItemTags variant="list" tags={exercise.exercise_tags} />
                           </div>
                         </div>
                       }
@@ -246,7 +246,7 @@ const Dashboard = (props) => {
             {injects?.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
                 {injects.map((inject) => {
-                  const exercise = browser.getExercise(inject.inject_exercise);
+                  const exercise = exercisesMap[inject.inject_exercise];
                   return (
                     <ListItem
                       key={inject.inject_id}
@@ -255,8 +255,7 @@ const Dashboard = (props) => {
                       divider={true}
                       button={true}
                       component={Link}
-                      to={`/exercises/${inject.inject_exercise}/animation`}
-                    >
+                      to={`/exercises/${inject.inject_exercise}/animation`}>
                       <ListItemIcon>
                         <InjectIcon
                           type={inject.inject_type}
@@ -351,18 +350,15 @@ Dashboard.propTypes = {
   fetchNextInjects: PropTypes.func,
   injects: PropTypes.array,
   statistics: PropTypes.object,
-  exercises: PropTypes.array,
-  browser: PropTypes.object,
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   return {
-    exercises: browser.exercises,
-    organizations: browser.organizations,
-    statistics: browser.statistics,
-    injects: browser.next_injects,
-    browser,
+    exercisesMap: helper.getExercisesMap(),
+    organizations: helper.getOrganizations(),
+    statistics: helper.getStatistics(),
+    injects: helper.getNextInjects(),
   };
 };
 

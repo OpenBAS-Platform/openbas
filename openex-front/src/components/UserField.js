@@ -12,7 +12,7 @@ import { fetchUsers, addUser } from '../actions/User';
 import { fetchOrganizations } from '../actions/Organization';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
-import { storeBrowser } from '../actions/Schema';
+import { storeHelper } from '../actions/Schema';
 import { resolveUserName } from '../utils/String';
 
 const styles = () => ({
@@ -133,10 +133,10 @@ class UserField extends Component {
 }
 
 const select = (state) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   return {
-    users: browser.users,
-    organizations: browser.organizations,
+    users: helper.getUsers(),
+    organizations: helper.getOrganizations(),
   };
 };
 

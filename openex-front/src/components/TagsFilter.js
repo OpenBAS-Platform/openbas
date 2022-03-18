@@ -9,7 +9,7 @@ import { LabelOutlined } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { fetchTags } from '../actions/Tag';
 import { useFormatter } from './i18n';
-import { useStore } from '../store';
+import { useHelper } from '../store';
 
 const useStyles = makeStyles(() => ({
   input: {
@@ -43,7 +43,7 @@ const TagsFilter = (props) => {
   useEffect(() => {
     dispatch(fetchTags());
   }, []);
-  const tags = useStore((store) => store.tags);
+  const tags = useHelper((helper) => helper.getTags());
   const { onAddTag, onRemoveTag, currentTags } = props;
   const tagTransform = (n) => ({
     id: n.tag_id,

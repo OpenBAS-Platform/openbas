@@ -37,7 +37,7 @@ import { addGrant, deleteGrant } from '../../../../actions/Grant';
 import GroupForm from './GroupForm';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { Transition } from '../../../../utils/Environment';
 
 const styles = () => ({
@@ -173,7 +173,7 @@ class GroupPopover extends Component {
 
   render() {
     const {
-      classes, t, users, group,
+      classes, t, usersMap, group, organizationsMap,
     } = this.props;
     const initialValues = R.pick(
       [
@@ -198,7 +198,7 @@ class GroupPopover extends Component {
       || (n.user_organization || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(users);
+    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(R.values(usersMap));
     return (
       <div>
         <IconButton
@@ -297,11 +297,7 @@ class GroupPopover extends Component {
                 <List>
                   {filteredUsers.map((user) => {
                     const disabled = this.state.usersIds.includes(user.user_id);
-                    const organizationName = R.propOr(
-                      '-',
-                      'organization_name',
-                      user.organization,
-                    );
+                    const organizationName = organizationsMap[user.user_organization]?.organization_name ?? '-';
                     return (
                       <ListItem
                         key={user.user_id}
@@ -326,7 +322,7 @@ class GroupPopover extends Component {
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
                   {this.state.usersIds.map((userId) => {
-                    const user = this.props.browser.getUser(userId);
+                    const user = usersMap[userId];
                     const userFirstname = R.propOr('-', 'user_firstname', user);
                     const userLastname = R.propOr('-', 'user_lastname', user);
                     const userGravatar = R.propOr('-', 'user_gravatar', user);
@@ -477,20 +473,15 @@ GroupPopover.propTypes = {
   deleteGroup: PropTypes.func,
   addGrant: PropTypes.func,
   deleteGrant: PropTypes.func,
-  organizations: PropTypes.array,
-  exercises: PropTypes.array,
-  users: PropTypes.array,
   groupUsersIds: PropTypes.array,
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  const { users, exercises, organizations } = browser;
+  const helper = storeHelper(state);
   return {
-    users,
-    organizations,
-    exercises,
-    browser,
+    usersMap: helper.getUsersMap(),
+    organizationsMap: helper.getOrganizationsMap(),
+    exercises: helper.getExercises(),
   };
 };
 

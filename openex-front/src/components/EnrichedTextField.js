@@ -3,23 +3,25 @@ import { Field } from 'react-final-form';
 import InputLabel from '@mui/material/InputLabel';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
-import * as R from 'ramda';
-import { connect } from 'react-redux';
-import { storeBrowser } from '../actions/Schema';
 import 'ckeditor5-custom-build/build/translations/fr';
 import '../resources/css/CKEditorDark.css';
 import locale from '../utils/BrowserLanguage';
+import { useHelper } from '../store';
 
 const renderEnrichedTextField = ({
   label,
   input: { onChange, value },
   style,
-  platformLanguage,
-  userLanguage,
   disabled,
 }) => {
-  const platformLang = platformLanguage !== 'auto' ? platformLanguage : locale;
-  const lang = userLanguage !== 'auto' ? userLanguage : platformLang;
+  const lang = useHelper((helper) => {
+    const me = helper.getMe();
+    const settings = helper.getSettings();
+    const rawPlatformLang = settings.platform_lang ?? 'auto';
+    const rawUserLang = me.user_lang ?? 'auto';
+    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
+    return rawUserLang !== 'auto' ? rawUserLang : platformLang;
+  });
   return (
     <div style={style}>
       <InputLabel variant="standard" shrink={true} disabled={disabled}>
@@ -46,13 +48,5 @@ export const ConnectedEnrichedTextField = (props) => (
   <Field name={props.name} component={renderEnrichedTextField} {...props} />
 );
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  const { settings, me } = browser;
-  const platformLanguage = R.propOr('auto', 'platform_lang', settings);
-  const userLanguage = R.propOr('auto', 'user_lang', me);
-  return { platformLanguage, userLanguage };
-};
-
 // eslint-disable-next-line import/prefer-default-export
-export const EnrichedTextField = connect(select)(ConnectedEnrichedTextField);
+export const EnrichedTextField = ConnectedEnrichedTextField;

@@ -15,7 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { updateDocument, deleteDocument } from '../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import { Transition } from '../../../utils/Environment';
 
 class DocumentPopover extends Component {
@@ -92,17 +92,23 @@ class DocumentPopover extends Component {
 
   render() {
     const {
-      t, document, onRemoveDocument, onToggleAttach, attached,
+      t, document, onRemoveDocument, onToggleAttach, attached, tagsMap, exercisesMap,
     } = this.props;
-    const documentTags = document.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
-    const documentExercises = document.exercises.map((ex) => ({
-      id: ex.exercise_id,
-      label: ex.exercise_name,
-    }));
+    const documentTags = document.document_tags.map((tagId) => {
+      const tag = tagsMap[tagId];
+      return {
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      };
+    });
+    const documentExercises = document.document_exercises.map((exId) => {
+      const ex = exercisesMap[exId];
+      return {
+        id: ex.exercise_id,
+        label: ex.exercise_name,
+      };
+    });
     const initialValues = R.pipe(
       R.assoc('document_tags', documentTags),
       R.assoc('document_exercises', documentExercises),
@@ -228,9 +234,13 @@ class DocumentPopover extends Component {
 }
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  const user = browser.me;
-  return { user, userAdmin: user?.admin };
+  const helper = storeHelper(state);
+  const user = helper.getMe();
+  const tagsMap = helper.getTagsMap();
+  const exercisesMap = helper.getExercisesMap();
+  return {
+    user, userAdmin: user?.admin, tagsMap, exercisesMap,
+  };
 };
 
 DocumentPopover.propTypes = {
@@ -239,7 +249,6 @@ DocumentPopover.propTypes = {
   updateDocument: PropTypes.func,
   deleteDocument: PropTypes.func,
   userAdmin: PropTypes.bool,
-  tags: PropTypes.object,
   onRemoveDocument: PropTypes.func,
   onToggleAttach: PropTypes.func,
   attached: PropTypes.bool,

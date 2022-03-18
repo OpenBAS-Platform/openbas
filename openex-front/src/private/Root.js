@@ -7,11 +7,11 @@ import { ConnectedIntlProvider } from '../components/AppIntlProvider';
 import { ConnectedThemeProvider } from '../components/AppThemeProvider';
 import RootPublic from '../public/Root';
 import Index from './Index';
-import { useStore } from '../store';
+import { useHelper } from '../store';
 import { fetchMe, fetchParameters } from '../actions/Application';
 
 const RootPrivate = () => {
-  const logged = useStore((store) => store.logged);
+  const logged = useHelper((helper) => helper.logged());
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchMe());

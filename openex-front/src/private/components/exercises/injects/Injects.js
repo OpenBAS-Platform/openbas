@@ -13,10 +13,7 @@ import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import {
-  fetchExerciseInjects,
-  fetchInjectTypes,
-} from '../../../../actions/Inject';
+import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import InjectIcon from './InjectIcon';
 import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';
@@ -25,7 +22,7 @@ import InjectDefinition from './InjectDefinition';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
 
@@ -188,9 +185,15 @@ const Injects = () => {
   const filtering = useSearchAnFilter('inject', 'depends_duration', searchColumns);
   // Fetching data
   const { exerciseId } = useParams();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const injectTypes = useStore((store) => store.inject_types);
-  const { injects } = exercise;
+  // eslint-disable-next-line
+  const { exercise, injects, injectTypes, tagsMap } = useHelper((helper) => {
+    return {
+      exercise: helper.getExercise(exerciseId),
+      injects: helper.getExerciseInjects(exerciseId),
+      injectTypes: helper.getInjectTypes(),
+      tagsMap: helper.getTagsMap(),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjects(exerciseId));
@@ -219,16 +222,14 @@ const Injects = () => {
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
-          style={{ paddingTop: 0 }}
-        >
+          style={{ paddingTop: 0 }}>
           <ListItemIcon>
             <span
               style={{
                 padding: '0 8px 0 10px',
                 fontWeight: 700,
                 fontSize: 12,
-              }}
-            >
+              }}>
               #
             </span>
           </ListItemIcon>
@@ -338,7 +339,7 @@ const Injects = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.inject_tags}
                     >
-                      <ItemTags variant="list" tags={inject.tags} />
+                      <ItemTags variant="list" tags={inject.inject_tags} />
                     </div>
                   </div>
                 }
@@ -349,6 +350,7 @@ const Injects = () => {
                   exercise={exercise}
                   inject={inject}
                   injectTypes={injectTypes}
+                  tagsMap={tagsMap}
                   setSelectedInject={setSelectedInject}
                 />
               </ListItemSecondaryAction>
@@ -363,8 +365,7 @@ const Injects = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedInject(null)}
-        elevation={1}
-      >
+        elevation={1}>
         <InjectDefinition
           injectId={selectedInject}
           exerciseId={exercise.exercise_id}

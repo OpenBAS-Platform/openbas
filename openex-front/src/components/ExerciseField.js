@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import { makeStyles } from '@mui/styles';
 import { Autocomplete } from './Autocomplete';
 import useDataLoader from '../utils/ServerSideEvent';
-import { useStore } from '../store';
+import { useHelper } from '../store';
 import { fetchExercises } from '../actions/Exercise';
 
 const useStyles = makeStyles(() => ({
@@ -26,7 +26,7 @@ const useStyles = makeStyles(() => ({
 const ExerciseField = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const exercises = useStore((store) => store.exercises);
+  const exercises = useHelper((helper) => helper.getExercises());
 
   useDataLoader(() => {
     dispatch(fetchExercises());

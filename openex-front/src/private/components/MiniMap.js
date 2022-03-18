@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { connect } from 'react-redux';
-import { storeBrowser } from '../../actions/Schema';
+import { storeHelper } from '../../actions/Schema';
 import Loader from '../../components/Loader';
 
 const styles = () => ({
@@ -46,8 +46,8 @@ MiniMap.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  const parameters = browser.settings ?? {};
+  const helper = storeHelper(state);
+  const parameters = helper.getSettings() ?? {};
   return { parameters };
 };
 

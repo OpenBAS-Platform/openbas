@@ -17,7 +17,7 @@ import Comcheck from './controls/Comcheck';
 import Lessons from './lessons/Lessons';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -29,7 +29,7 @@ const Index = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
+  const exercise = useHelper((helper) => helper.getExercise(exerciseId));
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchExercise(exerciseId));

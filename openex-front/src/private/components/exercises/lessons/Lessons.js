@@ -35,7 +35,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import CreateObjective from './CreateObjective';
 import { useFormatter } from '../../../../components/i18n';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchObjectives } from '../../../../actions/Objective';
 import Empty from '../../../../components/Empty';
@@ -103,8 +103,16 @@ const Lessons = () => {
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { objectives, logs, polls } = exercise;
+  // eslint-disable-next-line
+  const { exercise, objectives, logs, polls, usersMap } = useHelper((helper) => {
+    return {
+      exercise: helper.getExercise(exerciseId),
+      objectives: helper.getExerciseObjectives(exerciseId),
+      logs: helper.getExerciseLogs(exerciseId),
+      polls: helper.getExercisePolls(exerciseId),
+      usersMap: helper.getUsersMap(),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchLogs(exerciseId));
@@ -229,7 +237,7 @@ const Lessons = () => {
                     </Box>
                     <ListItemSecondaryAction>
                       <ObjectivePopover
-                        exerciseId={exerciseId}
+                        exercise={exercise}
                         objective={objective}
                       />
                     </ListItemSecondaryAction>
@@ -329,7 +337,7 @@ const Lessons = () => {
                       fontSize: 15,
                     }}
                   >
-                    <strong>{resolveUserName(log.user)}</strong>&nbsp;
+                    <strong>{resolveUserName(usersMap[log.log_user] ?? {})}</strong>&nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
                       {t('added an entry')} on {nsdt(log.log_created_at)}
                     </span>
@@ -342,7 +350,7 @@ const Lessons = () => {
                       textTransform: 'none',
                     }}
                   >
-                    <ItemTags tags={log.tags || []} />
+                    <ItemTags tags={log.log_tags} />
                   </div>
                 </div>
               }
@@ -388,7 +396,7 @@ const Lessons = () => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Objective achievement evalution')}</DialogTitle>
+        <DialogTitle>{t('Objective achievement evaluation')}</DialogTitle>
         <DialogContent>
           <ObjectiveEvaluations
             objectiveId={selectedObjective}

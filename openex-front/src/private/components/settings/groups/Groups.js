@@ -25,7 +25,7 @@ import CreateGroup from './CreateGroup';
 import { fetchGroups } from '../../../../actions/Group';
 import { fetchExercises } from '../../../../actions/Exercise';
 import GroupPopover from './GroupPopover';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -232,9 +232,7 @@ class Groups extends Component {
   }
 
   render() {
-    const {
-      classes, groups, exercises, organizations, users, t,
-    } = this.props;
+    const { classes, groups, t } = this.props;
     const { keyword, sortBy, orderAsc } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.group_name || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -390,9 +388,6 @@ class Groups extends Component {
                 <GroupPopover
                   group={group}
                   groupUsersIds={group.group_users}
-                  organizations={organizations}
-                  users={users}
-                  exercises={exercises}
                 />
               </ListItemSecondaryAction>
             </ListItem>
@@ -418,16 +413,8 @@ Groups.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  const {
-    groups, exercises, users, organizations,
-  } = browser;
-  return {
-    groups,
-    exercises,
-    users,
-    organizations,
-  };
+  const helper = storeHelper(state);
+  return { groups: helper.getGroups() };
 };
 
 export default R.compose(

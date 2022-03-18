@@ -20,7 +20,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import { fetchTags } from '../../../../actions/Tag';
 import { fetchPlayers } from '../../../../actions/User';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { fetchDryrun } from '../../../../actions/Dryrun';
 import { useFormatter } from '../../../../components/i18n';
@@ -199,9 +199,14 @@ const Dryrun = () => {
   const searchColumns = ['type', 'title', 'date'];
   const filtering = useSearchAnFilter('dryinject', 'date', searchColumns);
   // Fetching data
-  const dryrun = useStore((store) => store.getDryrun(dryrunId));
-  const dryinjects = dryrun ? dryrun.dryinjects : [];
-  const users = dryrun ? dryrun.users : [];
+  // eslint-disable-next-line arrow-body-style
+  const { dryrun, dryinjects, users } = useHelper((helper) => {
+    return {
+      dryrun: helper.getDryrun(dryrunId),
+      dryinjects: helper.getDryrunInjects(dryrunId),
+      users: helper.getDryrunUsers(dryrunId),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchPlayers());

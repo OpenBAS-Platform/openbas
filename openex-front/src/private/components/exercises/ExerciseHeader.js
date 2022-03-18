@@ -15,7 +15,7 @@ import DialogContent from '@mui/material/DialogContent';
 import { updateExerciseTags } from '../../../actions/Exercise';
 import TagField from '../../../components/TagField';
 import ExercisePopover from './ExercisePopover';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { Transition } from '../../../utils/Environment';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
@@ -41,21 +41,36 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
+  const classes = useStyles();
+  const tag = useHelper((helper) => helper.getTag(tagId));
+  return <Chip
+      key={tag.tag_id}
+      classes={{ root: classes.tag }}
+      label={tag.tag_name}
+      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)
+      }
+  />;
+};
+
 const ExerciseHeader = () => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { exerciseId } = useParams();
   const dispatch = useDispatch();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
+  // eslint-disable-next-line
+  const { exercise, tagsMap } = useHelper((helper) => {
+    return { exercise: helper.getExercise(exerciseId), tagsMap: helper.getTagsMap() };
+  });
   const [openTagAdd, setOpenTagAdd] = useState(false);
   const containerRef = useRef(null);
   const handleToggleAddTag = () => setOpenTagAdd(!openTagAdd);
 
   const deleteTag = (tagId) => {
-    const tags = exercise.tags.filter((tag) => tag.tag_id !== tagId);
+    const tagIds = exercise.exercise_tags.filter((id) => id !== tagId);
     dispatch(
       updateExerciseTags(exercise.exercise_id, {
-        exercise_tags: tags.map((tag) => tag.tag_id),
+        exercise_tags: tagIds,
       }),
     );
   };
@@ -65,12 +80,12 @@ const ExerciseHeader = () => {
       updateExerciseTags(exercise.exercise_id, {
         exercise_tags: R.uniq([
           ...values.exercise_tags.map((tag) => tag.id),
-          ...exercise.tags.map((tag) => tag.tag_id),
+          ...exercise.exercise_tags,
         ]),
       }),
     );
   };
-  const { tags } = exercise;
+  const { exercise_tags: tags } = exercise;
   return (
     <div className={classes.container} ref={containerRef}>
       <Typography
@@ -80,19 +95,12 @@ const ExerciseHeader = () => {
       >
         {exercise.exercise_name}
       </Typography>
-      <ExercisePopover exercise={exercise} />
+      <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
       <div className={classes.tags}>
-        {R.take(5, tags).map((tag) => (
-          <Chip
-            key={tag.tag_id}
-            classes={{ root: classes.tag }}
-            label={tag.tag_name}
-            onDelete={
-              isExerciseReadOnly(exercise, true)
-                ? null
-                : () => deleteTag(tag.tag_id)
-            }
-          />
+        {R.take(5, tags ?? []).map((tag) => (
+          <TagChip key={tag} tagId={tag}
+                   isReadOnly={isExerciseReadOnly(exercise, true)}
+                   deleteTag={deleteTag}/>
         ))}
         <div style={{ float: 'left', marginTop: -5 }}>
           <IconButton

@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import * as PropTypes from 'prop-types';
-import * as R from 'ramda';
-import { connect } from 'react-redux';
 import { IntlProvider } from 'react-intl';
 import moment from 'moment';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -10,7 +8,7 @@ import frLocale from 'date-fns/locale/fr';
 import enLocale from 'date-fns/locale/en-US';
 import locale, { DEFAULT_LANG } from '../utils/BrowserLanguage';
 import i18n from '../utils/Localization';
-import { storeBrowser } from '../actions/Schema';
+import { useHelper } from '../store';
 
 const localeMap = {
   en: enLocale,
@@ -18,11 +16,17 @@ const localeMap = {
 };
 
 const AppIntlProvider = (props) => {
-  const {
-    children, userLanguage, platformLanguage, platformName,
-  } = props;
-  const platformLang = platformLanguage !== 'auto' ? platformLanguage : locale;
-  const lang = userLanguage !== 'auto' ? userLanguage : platformLang;
+  const { children } = props;
+  const { platformName, lang } = useHelper((helper) => {
+    const me = helper.getMe();
+    const settings = helper.getSettings();
+    const name = settings.platform_name ?? 'OpenEx - Exercises planning platform';
+    const rawPlatformLang = settings.platform_lang ?? 'auto';
+    const rawUserLang = me?.user_lang ?? 'auto';
+    const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;
+    const userLang = rawUserLang !== 'auto' ? rawUserLang : platformLang;
+    return { platformName: name, lang: userLang };
+  });
   const baseMessages = i18n.messages[lang] || i18n.messages[DEFAULT_LANG];
   if (lang === 'fr') {
     moment.locale('fr');
@@ -42,12 +46,10 @@ const AppIntlProvider = (props) => {
           return;
         }
         throw err;
-      }}
-    >
+      }}>
       <LocalizationProvider
         dateAdapter={AdapterDateFns}
-        locale={localeMap[locale]}
-      >
+        locale={localeMap[locale]}>
         {children}
       </LocalizationProvider>
     </IntlProvider>
@@ -55,24 +57,8 @@ const AppIntlProvider = (props) => {
 };
 
 AppIntlProvider.propTypes = {
-  platformLanguage: PropTypes.string,
-  platformName: PropTypes.string,
-  userLanguage: PropTypes.string,
   children: PropTypes.node,
 };
 
-const select = (state) => {
-  const browser = storeBrowser(state);
-  const { settings, me } = browser;
-  const platformName = R.propOr(
-    'OpenEx - Exercises planning platform',
-    'platform_name',
-    settings,
-  );
-  const platformLanguage = R.propOr('auto', 'platform_lang', settings);
-  const userLanguage = R.propOr('auto', 'user_lang', me);
-  return { platformLanguage, platformName, userLanguage };
-};
-
 // eslint-disable-next-line import/prefer-default-export
-export const ConnectedIntlProvider = connect(select)(AppIntlProvider);
+export const ConnectedIntlProvider = AppIntlProvider;

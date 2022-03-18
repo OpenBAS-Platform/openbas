@@ -19,7 +19,7 @@ import {
   CastForEducationOutlined,
 } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchInjectTypes } from '../../../actions/Inject';
 
@@ -58,7 +58,7 @@ const Integrations = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const injectTypes = useStore((store) => store.inject_types);
+  const injectTypes = useHelper((store) => store.getInjectTypes());
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
   });

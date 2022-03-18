@@ -21,7 +21,7 @@ import ItemTags from '../../../components/ItemTags';
 import { truncate } from '../../../utils/String';
 import CreateOrganization from './CreateOrganization';
 import OrganizationPopover from './OrganizationPopover';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import { fetchTags } from '../../../actions/Tag';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -189,7 +189,7 @@ class Organizations extends Component {
   }
 
   render() {
-    const { classes, organizations } = this.props;
+    const { classes, organizations, tagsMap } = this.props;
     const {
       keyword, sortBy, orderAsc, tags,
     } = this.state;
@@ -296,13 +296,13 @@ class Organizations extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.organization_tags}
                     >
-                      <ItemTags variant="list" tags={organization.tags} />
+                      <ItemTags variant="list" tags={organization.organization_tags} />
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <OrganizationPopover organization={organization} />
+                <OrganizationPopover organization={organization} tagsMap={tagsMap} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
@@ -321,8 +321,11 @@ Organizations.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  return { organizations: browser.organizations };
+  const helper = storeHelper(state);
+  return {
+    organizations: helper.getOrganizations(),
+    tagsMap: helper.getTagsMap(),
+  };
 };
 
 export default R.compose(

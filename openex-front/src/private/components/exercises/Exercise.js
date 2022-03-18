@@ -34,7 +34,7 @@ import {
 } from '../../../actions/Exercise';
 import { useFormatter } from '../../../components/i18n';
 import ExerciseStatus from './ExerciseStatus';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 import ExerciseParametersForm from './ExerciseParametersForm';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../actions/Audience';
@@ -125,8 +125,11 @@ const Exercise = () => {
   const { exerciseId } = useParams();
   const [openChangeStatus, setOpenChangeStatus] = useState(null);
   const { t, fldt } = useFormatter();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { audiences } = exercise;
+  const { exercise, audiences } = useHelper((helper) => {
+    const ex = helper.getExercise(exerciseId);
+    const aud = helper.getExerciseAudiences(exerciseId);
+    return { exercise: ex, audiences: aud };
+  });
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
   });

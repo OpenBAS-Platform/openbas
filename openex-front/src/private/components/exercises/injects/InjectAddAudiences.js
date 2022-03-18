@@ -21,7 +21,7 @@ import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { fetchAudiences } from '../../../../actions/Audience';
 import CreateAudience from '../audiences/CreateAudience';
 import { truncate } from '../../../../utils/String';
@@ -103,7 +103,7 @@ class InjectAddAudiences extends Component {
 
   render() {
     const {
-      classes, t, audiences, injectAudiencesIds, exerciseId, exercise,
+      classes, t, audiences, injectAudiencesIds, exerciseId, exercise, audiencesMap,
     } = this.props;
     const { keyword, audiencesIds } = this.state;
     const filterByKeyword = (n) => keyword === ''
@@ -192,7 +192,7 @@ class InjectAddAudiences extends Component {
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
                   {this.state.audiencesIds.map((audienceId) => {
-                    const audience = this.props.browser.getAudience(audienceId);
+                    const audience = audiencesMap[audienceId];
                     return (
                       <Chip
                         key={audienceId}
@@ -235,14 +235,12 @@ InjectAddAudiences.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { exerciseId } = ownProps;
-  const exercise = browser.getExercise(exerciseId);
-  return {
-    exercise,
-    audiences: exercise.audiences,
-    browser,
-  };
+  const exercise = helper.getExercise(exerciseId);
+  const audiences = helper.getExerciseAudiences(exerciseId);
+  const audiencesMap = helper.getAudiencesMap();
+  return { exercise, audiences, audiencesMap };
 };
 
 export default R.compose(

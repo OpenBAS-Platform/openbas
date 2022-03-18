@@ -17,7 +17,7 @@ import { updateAudiencePlayers } from '../../../actions/Audience';
 import { updatePlayer, deletePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -108,20 +108,23 @@ class PlayerPopover extends Component {
 
   render() {
     const {
-      t, userAdmin, user, organizations, audienceId, exercise,
+      t, userAdmin, user, organizationsMap, audienceId, exercise, tagsMap,
     } = this.props;
-    const userOrganizationValue = user.organization;
+    const userOrganizationValue = organizationsMap[user.user_organization];
     const userOrganization = userOrganizationValue
       ? {
         id: userOrganizationValue.organization_id,
         label: userOrganizationValue.organization_name,
       }
       : null;
-    const userTags = user.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
+    const userTags = user.user_tags.map((tagId) => {
+      const tag = tagsMap[tagId];
+      return ({
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      });
+    });
     const initialValues = R.pipe(
       R.assoc('user_organization', userOrganization),
       R.assoc('user_tags', userTags),
@@ -210,7 +213,7 @@ class PlayerPopover extends Component {
             <PlayerForm
               initialValues={initialValues}
               editing={true}
-              organizations={organizations}
+              organizations={R.values(organizationsMap)}
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
               canUpdateEmail={canUpdateEmail}
@@ -264,11 +267,13 @@ PlayerPopover.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { exerciseId } = ownProps;
   return {
-    userAdmin: browser.me?.admin,
-    exercise: browser.getExercise(exerciseId),
+    userAdmin: helper.getMe()?.admin,
+    exercise: helper.getExercise(exerciseId),
+    tagsMap: helper.getTagsMap(),
+    organizationsMap: helper.getOrganizationsMap(),
   };
 };
 

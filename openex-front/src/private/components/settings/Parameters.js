@@ -12,7 +12,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Chip from '@mui/material/Chip';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import { updateParameters } from '../../../actions/Application';
 
 const styles = () => ({
@@ -89,10 +89,11 @@ Parameters.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  const userAdmin = browser.me?.admin;
-  const { settings } = browser;
-  return { userAdmin, settings };
+  const helper = storeHelper(state);
+  return {
+    userAdmin: helper.getMe()?.admin,
+    settings: helper.getSettings(),
+  };
 };
 
 export default R.compose(

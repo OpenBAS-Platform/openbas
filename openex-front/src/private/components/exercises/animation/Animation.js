@@ -14,7 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import Drawer from '@mui/material/Drawer';
 import { useFormatter } from '../../../../components/i18n';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
@@ -142,9 +142,21 @@ const Animation = () => {
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
   const { t, fndt } = useFormatter();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const injectTypes = useStore((store) => store.inject_types);
-  const { audiences, injects } = exercise;
+  const {
+    exercise, audiences, injects, injectTypes, tagsMap, audiencesInjectsMap,
+  } = useHelper((helper) => {
+    const exerciseAudiences = helper.getExerciseAudiences(exerciseId);
+    const injectsPerAudience = R.mergeAll(exerciseAudiences
+      .map((a) => ({ [a.audience_id]: helper.getAudienceInjects(a.audience_id) })));
+    return {
+      exercise: helper.getExercise(exerciseId),
+      injects: helper.getExerciseInjects(exerciseId),
+      audiences: exerciseAudiences,
+      tagsMap: helper.getTagsMap(),
+      audiencesInjectsMap: injectsPerAudience,
+      injectTypes: helper.getInjectTypes(),
+    };
+  });
   const sortedAudiences = R.sortWith(
     [R.ascend(R.prop('audience_name'))],
     audiences,
@@ -223,7 +235,7 @@ const Animation = () => {
           <div className={classes.timeline}>
             {sortedAudiences.map((audience, index) => {
               const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(audience.injects),
+                filtering.filterAndSort(audiencesInjectsMap[audience.audience_id]),
               );
               return (
                 <div
@@ -409,6 +421,7 @@ const Animation = () => {
                         inject={inject}
                         exerciseId={exerciseId}
                         exercise={exercise}
+                        tagsMap={tagsMap}
                         setSelectedInject={setSelectedInject}
                       />
                     </ListItemSecondaryAction>

@@ -26,7 +26,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
 import ItemTags from '../../../../components/ItemTags';
 import PlayerPopover from '../../players/PlayerPopover';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import AudienceAddPlayers from './AudienceAddPlayers';
 
 const styles = (theme) => ({
@@ -219,7 +219,7 @@ class AudiencesPlayers extends Component {
       users,
       handleClose,
       audience,
-      organizations,
+      organizationsMap,
       exerciseId,
       audienceId,
     } = this.props;
@@ -242,7 +242,6 @@ class AudiencesPlayers extends Component {
       orderAsc ? [R.ascend(R.prop(sortBy))] : [R.descend(R.prop(sortBy))],
     );
     const sortedUsers = R.pipe(
-      R.map((n) => R.assoc('user_organization', n.organization?.organization_name, n)),
       R.filter(
         (n) => tags.length === 0
           || R.any(
@@ -383,13 +382,13 @@ class AudiencesPlayers extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.user_organization}
                     >
-                      {user.user_organization}
+                      {organizationsMap[user.user_organization]?.organization_name}
                     </div>
                     <div
                       className={classes.bodyItem}
                       style={inlineStyles.user_tags}
                     >
-                      <ItemTags variant="list" tags={user.tags} />
+                      <ItemTags variant="list" tags={user.user_tags} />
                     </div>
                   </div>
                 }
@@ -406,7 +405,6 @@ class AudiencesPlayers extends Component {
           ))}
         </List>
         <AudienceAddPlayers
-          organizations={organizations}
           exerciseId={exerciseId}
           audienceId={audienceId}
           audienceUsersIds={users.map((u) => u.user_id)}
@@ -430,13 +428,12 @@ AudiencesPlayers.propTypes = {
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { audienceId } = ownProps;
-  const audience = browser.getAudience(audienceId);
   return {
-    organization: browser.organizations,
-    audience,
-    users: audience?.users || [],
+    organizationsMap: helper.getOrganizationsMap(),
+    audience: helper.getAudience(audienceId),
+    users: helper.getAudienceUsers(audienceId),
   };
 };
 

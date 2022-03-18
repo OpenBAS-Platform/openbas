@@ -16,7 +16,7 @@ import { fetchTags } from '../../../../actions/Tag';
 import TagsFilter from '../../../../components/TagsFilter';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import UserPopover from './UserPopover';
 
 const useStyles = makeStyles((theme) => ({
@@ -156,7 +156,12 @@ const Users = () => {
   const dispatch = useDispatch();
   const searchColumns = ['email', 'firstname', 'lastname', 'phone', 'organization'];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  const [users, organizations] = useStore((store) => [store.users, store.organizations]);
+  // eslint-disable-next-line max-len
+  const { users, tagsMap, organizationsMap } = useHelper((helper) => ({
+    users: helper.getUsers(),
+    organizationsMap: helper.getOrganizationsMap(),
+    tagsMap: helper.getTagsMap(),
+  }));
   useDataLoader(() => {
     dispatch(fetchTags());
     dispatch(fetchOrganizations());
@@ -240,7 +245,7 @@ const Users = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_organization}
                   >
-                    {user.organization?.organization_name}
+                    {organizationsMap[user.user_organization]?.organization_name}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -253,13 +258,13 @@ const Users = () => {
                     )}
                   </div>
                   <div className={classes.bodyItem} style={inlineStyles.user_tags}>
-                    <ItemTags variant="list" tags={user.tags} />
+                    <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <UserPopover user={user} organizations={organizations} />
+              <UserPopover user={user} tagsMap={tagsMap} organizationsMap={organizationsMap} />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

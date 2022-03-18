@@ -18,7 +18,7 @@ import { fetchDocuments } from '../../../actions/Document';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
@@ -325,7 +325,7 @@ class Documents extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.document_tags}
                     >
-                      <ItemTags variant="list" tags={document.tags} />
+                      <ItemTags variant="list" tags={document.document_tags} />
                     </div>
                   </div>
                 }
@@ -351,10 +351,10 @@ Documents.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   return {
-    documents: browser.documents,
-    userAdmin: browser.me?.admin,
+    documents: helper.getDocuments(),
+    userAdmin: helper.getMe()?.admin,
   };
 };
 

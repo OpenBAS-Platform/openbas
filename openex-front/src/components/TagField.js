@@ -11,7 +11,7 @@ import TagForm from '../private/components/settings/tags/TagForm';
 import { fetchTags, addTag } from '../actions/Tag';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
-import { storeBrowser } from '../actions/Schema';
+import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -120,9 +120,9 @@ class TagField extends Component {
 }
 
 const select = (state) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   return {
-    tags: browser.tags,
+    tags: helper.getTags(),
   };
 };
 

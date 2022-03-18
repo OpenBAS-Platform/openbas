@@ -9,7 +9,7 @@ import { CheckCircleOutlineOutlined } from '@mui/icons-material';
 import { fetchComcheckStatus } from '../../../actions/Comcheck';
 import logo from '../../../resources/images/logo.png';
 import { useFormatter } from '../../../components/i18n';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -46,7 +46,7 @@ const Comcheck = () => {
   const dispatch = useDispatch();
   const { fldt, t } = useFormatter();
   const { statusId } = useParams();
-  const status = useStore((store) => store.getComcheckStatus(statusId));
+  const status = useHelper((helper) => helper.getComcheckStatus(statusId));
   useEffect(() => {
     dispatch(fetchComcheckStatus(statusId));
   }, []);

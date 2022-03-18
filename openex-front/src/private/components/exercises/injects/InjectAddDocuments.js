@@ -18,7 +18,7 @@ import { ListItemIcon } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
-import { storeBrowser } from '../../../../actions/Schema';
+import { storeHelper } from '../../../../actions/Schema';
 import { fetchDocuments } from '../../../../actions/Document';
 import CreateDocument from '../../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
@@ -119,7 +119,7 @@ class InjectAddDocuments extends Component {
     const filteredDocuments = R.pipe(
       R.filter(filterByKeyword),
       R.take(5),
-    )(documents);
+    )(Object.values(documents));
     return (
       <div>
         <ListItem
@@ -196,7 +196,7 @@ class InjectAddDocuments extends Component {
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
                   {this.state.documentsIds.map((documentId) => {
-                    const document = this.props.browser.getDocument(documentId);
+                    const document = documents[documentId];
                     return (
                       <Chip
                         key={documentId}
@@ -229,21 +229,17 @@ class InjectAddDocuments extends Component {
 InjectAddDocuments.propTypes = {
   t: PropTypes.func,
   fetchDocuments: PropTypes.func,
-  documents: PropTypes.array,
+  documents: PropTypes.object,
   injectDocumentsIds: PropTypes.array,
-  browser: PropTypes.object,
   handleAddDocuments: PropTypes.func,
 };
 
 const select = (state, ownProps) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   const { exerciseId } = ownProps;
-  const exercise = browser.getExercise(exerciseId);
-  return {
-    exercise,
-    documents: browser.documents,
-    browser,
-  };
+  const exercise = helper.getExercise(exerciseId);
+  const documents = helper.getDocumentsMap();
+  return { exercise, documents };
 };
 
 export default R.compose(

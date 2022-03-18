@@ -16,7 +16,7 @@ import {
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 import inject18n from '../../../components/i18n';
 
 const styles = (theme) => ({
@@ -55,9 +55,8 @@ const Index = (props) => {
   }, []);
 
   const {
-    classes, user, organizations, t,
+    classes, user, tokens: userTokens, organizationsMap, t,
   } = props;
-  const userTokens = user.tokens;
   const onUpdate = (data) => {
     const inputValues = R.pipe(
       R.assoc(
@@ -76,7 +75,7 @@ const Index = (props) => {
     data.user_plain_password,
   );
 
-  const userOrganizationValue = user.organization;
+  const userOrganizationValue = organizationsMap[user.user_organization];
   const userOrganization = userOrganizationValue
     ? {
       id: userOrganizationValue.organization_id,
@@ -106,7 +105,7 @@ const Index = (props) => {
             {t('Profile')}
           </Typography>
           <UserForm
-            organizations={organizations}
+            organizations={R.values(organizationsMap)}
             onSubmit={onUpdate}
             initialValues={initialValues}
           />
@@ -180,8 +179,12 @@ Index.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  return { user: browser.me, organizations: browser.organizations };
+  const helper = storeHelper(state);
+  return {
+    user: helper.getMe(),
+    tokens: helper.getMeTokens(),
+    organizationsMap: helper.getOrganizationsMap(),
+  };
 };
 
 export default R.compose(

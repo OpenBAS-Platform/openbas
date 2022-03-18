@@ -26,7 +26,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const UserPopover = ({ user, organizations }) => {
+const UserPopover = ({ user, organizationsMap, tagsMap }) => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openEditPassword, setOpenEditPassword] = useState(false);
@@ -86,13 +86,17 @@ const UserPopover = ({ user, organizations }) => {
     handleCloseDelete();
   };
 
-  const org = user.organization;
+  const org = organizationsMap[user.user_organization];
   const userOrganization = org ? { id: org.organization_id, label: org.organization_name } : null;
-  const userTags = user.tags.map((tag) => ({
-    id: tag.tag_id,
-    label: tag.tag_name,
-    color: tag.tag_color,
-  }));
+
+  const userTags = user.user_tags
+    .map((tagId) => tagsMap[tagId])
+    .filter((tag) => tag !== undefined)
+    .map((tag) => ({
+      id: tag.tag_id,
+      label: tag.tag_name,
+      color: tag.tag_color,
+    }));
   const initialValues = R.pipe(
     R.assoc('user_organization', userOrganization),
     R.assoc('user_tags', userTags),
@@ -170,7 +174,6 @@ const UserPopover = ({ user, organizations }) => {
             <UserForm
               initialValues={initialValues}
               editing={true}
-              organizations={organizations}
               onSubmit={onSubmitEdit}
               handleClose={handleCloseEdit}
             />

@@ -19,7 +19,7 @@ import CreateAudience from './CreateAudience';
 import AudiencePopover from './AudiencePopover';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import AudiencePlayers from './AudiencePlayers';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
@@ -160,8 +160,10 @@ const Audiences = () => {
   ]);
   // Fetching data
   const { exerciseId } = useParams();
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { audiences } = exercise;
+  const { exercise, audiences } = useHelper((helper) => ({
+    exercise: helper.getExercise(exerciseId),
+    audiences: helper.getExerciseAudiences(exerciseId),
+  }));
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
   });
@@ -287,7 +289,7 @@ const Audiences = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.audience_tags}
                   >
-                    <ItemTags variant="list" tags={audience.tags} />
+                    <ItemTags variant="list" tags={audience.audience_tags} />
                   </div>
                 </div>
               }
@@ -310,13 +312,12 @@ const Audiences = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedAudience(null)}
-        elevation={1}
-      >
-        <AudiencePlayers
+        elevation={1}>
+        {selectedAudience !== null && <AudiencePlayers
           audienceId={selectedAudience}
           exerciseId={exerciseId}
           handleClose={() => setSelectedAudience(null)}
-        />
+        />}
       </Drawer>
       {isExerciseUpdatable(exercise) && (
         <CreateAudience exerciseId={exerciseId} />

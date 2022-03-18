@@ -1,4 +1,4 @@
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-underscore-dangle,max-len */
 import { schema } from 'normalizr';
 import * as R from 'ramda';
 
@@ -150,278 +150,71 @@ export const arrayOfLogs = new schema.Array(log);
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
-const _buildUser = (state, usr) => {
-  if (usr === undefined) return usr;
-  return {
-    ...usr,
-    admin: usr.user_admin === true,
-    tags: usr.user_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-    organization:
-      state.referential.entities.organizations[usr.user_organization],
-    tokens: R.filter(
-      (n) => n.token_user === usr.user_id,
-      R.values(state.referential.entities.tokens),
-    ),
-  };
-};
-const _resolveMe = (state) => _buildUser(
-  state,
-  state.referential.entities.users[R.path(['logged', 'user'], state.app)],
-);
-const _buildOrganization = (state, org) => {
-  if (org === undefined) return org;
-  return {
-    ...org,
-    tags: org.organization_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-  };
-};
-const _buildAudience = (state, aud) => {
-  if (aud === undefined) return aud;
-  return {
-    ...aud,
-    // eslint-disable-next-line max-len
-    injects: R.values(state.referential.entities.injects).filter((n) => aud.audience_injects.includes(n.inject_id)),
-    tags: aud.audience_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-    users: R.values(state.referential.entities.users)
-      .filter((n) => aud.audience_users.includes(n.user_id))
-      .map((u) => _buildUser(state, u)),
-  };
-};
-const _buildInject = (state, inj) => {
-  if (inj === undefined) return inj;
-  return {
-    ...inj,
-    tags: inj.inject_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-    audiences: R.values(state.referential.entities.audiences)
-      .filter((n) => inj.inject_audiences.includes(n.audience_id))
-      .map((a) => _buildAudience(state, a)),
-  };
-};
-const _buildComcheckStatus = (state, sta) => {
-  if (sta === undefined) return sta;
-  return {
-    ...sta,
-    user: _buildUser(
-      state,
-      state.referential.entities.users[sta.comcheckstatus_user],
-    ),
-  };
-};
-const _buildComcheck = (state, com) => {
-  if (com === undefined) return com;
-  return {
-    ...com,
-    status: com.comcheck_statuses
-      .asMutable()
-      .map((statusId) => state.referential.entities.comcheckstatuses[statusId])
-      .filter((s) => s !== undefined)
-      .map((s) => _buildComcheckStatus(state, s)),
-  };
-};
-const _buildDryrun = (state, id, dry) => {
-  if (dry === undefined) return dry;
-  const getDryinjects = () => R.values(state.referential.entities.dryinjects).filter(
-    (n) => n.dryinject_dryrun === id,
-  );
-  return {
-    ...dry,
-    dryinjects: getDryinjects(),
-    users: R.values(state.referential.entities.users)
-      .filter((n) => dry.dryrun_users.includes(n.user_id))
-      .map((u) => _buildUser(state, u)),
-  };
-};
-const _buildLog = (state, lo) => {
-  if (lo === undefined) return lo;
-  return {
-    ...lo,
-    tags: lo.log_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-    user: _buildUser(state, state.referential.entities.users[lo.log_user]),
-  };
-};
-const _buildEvaluation = (state, eva) => {
-  if (eva === undefined) return eva;
-  return {
-    ...eva,
-    user: _buildUser(
-      state,
-      state.referential.entities.users[eva.evaluation_user],
-    ),
-  };
-};
-const _buildObjective = (state, id, obj) => {
-  if (obj === undefined) return obj;
-  const getEvaluations = () => R.filter(
-    (n) => n.evaluation_objective === id,
-    R.values(state.referential.entities.evaluations),
-  ).map((e) => _buildEvaluation(state, e));
-  return {
-    ...obj,
-    evaluations: getEvaluations(),
-  };
-};
-const _buildAnswer = (state, ans) => {
-  if (ans === undefined) return ans;
-  return {
-    ...ans,
-    user: _buildUser(
-      state,
-      state.referential.entities.users[ans.evaluation_user],
-    ),
-  };
-};
-const _buildPoll = (state, id, pol) => {
-  if (pol === undefined) return pol;
-  const getAnswers = () => R.filter(
-    (n) => n.answer_poll === id,
-    R.values(state.referential.entities.answers),
-  ).map((e) => _buildAnswer(state, e));
-  return {
-    ...pol,
-    answers: getAnswers(),
-  };
-};
-const _buildExercise = (state, id, ex) => {
-  if (ex === undefined) return ex;
-  const getObjectives = () => R.filter(
-    (n) => n.objective_exercise === id,
-    R.values(state.referential.entities.objectives),
-  ).map((o) => _buildObjective(state, o.objective_id, o));
-  const getPolls = () => R.filter(
-    (n) => n.poll_exercise === id,
-    R.values(state.referential.entities.polls),
-  ).map((p) => _buildPoll(state, p.poll_id, p));
-  const getLogs = () => R.filter(
-    (n) => n.log_exercise === id,
-    R.values(state.referential.entities.logs),
-  ).map((l) => _buildLog(state, l));
-  const getAudiences = () => R.filter(
-    (n) => n.audience_exercise === id,
-    R.values(state.referential.entities.audiences),
-  ).map((a) => _buildAudience(state, a));
-  const getInjects = () => R.filter(
-    (n) => n.inject_exercise === id,
-    R.values(state.referential.entities.injects),
-  ).map((a) => _buildInject(state, a));
-  const getDryruns = () => R.filter(
-    (n) => n.dryrun_exercise === id,
-    R.values(state.referential.entities.dryruns),
-  ).map((d) => _buildDryrun(state, d.dryrun_id, d));
-  const getComchecks = () => R.filter(
-    (n) => n.comcheck_exercise === id,
-    R.values(state.referential.entities.comchecks),
-  ).map((c) => _buildComcheck(state, c));
-  const me = _resolveMe(state);
-  return {
-    ...ex,
-    exercise_id: id,
-    user_can_update:
-      me?.admin || (ex.exercise_planners || []).includes(me?.user_id),
-    user_can_delete: me?.admin,
-    tags: ex.exercise_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-    logs: getLogs(),
-    objectives: getObjectives(),
-    polls: getPolls(),
-    injects: getInjects(),
-    audiences: getAudiences(),
-    comchecks: getComchecks(),
-    dryruns: getDryruns(),
-    users: getAudiences()
-      .map((a) => a.users)
-      .flat(),
-  };
-};
-const _buildDocument = (state, id, doc) => {
-  if (doc === undefined) return doc;
-  return {
-    ...doc,
-    document_id: id,
-    tags: doc.document_tags
-      .asMutable()
-      .map((tagId) => state.referential.entities.tags[tagId])
-      .filter((t) => t !== undefined),
-    exercises: doc.document_exercises
-      .asMutable()
-      .map((exId) => state.referential.entities.exercises[exId])
-      .filter((t) => t !== undefined)
-      .map((ex) => _buildExercise(state, ex.exercise_id, ex)),
-  };
-};
-export const storeBrowser = (state) => ({
-  logged: state.app.logged,
-  users: R.values(state.referential.entities.users).map((usr) => _buildUser(state, usr)),
-  tags: R.values(state.referential.entities.tags),
-  groups: R.values(state.referential.entities.groups),
-  next_injects: R.take(
-    6,
-    R.sort(
-      (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime(),
-      R.values(state.referential.entities.injects)
-        .filter((i) => i.inject_date !== null && i.inject_status === null)
-        .map((i) => _buildInject(state, i)),
-    ),
-  ),
-  inject_types: R.values(state.referential.entities.inject_types),
-  // eslint-disable-next-line max-len
-  organizations: R.values(state.referential.entities.organizations).map((org) => _buildOrganization(state, org)),
-  // eslint-disable-next-line max-len
-  documents: R.values(state.referential.entities.documents).map((doc) => _buildDocument(state, doc.document_id, doc)),
-  // eslint-disable-next-line max-len
-  exercises: R.values(state.referential.entities.exercises).map((ex) => _buildExercise(state, ex.exercise_id, ex)),
-  settings: R.mergeAll(
-    Object.entries(state.referential.entities.parameters ?? {}).map(
-      ([k, v]) => ({ [k]: v.setting_value }),
-    ),
-  ),
-  me: _resolveMe(state),
-  statistics: state.referential.entities.statistics?.openex,
-  getUser(id) {
-    return _buildUser(state, state.referential.entities.users[id]);
+const maps = (key, state) => state.referential.entities[key].asMutable({ deep: true });
+const entities = (key, state) => Object.values(maps(key, state));
+const entity = (id, key, state) => state.referential.entities[key][id]?.asMutable({ deep: true });
+const me = (state) => state.referential.entities.users[R.path(['logged', 'user'], state.app)];
+
+export const storeHelper = (state) => ({
+  logged: () => state.app.logged,
+  getMe: () => me(state),
+  getMeTokens: () => entities('tokens', state).filter((t) => t.token_user === me(state)?.user_id),
+  getStatistics: () => state.referential.entities.statistics?.openex,
+  // exercises
+  getExercises: () => entities('exercises', state),
+  getExercisesMap: () => maps('exercises', state),
+  getExercise: (id) => entity(id, 'exercises', state),
+  getExerciseDryruns: (id) => entities('dryruns', state).filter((i) => i.dryrun_exercise === id),
+  getExerciseComchecks: (id) => entities('comchecks', state).filter((i) => i.comcheck_exercise === id),
+  getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
+  getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
+  getExerciseObjectives: (id) => entities('objectives', state).filter((o) => o.objective_exercise === id),
+  getExerciseLogs: (id) => entities('logs', state).filter((l) => l.log_exercise === id),
+  getExercisePolls: (id) => entities('polls', state).filter((o) => o.poll_exercise === id),
+  // dryrun
+  getDryrun: (id) => entity(id, 'dryruns', state),
+  getDryrunInjects: (id) => entities('dryinjects', state).filter((i) => i.dryinject_dryrun === id),
+  getDryrunUsers: (id) => entities('users', state).filter((i) => entity(id, 'dryruns', state).dryrun_users.includes(i)),
+  // comcheck
+  getComcheck: (id) => entity(id, 'comchecks', state),
+  getComcheckStatus: (id) => entity(id, 'comcheckstatuses', state),
+  getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter((i) => entity(id, 'comchecks', state).comcheck_statuses.includes(i)),
+  // users
+  getUsers: () => entities('users', state),
+  getGroups: () => entities('groups', state),
+  getUsersMap: () => maps('users', state),
+  getOrganizations: () => entities('organizations', state),
+  getOrganizationsMap: () => maps('organizations', state),
+  // objectives
+  getObjective: (id) => entity(id, 'objectives', state),
+  getObjectiveEvaluations: (id) => entities('evaluations', state).filter((e) => e.evaluation_objective === id),
+  // tags
+  getTag: (id) => entity(id, 'tags', state),
+  getTags: () => entities('tags', state),
+  getTagsMap: () => maps('tags', state),
+  // injects
+  getInject: (id) => entity(id, 'injects', state),
+  getInjectTypes: () => entities('inject_types', state),
+  getNextInjects: () => {
+    const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
+    const injects = entities('injects', state).filter((i) => i.inject_date !== null && i.inject_status === null);
+    return R.take(6, R.sort(sortFn, injects));
   },
-  getExercise(id) {
-    return _buildExercise(state, id, state.referential.entities.exercises[id]);
-  },
-  getObjective(id) {
-    return _buildObjective(
-      state,
-      id,
-      state.referential.entities.objectives[id],
+  // documents
+  getDocuments: () => entities('documents', state),
+  getDocumentsMap: () => maps('documents', state),
+  // audiences
+  getAudience: (id) => entity(id, 'audiences', state),
+  getAudienceUsers: (id) => entities('users', state).filter((u) => entity(id, 'audiences', state).audience_users.includes(u.user_id)),
+  getAudiences: () => entities('audiences', state),
+  getAudienceInjects: (id) => entities('injects', state).filter((i) => i.inject_audiences.includes(id)),
+  getAudiencesMap: () => maps('audiences', state),
+  // eslint-disable-next-line arrow-body-style
+  getSettings: () => {
+    return R.mergeAll(
+      Object.entries(state.referential.entities.parameters ?? {}).map(
+        ([k, v]) => ({ [k]: v.setting_value }),
+      ),
     );
-  },
-  getComcheck(id) {
-    return _buildComcheck(state, state.referential.entities.comchecks[id]);
-  },
-  getDryrun(id) {
-    return _buildDryrun(state, id, state.referential.entities.dryruns[id]);
-  },
-  getComcheckStatus(id) {
-    return state.referential.entities.comcheckstatuses[id];
-  },
-  getAudience(id) {
-    return _buildAudience(state, state.referential.entities.audiences[id]);
-  },
-  getInject(id) {
-    return _buildInject(state, state.referential.entities.injects[id]);
-  },
-  getDocument(id) {
-    return _buildDocument(state, id, state.referential.entities.documents[id]);
   },
 });

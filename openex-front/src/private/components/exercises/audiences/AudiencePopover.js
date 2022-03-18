@@ -21,6 +21,7 @@ import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
+import { storeHelper } from '../../../../actions/Schema';
 
 class AudiencePopover extends Component {
   constructor(props) {
@@ -148,13 +149,16 @@ class AudiencePopover extends Component {
 
   render() {
     const {
-      t, audience, setSelectedAudience, exercise, onRemoveAudience,
+      t, audience, setSelectedAudience, exercise, onRemoveAudience, tagsMap,
     } = this.props;
-    const audienceTags = audience.tags.map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
+    const audienceTags = (audience.audience_tags ?? []).map((tagId) => {
+      const tag = tagsMap[tagId];
+      return {
+        id: tag.tag_id,
+        label: tag.tag_name,
+        color: tag.tag_color,
+      };
+    });
     const initialValues = R.pipe(
       R.assoc('audience_tags', audienceTags),
       R.pick(['audience_name', 'audience_description', 'audience_tags']),
@@ -363,8 +367,14 @@ AudiencePopover.propTypes = {
   onRemoveAudience: PropTypes.func,
 };
 
+const select = (state) => {
+  const helper = storeHelper(state);
+  const tagsMap = helper.getTagsMap();
+  return { tagsMap };
+};
+
 export default R.compose(
-  connect(null, {
+  connect(select, {
     updateAudience,
     deleteAudience,
     updateAudienceActivation,

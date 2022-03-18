@@ -14,7 +14,7 @@ import {
 } from '../../../actions/Application';
 import LoginForm from './LoginForm';
 import inject18n from '../../../components/i18n';
-import { storeBrowser } from '../../../actions/Schema';
+import { storeHelper } from '../../../actions/Schema';
 
 const styles = () => ({
   container: {
@@ -97,8 +97,8 @@ Login.propTypes = {
 };
 
 const select = (state) => {
-  const browser = storeBrowser(state);
-  const parameters = browser.settings ?? {};
+  const helper = storeHelper(state);
+  const parameters = helper.getSettings() ?? {};
   return { parameters };
 };
 

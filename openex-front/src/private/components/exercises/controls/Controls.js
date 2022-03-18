@@ -26,7 +26,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../../actions/Audience';
 import { fetchComchecks, deleteComcheck } from '../../../../actions/Comcheck';
 import CreateControl from './CreateControl';
-import { useStore } from '../../../../store';
+import { useHelper } from '../../../../store';
 import Empty from '../../../../components/Empty';
 import ComcheckState from './ComcheckState';
 import { Transition } from '../../../../utils/Environment';
@@ -70,8 +70,14 @@ const Controls = () => {
   const { exerciseId } = useParams();
   const [openComcheckDelete, setOpenComcheckDelete] = useState(null);
   const [openDryrunDelete, setOpenDryrunDelete] = useState(null);
-  const exercise = useStore((store) => store.getExercise(exerciseId));
-  const { dryruns, comchecks } = exercise;
+  // eslint-disable-next-line arrow-body-style
+  const { exercise, dryruns, comchecks } = useHelper((helper) => {
+    return {
+      exercise: helper.getExercise(exerciseId),
+      dryruns: helper.getExerciseDryruns(exerciseId),
+      comchecks: helper.getExerciseComchecks(exerciseId),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
     dispatch(fetchComchecks(exerciseId));

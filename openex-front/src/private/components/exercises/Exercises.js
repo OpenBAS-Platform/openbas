@@ -15,7 +15,7 @@ import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
 import CreateExercise from './CreateExercise';
 import ExerciseStatus from './ExerciseStatus';
-import { useStore } from '../../../store';
+import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 
@@ -145,8 +145,10 @@ const Exercises = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const exercises = useStore((store) => store.exercises);
-  const userAdmin = useStore((store) => store.me?.admin ?? false);
+  const { exercises, userAdmin } = useHelper((helper) => ({
+    exercises: helper.getExercises(),
+    userAdmin: helper.getMe()?.admin ?? false,
+  }));
   const searchColumns = ['name', 'subtitle'];
   const filtering = useSearchAnFilter('exercise', 'name', searchColumns);
   useDataLoader(() => {
@@ -154,7 +156,7 @@ const Exercises = () => {
   });
   return (
     <div className={classes.container}>
-      <div className={classes.parameters}>
+      <div className={classes.parameters} >
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
             small={true}
@@ -276,7 +278,7 @@ const Exercises = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.exercise_tags}
                   >
-                    <ItemTags variant="list" tags={exercise.tags} />
+                    <ItemTags variant="list" tags={exercise.exercise_tags} />
                   </div>
                 </div>
               }

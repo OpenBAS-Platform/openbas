@@ -11,7 +11,7 @@ import OrganizationForm from '../private/components/organizations/OrganizationFo
 import { fetchOrganizations, addOrganization } from '../actions/Organization';
 import { Autocomplete } from './Autocomplete';
 import inject18n from './i18n';
-import { storeBrowser } from '../actions/Schema';
+import { storeHelper } from '../actions/Schema';
 
 const styles = () => ({
   icon: {
@@ -117,9 +117,9 @@ class OrganizationField extends Component {
 }
 
 const select = (state) => {
-  const browser = storeBrowser(state);
+  const helper = storeHelper(state);
   return {
-    organizations: browser.organizations,
+    organizations: helper.getOrganizations(),
   };
 };
 
