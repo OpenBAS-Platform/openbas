@@ -1,5 +1,7 @@
 /node_modules
 /coverage
+/packages
+/build
 /public
 /builder/dev/build
 /builder/prod/build
