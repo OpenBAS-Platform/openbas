@@ -14,7 +14,7 @@
     "@mui/styles": "5.5.1",
     "apexcharts": "3.33.2",
     "axios": "0.26.1",
-    "ckeditor5-custom-build": "file:./ckeditor",
+    "ckeditor5-custom-build": "0.0.1",
     "connected-react-router": "6.9.2",
     "date-fns": "2.28.0",
     "final-form": "4.20.6",
@@ -90,5 +90,8 @@
   "resolutions": {
     "mini-css-extract-plugin": "2.4.7"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "index.js"
 }
