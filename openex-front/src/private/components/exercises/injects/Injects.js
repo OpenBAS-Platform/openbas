@@ -185,7 +185,6 @@ const Injects = () => {
   const filtering = useSearchAnFilter('inject', 'depends_duration', searchColumns);
   // Fetching data
   const { exerciseId } = useParams();
-  // eslint-disable-next-line
   const { exercise, injects, injectTypes, tagsMap } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),

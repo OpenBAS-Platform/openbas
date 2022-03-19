@@ -25,7 +25,6 @@ const avatarStyle = {
   },
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const Avatar = (props) => (
   <MUIAvatar
     src={props.src}

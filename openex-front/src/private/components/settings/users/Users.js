@@ -156,7 +156,6 @@ const Users = () => {
   const dispatch = useDispatch();
   const searchColumns = ['email', 'firstname', 'lastname', 'phone', 'organization'];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  // eslint-disable-next-line max-len
   const { users, tagsMap, organizationsMap } = useHelper((helper) => ({
     users: helper.getUsers(),
     organizationsMap: helper.getOrganizationsMap(),

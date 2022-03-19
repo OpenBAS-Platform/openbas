@@ -67,7 +67,6 @@ const renderAutocomplete = ({
   );
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const Autocomplete = (props) => (
   <Field name={props.name} component={renderAutocomplete} {...props} />
 );

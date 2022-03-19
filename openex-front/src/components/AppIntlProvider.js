@@ -60,5 +60,4 @@ AppIntlProvider.propTypes = {
   children: PropTypes.node,
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const ConnectedIntlProvider = AppIntlProvider;

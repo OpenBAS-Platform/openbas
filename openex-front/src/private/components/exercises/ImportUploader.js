@@ -40,10 +40,7 @@ const ImportUploader = (props) => {
             validity,
             files: [file],
           },
-        }) =>
-          // eslint-disable-next-line implicit-arrow-linebreak
-          validity.valid && handleUpload(file)
-        }
+        }) => validity.valid && handleUpload(file)}
       />
       {upload ? (
         <Tooltip

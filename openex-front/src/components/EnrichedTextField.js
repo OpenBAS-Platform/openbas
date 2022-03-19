@@ -43,10 +43,8 @@ const renderEnrichedTextField = ({
   );
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const ConnectedEnrichedTextField = (props) => (
   <Field name={props.name} component={renderEnrichedTextField} {...props} />
 );
 
-// eslint-disable-next-line import/prefer-default-export
 export const EnrichedTextField = ConnectedEnrichedTextField;

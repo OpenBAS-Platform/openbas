@@ -103,7 +103,6 @@ const Lessons = () => {
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
-  // eslint-disable-next-line
   const { exercise, objectives, logs, polls, usersMap } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
@@ -132,7 +131,6 @@ const Lessons = () => {
     const inputValues = R.pipe(
       R.assoc('log_tags', R.pluck('id', data.log_tags)),
     )(data);
-    // eslint-disable-next-line max-len
     return dispatch(addLog(exerciseId, inputValues)).then((result) => {
       if (result.result) {
         action.reset();

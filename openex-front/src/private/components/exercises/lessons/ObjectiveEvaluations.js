@@ -31,7 +31,6 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const [submitting, setSubmitting] = useState(false);
   // Fetching data
   const { exerciseId } = useParams();
-  // eslint-disable-next-line
   const { me, exercise, objective, evaluations, usersMap } = useHelper((helper) => {
     return {
       me: helper.getMe(),

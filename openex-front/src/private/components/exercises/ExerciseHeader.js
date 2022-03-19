@@ -58,7 +58,6 @@ const ExerciseHeader = () => {
   const { t } = useFormatter();
   const { exerciseId } = useParams();
   const dispatch = useDispatch();
-  // eslint-disable-next-line
   const { exercise, tagsMap } = useHelper((helper) => {
     return { exercise: helper.getExercise(exerciseId), tagsMap: helper.getTagsMap() };
   });

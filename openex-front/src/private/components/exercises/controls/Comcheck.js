@@ -237,7 +237,6 @@ const Comcheck = () => {
     'organization',
   ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  // eslint-disable-next-line arrow-body-style
   const { comcheck, statuses } = useHelper((helper) => {
     return {
       comcheck: helper.getComcheck(comcheckId),

@@ -62,7 +62,6 @@ const renderColorPickerField = ({
   );
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const ColorPickerField = (props) => (
   <Field name={props.name} component={renderColorPickerField} {...props} />
 );

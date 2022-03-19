@@ -33,7 +33,6 @@ renderSliderField.propTypes = {
   onSliderChange: PropTypes.func,
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const SliderField = (props) => (
   <Field component={renderSliderField} {...props} />
 );

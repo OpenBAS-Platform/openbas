@@ -38,7 +38,6 @@ const initStore = () => {
   );
 };
 
-// eslint-disable-next-line max-len
 export const useHelper = (selector) => useSelector((state) => selector(storeHelper(state)), R.equals);
 
 export const store = initStore();

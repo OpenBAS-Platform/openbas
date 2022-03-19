@@ -31,7 +31,6 @@ const renderSwitch = ({
   </FormGroup>
 );
 
-// eslint-disable-next-line import/prefer-default-export
 export const SwitchField = (props) => (
   <Field name={props.name} component={renderSwitch} {...props} />
 );

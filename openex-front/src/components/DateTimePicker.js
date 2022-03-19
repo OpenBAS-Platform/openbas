@@ -33,7 +33,6 @@ const renderDateTimePicker = ({
   />
 );
 
-// eslint-disable-next-line import/prefer-default-export
 export const DateTimePicker = (props) => (
   <Field name={props.name} component={renderDateTimePicker} {...props} />
 );

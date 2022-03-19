@@ -21,7 +21,5 @@ export const splitDuration = (duration = 0) => {
   };
 };
 
-// eslint-disable-next-line max-len
-export const progression = (now, startDate, endDate) => (now > endDate
-  ? 100
+export const progression = (now, startDate, endDate) => (now > endDate ? 100
   : Math.round(((now - startDate) / (endDate - startDate)) * 100));

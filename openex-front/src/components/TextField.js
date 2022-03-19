@@ -25,7 +25,6 @@ const renderTextField = ({
   );
 };
 
-// eslint-disable-next-line import/prefer-default-export
 export const TextField = (props) => (
   <Field name={props.name} component={renderTextField} {...props} />
 );

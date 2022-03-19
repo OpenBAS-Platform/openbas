@@ -70,7 +70,6 @@ const Controls = () => {
   const { exerciseId } = useParams();
   const [openComcheckDelete, setOpenComcheckDelete] = useState(null);
   const [openDryrunDelete, setOpenDryrunDelete] = useState(null);
-  // eslint-disable-next-line arrow-body-style
   const { exercise, dryruns, comchecks } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),

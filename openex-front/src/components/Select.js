@@ -70,7 +70,6 @@ const renderSelectField = ({
   </FormControl>
 );
 
-// eslint-disable-next-line import/prefer-default-export
 export const Select = (props) => (
   <Field name={props.name} component={renderSelectField} {...props} />
 );

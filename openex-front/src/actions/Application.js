@@ -15,7 +15,6 @@ export const updateParameters = (data) => (dispatch) => putReferential(schema.ar
 export const askToken = (username, password) => (dispatch) => {
   const data = { login: username, password };
   const ref = postReferential(schema.user, '/api/login', data)(dispatch);
-  // eslint-disable-next-line arrow-body-style
   return ref.then((finalData) => {
     if (finalData[FORM_ERROR]) {
       return finalData;

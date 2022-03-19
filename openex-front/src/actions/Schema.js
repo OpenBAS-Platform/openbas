@@ -211,7 +211,6 @@ export const storeHelper = (state) => ({
     .filter((i) => entity(id, 'audiences', state).audience_injects.includes(i.inject_id)),
   getAudiences: () => entities('audiences', state),
   getAudiencesMap: () => maps('audiences', state),
-  // eslint-disable-next-line arrow-body-style
   getSettings: () => {
     return R.mergeAll(
       Object.entries(state.referential.entities.parameters ?? {}).map(

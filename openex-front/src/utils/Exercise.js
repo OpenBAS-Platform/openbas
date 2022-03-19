@@ -12,5 +12,4 @@ export const isExerciseReadOnly = (exercise, overrideStatus = false) => {
   );
 };
 
-// eslint-disable-next-line max-len
 export const isExerciseUpdatable = (exercise, overrideStatus = false) => !isExerciseReadOnly(exercise, overrideStatus);

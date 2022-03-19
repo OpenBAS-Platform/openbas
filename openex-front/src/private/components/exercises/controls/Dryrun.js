@@ -199,7 +199,6 @@ const Dryrun = () => {
   const searchColumns = ['type', 'title', 'date'];
   const filtering = useSearchAnFilter('dryinject', 'date', searchColumns);
   // Fetching data
-  // eslint-disable-next-line arrow-body-style
   const { dryrun, dryinjects, users } = useHelper((helper) => {
     return {
       dryrun: helper.getDryrun(dryrunId),

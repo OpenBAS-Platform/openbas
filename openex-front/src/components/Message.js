@@ -27,7 +27,6 @@ class Message extends Component {
     });
   }
 
-  // eslint-disable-next-line
   componentWillUnmount() {
     this.subscription.unsubscribe();
   }
