@@ -24,7 +24,8 @@ import static org.springframework.util.StringUtils.hasLength;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String COOKIE_NAME = "openex_token";
-    private static final String TOKEN_NAME = "X-Authorization-Token";
+    private static final String HEADER_NAME = "Authorization";
+    private static final String BEARER_PREFIX = "bearer ";
     private TokenRepository tokenRepository;
     private UserService userService;
 
@@ -38,12 +39,19 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         this.userService = userService;
     }
 
+    private String parseAuthorization(String value) {
+        if (value.toLowerCase().startsWith(BEARER_PREFIX)) {
+            return value.substring(BEARER_PREFIX.length());
+        }
+        return value;
+    }
+
     private String getAuthToken(HttpServletRequest request) {
-        String header = request.getHeader(TOKEN_NAME);
+        String header = request.getHeader(HEADER_NAME);
         Cookie[] cookies = ofNullable(request.getCookies()).orElse(new Cookie[0]);
         Optional<Cookie> defaultCookie = Arrays.stream(cookies)
                 .filter(cookie -> COOKIE_NAME.equals(cookie.getName())).findFirst();
-        return hasLength(header) ? header :
+        return hasLength(header) ? parseAuthorization(header) :
                 defaultCookie.orElseGet(() -> new Cookie(COOKIE_NAME, null)).getValue();
     }
 

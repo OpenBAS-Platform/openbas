@@ -12,11 +12,12 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.schema.AlternateTypeRules;
-import springfox.documentation.schema.ScalarType;
-import springfox.documentation.service.ParameterType;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.SecurityReference;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
 import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider;
@@ -28,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.singletonList;
 
 @Component
 public class SwaggerConfig {
@@ -77,22 +80,23 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
-        RequestParameterBuilder parameterBuilder = new RequestParameterBuilder()
-                .in(ParameterType.HEADER)
-                .name("X-Authorization-Token")
-                .required(true).query(param -> param.model(model -> model.scalarModel(ScalarType.STRING)));
+        ApiKey apiKey = new ApiKey("Bearer", "Authorization", "header");
+        List<SecurityReference> securityReferences = singletonList(SecurityReference.builder().reference("Bearer")
+                .scopes(new AuthorizationScope[0]).build());
+        SecurityContext securityContext = SecurityContext.builder().securityReferences(securityReferences).build();
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("io.openex"))
                 .paths(PathSelectors.any())
                 .build()
+                .securitySchemes(singletonList(apiKey))
+                .securityContexts(singletonList(securityContext))
                 .alternateTypeRules(
                         AlternateTypeRules.newRule(
                                 typeResolver.resolve(Optional.class, Instant.class),
                                 typeResolver.resolve(Date.class),
                                 Ordered.HIGHEST_PRECEDENCE
                         ))
-                .genericModelSubstitutes(Optional.class)
-                .globalRequestParameters(List.of(parameterBuilder.build()));
+                .genericModelSubstitutes(Optional.class);
     }
 }
