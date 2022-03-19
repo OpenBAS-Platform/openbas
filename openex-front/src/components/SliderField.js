@@ -15,8 +15,9 @@ const renderSliderField = ({
       /* disable the dragging propagation */
     }}
     onChange={(event, newValue) => {
-      // eslint-disable-next-line no-unused-expressions
-      onSliderChange && onSliderChange(event, newValue);
+      if (onSliderChange) {
+        onSliderChange(event, newValue);
+      }
       input.onChange(newValue);
     }}
   />

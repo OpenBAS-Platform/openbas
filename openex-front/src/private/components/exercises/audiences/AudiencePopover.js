@@ -21,7 +21,7 @@ import inject18n from '../../../../components/i18n';
 import AudienceForm from './AudienceForm';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
-import { storeHelper } from '../../../../actions/Schema';
+import { storeHelper, tagsConverter } from '../../../../actions/Schema';
 
 class AudiencePopover extends Component {
   constructor(props) {
@@ -151,14 +151,7 @@ class AudiencePopover extends Component {
     const {
       t, audience, setSelectedAudience, exercise, onRemoveAudience, tagsMap,
     } = this.props;
-    const audienceTags = (audience.audience_tags ?? []).map((tagId) => {
-      const tag = tagsMap[tagId];
-      return {
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      };
-    });
+    const audienceTags = tagsConverter(exercise.audience_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('audience_tags', audienceTags),
       R.pick(['audience_name', 'audience_description', 'audience_tags']),

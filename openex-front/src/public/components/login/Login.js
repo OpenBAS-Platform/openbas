@@ -61,7 +61,7 @@ const Login = (props) => {
   const marginTop = dimension.height / 2 - loginHeight / 2 - 200;
   return (
     <div className={classes.container} style={{ marginTop }}>
-      <img src={logo} alt="logo" className={classes.logo} />
+      <img src={`/${logo}`} alt="logo" className={classes.logo} />
       {isLocal && (
         <Paper variant="outlined">
           <LoginForm onSubmit={onSubmit} />

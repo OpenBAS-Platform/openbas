@@ -17,7 +17,7 @@ import { updateAudiencePlayers } from '../../../actions/Audience';
 import { updatePlayer, deletePlayer } from '../../../actions/User';
 import PlayerForm from './PlayerForm';
 import inject18n from '../../../components/i18n';
-import { storeHelper } from '../../../actions/Schema';
+import { storeHelper, tagsConverter } from '../../../actions/Schema';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
 
 const Transition = React.forwardRef((props, ref) => (
@@ -117,14 +117,7 @@ class PlayerPopover extends Component {
         label: userOrganizationValue.organization_name,
       }
       : null;
-    const userTags = user.user_tags.map((tagId) => {
-      const tag = tagsMap[tagId];
-      return ({
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      });
-    });
+    const userTags = tagsConverter(user.user_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('user_organization', userOrganization),
       R.assoc('user_tags', userTags),

@@ -25,6 +25,7 @@ import ExerciseForm from './ExerciseForm';
 import { updateExercise, deleteExercise } from '../../../actions/Exercise';
 import { Transition } from '../../../utils/Environment';
 import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { tagsConverter } from '../../../actions/Schema';
 
 const styles = () => ({
   button: {
@@ -119,14 +120,7 @@ class ExercisePopover extends Component {
     const {
       t, exercise, tagsMap, classes,
     } = this.props;
-    const exerciseTags = exercise.exercise_tags.map((tagId) => {
-      const tag = tagsMap[tagId];
-      return {
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      };
-    });
+    const exerciseTags = tagsConverter(exercise.exercise_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('exercise_tags', exerciseTags),
       R.pick([

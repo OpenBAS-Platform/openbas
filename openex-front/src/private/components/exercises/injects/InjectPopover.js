@@ -25,6 +25,7 @@ import InjectForm from './InjectForm';
 import inject18n from '../../../../components/i18n';
 import { splitDuration } from '../../../../utils/Time';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import { tagsConverter } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -191,14 +192,7 @@ class InjectPopover extends Component {
     const {
       t, inject, injectTypes, exercise, setSelectedInject, tagsMap,
     } = this.props;
-    const injectTags = inject.inject_tags.map((tagId) => {
-      const tag = tagsMap[tagId];
-      return {
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      };
-    });
+    const injectTags = tagsConverter(inject.inject_tags, tagsMap);
     const duration = splitDuration(inject.inject_depends_duration || 0);
     const initialValues = R.pipe(
       R.assoc('inject_tags', injectTags),

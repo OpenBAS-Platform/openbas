@@ -22,8 +22,9 @@ steps:
   commands: 
   - cd openex-front
   - yarn install
-  - NODE_OPTIONS=--max-old-space-size=8096 yarn build
-  - NODE_OPTIONS=--unhandled-rejections=warn yarn test
+  - yarn lint
+  - yarn build
+  - yarn test
 
 - name: build-circleci
   image: curlimages/curl

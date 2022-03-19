@@ -20,6 +20,7 @@ import {
 import UserForm from './UserForm';
 import { useFormatter } from '../../../../components/i18n';
 import UserPasswordForm from './UserPasswordForm';
+import { tagsConverter } from '../../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -88,15 +89,7 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
 
   const org = organizationsMap[user.user_organization];
   const userOrganization = org ? { id: org.organization_id, label: org.organization_name } : null;
-
-  const userTags = user.user_tags
-    .map((tagId) => tagsMap[tagId])
-    .filter((tag) => tag !== undefined)
-    .map((tag) => ({
-      id: tag.tag_id,
-      label: tag.tag_name,
-      color: tag.tag_color,
-    }));
+  const userTags = tagsConverter(user.user_tags, tagsMap);
   const initialValues = R.pipe(
     R.assoc('user_organization', userOrganization),
     R.assoc('user_tags', userTags),

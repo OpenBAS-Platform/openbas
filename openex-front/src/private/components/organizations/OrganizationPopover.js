@@ -19,6 +19,7 @@ import {
 } from '../../../actions/Organization';
 import OrganizationForm from './OrganizationForm';
 import inject18n from '../../../components/i18n';
+import { tagsConverter } from '../../../actions/Schema';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -78,14 +79,7 @@ class OrganizationPopover extends Component {
 
   render() {
     const { t, organization, tagsMap } = this.props;
-    const organizationTags = organization.organization_tags.map((tagId) => {
-      const tag = tagsMap[tagId];
-      return {
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      };
-    });
+    const organizationTags = tagsConverter(organization.organization_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('organization_tags', organizationTags),
       R.pick([

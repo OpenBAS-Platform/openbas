@@ -15,7 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { updateDocument, deleteDocument } from '../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
-import { storeHelper } from '../../../actions/Schema';
+import { storeHelper, tagsConverter } from '../../../actions/Schema';
 import { Transition } from '../../../utils/Environment';
 
 class DocumentPopover extends Component {
@@ -94,14 +94,7 @@ class DocumentPopover extends Component {
     const {
       t, document, onRemoveDocument, onToggleAttach, attached, tagsMap, exercisesMap,
     } = this.props;
-    const documentTags = document.document_tags.map((tagId) => {
-      const tag = tagsMap[tagId];
-      return {
-        id: tag.tag_id,
-        label: tag.tag_name,
-        color: tag.tag_color,
-      };
-    });
+    const documentTags = tagsConverter(document.document_tags, tagsMap);
     const documentExercises = document.document_exercises.map((exId) => {
       const ex = exercisesMap[exId];
       return {

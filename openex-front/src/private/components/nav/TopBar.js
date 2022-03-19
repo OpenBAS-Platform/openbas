@@ -98,7 +98,7 @@ class TopBar extends Component {
         <Toolbar>
           <div className={classes.logoContainer}>
             <Link to="/">
-              <img src={logo} alt="logo" className={classes.logo} />
+              <img src={`/${logo}`} alt="logo" className={classes.logo} />
             </Link>
           </div>
           <div className={classes.menuContainer}>

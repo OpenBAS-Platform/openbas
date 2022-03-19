@@ -80,8 +80,6 @@ public class MvcConfig implements WebMvcConfigurer {
         // React statics
         addPathStaticResolver(registry, "/static/**", "classpath:/build/static/");
         // Specific application images
-        addPathStaticResolver(registry, "/images/**", "classpath:/build/images/");
-        // Ckeditor statics
-        addPathStaticResolver(registry, "/ckeditor/**", "classpath:/build/ckeditor/");
+        addPathStaticResolver(registry, "/media/**", "classpath:/build/static/media/");
     }
 }

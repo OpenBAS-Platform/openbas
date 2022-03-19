@@ -220,3 +220,12 @@ export const storeHelper = (state) => ({
     );
   },
 });
+
+export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])
+  .map((tagId) => tagsMap[tagId])
+  .filter((tagItem) => tagItem !== undefined)
+  .map((tagItem) => ({
+    id: tagItem.tag_id,
+    label: tagItem.tag_name,
+    color: tagItem.tag_color,
+  }));

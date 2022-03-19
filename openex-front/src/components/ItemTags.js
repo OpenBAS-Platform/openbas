@@ -41,7 +41,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const ItemTags = (props) => {
-  const { tags, onClick, variant } = props;
+  const { tags, variant } = props;
   const { t } = useFormatter();
   const theme = useTheme();
   const classes = useStyles();
@@ -72,11 +72,6 @@ const ItemTags = (props) => {
                   borderColor: tag.tag_color,
                   backgroundColor: hexToRGB(tag.tag_color),
                 }}
-                onClick={
-                  typeof onClick === 'function'
-                    ? onClick.bind(this, tag.tag_id, tag.tag_name)
-                    : null
-                }
               />
             ),
             R.take(3, orderedTags),
@@ -94,11 +89,6 @@ const ItemTags = (props) => {
                 theme.palette.mode === 'dark' ? '#ffffff' : 'transparent',
               ),
             }}
-            onClick={
-              typeof onClick === 'function'
-                ? onClick.bind(this, null, null)
-                : null
-            }
           />
         )}
       </div>
