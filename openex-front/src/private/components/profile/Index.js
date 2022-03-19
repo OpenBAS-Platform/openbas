@@ -1,25 +1,25 @@
-import React, { useEffect } from 'react';
-import * as PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { makeStyles } from '@mui/styles';
 import * as R from 'ramda';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import withStyles from '@mui/styles/withStyles';
 import Typography from '@mui/material/Typography';
 import { fetchOrganizations } from '../../../actions/Organization';
 import {
   updateMeProfile,
   updateMeInformation,
   updateMePassword,
-  meTokens,
+  meTokens, renewToken,
 } from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
 import PasswordForm from './PasswordForm';
-import { storeHelper } from '../../../actions/Schema';
-import inject18n from '../../../components/i18n';
+import { useFormatter } from '../../../components/i18n';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { useHelper } from '../../../store';
 
-const styles = (theme) => ({
+const useStyles = makeStyles((theme) => ({
   paper: {
     padding: 20,
     marginBottom: 40,
@@ -46,17 +46,25 @@ const styles = (theme) => ({
     top: 8,
     right: 70,
   },
-});
+}));
 
-const Index = (props) => {
-  useEffect(() => {
-    props.fetchOrganizations();
-    props.meTokens();
-  }, []);
+const Index = () => {
+  const { t } = useFormatter();
+  const dispatch = useDispatch();
+  const classes = useStyles();
 
-  const {
-    classes, user, tokens: userTokens, organizationsMap, t,
-  } = props;
+  useDataLoader(() => {
+    dispatch(fetchOrganizations());
+    dispatch(meTokens());
+  });
+
+  const { user, tokens, organizationsMap } = useHelper((helper) => ({
+    user: helper.getMe(),
+    tokens: helper.getMeTokens(),
+    organizationsMap: helper.getOrganizationsMap(),
+  }));
+
+  const onRenew = (tokenId) => dispatch(renewToken(tokenId));
   const onUpdate = (data) => {
     const inputValues = R.pipe(
       R.assoc(
@@ -66,14 +74,13 @@ const Index = (props) => {
           : data.user_organization,
       ),
     )(data);
-    return props.updateMeProfile(inputValues);
+    return dispatch(updateMeProfile(inputValues));
   };
-
-  const onUpdateInformation = (data) => props.updateMeInformation(data);
-  const onUpdatePassword = (data) => props.updateMePassword(
+  const onUpdateInformation = (data) => dispatch(updateMeInformation(data));
+  const onUpdatePassword = (data) => dispatch(updateMePassword(
     data.user_current_password,
     data.user_plain_password,
-  );
+  ));
 
   const userOrganizationValue = organizationsMap[user.user_organization];
   const userOrganization = userOrganizationValue
@@ -96,7 +103,7 @@ const Index = (props) => {
       'user_theme',
     ]),
   )(user);
-  const userToken = userTokens.length > 0 ? R.head(userTokens) : undefined;
+  const userToken = tokens.length > 0 ? R.head(tokens) : undefined;
   return (
     <div className={classes.container}>
       <div style={{ width: 800, margin: '0 auto' }}>
@@ -131,9 +138,9 @@ const Index = (props) => {
           </Typography>
           <Typography variant="body1">
             {t(
-              'The OpenEX API relies on the REST standard, using HTTP verbs. The token must be passed into the HTTP heade',
+              'The OpenEX API relies on the REST standard. The token must be passed into the HTTP header',
             )}{' '}
-            <strong>X-Authorization-Token</strong>.
+            <strong>Authorization</strong>.
             <Typography
               variant="h6"
               gutterBottom={true}
@@ -142,7 +149,15 @@ const Index = (props) => {
               {t('Token key')}
             </Typography>
             <pre>{userToken?.token_value}</pre>
-            <Typography variant="h6" gutterBottom={true}>
+            <Button
+                variant="contained"
+                color="primary"
+                component="a"
+                onClick={() => onRenew(userToken?.token_id)}
+            >
+              {t('RENEW')}
+            </Button>
+            <Typography style={{ marginTop: 20 }} variant="h6" gutterBottom={true}>
               {t('Example')}
             </Typography>
             <pre>
@@ -150,7 +165,7 @@ const Index = (props) => {
               <br />
               Content-Type: application/json
               <br />
-              X-Authorization-Token: {userToken?.token_value}
+              Authorization: Bearer {userToken?.token_value}
             </pre>
           </Typography>
           <Typography variant="h6" gutterBottom={true}>
@@ -160,8 +175,7 @@ const Index = (props) => {
             variant="contained"
             color="primary"
             component="a"
-            href="/swagger-ui/"
-          >
+            href="/swagger-ui/">
             {t('API specifications')}
           </Button>
         </Paper>
@@ -170,31 +184,4 @@ const Index = (props) => {
   );
 };
 
-Index.propTypes = {
-  user: PropTypes.object,
-  organizations: PropTypes.array,
-  fetchOrganizations: PropTypes.func,
-  updateUser: PropTypes.func,
-  updateUserPassword: PropTypes.func,
-};
-
-const select = (state) => {
-  const helper = storeHelper(state);
-  return {
-    user: helper.getMe(),
-    tokens: helper.getMeTokens(),
-    organizationsMap: helper.getOrganizationsMap(),
-  };
-};
-
-export default R.compose(
-  connect(select, {
-    fetchOrganizations,
-    meTokens,
-    updateMeProfile,
-    updateMeInformation,
-    updateMePassword,
-  }),
-  inject18n,
-  withStyles(styles),
-)(Index);
+export default Index;

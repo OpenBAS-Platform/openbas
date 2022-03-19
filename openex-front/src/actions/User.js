@@ -41,4 +41,8 @@ export const updateMePassword = (currentPassword, newPassword) => (dispatch) => 
 export const updateMeProfile = (data) => (dispatch) => putReferential(schema.user, '/api/me/profile', data)(dispatch);
 
 export const updateMeInformation = (data) => (dispatch) => putReferential(schema.user, '/api/me/information', data)(dispatch);
+
+export const renewToken = (tokenId) => (dispatch) => postReferential(schema.token, '/api/me/token/refresh', {
+  token_id: tokenId,
+})(dispatch);
 // endregion

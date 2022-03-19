@@ -10,20 +10,20 @@ import io.openex.rest.exception.InputValidationException;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.me.UpdateMePasswordInput;
 import io.openex.rest.user.form.me.UpdateProfileInput;
-import io.openex.rest.user.form.user.UpdatePasswordInput;
+import io.openex.rest.user.form.user.RenewTokenInput;
 import io.openex.rest.user.form.user.UpdateUserInfoInput;
 import io.openex.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
@@ -107,6 +107,19 @@ public class MeApi extends RestBehavior {
         } else {
             throw new InputValidationException("user_current_password", "Bad current password");
         }
+    }
+
+    @RolesAllowed(ROLE_USER)
+    @PostMapping("/api/me/token/refresh")
+    @Transactional(rollbackOn = Exception.class)
+    public Token renewToken(@Valid @RequestBody RenewTokenInput input) throws InputValidationException {
+        User currentUser = currentUser();
+        Token token = tokenRepository.findById(input.getTokenId()).orElseThrow();
+        if(!currentUser.equals(token.getUser())) {
+            throw new AccessDeniedException("You are not allowed to renew this token");
+        }
+        token.setValue(UUID.randomUUID().toString());
+        return tokenRepository.save(token);
     }
 
     @RolesAllowed(ROLE_USER)
