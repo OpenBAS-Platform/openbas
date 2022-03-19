@@ -1,16 +1,15 @@
 import { FORM_ERROR } from 'final-form';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-import {
-  getReferential,
-  postReferential,
-  putReferential,
-  simpleCall,
-} from '../utils/Action';
+import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
 
-export const fetchParameters = () => (dispatch) => getReferential(schema.arrayOfParameters, '/api/settings')(dispatch);
+export const fetchParameters = () => (dispatch) => {
+  return getReferential(schema.arrayOfParameters, '/api/settings')(dispatch);
+};
 
-export const updateParameters = (data) => (dispatch) => putReferential(schema.arrayOfParameters, '/api/settings', data)(dispatch);
+export const updateParameters = (data) => (dispatch) => {
+  return putReferential(schema.arrayOfParameters, '/api/settings', data)(dispatch);
+};
 
 export const askToken = (username, password) => (dispatch) => {
   const data = { login: username, password };
@@ -26,15 +25,15 @@ export const askToken = (username, password) => (dispatch) => {
   });
 };
 
-export const checkKerberos = () => (dispatch) => getReferential(
-  schema.token,
-  '/api/auth/kerberos',
-)(dispatch).catch(() => {
-  dispatch({
-    type: Constants.IDENTITY_LOGIN_FAILED,
-    payload: { status: 'ERROR' },
+export const checkKerberos = () => (dispatch) => {
+  const ref = getReferential(schema.token, '/api/auth/kerberos')(dispatch);
+  return ref.catch(() => {
+    dispatch({
+      type: Constants.IDENTITY_LOGIN_FAILED,
+      payload: { status: 'ERROR' },
+    });
   });
-});
+};
 
 export const fetchMe = () => (dispatch) => {
   const ref = getReferential(schema.user, '/api/me')(dispatch);
@@ -47,6 +46,5 @@ export const logout = () => (dispatch) => {
 };
 
 export const fetchStatistics = () => (dispatch) => {
-  const uri = '/api/statistics';
-  return getReferential(schema.statistics, uri)(dispatch);
+  return getReferential(schema.statistics, '/api/statistics')(dispatch);
 };
