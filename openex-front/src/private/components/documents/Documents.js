@@ -354,7 +354,7 @@ const select = (state) => {
   const helper = storeHelper(state);
   return {
     documents: helper.getDocuments(),
-    userAdmin: helper.getMe()?.admin,
+    userAdmin: helper.getMe()?.user_admin,
   };
 };
 

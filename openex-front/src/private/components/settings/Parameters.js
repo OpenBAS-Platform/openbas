@@ -91,7 +91,7 @@ Parameters.propTypes = {
 const select = (state) => {
   const helper = storeHelper(state);
   return {
-    userAdmin: helper.getMe()?.admin,
+    userAdmin: helper.getMe()?.user_admin,
     settings: helper.getSettings(),
   };
 };

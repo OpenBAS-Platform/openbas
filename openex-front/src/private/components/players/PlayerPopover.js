@@ -270,7 +270,7 @@ const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { exerciseId } = ownProps;
   return {
-    userAdmin: helper.getMe()?.admin,
+    userAdmin: helper.getMe()?.user_admin,
     exercise: helper.getExercise(exerciseId),
     tagsMap: helper.getTagsMap(),
     organizationsMap: helper.getOrganizationsMap(),

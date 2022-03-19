@@ -147,7 +147,7 @@ const Exercises = () => {
   const { t, nsdt } = useFormatter();
   const { exercises, userAdmin } = useHelper((helper) => ({
     exercises: helper.getExercises(),
-    userAdmin: helper.getMe()?.admin ?? false,
+    userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   const searchColumns = ['name', 'subtitle'];
   const filtering = useSearchAnFilter('exercise', 'name', searchColumns);

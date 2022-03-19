@@ -16,7 +16,10 @@ const ImportUploader = (props) => {
   const uploadRef = useRef(null);
   const [upload, setUpload] = useState(null);
   const handleOpenUpload = () => uploadRef.current.click();
-  const userAdmin = useHelper((helper) => helper.getMe()?.admin ?? false);
+  const userAdmin = useHelper((helper) => {
+    const me = helper.getMe();
+    return me?.user_admin ?? false;
+  });
   const handleUpload = (file) => {
     setUpload(true);
     const formData = new FormData();

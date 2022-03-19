@@ -239,7 +239,7 @@ const select = (state) => {
   const tagsMap = helper.getTagsMap();
   const exercisesMap = helper.getExercisesMap();
   return {
-    user, userAdmin: user?.admin, tagsMap, exercisesMap,
+    user, userAdmin: user?.user_admin, tagsMap, exercisesMap,
   };
 };
 

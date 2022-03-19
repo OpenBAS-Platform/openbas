@@ -7,7 +7,6 @@ import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActionArea from '@mui/material/CardActionArea';
 import Grid from '@mui/material/Grid';
-import { Image } from './Image';
 
 const styles = () => ({
   container: {
@@ -89,7 +88,6 @@ const Exercise = (props) => {
               <div className="clearfix" />
             </div>
           </CardContent>
-          <Image image_id={props.image_id} style={{ width: '100%' }} />
         </CardActionArea>
       </Card>
     </Grid>
