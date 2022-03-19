@@ -205,9 +205,11 @@ export const storeHelper = (state) => ({
   getDocumentsMap: () => maps('documents', state),
   // audiences
   getAudience: (id) => entity(id, 'audiences', state),
-  getAudienceUsers: (id) => entities('users', state).filter((u) => entity(id, 'audiences', state).audience_users.includes(u.user_id)),
+  getAudienceUsers: (id) => entities('users', state)
+    .filter((u) => entity(id, 'audiences', state).audience_users.includes(u.user_id)),
+  getAudienceInjects: (id) => entities('injects', state)
+    .filter((i) => entity(id, 'audiences', state).audience_injects.includes(i.inject_id)),
   getAudiences: () => entities('audiences', state),
-  getAudienceInjects: (id) => entities('injects', state).filter((i) => i.inject_audiences.includes(id)),
   getAudiencesMap: () => maps('audiences', state),
   // eslint-disable-next-line arrow-body-style
   getSettings: () => {
