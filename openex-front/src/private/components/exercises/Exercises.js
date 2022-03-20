@@ -156,7 +156,7 @@ const Exercises = () => {
   });
   return (
     <div>
-      <div className={classes.parameters} >
+      <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
             small={true}

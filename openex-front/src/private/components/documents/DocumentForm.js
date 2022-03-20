@@ -28,9 +28,7 @@ class DocumentForm extends Component {
   }
 
   render() {
-    const {
-      t, editing, onSubmit, initialValues, handleClose, hideExercises,
-    } = this.props;
+    const { t, editing, onSubmit, initialValues, handleClose, hideExercises } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -43,9 +41,7 @@ class DocumentForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="documentForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"

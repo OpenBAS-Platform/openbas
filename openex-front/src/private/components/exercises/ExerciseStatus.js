@@ -52,9 +52,7 @@ const inlineStyles = {
 
 class ExerciseStatus extends Component {
   render() {
-    const {
-      t, status, classes, variant,
-    } = this.props;
+    const { t, status, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (status) {
       case 'SCHEDULED':

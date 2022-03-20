@@ -7,9 +7,7 @@ import inject18n from '../../../components/i18n';
 
 class ExerciseDateForm extends Component {
   render() {
-    const {
-      t, onSubmit, initialValues, editing, handleClose,
-    } = this.props;
+    const { t, onSubmit, initialValues, editing, handleClose } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}

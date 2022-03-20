@@ -180,7 +180,9 @@ export const storeHelper = (state) => ({
   // comcheck
   getComcheck: (id) => entity(id, 'comchecks', state),
   getComcheckStatus: (id) => entity(id, 'comcheckstatuses', state),
-  getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter((i) => entity(id, 'comchecks', state).comcheck_statuses.includes(i)),
+  getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter(
+    (i) => i.comcheckstatus_comcheck === id,
+  ),
   // users
   getUsers: () => entities('users', state),
   getGroups: () => entities('groups', state),

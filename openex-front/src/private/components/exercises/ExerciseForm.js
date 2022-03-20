@@ -21,9 +21,7 @@ class ExerciseForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, initialValues, editing, handleClose,
-    } = this.props;
+    const { t, onSubmit, initialValues, editing, handleClose } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -36,9 +34,7 @@ class ExerciseForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="exerciseForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"
@@ -87,7 +83,7 @@ class ExerciseForm extends Component {
               {handleClose && (
                 <Button
                   onClick={handleClose.bind(this)}
-                  disabled={pristine || submitting}
+                  disabled={submitting}
                   style={{ marginRight: 10 }}
                 >
                   {t('Cancel')}

@@ -37,9 +37,7 @@ const inlineStyles = {
 
 class DryrunStatus extends Component {
   render() {
-    const {
-      t, finished, classes, variant,
-    } = this.props;
+    const { t, finished, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     return finished ? (
       <Chip

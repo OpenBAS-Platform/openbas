@@ -9,9 +9,7 @@ import TagField from '../../../../components/TagField';
 import OrganizationField from '../../../../components/OrganizationField';
 
 const UserForm = (props) => {
-  const {
-    onSubmit, initialValues, editing, handleClose,
-  } = props;
+  const { onSubmit, initialValues, editing, handleClose } = props;
   const { t } = useFormatter();
   const validate = (values) => {
     const errors = {};
@@ -37,9 +35,7 @@ const UserForm = (props) => {
         },
       }}
     >
-      {({
-        handleSubmit, form, values, submitting, pristine,
-      }) => (
+      {({ handleSubmit, form, values, submitting, pristine }) => (
         <form id="userForm" onSubmit={handleSubmit}>
           <TextField
             variant="standard"

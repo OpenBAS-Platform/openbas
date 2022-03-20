@@ -59,8 +59,7 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
       ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
-    dispatch(updateUser(user.user_id, inputValues))
-      .then(() => handleCloseEdit());
+    dispatch(updateUser(user.user_id, inputValues)).then(() => handleCloseEdit());
   };
 
   const handleOpenEditPassword = () => {
@@ -71,8 +70,9 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
   const handleCloseEditPassword = () => setOpenEditPassword(false);
 
   const onSubmitEditPassword = (data) => {
-    dispatch(updateUserPassword(user.user_id, data.user_plain_password))
-      .then(() => handleCloseEditPassword());
+    dispatch(updateUserPassword(user.user_id, data.user_plain_password)).then(
+      () => handleCloseEditPassword(),
+    );
   };
 
   const handleOpenDelete = () => {
@@ -88,7 +88,9 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
   };
 
   const org = organizationsMap[user.user_organization];
-  const userOrganization = org ? { id: org.organization_id, label: org.organization_name } : null;
+  const userOrganization = org
+    ? { id: org.organization_id, label: org.organization_name }
+    : null;
   const userTags = tagsConverter(user.user_tags, tagsMap);
   const initialValues = R.pipe(
     R.assoc('user_organization', userOrganization),
@@ -106,88 +108,76 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
     ]),
   )(user);
   return (
-      <div>
-        <IconButton onClick={handlePopoverOpen}
-          aria-haspopup="true"
-          size="large">
-          <MoreVert />
-        </IconButton>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handlePopoverClose}>
-          <MenuItem onClick={handleOpenEdit}>
-            {t('Update')}
-          </MenuItem>
-          <MenuItem onClick={handleOpenEditPassword}>
-            {t('Update password')}
-          </MenuItem>
-          {user.user_email !== 'admin@openex.io' && (
-            <MenuItem onClick={handleOpenDelete}>
-              {t('Delete')}
-            </MenuItem>
-          )}
-        </Menu>
-        <Dialog
-          open={openDelete}
-          TransitionComponent={Transition}
-          onClose={handleCloseDelete}
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogContent>
-            <DialogContentText>
-              {t('Do you want to delete this user?')}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={handleCloseDelete}>
-              {t('Cancel')}
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={submitDelete}>
-              {t('Delete')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
-          open={openEdit}
-          onClose={handleCloseEdit}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
-          <DialogTitle>{t('Update the user')}</DialogTitle>
-          <DialogContent>
-            <UserForm
-              initialValues={initialValues}
-              editing={true}
-              onSubmit={onSubmitEdit}
-              handleClose={handleCloseEdit}
-            />
-          </DialogContent>
-        </Dialog>
-        <Dialog
-          TransitionComponent={Transition}
-          open={openEditPassword}
-          onClose={handleCloseEditPassword}
-          fullWidth={true}
-          maxWidth="md"
-          PaperProps={{ elevation: 1 }}>
-          <DialogTitle>{t('Update the user password')}</DialogTitle>
-          <DialogContent>
-            <UserPasswordForm
-              onSubmit={onSubmitEditPassword}
-              handleClose={handleCloseEditPassword}
-            />
-          </DialogContent>
-        </Dialog>
-      </div>
+    <div>
+      <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
+        <MoreVert />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handlePopoverClose}
+      >
+        <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        <MenuItem onClick={handleOpenEditPassword}>
+          {t('Update password')}
+        </MenuItem>
+        {user.user_email !== 'admin@openex.io' && (
+          <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
+        )}
+      </Menu>
+      <Dialog
+        open={openDelete}
+        TransitionComponent={Transition}
+        onClose={handleCloseDelete}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to delete this user?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitDelete}>
+            {t('Delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        TransitionComponent={Transition}
+        open={openEdit}
+        onClose={handleCloseEdit}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{t('Update the user')}</DialogTitle>
+        <DialogContent>
+          <UserForm
+            initialValues={initialValues}
+            editing={true}
+            onSubmit={onSubmitEdit}
+            handleClose={handleCloseEdit}
+          />
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        TransitionComponent={Transition}
+        open={openEditPassword}
+        onClose={handleCloseEditPassword}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{t('Update the user password')}</DialogTitle>
+        <DialogContent>
+          <UserPasswordForm
+            onSubmit={onSubmitEditPassword}
+            handleClose={handleCloseEditPassword}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

@@ -2,11 +2,17 @@ package io.openex.rest.comcheck.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
+
 public class ComcheckInput {
+    @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("comcheck_name")
+    private String name;
 
     @JsonProperty("comcheck_end_date")
     private Instant end;
@@ -19,6 +25,14 @@ public class ComcheckInput {
 
     @JsonProperty("comcheck_audiences")
     private List<String> audienceIds = new ArrayList<>();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public List<String> getAudienceIds() {
         return audienceIds;

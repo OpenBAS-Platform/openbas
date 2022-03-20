@@ -191,9 +191,7 @@ const Dryrun = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const {
-    nsdt, fldt, t, fndt,
-  } = useFormatter();
+  const { nsdt, fldt, t, fndt } = useFormatter();
   const { exerciseId, dryrunId } = useParams();
   // Filter and sort hook
   const searchColumns = ['type', 'title', 'date'];

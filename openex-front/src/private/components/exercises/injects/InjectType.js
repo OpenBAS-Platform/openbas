@@ -50,9 +50,7 @@ const inlineStyles = {
 
 class InjectType extends Component {
   render() {
-    const {
-      t, type, classes, variant,
-    } = this.props;
+    const { t, type, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (type) {
       case 'openex_email':

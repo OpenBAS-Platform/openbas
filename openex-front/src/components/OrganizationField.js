@@ -66,9 +66,7 @@ class OrganizationField extends Component {
   }
 
   render() {
-    const {
-      t, name, organizations, classes,
-    } = this.props;
+    const { t, name, organizations, classes } = this.props;
     const organizationsOptions = R.map(
       (n) => ({
         id: n.organization_id,

@@ -206,7 +206,7 @@ public class ExerciseApi extends RestBehavior {
         List<String> userIds = input.getUserIds();
         List<User> users = userIds.size() == 0 ?
                 List.of(currentUser()) : fromIterable(userRepository.findAllById(userIds));
-        return dryrunService.provisionDryrun(exercise, users);
+        return dryrunService.provisionDryrun(exercise, users, input.getName());
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")

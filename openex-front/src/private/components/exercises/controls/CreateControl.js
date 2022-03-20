@@ -83,9 +83,7 @@ class CreateControl extends Component {
   }
 
   render() {
-    const {
-      classes, t, audiences, variant, me, exercise,
-    } = this.props;
+    const { classes, t, audiences, variant, me, exercise } = this.props;
     return (
       <div>
         {variant === 'buttons' ? (

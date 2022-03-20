@@ -15,6 +15,7 @@ class ComcheckForm extends Component {
     const { t } = this.props;
     const errors = {};
     const requiredFields = [
+      'comcheck_name',
       'comcheck_audiences',
       'comcheck_end_date',
       'comcheck_subject',
@@ -29,9 +30,7 @@ class ComcheckForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, handleClose, initialValues, audiences,
-    } = this.props;
+    const { t, onSubmit, handleClose, initialValues, audiences } = this.props;
     const audiencesbyId = R.indexBy(R.prop('audience_id'), audiences);
     return (
       <Form
@@ -47,6 +46,12 @@ class ComcheckForm extends Component {
       >
         {({ handleSubmit, submitting, pristine }) => (
           <form id="comcheckForm" onSubmit={handleSubmit}>
+            <TextField
+              variant="standard"
+              name="comcheck_name"
+              fullWidth={true}
+              label={t('Name')}
+            />
             <Select
               variant="standard"
               name="comcheck_audiences"
@@ -60,6 +65,7 @@ class ComcheckForm extends Component {
                 v.map((a) => audiencesbyId[a].audience_name).join(', ')
               ))
               }
+              style={{ marginTop: 20 }}
             >
               <MenuItem disabled value="">
                 <em>{t('All audiences')}</em>

@@ -79,7 +79,10 @@ class OrganizationPopover extends Component {
 
   render() {
     const { t, organization, tagsMap } = this.props;
-    const organizationTags = tagsConverter(organization.organization_tags, tagsMap);
+    const organizationTags = tagsConverter(
+      organization.organization_tags,
+      tagsMap,
+    );
     const initialValues = R.pipe(
       R.assoc('organization_tags', organizationTags),
       R.pick([

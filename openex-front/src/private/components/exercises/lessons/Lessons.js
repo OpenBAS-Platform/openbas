@@ -103,15 +103,17 @@ const Lessons = () => {
   const bottomRef = useRef(null);
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, objectives, logs, polls, usersMap } = useHelper((helper) => {
-    return {
-      exercise: helper.getExercise(exerciseId),
-      objectives: helper.getExerciseObjectives(exerciseId),
-      logs: helper.getExerciseLogs(exerciseId),
-      polls: helper.getExercisePolls(exerciseId),
-      usersMap: helper.getUsersMap(),
-    };
-  });
+  const { exercise, objectives, logs, polls, usersMap } = useHelper(
+    (helper) => {
+      return {
+        exercise: helper.getExercise(exerciseId),
+        objectives: helper.getExerciseObjectives(exerciseId),
+        logs: helper.getExerciseLogs(exerciseId),
+        polls: helper.getExercisePolls(exerciseId),
+        usersMap: helper.getUsersMap(),
+      };
+    },
+  );
   useDataLoader(() => {
     dispatch(fetchObjectives(exerciseId));
     dispatch(fetchLogs(exerciseId));
@@ -335,7 +337,10 @@ const Lessons = () => {
                       fontSize: 15,
                     }}
                   >
-                    <strong>{resolveUserName(usersMap[log.log_user] ?? {})}</strong>&nbsp;
+                    <strong>
+                      {resolveUserName(usersMap[log.log_user] ?? {})}
+                    </strong>
+                    &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
                       {t('added an entry')} on {nsdt(log.log_created_at)}
                     </span>

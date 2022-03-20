@@ -31,6 +31,10 @@ public class Comcheck implements Base {
     @JsonProperty("comcheck_id")
     private String id;
 
+    @Column(name = "comcheck_name")
+    @JsonProperty("comcheck_name")
+    private String name;
+
     @Column(name = "comcheck_start_date")
     @JsonProperty("comcheck_start_date")
     private Instant start;
@@ -76,6 +80,14 @@ public class Comcheck implements Base {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Instant getStart() {

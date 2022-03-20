@@ -7,9 +7,7 @@ import MuiSwitch from '@mui/material/Switch';
 const renderSwitch = ({
   label,
   input,
-  meta: {
-    touched, invalid, error, submitError,
-  },
+  meta: { touched, invalid, error, submitError },
   style,
   ...others
 }) => (

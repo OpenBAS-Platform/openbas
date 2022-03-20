@@ -66,9 +66,7 @@ const styles = (theme) => ({
   },
 });
 
-const LeftBar = ({
-  location, classes, userAdmin, t,
-}) => (
+const LeftBar = ({ location, classes, userAdmin, t }) => (
   <Drawer variant="permanent" classes={{ paper: classes.drawerPaper }}>
     <Toolbar />
     <MenuList component="nav">

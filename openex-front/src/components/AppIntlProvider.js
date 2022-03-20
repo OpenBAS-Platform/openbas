@@ -46,10 +46,12 @@ const AppIntlProvider = (props) => {
           return;
         }
         throw err;
-      }}>
+      }}
+    >
       <LocalizationProvider
         dateAdapter={AdapterDateFns}
-        locale={localeMap[locale]}>
+        locale={localeMap[locale]}
+      >
         {children}
       </LocalizationProvider>
     </IntlProvider>

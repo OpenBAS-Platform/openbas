@@ -46,9 +46,7 @@ const inlineStyles = {
 
 class InjectStatus extends Component {
   render() {
-    const {
-      t, status, classes, variant,
-    } = this.props;
+    const { t, status, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (status) {
       case 'SUCCESS':

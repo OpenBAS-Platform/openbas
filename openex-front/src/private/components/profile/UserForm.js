@@ -35,9 +35,7 @@ class UserForm extends Component {
           },
         }}
       >
-        {({
-          form, handleSubmit, pristine, submitting, values,
-        }) => (
+        {({ form, handleSubmit, pristine, submitting, values }) => (
           <form id="userForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"

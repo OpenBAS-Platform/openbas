@@ -21,9 +21,7 @@ class PlayerForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, initialValues, editing, handleClose, canUpdateEmail,
-    } = this.props;
+    const { t, onSubmit, initialValues, editing, handleClose, canUpdateEmail } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -36,9 +34,7 @@ class PlayerForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="playerForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"

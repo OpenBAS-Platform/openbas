@@ -149,7 +149,12 @@ class AudiencePopover extends Component {
 
   render() {
     const {
-      t, audience, setSelectedAudience, exercise, onRemoveAudience, tagsMap,
+      t,
+      audience,
+      setSelectedAudience,
+      exercise,
+      onRemoveAudience,
+      tagsMap,
     } = this.props;
     const audienceTags = tagsConverter(exercise.audience_tags, tagsMap);
     const initialValues = R.pipe(

@@ -20,9 +20,7 @@ class OrganizationForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, handleClose, initialValues, editing,
-    } = this.props;
+    const { t, onSubmit, handleClose, initialValues, editing } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -35,9 +33,7 @@ class OrganizationForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="organizationForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"

@@ -68,9 +68,7 @@ class InjectForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="injectForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"

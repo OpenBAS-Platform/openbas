@@ -156,7 +156,13 @@ const inlineStyles = {
 const Users = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const searchColumns = ['email', 'firstname', 'lastname', 'phone', 'organization'];
+  const searchColumns = [
+    'email',
+    'firstname',
+    'lastname',
+    'phone',
+    'organization',
+  ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
   const { users, tagsMap, organizationsMap } = useHelper((helper) => ({
     users: helper.getUsers(),

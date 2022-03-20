@@ -28,6 +28,10 @@ public class Dryrun implements Base {
     @JsonProperty("dryrun_id")
     private String id;
 
+    @Column(name = "dryrun_name")
+    @JsonProperty("dryrun_name")
+    private String name;
+
     @Column(name = "dryrun_speed")
     @JsonProperty("dryrun_speed")
     private int speed;
@@ -84,6 +88,14 @@ public class Dryrun implements Base {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Instant getDate() {

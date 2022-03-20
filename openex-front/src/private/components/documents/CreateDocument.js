@@ -30,9 +30,7 @@ const styles = (theme) => ({
 });
 
 const CreateDocument = (props) => {
-  const {
-    classes, t, inline, exerciseId,
-  } = props;
+  const { classes, t, inline, exerciseId } = props;
   const [open, setOpen] = useState(false);
   const onSubmit = (data) => {
     const inputValues = R.pipe(

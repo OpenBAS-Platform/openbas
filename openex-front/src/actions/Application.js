@@ -1,14 +1,23 @@
 import { FORM_ERROR } from 'final-form';
 import * as Constants from '../constants/ActionTypes';
 import * as schema from './Schema';
-import { getReferential, postReferential, putReferential, simpleCall } from '../utils/Action';
+import {
+  getReferential,
+  postReferential,
+  putReferential,
+  simpleCall,
+} from '../utils/Action';
 
 export const fetchParameters = () => (dispatch) => {
   return getReferential(schema.arrayOfParameters, '/api/settings')(dispatch);
 };
 
 export const updateParameters = (data) => (dispatch) => {
-  return putReferential(schema.arrayOfParameters, '/api/settings', data)(dispatch);
+  return putReferential(
+    schema.arrayOfParameters,
+    '/api/settings',
+    data,
+  )(dispatch);
 };
 
 export const askToken = (username, password) => (dispatch) => {

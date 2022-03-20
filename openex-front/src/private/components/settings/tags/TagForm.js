@@ -20,9 +20,7 @@ class TagForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, initialValues, handleClose, editing,
-    } = this.props;
+    const { t, onSubmit, initialValues, handleClose, editing } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}

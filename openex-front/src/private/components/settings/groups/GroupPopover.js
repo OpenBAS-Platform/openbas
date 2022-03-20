@@ -41,7 +41,7 @@ import { storeHelper } from '../../../../actions/Schema';
 import { Transition } from '../../../../utils/Environment';
 import ItemTags from '../../../../components/ItemTags';
 import TagsFilter from '../../../../components/TagsFilter';
-import { resolveUserName } from '../../../../utils/String';
+import { resolveUserName, truncate } from '../../../../utils/String';
 
 const styles = () => ({
   box: {
@@ -365,7 +365,7 @@ class GroupPopover extends Component {
                       <Chip
                         key={userId}
                         onDelete={this.removeUser.bind(this, userId)}
-                        label={resolveUserName(user)}
+                        label={truncate(resolveUserName(user), 22)}
                         avatar={<Avatar src={userGravatar} size={32} />}
                         classes={{ root: classes.chip }}
                       />

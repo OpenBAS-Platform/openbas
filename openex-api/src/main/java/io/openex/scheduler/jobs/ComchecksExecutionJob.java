@@ -7,6 +7,7 @@ import io.openex.database.model.Exercise;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ComcheckStatusRepository;
 import io.openex.execution.*;
+import io.openex.injects.email.EmailContract;
 import io.openex.injects.email.EmailExecutor;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.email.model.EmailInject;
@@ -59,6 +60,7 @@ public class ComchecksExecutionJob implements Job {
 
     private EmailInject buildComcheckEmail(Comcheck comCheck) {
         EmailInject emailInject = new EmailInject();
+        emailInject.setType(EmailContract.NAME);
         EmailContent content = new EmailContent();
         content.setSubject(comCheck.getSubject());
         content.setBody(comCheck.getMessage());

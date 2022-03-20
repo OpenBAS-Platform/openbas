@@ -3,9 +3,7 @@ import * as PropTypes from 'prop-types';
 import MUISlider from '@mui/material/Slider';
 import { Field } from 'react-final-form';
 
-const renderSliderField = ({
-  input, step, min, max, onSliderChange,
-}) => (
+const renderSliderField = ({ input, step, min, max, onSliderChange }) => (
   <MUISlider
     step={step}
     min={min}

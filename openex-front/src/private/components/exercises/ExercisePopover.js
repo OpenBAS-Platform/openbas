@@ -117,9 +117,7 @@ class ExercisePopover extends Component {
   }
 
   render() {
-    const {
-      t, exercise, tagsMap, classes,
-    } = this.props;
+    const { t, exercise, tagsMap, classes } = this.props;
     const exerciseTags = tagsConverter(exercise.exercise_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('exercise_tags', exerciseTags),
@@ -176,18 +174,10 @@ class ExercisePopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseDelete.bind(this)}
-            >
+            <Button onClick={this.handleCloseDelete.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitDelete.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitDelete.bind(this)}>
               {t('Delete')}
             </Button>
           </DialogActions>
@@ -273,18 +263,10 @@ class ExercisePopover extends Component {
             </Table>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseExport.bind(this)}
-            >
+            <Button onClick={this.handleCloseExport.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitExport.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitExport.bind(this)}>
               {t('Export')}
             </Button>
           </DialogActions>

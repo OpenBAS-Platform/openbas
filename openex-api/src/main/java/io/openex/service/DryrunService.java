@@ -45,8 +45,9 @@ public class DryrunService {
                 .toList();
     }
 
-    private Dryrun createDryRun(Exercise exercise, List<User> users) {
+    private Dryrun createDryRun(Exercise exercise, List<User> users, String name) {
         Dryrun run = new Dryrun();
+        run.setName(name);
         run.setSpeed(SPEED_DRYRUN);
         run.setExercise(exercise);
         run.setDate(now());
@@ -55,11 +56,11 @@ public class DryrunService {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    public Dryrun provisionDryrun(Exercise exercise, List<User> users) {
+    public Dryrun provisionDryrun(Exercise exercise, List<User> users, String name) {
         Specification<Inject> injectFilters = InjectSpecification.forDryrun(exercise.getId());
         List<Inject> injects = injectRepository.findAll(injectFilters);
         Assert.isTrue(injects.size() > 0, "Cant create dryrun without injects");
-        Dryrun dryrun = createDryRun(exercise, users);
+        Dryrun dryrun = createDryRun(exercise, users, name);
         List<? extends DryInject> dryInjects = toDryInjects(injects, dryrun);
         dryInjectRepository.saveAll(dryInjects);
         return dryrun;

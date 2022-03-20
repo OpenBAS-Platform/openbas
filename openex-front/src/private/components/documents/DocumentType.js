@@ -29,9 +29,7 @@ const styles = () => ({
 
 class DocumentType extends Component {
   render() {
-    const {
-      classes, t, type, variant, disabled,
-    } = this.props;
+    const { classes, t, type, variant, disabled } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     const color = stringToColour(type);
     if (type) {

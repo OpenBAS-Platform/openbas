@@ -10,9 +10,7 @@ import { ColorLensOutlined } from '@mui/icons-material';
 const renderColorPickerField = ({
   label,
   input: { onChange, ...inputProps },
-  meta: {
-    touched, invalid, error, submitError,
-  },
+  meta: { touched, invalid, error, submitError },
   ...others
 }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);

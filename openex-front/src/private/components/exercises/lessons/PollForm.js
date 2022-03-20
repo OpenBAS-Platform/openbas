@@ -19,9 +19,7 @@ class PollForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, handleClose, initialValues, editing,
-    } = this.props;
+    const { t, onSubmit, handleClose, initialValues, editing } = this.props;
     return (
       <Form
         initialValues={initialValues}

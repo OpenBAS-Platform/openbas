@@ -6,9 +6,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
 
-const FileFieldInput = ({
-  required, input, dropZoneProps, ...props
-}) => {
+const FileFieldInput = ({ required, input, dropZoneProps, ...props }) => {
   const { t } = useFormatter();
   const onDrop = useCallback(
     (files) => {

@@ -47,17 +47,17 @@ const useStyles = makeStyles(() => ({
     height: '100%',
   },
   item: {
+    paddingLeft: 20,
     height: 50,
-    minHeight: 50,
-    maxHeight: 50,
-    paddingRight: 0,
   },
   bodyItem: {
-    height: '100%',
-    fontSize: 14,
     float: 'left',
+    height: 25,
+    fontSize: 13,
+    lineHeight: '25px',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
+    verticalAlign: 'middle',
     textOverflow: 'ellipsis',
   },
 }));
@@ -119,23 +119,17 @@ const Controls = () => {
                             style={{ width: '30%' }}
                           >
                             {nsd(dryrun.dryrun_date)}
-                            <span style={{ fontSize: 20 }}>&nbsp;</span>
                           </div>
                           <div
                             className={classes.bodyItem}
                             style={{ width: '15%' }}
                           >
-                            <span style={{ fontSize: 20 }}>&nbsp;</span>
                             <code>{dryrun.dryrun_speed}x</code>
                           </div>
                           <div
                             className={classes.bodyItem}
                             style={{ width: '20%' }}
                           >
-                            <span style={{ fontWeight: 600 }}>
-                              {dryrun.dryrun_injects_number}
-                            </span>
-                            <span style={{ fontSize: 20 }}>&nbsp;</span>
                             {t('injects')}
                           </div>
                           <div className={classes.bodyItem}>
@@ -147,7 +141,7 @@ const Controls = () => {
                         </div>
                       }
                     />
-                    <ListItemSecondaryAction style={{ paddingTop: 4 }}>
+                    <ListItemSecondaryAction>
                       <IconButton
                         onClick={() => setOpenDryrunDelete(dryrun.dryrun_id)}
                         aria-haspopup="true"
@@ -188,12 +182,14 @@ const Controls = () => {
                         <div>
                           <div
                             className={classes.bodyItem}
-                            style={{ width: '50%' }}
+                            style={{ width: '30%' }}
                           >
-                            {nsd(comcheck.comcheck_start_date)}
-                            <span style={{ fontSize: 20 }}>
-                              &nbsp;&nbsp;&#8594;&nbsp;&nbsp;
-                            </span>
+                            {comcheck.comcheck_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '15%' }}
+                          >
                             {nsd(comcheck.comcheck_end_date)}
                           </div>
                           <div
@@ -201,9 +197,8 @@ const Controls = () => {
                             style={{ width: '20%' }}
                           >
                             <span style={{ fontWeight: 600 }}>
-                              {comcheck.comcheck_users_number}
+                              {comcheck.comcheck_users_number} &nbsp;
                             </span>
-                            <span style={{ fontSize: 20 }}>&nbsp;</span>
                             {t('players')}
                           </div>
                           <div className={classes.bodyItem}>
@@ -215,7 +210,7 @@ const Controls = () => {
                         </div>
                       }
                     />
-                    <ListItemSecondaryAction style={{ paddingTop: 4 }}>
+                    <ListItemSecondaryAction>
                       <IconButton
                         onClick={() => setOpenComcheckDelete(comcheck.comcheck_id)
                         }
@@ -248,18 +243,10 @@ const Controls = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setOpenComcheckDelete(null)}
-          >
+          <Button onClick={() => setOpenComcheckDelete(null)}>
             {t('Cancel')}
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={submitComcheckDelete}
-          >
+          <Button color="secondary" onClick={submitComcheckDelete}>
             {t('Delete')}
           </Button>
         </DialogActions>
@@ -276,18 +263,10 @@ const Controls = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setOpenDryrunDelete(null)}
-          >
+          <Button onClick={() => setOpenDryrunDelete(null)}>
             {t('Cancel')}
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={submitDryrunDelete}
-          >
+          <Button color="secondary" onClick={submitDryrunDelete}>
             {t('Delete')}
           </Button>
         </DialogActions>

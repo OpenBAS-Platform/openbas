@@ -31,15 +31,17 @@ const ObjectiveEvaluations = ({ objectiveId, handleClose }) => {
   const [submitting, setSubmitting] = useState(false);
   // Fetching data
   const { exerciseId } = useParams();
-  const { me, exercise, objective, evaluations, usersMap } = useHelper((helper) => {
-    return {
-      me: helper.getMe(),
-      usersMap: helper.getUsersMap(),
-      exercise: helper.getExercise(exerciseId),
-      objective: helper.getObjective(objectiveId),
-      evaluations: helper.getObjectiveEvaluations(objectiveId),
-    };
-  });
+  const { me, exercise, objective, evaluations, usersMap } = useHelper(
+    (helper) => {
+      return {
+        me: helper.getMe(),
+        usersMap: helper.getUsersMap(),
+        exercise: helper.getExercise(exerciseId),
+        objective: helper.getObjective(objectiveId),
+        evaluations: helper.getObjectiveEvaluations(objectiveId),
+      };
+    },
+  );
   useDataLoader(() => {
     dispatch(fetchEvaluations(exerciseId, objectiveId));
   });

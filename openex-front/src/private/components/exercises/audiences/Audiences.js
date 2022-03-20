@@ -160,9 +160,10 @@ const Audiences = () => {
   ]);
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, audiences } = useHelper((helper) => ({
+  const { exercise, audiences, tagsMap } = useHelper((helper) => ({
     exercise: helper.getExercise(exerciseId),
     audiences: helper.getExerciseAudiences(exerciseId),
+    tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
@@ -312,12 +313,16 @@ const Audiences = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedAudience(null)}
-        elevation={1}>
-        {selectedAudience !== null && <AudiencePlayers
-          audienceId={selectedAudience}
-          exerciseId={exerciseId}
-          handleClose={() => setSelectedAudience(null)}
-        />}
+        elevation={1}
+      >
+        {selectedAudience !== null && (
+          <AudiencePlayers
+            audienceId={selectedAudience}
+            exerciseId={exerciseId}
+            handleClose={() => setSelectedAudience(null)}
+            tagsMap={tagsMap}
+          />
+        )}
       </Drawer>
       {isExerciseUpdatable(exercise) && (
         <CreateAudience exerciseId={exerciseId} />

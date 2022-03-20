@@ -37,10 +37,12 @@ const useStyles = makeStyles((theme) => ({
     float: 'left',
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -236,12 +238,12 @@ const Injects = () => {
           <ListItemIcon>
             <span
               style={{
-                padding: '0 8px 0 10px',
+                padding: '0 8px 0 8px',
                 fontWeight: 700,
                 fontSize: 12,
               }}
             >
-              #
+              &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText

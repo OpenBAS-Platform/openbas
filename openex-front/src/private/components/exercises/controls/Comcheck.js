@@ -45,10 +45,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -223,7 +225,7 @@ const Comcheck = () => {
   const dispatch = useDispatch();
   const [currentDate, setCurrentDate] = useState(new Date());
   useEffect(() => {
-    const intervalId = setInterval(() => setCurrentDate(new Date()), 1000);
+    const intervalId = setInterval(() => setCurrentDate(new Date()), 5000);
     return () => clearInterval(intervalId);
   }, []);
   const { nsdt, fldt, t } = useFormatter();
@@ -237,10 +239,11 @@ const Comcheck = () => {
     'organization',
   ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
-  const { comcheck, statuses } = useHelper((helper) => {
+  const { comcheck, statuses, usersMap } = useHelper((helper) => {
     return {
       comcheck: helper.getComcheck(comcheckId),
       statuses: helper.getComcheckStatuses(comcheckId),
+      usersMap: helper.getUsersMap(),
     };
   });
   // Fetching data
@@ -252,7 +255,7 @@ const Comcheck = () => {
     dispatch(fetchComcheckStatuses(exerciseId, comcheckId));
   });
   const players = statuses.map((s) => ({
-    ...s.user,
+    ...(usersMap[s.comcheckstatus_user] || {}),
     user_status_state: s.comcheckstatus_state,
     user_status_sent_date: s.comcheckstatus_sent_date,
     user_status_receive_date: s.comcheckstatus_receive_date,
@@ -263,13 +266,17 @@ const Comcheck = () => {
         <Grid item={true} xs={6} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
-                <Typography variant="h3">{t('Start date')}</Typography>
-                {fldt(comcheck?.comcheckstatus_start_date)}
+              <Grid item={true} xs={4}>
+                <Typography variant="h3">{t('Name')}</Typography>
+                {comcheck?.comcheck_name}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item={true} xs={4}>
+                <Typography variant="h3">{t('Start date')}</Typography>
+                {fldt(comcheck?.comcheck_start_date)}
+              </Grid>
+              <Grid item={true} xs={4}>
                 <Typography variant="h3">{t('End date')}</Typography>
-                {fldt(comcheck?.comcheckstatus_end_date)}
+                {fldt(comcheck?.comcheck_end_date)}
               </Grid>
             </Grid>
           </Paper>
@@ -278,20 +285,21 @@ const Comcheck = () => {
           <Paper
             variant="outlined"
             classes={{ root: classes.metric }}
-            style={{ display: 'flex' }}>
+            style={{ display: 'flex' }}
+          >
             <div className={classes.icon}>
-              {iconStatus(comcheck?.comcheckstatus_state)}
+              {iconStatus(comcheck?.comcheck_state)}
             </div>
             <div>
               <div className={classes.title}>{t('Comcheck')}</div>
-              <ComcheckState state={comcheck?.comcheckstatus_state} />
+              <ComcheckState state={comcheck?.comcheck_state} />
             </div>
             <div className={classes.progress}>
               <BorderLinearProgress
                 value={progression(
                   currentDate,
-                  Date.parse(comcheck?.comcheckstatus_start_date),
-                  Date.parse(comcheck?.comcheckstatus_end_date),
+                  Date.parse(comcheck?.comcheck_start_date),
+                  Date.parse(comcheck?.comcheck_end_date),
                 )}
                 variant="determinate"
               />
@@ -330,12 +338,12 @@ const Comcheck = () => {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 10px',
+                  padding: '0 8px 0 8px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </span>
             </ListItemIcon>
             <ListItemText
@@ -388,7 +396,7 @@ const Comcheck = () => {
               divider={true}
             >
               <ListItemIcon>
-                <PersonOutlined />
+                <PersonOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={

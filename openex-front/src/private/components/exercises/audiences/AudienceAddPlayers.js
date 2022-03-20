@@ -27,6 +27,8 @@ import { fetchPlayers } from '../../../../actions/User';
 import CreatePlayer from '../../players/CreatePlayer';
 import { resolveUserName, truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
+import ItemTags from '../../../../components/ItemTags';
+import TagsFilter from '../../../../components/TagsFilter';
 
 const styles = () => ({
   createButton: {
@@ -57,6 +59,7 @@ class AudienceAddPlayers extends Component {
       open: false,
       keyword: '',
       usersIds: [],
+      tags: [],
     };
   }
 
@@ -74,6 +77,16 @@ class AudienceAddPlayers extends Component {
 
   handleSearchUsers(value) {
     this.setState({ keyword: value });
+  }
+
+  handleAddTag(value) {
+    if (value) {
+      this.setState({ tags: [value] });
+    }
+  }
+
+  handleClearTag() {
+    this.setState({ tags: [] });
   }
 
   addUser(userId) {
@@ -106,9 +119,14 @@ class AudienceAddPlayers extends Component {
 
   render() {
     const {
-      classes, t, usersMap, audienceUsersIds, exercise, organizationsMap,
+      classes,
+      t,
+      usersMap,
+      audienceUsersIds,
+      exercise,
+      organizationsMap,
     } = this.props;
-    const { keyword, usersIds } = this.state;
+    const { keyword, usersIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
@@ -118,17 +136,40 @@ class AudienceAddPlayers extends Component {
         !== -1
       || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || R.propOr('-', 'organization_name', n.organization)
+      || (n.organization_name || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1
+      || (n.organization_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(R.values(usersMap));
+    const filteredUsers = R.pipe(
+      R.map((u) => ({
+        organization_name:
+          organizationsMap[u.user_organization]?.organization_name ?? '-',
+        organization_description:
+          organizationsMap[u.user_organization]?.organization_description
+          ?? '-',
+        ...u,
+      })),
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.user_tags),
+            R.pluck('id', tags),
+          ),
+      ),
+      R.filter(filterByKeyword),
+      R.take(10),
+    )(R.values(usersMap));
     return (
       <div>
-        <Fab onClick={this.handleOpen.bind(this)}
+        <Fab
+          onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
           className={classes.createButton}
-          disabled={isExerciseReadOnly(exercise)}>
+          disabled={isExerciseReadOnly(exercise)}
+        >
           <Add />
         </Fab>
         <Dialog
@@ -136,12 +177,12 @@ class AudienceAddPlayers extends Component {
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
-          maxWidth="md"
+          maxWidth="lg"
           PaperProps={{
             elevation: 1,
             sx: {
-              minHeight: 540,
-              maxHeight: 540,
+              minHeight: 580,
+              maxHeight: 580,
             },
           }}
         >
@@ -149,14 +190,26 @@ class AudienceAddPlayers extends Component {
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
-                <SearchFilter
-                  onChange={this.handleSearchUsers.bind(this)}
-                  fullWidth={true}/>
+                <Grid container={true} spacing={3}>
+                  <Grid item={true} xs={6}>
+                    <SearchFilter
+                      onChange={this.handleSearchUsers.bind(this)}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                  <Grid item={true} xs={6}>
+                    <TagsFilter
+                      onAddTag={this.handleAddTag.bind(this)}
+                      onClearTag={this.handleClearTag.bind(this)}
+                      currentTags={tags}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                </Grid>
                 <List>
                   {filteredUsers.map((user) => {
                     const disabled = usersIds.includes(user.user_id)
                       || audienceUsersIds.includes(user.user_id);
-                    const organizationName = organizationsMap[user.user_organization]?.organization_name ?? '-';
                     return (
                       <ListItem
                         key={user.user_id}
@@ -164,14 +217,16 @@ class AudienceAddPlayers extends Component {
                         button={true}
                         divider={true}
                         dense={true}
-                        onClick={this.addUser.bind(this, user.user_id)}>
+                        onClick={this.addUser.bind(this, user.user_id)}
+                      >
                         <ListItemIcon>
                           <PersonOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={user.user_email}
-                          secondary={organizationName}
+                          primary={resolveUserName(user)}
+                          secondary={user.organization_name}
                         />
+                        <ItemTags variant="list" tags={user.user_tags} />
                       </ListItem>
                     );
                   })}

@@ -6,9 +6,7 @@ import { useFormatter } from './i18n';
 const renderTextField = ({
   label,
   input,
-  meta: {
-    touched, invalid, error, submitError,
-  },
+  meta: { touched, invalid, error, submitError },
   ...others
 }) => {
   const { t } = useFormatter();

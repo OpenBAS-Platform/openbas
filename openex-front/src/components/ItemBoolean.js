@@ -53,9 +53,7 @@ const inlineStyles = {
 
 class ItemBoolean extends Component {
   render() {
-    const {
-      classes, label, status, variant, t, reverse, onClick,
-    } = this.props;
+    const { classes, label, status, variant, t, reverse, onClick } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     const inlineStyleRed = onClick
       ? inlineStyles.redClickable

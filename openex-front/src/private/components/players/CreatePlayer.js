@@ -65,9 +65,7 @@ class CreatePlayer extends Component {
   }
 
   render() {
-    const {
-      classes, t, organizations, inline,
-    } = this.props;
+    const { classes, t, organizations, inline } = this.props;
     return (
       <div>
         {inline === true ? (

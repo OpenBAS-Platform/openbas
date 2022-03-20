@@ -4,6 +4,7 @@ import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import inject18n from '../../../../components/i18n';
 import UserField from '../../../../components/UserField';
+import { TextField } from '../../../../components/TextField';
 
 class DryrunForm extends Component {
   validate(values) {
@@ -19,9 +20,7 @@ class DryrunForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, handleClose, initialValues,
-    } = this.props;
+    const { t, onSubmit, handleClose, initialValues } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -34,16 +33,20 @@ class DryrunForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, submitting, values, form,
-        }) => (
+        {({ handleSubmit, submitting, values, form }) => (
           <form id="dryrunForm" onSubmit={handleSubmit}>
+            <TextField
+              variant="standard"
+              name="dryrun_name"
+              fullWidth={true}
+              label={t('Name')}
+            />
             <UserField
               label={t('Dryrun recipients')}
               name="dryrun_users"
               values={values}
               setFieldValue={form.mutators.setValue}
-              noMargin={true}
+              style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

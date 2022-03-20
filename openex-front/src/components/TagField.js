@@ -67,9 +67,7 @@ class TagField extends Component {
   }
 
   render() {
-    const {
-      t, name, tags, classes, onKeyDown, style, label, placeholder,
-    } = this.props;
+    const { t, name, tags, classes, onKeyDown, style, label, placeholder } = this.props;
     const tagsOptions = R.map(
       (n) => ({
         id: n.tag_id,

@@ -5,9 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import { Field } from 'react-final-form';
 
-const renderHelper = ({
-  touched, error, submitError, helperText, variant,
-}) => {
+const renderHelper = ({ touched, error, submitError, helperText, variant }) => {
   if (!(touched && error)) {
     return helperText;
   }

@@ -71,9 +71,7 @@ class LogPopover extends Component {
   }
 
   render() {
-    const {
-      t, log, exercise, tagsMap,
-    } = this.props;
+    const { t, log, exercise, tagsMap } = this.props;
     const logTags = tagsConverter(log.log_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('log_tags', logTags),

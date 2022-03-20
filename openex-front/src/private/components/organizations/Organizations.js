@@ -191,9 +191,7 @@ class Organizations extends Component {
 
   render() {
     const { classes, organizations, tagsMap } = this.props;
-    const {
-      keyword, sortBy, orderAsc, tags,
-    } = this.state;
+    const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.organization_name || '')
         .toLowerCase()
@@ -297,13 +295,19 @@ class Organizations extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.organization_tags}
                     >
-                      <ItemTags variant="list" tags={organization.organization_tags} />
+                      <ItemTags
+                        variant="list"
+                        tags={organization.organization_tags}
+                      />
                     </div>
                   </div>
                 }
               />
               <ListItemSecondaryAction>
-                <OrganizationPopover organization={organization} tagsMap={tagsMap} />
+                <OrganizationPopover
+                  organization={organization}
+                  tagsMap={tagsMap}
+                />
               </ListItemSecondaryAction>
             </ListItem>
           ))}

@@ -32,9 +32,7 @@ const ExerciseField = (props) => {
     dispatch(fetchExercises());
   });
 
-  const {
-    name, onKeyDown, style, label, placeholder, noMargin,
-  } = props;
+  const { name, onKeyDown, style, label, placeholder, noMargin } = props;
   const exerciseOptions = (exercises || []).map((n) => ({
     id: n.exercise_id,
     label: n.exercise_name,

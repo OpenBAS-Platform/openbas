@@ -10,7 +10,8 @@ import {
   updateMeProfile,
   updateMeInformation,
   updateMePassword,
-  meTokens, renewToken,
+  meTokens,
+  renewToken,
 } from '../../../actions/User';
 import UserForm from './UserForm';
 import ProfileForm from './ProfileForm';
@@ -77,10 +78,9 @@ const Index = () => {
     return dispatch(updateMeProfile(inputValues));
   };
   const onUpdateInformation = (data) => dispatch(updateMeInformation(data));
-  const onUpdatePassword = (data) => dispatch(updateMePassword(
-    data.user_current_password,
-    data.user_plain_password,
-  ));
+  const onUpdatePassword = (data) => dispatch(
+    updateMePassword(data.user_current_password, data.user_plain_password),
+  );
 
   const userOrganizationValue = organizationsMap[user.user_organization];
   const userOrganization = userOrganizationValue
@@ -150,14 +150,18 @@ const Index = () => {
             </Typography>
             <pre>{userToken?.token_value}</pre>
             <Button
-                variant="contained"
-                color="primary"
-                component="a"
-                onClick={() => onRenew(userToken?.token_id)}
+              variant="contained"
+              color="primary"
+              component="a"
+              onClick={() => onRenew(userToken?.token_id)}
             >
               {t('RENEW')}
             </Button>
-            <Typography style={{ marginTop: 20 }} variant="h6" gutterBottom={true}>
+            <Typography
+              style={{ marginTop: 20 }}
+              variant="h6"
+              gutterBottom={true}
+            >
               {t('Example')}
             </Typography>
             <pre>
@@ -175,7 +179,8 @@ const Index = () => {
             variant="contained"
             color="primary"
             component="a"
-            href="/swagger-ui/">
+            href="/swagger-ui/"
+          >
             {t('API specifications')}
           </Button>
         </Paper>

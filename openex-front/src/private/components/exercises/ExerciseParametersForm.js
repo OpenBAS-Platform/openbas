@@ -19,9 +19,7 @@ class ExerciseParametersForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, initialValues, disabled,
-    } = this.props;
+    const { t, onSubmit, initialValues, disabled } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}

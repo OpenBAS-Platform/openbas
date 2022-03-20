@@ -20,9 +20,7 @@ class LogForm extends Component {
   }
 
   render() {
-    const {
-      t, onSubmit, handleClose, initialValues, editing,
-    } = this.props;
+    const { t, onSubmit, handleClose, initialValues, editing } = this.props;
     return (
       <Form
         initialValues={initialValues}
@@ -34,9 +32,7 @@ class LogForm extends Component {
           },
         }}
       >
-        {({
-          handleSubmit, form, values, submitting, pristine,
-        }) => (
+        {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="logForm" onSubmit={handleSubmit}>
             <TextField
               variant="standard"

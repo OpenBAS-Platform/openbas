@@ -52,9 +52,7 @@ const inlineStyles = {
 
 class ComcheckStatusState extends Component {
   render() {
-    const {
-      t, state, classes, variant,
-    } = this.props;
+    const { t, state, classes, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (state) {
       case 'RUNNING':

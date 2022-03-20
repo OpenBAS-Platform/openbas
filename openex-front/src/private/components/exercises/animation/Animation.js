@@ -143,11 +143,20 @@ const Animation = () => {
   const { exerciseId } = useParams();
   const { t, fndt } = useFormatter();
   const {
-    exercise, audiences, injects, injectTypes, exercisesMap, tagsMap, audiencesInjectsMap,
+    exercise,
+    audiences,
+    injects,
+    injectTypes,
+    exercisesMap,
+    tagsMap,
+    audiencesInjectsMap,
   } = useHelper((helper) => {
     const exerciseAudiences = helper.getExerciseAudiences(exerciseId);
-    const injectsPerAudience = R.mergeAll(exerciseAudiences
-      .map((a) => ({ [a.audience_id]: helper.getAudienceInjects(a.audience_id) })));
+    const injectsPerAudience = R.mergeAll(
+      exerciseAudiences.map((a) => ({
+        [a.audience_id]: helper.getAudienceInjects(a.audience_id),
+      })),
+    );
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
@@ -236,7 +245,9 @@ const Animation = () => {
           <div className={classes.timeline}>
             {sortedAudiences.map((audience, index) => {
               const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(audiencesInjectsMap[audience.audience_id]),
+                filtering.filterAndSort(
+                  audiencesInjectsMap[audience.audience_id],
+                ),
               );
               return (
                 <div

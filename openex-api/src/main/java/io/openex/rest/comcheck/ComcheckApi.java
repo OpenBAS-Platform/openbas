@@ -77,6 +77,7 @@ public class ComcheckApi extends RestBehavior {
         // 01. Create the comcheck and get the ID
         Comcheck check = new Comcheck();
         check.setUpdateAttributes(comCheck);
+        check.setName(comCheck.getName());
         check.setStart(now());
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         check.setExercise(exercise);
