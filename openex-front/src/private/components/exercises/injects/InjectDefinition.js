@@ -379,6 +379,8 @@ class InjectDefinition extends Component {
       injectTypes,
       audiencesMap,
       documentsMap,
+      exercisesMap,
+      tagsMap,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -491,7 +493,7 @@ class InjectDefinition extends Component {
                               fontSize: 12,
                             }}
                           >
-                            #
+                            &nbsp;
                           </span>
                         </ListItemIcon>
                         <ListItemText
@@ -729,7 +731,7 @@ class InjectDefinition extends Component {
                             fontSize: 12,
                           }}
                         >
-                          #
+                          &nbsp;
                         </span>
                       </ListItemIcon>
                       <ListItemText
@@ -765,6 +767,9 @@ class InjectDefinition extends Component {
                         key={document.document_id}
                         classes={{ root: classes.item }}
                         divider={true}
+                        button={true}
+                        component="a"
+                        href={`/api/documents/${document.document_id}/file`}
                       >
                         <ListItemIcon>
                           <AttachmentOutlined />
@@ -791,7 +796,10 @@ class InjectDefinition extends Component {
                                 className={classes.bodyItem}
                                 style={inlineStyles.document_tags}
                               >
-                                <ItemTags variant="list" tags={document.document_tags} />
+                                <ItemTags
+                                  variant="list"
+                                  tags={document.document_tags}
+                                />
                               </div>
                               <div
                                 className={classes.bodyItem}
@@ -827,6 +835,8 @@ class InjectDefinition extends Component {
                           <DocumentPopover
                             exerciseId={exerciseId}
                             document={document}
+                            exercisesMap={exercisesMap}
+                            tagsMap={tagsMap}
                             onRemoveDocument={this.handleRemoveDocument.bind(
                               this,
                             )}
@@ -880,6 +890,8 @@ InjectDefinition.propTypes = {
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
   fetchDocuments: PropTypes.func,
+  exercisesMap: PropTypes.object,
+  tagsMap: PropTypes.object,
 };
 
 const select = (state, ownProps) => {

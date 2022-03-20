@@ -24,6 +24,8 @@ import CreateDocument from '../../documents/CreateDocument';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
+import TagsFilter from '../../../../components/TagsFilter';
+import ItemTags from '../../../../components/ItemTags';
 
 const styles = (theme) => ({
   createButton: {
@@ -58,6 +60,7 @@ class InjectAddDocuments extends Component {
       open: false,
       keyword: '',
       documentsIds: [],
+      tags: [],
     };
   }
 
@@ -75,6 +78,16 @@ class InjectAddDocuments extends Component {
 
   handleSearchDocuments(value) {
     this.setState({ keyword: value });
+  }
+
+  handleAddTag(value) {
+    if (value) {
+      this.setState({ tags: [value] });
+    }
+  }
+
+  handleClearTag() {
+    this.setState({ tags: [] });
   }
 
   addDocument(documentId) {
@@ -104,10 +117,8 @@ class InjectAddDocuments extends Component {
   }
 
   render() {
-    const {
-      classes, t, documents, injectDocumentsIds, exerciseId, exercise,
-    } = this.props;
-    const { keyword, documentsIds } = this.state;
+    const { classes, t, documents, injectDocumentsIds, exerciseId, exercise } = this.props;
+    const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
@@ -117,8 +128,15 @@ class InjectAddDocuments extends Component {
       || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1;
     const filteredDocuments = R.pipe(
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.document_tags),
+            R.pluck('id', tags),
+          ),
+      ),
       R.filter(filterByKeyword),
-      R.take(5),
+      R.take(10),
     )(Object.values(documents));
     return (
       <div>
@@ -143,12 +161,12 @@ class InjectAddDocuments extends Component {
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
-          maxWidth="md"
+          maxWidth="lg"
           PaperProps={{
             elevation: 1,
             sx: {
-              minHeight: 540,
-              maxHeight: 540,
+              minHeight: 580,
+              maxHeight: 580,
             },
           }}
         >
@@ -156,10 +174,22 @@ class InjectAddDocuments extends Component {
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
-                <SearchFilter
-                  onChange={this.handleSearchDocuments.bind(this)}
-                  fullWidth={true}
-                />
+                <Grid container={true} spacing={3}>
+                  <Grid item={true} xs={6}>
+                    <SearchFilter
+                      onChange={this.handleSearchDocuments.bind(this)}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                  <Grid item={true} xs={6}>
+                    <TagsFilter
+                      onAddTag={this.handleAddTag.bind(this)}
+                      onClearTag={this.handleClearTag.bind(this)}
+                      currentTags={tags}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                </Grid>
                 <List>
                   {filteredDocuments.map((document) => {
                     const disabled = documentsIds.includes(document.document_id)
@@ -182,6 +212,10 @@ class InjectAddDocuments extends Component {
                         <ListItemText
                           primary={document.document_name}
                           secondary={document.document_description}
+                        />
+                        <ItemTags
+                          variant="list"
+                          tags={document.document_tags}
                         />
                       </ListItem>
                     );

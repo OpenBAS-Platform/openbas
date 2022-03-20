@@ -14,6 +14,8 @@ import {
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { interval } from 'rxjs';
+import Chip from '@mui/material/Chip';
+import { Link } from 'react-router-dom';
 import inject18n from '../../../components/i18n';
 import { fetchDocuments } from '../../../actions/Document';
 import { fetchTags } from '../../../actions/Tag';
@@ -66,6 +68,13 @@ const styles = (theme) => ({
   },
   icon: {
     color: theme.palette.primary.main,
+  },
+  exercise: {
+    fontSize: 12,
+    height: 20,
+    float: 'left',
+    marginRight: 7,
+    width: 100,
   },
 });
 
@@ -300,7 +309,7 @@ class Documents extends Component {
               href={`/api/documents/${document.document_id}/file`}
             >
               <ListItemIcon>
-                <DescriptionOutlined />
+                <DescriptionOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={
@@ -321,7 +330,20 @@ class Documents extends Component {
                       className={classes.bodyItem}
                       style={inlineStyles.document_exercises}
                     >
-                      {document.document_exercises.length}
+                      {R.take(3, document.document_exercises).map((e) => {
+                        const exercise = exercisesMap[e] || {};
+                        return (
+                          <Chip
+                            key={exercise.exercise_id}
+                            classes={{ root: classes.exercise }}
+                            variant="outlined"
+                            label={exercise.exercise_name}
+                            component={Link}
+                            clickable={true}
+                            to={`/exercises/${exercise.exercise_id}`}
+                          />
+                        );
+                      })}
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -342,7 +364,11 @@ class Documents extends Component {
                 }
               />
               <ListItemSecondaryAction>
-                <DocumentPopover document={document} tagsMap={tagsMap} exercisesMap={exercisesMap} />
+                <DocumentPopover
+                  document={document}
+                  tagsMap={tagsMap}
+                  exercisesMap={exercisesMap}
+                />
               </ListItemSecondaryAction>
             </ListItem>
           ))}

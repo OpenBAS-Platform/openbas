@@ -155,7 +155,7 @@ const Exercises = () => {
     dispatch(fetchExercises());
   });
   return (
-    <div className={classes.container}>
+    <div>
       <div className={classes.parameters} >
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
@@ -187,7 +187,7 @@ const Exercises = () => {
                 fontSize: 12,
               }}
             >
-              #
+              &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
@@ -238,7 +238,7 @@ const Exercises = () => {
             to={`/exercises/${exercise.exercise_id}`}
           >
             <ListItemIcon>
-              <Kayaking />
+              <Kayaking color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={

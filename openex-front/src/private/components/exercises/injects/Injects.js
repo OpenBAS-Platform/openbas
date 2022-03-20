@@ -13,7 +13,10 @@ import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
-import { fetchExerciseInjects, fetchInjectTypes } from '../../../../actions/Inject';
+import {
+  fetchExerciseInjects,
+  fetchInjectTypes,
+} from '../../../../actions/Inject';
 import InjectIcon from './InjectIcon';
 import CreateInject from './CreateInject';
 import InjectPopover from './InjectPopover';
@@ -182,17 +185,24 @@ const Injects = () => {
   const [selectedInject, setSelectedInject] = useState(null);
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
-  const filtering = useSearchAnFilter('inject', 'depends_duration', searchColumns);
+  const filtering = useSearchAnFilter(
+    'inject',
+    'depends_duration',
+    searchColumns,
+  );
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, injects, injectTypes, tagsMap } = useHelper((helper) => {
-    return {
-      exercise: helper.getExercise(exerciseId),
-      injects: helper.getExerciseInjects(exerciseId),
-      injectTypes: helper.getInjectTypes(),
-      tagsMap: helper.getTagsMap(),
-    };
-  });
+  const { exercise, injects, injectTypes, tagsMap, exercisesMap } = useHelper(
+    (helper) => {
+      return {
+        exercise: helper.getExercise(exerciseId),
+        injects: helper.getExerciseInjects(exerciseId),
+        injectTypes: helper.getInjectTypes(),
+        tagsMap: helper.getTagsMap(),
+        exercisesMap: helper.getExercisesMap(),
+      };
+    },
+  );
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjects(exerciseId));
@@ -221,14 +231,16 @@ const Injects = () => {
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
-          style={{ paddingTop: 0 }}>
+          style={{ paddingTop: 0 }}
+        >
           <ListItemIcon>
             <span
               style={{
                 padding: '0 8px 0 10px',
                 fontWeight: 700,
                 fontSize: 12,
-              }}>
+              }}
+            >
               #
             </span>
           </ListItemIcon>
@@ -364,13 +376,16 @@ const Injects = () => {
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
         onClose={() => setSelectedInject(null)}
-        elevation={1}>
+        elevation={1}
+      >
         <InjectDefinition
           injectId={selectedInject}
           exerciseId={exercise.exercise_id}
           exercise={exercise}
           injectTypes={injectTypes}
           handleClose={() => setSelectedInject(null)}
+          exercisesMap={exercisesMap}
+          tagsMap={tagsMap}
         />
       </Drawer>
       {isExerciseUpdatable(exercise) && (

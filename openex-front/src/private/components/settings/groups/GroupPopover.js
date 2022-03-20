@@ -312,8 +312,8 @@ class GroupPopover extends Component {
           }}
         >
           <DialogTitle>{t('Manage the users of this group')}</DialogTitle>
-          <DialogContent style={{ paddingTop: 10 }}>
-            <Grid container={true} spacing={3}>
+          <DialogContent>
+            <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>

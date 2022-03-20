@@ -91,7 +91,6 @@ const ExerciseHeader = () => {
     );
   };
   const { exercise_tags: tags } = exercise;
-  console.log(tags);
   return (
     <div className={classes.container} ref={containerRef}>
       <Typography
@@ -152,8 +151,6 @@ const ExerciseHeader = () => {
                   />
                   <div style={{ float: 'right', marginTop: 20 }}>
                     <Button
-                      variant="contained"
-                      color="secondary"
                       onClick={handleToggleAddTag}
                       disabled={submitting}
                       style={{ marginRight: 10 }}
@@ -161,8 +158,7 @@ const ExerciseHeader = () => {
                       {t('Cancel')}
                     </Button>
                     <Button
-                      variant="contained"
-                      color="primary"
+                      color="secondary"
                       type="submit"
                       disabled={pristine || submitting}
                     >

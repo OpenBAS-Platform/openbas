@@ -143,7 +143,7 @@ const Animation = () => {
   const { exerciseId } = useParams();
   const { t, fndt } = useFormatter();
   const {
-    exercise, audiences, injects, injectTypes, tagsMap, audiencesInjectsMap,
+    exercise, audiences, injects, injectTypes, exercisesMap, tagsMap, audiencesInjectsMap,
   } = useHelper((helper) => {
     const exerciseAudiences = helper.getExerciseAudiences(exerciseId);
     const injectsPerAudience = R.mergeAll(exerciseAudiences
@@ -152,6 +152,7 @@ const Animation = () => {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
       audiences: exerciseAudiences,
+      exercisesMap: helper.getExercisesMap(),
       tagsMap: helper.getTagsMap(),
       audiencesInjectsMap: injectsPerAudience,
       injectTypes: helper.getInjectTypes(),
@@ -512,6 +513,8 @@ const Animation = () => {
           exercise={exercise}
           injectTypes={injectTypes}
           handleClose={() => setSelectedInject(null)}
+          exercisesMap={exercisesMap}
+          tagsMap={tagsMap}
         />
       </Drawer>
     </div>

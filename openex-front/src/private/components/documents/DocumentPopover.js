@@ -165,18 +165,10 @@ class DocumentPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseDelete.bind(this)}
-            >
+            <Button onClick={this.handleCloseDelete.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitDelete.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitDelete.bind(this)}>
               {t('Delete')}
             </Button>
           </DialogActions>
@@ -212,18 +204,10 @@ class DocumentPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseRemove.bind(this)}
-            >
+            <Button onClick={this.handleCloseRemove.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitRemove.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitRemove.bind(this)}>
               {t('Remove')}
             </Button>
           </DialogActions>
