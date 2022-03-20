@@ -9,6 +9,10 @@ import Chip from '@mui/material/Chip';
 import { useDispatch } from 'react-redux';
 import Drawer from '@mui/material/Drawer';
 import { useParams } from 'react-router-dom';
+import { CSVLink } from 'react-csv';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import { FileDownloadOutlined } from '@mui/icons-material';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -32,9 +36,6 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: '10px 0 50px 0',
-  },
-  parameters: {
-    float: 'left',
   },
   itemHead: {
     paddingLeft: 10,
@@ -209,10 +210,11 @@ const Injects = () => {
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjects(exerciseId));
   });
+  const sortedInjects = filtering.filterAndSort(injects);
   // Rendering
   return (
     <div className={classes.container}>
-      <div className={classes.parameters}>
+      <div>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
             small={true}
@@ -226,6 +228,21 @@ const Injects = () => {
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
+        </div>
+        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+          {sortedInjects.length > 0 ? (
+            <CSVLink data={sortedInjects} filename={`${t('Injects')}.csv`}>
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -290,7 +307,7 @@ const Injects = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(injects).map((inject) => {
+        {sortedInjects.map((inject) => {
           const duration = splitDuration(inject.inject_depends_duration || 0);
           return (
             <ListItem

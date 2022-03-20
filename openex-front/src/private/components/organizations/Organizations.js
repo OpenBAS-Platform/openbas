@@ -6,14 +6,18 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import Tooltip from '@mui/material/Tooltip';
+import { CSVLink } from 'react-csv';
 import { connect } from 'react-redux';
 import { interval } from 'rxjs';
 import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   DomainOutlined,
+  FileDownloadOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import IconButton from '@mui/material/IconButton';
 import inject18n from '../../../components/i18n';
 import { fetchOrganizations } from '../../../actions/Organization';
 import { FIVE_SECONDS } from '../../../utils/Time';
@@ -30,7 +34,6 @@ const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   parameters: {
-    float: 'left',
     marginTop: -10,
   },
   container: {
@@ -190,7 +193,7 @@ class Organizations extends Component {
   }
 
   render() {
-    const { classes, organizations, tagsMap } = this.props;
+    const { classes, organizations, tagsMap, t } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.organization_name || '')
@@ -229,6 +232,24 @@ class Organizations extends Component {
               onRemoveTag={this.handleRemoveTag.bind(this)}
               currentTags={tags}
             />
+          </div>
+          <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+            {sortedOrganizations.length > 0 ? (
+              <CSVLink
+                data={sortedOrganizations}
+                filename={`${t('Organizations')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
           </div>
         </div>
         <div className="clearfix" />

@@ -6,8 +6,15 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
-import { ChevronRightOutlined, Kayaking } from '@mui/icons-material';
+import {
+  ChevronRightOutlined,
+  FileDownloadOutlined,
+  Kayaking,
+} from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { CSVLink } from 'react-csv';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
 import { useFormatter } from '../../../components/i18n';
 import { fetchExercises } from '../../../actions/Exercise';
 import ItemTags from '../../../components/ItemTags';
@@ -21,7 +28,6 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
-    float: 'left',
     marginTop: -10,
   },
   container: {
@@ -154,6 +160,7 @@ const Exercises = () => {
   useDataLoader(() => {
     dispatch(fetchExercises());
   });
+  const sortedExercises = filtering.filterAndSort(exercises);
   return (
     <div>
       <div className={classes.parameters}>
@@ -170,6 +177,24 @@ const Exercises = () => {
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
+        </div>
+        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+          {sortedExercises.length > 0 ? (
+            <CSVLink
+              data={sortedExercises}
+              filename={`${t('Exercises')}.csv`}
+            >
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -228,7 +253,7 @@ const Exercises = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(exercises).map((exercise) => (
+        {sortedExercises.map((exercise) => (
           <ListItem
             key={exercise.exercise_id}
             classes={{ root: classes.item }}

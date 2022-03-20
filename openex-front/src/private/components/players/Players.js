@@ -6,7 +6,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { PersonOutlined } from '@mui/icons-material';
+import { FileDownloadOutlined, PersonOutlined } from '@mui/icons-material';
+import { CSVLink } from 'react-csv';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
 import { fetchPlayers } from '../../../actions/User';
 import { fetchOrganizations } from '../../../actions/Organization';
 import ItemTags from '../../../components/ItemTags';
@@ -18,10 +21,10 @@ import { fetchTags } from '../../../actions/Tag';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
+import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
-    float: 'left',
     marginTop: -10,
   },
   container: {
@@ -145,6 +148,7 @@ const Players = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { t } = useFormatter();
   // Filter and sort hook
   const searchColumns = [
     'email',
@@ -165,7 +169,7 @@ const Players = () => {
     dispatch(fetchOrganizations());
     dispatch(fetchPlayers());
   });
-
+  const sortedUsers = filtering.filterAndSort(users);
   return (
     <div>
       <div className={classes.parameters}>
@@ -182,6 +186,21 @@ const Players = () => {
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
+        </div>
+        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+          {sortedUsers.length > 0 ? (
+            <CSVLink data={sortedUsers} filename={`${t('Players')}.csv`}>
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -235,7 +254,7 @@ const Players = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(users).map((user) => (
+        {sortedUsers.map((user) => (
           <ListItem
             key={user.user_id}
             classes={{ root: classes.item }}

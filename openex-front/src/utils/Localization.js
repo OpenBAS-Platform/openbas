@@ -30,11 +30,13 @@ const i18n = {
       'Organizations distribution across exercises':
         'Distribution des organisations dans les exercices',
       'Players distribution': 'Distribution des joueurs',
+      'added an entry on': 'a ajouté une entrée le',
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Start date': 'Date de début',
       'End date': 'Date de fin',
       Tags: 'Tags',
+      'Export this list': 'Exporter cette liste',
       'Create a new exercise': 'Créer un nouvel exercice',
       'Do you want to delete this audience?':
         'Souhaitez-vous supprimer cette audience ?',

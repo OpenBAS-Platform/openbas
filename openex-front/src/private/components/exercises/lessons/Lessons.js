@@ -51,7 +51,7 @@ import CreatePoll from './CreatePoll';
 import PollPopover from './PollPopover';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -62,7 +62,10 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
   },
   title: {
-    fontSize: 16,
+    textTransform: 'uppercase',
+    fontSize: 12,
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
   },
   number: {
     fontSize: 30,
@@ -333,7 +336,7 @@ const Lessons = () => {
                       float: 'left',
                       fontDecoration: 'none',
                       textTransform: 'none',
-                      paddingTop: 5,
+                      paddingTop: 7,
                       fontSize: 15,
                     }}
                   >
@@ -342,13 +345,13 @@ const Lessons = () => {
                     </strong>
                     &nbsp;
                     <span style={{ color: theme.palette.text.secondary }}>
-                      {t('added an entry')} on {nsdt(log.log_created_at)}
+                      {t('added an entry on')} {nsdt(log.log_created_at)}
                     </span>
                   </div>
                   <div
                     style={{
                       float: 'left',
-                      marginLeft: 20,
+                      margin: '4px 0 0 20px',
                       fontDecoration: 'none',
                       textTransform: 'none',
                     }}

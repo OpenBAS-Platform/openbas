@@ -102,15 +102,14 @@ const styles = (theme) => ({
     fontSize: 15,
   },
   item: {
+    paddingLeft: 20,
     height: 50,
-    minHeight: 50,
-    maxHeight: 50,
-    paddingRight: 0,
   },
   bodyItem: {
-    height: '100%',
-    fontSize: 14,
+    fontSize: 13,
     float: 'left',
+    width: '20%',
+    height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -248,7 +247,6 @@ const Dashboard = (props) => {
                 {R.take(6, exercises).map((exercise) => (
                   <ListItem
                     key={exercise.exercise_id}
-                    dense={true}
                     button={true}
                     classes={{ root: classes.item }}
                     divider={true}

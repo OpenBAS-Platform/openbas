@@ -9765,6 +9765,7 @@ __metadata:
     react: 17.0.2
     react-apexcharts: 1.4.0
     react-color: 2.19.3
+    react-csv: 2.2.2
     react-dom: 17.0.2
     react-dropzone: 12.0.4
     react-final-form: 6.5.8
@@ -10795,6 +10796,13 @@ __metadata:
   peerDependencies:
     react: "*"
   checksum: 40b49e1aa2ab27a099cc37a3fa2d5bb906b8def4dbe2d922c0e42365e386d82b03f9b06a2b29a44a51f1e114cef72e61c0ba0740581a128d951936ea4617429b
+  languageName: node
+  linkType: hard
+
+"react-csv@npm:2.2.2":
+  version: 2.2.2
+  resolution: "react-csv@npm:2.2.2"
+  checksum: a6ffabd67fc9ba1478b003977923cfa3ccdd9553ac5edcc3824b4a5ea849b87cb2acfcc0781b0cd0a259bf56e6a7dfd35cfc307576aa51819fc5a32b03118fab
   languageName: node
   linkType: hard
 

@@ -11,11 +11,15 @@ import {
   ArrowDropDownOutlined,
   ArrowDropUpOutlined,
   DescriptionOutlined,
+  FileDownloadOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { interval } from 'rxjs';
 import Chip from '@mui/material/Chip';
 import { Link } from 'react-router-dom';
+import { CSVLink } from 'react-csv';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
 import inject18n from '../../../components/i18n';
 import { fetchDocuments } from '../../../actions/Document';
 import { fetchTags } from '../../../actions/Tag';
@@ -33,7 +37,6 @@ const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   parameters: {
-    float: 'left',
     marginTop: -10,
   },
   container: {
@@ -225,7 +228,7 @@ class Documents extends Component {
   }
 
   render() {
-    const { classes, documents, userAdmin, tagsMap, exercisesMap } = this.props;
+    const { classes, documents, userAdmin, tagsMap, exercisesMap, t } = this.props;
     const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -265,6 +268,24 @@ class Documents extends Component {
               onRemoveTag={this.handleRemoveTag.bind(this)}
               currentTags={tags}
             />
+          </div>
+          <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+            {sortedDocuments.length > 0 ? (
+              <CSVLink
+                data={sortedDocuments}
+                filename={`${t('Documents')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
           </div>
         </div>
         <div className="clearfix" />

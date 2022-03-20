@@ -6,9 +6,15 @@ import Drawer from '@mui/material/Drawer';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { useDispatch } from 'react-redux';
-import { CastForEducationOutlined } from '@mui/icons-material';
+import {
+  CastForEducationOutlined,
+  FileDownloadOutlined,
+} from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useParams } from 'react-router-dom';
+import { CSVLink } from 'react-csv';
+import Tooltip from '@mui/material/Tooltip';
+import IconButton from '@mui/material/IconButton';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import ItemTags from '../../../../components/ItemTags';
@@ -24,9 +30,6 @@ import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 
 const useStyles = makeStyles((theme) => ({
-  parameters: {
-    float: 'left',
-  },
   container: {
     margin: '10px 0 50px 0',
   },
@@ -168,9 +171,10 @@ const Audiences = () => {
   useDataLoader(() => {
     dispatch(fetchAudiences(exerciseId));
   });
+  const sortedAudiences = filtering.filterAndSort(audiences);
   return (
     <div className={classes.container}>
-      <div className={classes.parameters}>
+      <div>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
             small={true}
@@ -184,6 +188,21 @@ const Audiences = () => {
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
+        </div>
+        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+          {sortedAudiences.length > 0 ? (
+            <CSVLink data={sortedAudiences} filename={`${t('Audiences')}.csv`}>
+              <Tooltip title={t('Export this list')}>
+                <IconButton size="large">
+                  <FileDownloadOutlined color="primary" />
+                </IconButton>
+              </Tooltip>
+            </CSVLink>
+          ) : (
+            <IconButton size="large" disabled={true}>
+              <FileDownloadOutlined />
+            </IconButton>
+          )}
         </div>
       </div>
       <div className="clearfix" />
@@ -242,7 +261,7 @@ const Audiences = () => {
           />
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
-        {filtering.filterAndSort(audiences).map((audience) => (
+        {sortedAudiences.map((audience) => (
           <ListItem
             key={audience.audience_id}
             classes={{ root: classes.item }}

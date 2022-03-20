@@ -297,7 +297,7 @@ class AudiencesPlayers extends Component {
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </span>
             </ListItemIcon>
             <ListItemText

@@ -1,6 +1,6 @@
 {
-  "short_name": "OpenCTI dashboard",
-  "name": "The OpenCTI web interface frontend.",
+  "short_name": "OpenEx dashboard",
+  "name": "The OpenEx web interface frontend.",
   "icons": [
     {
       "src": "favicon.png",

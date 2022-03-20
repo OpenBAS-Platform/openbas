@@ -46,7 +46,7 @@ import { Transition } from '../../../utils/Environment';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import CreateControl from './controls/CreateControl';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     marginTop: -20,
@@ -59,7 +59,10 @@ const useStyles = makeStyles(() => ({
     overflow: 'hidden',
   },
   title: {
-    fontSize: 16,
+    textTransform: 'uppercase',
+    fontSize: 12,
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
   },
   number: {
     fontSize: 30,
