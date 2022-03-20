@@ -42,10 +42,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -216,11 +218,15 @@ const Dryrun = () => {
         <Grid item={true} xs={6} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             <Grid container={true} spacing={3}>
-              <Grid item={true} xs={6}>
+              <Grid item={true} xs={4}>
+                <Typography variant="h3">{t('Name')}</Typography>
+                {dryrun?.dryrun_name}
+              </Grid>
+              <Grid item={true} xs={4}>
                 <Typography variant="h3">{t('Start date')}</Typography>
                 {fldt(dryrun?.dryrun_date)}
               </Grid>
-              <Grid item={true} xs={6}>
+              <Grid item={true} xs={4}>
                 <Typography variant="h3" style={{ marginBottom: 0 }}>
                   {t('Dryrun recipients')}
                 </Typography>
@@ -296,12 +302,12 @@ const Dryrun = () => {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 10px',
+                  padding: '0 8px 0 8px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </span>
             </ListItemIcon>
             <ListItemText

@@ -118,6 +118,12 @@ const Controls = () => {
                             className={classes.bodyItem}
                             style={{ width: '30%' }}
                           >
+                            {dryrun.dryrun_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={{ width: '15%' }}
+                          >
                             {nsd(dryrun.dryrun_date)}
                           </div>
                           <div

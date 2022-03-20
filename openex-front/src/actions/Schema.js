@@ -176,7 +176,7 @@ export const storeHelper = (state) => ({
   // dryrun
   getDryrun: (id) => entity(id, 'dryruns', state),
   getDryrunInjects: (id) => entities('dryinjects', state).filter((i) => i.dryinject_dryrun === id),
-  getDryrunUsers: (id) => entities('users', state).filter((i) => entity(id, 'dryruns', state).dryrun_users.includes(i)),
+  getDryrunUsers: (id) => entities('users', state).filter((i) => (entity(id, 'dryruns', state) || {}).dryrun_users?.includes(i.user_id)),
   // comcheck
   getComcheck: (id) => entity(id, 'comchecks', state),
   getComcheckStatus: (id) => entity(id, 'comcheckstatuses', state),
@@ -211,8 +211,10 @@ export const storeHelper = (state) => ({
   getDocumentsMap: () => maps('documents', state),
   // audiences
   getAudience: (id) => entity(id, 'audiences', state),
-  getAudienceUsers: (id) => entities('users', state).filter((u) => entity(id, 'audiences', state).audience_users.includes(u.user_id)),
-  getAudienceInjects: (id) => entities('injects', state).filter((i) => entity(id, 'audiences', state).audience_injects.includes(i.inject_id)),
+  getAudienceUsers: (id) => entities('users', state).filter((u) => (entity(id, 'audiences', state) || {}).audience_users?.includes(u.user_id)),
+  getAudienceInjects: (id) => entities('injects', state).filter((i) => (entity(id, 'audiences', state) || {}).audience_injects?.includes(
+    i.inject_id,
+  )),
   getAudiences: () => entities('audiences', state),
   getAudiencesMap: () => maps('audiences', state),
   getSettings: () => {

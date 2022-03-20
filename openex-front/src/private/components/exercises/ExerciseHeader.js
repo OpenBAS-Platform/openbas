@@ -29,6 +29,7 @@ const useStyles = makeStyles(() => ({
     textTransform: 'uppercase',
   },
   tags: {
+    marginTop: -4,
     float: 'right',
   },
   tag: {
