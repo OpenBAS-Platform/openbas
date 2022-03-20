@@ -33,10 +33,12 @@ const styles = (theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -175,7 +177,7 @@ class Tags extends Component {
     );
     const sortedTags = R.pipe(R.filter(filterByKeyword), sort)(tags);
     return (
-      <div className={classes.container}>
+      <div>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
@@ -195,12 +197,12 @@ class Tags extends Component {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 10px',
+                  padding: '0 8px 0 8px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </span>
             </ListItemIcon>
             <ListItemText

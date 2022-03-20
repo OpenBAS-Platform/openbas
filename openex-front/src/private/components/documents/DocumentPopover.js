@@ -15,7 +15,11 @@ import MenuItem from '@mui/material/MenuItem';
 import { updateDocument, deleteDocument } from '../../../actions/Document';
 import DocumentForm from './DocumentForm';
 import inject18n from '../../../components/i18n';
-import { storeHelper, tagsConverter } from '../../../actions/Schema';
+import {
+  exercisesConverter,
+  storeHelper,
+  tagsConverter,
+} from '../../../actions/Schema';
 import { Transition } from '../../../utils/Environment';
 
 class DocumentPopover extends Component {
@@ -92,16 +96,19 @@ class DocumentPopover extends Component {
 
   render() {
     const {
-      t, document, onRemoveDocument, onToggleAttach, attached, tagsMap, exercisesMap,
+      t,
+      document,
+      onRemoveDocument,
+      onToggleAttach,
+      attached,
+      tagsMap,
+      exercisesMap,
     } = this.props;
     const documentTags = tagsConverter(document.document_tags, tagsMap);
-    const documentExercises = document.document_exercises.map((exId) => {
-      const ex = exercisesMap[exId];
-      return {
-        id: ex.exercise_id,
-        label: ex.exercise_name,
-      };
-    });
+    const documentExercises = exercisesConverter(
+      document.document_exercises,
+      exercisesMap,
+    );
     const initialValues = R.pipe(
       R.assoc('document_tags', documentTags),
       R.assoc('document_exercises', documentExercises),
@@ -229,10 +236,9 @@ class DocumentPopover extends Component {
 const select = (state) => {
   const helper = storeHelper(state);
   const user = helper.getMe();
-  const tagsMap = helper.getTagsMap();
-  const exercisesMap = helper.getExercisesMap();
   return {
-    user, userAdmin: user?.user_admin, tagsMap, exercisesMap,
+    user,
+    userAdmin: user?.user_admin,
   };
 };
 
@@ -242,6 +248,8 @@ DocumentPopover.propTypes = {
   updateDocument: PropTypes.func,
   deleteDocument: PropTypes.func,
   userAdmin: PropTypes.bool,
+  tagsMap: PropTypes.object,
+  exercisesMap: PropTypes.object,
   onRemoveDocument: PropTypes.func,
   onToggleAttach: PropTypes.func,
   attached: PropTypes.bool,

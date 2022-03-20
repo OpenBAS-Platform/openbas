@@ -44,7 +44,7 @@ const TagsFilter = (props) => {
     dispatch(fetchTags());
   }, []);
   const tags = useHelper((helper) => helper.getTags());
-  const { onAddTag, onRemoveTag, currentTags } = props;
+  const { onAddTag, onClearTag, onRemoveTag, currentTags, fullWidth } = props;
   const tagTransform = (n) => ({
     id: n.tag_id,
     label: n.tag_name,
@@ -54,17 +54,19 @@ const TagsFilter = (props) => {
   return (
     <div>
       <Autocomplete
-        sx={{ width: 250, float: 'left' }}
+        sx={{ width: fullWidth ? '100%' : 250, float: 'left' }}
         selectOnFocus={true}
         openOnFocus={true}
         autoSelect={false}
         autoHighlight={true}
+        hiddenLabel={true}
         size="small"
         options={tagsOptions}
-        onChange={(event, value) => {
+        onChange={(event, value, reason) => {
           // When removing, a null change is fired
           // We handle directly the remove through the chip deletion.
           if (value !== null) onAddTag(value);
+          if (reason === 'clear' && fullWidth) onClearTag();
         }}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         renderOption={(p, option) => (
@@ -84,19 +86,21 @@ const TagsFilter = (props) => {
           />
         )}
       />
-      <div className={classes.filters}>
-        {R.map(
-          (currentTag) => (
-            <Chip
-              key={currentTag.id}
-              classes={{ root: classes.filter }}
-              label={currentTag.label}
-              onDelete={() => onRemoveTag(currentTag.id)}
-            />
-          ),
-          currentTags,
-        )}
-      </div>
+      {!fullWidth && (
+        <div className={classes.filters}>
+          {R.map(
+            (currentTag) => (
+              <Chip
+                key={currentTag.id}
+                classes={{ root: classes.filter }}
+                label={currentTag.label}
+                onDelete={() => onRemoveTag(currentTag.id)}
+              />
+            ),
+            currentTags,
+          )}
+        </div>
+      )}
     </div>
   );
 };

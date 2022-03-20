@@ -24,6 +24,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import CreateGroup from './CreateGroup';
 import { fetchGroups } from '../../../../actions/Group';
 import { fetchExercises } from '../../../../actions/Exercise';
+import { fetchTags } from '../../../../actions/Tag';
 import GroupPopover from './GroupPopover';
 import { storeHelper } from '../../../../actions/Schema';
 
@@ -38,10 +39,12 @@ const styles = (theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -177,6 +180,7 @@ class Groups extends Component {
     this.props.fetchUsers();
     this.props.fetchGroups();
     this.props.fetchExercises();
+    this.props.fetchTags();
     this.subscription = interval$.subscribe(() => {
       this.props.fetchOrganizations();
       this.props.fetchUsers();
@@ -249,7 +253,7 @@ class Groups extends Component {
       sort,
     )(groups);
     return (
-      <div className={classes.container}>
+      <div>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
@@ -269,12 +273,12 @@ class Groups extends Component {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 10px',
+                  padding: '0 8px 0 8px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </span>
             </ListItemIcon>
             <ListItemText
@@ -310,7 +314,7 @@ class Groups extends Component {
               divider={true}
             >
               <ListItemIcon>
-                <GroupOutlined />
+                <GroupOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={
@@ -385,10 +389,7 @@ class Groups extends Component {
                 }
               />
               <ListItemSecondaryAction>
-                <GroupPopover
-                  group={group}
-                  groupUsersIds={group.group_users}
-                />
+                <GroupPopover group={group} groupUsersIds={group.group_users} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
@@ -410,6 +411,7 @@ Groups.propTypes = {
   fetchOrganizations: PropTypes.func,
   fetchExercises: PropTypes.func,
   fetchGroups: PropTypes.func,
+  fetchTags: PropTypes.func,
 };
 
 const select = (state) => {
@@ -423,6 +425,7 @@ export default R.compose(
     fetchExercises,
     fetchUsers,
     fetchOrganizations,
+    fetchTags,
   }),
   inject18n,
   withStyles(styles),

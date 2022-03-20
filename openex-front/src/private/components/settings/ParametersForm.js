@@ -29,7 +29,6 @@ const ParametersForm = (props) => {
             name="platform_theme"
             fullWidth={true}
             style={{ marginTop: 20 }}
-            disabled={true}
           >
             <MenuItem key="dark" value="dark">
               {t('Dark')}

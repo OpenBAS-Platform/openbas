@@ -108,7 +108,13 @@ class PlayerPopover extends Component {
 
   render() {
     const {
-      t, userAdmin, user, organizationsMap, audienceId, exercise, tagsMap,
+      t,
+      userAdmin,
+      user,
+      organizationsMap,
+      audienceId,
+      exercise,
+      tagsMap,
     } = this.props;
     const userOrganizationValue = organizationsMap[user.user_organization];
     const userOrganization = userOrganizationValue
@@ -257,6 +263,8 @@ PlayerPopover.propTypes = {
   exercise: PropTypes.object,
   audienceId: PropTypes.string,
   audienceUsersIds: PropTypes.array,
+  tagsMap: PropTypes.object,
+  organizationsMap: PropTypes.object,
 };
 
 const select = (state, ownProps) => {
@@ -265,8 +273,6 @@ const select = (state, ownProps) => {
   return {
     userAdmin: helper.getMe()?.user_admin,
     exercise: helper.getExercise(exerciseId),
-    tagsMap: helper.getTagsMap(),
-    organizationsMap: helper.getOrganizationsMap(),
   };
 };
 

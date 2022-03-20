@@ -21,8 +21,11 @@ public class OpenExConfig {
     @JsonProperty("application_version")
     private String version;
 
-    @JsonProperty("map_tile_server")
-    private String mapTileServer;
+    @JsonProperty("map_tile_server_light")
+    private String mapTileServerLight;
+
+    @JsonProperty("map_tile_server_dark")
+    private String mapTileServerDark;
 
     @JsonProperty("auth_local_enable")
     private boolean authLocalEnable;
@@ -98,12 +101,20 @@ public class OpenExConfig {
         this.cookieDuration = cookieDuration;
     }
 
-    public String getMapTileServer() {
-        return mapTileServer;
+    public String getMapTileServerLight() {
+        return mapTileServerLight;
     }
 
-    public void setMapTileServer(String mapTileServer) {
-        this.mapTileServer = mapTileServer;
+    public void setMapTileServerLight(String mapTileServerLight) {
+        this.mapTileServerLight = mapTileServerLight;
+    }
+
+    public String getMapTileServerDark() {
+        return mapTileServerDark;
+    }
+
+    public void setMapTileServerDark(String mapTileServerDark) {
+        this.mapTileServerDark = mapTileServerDark;
     }
 
     public boolean isAuthLocalEnable() {

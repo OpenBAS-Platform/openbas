@@ -28,10 +28,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -167,10 +169,11 @@ const Users = () => {
     dispatch(fetchUsers());
   });
   return (
-    <div className={classes.container}>
+    <div>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <SearchFilter small={true}
+          <SearchFilter
+            small={true}
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
           />
@@ -188,24 +191,52 @@ const Users = () => {
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
-          style={{ paddingTop: 0 }}>
+          style={{ paddingTop: 0 }}
+        >
           <ListItemIcon>
-            <span style={{
-              padding: '0 8px 0 10px',
-              fontWeight: 700,
-              fontSize: 12,
-            }}>
-              #
+            <span
+              style={{
+                padding: '0 8px 0 8px',
+                fontWeight: 700,
+                fontSize: 12,
+              }}
+            >
+              &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
             primary={
               <div>
-                {filtering.buildHeader('user_email', 'Email address', true, headerStyles)}
-                {filtering.buildHeader('user_firstname', 'Firstname', true, headerStyles)}
-                {filtering.buildHeader('user_lastname', 'Lastname', true, headerStyles)}
-                {filtering.buildHeader('user_organization', 'Organization', true, headerStyles)}
-                {filtering.buildHeader('user_admin', 'Administrator', true, headerStyles)}
+                {filtering.buildHeader(
+                  'user_email',
+                  'Email address',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_firstname',
+                  'Firstname',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_lastname',
+                  'Lastname',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_organization',
+                  'Organization',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'user_admin',
+                  'Administrator',
+                  true,
+                  headerStyles,
+                )}
                 {filtering.buildHeader('user_tags', 'Tags', true, headerStyles)}
               </div>
             }
@@ -213,11 +244,13 @@ const Users = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {filtering.filterAndSort(users ?? []).map((user) => (
-          <ListItem key={user.user_id}
+          <ListItem
+            key={user.user_id}
             classes={{ root: classes.item }}
-            divider={true}>
+            divider={true}
+          >
             <ListItemIcon>
-              <PersonOutlined />
+              <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -244,7 +277,10 @@ const Users = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_organization}
                   >
-                    {organizationsMap[user.user_organization]?.organization_name}
+                    {
+                      organizationsMap[user.user_organization]
+                        ?.organization_name
+                    }
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -256,14 +292,21 @@ const Users = () => {
                       '-'
                     )}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.user_tags}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.user_tags}
+                  >
                     <ItemTags variant="list" tags={user.user_tags} />
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <UserPopover user={user} tagsMap={tagsMap} organizationsMap={organizationsMap} />
+              <UserPopover
+                user={user}
+                tagsMap={tagsMap}
+                organizationsMap={organizationsMap}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

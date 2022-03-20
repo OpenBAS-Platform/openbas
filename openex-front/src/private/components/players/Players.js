@@ -28,10 +28,12 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -153,9 +155,10 @@ const Players = () => {
   ];
   const filtering = useSearchAnFilter('user', 'email', searchColumns);
   // Fetching data
-  const { users, organizationsMap } = useHelper((helper) => ({
+  const { users, organizationsMap, tagsMap } = useHelper((helper) => ({
     users: helper.getUsers(),
     organizationsMap: helper.getOrganizationsMap(),
+    tagsMap: helper.getTagsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchTags());
@@ -164,7 +167,7 @@ const Players = () => {
   });
 
   return (
-    <div className={classes.container}>
+    <div>
       <div className={classes.parameters}>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
@@ -191,12 +194,12 @@ const Players = () => {
           <ListItemIcon>
             <span
               style={{
-                padding: '0 8px 0 10px',
+                padding: '0 8px 0 8px',
                 fontWeight: 700,
                 fontSize: 12,
               }}
             >
-              #
+              &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
@@ -239,7 +242,7 @@ const Players = () => {
             divider={true}
           >
             <ListItemIcon>
-              <PersonOutlined />
+              <PersonOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
@@ -266,7 +269,8 @@ const Players = () => {
                     className={classes.bodyItem}
                     style={inlineStyles.user_organization}
                   >
-                    {organizationsMap[user.user_organization]?.organization_name || '-'}
+                    {organizationsMap[user.user_organization]
+                      ?.organization_name || '-'}
                   </div>
                   <div
                     className={classes.bodyItem}
@@ -278,7 +282,11 @@ const Players = () => {
               }
             />
             <ListItemSecondaryAction>
-              <PlayerPopover user={user} />
+              <PlayerPopover
+                user={user}
+                tagsMap={tagsMap}
+                organizationsMap={organizationsMap}
+              />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

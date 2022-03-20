@@ -70,7 +70,6 @@ class UserForm extends Component {
               name="user_theme"
               fullWidth={true}
               style={{ marginTop: 20 }}
-              disabled={true}
             >
               <MenuItem key="default" value="default">
                 {t('Default')}

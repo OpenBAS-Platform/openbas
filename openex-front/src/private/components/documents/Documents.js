@@ -13,8 +13,11 @@ import {
   DescriptionOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import { interval } from 'rxjs';
 import inject18n from '../../../components/i18n';
 import { fetchDocuments } from '../../../actions/Document';
+import { fetchTags } from '../../../actions/Tag';
+import { fetchExercises } from '../../../actions/Exercise';
 import ItemTags from '../../../components/ItemTags';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
@@ -22,6 +25,9 @@ import { storeHelper } from '../../../actions/Schema';
 import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
+import { FIVE_SECONDS } from '../../../utils/Time';
+
+const interval$ = interval(FIVE_SECONDS);
 
 const styles = (theme) => ({
   parameters: {
@@ -32,10 +38,12 @@ const styles = (theme) => ({
     marginTop: 10,
   },
   itemHead: {
+    paddingLeft: 10,
     textTransform: 'uppercase',
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -76,25 +84,25 @@ const inlineStylesHeaders = {
   },
   document_description: {
     float: 'left',
-    width: '20%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
   document_exercises: {
     float: 'left',
-    width: '10%',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
   document_type: {
     float: 'left',
-    width: '15%',
+    width: '12%',
     fontSize: 12,
     fontWeight: '700',
   },
   document_tags: {
     float: 'left',
-    width: '30%',
+    width: '20%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -111,7 +119,7 @@ const inlineStyles = {
   },
   document_description: {
     float: 'left',
-    width: '20%',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -119,7 +127,7 @@ const inlineStyles = {
   },
   document_exercises: {
     float: 'left',
-    width: '10%',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -127,7 +135,7 @@ const inlineStyles = {
   },
   document_type: {
     float: 'left',
-    width: '15%',
+    width: '12%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -135,7 +143,7 @@ const inlineStyles = {
   },
   document_tags: {
     float: 'left',
-    width: '30%',
+    width: '20%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -156,6 +164,11 @@ class Documents extends Component {
 
   componentDidMount() {
     this.props.fetchDocuments();
+    this.props.fetchTags();
+    this.props.fetchExercises();
+    this.subscription = interval$.subscribe(() => {
+      this.props.fetchDocuments();
+    });
   }
 
   handleSearch(value) {
@@ -203,10 +216,8 @@ class Documents extends Component {
   }
 
   render() {
-    const { classes, documents, userAdmin } = this.props;
-    const {
-      keyword, sortBy, orderAsc, tags,
-    } = this.state;
+    const { classes, documents, userAdmin, tagsMap, exercisesMap } = this.props;
+    const { keyword, sortBy, orderAsc, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
@@ -230,7 +241,7 @@ class Documents extends Component {
       sort,
     )(documents);
     return (
-      <div className={classes.container}>
+      <div>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
@@ -258,12 +269,12 @@ class Documents extends Component {
             <ListItemIcon>
               <span
                 style={{
-                  padding: '0 8px 0 10px',
+                  padding: '0 8px 0 8px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </span>
             </ListItemIcon>
             <ListItemText
@@ -271,7 +282,7 @@ class Documents extends Component {
                 <div>
                   {this.sortHeader('document_name', 'Name', true)}
                   {this.sortHeader('document_description', 'Description', true)}
-                  {this.sortHeader('document_exercises', '# Exercises', true)}
+                  {this.sortHeader('document_exercises', 'Exercises', true)}
                   {this.sortHeader('document_type', 'Type', true)}
                   {this.sortHeader('document_tags', 'Tags', true)}
                 </div>
@@ -331,7 +342,7 @@ class Documents extends Component {
                 }
               />
               <ListItemSecondaryAction>
-                <DocumentPopover document={document} />
+                <DocumentPopover document={document} tagsMap={tagsMap} exercisesMap={exercisesMap} />
               </ListItemSecondaryAction>
             </ListItem>
           ))}
@@ -347,6 +358,8 @@ Documents.propTypes = {
   nsdt: PropTypes.func,
   documents: PropTypes.array,
   fetchDocuments: PropTypes.func,
+  fetchTags: PropTypes.func,
+  fetchExercises: PropTypes.func,
   userAdmin: PropTypes.bool,
 };
 
@@ -354,12 +367,14 @@ const select = (state) => {
   const helper = storeHelper(state);
   return {
     documents: helper.getDocuments(),
+    tagsMap: helper.getTagsMap(),
+    exercisesMap: helper.getExercisesMap(),
     userAdmin: helper.getMe()?.user_admin,
   };
 };
 
 export default R.compose(
-  connect(select, { fetchDocuments }),
+  connect(select, { fetchDocuments, fetchTags, fetchExercises }),
   inject18n,
   withStyles(styles),
 )(Documents);

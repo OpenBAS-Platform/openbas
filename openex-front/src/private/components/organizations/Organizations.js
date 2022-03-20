@@ -42,6 +42,7 @@ const styles = (theme) => ({
     cursor: 'pointer',
   },
   item: {
+    paddingLeft: 10,
     height: 50,
   },
   bodyItem: {
@@ -215,7 +216,7 @@ class Organizations extends Component {
       sort,
     )(organizations);
     return (
-      <div className={classes.container}>
+      <div>
         <div className={classes.parameters}>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
@@ -242,12 +243,12 @@ class Organizations extends Component {
             <ListItemIcon>
               <div
                 style={{
-                  padding: '0 8px 0 10px',
+                  padding: '0 8px 0 8px',
                   fontWeight: 700,
                   fontSize: 12,
                 }}
               >
-                #
+                &nbsp;
               </div>
             </ListItemIcon>
             <ListItemText
@@ -272,7 +273,7 @@ class Organizations extends Component {
               divider={true}
             >
               <ListItemIcon>
-                <DomainOutlined />
+                <DomainOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={

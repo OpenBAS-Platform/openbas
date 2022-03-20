@@ -1,6 +1,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
+import withTheme from '@mui/styles/withTheme';
 import withStyles from '@mui/styles/withStyles';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { connect } from 'react-redux';
@@ -18,7 +19,7 @@ const styles = () => ({
 });
 
 const MiniMap = (props) => {
-  const { parameters, center, zoom } = props;
+  const { parameters, center, zoom, theme } = props;
   if (R.isEmpty(parameters) || R.isNil(parameters)) {
     return <Loader variant="inElement" />;
   }
@@ -32,7 +33,13 @@ const MiniMap = (props) => {
         attributionControl={false}
         style={{ height: '100%' }}
       >
-        <TileLayer url={parameters.map_tile_server ?? ''} />
+        <TileLayer
+          url={
+            theme.palette.mode === 'light'
+              ? parameters.map_tile_server_light
+              : parameters.map_tile_server_dark
+          }
+        />
       </MapContainer>
     </div>
   );
@@ -51,4 +58,8 @@ const select = (state) => {
   return { parameters };
 };
 
-export default R.compose(connect(select, null), withStyles(styles))(MiniMap);
+export default R.compose(
+  connect(select, null),
+  withTheme,
+  withStyles(styles),
+)(MiniMap);

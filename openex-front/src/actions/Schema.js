@@ -158,7 +158,9 @@ const me = (state) => state.referential.entities.users[R.path(['logged', 'user']
 export const storeHelper = (state) => ({
   logged: () => state.app.logged,
   getMe: () => me(state),
-  getMeTokens: () => entities('tokens', state).filter((t) => t.token_user === me(state)?.user_id),
+  getMeTokens: () => entities('tokens', state).filter(
+    (t) => t.token_user === me(state)?.user_id,
+  ),
   getStatistics: () => state.referential.entities.statistics?.openex,
   // exercises
   getExercises: () => entities('exercises', state),
@@ -197,7 +199,9 @@ export const storeHelper = (state) => ({
   getInjectTypes: () => entities('inject_types', state),
   getNextInjects: () => {
     const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
-    const injects = entities('injects', state).filter((i) => i.inject_date !== null && i.inject_status === null);
+    const injects = entities('injects', state).filter(
+      (i) => i.inject_date !== null && i.inject_status === null,
+    );
     return R.take(6, R.sort(sortFn, injects));
   },
   // documents
@@ -205,10 +209,8 @@ export const storeHelper = (state) => ({
   getDocumentsMap: () => maps('documents', state),
   // audiences
   getAudience: (id) => entity(id, 'audiences', state),
-  getAudienceUsers: (id) => entities('users', state)
-    .filter((u) => entity(id, 'audiences', state).audience_users.includes(u.user_id)),
-  getAudienceInjects: (id) => entities('injects', state)
-    .filter((i) => entity(id, 'audiences', state).audience_injects.includes(i.inject_id)),
+  getAudienceUsers: (id) => entities('users', state).filter((u) => entity(id, 'audiences', state).audience_users.includes(u.user_id)),
+  getAudienceInjects: (id) => entities('injects', state).filter((i) => entity(id, 'audiences', state).audience_injects.includes(i.inject_id)),
   getAudiences: () => entities('audiences', state),
   getAudiencesMap: () => maps('audiences', state),
   getSettings: () => {
@@ -227,4 +229,12 @@ export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])
     id: tagItem.tag_id,
     label: tagItem.tag_name,
     color: tagItem.tag_color,
+  }));
+
+export const exercisesConverter = (exercise_ids, exercisesMap) => (exercise_ids ?? [])
+  .map((exerciseId) => exercisesMap[exerciseId])
+  .filter((exerciseItem) => exerciseItem !== undefined)
+  .map((exerciseItem) => ({
+    id: exerciseItem.exercise_id,
+    label: exerciseItem.exercise_name,
   }));

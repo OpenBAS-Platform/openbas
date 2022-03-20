@@ -6,6 +6,8 @@ import { withStyles, withTheme } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import { connect } from 'react-redux';
 import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -35,15 +37,14 @@ import { distributionChartOptions } from '../../utils/Charts';
 import InjectIcon from './exercises/injects/InjectIcon';
 import ProgressBarCountdown from '../../components/ProgressBarCountdown';
 
-const styles = () => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
   },
-  metric: {
+  card: {
+    width: '100%',
+    borderRadius: 6,
     position: 'relative',
-    padding: 20,
-    height: 100,
-    overflow: 'hidden',
   },
   list: {
     padding: 0,
@@ -61,18 +62,44 @@ const styles = () => ({
     overflow: 'hidden',
     height: 400,
   },
-  title: {
-    fontSize: 16,
-  },
   number: {
-    fontSize: 30,
-    fontWeight: 800,
+    marginTop: 10,
     float: 'left',
+    fontSize: 30,
+  },
+  title: {
+    marginTop: 5,
+    textTransform: 'uppercase',
+    fontSize: 12,
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
   },
   icon: {
     position: 'absolute',
-    top: 25,
-    right: 15,
+    color: theme.palette.primary.main,
+    top: 35,
+    right: 20,
+  },
+  graphContainer: {
+    width: '100%',
+    padding: 0,
+    overflow: 'hidden',
+  },
+  labelsCloud: {
+    width: '100%',
+    height: 300,
+  },
+  label: {
+    width: '100%',
+    height: 100,
+    padding: 15,
+  },
+  labelNumber: {
+    fontSize: 30,
+    fontWeight: 500,
+  },
+  labelValue: {
+    fontSize: 15,
   },
   item: {
     height: 50,
@@ -132,59 +159,86 @@ const Dashboard = (props) => {
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
         <Grid item={true} xs={3}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <RowingOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Exercises')}</div>
-            <div className={classes.number}>
-              {statistics?.exercises_count?.global_count ?? '-'}
-            </div>
-            <ItemNumberDifference
-              difference={statistics?.exercises_count?.progression_count ?? 0}
-              description={t('one month')}
-            />
-          </Paper>
+          <Card
+            classes={{ root: classes.card }}
+            style={{ height: 110 }}
+            variant="outlined"
+          >
+            <CardContent>
+              <div className={classes.icon}>
+                <RowingOutlined color="primary" fontSize="large" />
+              </div>
+              <div className={classes.title}>{t('Exercises')}</div>
+              <div className={classes.number}>
+                {statistics?.exercises_count?.global_count ?? '-'}
+              </div>
+              <ItemNumberDifference
+                difference={statistics?.exercises_count?.progression_count ?? 0}
+                description={t('one month')}
+              />
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item={true} xs={3}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <GroupsOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Players')}</div>
-            <div className={classes.number}>
-              {statistics?.users_count?.global_count ?? '-'}
-            </div>
-            <ItemNumberDifference
-              difference={statistics?.users_count?.progression_count ?? 0}
-              description={t('one month')}
-            />
-          </Paper>
+          <Card
+            classes={{ root: classes.card }}
+            style={{ height: 110 }}
+            variant="outlined"
+          >
+            <CardContent>
+              <div className={classes.icon}>
+                <GroupsOutlined color="primary" fontSize="large" />
+              </div>
+              <div className={classes.title}>{t('Players')}</div>
+              <div className={classes.number}>
+                {statistics?.users_count?.global_count ?? '-'}
+              </div>
+              <ItemNumberDifference
+                difference={statistics?.users_count?.progression_count ?? 0}
+                description={t('one month')}
+              />
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item={true} xs={3}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <NotificationsOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Injects')}</div>
-            <div className={classes.number}>
-              {statistics?.injects_count?.global_count ?? '-'}
-            </div>
-            <ItemNumberDifference
-              difference={statistics?.injects_count?.progression_count ?? 0}
-              description={t('one month')}
-            />
-          </Paper>
+          <Card
+            classes={{ root: classes.card }}
+            style={{ height: 110 }}
+            variant="outlined"
+          >
+            <CardContent>
+              <div className={classes.icon}>
+                <NotificationsOutlined color="primary" fontSize="large" />
+              </div>
+              <div className={classes.title}>{t('Injects')}</div>
+              <div className={classes.number}>
+                {statistics?.injects_count?.global_count ?? '-'}
+              </div>
+              <ItemNumberDifference
+                difference={statistics?.injects_count?.progression_count ?? 0}
+                description={t('one month')}
+              />
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item={true} xs={3}>
-          <Paper variant="outlined" classes={{ root: classes.metric }}>
-            <div className={classes.icon}>
-              <ContactMailOutlined color="primary" sx={{ fontSize: 50 }} />
-            </div>
-            <div className={classes.title}>{t('Messages')}</div>
-            <div className={classes.number}>-</div>
-            <ItemNumberDifference difference={0} description={t('one month')} />
-          </Paper>
+          <Card
+            classes={{ root: classes.card }}
+            style={{ height: 110 }}
+            variant="outlined"
+          >
+            <CardContent>
+              <div className={classes.icon}>
+                <ContactMailOutlined color="primary" fontSize="large" />
+              </div>
+              <div className={classes.title}>{t('Messages')}</div>
+              <div className={classes.number}>-</div>
+              <ItemNumberDifference
+                difference={0}
+                description={t('one month')}
+              />
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item={true} xs={6}>
           <Typography variant="h4">{t('Recent exercises')}</Typography>
@@ -227,7 +281,10 @@ const Dashboard = (props) => {
                             className={classes.bodyItem}
                             style={{ width: '40%' }}
                           >
-                            <ItemTags variant="list" tags={exercise.exercise_tags} />
+                            <ItemTags
+                              variant="list"
+                              tags={exercise.exercise_tags}
+                            />
                           </div>
                         </div>
                       }
@@ -255,7 +312,8 @@ const Dashboard = (props) => {
                       divider={true}
                       button={true}
                       component={Link}
-                      to={`/exercises/${inject.inject_exercise}/animation`}>
+                      to={`/exercises/${inject.inject_exercise}/animation`}
+                    >
                       <ListItemIcon>
                         <InjectIcon
                           type={inject.inject_type}

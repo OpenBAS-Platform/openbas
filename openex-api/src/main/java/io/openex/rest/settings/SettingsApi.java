@@ -109,7 +109,8 @@ public class SettingsApi extends RestBehavior {
         // Build authenticated user settings
         User user = currentUser();
         if (user != null) {
-            settings.add(new PlatformSetting("map_tile_server", openExConfig.getMapTileServer()));
+            settings.add(new PlatformSetting("map_tile_server_light", openExConfig.getMapTileServerLight()));
+            settings.add(new PlatformSetting("map_tile_server_dark", openExConfig.getMapTileServerDark()));
             settings.add(buildPlatformSetting(dbSettings, PLATFORM_NAME));
             // Build admin settings
             if (user.isAdmin()) {

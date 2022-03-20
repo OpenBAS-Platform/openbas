@@ -39,6 +39,9 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { Transition } from '../../../../utils/Environment';
+import ItemTags from '../../../../components/ItemTags';
+import TagsFilter from '../../../../components/TagsFilter';
+import { resolveUserName } from '../../../../utils/String';
 
 const styles = () => ({
   box: {
@@ -69,6 +72,7 @@ class GroupPopover extends Component {
       openGrants: false,
       openPopover: false,
       keyword: '',
+      tags: [],
       usersIds: props.groupUsersIds,
     };
   }
@@ -105,6 +109,16 @@ class GroupPopover extends Component {
 
   handleSearchUsers(value) {
     this.setState({ keyword: value });
+  }
+
+  handleAddTag(value) {
+    if (value) {
+      this.setState({ tags: [value] });
+    }
+  }
+
+  handleClearTag() {
+    this.setState({ tags: [] });
   }
 
   addUser(userId) {
@@ -172,9 +186,7 @@ class GroupPopover extends Component {
   }
 
   render() {
-    const {
-      classes, t, usersMap, group, organizationsMap,
-    } = this.props;
+    const { classes, t, usersMap, group, organizationsMap } = this.props;
     const initialValues = R.pick(
       [
         'group_name',
@@ -185,7 +197,7 @@ class GroupPopover extends Component {
       ],
       group,
     );
-    const { keyword } = this.state;
+    const { keyword, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.user_email || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
@@ -195,10 +207,31 @@ class GroupPopover extends Component {
         !== -1
       || (n.user_phone || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.user_organization || '')
+      || (n.organization_name || '')
+        .toLowerCase()
+        .indexOf(keyword.toLowerCase()) !== -1
+      || (n.organization_description || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const filteredUsers = R.pipe(R.filter(filterByKeyword), R.take(5))(R.values(usersMap));
+    const filteredUsers = R.pipe(
+      R.map((u) => ({
+        organization_name:
+          organizationsMap[u.user_organization]?.organization_name ?? '-',
+        organization_description:
+          organizationsMap[u.user_organization]?.organization_description
+          ?? '-',
+        ...u,
+      })),
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.user_tags),
+            R.pluck('id', tags),
+          ),
+      ),
+      R.filter(filterByKeyword),
+      R.take(10),
+    )(R.values(usersMap));
     return (
       <div>
         <IconButton
@@ -238,18 +271,10 @@ class GroupPopover extends Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseDelete.bind(this)}
-            >
+            <Button onClick={this.handleCloseDelete.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitDelete.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitDelete.bind(this)}>
               {t('Delete')}
             </Button>
           </DialogActions>
@@ -277,27 +302,38 @@ class GroupPopover extends Component {
           TransitionComponent={Transition}
           onClose={this.handleCloseUsers.bind(this)}
           fullWidth={true}
-          maxWidth="md"
+          maxWidth="lg"
           PaperProps={{
             elevation: 1,
             sx: {
-              minHeight: 480,
-              maxHeight: 480,
+              minHeight: 580,
+              maxHeight: 580,
             },
           }}
         >
           <DialogTitle>{t('Manage the users of this group')}</DialogTitle>
-          <DialogContent>
+          <DialogContent style={{ paddingTop: 10 }}>
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={8}>
-                <SearchFilter
-                  onChange={this.handleSearchUsers.bind(this)}
-                  fullWidth={true}
-                />
+                <Grid container={true} spacing={3}>
+                  <Grid item={true} xs={6}>
+                    <SearchFilter
+                      onChange={this.handleSearchUsers.bind(this)}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                  <Grid item={true} xs={6}>
+                    <TagsFilter
+                      onAddTag={this.handleAddTag.bind(this)}
+                      onClearTag={this.handleClearTag.bind(this)}
+                      currentTags={tags}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                </Grid>
                 <List>
                   {filteredUsers.map((user) => {
                     const disabled = this.state.usersIds.includes(user.user_id);
-                    const organizationName = organizationsMap[user.user_organization]?.organization_name ?? '-';
                     return (
                       <ListItem
                         key={user.user_id}
@@ -311,9 +347,10 @@ class GroupPopover extends Component {
                           <PersonOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={user.user_email}
-                          secondary={organizationName}
+                          primary={resolveUserName(user)}
+                          secondary={user.organization_name}
                         />
+                        <ItemTags variant="list" tags={user.user_tags} />
                       </ListItem>
                     );
                   })}
@@ -323,14 +360,12 @@ class GroupPopover extends Component {
                 <Box className={classes.box}>
                   {this.state.usersIds.map((userId) => {
                     const user = usersMap[userId];
-                    const userFirstname = R.propOr('-', 'user_firstname', user);
-                    const userLastname = R.propOr('-', 'user_lastname', user);
                     const userGravatar = R.propOr('-', 'user_gravatar', user);
                     return (
                       <Chip
                         key={userId}
                         onDelete={this.removeUser.bind(this, userId)}
-                        label={`${userFirstname} ${userLastname}`}
+                        label={resolveUserName(user)}
                         avatar={<Avatar src={userGravatar} size={32} />}
                         classes={{ root: classes.chip }}
                       />
@@ -341,18 +376,10 @@ class GroupPopover extends Component {
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseUsers.bind(this)}
-            >
+            <Button onClick={this.handleCloseUsers.bind(this)}>
               {t('Cancel')}
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.submitAddUsers.bind(this)}
-            >
+            <Button color="secondary" onClick={this.submitAddUsers.bind(this)}>
               {t('Update')}
             </Button>
           </DialogActions>
@@ -450,11 +477,7 @@ class GroupPopover extends Component {
             </Table>
           </DialogContent>
           <DialogActions>
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={this.handleCloseGrants.bind(this)}
-            >
+            <Button onClick={this.handleCloseGrants.bind(this)}>
               {t('Close')}
             </Button>
           </DialogActions>
