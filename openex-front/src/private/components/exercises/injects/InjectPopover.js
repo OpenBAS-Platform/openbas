@@ -179,7 +179,10 @@ class InjectPopover extends Component {
   }
 
   submitDone() {
-    this.props.injectDone(this.props.inject.inject_id);
+    this.props.injectDone(
+      this.props.exercise.exercise_id,
+      this.props.inject.inject_id,
+    );
     this.handleCloseDone();
   }
 
@@ -189,9 +192,7 @@ class InjectPopover extends Component {
   }
 
   render() {
-    const {
-      t, inject, injectTypes, exercise, setSelectedInject, tagsMap,
-    } = this.props;
+    const { t, inject, injectTypes, exercise, setSelectedInject, tagsMap } = this.props;
     const injectTags = tagsConverter(inject.inject_tags, tagsMap);
     const duration = splitDuration(inject.inject_depends_duration || 0);
     const initialValues = R.pipe(

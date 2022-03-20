@@ -204,7 +204,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @Transactional(rollbackOn = Exception.class)
-    @PostMapping("/api/injects/{injectId}/status")
+    @PostMapping("/api/exercises/{exerciseId}/injects/{injectId}/status")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject setInjectStatus(@PathVariable String exerciseId,
                                   @PathVariable String injectId,

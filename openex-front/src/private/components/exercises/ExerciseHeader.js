@@ -44,13 +44,16 @@ const useStyles = makeStyles(() => ({
 const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
   const classes = useStyles();
   const tag = useHelper((helper) => helper.getTag(tagId));
-  return <Chip
+  return tag ? (
+    <Chip
       key={tag.tag_id}
       classes={{ root: classes.tag }}
       label={tag.tag_name}
-      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)
-      }
-  />;
+      onDelete={isReadOnly ? null : () => deleteTag(tag.tag_id)}
+    />
+  ) : (
+    <div />
+  );
 };
 
 const ExerciseHeader = () => {
@@ -59,7 +62,10 @@ const ExerciseHeader = () => {
   const { exerciseId } = useParams();
   const dispatch = useDispatch();
   const { exercise, tagsMap } = useHelper((helper) => {
-    return { exercise: helper.getExercise(exerciseId), tagsMap: helper.getTagsMap() };
+    return {
+      exercise: helper.getExercise(exerciseId),
+      tagsMap: helper.getTagsMap(),
+    };
   });
   const [openTagAdd, setOpenTagAdd] = useState(false);
   const containerRef = useRef(null);
@@ -85,6 +91,7 @@ const ExerciseHeader = () => {
     );
   };
   const { exercise_tags: tags } = exercise;
+  console.log(tags);
   return (
     <div className={classes.container} ref={containerRef}>
       <Typography
@@ -97,9 +104,12 @@ const ExerciseHeader = () => {
       <ExercisePopover exercise={exercise} tagsMap={tagsMap} />
       <div className={classes.tags}>
         {R.take(5, tags ?? []).map((tag) => (
-          <TagChip key={tag} tagId={tag}
-                   isReadOnly={isExerciseReadOnly(exercise, true)}
-                   deleteTag={deleteTag}/>
+          <TagChip
+            key={tag}
+            tagId={tag}
+            isReadOnly={isExerciseReadOnly(exercise, true)}
+            deleteTag={deleteTag}
+          />
         ))}
         <div style={{ float: 'left', marginTop: -5 }}>
           <IconButton
@@ -132,9 +142,7 @@ const ExerciseHeader = () => {
                 },
               }}
             >
-              {({
-                handleSubmit, values, submitting, pristine,
-              }) => (
+              {({ handleSubmit, values, submitting, pristine }) => (
                 <form id="tagsForm" onSubmit={handleSubmit}>
                   <TagField
                     name="exercise_tags"
