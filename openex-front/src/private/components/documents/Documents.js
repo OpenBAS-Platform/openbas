@@ -354,15 +354,19 @@ class Documents extends Component {
                       {R.take(3, document.document_exercises).map((e) => {
                         const exercise = exercisesMap[e] || {};
                         return (
-                          <Chip
+                          <Tooltip
                             key={exercise.exercise_id}
-                            classes={{ root: classes.exercise }}
-                            variant="outlined"
-                            label={exercise.exercise_name}
-                            component={Link}
-                            clickable={true}
-                            to={`/exercises/${exercise.exercise_id}`}
-                          />
+                            title={exercise.exercise_name}
+                          >
+                            <Chip
+                              classes={{ root: classes.exercise }}
+                              variant="outlined"
+                              label={exercise.exercise_name}
+                              component={Link}
+                              clickable={true}
+                              to={`/exercises/${exercise.exercise_id}`}
+                            />
+                          </Tooltip>
                         );
                       })}
                     </div>
