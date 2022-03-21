@@ -27,9 +27,9 @@ const styles = () => ({
 
 const inlineStyles = {
   openex_email: {
-    backgroundColor: 'rgba(139, 195, 74, 0.08)',
-    color: '#8bc34a',
-    border: '1px solid #8bc34a',
+    backgroundColor: 'rgba(205, 220, 57, 0.08)',
+    color: '#cddc39',
+    border: '1px solid #cddc39',
   },
   openex_ovh_sms: {
     backgroundColor: 'rgba(170, 0, 255, 0.08)',

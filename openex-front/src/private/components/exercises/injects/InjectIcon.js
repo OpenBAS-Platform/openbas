@@ -32,7 +32,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <EmailOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#8bc34a' : '#304ffe' }}
+          sx={{ color: done ? '#43a047' : '#cddc39' }}
         />
       );
     case 'openex_ovh_sms':
@@ -40,7 +40,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <SmsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#8bc34a' : '#aa00ff' }}
+          sx={{ color: done ? '#43a047' : '#aa00ff' }}
         />
       );
     case 'openex_manual':
@@ -48,7 +48,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <NotificationsActiveOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#8bc34a' : '#009688' }}
+          sx={{ color: done ? '#43a047' : '#009688' }}
         />
       );
     case 'openex_mastodon':
@@ -56,7 +56,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <Mastodon
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#8bc34a' : '#e91e63' }}
+          sx={{ color: done ? '#43a047' : '#e91e63' }}
         />
       );
     default:
