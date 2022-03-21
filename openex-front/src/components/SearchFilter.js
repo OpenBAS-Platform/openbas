@@ -22,6 +22,11 @@ const styles = (theme) => ({
     transition: theme.transitions.create('width'),
     width: 200,
   },
+  searchInputThin: {
+    transition: theme.transitions.create('width'),
+    width: 200,
+    height: 30,
+  },
   searchInputFocusedSmall: {
     width: 300,
   },
@@ -38,8 +43,14 @@ class SearchFilter extends Component {
       keyword,
       fullWidth,
       small,
+      thin,
     } = this.props;
-    const searchInput = small ? classes.searchInputSmall : classes.searchInput;
+    let { searchInput } = classes;
+    if (small) {
+      searchInput = classes.searchInputSmall;
+    } else if (thin) {
+      searchInput = classes.searchInputThin;
+    }
     const searchInputFocused = small
       ? classes.searchInputFocusedSmall
       : classes.searchInputFocused;
@@ -69,12 +80,15 @@ class SearchFilter extends Component {
               <Search />
             </InputAdornment>
           ),
+          // eslint-disable-next-line no-nested-ternary
           classes: !fullWidth
             ? {
               root: searchInput,
               focused: searchInputFocused,
             }
-            : null,
+            : thin
+              ? { root: searchInput }
+              : null,
         }}
         classes={fullWidth ? null : { root: classes.searchRoot }}
         autoComplete="off"

@@ -5,8 +5,9 @@ import Box from '@mui/material/Box';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
-import { LabelOutlined } from '@mui/icons-material';
+import { LabelOutlined, Search } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
+import InputAdornment from '@mui/material/InputAdornment';
 import { fetchTags } from '../actions/Tag';
 import { useFormatter } from './i18n';
 import { useHelper } from '../store';
@@ -33,6 +34,9 @@ const useStyles = makeStyles(() => ({
   },
   filter: {
     marginRight: 10,
+  },
+  thin: {
+    height: 30,
   },
 }));
 

@@ -424,16 +424,11 @@ const Exercise = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => setOpenChangeStatus(null)}
-          >
+          <Button onClick={() => setOpenChangeStatus(null)}>
             {t('Cancel')}
           </Button>
           <Button
-            variant="contained"
-            color="primary"
+            color="secondary"
             onClick={() => submitUpdateStatus({ exercise_status: openChangeStatus })
             }
           >

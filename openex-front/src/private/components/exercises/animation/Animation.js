@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@mui/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { useParams } from 'react-router-dom';
@@ -106,6 +106,10 @@ const useStyles = makeStyles(() => ({
   injectGroup: {
     position: 'absolute',
     padding: '6px 5px 0 5px',
+    zIndex: 1000,
+    display: 'grid',
+    gridAutoFlow: 'column',
+    gridTemplateRows: 'repeat(2, 20px)',
   },
   paper: {
     position: 'relative',
@@ -140,6 +144,7 @@ const useStyles = makeStyles(() => ({
 const Animation = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const theme = useTheme();
   const { exerciseId } = useParams();
   const { t, fndt } = useFormatter();
   const {
@@ -210,6 +215,16 @@ const Animation = () => {
     [R.descend(R.prop('inject_depends_duration'))],
     injects.filter((i) => i.inject_status !== null),
   );
+  const grid0 = theme.palette.mode === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)';
+  const grid5 = theme.palette.mode === 'light'
+    ? 'rgba(0,0,0,0.05)'
+    : 'rgba(255,255,255,0.05)';
+  const grid25 = theme.palette.mode === 'light'
+    ? '1px solid rgba(0, 0, 0, 0.25)'
+    : '1px solid rgba(255, 255, 255, 0.25)';
+  const grid15 = theme.palette.mode === 'light'
+    ? '1px dashed rgba(0, 0, 0, 0.15)'
+    : '1px dashed rgba(255, 255, 255, 0.15)';
   return (
     <div className={classes.root}>
       <div className={classes.parameters}>
@@ -254,10 +269,7 @@ const Animation = () => {
                   key={audience.audience_id}
                   className={classes.line}
                   style={{
-                    backgroundColor:
-                      index % 2 === 0
-                        ? 'rgba(255,255,255,0.05)'
-                        : 'rgba(255,255,255,0)',
+                    backgroundColor: index % 2 === 0 ? grid0 : grid5,
                   }}
                 >
                   {Object.keys(injectsGroupedByTick).map((key, i) => {
@@ -273,6 +285,7 @@ const Animation = () => {
                             key={inject.inject_id}
                             type={inject.inject_type}
                             tooltip={inject.inject_title}
+                            done={inject.inject_status !== null}
                             size="small"
                           />
                         ))}
@@ -293,10 +306,7 @@ const Animation = () => {
                       left: `${index * 5}%`,
                       height: index % 5 === 0 ? 'calc(100% + 30px)' : '100%',
                       top: index % 5 === 0 ? -15 : 0,
-                      borderRight:
-                        index % 5 === 0
-                          ? '1px solid rgba(255, 255, 255, 0.25)'
-                          : '1px dashed rgba(255, 255, 255, 0.15)',
+                      borderRight: index % 5 === 0 ? grid25 : grid15,
                     }}
                   >
                     <div className={classes.tickLabelTop}>
@@ -345,10 +355,7 @@ const Animation = () => {
                       left: `${index * 5}%`,
                       height: index % 5 === 0 ? '110%' : '100%',
                       top: index % 5 === 0 ? '-5%' : 0,
-                      borderRight:
-                        index % 5 === 0
-                          ? '1px solid rgba(255, 255, 255, 0.25)'
-                          : '1px dashed rgba(255, 255, 255, 0.15)',
+                      borderRight: index % 5 === 0 ? grid25 : grid15,
                     }}
                   >
                     <div className={classes.tickLabelTop}>

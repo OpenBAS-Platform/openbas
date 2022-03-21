@@ -97,7 +97,10 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   title: {
-    fontSize: 16,
+    textTransform: 'uppercase',
+    fontSize: 12,
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
   },
 }));
 
@@ -296,11 +299,15 @@ const Comcheck = () => {
             </div>
             <div className={classes.progress}>
               <BorderLinearProgress
-                value={progression(
-                  currentDate,
-                  Date.parse(comcheck?.comcheck_start_date),
-                  Date.parse(comcheck?.comcheck_end_date),
-                )}
+                value={
+                  comcheck?.comcheck_state === 'FINISHED'
+                    ? 100
+                    : progression(
+                      currentDate,
+                      Date.parse(comcheck?.comcheck_start_date),
+                      Date.parse(comcheck?.comcheck_end_date),
+                    )
+                }
                 variant="determinate"
               />
             </div>

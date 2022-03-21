@@ -31,7 +31,7 @@ import AudienceAddPlayers from './AudienceAddPlayers';
 
 const styles = (theme) => ({
   header: {
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.nav,
     padding: '20px 20px 20px 60px',
   },
   closeButton: {
@@ -52,8 +52,8 @@ const styles = (theme) => ({
     float: 'right',
   },
   parameters: {
-    float: 'left',
-    marginTop: -10,
+    float: 'right',
+    marginTop: -8,
   },
   container: {
     marginTop: 10,
@@ -266,20 +266,22 @@ class AudiencesPlayers extends Component {
           <Typography variant="h6" classes={{ root: classes.title }}>
             {R.propOr('-', 'audience_name', audience)}
           </Typography>
-          <div className={classes.tags}>
-            <TagsFilter
-              onAddTag={this.handleAddTag.bind(this)}
-              onRemoveTag={this.handleRemoveTag.bind(this)}
-              currentTags={tags}
-            />
-          </div>
-          <div className={classes.search}>
-            <SearchFilter
-              small={true}
-              fullWidth={true}
-              onChange={this.handleSearch.bind(this)}
-              keyword={keyword}
-            />
+          <div className={classes.parameters}>
+            <div className={classes.tags}>
+              <TagsFilter
+                onAddTag={this.handleAddTag.bind(this)}
+                onRemoveTag={this.handleRemoveTag.bind(this)}
+                currentTags={tags}
+                thin={true}
+              />
+            </div>
+            <div className={classes.search}>
+              <SearchFilter
+                fullWidth={true}
+                onChange={this.handleSearch.bind(this)}
+                keyword={keyword}
+              />
+            </div>
           </div>
           <div className="clearfix" />
         </div>

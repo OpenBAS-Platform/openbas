@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
+import Tooltip from '@mui/material/Tooltip';
 import {
   EmailOutlined,
   SmsOutlined,
@@ -8,7 +9,7 @@ import {
 } from '@mui/icons-material';
 import { Mastodon } from 'mdi-material-ui';
 
-const iconSelector = (type, variant, fontSize) => {
+const iconSelector = (type, variant, fontSize, done) => {
   let style = {};
   switch (variant) {
     case 'inline':
@@ -31,7 +32,7 @@ const iconSelector = (type, variant, fontSize) => {
         <EmailOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: '#8bc34a' }}
+          sx={{ color: done ? '#8bc34a' : '#304ffe' }}
         />
       );
     case 'openex_ovh_sms':
@@ -39,7 +40,7 @@ const iconSelector = (type, variant, fontSize) => {
         <SmsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: '#aa00ff' }}
+          sx={{ color: done ? '#8bc34a' : '#aa00ff' }}
         />
       );
     case 'openex_manual':
@@ -47,12 +48,16 @@ const iconSelector = (type, variant, fontSize) => {
         <NotificationsActiveOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: '#009688' }}
+          sx={{ color: done ? '#8bc34a' : '#009688' }}
         />
       );
     case 'openex_mastodon':
       return (
-        <Mastodon style={style} fontSize={fontSize} sx={{ color: '#e91e63' }} />
+        <Mastodon
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#8bc34a' : '#e91e63' }}
+        />
       );
     default:
       return <HelpOutlined style={style} fontSize={fontSize} />;
@@ -61,9 +66,16 @@ const iconSelector = (type, variant, fontSize) => {
 
 class InjectIcon extends Component {
   render() {
-    const { type, size, variant } = this.props;
+    const { type, size, variant, tooltip, done } = this.props;
     const fontSize = size || 'medium';
-    return iconSelector(type, variant, fontSize);
+    if (tooltip) {
+      return (
+        <Tooltip title={tooltip}>
+          {iconSelector(type, variant, fontSize, done)}
+        </Tooltip>
+      );
+    }
+    return iconSelector(type, variant, fontSize, done);
   }
 }
 
@@ -72,6 +84,7 @@ InjectIcon.propTypes = {
   size: PropTypes.string,
   tooltip: PropTypes.string,
   variant: PropTypes.string,
+  done: PropTypes.bool,
 };
 
 export default InjectIcon;

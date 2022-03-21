@@ -94,7 +94,10 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   title: {
-    fontSize: 16,
+    textTransform: 'uppercase',
+    fontSize: 12,
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
   },
   date: {
     fontSize: 12,
