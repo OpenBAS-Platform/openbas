@@ -2,7 +2,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -13,7 +13,8 @@ import Chip from '@mui/material/Chip';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
-import { updateParameters } from '../../../actions/Application';
+import { updateParameters, fetchParameters } from '../../../actions/Application';
+import useDataLoader from '../../../utils/ServerSideEvent';
 
 const styles = () => ({
   root: {
@@ -34,7 +35,10 @@ const Parameters = (props) => {
     classes,
     settings,
   } = props;
-
+  const dispatch = useDispatch();
+  useDataLoader(() => {
+    dispatch(fetchParameters());
+  });
   const onUpdate = (data) => connectedUpdateParameters(data);
 
   return (
