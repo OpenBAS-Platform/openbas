@@ -81,7 +81,7 @@ public class EmailService {
         String contextualBody = buildContextualContent(message, context);
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
-        mimeMessage.setSubject(contextualSubject);
+        mimeMessage.setSubject(contextualSubject, "utf-8");
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         Multipart mailMultipart = new MimeMultipart("mixed");
         // Add mail content
@@ -104,7 +104,7 @@ public class EmailService {
             // Need to create another email that will wrap everything.
             MimeMessage encMessage = emailSender.createMimeMessage();
             encMessage.setFrom(from);
-            encMessage.setSubject(subject);
+            encMessage.setSubject(subject, "utf-8");
             encMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
             Multipart encMultipart = new MimeMultipart("encrypted; protocol=\"application/pgp-encrypted\"");
             // This is an OpenPGP/MIME encrypted message (RFC 4880 and 3156)
