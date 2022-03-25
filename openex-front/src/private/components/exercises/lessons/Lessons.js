@@ -147,7 +147,7 @@ const Lessons = () => {
     });
   };
   const sortedObjectives = R.sortWith(
-    [R.descend(R.prop('objective_priority'))],
+    [R.ascend(R.prop('objective_priority'))],
     objectives,
   );
   return (

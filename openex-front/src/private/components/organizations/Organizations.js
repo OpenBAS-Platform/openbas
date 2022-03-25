@@ -29,6 +29,7 @@ import { storeHelper } from '../../../actions/Schema';
 import { fetchTags } from '../../../actions/Tag';
 import SearchFilter from '../../../components/SearchFilter';
 import TagsFilter from '../../../components/TagsFilter';
+import { exportData } from '../../../utils/Environment';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -236,7 +237,16 @@ class Organizations extends Component {
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
             {sortedOrganizations.length > 0 ? (
               <CSVLink
-                data={sortedOrganizations}
+                data={exportData(
+                  'organization',
+                  [
+                    'organization_name',
+                    'organization_description',
+                    'organization_tags',
+                  ],
+                  sortedOrganizations,
+                  tagsMap,
+                )}
                 filename={`${t('Organizations')}.csv`}
               >
                 <Tooltip title={t('Export this list')}>

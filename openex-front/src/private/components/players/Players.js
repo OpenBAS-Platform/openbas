@@ -22,6 +22,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { useFormatter } from '../../../components/i18n';
+import { exportData } from '../../../utils/Environment';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -189,7 +190,23 @@ const Players = () => {
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
           {sortedUsers.length > 0 ? (
-            <CSVLink data={sortedUsers} filename={`${t('Players')}.csv`}>
+            <CSVLink
+              data={exportData(
+                'user',
+                [
+                  'user_email',
+                  'user_firstname',
+                  'user_lastname',
+                  'user_phone',
+                  'user_organization',
+                  'user_tags',
+                ],
+                sortedUsers,
+                tagsMap,
+                organizationsMap,
+              )}
+              filename={`${t('Players')}.csv`}
+            >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
                   <FileDownloadOutlined color="primary" />

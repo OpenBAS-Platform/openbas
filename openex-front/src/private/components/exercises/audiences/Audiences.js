@@ -28,6 +28,7 @@ import AudiencePlayers from './AudiencePlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
+import { exportData } from '../../../../utils/Environment';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -191,7 +192,21 @@ const Audiences = () => {
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
           {sortedAudiences.length > 0 ? (
-            <CSVLink data={sortedAudiences} filename={`${t('Audiences')}.csv`}>
+            <CSVLink
+              data={exportData(
+                'audience',
+                [
+                  'audience_name',
+                  'audience_description',
+                  'audience_users_number',
+                  'audience_enabled',
+                  'audience_tags',
+                ],
+                sortedAudiences,
+                tagsMap,
+              )}
+              filename={`[${exercise.exercise_name}] ${t('Audiences')}.csv`}
+            >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
                   <FileDownloadOutlined color="primary" />

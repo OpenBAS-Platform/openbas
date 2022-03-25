@@ -25,6 +25,7 @@ import ExerciseStatus from './ExerciseStatus';
 import { useHelper } from '../../../store';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
+import { exportData } from '../../../utils/Environment';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -151,8 +152,9 @@ const Exercises = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t, nsdt } = useFormatter();
-  const { exercises, userAdmin } = useHelper((helper) => ({
+  const { exercises, tagsMap, userAdmin } = useHelper((helper) => ({
     exercises: helper.getExercises(),
+    tagsMap: helper.getTagsMap(),
     userAdmin: helper.getMe()?.user_admin ?? false,
   }));
   const searchColumns = ['name', 'subtitle'];
@@ -181,7 +183,18 @@ const Exercises = () => {
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
           {sortedExercises.length > 0 ? (
             <CSVLink
-              data={sortedExercises}
+              data={exportData(
+                'exercise',
+                [
+                  'exercise_name',
+                  'exercise_subtitle',
+                  'exercise_description',
+                  'exercise_status',
+                  'exercise_tags',
+                ],
+                sortedExercises,
+                tagsMap,
+              )}
               filename={`${t('Exercises')}.csv`}
             >
               <Tooltip title={t('Export this list')}>

@@ -176,9 +176,9 @@ const Animation = () => {
       injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
     };
   });
-  const technicalAudiences = injectTypesWithNoAudiences.map((t) => ({
-    audience_id: t.type,
-    audience_name: t.type,
+  const technicalAudiences = injectTypesWithNoAudiences.map((type) => ({
+    audience_id: type.type,
+    audience_name: type.type,
   }));
   const sortedNativeAudiences = R.sortWith(
     [R.ascend(R.prop('audience_name'))],

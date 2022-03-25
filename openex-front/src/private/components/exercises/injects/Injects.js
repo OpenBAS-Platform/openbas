@@ -13,6 +13,7 @@ import { CSVLink } from 'react-csv';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import { FileDownloadOutlined } from '@mui/icons-material';
+import * as R from 'ramda';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
@@ -32,6 +33,7 @@ import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
+import { exportData } from '../../../../utils/Environment';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -211,7 +213,9 @@ const Injects = () => {
     dispatch(fetchExerciseInjects(exerciseId));
   });
   const sortedInjects = filtering.filterAndSort(injects);
-  const disabledTypes = injectTypes.filter((type) => type.expose === false).map((type) => type.type);
+  const disabledTypes = injectTypes
+    .filter((type) => type.expose === false)
+    .map((type) => type.type);
   // Rendering
   return (
     <div className={classes.container}>
@@ -232,7 +236,24 @@ const Injects = () => {
         </div>
         <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
           {sortedInjects.length > 0 ? (
-            <CSVLink data={sortedInjects} filename={`${t('Injects')}.csv`}>
+            <CSVLink
+              data={exportData(
+                'inject',
+                [
+                  'inject_type',
+                  'inject_title',
+                  'inject_description',
+                  'inject_depends_duration',
+                  'inject_users_number',
+                  'inject_enabled',
+                  'inject_tags',
+                  'inject_content',
+                ],
+                sortedInjects,
+                tagsMap,
+              )}
+              filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
+            >
               <Tooltip title={t('Export this list')}>
                 <IconButton size="large">
                   <FileDownloadOutlined color="primary" />

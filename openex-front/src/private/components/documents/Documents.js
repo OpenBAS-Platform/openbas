@@ -32,6 +32,7 @@ import CreateDocument from './CreateDocument';
 import DocumentPopover from './DocumentPopover';
 import DocumentType from './DocumentType';
 import { FIVE_SECONDS } from '../../../utils/Time';
+import { exportData } from '../../../utils/Environment';
 
 const interval$ = interval(FIVE_SECONDS);
 
@@ -272,7 +273,20 @@ class Documents extends Component {
           <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
             {sortedDocuments.length > 0 ? (
               <CSVLink
-                data={sortedDocuments}
+                data={exportData(
+                  'document',
+                  [
+                    'document_name',
+                    'document_description',
+                    'document_exercises',
+                    'document_type',
+                    'document_tags',
+                  ],
+                  sortedDocuments,
+                  tagsMap,
+                  null,
+                  exercisesMap,
+                )}
                 filename={`${t('Documents')}.csv`}
               >
                 <Tooltip title={t('Export this list')}>
