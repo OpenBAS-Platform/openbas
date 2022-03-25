@@ -59,6 +59,12 @@ class InjectForm extends Component {
       injectTypes,
       classes,
     } = this.props;
+    const sortedTypes = R.sortWith(
+      [R.ascend(R.prop('ttype'))],
+      R.values(injectTypes)
+        .filter((type) => type.expose === true)
+        .map((type) => R.assoc('ttype', t(type.type), type)),
+    );
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -85,14 +91,11 @@ class InjectForm extends Component {
               name="inject_type"
               fullWidth={true}
               disabled={editing}
+              renderValue={(selected) => t(selected)}
               style={{ marginTop: 20 }}
             >
-              {R.values(injectTypes).map((type) => (
-                <MenuItem
-                  key={type.type}
-                  value={type.type}
-                  disabled={type.expose === false}
-                >
+              {sortedTypes.map((type) => (
+                <MenuItem key={type.type} value={type.type}>
                   <ListItemIcon>
                     <InjectIcon type={type.type} />
                   </ListItemIcon>
