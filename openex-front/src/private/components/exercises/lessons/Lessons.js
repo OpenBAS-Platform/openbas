@@ -146,6 +146,10 @@ const Lessons = () => {
       return result;
     });
   };
+  const sortedObjectives = R.sortWith(
+    [R.descend(R.prop('objective_priority'))],
+    objectives,
+  );
   return (
     <div className={classes.root}>
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
@@ -201,9 +205,9 @@ const Lessons = () => {
           )}
           <div className="clearfix" />
           <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {objectives.length > 0 ? (
+            {sortedObjectives.length > 0 ? (
               <List style={{ padding: 0 }}>
-                {objectives.map((objective) => (
+                {sortedObjectives.map((objective) => (
                   <ListItem
                     key={objective.objective_id}
                     divider={true}

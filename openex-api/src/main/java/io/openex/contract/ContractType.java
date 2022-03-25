@@ -9,6 +9,8 @@ public enum ContractType {
     Checkbox,
     @JsonProperty("textarea")
     Textarea,
+    @JsonProperty("select")
+    Select,
     @JsonProperty("richtextarea")
     Richtextarea,
     @JsonProperty("attachment")

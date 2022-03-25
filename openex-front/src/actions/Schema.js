@@ -170,6 +170,22 @@ export const storeHelper = (state) => ({
   getExerciseComchecks: (id) => entities('comchecks', state).filter((i) => i.comcheck_exercise === id),
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
+  getExerciseTechnicalInjectsPerType: (id) => {
+    const typesWithNoAudiences = entities('inject_types', state)
+      .map((t) => ({
+        type: t.type,
+        hasAudiences: t.fields.filter((f) => f.name === 'audiences').length > 0,
+      }))
+      .filter((t) => !t.hasAudiences)
+      .map((t) => t.type);
+    return R.mergeAll(
+      typesWithNoAudiences.map((t) => ({
+        [t]: entities('injects', state).filter(
+          (i) => i.inject_type === t && i.inject_exercise === id,
+        ),
+      })),
+    );
+  },
   getExerciseObjectives: (id) => entities('objectives', state).filter((o) => o.objective_exercise === id),
   getExerciseLogs: (id) => entities('logs', state).filter((l) => l.log_exercise === id),
   getExercisePolls: (id) => entities('polls', state).filter((o) => o.poll_exercise === id),
@@ -199,6 +215,12 @@ export const storeHelper = (state) => ({
   // injects
   getInject: (id) => entity(id, 'injects', state),
   getInjectTypes: () => entities('inject_types', state),
+  getInjectTypesWithNoAudiences: () => entities('inject_types', state)
+    .map((t) => ({
+      hasAudiences: t.fields.filter((f) => f.name === 'audiences').length > 0,
+      ...t,
+    }))
+    .filter((t) => !t.hasAudiences),
   getNextInjects: () => {
     const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
     const injects = entities('injects', state).filter(

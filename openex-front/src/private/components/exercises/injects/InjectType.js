@@ -32,9 +32,9 @@ const inlineStyles = {
     border: '1px solid #cddc39',
   },
   openex_ovh_sms: {
-    backgroundColor: 'rgba(170, 0, 255, 0.08)',
-    color: '#aa00ff',
-    border: '1px solid #aa00ff',
+    backgroundColor: 'rgba(156, 39, 176, 0.08)',
+    color: '#9c27b0',
+    border: '1px solid #9c27b0',
   },
   openex_manual: {
     backgroundColor: 'rgba(0, 150, 136, 0.08)',
@@ -45,6 +45,26 @@ const inlineStyles = {
     backgroundColor: 'rgba(233, 30, 99, 0.08)',
     color: '#e91e63',
     border: '1px solid #e91e63',
+  },
+  openex_lade: {
+    backgroundColor: 'rgba(103, 58, 183, 0.08)',
+    color: '#673ab7',
+    border: '1px solid #673ab7',
+  },
+  openex_gnu_social: {
+    backgroundColor: 'rgba(244, 67, 54, 0.08)',
+    color: '#f44336',
+    border: '1px solid #f44336',
+  },
+  openex_twitter: {
+    backgroundColor: 'rgba(33, 150, 243, 0.08)',
+    color: '#2196f3',
+    border: '1px solid #2196f3',
+  },
+  openex_rest_api: {
+    backgroundColor: 'rgba(0, 188, 212, 0.08)',
+    color: '#00bcd4',
+    border: '1px solid #00bcd4',
   },
 };
 
@@ -70,6 +90,38 @@ class InjectType extends Component {
           />
         );
       case 'openex_mastodon':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.openex_mastodon}
+            label={t('Mastodon')}
+          />
+        );
+      case 'openex_lade':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.openex_mastodon}
+            label={t('Mastodon')}
+          />
+        );
+      case 'openex_gnu_social':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.openex_mastodon}
+            label={t('Mastodon')}
+          />
+        );
+      case 'openex_twitter':
+        return (
+          <Chip
+            classes={{ root: style }}
+            style={inlineStyles.openex_mastodon}
+            label={t('Mastodon')}
+          />
+        );
+      case 'openex_rest_api':
         return (
           <Chip
             classes={{ root: style }}

@@ -211,6 +211,7 @@ const Injects = () => {
     dispatch(fetchExerciseInjects(exerciseId));
   });
   const sortedInjects = filtering.filterAndSort(injects);
+  const disabledTypes = injectTypes.filter((type) => type.expose === false).map((type) => type.type);
   // Rendering
   return (
     <div className={classes.container}>
@@ -309,12 +310,14 @@ const Injects = () => {
         </ListItem>
         {sortedInjects.map((inject) => {
           const duration = splitDuration(inject.inject_depends_duration || 0);
+          const isDisabled = disabledTypes.includes(inject.inject_type);
           return (
             <ListItem
               key={inject.inject_id}
               classes={{ root: classes.item }}
               divider={true}
               button={true}
+              disabled={isDisabled}
               onClick={() => setSelectedInject(inject.inject_id)}
             >
               <ListItemIcon>
@@ -382,6 +385,7 @@ const Injects = () => {
                   injectTypes={injectTypes}
                   tagsMap={tagsMap}
                   setSelectedInject={setSelectedInject}
+                  isDisabled={isDisabled}
                 />
               </ListItemSecondaryAction>
             </ListItem>

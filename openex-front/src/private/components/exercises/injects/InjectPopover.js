@@ -192,7 +192,15 @@ class InjectPopover extends Component {
   }
 
   render() {
-    const { t, inject, injectTypes, exercise, setSelectedInject, tagsMap } = this.props;
+    const {
+      t,
+      inject,
+      injectTypes,
+      exercise,
+      setSelectedInject,
+      tagsMap,
+      isDisabled,
+    } = this.props;
     const injectTags = tagsConverter(inject.inject_tags, tagsMap);
     const duration = splitDuration(inject.inject_depends_duration || 0);
     const initialValues = R.pipe(
@@ -228,39 +236,45 @@ class InjectPopover extends Component {
         >
           <MenuItem
             onClick={this.handleOpenEdit.bind(this)}
-            disabled={isExerciseReadOnly(exercise)}
+            disabled={isExerciseReadOnly(exercise) || isDisabled}
           >
             {t('Update')}
           </MenuItem>
           {setSelectedInject && (
-            <MenuItem onClick={this.handleOpenEditContent.bind(this)}>
+            <MenuItem
+              onClick={this.handleOpenEditContent.bind(this)}
+              disabled={isExerciseReadOnly(exercise) || isDisabled}
+            >
               {t('Manage content')}
             </MenuItem>
           )}
           {!inject.inject_status && (
             <MenuItem
               onClick={this.handleOpenDone.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={isExerciseReadOnly(exercise) || isDisabled}
             >
               {t('Mark as done')}
             </MenuItem>
           )}
           {inject.inject_type !== 'openex_manual' && (
-            <MenuItem onClick={this.handleOpenTry.bind(this)}>
+            <MenuItem
+              onClick={this.handleOpenTry.bind(this)}
+              disabled={isExerciseReadOnly(exercise) || isDisabled}
+            >
               {t('Try the inject')}
             </MenuItem>
           )}
           {inject.inject_enabled ? (
             <MenuItem
               onClick={this.handleOpenDisable.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={isExerciseReadOnly(exercise) || isDisabled}
             >
               {t('Disable')}
             </MenuItem>
           ) : (
             <MenuItem
               onClick={this.handleOpenEnable.bind(this)}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={isExerciseReadOnly(exercise) || isDisabled}
             >
               {t('Enable')}
             </MenuItem>
@@ -411,6 +425,7 @@ InjectPopover.propTypes = {
   updateInjectActivation: PropTypes.func,
   injectDone: PropTypes.func,
   setSelectedInject: PropTypes.func,
+  isDisabled: PropTypes.bool,
 };
 
 export default R.compose(

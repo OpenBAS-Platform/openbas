@@ -4,7 +4,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { CastForEducationOutlined } from '@mui/icons-material';
+import { CastOutlined, CastForEducationOutlined } from '@mui/icons-material';
 import * as R from 'ramda';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
@@ -152,9 +152,11 @@ const Animation = () => {
     audiences,
     injects,
     injectTypes,
+    injectTypesWithNoAudiences,
     exercisesMap,
     tagsMap,
     audiencesInjectsMap,
+    technicalInjectsMap,
   } = useHelper((helper) => {
     const exerciseAudiences = helper.getExerciseAudiences(exerciseId);
     const injectsPerAudience = R.mergeAll(
@@ -169,13 +171,21 @@ const Animation = () => {
       exercisesMap: helper.getExercisesMap(),
       tagsMap: helper.getTagsMap(),
       audiencesInjectsMap: injectsPerAudience,
+      technicalInjectsMap: helper.getExerciseTechnicalInjectsPerType(exerciseId),
       injectTypes: helper.getInjectTypes(),
+      injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
     };
   });
-  const sortedAudiences = R.sortWith(
+  const technicalAudiences = injectTypesWithNoAudiences.map((t) => ({
+    audience_id: t.type,
+    audience_name: t.type,
+  }));
+  const sortedNativeAudiences = R.sortWith(
     [R.ascend(R.prop('audience_name'))],
     audiences,
   );
+  const sortedAudiences = [...technicalAudiences, ...sortedNativeAudiences];
+  const injectsMap = { ...audiencesInjectsMap, ...technicalInjectsMap };
   const [selectedInject, setSelectedInject] = useState(null);
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
@@ -215,6 +225,9 @@ const Animation = () => {
     [R.descend(R.prop('inject_depends_duration'))],
     injects.filter((i) => i.inject_status !== null),
   );
+  const disabledTypes = injectTypes
+    .filter((type) => type.expose === false)
+    .map((type) => type.type);
   const grid0 = theme.palette.mode === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)';
   const grid5 = theme.palette.mode === 'light'
     ? 'rgba(0,0,0,0.05)'
@@ -244,15 +257,21 @@ const Animation = () => {
         </div>
       </div>
       <div className="clearfix" />
-      {audiences.length > 0 ? (
+      {sortedAudiences.length > 0 ? (
         <div className={classes.container}>
           <div className={classes.names}>
             {sortedAudiences.map((audience) => (
               <div key={audience.audience_id} className={classes.lineName}>
                 <div className={classes.name}>
-                  <CastForEducationOutlined fontSize="small" />
+                  {audience.audience_name.startsWith('openex_') ? (
+                    <CastOutlined fontSize="small" />
+                  ) : (
+                    <CastForEducationOutlined fontSize="small" />
+                  )}
                   &nbsp;&nbsp;
-                  {truncate(audience.audience_name, 20)}
+                  {audience.audience_name.startsWith('openex_')
+                    ? t(audience.audience_name)
+                    : truncate(audience.audience_name, 20)}
                 </div>
               </div>
             ))}
@@ -260,9 +279,7 @@ const Animation = () => {
           <div className={classes.timeline}>
             {sortedAudiences.map((audience, index) => {
               const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(
-                  audiencesInjectsMap[audience.audience_id],
-                ),
+                filtering.filterAndSort(injectsMap[audience.audience_id]),
               );
               return (
                 <div
@@ -388,64 +405,72 @@ const Animation = () => {
           <Paper variant="outlined" classes={{ root: classes.paper }}>
             {pendingInjects.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
-                {pendingInjects.map((inject) => (
-                  <ListItem
-                    key={inject.inject_id}
-                    dense={true}
-                    classes={{ root: classes.item }}
-                    divider={true}
-                    button={true}
-                    onClick={() => setSelectedInject(inject.inject_id)}
-                  >
-                    <ListItemIcon>
-                      <InjectIcon type={inject.inject_type} variant="inline" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '50%' }}
-                          >
-                            {inject.inject_title}
+                {pendingInjects.map((inject) => {
+                  const isDisabled = disabledTypes.includes(inject.inject_type);
+                  return (
+                    <ListItem
+                      key={inject.inject_id}
+                      dense={true}
+                      classes={{ root: classes.item }}
+                      divider={true}
+                      button={true}
+                      disabled={isDisabled}
+                      onClick={() => setSelectedInject(inject.inject_id)}
+                    >
+                      <ListItemIcon>
+                        <InjectIcon
+                          type={inject.inject_type}
+                          variant="inline"
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '50%' }}
+                            >
+                              {inject.inject_title}
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{ width: '20%', paddingTop: 8 }}
+                            >
+                              <ProgressBarCountdown
+                                date={inject.inject_date}
+                                paused={
+                                  exercise?.exercise_status === 'PAUSED'
+                                  || exercise?.exercise_status === 'CANCELED'
+                                }
+                              />
+                            </div>
+                            <div
+                              className={classes.bodyItem}
+                              style={{
+                                fontFamily: 'Consolas, monaco, monospace',
+                                fontSize: 12,
+                                paddingTop: 3,
+                                marginRight: 15,
+                              }}
+                            >
+                              {fndt(inject.inject_date)}
+                            </div>
                           </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{ width: '20%', paddingTop: 8 }}
-                          >
-                            <ProgressBarCountdown
-                              date={inject.inject_date}
-                              paused={
-                                exercise?.exercise_status === 'PAUSED'
-                                || exercise?.exercise_status === 'CANCELED'
-                              }
-                            />
-                          </div>
-                          <div
-                            className={classes.bodyItem}
-                            style={{
-                              fontFamily: 'Consolas, monaco, monospace',
-                              fontSize: 12,
-                              paddingTop: 3,
-                              marginRight: 15,
-                            }}
-                          >
-                            {fndt(inject.inject_date)}
-                          </div>
-                        </div>
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <InjectPopover
-                        inject={inject}
-                        exerciseId={exerciseId}
-                        exercise={exercise}
-                        tagsMap={tagsMap}
-                        setSelectedInject={setSelectedInject}
+                        }
                       />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
+                      <ListItemSecondaryAction>
+                        <InjectPopover
+                          inject={inject}
+                          exerciseId={exerciseId}
+                          exercise={exercise}
+                          tagsMap={tagsMap}
+                          setSelectedInject={setSelectedInject}
+                          isDisabled={isDisabled}
+                        />
+                      </ListItemSecondaryAction>
+                    </ListItem>
+                  );
+                })}
               </List>
             ) : (
               <Empty message={t('No pending injects in this exercise.')} />

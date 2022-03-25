@@ -6,8 +6,10 @@ import {
   SmsOutlined,
   NotificationsActiveOutlined,
   HelpOutlined,
+  SpeakerNotesOutlined,
+  ApiOutlined,
 } from '@mui/icons-material';
-import { Mastodon } from 'mdi-material-ui';
+import { Mastodon, LockPattern, Twitter } from 'mdi-material-ui';
 
 const iconSelector = (type, variant, fontSize, done) => {
   let style = {};
@@ -32,7 +34,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <EmailOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#43a047' : '#cddc39' }}
+          sx={{ color: done ? '#4caf50' : '#cddc39' }}
         />
       );
     case 'openex_ovh_sms':
@@ -40,7 +42,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <SmsOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#43a047' : '#aa00ff' }}
+          sx={{ color: done ? '#4caf50' : '#9c27b0' }}
         />
       );
     case 'openex_manual':
@@ -48,7 +50,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <NotificationsActiveOutlined
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#43a047' : '#009688' }}
+          sx={{ color: done ? '#4caf50' : '#009688' }}
         />
       );
     case 'openex_mastodon':
@@ -56,7 +58,39 @@ const iconSelector = (type, variant, fontSize, done) => {
         <Mastodon
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#43a047' : '#e91e63' }}
+          sx={{ color: done ? '#4caf50' : '#e91e63' }}
+        />
+      );
+    case 'openex_lade':
+      return (
+        <LockPattern
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#4caf50' : '#673ab7' }}
+        />
+      );
+    case 'openex_gnu_social':
+      return (
+        <SpeakerNotesOutlined
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#4caf50' : '#f44336' }}
+        />
+      );
+    case 'openex_twitter':
+      return (
+        <Twitter
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#4caf50' : '#2196f3' }}
+        />
+      );
+    case 'openex_rest_api':
+      return (
+        <ApiOutlined
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#4caf50' : '#00bcd4' }}
         />
       );
     default:

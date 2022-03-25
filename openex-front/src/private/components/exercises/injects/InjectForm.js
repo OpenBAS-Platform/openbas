@@ -4,11 +4,14 @@ import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import withStyles from '@mui/styles/withStyles';
 import { TextField } from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
 import { Select } from '../../../../components/Select';
+import InjectIcon from './InjectIcon';
 
 const styles = (theme) => ({
   duration: {
@@ -85,8 +88,15 @@ class InjectForm extends Component {
               style={{ marginTop: 20 }}
             >
               {R.values(injectTypes).map((type) => (
-                <MenuItem key={type.type} value={type.type}>
-                  {t(type.type)}
+                <MenuItem
+                  key={type.type}
+                  value={type.type}
+                  disabled={type.expose === false}
+                >
+                  <ListItemIcon>
+                    <InjectIcon type={type.type} />
+                  </ListItemIcon>
+                  <ListItemText>{t(type.type)}</ListItemText>
                 </MenuItem>
               ))}
             </Select>
