@@ -13,7 +13,6 @@ import { CSVLink } from 'react-csv';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import { FileDownloadOutlined } from '@mui/icons-material';
-import * as R from 'ramda';
 import { splitDuration } from '../../../../utils/Time';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
