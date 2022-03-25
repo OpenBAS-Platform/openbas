@@ -357,8 +357,8 @@ const Exercise = () => {
                   <Countdown
                     date={nextInjectDate}
                     paused={
-                      exercise?.exercise_status === 'PAUSED'
-                      || exercise?.exercise_status === 'CANCELED'
+                      exercise.exercise_status === 'PAUSED'
+                      || exercise.exercise_status === 'CANCELED'
                     }
                   />
                 </div>
