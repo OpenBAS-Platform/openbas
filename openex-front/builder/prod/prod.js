@@ -54,7 +54,7 @@ esbuild
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
         <link rel="shortcut icon" href="/static/favicon.png">
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>OpenEx - Exercises planning platform</title>
+        <title>OpenEx - Crisis Drills Planning Platform</title>
         ${jsImport}
         ${cssImport}
         </head>
