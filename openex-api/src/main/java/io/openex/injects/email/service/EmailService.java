@@ -33,6 +33,12 @@ public class EmailService {
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
     private DocumentService fileService;
+    private ImapService imapService;
+
+    @Autowired
+    public void setImapService(ImapService imapService) {
+        this.imapService = imapService;
+    }
 
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
@@ -125,8 +131,10 @@ public class EmailService {
             // Fill the message with the multipart content
             encMessage.setContent(encMultipart);
             emailSender.send(encMessage);
+            imapService.storeSentMessage(encMessage);
         } else {
             emailSender.send(mimeMessage);
+            imapService.storeSentMessage(mimeMessage);
         }
     }
 }
