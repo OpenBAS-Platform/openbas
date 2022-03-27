@@ -12,6 +12,7 @@ import io.openex.injects.email.model.EmailAttachment;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.email.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,6 +24,12 @@ import static io.openex.execution.ExecutionTrace.traceSuccess;
 public class EmailExecutor extends BasicExecutor {
 
     private EmailService emailService;
+
+    @Value("${openex.mail.imap.enabled}")
+    private boolean imapEnabled;
+
+    @Value("${spring.mail.username}")
+    private String imapUsername;
 
     @Autowired
     public void setEmailService(EmailService emailService) {
@@ -37,7 +44,7 @@ public class EmailExecutor extends BasicExecutor {
                 .filter(InjectDocument::isAttached)
                 .map(InjectDocument::getDocument).toList();
         String subject = content.getSubject();
-        String message = content.buildMessage(inject.getFooter(), inject.getHeader());
+        String message = content.buildMessage(inject.getId(), inject.getFooter(), inject.getHeader());
         boolean mustBeEncrypted = content.isEncrypted();
         // Resolve the attachments only once
         List<EmailAttachment> attachments = emailService.resolveAttachments(execution, documents);
@@ -48,7 +55,7 @@ public class EmailExecutor extends BasicExecutor {
         users.stream().parallel().forEach(userInjectContext -> {
             User user = userInjectContext.getUser();
             String email = user.getEmail();
-            String replyTo = userInjectContext.getExercise().getReplyTo();
+            String replyTo = imapEnabled ? imapUsername : userInjectContext.getExercise().getReplyTo();
             try {
                 emailService.sendEmail(userInjectContext, replyTo, mustBeEncrypted, subject, message, attachments);
                 execution.addTrace(traceSuccess(user.getId(), "Mail sent to " + email));
