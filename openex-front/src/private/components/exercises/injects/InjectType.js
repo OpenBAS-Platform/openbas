@@ -101,7 +101,7 @@ class InjectType extends Component {
         return (
           <Chip
             classes={{ root: style }}
-            style={inlineStyles.openex_mastodon}
+            style={inlineStyles.openex_lade}
             label={t('Lade')}
           />
         );
@@ -109,7 +109,7 @@ class InjectType extends Component {
         return (
           <Chip
             classes={{ root: style }}
-            style={inlineStyles.openex_mastodon}
+            style={inlineStyles.openex_gnu_social}
             label={t('Mastodon')}
           />
         );
@@ -117,7 +117,7 @@ class InjectType extends Component {
         return (
           <Chip
             classes={{ root: style }}
-            style={inlineStyles.openex_mastodon}
+            style={inlineStyles.openex_twitter}
             label={t('Twitter')}
           />
         );
@@ -125,7 +125,7 @@ class InjectType extends Component {
         return (
           <Chip
             classes={{ root: style }}
-            style={inlineStyles.openex_mastodon}
+            style={inlineStyles.openex_rest_api}
             label={t('Rest API')}
           />
         );

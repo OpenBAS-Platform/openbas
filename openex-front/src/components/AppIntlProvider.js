@@ -20,7 +20,7 @@ const AppIntlProvider = (props) => {
   const { platformName, lang } = useHelper((helper) => {
     const me = helper.getMe();
     const settings = helper.getSettings();
-    const name = settings.platform_name ?? 'OpenEx - Exercises planning platform';
+    const name = settings.platform_name ?? 'OpenEx - Crisis Drills Planning Platform';
     const rawPlatformLang = settings.platform_lang ?? 'auto';
     const rawUserLang = me?.user_lang ?? 'auto';
     const platformLang = rawPlatformLang !== 'auto' ? rawPlatformLang : locale;

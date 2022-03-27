@@ -354,14 +354,18 @@ class InjectDefinition extends Component {
   validate(values) {
     const { t, injectTypes, inject } = this.props;
     const errors = {};
-    const injectType = R.head(injectTypes.filter((i) => i.contract_id === inject.inject_contract));
+    const injectType = R.head(
+      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    );
     if (injectType && Array.isArray(injectType.fields)) {
-      injectType.fields.filter((f) => !['audiences', 'attachments'].includes(f.key)).forEach((field) => {
-        const value = values[field.key];
-        if (field.mandatory && R.isEmpty(value)) {
-          errors[field.key] = t('This field is required.');
-        }
-      });
+      injectType.fields
+        .filter((f) => !['audiences', 'attachments'].includes(f.key))
+        .forEach((field) => {
+          const value = values[field.key];
+          if (field.mandatory && R.isEmpty(value)) {
+            errors[field.key] = t('This field is required.');
+          }
+        });
     }
     return errors;
   }
@@ -392,7 +396,9 @@ class InjectDefinition extends Component {
       documentsSortBy,
       documentsOrderAsc,
     } = this.state;
-    const injectType = R.head(injectTypes.filter((i) => i.contract_id === inject.inject_contract));
+    const injectType = R.head(
+      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    );
     const audiences = audiencesIds
       .map((a) => audiencesMap[a])
       .filter((a) => a !== undefined);
@@ -416,16 +422,22 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAudiences = injectType.fields.map((f) => f.key).includes('audiences');
-    const hasAttachments = injectType.fields.map((f) => f.key).includes('attachments');
+    const hasAudiences = injectType.fields
+      .map((f) => f.key)
+      .includes('audiences');
+    const hasAttachments = injectType.fields
+      .map((f) => f.key)
+      .includes('attachments');
     const initialValues = { ...inject.inject_content };
     // Enrich initialValues with default contract value
     if (inject.inject_content === null) {
-      injectType.fields.filter((f) => !['audiences', 'attachments'].includes(f.key)).forEach((field) => {
-        if (!initialValues[field.key]) {
-          initialValues[field.key] = field.defaultValue;
-        }
-      });
+      injectType.fields
+        .filter((f) => !['audiences', 'attachments'].includes(f.key))
+        .forEach((field) => {
+          if (!initialValues[field.key]) {
+            initialValues[field.key] = field.defaultValue;
+          }
+        });
     }
     return (
       <div>
@@ -435,7 +447,8 @@ class InjectDefinition extends Component {
             className={classes.closeButton}
             onClick={handleClose.bind(this)}
             size="large"
-            color="primary">
+            color="primary"
+          >
             <CloseRounded fontSize="small" color="primary" />
           </IconButton>
           <Typography variant="h6" classes={{ root: classes.title }}>
@@ -453,7 +466,8 @@ class InjectDefinition extends Component {
               setValue: ([field, value], state, { changeValue }) => {
                 changeValue(state, field, () => value);
               },
-            }}>
+            }}
+          >
             {({ handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
                 {hasAudiences && (
@@ -463,7 +477,8 @@ class InjectDefinition extends Component {
                     </Typography>
                     <FormGroup
                       row={true}
-                      classes={{ root: classes.allAudiences }}>
+                      classes={{ root: classes.allAudiences }}
+                    >
                       <FormControlLabel
                         control={
                           <Switch
@@ -648,21 +663,31 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <Typography variant="h2" style={{ marginTop: hasAudiences ? 30 : 0 }}>
-                  {t('Inject data: ')}<b>{injectType.name}</b>
+                <Typography
+                  variant="h2"
+                  style={{ marginTop: hasAudiences ? 30 : 0 }}
+                >
+                  {t('Inject data: ')}
+                  <b>{injectType.name}</b>
                 </Typography>
                 <div style={{ marginTop: -20, overflowX: 'hidden' }}>
-                  {injectType.fields.filter((f) => !['audiences', 'attachments'].includes(f.key)).map((field) => {
-                    switch (field.type) {
-                      case 'textarea':
-                        return field.richText ? <EnrichedTextField
+                  {injectType.fields
+                    .filter(
+                      (f) => !['audiences', 'attachments'].includes(f.key),
+                    )
+                    .map((field) => {
+                      switch (field.type) {
+                        case 'textarea':
+                          return field.richText ? (
+                            <EnrichedTextField
                               key={field.key}
                               name={field.key}
                               label={t(field.label)}
                               fullWidth={true}
                               style={{ marginTop: 20, height: 250 }}
                               disabled={isExerciseReadOnly(exercise)}
-                          /> : (
+                            />
+                          ) : (
                             <TextField
                               variant="standard"
                               key={field.key}
@@ -674,9 +699,9 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                               disabled={isExerciseReadOnly(exercise)}
                             />
-                        );
-                      case 'checkbox':
-                        return (
+                          );
+                        case 'checkbox':
+                          return (
                             <SwitchField
                               key={field.key}
                               name={field.key}
@@ -684,53 +709,93 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 10 }}
                               disabled={isExerciseReadOnly(exercise)}
                             />
-                        );
-                      case 'select':
-                        return field.cardinality === 'n' ? (
-                              <Select variant="standard" label={t(field.label)} key={field.key} multiple
-                                      renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
-                                      name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
-                                {Object.entries(field.choices).map(([k, v]) => (
-                                    <MenuItem key={k} value={k}>
-                                      <ListItemText>{v}</ListItemText>
-                                    </MenuItem>
+                          );
+                        case 'select':
+                          return field.cardinality === 'n' ? (
+                            <Select
+                              variant="standard"
+                              label={t(field.label)}
+                              key={field.key}
+                              multiple
+                              renderValue={(v) => v.map((a) => field.choices[a]).join(', ')
+                              }
+                              name={field.key}
+                              fullWidth={true}
+                              style={{ marginTop: 20 }}
+                            >
+                              {Object.entries(field.choices)
+                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .map(([k, v]) => (
+                                  <MenuItem key={k} value={k}>
+                                    <ListItemText>{v}</ListItemText>
+                                  </MenuItem>
                                 ))}
-                              </Select>
-                        ) : (<Select variant="standard" label={t(field.label)} key={field.key}
-                                     renderValue={(v) => field.choices[v]}
-                                     name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
-                          {Object.entries(field.choices).map(([k, v]) => (
-                              <MenuItem key={k} value={k}>
-                                <ListItemText>{v}</ListItemText>
-                              </MenuItem>
-                          ))}
-                        </Select>);
-                      case 'dependency-select':
-                        // eslint-disable-next-line no-case-declarations
-                        const depValue = values[field.dependencyField];
-                        // eslint-disable-next-line no-case-declarations
-                        const choices = field.choices[depValue] ?? {};
-                        return field.cardinality === 'n' ? (
-                              <Select variant="standard" label={t(field.label)} key={field.key} multiple
-                                      renderValue={(v) => v.map((a) => choices[a]).join(', ')}
-                                      name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
-                                {Object.entries(choices).map(([k, v]) => (
-                                    <MenuItem key={k} value={k}>
-                                      <ListItemText>{v}</ListItemText>
-                                    </MenuItem>
+                            </Select>
+                          ) : (
+                            <Select
+                              variant="standard"
+                              label={t(field.label)}
+                              key={field.key}
+                              renderValue={(v) => field.choices[v]}
+                              name={field.key}
+                              fullWidth={true}
+                              style={{ marginTop: 20 }}
+                            >
+                              {Object.entries(field.choices)
+                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .map(([k, v]) => (
+                                  <MenuItem key={k} value={k}>
+                                    <ListItemText>{v}</ListItemText>
+                                  </MenuItem>
                                 ))}
-                              </Select>
-                        ) : <Select variant="standard" label={t(field.label)} key={field.key}
-                                renderValue={(v) => choices[v]}
-                                name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
-                          {Object.entries(choices).map(([k, v]) => (
-                              <MenuItem key={k} value={k}>
-                                <ListItemText>{v}</ListItemText>
-                              </MenuItem>
-                          ))}
-                        </Select>;
-                      default:
-                        return (
+                            </Select>
+                          );
+                        case 'dependency-select':
+                          // eslint-disable-next-line no-case-declarations
+                          const depValue = values[field.dependencyField];
+                          // eslint-disable-next-line no-case-declarations
+                          const choices = field.choices[depValue] ?? {};
+                          return field.cardinality === 'n' ? (
+                            <Select
+                              variant="standard"
+                              label={t(field.label)}
+                              key={field.key}
+                              multiple
+                              renderValue={(v) => v.map((a) => choices[a]).join(', ')
+                              }
+                              name={field.key}
+                              fullWidth={true}
+                              style={{ marginTop: 20 }}
+                            >
+                              {Object.entries(choices)
+                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .map(([k, v]) => (
+                                  <MenuItem key={k} value={k}>
+                                    <ListItemText>{v}</ListItemText>
+                                  </MenuItem>
+                                ))}
+                            </Select>
+                          ) : (
+                            <Select
+                              variant="standard"
+                              label={t(field.label)}
+                              key={field.key}
+                              renderValue={(v) => choices[v]}
+                              name={field.key}
+                              fullWidth={true}
+                              style={{ marginTop: 20 }}
+                            >
+                              {Object.entries(choices)
+                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .map(([k, v]) => (
+                                  <MenuItem key={k} value={k}>
+                                    <ListItemText>{v}</ListItemText>
+                                  </MenuItem>
+                                ))}
+                            </Select>
+                          );
+                        default:
+                          return (
                             <TextField
                               variant="standard"
                               key={field.key}
@@ -740,9 +805,9 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                               disabled={isExerciseReadOnly(exercise)}
                             />
-                        );
-                    }
-                  })}
+                          );
+                      }
+                    })}
                 </div>
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>

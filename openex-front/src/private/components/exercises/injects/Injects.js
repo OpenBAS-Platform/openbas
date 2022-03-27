@@ -331,6 +331,12 @@ const Injects = () => {
         {sortedInjects.map((inject) => {
           const duration = splitDuration(inject.inject_depends_duration || 0);
           const isDisabled = disabledTypes.includes(inject.inject_type);
+          let injectStatus = inject.inject_enabled
+            ? t('Enabled')
+            : t('Disabled');
+          if (inject.inject_content === null) {
+            injectStatus = t('To fill');
+          }
           return (
             <ListItem
               key={inject.inject_id}
@@ -381,10 +387,12 @@ const Injects = () => {
                       style={inlineStyles.inject_enabled}
                     >
                       <ItemBoolean
-                        status={inject.inject_enabled}
-                        label={
-                          inject.inject_enabled ? t('Enabled') : t('Disabled')
+                        status={
+                          inject.inject_content === null
+                            ? false
+                            : inject.inject_enabled
                         }
+                        label={injectStatus}
                         variant="list"
                       />
                     </div>

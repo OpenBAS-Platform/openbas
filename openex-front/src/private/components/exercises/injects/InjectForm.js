@@ -3,15 +3,13 @@ import * as PropTypes from 'prop-types';
 import * as R from 'ramda';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import withStyles from '@mui/styles/withStyles';
+import Box from '@mui/material/Box';
 import { TextField } from '../../../../components/TextField';
 import inject18n from '../../../../components/i18n';
 import TagField from '../../../../components/TagField';
-import { Select } from '../../../../components/Select';
 import InjectIcon from './InjectIcon';
+import { Autocomplete } from '../../../../components/Autocomplete';
 
 const styles = (theme) => ({
   duration: {
@@ -27,6 +25,18 @@ const styles = (theme) => ({
     fontSize: 12,
     paddingTop: 15,
     color: theme.palette.primary.main,
+  },
+  icon: {
+    paddingTop: 4,
+    display: 'inline-block',
+  },
+  text: {
+    display: 'inline-block',
+    flexGrow: 1,
+    marginLeft: 10,
+  },
+  autoCompleteIndicator: {
+    display: 'none',
   },
 });
 
@@ -60,11 +70,11 @@ class InjectForm extends Component {
       classes,
     } = this.props;
     const sortedTypes = R.sortWith(
-      [R.ascend(R.prop('tname'))],
+      [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
       R.values(injectTypes)
         .filter((type) => type.expose === true)
-        .map((type) => R.assoc('tname', t(type.name), type)),
-    );
+        .map((type) => ({ tname: t(type.name), ttype: t(type.type), ...type })),
+    ).map((n) => ({ id: n.contract_id, label: n.tname, type: n.type }));
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -79,26 +89,32 @@ class InjectForm extends Component {
       >
         {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="injectForm" onSubmit={handleSubmit}>
-            <TextField variant="standard"
+            <TextField
+              variant="standard"
               name="inject_title"
               fullWidth={true}
               label={t('Title')}
             />
-            <Select variant="standard"
-              label={t('Type')}
+            <Autocomplete
+              variant="standard"
+              size="small"
               name="inject_contract"
+              label={t('Type')}
               fullWidth={true}
-              disabled={editing}
-              style={{ marginTop: 20 }}>
-              {sortedTypes.map((type) => (
-                <MenuItem key={type.contract_id} value={type.contract_id}>
-                  <ListItemIcon>
-                    <InjectIcon type={type.type} />
-                  </ListItemIcon>
-                  <ListItemText>{t(type.name)}</ListItemText>
-                </MenuItem>
-              ))}
-            </Select>
+              multiple={false}
+              options={sortedTypes}
+              style={{ marginTop: 20 }}
+              groupBy={(option) => t(option.type)}
+              renderOption={(renderProps, option) => (
+                <Box component="li" {...renderProps}>
+                  <div className={classes.icon}>
+                    <InjectIcon type={option.type} />
+                  </div>
+                  <div className={classes.text}>{t(option.label)}</div>
+                </Box>
+              )}
+              classes={{ clearIndicator: classes.autoCompleteIndicator }}
+            />
             <TextField
               variant="standard"
               name="inject_description"

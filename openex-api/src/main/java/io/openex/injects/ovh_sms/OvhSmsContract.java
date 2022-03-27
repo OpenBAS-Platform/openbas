@@ -43,6 +43,6 @@ public class OvhSmsContract implements BaseContract {
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textareaField("message", "Message"))
                 .build();
-        return List.of(new ContractInstance(TYPE, isExpose(), OVH_DEFAULT, "SMS (OVH)", instance));
+        return List.of(new ContractInstance(TYPE, isExpose(), OVH_DEFAULT, "Send a SMS", instance));
     }
 }

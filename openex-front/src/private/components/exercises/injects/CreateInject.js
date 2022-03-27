@@ -54,7 +54,7 @@ class CreateInject extends Component {
           + data.inject_depends_duration_minutes * 60
           + data.inject_depends_duration_seconds,
       ),
-      R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
+      R.assoc('inject_contract', data.inject_contract.id),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
       R.dissoc('inject_depends_duration_days'),
       R.dissoc('inject_depends_duration_hours'),
@@ -75,18 +75,22 @@ class CreateInject extends Component {
     const { classes, t, injectTypes } = this.props;
     return (
       <div>
-        <Fab onClick={this.handleOpen.bind(this)}
+        <Fab
+          onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
-          className={classes.createButton}>
+          className={classes.createButton}
+        >
           <Add />
         </Fab>
-        <Dialog open={this.state.open}
+        <Dialog
+          open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
           maxWidth="md"
-          PaperProps={{ elevation: 1 }}>
+          PaperProps={{ elevation: 1 }}
+        >
           <DialogTitle>{t('Create a new inject')}</DialogTitle>
           <DialogContent>
             <InjectForm

@@ -136,7 +136,7 @@ const i18n = {
       'Do you want to delete this document?':
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
-      'Inject data': 'Données du stimuli',
+      'Inject data: ': 'Données du stimuli : ',
       'Add target audiences in this inject':
         'Ajouter des audiences cibles dans ce stimuli',
       'Targeted audiences': 'Audiences ciblées',
@@ -317,6 +317,9 @@ const i18n = {
       Elements: 'Eléments',
       'Scenario (including attached files)':
         'Scénario (fichiers joints inclus)',
+      'Send an email': 'Envoyer un email',
+      'Send a SMS': 'Envoyer un SMS',
+      'To fill': 'A remplir',
     },
     en: {
       openex_email: 'Email',
