@@ -3,6 +3,10 @@ package io.openex.importer;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
+import io.openex.injects.email.EmailContract;
+import io.openex.injects.manual.ManualContract;
+import io.openex.injects.mastodon.MastodonContract;
+import io.openex.injects.ovh_sms.OvhSmsContract;
 import io.openex.service.DocumentService;
 import io.openex.service.ImportEntry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,34 +108,52 @@ public class V1_DataImporter implements Importer {
             String country = injectNode.get("inject_country").textValue();
             String city = injectNode.get("inject_city").textValue();
             String type = injectNode.get("inject_type").textValue();
-            String content = injectNode.get("inject_content").toString();
-            JsonNode dependsOnNode = injectNode.get("inject_depends_on");
-            String dependsOn = !dependsOnNode.isNull() ? baseIds.get(dependsOnNode.asText()).getId() : null;
-            Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
-            boolean allAudiences = injectNode.get("inject_all_audiences").booleanValue();
-            injectRepository.importSave(injectId, title, description, country, city, type, allAudiences,
-                    true, exercise.getId(), dependsOn, dependsDuration, content);
-            baseIds.put(id, new BaseHolder(injectId));
-            // Tags
-            List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
-            injectTagIds.forEach(tagId -> {
-                String remappedId = baseIds.get(tagId).getId();
-                injectRepository.addTag(injectId, remappedId);
-            });
-            // Audiences
-            List<String> injectAudienceIds = resolveJsonIds(injectNode, "inject_audiences");
-            injectAudienceIds.forEach(audienceId -> {
-                String remappedId = baseIds.get(audienceId).getId();
-                injectRepository.addAudience(injectId, remappedId);
-            });
-            // Documents
-            List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
-            injectDocuments.forEach(jsonNode -> {
-                String docId = jsonNode.get("document_id").textValue();
-                String documentId = baseIds.get(docId).getId();
-                boolean docAttached = jsonNode.get("document_attached").booleanValue();
-                injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
-            });
+            String contract = null;
+            JsonNode injectContractNode = injectNode.get("inject_contract");
+            // In old v1 import, contract could be empty
+            // In this case basic inject types must be mapped to corresponding default contract
+            if (injectContractNode != null) {
+                contract = injectContractNode.textValue();
+            } else if (type.equals(EmailContract.TYPE)) {
+                contract = EmailContract.EMAIL_DEFAULT;
+            } else if (type.equals(MastodonContract.TYPE)) {
+                contract = MastodonContract.MASTODON_DEFAULT;
+            } else if (type.equals(OvhSmsContract.TYPE)) {
+                contract = OvhSmsContract.OVH_DEFAULT;
+            } else if (type.equals(ManualContract.TYPE)) {
+                contract = ManualContract.MANUAL_DEFAULT;
+            }
+            // If contract is not know, inject can't be imported
+            if (contract != null) {
+                String content = injectNode.get("inject_content").toString();
+                JsonNode dependsOnNode = injectNode.get("inject_depends_on");
+                String dependsOn = !dependsOnNode.isNull() ? baseIds.get(dependsOnNode.asText()).getId() : null;
+                Long dependsDuration = injectNode.get("inject_depends_duration").asLong();
+                boolean allAudiences = injectNode.get("inject_all_audiences").booleanValue();
+                injectRepository.importSave(injectId, title, description, country, city, type, contract, allAudiences,
+                        true, exercise.getId(), dependsOn, dependsDuration, content);
+                baseIds.put(id, new BaseHolder(injectId));
+                // Tags
+                List<String> injectTagIds = resolveJsonIds(injectNode, "inject_tags");
+                injectTagIds.forEach(tagId -> {
+                    String remappedId = baseIds.get(tagId).getId();
+                    injectRepository.addTag(injectId, remappedId);
+                });
+                // Audiences
+                List<String> injectAudienceIds = resolveJsonIds(injectNode, "inject_audiences");
+                injectAudienceIds.forEach(audienceId -> {
+                    String remappedId = baseIds.get(audienceId).getId();
+                    injectRepository.addAudience(injectId, remappedId);
+                });
+                // Documents
+                List<JsonNode> injectDocuments = resolveJsonElements(injectNode, "inject_documents").toList();
+                injectDocuments.forEach(jsonNode -> {
+                    String docId = jsonNode.get("document_id").textValue();
+                    String documentId = baseIds.get(docId).getId();
+                    boolean docAttached = jsonNode.get("document_attached").booleanValue();
+                    injectDocumentRepository.addInjectDoc(injectId, documentId, docAttached);
+                });
+            }
         });
         // Looking for child of created injects
         List<JsonNode> childInjects = injects.stream().filter(jsonNode -> {
@@ -186,7 +208,6 @@ public class V1_DataImporter implements Importer {
         exercise.setHeader(exerciseNode.get("exercise_message_header").textValue());
         exercise.setFooter(exerciseNode.get("exercise_message_footer").textValue());
         exercise.setReplyTo(exerciseNode.get("exercise_mail_from").textValue());
-        // TODO Handle image of exercise
         List<String> exerciseTagIds = resolveJsonIds(exerciseNode, "exercise_tags");
         List<Tag> tagsForExercise = exerciseTagIds.stream().map(baseIds::get).map(base -> (Tag) base).toList();
         exercise.setTags(tagsForExercise);

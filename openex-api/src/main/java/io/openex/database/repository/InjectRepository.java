@@ -30,15 +30,16 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
 
     @Modifying
     @Query(value = "insert into injects (inject_id, inject_title, inject_description, inject_country, inject_city," +
-            "inject_type, inject_all_audiences, inject_enabled, inject_exercise, inject_depends_from_another, " +
+            "inject_type, inject_contract, inject_all_audiences, inject_enabled, inject_exercise, inject_depends_from_another, " +
             "inject_depends_duration, inject_content) " +
-            "values (:id, :title, :description, :country, :city, :type, :allAudiences, :enabled, :exercise, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
+            "values (:id, :title, :description, :country, :city, :type, :contract, :allAudiences, :enabled, :exercise, :dependsOn, :dependsDuration, :content)", nativeQuery = true)
     void importSave(@Param("id") String id,
                     @Param("title") String title,
                     @Param("description") String description,
                     @Param("country") String country,
                     @Param("city") String city,
                     @Param("type") String type,
+                    @Param("contract") String contract,
                     @Param("allAudiences") boolean allAudiences,
                     @Param("enabled") boolean enabled,
                     @Param("exercise") String exerciseId,
