@@ -435,7 +435,11 @@ class InjectDefinition extends Component {
         .filter((f) => !['audiences', 'attachments'].includes(f.key))
         .forEach((field) => {
           if (!initialValues[field.key]) {
-            initialValues[field.key] = field.defaultValue;
+            if (field.cardinality && field.cardinality === '1') {
+              initialValues[field.key] = R.head(field.defaultValue);
+            } else {
+              initialValues[field.key] = field.defaultValue;
+            }
           }
         });
     }

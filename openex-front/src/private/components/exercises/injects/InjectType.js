@@ -22,7 +22,7 @@ const styles = () => ({
     float: 'left',
     marginRight: 7,
     borderRadius: 5,
-    width: 100,
+    width: 120,
   },
 });
 

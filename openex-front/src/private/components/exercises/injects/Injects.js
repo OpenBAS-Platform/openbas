@@ -196,13 +196,21 @@ const Injects = () => {
   );
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, injects, injectTypesMap, tagsMap, exercisesMap } = useHelper((helper) => {
+  const {
+    exercise,
+    injects,
+    injectTypesMap,
+    tagsMap,
+    exercisesMap,
+    injectTypesWithNoAudiences,
+  } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       injects: helper.getExerciseInjects(exerciseId),
       injectTypesMap: helper.getInjectTypesMap(),
       tagsMap: helper.getTagsMap(),
       exercisesMap: helper.getExercisesMap(),
+      injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
     };
   });
   useDataLoader(() => {
@@ -329,9 +337,14 @@ const Injects = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedInjects.map((inject) => {
-          const injectTypeName = injectTypesMap[inject.inject_contract]?.name || t(inject.inject_type);
+          const injectTypeName = injectTypesMap[inject.inject_contract]?.name
+            || t(inject.inject_type);
           const duration = splitDuration(inject.inject_depends_duration || 0);
-          const isDisabled = disabledTypes.includes(inject.inject_type) || !types.includes(inject.inject_type);
+          const isDisabled = disabledTypes.includes(inject.inject_type)
+            || !types.includes(inject.inject_type);
+          const isNoAudience = injectTypesWithNoAudiences.includes(
+            inject.inject_type,
+          );
           let injectStatus = inject.inject_enabled
             ? t('Enabled')
             : t('Disabled');
@@ -388,7 +401,7 @@ const Injects = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.inject_users_number}
                     >
-                      {inject.inject_users_number}
+                      {isNoAudience ? t('N/A') : inject.inject_users_number}
                     </div>
                     <div
                       className={classes.bodyItem}
@@ -418,7 +431,7 @@ const Injects = () => {
                   exerciseId={exerciseId}
                   exercise={exercise}
                   inject={inject}
-                  injectTypes={injectTypes}
+                  injectTypesMap={injectTypesMap}
                   tagsMap={tagsMap}
                   setSelectedInject={setSelectedInject}
                   isDisabled={isDisabled}
@@ -449,7 +462,7 @@ const Injects = () => {
       </Drawer>
       {isExerciseUpdatable(exercise) && (
         <CreateInject
-          injectTypes={injectTypes}
+          injectTypesMap={injectTypesMap}
           exerciseId={exercise.exercise_id}
         />
       )}

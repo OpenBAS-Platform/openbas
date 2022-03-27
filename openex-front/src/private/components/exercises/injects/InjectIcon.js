@@ -67,7 +67,10 @@ const iconSelector = (type, variant, fontSize, done) => {
         <img
           src={`/${window.BASE_PATH ? `${window.BASE_PATH}/` : ''}${Airbus}`}
           alt="Airbus Lade"
-          style={{ width: 24, height: 24 }}
+          style={{
+            width: fontSize === 'small' ? 20 : 24,
+            height: fontSize === 'small' ? 20 : 24,
+          }}
         />
       );
     case 'openex_gnu_social':

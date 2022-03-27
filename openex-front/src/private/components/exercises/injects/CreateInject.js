@@ -72,7 +72,7 @@ class CreateInject extends Component {
   }
 
   render() {
-    const { classes, t, injectTypes } = this.props;
+    const { classes, t, injectTypesMap } = this.props;
     return (
       <div>
         <Fab
@@ -104,7 +104,7 @@ class CreateInject extends Component {
                 inject_depends_duration_seconds: 0,
               }}
               handleClose={this.handleClose.bind(this)}
-              injectTypes={injectTypes}
+              injectTypesMap={injectTypesMap}
             />
           </DialogContent>
         </Dialog>
@@ -117,7 +117,7 @@ CreateInject.propTypes = {
   t: PropTypes.func,
   exerciseId: PropTypes.string,
   addInject: PropTypes.func,
-  injectTypes: PropTypes.array,
+  injectTypesMap: PropTypes.object,
 };
 
 export default R.compose(

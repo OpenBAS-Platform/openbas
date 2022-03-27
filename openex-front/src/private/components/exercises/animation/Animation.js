@@ -151,7 +151,7 @@ const Animation = () => {
     exercise,
     audiences,
     injects,
-    injectTypes,
+    injectTypesMap,
     injectTypesWithNoAudiences,
     exercisesMap,
     tagsMap,
@@ -173,7 +173,7 @@ const Animation = () => {
       audiencesInjectsMap: injectsPerAudience,
       technicalInjectsMap:
         helper.getExerciseTechnicalInjectsPerType(exerciseId),
-      injectTypes: helper.getInjectTypes(),
+      injectTypesMap: helper.getInjectTypesMap(),
       injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
     };
   });
@@ -227,6 +227,7 @@ const Animation = () => {
     [R.descend(R.prop('inject_depends_duration'))],
     injects.filter((i) => i.inject_status !== null),
   );
+  const injectTypes = R.values(injectTypesMap);
   const disabledTypes = injectTypes
     .filter((type) => type.expose === false)
     .map((type) => type.type);
@@ -468,6 +469,7 @@ const Animation = () => {
                           exerciseId={exerciseId}
                           exercise={exercise}
                           tagsMap={tagsMap}
+                          injectTypesMap={injectTypesMap}
                           setSelectedInject={setSelectedInject}
                           isDisabled={isDisabled}
                         />

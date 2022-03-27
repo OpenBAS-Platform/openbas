@@ -14,6 +14,11 @@ import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Alert from '@mui/material/Alert';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import withStyles from '@mui/styles/withStyles';
 import {
   updateInject,
   deleteInject,
@@ -32,6 +37,16 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
+const styles = () => ({
+  tableHeader: {
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
+  tableCell: {
+    borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
+  },
+});
+
 class InjectPopover extends Component {
   constructor(props) {
     super(props);
@@ -44,6 +59,8 @@ class InjectPopover extends Component {
       openEnable: false,
       openDisable: false,
       openDone: false,
+      openResult: false,
+      injectResult: null,
     };
   }
 
@@ -111,6 +128,13 @@ class InjectPopover extends Component {
   handleCloseTry() {
     this.setState({
       openTry: false,
+    });
+  }
+
+  handleCloseResult() {
+    this.setState({
+      openResult: false,
+      injectResult: null,
     });
   }
 
@@ -195,11 +219,12 @@ class InjectPopover extends Component {
     const {
       t,
       inject,
-      injectTypes,
+      injectTypesMap,
       exercise,
       setSelectedInject,
       tagsMap,
       isDisabled,
+      classes,
     } = this.props;
     const injectTags = tagsConverter(inject.inject_tags, tagsMap);
     const duration = splitDuration(inject.inject_depends_duration || 0);
@@ -319,7 +344,7 @@ class InjectPopover extends Component {
             <InjectForm
               initialValues={initialValues}
               editing={true}
-              injectTypes={injectTypes}
+              injectTypesMap={injectTypesMap}
               onSubmit={this.onSubmitEdit.bind(this)}
               handleClose={this.handleCloseEdit.bind(this)}
             />
@@ -408,6 +433,75 @@ class InjectPopover extends Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          open={this.state.openResult}
+          TransitionComponent={Transition}
+          onClose={this.handleCloseResult.bind(this)}
+          fullWidth={true}
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
+        >
+          <DialogContent>
+            <Table selectable={false} size="small">
+              <TableBody displayRowCheckbox={false}>
+                {this.state.injectResult
+                  && Object.entries(this.state.injectResult.status_reporting).map(
+                    ([key, value]) => {
+                      if (key === 'execution_traces') {
+                        return (
+                          <TableRow key={key}>
+                            <TableCell classes={{ root: classes.tableCell }}>
+                              {key}
+                            </TableCell>
+                            <TableCell classes={{ root: classes.tableCell }}>
+                              <Table selectable={false} size="small" key={key}>
+                                <TableBody displayRowCheckbox={false}>
+                                  {value.map((trace) => (
+                                    <TableRow key={trace.trace_identifier}>
+                                      <TableCell
+                                        classes={{ root: classes.tableCell }}
+                                      >
+                                        {trace.trace_message}
+                                      </TableCell>
+                                      <TableCell
+                                        classes={{ root: classes.tableCell }}
+                                      >
+                                        {trace.trace_status}
+                                      </TableCell>
+                                      <TableCell
+                                        classes={{ root: classes.tableCell }}
+                                      >
+                                        {trace.trace_time}
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                      return (
+                        <TableRow key={key}>
+                          <TableCell classes={{ root: classes.tableCell }}>
+                            {key}
+                          </TableCell>
+                          <TableCell classes={{ root: classes.tableCell }}>
+                            {value}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    },
+                  )}
+              </TableBody>
+            </Table>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleCloseResult.bind(this)}>
+              {t('Close')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -421,7 +515,7 @@ InjectPopover.propTypes = {
   inject: PropTypes.object,
   updateInject: PropTypes.func,
   deleteInject: PropTypes.func,
-  injectTypes: PropTypes.array,
+  injectTypesMap: PropTypes.object,
   updateInjectActivation: PropTypes.func,
   injectDone: PropTypes.func,
   setSelectedInject: PropTypes.func,
@@ -437,4 +531,5 @@ export default R.compose(
     injectDone,
   }),
   inject18n,
+  withStyles(styles),
 )(InjectPopover);

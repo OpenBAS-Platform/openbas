@@ -23,9 +23,10 @@ const renderColorPickerField = ({
         label={label}
         error={touched && invalid}
         helperText={touched && (error || submitError)}
-        {...inputProps}
         {...others}
         InputProps={{
+          ...inputProps,
+          onChange,
           endAdornment: (
             <InputAdornment position="end">
               <IconButton

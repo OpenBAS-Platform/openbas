@@ -66,19 +66,30 @@ class InjectForm extends Component {
       handleClose,
       initialValues,
       editing,
-      injectTypes,
+      injectTypesMap,
       classes,
     } = this.props;
+    console.log(injectTypesMap);
     const sortedTypes = R.sortWith(
       [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-      R.values(injectTypes)
+      R.values(injectTypesMap)
         .filter((type) => type.expose === true)
         .map((type) => ({ tname: t(type.name), ttype: t(type.type), ...type })),
     ).map((n) => ({ id: n.contract_id, label: n.tname, type: n.type }));
+    const finalInitialValues = editing
+      ? R.assoc(
+        'inject_contract',
+        {
+          id: initialValues.inject_contract,
+          label: injectTypesMap[initialValues.inject_contract]?.name,
+        },
+        initialValues,
+      )
+      : initialValues;
     return (
       <Form
         keepDirtyOnReinitialize={true}
-        initialValues={initialValues}
+        initialValues={finalInitialValues}
         onSubmit={onSubmit}
         validate={this.validate.bind(this)}
         mutators={{
@@ -184,7 +195,7 @@ InjectForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
-  injectTypes: PropTypes.array,
+  injectTypesMap: PropTypes.object,
 };
 
 export default R.compose(inject18n, withStyles(styles))(InjectForm);

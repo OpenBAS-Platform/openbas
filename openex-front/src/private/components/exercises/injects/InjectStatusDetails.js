@@ -114,11 +114,7 @@ class InjectStatusDetails extends Component {
               </Table>
             </DialogContent>
             <DialogActions>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={this.handleClose.bind(this)}
-              >
+              <Button onClick={this.handleClose.bind(this)}>
                 {t('Close')}
               </Button>
             </DialogActions>
