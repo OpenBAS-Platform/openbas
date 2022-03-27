@@ -1,16 +1,18 @@
 package io.openex.scheduler.jobs;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.config.OpenExConfig;
 import io.openex.database.model.Comcheck;
 import io.openex.database.model.ComcheckStatus;
 import io.openex.database.model.Exercise;
+import io.openex.database.model.Inject;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ComcheckStatusRepository;
 import io.openex.execution.*;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.email.EmailExecutor;
-import io.openex.injects.email.model.EmailContent;
-import io.openex.injects.email.model.EmailInject;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,9 @@ public class ComchecksExecutionJob implements Job {
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
+
+    @Resource
+    private ObjectMapper mapper;
 
     @Autowired
     public void setComcheckRepository(ComcheckRepository comcheckRepository) {
@@ -58,12 +64,12 @@ public class ComchecksExecutionJob implements Job {
         this.comcheckStatusRepository = comcheckStatusRepository;
     }
 
-    private EmailInject buildComcheckEmail(Comcheck comCheck) {
-        EmailInject emailInject = new EmailInject();
-        emailInject.setType(EmailContract.NAME);
-        EmailContent content = new EmailContent();
-        content.setSubject(comCheck.getSubject());
-        content.setBody(comCheck.getMessage());
+    private Inject buildComcheckEmail(Comcheck comCheck) {
+        Inject emailInject = new Inject();
+        emailInject.setContract(EmailContract.EMAIL_DEFAULT);
+        ObjectNode content = mapper.createObjectNode();
+        content.set("subject", mapper.convertValue(comCheck.getSubject(), JsonNode.class));
+        content.set("body", mapper.convertValue(comCheck.getMessage(), JsonNode.class));
         emailInject.setContent(content);
         return emailInject;
     }
@@ -96,8 +102,8 @@ public class ComchecksExecutionJob implements Job {
                     injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
                     return injectContext;
                 }).toList();
-                EmailInject emailInject = buildComcheckEmail(comCheck);
-                ExecutableInject<?> injection = new ExecutableInject<>(emailInject, userInjectContexts);
+                Inject emailInject = buildComcheckEmail(comCheck);
+                ExecutableInject injection = new ExecutableInject(emailInject, userInjectContexts);
                 EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
                 Execution execution = emailExecutor.executeDirectly(injection);
                 // Save the status sent date

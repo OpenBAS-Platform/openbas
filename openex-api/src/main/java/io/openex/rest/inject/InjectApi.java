@@ -1,6 +1,7 @@
 package io.openex.rest.inject;
 
-import io.openex.contract.Contract;
+import io.openex.contract.BaseContract;
+import io.openex.contract.ContractInstance;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.database.specification.InjectSpecification;
@@ -20,6 +21,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static io.openex.config.AppConfig.currentUser;
@@ -83,18 +85,19 @@ public class InjectApi extends RestBehavior {
     }
 
     @GetMapping("/api/inject_types")
-    public List<Contract> injectTypes() {
-        return contractService.getContracts();
+    public List<ContractInstance> injectTypes() {
+        return contractService.getContracts().values().stream().toList();
     }
 
     @GetMapping("/api/injects/try/{injectId}")
     public InjectStatus execute(@PathVariable String injectId) {
+        Map<String, ContractInstance> contractMap = contractService.getContracts();
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         List<ExecutionContext> userInjectContexts = List.of(new ExecutionContext(currentUser(),
                 inject.getExercise(), "Direct test"));
-        ExecutableInject<?> injection = new ExecutableInject<>(inject, userInjectContexts);
-        Class<? extends Executor<?>> executorClass = inject.executor();
-        Executor<?> executor = context.getBean(executorClass);
+        ExecutableInject injection = new ExecutableInject(inject, userInjectContexts);
+        String contractType = contractMap.get(inject.getContract()).getType();
+        Executor executor = context.getBean(contractType, Executor.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
@@ -178,6 +181,7 @@ public class InjectApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Get common attributes
         Inject inject = input.toInject();
+        inject.setType(contractService.getContractType(input.getContract()));
         inject.setUser(currentUser());
         inject.setExercise(exercise);
         // Set dependencies

@@ -1,23 +1,21 @@
 package io.openex.injects.lade;
 
-import io.openex.database.model.Document;
-import io.openex.database.model.InjectDocument;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.openex.contract.ContractInstance;
+import io.openex.database.model.Inject;
 import io.openex.execution.BasicExecutor;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
-import io.openex.injects.lade.model.LadeContent;
-import io.openex.injects.lade.model.LadeInject;
 import io.openex.injects.lade.service.LadeService;
+import io.openex.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 import static io.openex.execution.ExecutionTrace.traceError;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 
-@Component
-public class LadeExecutor extends BasicExecutor<LadeInject> {
+@Component("openex_lade")
+public class LadeExecutor extends BasicExecutor {
 
     private LadeService ladeService;
 
@@ -27,7 +25,17 @@ public class LadeExecutor extends BasicExecutor<LadeInject> {
     }
 
     @Override
-    public void process(ExecutableInject<LadeInject> injection, Execution execution) {
-        // TODO
+    public void process(ExecutableInject injection, Execution execution) throws Exception {
+        Inject inject = injection.getInject();
+        ContractInstance contractInstance = getContractService().getContracts().get(inject.getContract());
+        String bundleIdentifier = contractInstance.getContext().get("bundle_identifier");
+        ObjectNode content = inject.getContent();
+        try {
+            String callResult = ladeService.executeAction(bundleIdentifier, inject.getContract(), content);
+            String message = "Lade action sent with workflow (" + callResult + ")";
+            execution.addTrace(traceSuccess("lade", message));
+        } catch (Exception e) {
+            execution.addTrace(traceError("lade", e.getMessage(), e));
+        }
     }
 }

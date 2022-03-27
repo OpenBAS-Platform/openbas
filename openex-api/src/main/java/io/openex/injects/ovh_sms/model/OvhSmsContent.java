@@ -1,13 +1,12 @@
 package io.openex.injects.ovh_sms.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.openex.database.model.InjectContent;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OvhSmsContent extends InjectContent {
+public class OvhSmsContent {
 
     private String message;
 

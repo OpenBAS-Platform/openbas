@@ -15,7 +15,7 @@ export const arrayOfTags = new schema.Array(tag);
 export const injectType = new schema.Entity(
   'inject_types',
   {},
-  { idAttribute: 'type' },
+  { idAttribute: 'contract_id' },
 );
 export const arrayOfInjectTypes = new schema.Array(injectType);
 
@@ -171,6 +171,7 @@ export const storeHelper = (state) => ({
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
   getExerciseTechnicalInjectsPerType: (id) => {
+    const injectTypesMap = maps('inject_types', state);
     const typesWithNoAudiences = entities('inject_types', state)
       .map((t) => ({
         type: t.type,
@@ -215,12 +216,10 @@ export const storeHelper = (state) => ({
   // injects
   getInject: (id) => entity(id, 'injects', state),
   getInjectTypes: () => entities('inject_types', state),
-  getInjectTypesWithNoAudiences: () => entities('inject_types', state)
-    .map((t) => ({
-      hasAudiences: t.fields.filter((f) => f.name === 'audiences').length > 0,
-      ...t,
-    }))
-    .filter((t) => !t.hasAudiences),
+  getInjectTypesWithNoAudiences: () => R.uniq(entities('inject_types', state)
+    .map((t) => ({ hasAudiences: t.fields.filter((f) => f.key === 'audiences').length > 0, ...t }))
+    .filter((t) => !t.hasAudiences)
+    .map((t) => t.type)),
   getNextInjects: () => {
     const sortFn = (a, b) => new Date(a.inject_date).getTime() - new Date(b.inject_date).getTime();
     const injects = entities('injects', state).filter(

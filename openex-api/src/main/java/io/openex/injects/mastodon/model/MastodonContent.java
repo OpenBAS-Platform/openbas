@@ -2,13 +2,12 @@ package io.openex.injects.mastodon.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.openex.database.model.InjectContent;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MastodonContent extends InjectContent {
+public class MastodonContent {
 
     @JsonProperty("token")
     private String token;

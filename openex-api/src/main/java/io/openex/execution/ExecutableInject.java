@@ -5,24 +5,24 @@ import io.openex.database.model.Injection;
 
 import java.util.List;
 
-public class ExecutableInject<T extends Inject> {
-    private final T inject;
+public class ExecutableInject {
+    private final Inject inject;
     private final Injection source;
     private final List<ExecutionContext> users;
 
-    public ExecutableInject(T inject, List<ExecutionContext> users) {
+    public ExecutableInject(Inject inject, List<ExecutionContext> users) {
         this.inject = inject;
         this.source = inject;
         this.users = users;
     }
 
-    public ExecutableInject(Injection source, T inject, List<ExecutionContext> users) {
+    public ExecutableInject(Injection source, Inject inject, List<ExecutionContext> users) {
         this.inject = inject;
         this.source = source;
         this.users = users;
     }
 
-    public T getInject() {
+    public Inject getInject() {
         return inject;
     }
 

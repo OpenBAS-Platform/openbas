@@ -1,5 +1,6 @@
 package io.openex.scheduler.jobs;
 
+import io.openex.contract.ContractInstance;
 import io.openex.database.model.*;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.ExerciseRepository;
@@ -8,6 +9,7 @@ import io.openex.execution.ExecutableInject;
 import io.openex.execution.Execution;
 import io.openex.execution.Executor;
 import io.openex.helper.InjectHelper;
+import io.openex.service.ContractService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -31,6 +33,12 @@ public class InjectsExecutionJob implements Job {
     private DryInjectRepository dryInjectRepository;
     private InjectRepository injectRepository;
     private ExerciseRepository exerciseRepository;
+    private ContractService contractService;
+
+    @Autowired
+    public void setContractService(ContractService contractService) {
+        this.contractService = contractService;
+    }
 
     @Autowired
     public void setInjectRepository(InjectRepository injectRepository) {
@@ -60,6 +68,7 @@ public class InjectsExecutionJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
+            Map<String, ContractInstance> contractMap = contractService.getContracts();
             // Handle starting exercises if needed.
             List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
             exercises.stream().parallel().forEach(exercise -> {
@@ -67,20 +76,20 @@ public class InjectsExecutionJob implements Job {
                 exercise.setUpdatedAt(now());
                 exerciseRepository.save(exercise);
             });
-            List<ExecutableInject<?>> injects = injectHelper.getInjectsToRun();
+            List<ExecutableInject> injects = injectHelper.getInjectsToRun();
             // Get all injects to execute grouped by exercise.
-            Map<Exercise, List<ExecutableInject<?>>> byExercises = injects.stream()
+            Map<Exercise, List<ExecutableInject>> byExercises = injects.stream()
                     .collect(groupingBy(ex -> ex.getInject().getExercise()));
             // Execute injects in parallel for each exercise.
             byExercises.entrySet().stream().parallel().forEach(entry -> {
                 Exercise exercise = entry.getKey();
-                List<ExecutableInject<?>> executableInjects = entry.getValue();
+                List<ExecutableInject> executableInjects = entry.getValue();
                 // Execute each inject for the exercise in order.
                 executableInjects.forEach(executableInject -> {
                     Inject inject = executableInject.getInject();
                     Injection source = executableInject.getSource();
-                    Class<? extends Executor<?>> executorClass = inject.executor();
-                    Executor<? extends Inject> executor = context.getBean(executorClass);
+                    String contractType = contractMap.get(inject.getContract()).getType();
+                    Executor executor = context.getBean(contractType, Executor.class);
                     Execution execution = executor.executeInRange(executableInject);
                     // Report inject execution
                     if (source instanceof Inject) {

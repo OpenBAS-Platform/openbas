@@ -1,12 +1,15 @@
 package io.openex.injects.email;
 
 import io.openex.database.model.Document;
+import io.openex.database.model.Inject;
 import io.openex.database.model.InjectDocument;
 import io.openex.database.model.User;
-import io.openex.execution.*;
+import io.openex.execution.BasicExecutor;
+import io.openex.execution.ExecutableInject;
+import io.openex.execution.Execution;
+import io.openex.execution.ExecutionContext;
 import io.openex.injects.email.model.EmailAttachment;
 import io.openex.injects.email.model.EmailContent;
-import io.openex.injects.email.model.EmailInject;
 import io.openex.injects.email.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,8 +19,8 @@ import java.util.List;
 import static io.openex.execution.ExecutionTrace.traceError;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 
-@Component
-public class EmailExecutor extends BasicExecutor<EmailInject> {
+@Component("openex_email")
+public class EmailExecutor extends BasicExecutor {
 
     private EmailService emailService;
 
@@ -27,18 +30,21 @@ public class EmailExecutor extends BasicExecutor<EmailInject> {
     }
 
     @Override
-    public void process(ExecutableInject<EmailInject> injection, Execution execution) {
-        EmailInject inject = injection.getInject();
-        EmailContent content = inject.getContent();
+    public void process(ExecutableInject injection, Execution execution) throws Exception {
+        Inject inject = injection.getInject();
+        EmailContent content = contentConvert(injection, EmailContent.class);
         List<Document> documents = inject.getDocuments().stream()
                 .filter(InjectDocument::isAttached)
                 .map(InjectDocument::getDocument).toList();
         String subject = content.getSubject();
-        String message = inject.getContent().buildMessage(inject.getFooter(), inject.getHeader());
+        String message = content.buildMessage(inject.getFooter(), inject.getHeader());
         boolean mustBeEncrypted = content.isEncrypted();
         // Resolve the attachments only once
         List<EmailAttachment> attachments = emailService.resolveAttachments(execution, documents);
         List<ExecutionContext> users = injection.getUsers();
+        if (users.size() == 0) {
+            throw new UnsupportedOperationException("Email needs at least one user");
+        }
         users.stream().parallel().forEach(userInjectContext -> {
             User user = userInjectContext.getUser();
             String email = user.getEmail();

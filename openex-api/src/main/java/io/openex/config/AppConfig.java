@@ -9,12 +9,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.openex.database.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Component
 @EnableAsync
+@EnableScheduling
 @EnableTransactionManagement
 public class AppConfig {
 

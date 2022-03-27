@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -51,6 +53,8 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 @RestController
 @RolesAllowed(ROLE_USER)
 public class ExerciseApi extends RestBehavior {
+
+    private static final Logger LOGGER = Logger.getLogger(ExerciseApi.class.getName());
 
     // region repositories
     private LogRepository logRepository;
@@ -499,8 +503,7 @@ public class ExerciseApi extends RestBehavior {
                     zipExport.write(data);
                     zipExport.closeEntry();
                 } catch (IOException e) {
-                    // Cant add to zip
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
             }
         });

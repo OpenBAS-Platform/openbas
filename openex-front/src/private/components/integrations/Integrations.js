@@ -13,7 +13,6 @@ import {
   HelpOutlined,
   TitleOutlined,
   TextFieldsOutlined,
-  FormatIndentIncreaseOutlined,
   ToggleOnOutlined,
   DescriptionOutlined,
   CastForEducationOutlined,
@@ -41,8 +40,6 @@ const iconField = (type) => {
       return <TitleOutlined color="primary" />;
     case 'textarea':
       return <TextFieldsOutlined color="primary" />;
-    case 'richtextarea':
-      return <FormatIndentIncreaseOutlined color="primary" />;
     case 'checkbox':
       return <ToggleOnOutlined color="primary" />;
     case 'attachment':
@@ -67,26 +64,17 @@ const Integrations = () => {
     <div className={classes.root}>
       <Grid container={true} spacing={3}>
         {injectTypes.map((injectType) => (
-          <Grid
-            key={injectType.type}
-            item={true}
-            xs={6}
-            style={{ marginBottom: 30 }}
-          >
+          <Grid key={injectType.type} item={true} xs={6} style={{ marginBottom: 30 }}>
             <Typography variant="h4">{t(injectType.type)}</Typography>
             <Paper variant="outlined" classes={{ root: classes.paper }}>
               <List style={{ paddingTop: 0 }}>
                 {injectType.fields.map((field) => (
                   <ListItem key={field.name} divider={true} dense={true}>
                     <ListItemIcon>{iconField(field.type)}</ListItemIcon>
-                    <ListItemText
-                      primary={t(field.name)}
-                      secondary={t(field.type)}
-                    />
+                    <ListItemText primary={t(field.name)} secondary={t(field.type)}/>
                     <Chip
                       label={field.mandatory ? t('Mandatory') : t('Optional')}
-                      color={field.mandatory ? 'secondary' : 'primary'}
-                    />
+                      color={field.mandatory ? 'secondary' : 'primary'}/>
                   </ListItem>
                 ))}
               </List>

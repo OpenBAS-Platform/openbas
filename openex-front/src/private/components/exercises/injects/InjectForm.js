@@ -36,7 +36,7 @@ class InjectForm extends Component {
     const errors = {};
     const requiredFields = [
       'inject_title',
-      'inject_type',
+      'inject_contract',
       'inject_depends_duration_days',
       'inject_depends_duration_hours',
       'inject_depends_duration_minutes',
@@ -60,10 +60,10 @@ class InjectForm extends Component {
       classes,
     } = this.props;
     const sortedTypes = R.sortWith(
-      [R.ascend(R.prop('ttype'))],
+      [R.ascend(R.prop('tname'))],
       R.values(injectTypes)
         .filter((type) => type.expose === true)
-        .map((type) => R.assoc('ttype', t(type.type), type)),
+        .map((type) => R.assoc('tname', t(type.name), type)),
     );
     return (
       <Form
@@ -79,27 +79,23 @@ class InjectForm extends Component {
       >
         {({ handleSubmit, form, values, submitting, pristine }) => (
           <form id="injectForm" onSubmit={handleSubmit}>
-            <TextField
-              variant="standard"
+            <TextField variant="standard"
               name="inject_title"
               fullWidth={true}
               label={t('Title')}
             />
-            <Select
-              variant="standard"
+            <Select variant="standard"
               label={t('Type')}
-              name="inject_type"
+              name="inject_contract"
               fullWidth={true}
               disabled={editing}
-              renderValue={(selected) => t(selected)}
-              style={{ marginTop: 20 }}
-            >
+              style={{ marginTop: 20 }}>
               {sortedTypes.map((type) => (
-                <MenuItem key={type.type} value={type.type}>
+                <MenuItem key={type.contract_id} value={type.contract_id}>
                   <ListItemIcon>
                     <InjectIcon type={type.type} />
                   </ListItemIcon>
-                  <ListItemText>{t(type.type)}</ListItemText>
+                  <ListItemText>{t(type.name)}</ListItemText>
                 </MenuItem>
               ))}
             </Select>

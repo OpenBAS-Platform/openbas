@@ -72,19 +72,19 @@ public class InjectHelper {
         return injectWhen.equals(now) || injectWhen.isBefore(now);
     }
 
-    public List<ExecutableInject<?>> getInjectsToRun() {
+    public List<ExecutableInject> getInjectsToRun() {
         // Get injects
         List<Inject> executableInjects = injectRepository.findAll(InjectSpecification.executable());
-        Stream<ExecutableInject<?>> injects = executableInjects.stream()
+        Stream<ExecutableInject> injects = executableInjects.stream()
                 .filter(this::isBeforeOrEqualsNow)
                 .sorted(Inject.executionComparator)
-                .map(inject -> new ExecutableInject<>(inject, usersFromInjection(inject)));
+                .map(inject -> new ExecutableInject(inject, usersFromInjection(inject)));
         // Get dry injects
         List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
-        Stream<ExecutableInject<?>> dryInjects = executableDryInjects.stream()
+        Stream<ExecutableInject> dryInjects = executableDryInjects.stream()
                 .filter(this::isBeforeOrEqualsNow)
                 .sorted(DryInject.executionComparator)
-                .map(dry -> new ExecutableInject<>(dry, dry.getInject(), usersFromInjection(dry)));
+                .map(dry -> new ExecutableInject(dry, dry.getInject(), usersFromInjection(dry)));
         // Combine injects and dry
         return concat(injects, dryInjects).collect(Collectors.toList());
     }

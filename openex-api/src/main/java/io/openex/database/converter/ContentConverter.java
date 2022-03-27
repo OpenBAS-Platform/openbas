@@ -1,22 +1,22 @@
-package io.openex.injects.lade.converter;
+package io.openex.database.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.openex.injects.lade.model.LadeContent;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import javax.annotation.Resource;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.io.IOException;
 
-@Converter(autoApply = true)
-public class LadeContentConverter implements AttributeConverter<LadeContent, String> {
+@Converter
+public class ContentConverter implements AttributeConverter<ObjectNode, String> {
 
     @Resource
     private ObjectMapper mapper;
 
     @Override
-    public String convertToDatabaseColumn(LadeContent meta) {
+    public String convertToDatabaseColumn(ObjectNode meta) {
         try {
             return mapper.writeValueAsString(meta);
         } catch (JsonProcessingException ex) {
@@ -26,9 +26,9 @@ public class LadeContentConverter implements AttributeConverter<LadeContent, Str
     }
 
     @Override
-    public LadeContent convertToEntityAttribute(String dbData) {
+    public ObjectNode convertToEntityAttribute(String dbData) {
         try {
-            return mapper.readValue(dbData, LadeContent.class);
+            return mapper.readValue(dbData, ObjectNode.class);
         } catch (IOException ex) {
             // logger.error("Unexpected IOEx decoding json from database: " + dbData);
             return null;

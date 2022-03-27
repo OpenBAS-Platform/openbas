@@ -2,14 +2,13 @@ package io.openex.rest.inject.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.model.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "inject_type", visible = true)
-public abstract class InjectInput {
+public class InjectInput {
 
     @JsonProperty("inject_title")
     private String title;
@@ -17,8 +16,11 @@ public abstract class InjectInput {
     @JsonProperty("inject_description")
     private String description;
 
-    @JsonProperty("inject_type")
-    private String type;
+    @JsonProperty("inject_contract")
+    private String contract;
+
+    @JsonProperty("inject_content")
+    private ObjectNode content;
 
     @JsonProperty("inject_depends_from_another")
     private String dependsOn;
@@ -60,12 +62,20 @@ public abstract class InjectInput {
         this.description = description;
     }
 
-    public String getType() {
-        return type;
+    public ObjectNode getContent() {
+        return content;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setContent(ObjectNode content) {
+        this.content = content;
+    }
+
+    public String getContract() {
+        return contract;
+    }
+
+    public void setContract(String contract) {
+        this.contract = contract;
     }
 
     public List<String> getAudiences() {
@@ -136,14 +146,13 @@ public abstract class InjectInput {
         this.tagIds = tagIds;
     }
 
-    public abstract Inject init();
-
     public Inject toInject() {
-        Inject inject = init();
+        Inject inject = new Inject();
         inject.setTitle(getTitle());
         inject.setDescription(getDescription());
+        inject.setContent(getContent());
+        inject.setContract(getContract());
         inject.setDependsDuration(getDependsDuration());
-        inject.setType(getType());
         inject.setAllAudiences(getAllAudiences());
         inject.setCountry(getCountry());
         inject.setCity(getCity());

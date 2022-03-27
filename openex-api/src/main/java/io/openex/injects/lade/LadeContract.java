@@ -1,29 +1,31 @@
 package io.openex.injects.lade;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import io.openex.contract.Contract;
-import io.openex.contract.ContractField;
+import io.openex.contract.BaseContract;
+import io.openex.contract.ContractInstance;
 import io.openex.injects.lade.config.LadeConfig;
-import io.openex.injects.lade.model.LadeForm;
+import io.openex.injects.lade.service.LadeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
-import static io.openex.contract.ContractDef.contractBuilder;
-import static io.openex.contract.ContractType.Textarea;
-import static io.openex.contract.ContractType.Select;
-
 @Component
-public class LadeContract implements Contract {
+public class LadeContract implements BaseContract {
 
-    public static final String NAME = "openex_lade";
+    @Resource
+    protected ObjectMapper mapper;
+
+    public static final String TYPE = "openex_lade";
 
     private LadeConfig config;
 
-    public LadeContract(ObjectMapper mapper) {
-        mapper.registerSubtypes(new NamedType(LadeForm.class, LadeContract.NAME));
+    private LadeService ladeService;
+
+    @Autowired
+    public void setLadeService(LadeService ladeService) {
+        this.ladeService = ladeService;
     }
 
     @Autowired
@@ -38,15 +40,14 @@ public class LadeContract implements Contract {
 
     @Override
     public String getType() {
-        return NAME;
+        return TYPE;
     }
 
     @Override
-    public List<ContractField> getFields() {
-        return contractBuilder()
-                .mandatory("workzone_identifier")
-                .mandatory("action", Select)
-                .mandatory("parameters", Textarea)
-                .build();
+    public List<ContractInstance> generateContracts() throws Exception {
+        if (isExpose()) {
+            return ladeService.buildContracts(this);
+        }
+        return List.of();
     }
 }

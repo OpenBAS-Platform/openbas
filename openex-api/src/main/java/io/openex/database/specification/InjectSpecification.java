@@ -29,7 +29,7 @@ public class InjectSpecification {
         return (root, query, cb) -> {
             Path<Object> exercisePath = root.get("exercise");
             return cb.and(
-                    cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
+                    cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
                     cb.equal(root.get("enabled"), true), // isEnable
                     cb.isNotNull(exercisePath.get("start")), // fromScheduled
                     cb.equal(exercisePath.get("status"), Exercise.STATUS.RUNNING), // fromRunningExercise
@@ -40,7 +40,7 @@ public class InjectSpecification {
 
     public static Specification<Inject> forDryrun(String exerciseId) {
         return (root, query, cb) -> cb.and(
-                cb.notEqual(root.get("type"), ManualContract.NAME),  // notManual
+                cb.notEqual(root.get("type"), ManualContract.TYPE),  // notManual
                 cb.equal(root.get("enabled"), true), // isEnable
                 cb.equal(root.get("exercise").get("id"), exerciseId) // fromWantedExercise
         );

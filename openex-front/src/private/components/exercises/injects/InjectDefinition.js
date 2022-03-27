@@ -4,6 +4,7 @@ import * as R from 'ramda';
 import withStyles from '@mui/styles/withStyles';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Form } from 'react-final-form';
@@ -38,6 +39,7 @@ import InjectAddDocuments from './InjectAddDocuments';
 import Loader from '../../../../components/Loader';
 import DocumentType from '../../documents/DocumentType';
 import DocumentPopover from '../../documents/DocumentPopover';
+import { Select } from '../../../../components/Select';
 
 const styles = (theme) => ({
   header: {
@@ -334,7 +336,7 @@ class InjectDefinition extends Component {
     const { allAudiences, audiencesIds, documents } = this.state;
     const values = {
       inject_title: inject.inject_title,
-      inject_type: inject.inject_type,
+      inject_contract: inject.inject_contract,
       inject_description: inject.inject_description,
       inject_tags: inject.inject_tags,
       inject_depends_duration: inject.inject_depends_duration,
@@ -352,18 +354,14 @@ class InjectDefinition extends Component {
   validate(values) {
     const { t, injectTypes, inject } = this.props;
     const errors = {};
-    const injectType = R.head(
-      injectTypes.filter((i) => i.type === inject.inject_type),
-    );
+    const injectType = R.head(injectTypes.filter((i) => i.contract_id === inject.inject_contract));
     if (injectType && Array.isArray(injectType.fields)) {
-      injectType.fields
-        .filter((f) => !['audiences', 'attachments'].includes(f.name))
-        .forEach((field) => {
-          const value = values[field.name];
-          if (field.mandatory && !value) {
-            errors[field.name] = t('This field is required.');
-          }
-        });
+      injectType.fields.filter((f) => !['audiences', 'attachments'].includes(f.key)).forEach((field) => {
+        const value = values[field.key];
+        if (field.mandatory && R.isEmpty(value)) {
+          errors[field.key] = t('This field is required.');
+        }
+      });
     }
     return errors;
   }
@@ -394,9 +392,7 @@ class InjectDefinition extends Component {
       documentsSortBy,
       documentsOrderAsc,
     } = this.state;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.type === inject.inject_type),
-    );
+    const injectType = R.head(injectTypes.filter((i) => i.contract_id === inject.inject_contract));
     const audiences = audiencesIds
       .map((a) => audiencesMap[a])
       .filter((a) => a !== undefined);
@@ -420,12 +416,17 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAudiences = injectType.fields
-      .map((f) => f.name)
-      .includes('audiences');
-    const hasAttachments = injectType.fields
-      .map((f) => f.name)
-      .includes('attachments');
+    const hasAudiences = injectType.fields.map((f) => f.key).includes('audiences');
+    const hasAttachments = injectType.fields.map((f) => f.key).includes('attachments');
+    const initialValues = { ...inject.inject_content };
+    // Enrich initialValues with default contract value
+    if (inject.inject_content === null) {
+      injectType.fields.filter((f) => !['audiences', 'attachments'].includes(f.key)).forEach((field) => {
+        if (!initialValues[field.key]) {
+          initialValues[field.key] = field.defaultValue;
+        }
+      });
+    }
     return (
       <div>
         <div className={classes.header}>
@@ -434,8 +435,7 @@ class InjectDefinition extends Component {
             className={classes.closeButton}
             onClick={handleClose.bind(this)}
             size="large"
-            color="primary"
-          >
+            color="primary">
             <CloseRounded fontSize="small" color="primary" />
           </IconButton>
           <Typography variant="h6" classes={{ root: classes.title }}>
@@ -446,16 +446,15 @@ class InjectDefinition extends Component {
         <div className={classes.container}>
           <Form
             keepDirtyOnReinitialize={true}
-            initialValues={inject.inject_content}
+            initialValues={initialValues}
             onSubmit={this.onSubmit.bind(this)}
             validate={this.validate.bind(this)}
             mutators={{
               setValue: ([field, value], state, { changeValue }) => {
                 changeValue(state, field, () => value);
               },
-            }}
-          >
-            {({ handleSubmit, submitting }) => (
+            }}>
+            {({ handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
                 {hasAudiences && (
                   <div>
@@ -464,8 +463,7 @@ class InjectDefinition extends Component {
                     </Typography>
                     <FormGroup
                       row={true}
-                      classes={{ root: classes.allAudiences }}
-                    >
+                      classes={{ root: classes.allAudiences }}>
                       <FormControlLabel
                         control={
                           <Switch
@@ -650,68 +648,101 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <Typography
-                  variant="h2"
-                  style={{ marginTop: hasAudiences ? 30 : 0 }}
-                >
-                  {t('Inject data')}
+                <Typography variant="h2" style={{ marginTop: hasAudiences ? 30 : 0 }}>
+                  {t('Inject data: ')}<b>{injectType.name}</b>
                 </Typography>
                 <div style={{ marginTop: -20, overflowX: 'hidden' }}>
-                  {injectType.fields
-                    .filter(
-                      (f) => !['audiences', 'attachments'].includes(f.name),
-                    )
-                    .map((field) => {
-                      switch (field.type) {
-                        case 'textarea':
-                          return (
-                            <TextField
-                              variant="standard"
-                              key={field.name}
-                              name={field.name}
-                              fullWidth={true}
-                              multiline={true}
-                              rows={10}
-                              label={t(field.name)}
-                              style={{ marginTop: 20 }}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          );
-                        case 'richtextarea':
-                          return (
-                            <EnrichedTextField
-                              key={field.name}
-                              name={field.name}
-                              label={t(field.name)}
+                  {injectType.fields.filter((f) => !['audiences', 'attachments'].includes(f.key)).map((field) => {
+                    switch (field.type) {
+                      case 'textarea':
+                        return field.richText ? <EnrichedTextField
+                              key={field.key}
+                              name={field.key}
+                              label={t(field.label)}
                               fullWidth={true}
                               style={{ marginTop: 20, height: 250 }}
                               disabled={isExerciseReadOnly(exercise)}
-                            />
-                          );
-                        case 'checkbox':
-                          return (
-                            <SwitchField
-                              key={field.name}
-                              name={field.name}
-                              label={t(field.name)}
-                              style={{ marginTop: 10 }}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          );
-                        default:
-                          return (
+                          /> : (
                             <TextField
                               variant="standard"
-                              key={field.name}
-                              name={field.name}
+                              key={field.key}
+                              name={field.key}
                               fullWidth={true}
-                              label={t(field.name)}
+                              multiline={true}
+                              rows={10}
+                              label={t(field.label)}
                               style={{ marginTop: 20 }}
                               disabled={isExerciseReadOnly(exercise)}
                             />
-                          );
-                      }
-                    })}
+                        );
+                      case 'checkbox':
+                        return (
+                            <SwitchField
+                              key={field.key}
+                              name={field.key}
+                              label={t(field.label)}
+                              style={{ marginTop: 10 }}
+                              disabled={isExerciseReadOnly(exercise)}
+                            />
+                        );
+                      case 'select':
+                        return field.cardinality === 'n' ? (
+                              <Select variant="standard" label={t(field.label)} key={field.key} multiple
+                                      renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
+                                      name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
+                                {Object.entries(field.choices).map(([k, v]) => (
+                                    <MenuItem key={k} value={k}>
+                                      <ListItemText>{v}</ListItemText>
+                                    </MenuItem>
+                                ))}
+                              </Select>
+                        ) : (<Select variant="standard" label={t(field.label)} key={field.key}
+                                     renderValue={(v) => field.choices[v]}
+                                     name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
+                          {Object.entries(field.choices).map(([k, v]) => (
+                              <MenuItem key={k} value={k}>
+                                <ListItemText>{v}</ListItemText>
+                              </MenuItem>
+                          ))}
+                        </Select>);
+                      case 'dependency-select':
+                        // eslint-disable-next-line no-case-declarations
+                        const depValue = values[field.dependencyField];
+                        // eslint-disable-next-line no-case-declarations
+                        const choices = field.choices[depValue] ?? {};
+                        return field.cardinality === 'n' ? (
+                              <Select variant="standard" label={t(field.label)} key={field.key} multiple
+                                      renderValue={(v) => v.map((a) => choices[a]).join(', ')}
+                                      name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
+                                {Object.entries(choices).map(([k, v]) => (
+                                    <MenuItem key={k} value={k}>
+                                      <ListItemText>{v}</ListItemText>
+                                    </MenuItem>
+                                ))}
+                              </Select>
+                        ) : <Select variant="standard" label={t(field.label)} key={field.key}
+                                renderValue={(v) => choices[v]}
+                                name={field.key} fullWidth={true} style={{ marginTop: 20 }}>
+                          {Object.entries(choices).map(([k, v]) => (
+                              <MenuItem key={k} value={k}>
+                                <ListItemText>{v}</ListItemText>
+                              </MenuItem>
+                          ))}
+                        </Select>;
+                      default:
+                        return (
+                            <TextField
+                              variant="standard"
+                              key={field.key}
+                              name={field.key}
+                              fullWidth={true}
+                              label={t(field.label)}
+                              style={{ marginTop: 20 }}
+                              disabled={isExerciseReadOnly(exercise)}
+                            />
+                        );
+                    }
+                  })}
                 </div>
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>

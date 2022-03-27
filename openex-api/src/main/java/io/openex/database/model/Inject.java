@@ -3,10 +3,11 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.execution.Executor;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
+import io.openex.database.converter.ContentConverter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -21,10 +22,8 @@ import static java.util.Optional.ofNullable;
 
 @Entity
 @Table(name = "injects")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "inject_type")
 @EntityListeners(ModelBaseListener.class)
-public abstract class Inject implements Base, Injection {
+public class Inject implements Base, Injection {
 
     private static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
@@ -50,6 +49,10 @@ public abstract class Inject implements Base, Injection {
     @JsonProperty("inject_description")
     private String description;
 
+    @Column(name = "inject_contract")
+    @JsonProperty("inject_contract")
+    private String contract;
+
     @Column(name = "inject_country")
     @JsonProperty("inject_country")
     private String country;
@@ -62,9 +65,14 @@ public abstract class Inject implements Base, Injection {
     @JsonProperty("inject_enabled")
     private boolean enabled = true;
 
-    @Column(name = "inject_type", insertable = false, updatable = false)
+    @Column(name = "inject_type", updatable = false)
     @JsonProperty("inject_type")
     private String type;
+
+    @Column(name = "inject_content")
+    @Convert(converter = ContentConverter.class)
+    @JsonProperty("inject_content")
+    private ObjectNode content;
 
     @Column(name = "inject_created_at")
     @JsonProperty("inject_created_at")
@@ -126,8 +134,6 @@ public abstract class Inject implements Base, Injection {
     @JsonProperty("inject_documents")
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectDocument> documents = new ArrayList<>();
-
-    public abstract Class<? extends Executor<?>> executor();
 
     // region transient
     @Transient
@@ -245,6 +251,22 @@ public abstract class Inject implements Base, Injection {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public ObjectNode getContent() {
+        return content;
+    }
+
+    public void setContent(ObjectNode content) {
+        this.content = content;
+    }
+
+    public String getContract() {
+        return contract;
+    }
+
+    public void setContract(String contract) {
+        this.contract = contract;
     }
 
     @Override

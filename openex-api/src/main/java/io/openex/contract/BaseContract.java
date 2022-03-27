@@ -2,11 +2,11 @@ package io.openex.contract;
 
 import java.util.List;
 
-public interface Contract {
+public interface BaseContract {
 
     boolean isExpose();
 
     String getType();
 
-    List<ContractField> getFields();
+    List<ContractInstance> generateContracts() throws Exception;
 }

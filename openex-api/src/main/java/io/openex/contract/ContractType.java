@@ -11,8 +11,8 @@ public enum ContractType {
     Textarea,
     @JsonProperty("select")
     Select,
-    @JsonProperty("richtextarea")
-    Richtextarea,
+    @JsonProperty("dependency-select")
+    DependencySelect,
     @JsonProperty("attachment")
     Attachment,
     @JsonProperty("audience")

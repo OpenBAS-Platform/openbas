@@ -30,11 +30,7 @@ const renderSelectField = ({
 }) => (
   <FormControl error={touched && error} fullWidth={fullWidth} style={style}>
     {others.displayEmpty ? (
-      <InputLabel
-        shrink={true}
-        htmlFor={name}
-        variant={others.variant || 'standard'}
-      >
+      <InputLabel shrink={true} htmlFor={name} variant={others.variant || 'standard'}>
         {label}
       </InputLabel>
     ) : (
@@ -51,11 +47,7 @@ const renderSelectField = ({
       }}
       {...inputProps}
       {...others}
-      inputProps={{
-        name,
-        id: name,
-      }}
-    >
+      inputProps={{ name, id: name }}>
       {children}
     </MUISelect>
     {renderHelper({

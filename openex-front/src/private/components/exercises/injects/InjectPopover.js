@@ -207,7 +207,7 @@ class InjectPopover extends Component {
       R.assoc('inject_tags', injectTags),
       R.pick([
         'inject_title',
-        'inject_type',
+        'inject_contract',
         'inject_description',
         'inject_tags',
         'inject_content',

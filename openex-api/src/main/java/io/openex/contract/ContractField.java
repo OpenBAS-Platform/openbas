@@ -6,13 +6,9 @@ public class ContractField {
 
     private ContractType type;
 
-    private ContractCardinality cardinality;
-
     private boolean mandatory;
 
-    ContractField(String name, ContractType type, Boolean mandatory) {
-        this(name, type, ContractCardinality.One, mandatory);
-    }
+    private ContractCardinality cardinality;
 
     ContractField(String name, ContractType type, ContractCardinality cardinality, Boolean mandatory) {
         this.name = name;

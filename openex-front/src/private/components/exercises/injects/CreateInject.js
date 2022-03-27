@@ -75,22 +75,18 @@ class CreateInject extends Component {
     const { classes, t, injectTypes } = this.props;
     return (
       <div>
-        <Fab
-          onClick={this.handleOpen.bind(this)}
+        <Fab onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
-          className={classes.createButton}
-        >
+          className={classes.createButton}>
           <Add />
         </Fab>
-        <Dialog
-          open={this.state.open}
+        <Dialog open={this.state.open}
           TransitionComponent={Transition}
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
           maxWidth="md"
-          PaperProps={{ elevation: 1 }}
-        >
+          PaperProps={{ elevation: 1 }}>
           <DialogTitle>{t('Create a new inject')}</DialogTitle>
           <DialogContent>
             <InjectForm
