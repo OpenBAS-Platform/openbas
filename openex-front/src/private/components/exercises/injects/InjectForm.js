@@ -69,7 +69,6 @@ class InjectForm extends Component {
       injectTypesMap,
       classes,
     } = this.props;
-    console.log(injectTypesMap);
     const sortedTypes = R.sortWith(
       [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
       R.values(injectTypesMap)
