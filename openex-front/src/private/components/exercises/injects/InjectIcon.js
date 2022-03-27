@@ -68,8 +68,8 @@ const iconSelector = (type, variant, fontSize, done) => {
           src={`/${window.BASE_PATH ? `${window.BASE_PATH}/` : ''}${Airbus}`}
           alt="Airbus Lade"
           style={{
-            width: fontSize === 'small' ? 20 : 24,
-            height: fontSize === 'small' ? 20 : 24,
+            width: fontSize === 'small' || variant === 'inline' ? 20 : 24,
+            height: fontSize === 'small' || variant === 'inline' ? 20 : 24,
           }}
         />
       );

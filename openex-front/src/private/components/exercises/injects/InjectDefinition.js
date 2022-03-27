@@ -728,7 +728,7 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                             >
                               {Object.entries(field.choices)
-                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
                                   <MenuItem key={k} value={k}>
                                     <ListItemText>{v}</ListItemText>
@@ -746,7 +746,7 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                             >
                               {Object.entries(field.choices)
-                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
                                   <MenuItem key={k} value={k}>
                                     <ListItemText>{v}</ListItemText>
@@ -772,7 +772,7 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                             >
                               {Object.entries(choices)
-                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
                                   <MenuItem key={k} value={k}>
                                     <ListItemText>{v}</ListItemText>
@@ -790,7 +790,7 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                             >
                               {Object.entries(choices)
-                                .sort((a, b) => a[0].localeCompare(b[0]))
+                                .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
                                   <MenuItem key={k} value={k}>
                                     <ListItemText>{v}</ListItemText>

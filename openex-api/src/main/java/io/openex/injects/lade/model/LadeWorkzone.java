@@ -8,10 +8,9 @@ public class LadeWorkzone {
 
     private String name;
 
-    private Map<String, String> networks = new HashMap<>();
+    private Map<String, String> hostsByName = new HashMap<>();
 
-    private Map<String, String> hosts = new HashMap<>();
-
+    private Map<String, String> hostsByIp = new HashMap<>();
 
     public LadeWorkzone(String id, String name) {
         this.id = id;
@@ -34,19 +33,19 @@ public class LadeWorkzone {
         this.name = name;
     }
 
-    public Map<String, String> getNetworks() {
-        return networks;
+    public Map<String, String> getHostsByName() {
+        return hostsByName;
     }
 
-    public void setNetworks(Map<String, String> networks) {
-        this.networks = networks;
+    public void setHostsByName(Map<String, String> hostsByName) {
+        this.hostsByName = hostsByName;
     }
 
-    public Map<String, String> getHosts() {
-        return hosts;
+    public Map<String, String> getHostsByIp() {
+        return hostsByIp;
     }
 
-    public void setHosts(Map<String, String> hosts) {
-        this.hosts = hosts;
+    public void setHostsByIp(Map<String, String> hostsByIp) {
+        this.hostsByIp = hostsByIp;
     }
 }

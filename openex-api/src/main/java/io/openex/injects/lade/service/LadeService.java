@@ -92,27 +92,20 @@ public class LadeService {
                     String body = EntityUtils.toString(getResponse.getEntity());
                     return mapper.readTree(body);
                 });
-                Map<String, String> hosts = new HashMap<>();
+                Map<String, String> hostsByName = new HashMap<>();
+                Map<String, String> hostsByIp = new HashMap<>();
                 nodeHosts.forEach(nodeHost -> {
                     // String hostIdentifier = nodeHost.get("identifier").asText();
                     String hostname = nodeHost.get("hostname").asText();
-                    hosts.put(hostname, hostname);
+                    String os = nodeHost.get("os").asText();
+                    hostsByName.put(hostname, hostname + " (" + os + ")");
+                    nodeHost.get("nics").forEach(nic -> {
+                        String ip = nic.get("ip").asText();
+                        hostsByIp.put(ip, hostname + " (" + os + ")" + " - " + ip);
+                    });
                 });
-                ladeWorkzone.setHosts(hosts);
-                // Fetch networks
-                HttpGet networkGet = buildGet(token, "/api/workzones/" + identifier + "/networks");
-                JsonNode nodeNetworks = httpclient.execute(networkGet, getResponse -> {
-                    String body = EntityUtils.toString(getResponse.getEntity());
-                    return mapper.readTree(body);
-                });
-                Map<String, String> networks = new HashMap<>();
-                nodeNetworks.forEach(networkHost -> {
-                    // String networkIdentifier = networkHost.get("identifier").asText();
-                    String networkIp = networkHost.get("ip").asText();
-                    String networkName = networkHost.get("name").asText();
-                    networks.put(networkName, networkName + " (" + networkIp + ")");
-                });
-                ladeWorkzone.setNetworks(networks);
+                ladeWorkzone.setHostsByName(hostsByName);
+                ladeWorkzone.setHostsByIp(hostsByIp);
                 // Add new built workzone
                 zones.put(ladeWorkzone.getId(), ladeWorkzone);
             } catch (Exception e) {
@@ -130,14 +123,9 @@ public class LadeService {
         String defaultChoice = workzoneChoices.keySet().stream().findFirst().orElseThrow();
         ContractSelect workContract = selectFieldWithDefault("workzone", "Workzone", workzoneChoices, defaultChoice);
         Map<String, Map<String, String>> workzoneHostsMap = new HashMap<>();
-        workzoneContract.forEach((k, value) -> workzoneHostsMap.put(k, value.getHosts()));
-        Map<String, Map<String, String>> workzoneHostsNetworksMap = new HashMap<>();
-        workzoneContract.forEach((k, value) -> {
-            Map<String, String> all = new HashMap<>();
-            all.putAll(value.getNetworks());
-            all.putAll(value.getHosts());
-            workzoneHostsNetworksMap.put(k, all);
-        });
+        workzoneContract.forEach((k, value) -> workzoneHostsMap.put(k, value.getHostsByName()));
+        Map<String, Map<String, String>> workzoneHostsIps = new HashMap<>();
+        workzoneContract.forEach((k, value) -> workzoneHostsIps.put(k, value.getHostsByIp()));
         List<ContractInstance> contracts = new ArrayList<>();
         HttpGet actionsGet = buildGet(token, "/api/actions");
         JsonNode actions = httpclient.execute(actionsGet, getResponse -> {
@@ -168,7 +156,7 @@ public class LadeService {
                     String name = nameNode != null ? nameNode.asText() : key;
                     List<String> types = asStream(parameter.get("types").elements()).map(JsonNode::asText).toList();
                     if (types.contains("host.nics.ip")) {
-                        builder.mandatory(dependencySelectField(key, name, "workzone", workzoneHostsNetworksMap));
+                        builder.mandatory(dependencySelectField(key, name, "workzone", workzoneHostsIps));
                     } else if (types.contains("boolean")) {
                         JsonNode defaultNode = parameter.get("default");
                         builder.optional(checkboxField(key, name, defaultNode.booleanValue()));
