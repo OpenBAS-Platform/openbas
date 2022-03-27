@@ -90,6 +90,7 @@ class InjectPopover extends Component {
           + data.inject_depends_duration_hours * 3600
           + data.inject_depends_duration_minutes * 60,
       ),
+      R.assoc('inject_contract', data.inject_contract.id),
       R.assoc('inject_tags', R.pluck('id', data.inject_tags)),
       R.dissoc('inject_depends_duration_days'),
       R.dissoc('inject_depends_duration_hours'),
