@@ -171,7 +171,6 @@ export const storeHelper = (state) => ({
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
   getExerciseTechnicalInjectsPerType: (id) => {
-    const injectTypesMap = maps('inject_types', state);
     const typesWithNoAudiences = entities('inject_types', state)
       .map((t) => ({
         type: t.type,
