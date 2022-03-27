@@ -9,7 +9,7 @@ import { useFormatter } from '../components/i18n';
 const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
   const { t } = useFormatter();
   const [order, setOrder] = useState({
-    sortBy: `${schema}_${defaultSortKey}`,
+    sortBy: `${schema ? `${schema}_` : ''}${defaultSortKey}`,
     orderAsc: true,
   });
   const [keyword, setKeyword] = useState('');
@@ -49,7 +49,7 @@ const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
     const filterByKeyword = (e) => {
       const isEmptyKeyword = keyword === '';
       const isKnownColumn = searchColumns
-        .map((d) => e[`${schema}_${d}`] || '')
+        .map((d) => e[`${schema ? `${schema}_` : ''}${d}`] || '')
         .map((data) => (typeof data === 'object' ? JSON.stringify(data) : data))
         .map((info) => info.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
         .reduce((a, b) => a || b);
@@ -60,17 +60,19 @@ const useSearchAnFilter = (schema, defaultSortKey, searchColumns) => {
         ? [R.ascend(R.prop(order.sortBy))]
         : [R.descend(R.prop(order.sortBy))],
     );
-    return R.pipe(
-      R.filter(
-        (n) => tags.length === 0
-          || R.any(
-            (filter) => R.includes(filter, n[`${schema}_tags`] || []),
-            R.pluck('id', tags),
-          ),
-      ),
-      R.filter(filterByKeyword),
-      sort,
-    )(elements);
+    return defaultSortKey
+      ? R.pipe(
+        R.filter(
+          (n) => tags.length === 0
+              || R.any(
+                (filter) => R.includes(filter, n[`${schema}_tags`] || []),
+                R.pluck('id', tags),
+              ),
+        ),
+        R.filter(filterByKeyword),
+        sort,
+      )(elements)
+      : R.pipe(R.filter(filterByKeyword))(elements);
   };
   return {
     keyword,

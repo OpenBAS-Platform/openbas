@@ -215,6 +215,7 @@ export const storeHelper = (state) => ({
   // injects
   getInject: (id) => entity(id, 'injects', state),
   getInjectTypes: () => entities('inject_types', state),
+  getInjectTypesMap: () => maps('inject_types', state),
   getInjectTypesWithNoAudiences: () => R.uniq(entities('inject_types', state)
     .map((t) => ({ hasAudiences: t.fields.filter((f) => f.key === 'audiences').length > 0, ...t }))
     .filter((t) => !t.hasAudiences)

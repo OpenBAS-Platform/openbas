@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
-import Tooltip from '@mui/material/Tooltip';
 import {
   EmailOutlined,
   SmsOutlined,
@@ -9,10 +8,12 @@ import {
   SpeakerNotesOutlined,
   ApiOutlined,
 } from '@mui/icons-material';
-import { Mastodon, LockPattern, Twitter } from 'mdi-material-ui';
+import { Mastodon, Twitter } from 'mdi-material-ui';
+import Airbus from '../../../../resources/images/contracts/airbus.png';
+import CustomTooltip from '../../../../components/CustomTooltip';
 
 const iconSelector = (type, variant, fontSize, done) => {
-  let style = {};
+  let style;
   switch (variant) {
     case 'inline':
       style = {
@@ -63,10 +64,10 @@ const iconSelector = (type, variant, fontSize, done) => {
       );
     case 'openex_lade':
       return (
-        <LockPattern
-          style={style}
-          fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#673ab7' }}
+        <img
+          src={`/${window.BASE_PATH ? `${window.BASE_PATH}/` : ''}${Airbus}`}
+          alt="Airbus Lade"
+          style={{ width: 24, height: 24 }}
         />
       );
     case 'openex_gnu_social':
@@ -104,9 +105,9 @@ class InjectIcon extends Component {
     const fontSize = size || 'medium';
     if (tooltip) {
       return (
-        <Tooltip title={tooltip}>
+        <CustomTooltip title={tooltip}>
           {iconSelector(type, variant, fontSize, done)}
-        </Tooltip>
+        </CustomTooltip>
       );
     }
     return iconSelector(type, variant, fontSize, done);

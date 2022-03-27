@@ -171,13 +171,16 @@ const Animation = () => {
       exercisesMap: helper.getExercisesMap(),
       tagsMap: helper.getTagsMap(),
       audiencesInjectsMap: injectsPerAudience,
-      technicalInjectsMap: helper.getExerciseTechnicalInjectsPerType(exerciseId),
+      technicalInjectsMap:
+        helper.getExerciseTechnicalInjectsPerType(exerciseId),
       injectTypes: helper.getInjectTypes(),
       injectTypesWithNoAudiences: helper.getInjectTypesWithNoAudiences(),
     };
   });
   const technicalAudiences = injectTypesWithNoAudiences
-    .filter((injectType) => injects.filter((i) => i.inject_type === injectType).length > 0)
+    .filter(
+      (injectType) => injects.filter((i) => i.inject_type === injectType).length > 0,
+    )
     .map((type) => ({ audience_id: type, audience_name: type }));
   const sortedNativeAudiences = R.sortWith(
     [R.ascend(R.prop('audience_name'))],
@@ -227,6 +230,7 @@ const Animation = () => {
   const disabledTypes = injectTypes
     .filter((type) => type.expose === false)
     .map((type) => type.type);
+  const types = injectTypes.map((type) => type.type);
   const grid0 = theme.palette.mode === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)';
   const grid5 = theme.palette.mode === 'light'
     ? 'rgba(0,0,0,0.05)'
@@ -405,7 +409,8 @@ const Animation = () => {
             {pendingInjects.length > 0 ? (
               <List style={{ paddingTop: 0 }}>
                 {pendingInjects.map((inject) => {
-                  const isDisabled = disabledTypes.includes(inject.inject_type);
+                  const isDisabled = disabledTypes.includes(inject.inject_type)
+                    || !types.includes(inject.inject_type);
                   return (
                     <ListItem
                       key={inject.inject_id}

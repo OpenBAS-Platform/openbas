@@ -59,7 +59,7 @@ const UserPopover = ({ user, organizationsMap, tagsMap }) => {
       ),
       R.assoc('user_tags', R.pluck('id', data.user_tags)),
     )(data);
-    dispatch(updateUser(user.user_id, inputValues)).then(() => handleCloseEdit());
+    return dispatch(updateUser(user.user_id, inputValues)).then(() => handleCloseEdit());
   };
 
   const handleOpenEditPassword = () => {

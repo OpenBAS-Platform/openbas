@@ -3,6 +3,7 @@ import * as R from 'ramda';
 import * as PropTypes from 'prop-types';
 import withStyles from '@mui/styles/withStyles';
 import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 import inject18n from '../../../../components/i18n';
 
 const styles = () => ({
@@ -70,72 +71,88 @@ const inlineStyles = {
 
 class InjectType extends Component {
   render() {
-    const { t, type, classes, variant } = this.props;
+    const { t, type, classes, label, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     switch (type) {
       case 'openex_email':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_email}
-            label={t('Email')}
-          />
+          <Tooltip title={label || t('Email')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_email}
+              label={label || t('Email')}
+            />
+          </Tooltip>
         );
       case 'openex_ovh_sms':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_ovh_sms}
-            label={t('OVH SMS')}
-          />
+          <Tooltip title={label || t('OVH SMS')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_ovh_sms}
+              label={label || t('OVH SMS')}
+            />
+          </Tooltip>
         );
       case 'openex_mastodon':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_mastodon}
-            label={t('Mastodon')}
-          />
+          <Tooltip title={label || t('Mastodon')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_mastodon}
+              label={label || 'Mastodon'}
+            />
+          </Tooltip>
         );
       case 'openex_lade':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_lade}
-            label={t('Lade')}
-          />
+          <Tooltip title={label || t('Airbus Lade')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_lade}
+              label={label || t('Airbus Lade')}
+            />
+          </Tooltip>
         );
       case 'openex_gnu_social':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_gnu_social}
-            label={t('Mastodon')}
-          />
+          <Tooltip title={label || t('Mastodon')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_gnu_social}
+              label={label || t('Mastodon')}
+            />
+          </Tooltip>
         );
       case 'openex_twitter':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_twitter}
-            label={t('Twitter')}
-          />
+          <Tooltip title={label || t('Twitter')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_twitter}
+              label={label || t('Twitter')}
+            />
+          </Tooltip>
         );
       case 'openex_rest_api':
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_rest_api}
-            label={t('Rest API')}
-          />
+          <Tooltip title={label || t('Rest API')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_rest_api}
+              label={label || t('Rest API')}
+            />
+          </Tooltip>
         );
       default:
         return (
-          <Chip
-            classes={{ root: style }}
-            style={inlineStyles.openex_manual}
-            label={t('Manual')}
-          />
+          <Tooltip title={label || t('Manual')}>
+            <Chip
+              classes={{ root: style }}
+              style={inlineStyles.openex_manual}
+              label={label || t('Manual')}
+            />
+          </Tooltip>
         );
     }
   }
@@ -145,6 +162,7 @@ InjectType.propTypes = {
   classes: PropTypes.object.isRequired,
   variant: PropTypes.string,
   type: PropTypes.string,
+  label: PropTypes.string,
 };
 
 export default R.compose(inject18n, withStyles(styles))(InjectType);

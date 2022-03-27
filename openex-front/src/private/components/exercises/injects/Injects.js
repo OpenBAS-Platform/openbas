@@ -196,22 +196,22 @@ const Injects = () => {
   );
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, injects, injectTypes, tagsMap, exercisesMap } = useHelper(
-    (helper) => {
-      return {
-        exercise: helper.getExercise(exerciseId),
-        injects: helper.getExerciseInjects(exerciseId),
-        injectTypes: helper.getInjectTypes(),
-        tagsMap: helper.getTagsMap(),
-        exercisesMap: helper.getExercisesMap(),
-      };
-    },
-  );
+  const { exercise, injects, injectTypesMap, tagsMap, exercisesMap } = useHelper((helper) => {
+    return {
+      exercise: helper.getExercise(exerciseId),
+      injects: helper.getExerciseInjects(exerciseId),
+      injectTypesMap: helper.getInjectTypesMap(),
+      tagsMap: helper.getTagsMap(),
+      exercisesMap: helper.getExercisesMap(),
+    };
+  });
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
     dispatch(fetchExerciseInjects(exerciseId));
   });
+  const injectTypes = Object.values(injectTypesMap);
   const sortedInjects = filtering.filterAndSort(injects);
+  const types = injectTypes.map((type) => type.type);
   const disabledTypes = injectTypes
     .filter((type) => type.expose === false)
     .map((type) => type.type);
@@ -329,8 +329,9 @@ const Injects = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedInjects.map((inject) => {
+          const injectTypeName = injectTypesMap[inject.inject_contract]?.name || t(inject.inject_type);
           const duration = splitDuration(inject.inject_depends_duration || 0);
-          const isDisabled = disabledTypes.includes(inject.inject_type);
+          const isDisabled = disabledTypes.includes(inject.inject_type) || !types.includes(inject.inject_type);
           let injectStatus = inject.inject_enabled
             ? t('Enabled')
             : t('Disabled');
@@ -347,7 +348,10 @@ const Injects = () => {
               onClick={() => setSelectedInject(inject.inject_id)}
             >
               <ListItemIcon>
-                <InjectIcon type={inject.inject_type} />
+                <InjectIcon
+                  tooltip={t(inject.inject_type)}
+                  type={inject.inject_type}
+                />
               </ListItemIcon>
               <ListItemText
                 primary={
@@ -356,7 +360,11 @@ const Injects = () => {
                       className={classes.bodyItem}
                       style={inlineStyles.inject_type}
                     >
-                      <InjectType variant="list" type={inject.inject_type} />
+                      <InjectType
+                        variant="list"
+                        type={inject.inject_type}
+                        label={t(injectTypeName)}
+                      />
                     </div>
                     <div
                       className={classes.bodyItem}
