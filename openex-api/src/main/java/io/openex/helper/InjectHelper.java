@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.openex.database.specification.AudienceSpecification.fromExercise;
 import static io.openex.rest.helper.RestBehavior.fromIterable;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Stream.concat;
@@ -49,7 +50,7 @@ public class InjectHelper {
                     .map(user -> new ExecutionContext(user, exercise, "Dryrun"));
         } else if (injection instanceof Inject inject) {
             List<Audience> audiences = inject.isAllAudiences() ?
-                    fromIterable(audienceRepository.findAll()) : inject.getAudiences();
+                    fromIterable(audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
             return audiences.stream().filter(Audience::isEnabled)
                     .flatMap(audience -> audience.getUsers().stream()
                             .map(user -> new ExecutionContext(user, exercise, audience.getName())));
