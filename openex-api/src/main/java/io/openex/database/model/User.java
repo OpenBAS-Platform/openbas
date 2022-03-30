@@ -132,6 +132,15 @@ public class User implements Base, OAuth2User {
     @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "communications_users",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "communication_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("user_communications")
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Communication> communications = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Token> tokens = new ArrayList<>();
@@ -369,6 +378,14 @@ public class User implements Base, OAuth2User {
 
     public void setComcheckStatuses(List<ComcheckStatus> comcheckStatuses) {
         this.comcheckStatuses = comcheckStatuses;
+    }
+
+    public List<Communication> getCommunications() {
+        return communications;
+    }
+
+    public void setCommunications(List<Communication> communications) {
+        this.communications = communications;
     }
 
     @Override

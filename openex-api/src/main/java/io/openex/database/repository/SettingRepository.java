@@ -15,6 +15,8 @@ public interface SettingRepository extends CrudRepository<Setting, String>, JpaS
     @NotNull
     Optional<Setting> findById(@NotNull String id);
 
+    Optional<Setting> findByKey(String key);
+
     @Query(value = "SHOW server_version", nativeQuery = true)
     String getServerVersion();
 }

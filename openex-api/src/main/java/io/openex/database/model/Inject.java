@@ -135,6 +135,11 @@ public class Inject implements Base, Injection {
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectDocument> documents = new ArrayList<>();
 
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER)
+    @JsonProperty("inject_communications")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Communication> communications = new ArrayList<>();
+
     // region transient
     @Transient
     public String getHeader() {
@@ -372,6 +377,14 @@ public class Inject implements Base, Injection {
 
     public void setDocuments(List<InjectDocument> documents) {
         this.documents = documents;
+    }
+
+    public List<Communication> getCommunications() {
+        return communications;
+    }
+
+    public void setCommunications(List<Communication> communications) {
+        this.communications = communications;
     }
 
     @JsonIgnore

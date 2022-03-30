@@ -1,6 +1,5 @@
 package io.openex.rest.inject;
 
-import io.openex.contract.BaseContract;
 import io.openex.contract.ContractInstance;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
@@ -14,6 +13,7 @@ import io.openex.rest.inject.form.*;
 import io.openex.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.openex.config.AppConfig.currentUser;
+import static io.openex.database.specification.CommunicationSpecification.fromInject;
 import static io.openex.execution.ExecutionTrace.traceSuccess;
 import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
@@ -35,6 +36,7 @@ public class InjectApi extends RestBehavior {
 
     private static final int MAX_NEXT_INJECTS = 6;
 
+    private CommunicationRepository communicationRepository;
     private ExerciseRepository exerciseRepository;
     private InjectRepository injectRepository;
     private InjectDocumentRepository injectDocumentRepository;
@@ -43,6 +45,11 @@ public class InjectApi extends RestBehavior {
     private DocumentRepository documentRepository;
     private ApplicationContext context;
     private ContractService contractService;
+
+    @Autowired
+    public void setCommunicationRepository(CommunicationRepository communicationRepository) {
+        this.communicationRepository = communicationRepository;
+    }
 
     @Autowired
     public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
@@ -173,6 +180,11 @@ public class InjectApi extends RestBehavior {
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
     public Iterable<Audience> exerciseInjectAudiences(@PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow().getAudiences();
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/communications")
+    public Iterable<Communication> exerciseInjectCommunications(@PathVariable String injectId) {
+        return communicationRepository.findAll(fromInject(injectId), Sort.by(Sort.Direction.DESC, "receivedAt"));
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")

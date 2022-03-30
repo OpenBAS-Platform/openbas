@@ -8,6 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,6 +18,8 @@ public interface UserRepository extends CrudRepository<User, String>, JpaSpecifi
     Optional<User> findById(@NotNull String id);
 
     Optional<User> findByEmail(String email);
+
+    List<User> findAllByEmailIn(List<String> emails);
 
     @Override
     @Query("select count(distinct u) from User u " +
