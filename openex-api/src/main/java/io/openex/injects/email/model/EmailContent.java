@@ -1,6 +1,7 @@
 package io.openex.injects.email.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.database.model.Inject;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
@@ -9,7 +10,6 @@ public class EmailContent {
 
     private static final String HEADER_DIV = "<div style=\"text-align: center; margin-bottom: 10px;\">";
     private static final String FOOTER_DIV = "<div style=\"text-align: center; margin-top: 10px;\">";
-    private static final String INTERNAL_DIV = "<div style=\"display: none; margin-top: 10px;\">";
     private static final String START_DIV = "<div>";
     private static final String END_DIV = "</div>";
 
@@ -42,7 +42,9 @@ public class EmailContent {
         this.encrypted = encrypted;
     }
 
-    public String buildMessage(String id, String footer, String header) {
+    public String buildMessage(Inject inject, boolean imapEnabled) {
+        String footer = inject.getFooter();
+        String header = inject.getHeader();
         StringBuilder data = new StringBuilder();
         if (StringUtils.hasLength(header)) {
             data.append(HEADER_DIV).append(header).append(END_DIV);
@@ -51,7 +53,16 @@ public class EmailContent {
         if (StringUtils.hasLength(footer)) {
             data.append(FOOTER_DIV).append(footer).append(END_DIV);
         }
-        data.append(INTERNAL_DIV).append("[OPENEX_INTERNAL_ID=").append(id). append("]").append(END_DIV);
+        // If imap is enable we need to inject the id marker
+        if (imapEnabled) {
+            data.append(START_DIV)
+                    .append("<br/><br/><br/><br/>")
+                    .append("---------------------------------------------------------------------------------<br/>")
+                    .append("OpenEX internal information, do not remove!<br/>")
+                    .append("[inject_id=").append(inject.getId()).append("]<br/>")
+                    .append("---------------------------------------------------------------------------------<br/>")
+                    .append(END_DIV);
+        }
         return data.toString();
     }
 

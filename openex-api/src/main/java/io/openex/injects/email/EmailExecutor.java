@@ -44,7 +44,7 @@ public class EmailExecutor extends BasicExecutor {
                 .filter(InjectDocument::isAttached)
                 .map(InjectDocument::getDocument).toList();
         String subject = content.getSubject();
-        String message = content.buildMessage(inject.getId(), inject.getFooter(), inject.getHeader());
+        String message = content.buildMessage(inject, imapEnabled);
         boolean mustBeEncrypted = content.isEncrypted();
         // Resolve the attachments only once
         List<EmailAttachment> attachments = emailService.resolveAttachments(execution, documents);

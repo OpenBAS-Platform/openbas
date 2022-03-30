@@ -1,8 +1,10 @@
 package io.openex.rest.user;
 
 import io.openex.config.SessionManager;
+import io.openex.database.model.Communication;
 import io.openex.database.model.User;
 import io.openex.database.model.basic.BasicInject;
+import io.openex.database.repository.CommunicationRepository;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.database.repository.UserRepository;
@@ -19,8 +21,11 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static io.openex.config.AppConfig.currentUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;
+import static java.util.Comparator.comparing;
 
 @RestController
 public class PlayerApi extends RestBehavior {
@@ -28,11 +33,17 @@ public class PlayerApi extends RestBehavior {
     @Resource
     private SessionManager sessionManager;
 
+    private CommunicationRepository communicationRepository;
     private OrganizationRepository organizationRepository;
     private BasicInjectRepository basicInjectRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
     private UserService userService;
+
+    @Autowired
+    public void setCommunicationRepository(CommunicationRepository communicationRepository) {
+        this.communicationRepository = communicationRepository;
+    }
 
     @Autowired
     public void setBasicInjectRepository(BasicInjectRepository basicInjectRepository) {
@@ -65,6 +76,12 @@ public class PlayerApi extends RestBehavior {
         Iterable<BasicInject> injects = basicInjectRepository.findAll();
         return fromIterable(userRepository.findAll()).stream()
                 .peek(user -> user.resolveInjects(injects)).toList();
+    }
+
+    @GetMapping("/api/player/{userId}/communications")
+    @PreAuthorize("isPlanner()")
+    public Iterable<Communication> playerCommunications(@PathVariable String userId) {
+        return communicationRepository.findByUser(userId);
     }
 
     @Transactional(rollbackOn = Exception.class)
