@@ -17,6 +17,7 @@ import io.openex.service.DryrunService;
 import io.openex.service.ImportService;
 import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,6 +56,14 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 public class ExerciseApi extends RestBehavior {
 
     private static final Logger LOGGER = Logger.getLogger(ExerciseApi.class.getName());
+
+    // region properties
+    @Value("${openex.mail.imap.enabled}")
+    private boolean imapEnabled;
+
+    @Value("${openex.mail.imap.username}")
+    private String imapUsername;
+    // endregion
 
     // region repositories
     private LogRepository logRepository;
@@ -264,6 +273,10 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = new Exercise();
         exercise.setUpdateAttributes(input);
         exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        if (imapEnabled) {
+            exercise.setReplyTo(imapUsername);
+        }
+
         // Find automatic groups to grants
         List<Group> groups = fromIterable(groupRepository.findAll());
         List<Grant> grants = groups.stream()

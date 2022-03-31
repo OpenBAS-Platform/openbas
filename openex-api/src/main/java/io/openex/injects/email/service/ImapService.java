@@ -41,20 +41,23 @@ public class ImapService {
     @Value("${openex.mail.imap.enabled}")
     private boolean enabled;
 
+    @Value("${openex.mail.imap.host}")
+    private String host;
+
+    @Value("${openex.mail.imap.port}")
+    private Integer port;
+
+    @Value("${openex.mail.imap.username}")
+    private String username;
+
+    @Value("${openex.mail.imap.password}")
+    private String password;
+
     @Value("${openex.mail.imap.inbox}")
     private List<String> inboxFolders;
 
     @Value("${openex.mail.imap.sent}")
     private String sentFolder;
-
-    @Value("${spring.mail.host}")
-    private String host;
-
-    @Value("${spring.mail.username}")
-    private String username;
-
-    @Value("${spring.mail.password}")
-    private String password;
 
     private UserRepository userRepository;
     private InjectRepository injectRepository;
@@ -88,13 +91,14 @@ public class ImapService {
     private void initStore(Environment env) throws Exception {
         Session session = Session.getDefaultInstance(buildProperties(env), null);
         imapStore = session.getStore(PROVIDER);
-        String host = env.getProperty("spring.mail.host");
-        String username = env.getProperty("spring.mail.username");
-        String password = env.getProperty("spring.mail.password");
+        String host = env.getProperty("openex.mail.imap.host");
+        int port = env.getProperty("openex.mail.imap.port", Integer.class, 995);
+        String username = env.getProperty("openex.mail.imap.username");
+        String password = env.getProperty("openex.mail.imap.password");
         boolean isEnabled = env.getProperty("openex.mail.imap.enabled", Boolean.class, false);
         if (isEnabled) {
             LOGGER.log(Level.INFO, "IMAP sync started");
-            imapStore.connect(host, username, password);
+            imapStore.connect(host, port, username, password);
         } else {
             LOGGER.log(Level.INFO, "IMAP sync disabled");
         }
@@ -130,15 +134,15 @@ public class ImapService {
     }
 
     private Properties buildProperties(Environment env) {
-        String sslEnable = env.getProperty("spring.mail.properties.mail.smtp.ssl.enable");
-        String sslTrust = env.getProperty("spring.mail.properties.mail.smtp.ssl.trust");
-        String sslAuth = env.getProperty("spring.mail.properties.mail.smtp.auth");
-        String sslStartTLS = env.getProperty("spring.mail.properties.mail.smtp.starttls.enable");
+        String sslEnable = env.getProperty("openex.mail.imap.ssl.enable");
+        String sslTrust = env.getProperty("openex.mail.imap.ssl.trust");
+        String sslAuth = env.getProperty("openex.mail.imap.auth");
+        String sslStartTLS = env.getProperty("openex.mail.imap.starttls.enable");
         Properties props = new Properties();
-        props.setProperty("mail.smtp.ssl.enable", sslEnable);
-        props.setProperty("mail.smtp.ssl.trust", sslTrust);
-        props.setProperty("mail.smtp.auth", sslAuth);
-        props.setProperty("mail.smtp.starttls.enable", sslStartTLS);
+        props.setProperty("mail.imap.ssl.enable", sslEnable);
+        props.setProperty("mail.imap.ssl.trust", sslTrust);
+        props.setProperty("mail.imap.auth", sslAuth);
+        props.setProperty("mail.imap.starttls.enable", sslStartTLS);
         return props;
     }
 
@@ -230,7 +234,7 @@ public class ImapService {
     public void connectionListener() throws Exception {
         if (enabled) {
             if (!imapStore.isConnected()) {
-                imapStore.connect(host, username, password);
+                imapStore.connect(host, port, username, password);
             }
             syncFolders();
         }
