@@ -46,7 +46,8 @@ public class ContractService {
     }
 
     public String getContractType(String contractId) {
-        return contracts.get(contractId).getType();
+        ContractInstance contractInstance = contracts.get(contractId);
+        return contractInstance != null ? contractInstance.getType() : null;
     }
 
     public boolean isInjectContractEnable(Inject inject) {
