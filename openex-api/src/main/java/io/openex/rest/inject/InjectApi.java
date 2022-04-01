@@ -38,6 +38,7 @@ public class InjectApi extends RestBehavior {
 
     private CommunicationRepository communicationRepository;
     private ExerciseRepository exerciseRepository;
+    private UserRepository userRepository;
     private InjectRepository injectRepository;
     private InjectDocumentRepository injectDocumentRepository;
     private AudienceRepository audienceRepository;
@@ -45,6 +46,11 @@ public class InjectApi extends RestBehavior {
     private DocumentRepository documentRepository;
     private ApplicationContext context;
     private ContractService contractService;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Autowired
     public void setCommunicationRepository(CommunicationRepository communicationRepository) {
@@ -188,8 +194,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
-    public Inject createInject(@PathVariable String exerciseId,
-                               @Valid @RequestBody InjectInput input) {
+    public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Get common attributes
         Inject inject = input.toInject();
@@ -201,6 +206,26 @@ public class InjectApi extends RestBehavior {
         inject.setAudiences(fromIterable(audienceRepository.findAllById(input.getAudiences())));
         inject.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return injectRepository.save(inject);
+    }
+
+    @PostMapping("/api/exercises/{exerciseId}/inject")
+    public InjectStatus executeInject(@PathVariable String exerciseId, @Valid @RequestBody DirectInjectInput input) {
+        Inject inject = input.toInject();
+        String contractType = contractService.getContractType(inject.getContract());
+        if (contractType == null) {
+            throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
+        }
+        inject.setType(contractType);
+        inject.setUser(currentUser());
+        inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
+        Iterable<User> users = userRepository.findAllById(input.getUserIds());
+        List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
+                .map(user -> new ExecutionContext(user, inject.getExercise(), "Direct execution"))
+                .toList();
+        ExecutableInject injection = new ExecutableInject(inject, userInjectContexts);
+        Executor executor = context.getBean(contractType, Executor.class);
+        Execution execution = executor.executeDirectly(injection);
+        return InjectStatus.fromExecution(execution, inject);
     }
 
     @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
