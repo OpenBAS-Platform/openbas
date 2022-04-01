@@ -33,12 +33,6 @@ public class EmailService {
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
     private DocumentService fileService;
-    private ImapService imapService;
-
-    @Autowired
-    public void setImapService(ImapService imapService) {
-        this.imapService = imapService;
-    }
 
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
@@ -80,19 +74,14 @@ public class EmailService {
         return resolved;
     }
 
-    public void sendEmail(ExecutionContext context, String from, boolean mustBeEncrypted,
-                          String subject, String message, List<EmailAttachment> attachments) throws Exception {
-        String email = context.getUser().getEmail();
-        String contextualSubject = buildContextualContent(subject, context);
-        String contextualBody = buildContextualContent(message, context);
+    private MimeMessage buildMimeMessage(String from, String subject, String body, List<EmailAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
-        mimeMessage.setSubject(contextualSubject, "utf-8");
-        mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
+        mimeMessage.setSubject(subject, "utf-8");
         Multipart mailMultipart = new MimeMultipart("mixed");
         // Add mail content
         MimeBodyPart bodyPart = new MimeBodyPart();
-        bodyPart.setContent(contextualBody, "text/html;charset=utf-8");
+        bodyPart.setContent(body, "text/html;charset=utf-8");
         mailMultipart.addBodyPart(bodyPart);
         // Add Attachments
         for (EmailAttachment attachment : attachments) {
@@ -104,9 +93,31 @@ public class EmailService {
             mailMultipart.addBodyPart(aBodyPart);
         }
         mimeMessage.setContent(mailMultipart);
+        return mimeMessage;
+    }
+
+    public MimeMessage sendGlobalEmail(List<ExecutionContext> usersContext, String from, String subject, String message,
+                                       List<EmailAttachment> attachments) throws Exception {
+        MimeMessage mimeMessage = buildMimeMessage(from, subject, message, attachments);
+        List<InternetAddress> recipients = new ArrayList<>();
+        for (ExecutionContext userContext : usersContext) {
+            recipients.add(new InternetAddress(userContext.getUser().getEmail()));
+        }
+        mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
+        emailSender.send(mimeMessage);
+        return mimeMessage;
+    }
+
+    public MimeMessage sendEmail(ExecutionContext userContext, String from, boolean mustBeEncrypted, String subject,
+                                 String message, List<EmailAttachment> attachments) throws Exception {
+        String email = userContext.getUser().getEmail();
+        String contextualSubject = buildContextualContent(subject, userContext);
+        String contextualBody = buildContextualContent(message, userContext);
+        MimeMessage mimeMessage = buildMimeMessage(from, contextualSubject, contextualBody, attachments);
+        mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         // Crypt if needed
         if (mustBeEncrypted) {
-            PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(context.getUser());
+            PGPPublicKey userPgpKey = emailPgp.getUserPgpKey(userContext.getUser());
             // Need to create another email that will wrap everything.
             MimeMessage encMessage = emailSender.createMimeMessage();
             encMessage.setFrom(from);
@@ -131,10 +142,10 @@ public class EmailService {
             // Fill the message with the multipart content
             encMessage.setContent(encMultipart);
             emailSender.send(encMessage);
-            imapService.storeSentMessage(encMessage);
+            return encMessage;
         } else {
             emailSender.send(mimeMessage);
-            imapService.storeSentMessage(mimeMessage);
+            return mimeMessage;
         }
     }
 }

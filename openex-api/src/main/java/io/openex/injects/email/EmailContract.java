@@ -19,6 +19,7 @@ import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 public class EmailContract implements BaseContract {
 
     public static final String EMAIL_DEFAULT = "138ad8f8-32f8-4a22-8114-aaa12322bd09";
+    public static final String EMAIL_GLOBAL = "2790bd39-37d4-4e39-be7e-53f3ca783f86";
     public static final String TYPE = "openex_email";
 
     @Override
@@ -33,13 +34,25 @@ public class EmailContract implements BaseContract {
 
     @Override
     public List<ContractInstance> generateContracts() throws Exception {
-        List<ContractElement> instance = contractBuilder()
+        // Standard contract
+        List<ContractElement> standardInstance = contractBuilder()
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .build();
-        return List.of(new ContractInstance(TYPE, isExpose(), EMAIL_DEFAULT, "Send an email", instance));
+        ContractInstance standardEmail = new ContractInstance(TYPE, isExpose(),
+                EMAIL_DEFAULT, "User based email", standardInstance);
+        // Global contract
+        List<ContractElement> globalInstance = contractBuilder()
+                .mandatory(audienceField("audiences", "Audiences", Multiple))
+                .mandatory(textField("subject", "Subject"))
+                .mandatory(richTextareaField("body", "Body"))
+                .optional(attachmentField("attachments", "Attachments", Multiple))
+                .build();
+        ContractInstance globalEmail = new ContractInstance(TYPE, isExpose(),
+                EMAIL_GLOBAL, "Multi recipients email", globalInstance);
+        return List.of(standardEmail, globalEmail);
     }
 }
