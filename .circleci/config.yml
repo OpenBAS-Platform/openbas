@@ -39,7 +39,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: 
-          working_directory: ~/openex/openex-api
+          working_directory: ~/openex
           command: mvn install -DskipTests
       - slack/notify:
           event: fail
@@ -58,7 +58,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: 
-          working_directory: ~/openex_musl/openex-api
+          working_directory: ~/openex_musl
           command: mvn install -DskipTests
       - slack/notify:
           event: fail
