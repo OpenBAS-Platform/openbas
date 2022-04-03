@@ -13,7 +13,6 @@ steps:
     MINIO_ACCESS-KEY: minioadmin
     MINIO_ACCESS-SECRET: minioadmin
   commands:
-  - cd openex-api
   - mvn test
 
 - name: frontend-tests

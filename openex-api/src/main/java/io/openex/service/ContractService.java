@@ -1,7 +1,7 @@
 package io.openex.service;
 
-import io.openex.contract.BaseContract;
-import io.openex.contract.ContractInstance;
+import io.openex.contract.Contract;
+import io.openex.contract.Contractor;
 import io.openex.database.model.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,21 +19,21 @@ import java.util.stream.Collectors;
 public class ContractService {
 
     private static final Logger LOGGER = Logger.getLogger(ContractService.class.getName());
-    private final Map<String, ContractInstance> contracts = new HashMap<>();
-    private List<BaseContract> baseContracts;
+    private final Map<String, Contract> contracts = new HashMap<>();
+    private List<Contractor> baseContracts;
 
     @Autowired
-    public void setBaseContracts(List<BaseContract> baseContracts) {
+    public void setBaseContracts(List<Contractor> baseContracts) {
         this.baseContracts = baseContracts;
     }
 
     // You build the contracts every minute
     @Scheduled(fixedDelay = 60000, initialDelay = 0)
     public void buildContracts() {
-        baseContracts.forEach(baseContract -> {
+        baseContracts.forEach(helper -> {
             try {
-                Map<String, ContractInstance> contractInstances = baseContract.generateContracts()
-                        .stream().collect(Collectors.toMap(ContractInstance::getId, Function.identity()));
+                Map<String, Contract> contractInstances = helper.contracts()
+                        .stream().collect(Collectors.toMap(Contract::getId, Function.identity()));
                 contracts.putAll(contractInstances);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -41,17 +41,21 @@ public class ContractService {
         });
     }
 
-    public Map<String, ContractInstance> getContracts() {
+    public Map<String, Contract> getContracts() {
         return contracts;
     }
 
     public String getContractType(String contractId) {
-        ContractInstance contractInstance = contracts.get(contractId);
+        Contract contractInstance = contracts.get(contractId);
         return contractInstance != null ? contractInstance.getType() : null;
     }
 
+    public Contract resolveContract(Inject inject) {
+        return contracts.get(inject.getContract());
+    }
+
     public boolean isInjectContractEnable(Inject inject) {
-        ContractInstance contract = contracts.get(inject.getContract());
-        return contract.isExpose();
+        Contract contract = contracts.get(inject.getContract());
+        return contract != null && contract.isExpose();
     }
 }

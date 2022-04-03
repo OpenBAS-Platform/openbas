@@ -15,6 +15,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RestController

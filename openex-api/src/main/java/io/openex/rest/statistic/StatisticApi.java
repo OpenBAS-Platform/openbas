@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.UserHelper.currentUser;
 
 @RestController
 public class StatisticApi extends RestBehavior {

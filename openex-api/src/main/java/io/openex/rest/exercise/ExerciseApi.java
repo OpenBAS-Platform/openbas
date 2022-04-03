@@ -12,7 +12,7 @@ import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.DocumentService;
+import io.openex.service.FileService;
 import io.openex.service.DryrunService;
 import io.openex.service.ImportService;
 import io.openex.service.InjectService;
@@ -41,10 +41,11 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static io.openex.config.AppConfig.currentUser;
 import static io.openex.database.model.Exercise.STATUS.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.service.ImportService.EXPORT_ENTRY_ATTACHMENT;
 import static io.openex.service.ImportService.EXPORT_ENTRY_EXERCISE;
 import static java.time.Duration.between;
@@ -83,7 +84,7 @@ public class ExerciseApi extends RestBehavior {
 
     // region services
     private DryrunService dryrunService;
-    private DocumentService fileService;
+    private FileService fileService;
     private InjectService injectService;
     // endregion
 
@@ -134,7 +135,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Autowired
-    public void setFileService(DocumentService fileService) {
+    public void setFileService(FileService fileService) {
         this.fileService = fileService;
     }
 

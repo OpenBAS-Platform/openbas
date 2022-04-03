@@ -22,7 +22,7 @@ import java.util.UUID;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.helper.DatabaseHelper.updateRelation;
-import static io.openex.rest.helper.RestBehavior.fromIterable;
+import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @Service

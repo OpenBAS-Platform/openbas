@@ -5,9 +5,7 @@ import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.manual.ManualContract;
-import io.openex.injects.mastodon.MastodonContract;
-import io.openex.injects.ovh_sms.OvhSmsContract;
-import io.openex.service.DocumentService;
+import io.openex.service.FileService;
 import io.openex.service.ImportEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.openex.rest.helper.RestBehavior.fromIterable;
+import static io.openex.helper.StreamHelper.fromIterable;
 
 @Component
 public class V1_DataImporter implements Importer {
@@ -30,7 +28,7 @@ public class V1_DataImporter implements Importer {
         }
     }
 
-    private DocumentService documentService;
+    private FileService documentService;
     private DocumentRepository documentRepository;
     private TagRepository tagRepository;
     private ExerciseRepository exerciseRepository;
@@ -63,7 +61,7 @@ public class V1_DataImporter implements Importer {
     }
 
     @Autowired
-    public void setDocumentService(DocumentService documentService) {
+    public void setDocumentService(FileService documentService) {
         this.documentService = documentService;
     }
 
@@ -116,10 +114,10 @@ public class V1_DataImporter implements Importer {
                 contract = injectContractNode.textValue();
             } else if (type.equals(EmailContract.TYPE)) {
                 contract = EmailContract.EMAIL_DEFAULT;
-            } else if (type.equals(MastodonContract.TYPE)) {
-                contract = MastodonContract.MASTODON_DEFAULT;
-            } else if (type.equals(OvhSmsContract.TYPE)) {
-                contract = OvhSmsContract.OVH_DEFAULT;
+            } else if (type.equals("openex_mastodon")) {
+                contract = "aeab9ed6-ae98-4b48-b8cc-2e91ac54f2f9";
+            } else if (type.equals("openex_ovh_sms")) {
+                contract = "e9e902bc-b03d-4223-89e1-fca093ac79dd";
             } else if (type.equals(ManualContract.TYPE)) {
                 contract = ManualContract.MANUAL_DEFAULT;
             }

@@ -21,9 +21,8 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import java.util.List;
-
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static java.util.Comparator.comparing;
 

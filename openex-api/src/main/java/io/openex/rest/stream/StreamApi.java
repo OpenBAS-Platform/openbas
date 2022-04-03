@@ -20,7 +20,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.UserHelper.currentUser;
 import static java.time.Instant.now;
 
 @RestController

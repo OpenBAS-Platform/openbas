@@ -12,7 +12,7 @@ import io.openex.rest.document.form.DocumentCreateInput;
 import io.openex.rest.document.form.DocumentTagUpdateInput;
 import io.openex.rest.document.form.DocumentUpdateInput;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.DocumentService;
+import io.openex.service.FileService;
 import io.openex.service.InjectService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -32,12 +32,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
+
 
 @RestController
 public class DocumentApi extends RestBehavior {
 
-    private DocumentService fileService;
+    private FileService fileService;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
@@ -70,7 +72,7 @@ public class DocumentApi extends RestBehavior {
     }
 
     @Autowired
-    public void setFileService(DocumentService fileService) {
+    public void setFileService(FileService fileService) {
         this.fileService = fileService;
     }
 
@@ -146,8 +148,7 @@ public class DocumentApi extends RestBehavior {
     }
 
     @PutMapping("/api/documents/{documentId}/tags")
-    public Document documentTags(@PathVariable String documentId,
-                                 @RequestBody DocumentTagUpdateInput input) {
+    public Document documentTags(@PathVariable String documentId, @RequestBody DocumentTagUpdateInput input) {
         Document document = resolveDocument(documentId).orElseThrow();
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return documentRepository.save(document);
@@ -155,8 +156,7 @@ public class DocumentApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/documents/{documentId}")
-    public Document updateDocumentInformation(@PathVariable String documentId,
-                                              @Valid @RequestBody DocumentUpdateInput input) {
+    public Document updateDocumentInformation(@PathVariable String documentId, @Valid @RequestBody DocumentUpdateInput input) {
         Document document = resolveDocument(documentId).orElseThrow();
         document.setUpdateAttributes(input);
         document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));

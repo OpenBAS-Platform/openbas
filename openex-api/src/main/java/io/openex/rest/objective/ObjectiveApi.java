@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.helper.DatabaseHelper.resolveRelation;
 import static java.time.Instant.now;
 

@@ -28,7 +28,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.database.model.Setting.SETTING_KEYS.*;
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static java.util.Optional.ofNullable;

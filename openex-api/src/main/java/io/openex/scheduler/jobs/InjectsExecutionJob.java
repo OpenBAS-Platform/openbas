@@ -1,15 +1,13 @@
 package io.openex.scheduler.jobs;
 
-import io.openex.contract.ContractInstance;
+import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.DryInjectRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectRepository;
 import io.openex.execution.ExecutableInject;
-import io.openex.execution.Execution;
-import io.openex.execution.Executor;
+import io.openex.execution.Injector;
 import io.openex.helper.InjectHelper;
-import io.openex.service.ContractService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+import static io.openex.database.model.Execution.executionError;
 import static java.time.Instant.now;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -33,12 +32,6 @@ public class InjectsExecutionJob implements Job {
     private DryInjectRepository dryInjectRepository;
     private InjectRepository injectRepository;
     private ExerciseRepository exerciseRepository;
-    private ContractService contractService;
-
-    @Autowired
-    public void setContractService(ContractService contractService) {
-        this.contractService = contractService;
-    }
 
     @Autowired
     public void setInjectRepository(InjectRepository injectRepository) {
@@ -68,7 +61,6 @@ public class InjectsExecutionJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
-            Map<String, ContractInstance> contractMap = contractService.getContracts();
             // Handle starting exercises if needed.
             List<Exercise> exercises = exerciseRepository.findAllShouldBeInRunningState(now());
             exercises.stream().parallel().forEach(exercise -> {
@@ -86,11 +78,15 @@ public class InjectsExecutionJob implements Job {
                 List<ExecutableInject> executableInjects = entry.getValue();
                 // Execute each inject for the exercise in order.
                 executableInjects.forEach(executableInject -> {
-                    Inject inject = executableInject.getInject();
                     Injection source = executableInject.getSource();
-                    String contractType = contractMap.get(inject.getContract()).getType();
-                    Executor executor = context.getBean(contractType, Executor.class);
-                    Execution execution = executor.executeInRange(executableInject);
+                    Contract contract = executableInject.getContract();
+                    Execution execution;
+                    if (contract == null) {
+                        execution = executionError("injector", "Inject is not available for execution");
+                    } else {
+                        Injector executor = context.getBean(contract.getType(), Injector.class);
+                        execution = executor.executeInRange(executableInject);
+                    }
                     // Report inject execution
                     if (source instanceof Inject) {
                         Inject executedInject = injectRepository.findById(source.getId()).orElseThrow();

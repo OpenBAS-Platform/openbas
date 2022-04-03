@@ -4,15 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.config.OpenExConfig;
-import io.openex.database.model.Comcheck;
-import io.openex.database.model.ComcheckStatus;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Inject;
+import io.openex.contract.Contract;
+import io.openex.database.model.*;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ComcheckStatusRepository;
 import io.openex.execution.*;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.email.EmailExecutor;
+import io.openex.service.ContractService;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -40,9 +39,15 @@ public class ComchecksExecutionJob implements Job {
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
     private ComcheckStatusRepository comcheckStatusRepository;
+    private ContractService contractService;
 
     @Resource
     private ObjectMapper mapper;
+
+    @Autowired
+    public void setContractService(ContractService contractService) {
+        this.contractService = contractService;
+    }
 
     @Autowired
     public void setComcheckRepository(ComcheckRepository comcheckRepository) {
@@ -103,7 +108,8 @@ public class ComchecksExecutionJob implements Job {
                     return injectContext;
                 }).toList();
                 Inject emailInject = buildComcheckEmail(comCheck);
-                ExecutableInject injection = new ExecutableInject(emailInject, userInjectContexts);
+                Contract contract = contractService.resolveContract(emailInject);
+                ExecutableInject injection = new ExecutableInject(emailInject, contract, userInjectContexts);
                 EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
                 Execution execution = emailExecutor.executeDirectly(injection);
                 // Save the status sent date

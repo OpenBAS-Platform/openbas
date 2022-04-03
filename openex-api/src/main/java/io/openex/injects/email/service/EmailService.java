@@ -1,13 +1,7 @@
 package io.openex.injects.email.service;
 
-import io.openex.database.model.Document;
-import io.openex.database.repository.DocumentRepository;
-import io.openex.execution.Execution;
+import io.openex.database.model.DataAttachment;
 import io.openex.execution.ExecutionContext;
-import io.openex.execution.ExecutionTrace;
-import io.openex.injects.email.model.EmailAttachment;
-import io.openex.service.DocumentService;
-import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,30 +13,16 @@ import javax.mail.Multipart;
 import javax.mail.internet.*;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static io.openex.helper.TemplateHelper.buildContextualContent;
 
 @Component
 public class EmailService {
 
-    private DocumentRepository documentRepository;
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
-    private DocumentService fileService;
-
-    @Autowired
-    public void setDocumentRepository(DocumentRepository documentRepository) {
-        this.documentRepository = documentRepository;
-    }
-
-    @Autowired
-    public void setFileService(DocumentService fileService) {
-        this.fileService = fileService;
-    }
 
     @Autowired
     public void setEmailSender(JavaMailSender emailSender) {
@@ -54,27 +34,7 @@ public class EmailService {
         this.emailPgp = emailPgp;
     }
 
-    public List<EmailAttachment> resolveAttachments(Execution execution, List<Document> attachments) {
-        List<EmailAttachment> resolved = new ArrayList<>();
-        for (Document attachment : attachments) {
-            String documentId = attachment.getId();
-            Optional<Document> askedDocument = documentRepository.findById(documentId);
-            try {
-                Document doc = askedDocument.orElseThrow();
-                InputStream fileInputStream = fileService.getFile(doc).orElseThrow();
-                byte[] content = IOUtils.toByteArray(fileInputStream);
-                resolved.add(new EmailAttachment(doc.getName(), content, doc.getType()));
-            } catch (Exception e) {
-                // Can't fetch the attachments, ignore
-                String docInfo = askedDocument.map(Document::getName).orElse(documentId);
-                String message = "Error getting document " + docInfo;
-                execution.addTrace(ExecutionTrace.traceError(getClass().getSimpleName(), message, e));
-            }
-        }
-        return resolved;
-    }
-
-    private MimeMessage buildMimeMessage(String from, String subject, String body, List<EmailAttachment> attachments) throws Exception {
+    private MimeMessage buildMimeMessage(String from, String subject, String body, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
         mimeMessage.setSubject(subject, "utf-8");
@@ -84,7 +44,7 @@ public class EmailService {
         bodyPart.setContent(body, "text/html;charset=utf-8");
         mailMultipart.addBodyPart(bodyPart);
         // Add Attachments
-        for (EmailAttachment attachment : attachments) {
+        for (DataAttachment attachment : attachments) {
             MimeBodyPart aBodyPart = new MimeBodyPart();
             aBodyPart.setFileName(attachment.name());
             aBodyPart.setHeader("Content-Type", attachment.contentType());
@@ -96,8 +56,8 @@ public class EmailService {
         return mimeMessage;
     }
 
-    public MimeMessage sendGlobalEmail(List<ExecutionContext> usersContext, String from, String subject, String message,
-                                       List<EmailAttachment> attachments) throws Exception {
+    public MimeMessage sendEmail(List<ExecutionContext> usersContext, String from, String subject, String message,
+                                       List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
@@ -109,7 +69,7 @@ public class EmailService {
     }
 
     public MimeMessage sendEmail(ExecutionContext userContext, String from, boolean mustBeEncrypted, String subject,
-                                 String message, List<EmailAttachment> attachments) throws Exception {
+                                 String message, List<DataAttachment> attachments) throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);

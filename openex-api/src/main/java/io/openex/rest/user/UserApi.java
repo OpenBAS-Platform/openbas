@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.DatabaseHelper.updateRelation;
+import static io.openex.helper.StreamHelper.fromIterable;
 
 @RestController
 public class UserApi extends RestBehavior {

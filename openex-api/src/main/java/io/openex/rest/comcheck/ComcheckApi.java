@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
 
+import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RestController

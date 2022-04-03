@@ -25,7 +25,7 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.database.model.User.ROLE_USER;
 import static io.openex.database.specification.TokenSpecification.fromUser;
 import static io.openex.helper.DatabaseHelper.updateRelation;

@@ -1,7 +1,7 @@
 package io.openex.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import org.jetbrains.annotations.NotNull;
+import javax.validation.constraints.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;

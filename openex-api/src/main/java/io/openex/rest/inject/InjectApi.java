@@ -1,13 +1,13 @@
 package io.openex.rest.inject;
 
-import io.openex.contract.ContractInstance;
+import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.database.specification.InjectSpecification;
+import io.openex.execution.Injector;
 import io.openex.execution.ExecutableInject;
-import io.openex.execution.Execution;
+import io.openex.database.model.Execution;
 import io.openex.execution.ExecutionContext;
-import io.openex.execution.Executor;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
 import io.openex.service.ContractService;
@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static io.openex.config.AppConfig.currentUser;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
 import static io.openex.database.specification.CommunicationSpecification.fromInject;
-import static io.openex.execution.ExecutionTrace.traceSuccess;
+import static io.openex.database.model.ExecutionTrace.traceSuccess;
 import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
 import static java.time.Instant.now;
@@ -98,19 +99,21 @@ public class InjectApi extends RestBehavior {
     }
 
     @GetMapping("/api/inject_types")
-    public List<ContractInstance> injectTypes() {
+    public List<Contract> injectTypes() {
         return contractService.getContracts().values().stream().toList();
     }
 
     @GetMapping("/api/injects/try/{injectId}")
     public InjectStatus execute(@PathVariable String injectId) {
-        Map<String, ContractInstance> contractMap = contractService.getContracts();
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         List<ExecutionContext> userInjectContexts = List.of(new ExecutionContext(currentUser(),
                 inject.getExercise(), "Direct test"));
-        ExecutableInject injection = new ExecutableInject(inject, userInjectContexts);
-        String contractType = contractMap.get(inject.getContract()).getType();
-        Executor executor = context.getBean(contractType, Executor.class);
+        Contract contract = contractService.resolveContract(inject);
+        if (contract == null) {
+            throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
+        }
+        ExecutableInject injection = new ExecutableInject(inject, contract, userInjectContexts);
+        Injector executor = context.getBean(contract.getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
@@ -118,8 +121,7 @@ public class InjectApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject updateInject(@PathVariable String exerciseId,
-                               @PathVariable String injectId,
+    public Inject updateInject(@PathVariable String exerciseId, @PathVariable String injectId,
                                @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Inject inject = injectRepository.findById(injectId).orElseThrow();
@@ -211,19 +213,19 @@ public class InjectApi extends RestBehavior {
     @PostMapping("/api/exercises/{exerciseId}/inject")
     public InjectStatus executeInject(@PathVariable String exerciseId, @Valid @RequestBody DirectInjectInput input) {
         Inject inject = input.toInject();
-        String contractType = contractService.getContractType(inject.getContract());
-        if (contractType == null) {
+        Contract contract = contractService.resolveContract(inject);
+        if (contract == null) {
             throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
         }
-        inject.setType(contractType);
+        inject.setType(contract.getType());
         inject.setUser(currentUser());
         inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
         Iterable<User> users = userRepository.findAllById(input.getUserIds());
         List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
                 .map(user -> new ExecutionContext(user, inject.getExercise(), "Direct execution"))
                 .toList();
-        ExecutableInject injection = new ExecutableInject(inject, userInjectContexts);
-        Executor executor = context.getBean(contractType, Executor.class);
+        ExecutableInject injection = new ExecutableInject(inject, contract, userInjectContexts);
+        Injector executor = context.getBean(contract.getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
