@@ -13,7 +13,7 @@ steps:
     MINIO_ACCESS-KEY: minioadmin
     MINIO_ACCESS-SECRET: minioadmin
   commands:
-  - mvn test
+  - mvn install
 
 - name: frontend-tests
   image: nikolaik/python-nodejs:python3.9-nodejs16-alpine
