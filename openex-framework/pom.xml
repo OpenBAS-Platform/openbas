@@ -12,6 +12,7 @@
     <artifactId>openex-framework</artifactId>
     <name>OpenEx framework</name>
     <description>OpenEx framework</description>
+    <version>1.0.0</version>
 
     <dependencies>
         <dependency>

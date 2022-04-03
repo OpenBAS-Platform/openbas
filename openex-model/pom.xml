@@ -12,6 +12,7 @@
     <artifactId>openex-model</artifactId>
     <name>OpenEx model</name>
     <description>OpenEx model</description>
+    <version>1.0.0</version>
 
     <dependencies>
         <dependency>
