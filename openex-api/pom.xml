@@ -15,7 +15,7 @@
 
     <profiles>
         <profile>
-            <id>default-injectors</id>
+            <id>dev</id>
             <dependencies>
                 <dependency>
                     <groupId>io.openex</groupId>
