@@ -6,13 +6,12 @@
     <parent>
         <groupId>io.openex</groupId>
         <artifactId>openex-platform</artifactId>
-        <version>3.1.0</version>
+        <version>3.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>openex-model</artifactId>
     <name>OpenEx model</name>
     <description>OpenEx model</description>
-    <version>1.0.0</version>
 
     <dependencies>
         <dependency>
@@ -41,16 +40,6 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>8.3.7</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>2.0.1.Final</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-hibernate5</artifactId>
             <version>${jackson.version}</version>
@@ -70,6 +59,16 @@
             <artifactId>commons-io</artifactId>
             <!--suppress MavenPackageUpdate -->
             <version>2.11.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.3.7</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
         </dependency>
     </dependencies>
 
