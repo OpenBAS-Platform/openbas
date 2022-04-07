@@ -58,7 +58,7 @@ public class EmailContent {
             data.append(START_DIV)
                     .append("<br/><br/><br/><br/>")
                     .append("---------------------------------------------------------------------------------<br/>")
-                    .append("OpenEX internal information, do not remove!<br/>")
+                    .append("OpenEx internal information, do not remove!<br/>")
                     .append("[inject_id=").append(inject.getId()).append("]<br/>")
                     .append("---------------------------------------------------------------------------------<br/>")
                     .append(END_DIV);

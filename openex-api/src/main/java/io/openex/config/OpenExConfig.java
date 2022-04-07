@@ -13,7 +13,7 @@ public class OpenExConfig {
     private String id = "global";
 
     @JsonProperty("application_name")
-    private String name = "OpenEX";
+    private String name = "OpenEx";
 
     @JsonProperty("application_base_url")
     private String baseUrl;

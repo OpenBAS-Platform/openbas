@@ -138,7 +138,7 @@ const Index = () => {
           </Typography>
           <Typography variant="body1">
             {t(
-              'The OpenEX API relies on the REST standard. The token must be passed into the HTTP header',
+              'The OpenEx API relies on the REST standard. The token must be passed into the HTTP header',
             )}{' '}
             <strong>Authorization</strong>.
             <Typography

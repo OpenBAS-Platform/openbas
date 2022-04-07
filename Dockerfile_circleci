@@ -1,8 +1,12 @@
 FROM maven:3.8.4-openjdk-17 AS api-builder
 
-WORKDIR /opt/openex-build/openex-api
-COPY openex-api /opt/openex-build/openex-api
-COPY openex-front/build /opt/openex-build/openex-front/build
+WORKDIR /opt/openex-build/openex
+COPY openex-model ./openex-model
+COPY openex-framework ./openex-framework
+COPY openex-api ./openex-api
+COPY openex-injectors ./openex-injectors
+COPY openex-front/build ./openex-front/build
+COPY pom.xml ./pom.xml
 RUN mvn install -DskipTests
 
 FROM openjdk:17-slim AS app
@@ -12,7 +16,7 @@ RUN ln -s /usr/bin/dpkg-deb /usr/sbin/dpkg-deb
 RUN ln -s /bin/rm /usr/sbin/rm
 RUN ln -s /bin/tar /usr/sbin/tar
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y tini;
-COPY --from=api-builder /opt/openex-build/openex-api/target/openex-api.jar ./
+COPY --from=api-builder /opt/openex-build/openex/openex-api/target/openex-api.jar ./
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["java", "-jar", "openex-api.jar"]
