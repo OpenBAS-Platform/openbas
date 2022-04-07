@@ -17,7 +17,7 @@ COPY openex-api ./openex-api
 COPY openex-injectors ./openex-injectors
 COPY pom.xml ./pom.xml
 COPY --from=front-builder /opt/openex-build/openex-front/build ./openex-front/build
-RUN mvn install -DskipTests
+RUN mvn install -DskipTests -Pdev
 
 FROM openjdk:17-slim AS app
 

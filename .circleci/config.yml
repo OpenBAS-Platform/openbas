@@ -11,6 +11,11 @@ jobs:
       - run:
           command: apt-get update --allow-insecure-repositories --allow-unauthenticated && apt-get install -y build-essential
       - checkout
+       - run:
+          name: Update submodules
+          command: |
+            git submodule sync
+            git submodule update --init --recursive --jobs 8
       - run: 
           working_directory: ~/openex/openex-front
           command: yarn install
@@ -40,7 +45,7 @@ jobs:
           at: ~/
       - run: 
           working_directory: ~/openex
-          command: mvn install -DskipTests
+          command: mvn install -DskipTests -Pdev
       - slack/notify:
           event: fail
           template: basic_fail_1              
@@ -59,7 +64,7 @@ jobs:
           at: ~/
       - run: 
           working_directory: ~/openex_musl
-          command: mvn install -DskipTests
+          command: mvn install -DskipTests -Pdev
       - slack/notify:
           event: fail
           template: basic_fail_1          

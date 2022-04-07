@@ -13,6 +13,29 @@
     <name>OpenEx API</name>
     <description>OpenEx api</description>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <dependencies>
+                <dependency>
+                    <groupId>io.openex</groupId>
+                    <artifactId>openex-injector-ovh</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.openex</groupId>
+                    <artifactId>openex-injector-lade</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.openex</groupId>
+                    <artifactId>openex-injector-mastodon</artifactId>
+                    <version>1.0.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>io.openex</groupId>
