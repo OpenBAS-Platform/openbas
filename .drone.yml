@@ -2,6 +2,11 @@ kind: pipeline
 name: openex-tests
 
 steps:
+- name: submodules
+  image: alpine/git
+  commands:
+  - git submodule update --init --recursive
+    
 - name: api-tests
   image: maven:3.8.4-openjdk-17
   environment:
