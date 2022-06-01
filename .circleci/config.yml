@@ -38,7 +38,7 @@ jobs:
   build_platform:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.5-openjdk-18
     steps:
       - attach_workspace:
           at: ~/
@@ -56,7 +56,7 @@ jobs:
   build_platform_musl:
     working_directory: ~/openex_musl
     docker:
-      - image: maven:3.8.4-eclipse-temurin-17-alpine
+      - image: maven:3.8.5-eclipse-temurin-18-alpine
     resource_class: large
     steps:
       - attach_workspace:
@@ -75,7 +75,7 @@ jobs:
   package_rolling:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.5-openjdk-18
     steps:
       - attach_workspace:
           at: ~/
@@ -98,7 +98,7 @@ jobs:
   package_rolling_musl:
     working_directory: ~/openex_musl
     docker:
-      - image: maven:3.8.4-openjdk-17
+      - image: maven:3.8.5-openjdk-18
     steps:
       - attach_workspace:
           at: ~/
@@ -119,7 +119,7 @@ jobs:
   deploy_demo:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17-slim
+      - image: maven:3.8.5-openjdk-18-slim
     steps:
       - attach_workspace:
           at: ~/
@@ -152,7 +152,7 @@ jobs:
   deploy_reference:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17-slim
+      - image: maven:3.8.5-openjdk-18-slim
     steps:
       - attach_workspace:
           at: ~/
@@ -184,7 +184,7 @@ jobs:
   deploy_lab:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17-slim
+      - image: maven:3.8.5-openjdk-18-slim
     steps:
       - attach_workspace:
           at: ~/
@@ -216,7 +216,7 @@ jobs:
   deploy_testing:
     working_directory: ~/openex
     docker:
-      - image: maven:3.8.4-openjdk-17-slim
+      - image: maven:3.8.5-openjdk-18-slim
     steps:
       - attach_workspace:
           at: ~/
