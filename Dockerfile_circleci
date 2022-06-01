@@ -1,4 +1,4 @@
-FROM maven:3.8.4-openjdk-17 AS api-builder
+FROM maven:3.8.5-openjdk-18 AS api-builder
 
 WORKDIR /opt/openex-build/openex
 COPY openex-model ./openex-model
@@ -9,7 +9,7 @@ COPY openex-front/build ./openex-front/build
 COPY pom.xml ./pom.xml
 RUN mvn install -DskipTests -Pdev
 
-FROM openjdk:17-slim AS app
+FROM openjdk:18-slim AS app
 
 RUN ln -s /usr/bin/dpkg-split /usr/sbin/dpkg-split
 RUN ln -s /usr/bin/dpkg-deb /usr/sbin/dpkg-deb
