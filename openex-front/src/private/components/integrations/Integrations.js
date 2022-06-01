@@ -15,6 +15,7 @@ import {
   TitleOutlined,
   TextFieldsOutlined,
   ToggleOnOutlined,
+  SplitscreenOutlined,
   DescriptionOutlined,
   CastForEducationOutlined,
   ListOutlined,
@@ -49,6 +50,8 @@ const iconField = (type) => {
       return <TextFieldsOutlined color="primary" />;
     case 'checkbox':
       return <ToggleOnOutlined color="primary" />;
+    case 'tuple':
+      return <SplitscreenOutlined color="primary" />;
     case 'attachment':
       return <DescriptionOutlined color="primary" />;
     case 'audience':

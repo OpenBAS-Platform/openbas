@@ -15,6 +15,8 @@ import {
   AttachmentOutlined,
   CastForEducationOutlined,
   CloseRounded,
+  ControlPointOutlined,
+  DeleteOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
@@ -60,6 +62,10 @@ const styles = (theme) => ({
   item: {
     paddingLeft: 10,
     height: 50,
+  },
+  tuple: {
+    paddingTop: 0,
+    paddingLeft: 0,
   },
   bodyItem: {
     height: '100%',
@@ -211,6 +217,7 @@ class InjectDefinition extends Component {
       allAudiences: props.inject.inject_all_audiences,
       audiencesIds: props.inject.inject_audiences,
       documents: props.inject.inject_documents,
+      baseContent: props.inject.inject_content,
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -244,6 +251,23 @@ class InjectDefinition extends Component {
     this.setState({
       documents: [...this.state.documents, ...documents],
     });
+  }
+
+  handleAddTuple(attributeKey) {
+    const newContent = { ...this.state.baseContent };
+    if (newContent[attributeKey]) {
+      newContent[attributeKey].push({ key: '', value: '' });
+    } else {
+      newContent[attributeKey] = [{ key: '', value: '' }];
+    }
+    this.setState({ baseContent: newContent });
+  }
+
+  handleRemoveTuple(attributeKey, index, values) {
+    values[attributeKey].splice(index, 1);
+    const newContent = { ...this.state.baseContent };
+    newContent[attributeKey].splice(index, 1);
+    this.setState({ baseContent: newContent });
   }
 
   handleRemoveDocument(documentId) {
@@ -388,6 +412,7 @@ class InjectDefinition extends Component {
       return <Loader variant="inElement" />;
     }
     const {
+      baseContent,
       allAudiences,
       audiencesIds,
       documents,
@@ -667,10 +692,8 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <Typography
-                  variant="h2"
-                  style={{ marginTop: hasAudiences ? 30 : 0 }}
-                >
+                <Typography variant="h2"
+                  style={{ marginTop: hasAudiences ? 30 : 0 }}>
                   {t('Inject data: ')}
                   <b>{injectType.name}</b>
                 </Typography>
@@ -714,6 +737,47 @@ class InjectDefinition extends Component {
                               disabled={isExerciseReadOnly(exercise)}
                             />
                           );
+                        case 'tuple':
+                          // eslint-disable-next-line no-case-declarations
+                          const multiple = field.cardinality === 'n';
+                          // eslint-disable-next-line no-case-declarations
+                          const tuples = multiple ? (baseContent?.[field.key] ?? []) : [{ key: '', value: '' }];
+                          return <div>
+                                <div style={{ marginTop: 20, fontSize: '0.9rem', color: 'rgba(0, 0, 0, 0.6)' }}>
+                                    {t(field.key)}
+                                    { field.cardinality === 'n'
+                                    && <IconButton onClick={this.handleAddTuple.bind(this, field.key)} aria-haspopup="true" size="medium">
+                                      <ControlPointOutlined color="primary" />
+                                    </IconButton> }
+                                </div>
+                                <List style={{ marginTop: 8 }}>
+                                  {tuples.map((tuple, index) => (
+                                      <ListItem key={`${field.key}_list_${index}`} classes={{ root: classes.tuple }} divider={false}>
+                                        <TextField variant="standard"
+                                            key={`key_${field.key}_${index}`}
+                                            name={`${field.key}[${index}][key]`}
+                                            fullWidth={true}
+                                            label={t('Key')}
+                                            style={{ marginRight: 20 }}
+                                            disabled={isExerciseReadOnly(exercise)}/>
+                                        <TextField variant="standard"
+                                            key={`value_${field.key}_${index}`}
+                                            name={`${field.key}[${index}][value]`}
+                                            fullWidth={true}
+                                            label={t('Value')}
+                                            style={{ marginRight: 20 }}
+                                            disabled={isExerciseReadOnly(exercise)}/>
+                                        {field.cardinality === 'n'
+                                            && <IconButton
+                                                onClick={this.handleRemoveTuple.bind(this, field.key, index, values)}
+                                                aria-haspopup="true" size="small">
+                                              <DeleteOutlined color="primary"/>
+                                            </IconButton>
+                                        }
+                                      </ListItem>
+                                  ))}
+                                </List>
+                              </div>;
                         case 'select':
                           return field.cardinality === 'n' ? (
                             <Select
@@ -721,8 +785,7 @@ class InjectDefinition extends Component {
                               label={t(field.label)}
                               key={field.key}
                               multiple
-                              renderValue={(v) => v.map((a) => field.choices[a]).join(', ')
-                              }
+                              renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
                               name={field.key}
                               fullWidth={true}
                               style={{ marginTop: 20 }}

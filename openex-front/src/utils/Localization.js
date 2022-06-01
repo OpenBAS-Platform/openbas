@@ -215,6 +215,7 @@ const i18n = {
       Optional: 'Optionnel',
       text: 'Champ texte',
       textarea: 'Zone de texte',
+      tuple: 'Duo clef valeur',
       checkbox: 'Case à cocher',
       'Do you want to try this inject?': 'Souhaitez-vous tester ce stimuli ?',
       'The inject will only be sent to you.':
@@ -339,6 +340,7 @@ const i18n = {
       audience: 'Audience',
       text: 'Text field',
       textarea: 'Text area',
+      tuple: 'Key value pair',
       checkbox: 'Checkbox',
       attachment: 'Document',
       message: 'Message',
