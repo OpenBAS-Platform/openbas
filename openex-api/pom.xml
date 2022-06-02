@@ -34,7 +34,7 @@
                 </dependency>
                 <dependency>
                     <groupId>io.openex</groupId>
-                    <artifactId>openex-injector-api</artifactId>
+                    <artifactId>openex-injector-http</artifactId>
                     <version>1.0.0-SNAPSHOT</version>
                 </dependency>
             </dependencies>
