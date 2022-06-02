@@ -89,7 +89,7 @@ const iconSelector = (type, variant, fontSize, done) => {
           sx={{ color: done ? '#4caf50' : '#2196f3' }}
         />
       );
-    case 'openex_rest_api':
+    case 'openex_http':
       return (
         <ApiOutlined
           style={style}

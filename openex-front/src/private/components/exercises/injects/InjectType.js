@@ -62,7 +62,7 @@ const inlineStyles = {
     color: '#2196f3',
     border: '1px solid #2196f3',
   },
-  openex_rest_api: {
+  openex_http: {
     backgroundColor: 'rgba(0, 188, 212, 0.08)',
     color: '#00bcd4',
     border: '1px solid #00bcd4',
@@ -134,13 +134,13 @@ class InjectType extends Component {
             />
           </Tooltip>
         );
-      case 'openex_rest_api':
+      case 'openex_http':
         return (
-          <Tooltip title={label || t('Rest API')}>
+          <Tooltip title={label || t('HTTP Call')}>
             <Chip
               classes={{ root: style }}
-              style={inlineStyles.openex_rest_api}
-              label={label || t('Rest API')}
+              style={inlineStyles.openex_http}
+              label={label || t('HTTP Call')}
             />
           </Tooltip>
         );
