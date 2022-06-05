@@ -178,14 +178,9 @@ const Animation = () => {
     };
   });
   const technicalAudiences = injectTypesWithNoAudiences
-    .filter(
-      (injectType) => injects.filter((i) => i.inject_type === injectType).length > 0,
-    )
+    .filter((injectType) => injects.filter((i) => i.inject_type === injectType).length > 0)
     .map((type) => ({ audience_id: type, audience_name: type }));
-  const sortedNativeAudiences = R.sortWith(
-    [R.ascend(R.prop('audience_name'))],
-    audiences,
-  );
+  const sortedNativeAudiences = R.sortWith([R.ascend(R.prop('audience_name'))], audiences);
   const sortedAudiences = [...technicalAudiences, ...sortedNativeAudiences];
   const injectsMap = { ...audiencesInjectsMap, ...technicalInjectsMap };
   const [selectedInject, setSelectedInject] = useState(null);
@@ -229,9 +224,9 @@ const Animation = () => {
   );
   const injectTypes = R.values(injectTypesMap);
   const disabledTypes = injectTypes
-    .filter((type) => type.expose === false)
-    .map((type) => type.type);
-  const types = injectTypes.map((type) => type.type);
+    .filter((type) => type.config.expose === false)
+    .map((type) => type.config.type);
+  const types = injectTypes.map((type) => type.config.type);
   const grid0 = theme.palette.mode === 'light' ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)';
   const grid5 = theme.palette.mode === 'light'
     ? 'rgba(0,0,0,0.05)'
@@ -282,25 +277,14 @@ const Animation = () => {
           </div>
           <div className={classes.timeline}>
             {sortedAudiences.map((audience, index) => {
-              const injectsGroupedByTick = byTick(
-                filtering.filterAndSort(injectsMap[audience.audience_id]),
-              );
+              const injectsGroupedByTick = byTick(filtering.filterAndSort(injectsMap[audience.audience_id]));
               return (
-                <div
-                  key={audience.audience_id}
-                  className={classes.line}
-                  style={{
-                    backgroundColor: index % 2 === 0 ? grid0 : grid5,
-                  }}
-                >
+                <div key={audience.audience_id} className={classes.line}
+                  style={{ backgroundColor: index % 2 === 0 ? grid0 : grid5 }}>
                   {Object.keys(injectsGroupedByTick).map((key, i) => {
                     const injectGroupPosition = (key * 100) / totalDuration;
                     return (
-                      <div
-                        key={i}
-                        className={classes.injectGroup}
-                        style={{ left: `${injectGroupPosition}%` }}
-                      >
+                      <div key={i} className={classes.injectGroup} style={{ left: `${injectGroupPosition}%` }}>
                         {injectsGroupedByTick[key].map((inject) => (
                           <InjectIcon
                             key={inject.inject_id}

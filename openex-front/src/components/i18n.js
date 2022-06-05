@@ -134,6 +134,7 @@ const inject18n = (WrappedComponent) => {
         <WrappedComponent
           {...this.props}
           {...{ t: translate }}
+          {...{ tPick: (label) => label[this.props.intl.locale] ?? label[this.props.intl.defaultLocale] }}
           {...{ n: formatNumber }}
           {...{ b: formatBytes }}
           {...{ fld: longDate }}
@@ -271,6 +272,7 @@ export const useFormatter = () => {
   };
   return {
     t: translate,
+    tPick: (label) => label[intl.locale] ?? label[intl.defaultLocale],
     n: formatNumber,
     b: formatBytes,
     fld: longDate,

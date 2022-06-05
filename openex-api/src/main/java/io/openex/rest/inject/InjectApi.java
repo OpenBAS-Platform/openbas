@@ -113,7 +113,7 @@ public class InjectApi extends RestBehavior {
             throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
         }
         ExecutableInject injection = new ExecutableInject(inject, contract, userInjectContexts);
-        Injector executor = context.getBean(contract.getType(), Injector.class);
+        Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
     }
@@ -217,7 +217,7 @@ public class InjectApi extends RestBehavior {
         if (contract == null) {
             throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
         }
-        inject.setType(contract.getType());
+        inject.setType(contract.getConfig().getType());
         inject.setUser(currentUser());
         inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
         Iterable<User> users = userRepository.findAllById(input.getUserIds());
@@ -225,7 +225,7 @@ public class InjectApi extends RestBehavior {
                 .map(user -> new ExecutionContext(user, inject.getExercise(), "Direct execution"))
                 .toList();
         ExecutableInject injection = new ExecutableInject(inject, contract, userInjectContexts);
-        Injector executor = context.getBean(contract.getType(), Injector.class);
+        Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
     }

@@ -47,15 +47,10 @@ public class ContractService {
 
     public String getContractType(String contractId) {
         Contract contractInstance = contracts.get(contractId);
-        return contractInstance != null ? contractInstance.getType() : null;
+        return contractInstance != null ? contractInstance.getConfig().getType() : null;
     }
 
     public Contract resolveContract(Inject inject) {
         return contracts.get(inject.getContract());
-    }
-
-    public boolean isInjectContractEnable(Inject inject) {
-        Contract contract = contracts.get(inject.getContract());
-        return contract != null && contract.isExpose();
     }
 }

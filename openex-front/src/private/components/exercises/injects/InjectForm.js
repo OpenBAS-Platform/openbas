@@ -62,6 +62,7 @@ class InjectForm extends Component {
   render() {
     const {
       t,
+      tPick,
       onSubmit,
       handleClose,
       initialValues,
@@ -71,16 +72,15 @@ class InjectForm extends Component {
     } = this.props;
     const sortedTypes = R.sortWith(
       [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-      R.values(injectTypesMap)
-        .filter((type) => type.expose === true)
-        .map((type) => ({ tname: t(type.name), ttype: t(type.type), ...type })),
-    ).map((n) => ({ id: n.contract_id, label: n.tname, type: n.type }));
+      R.values(injectTypesMap).filter((type) => type.config.expose === true)
+        .map((type) => ({ tname: tPick(type.label), ttype: tPick(type.config.label), ...type })),
+    ).map((n) => ({ id: n.contract_id, label: n.tname, group: n.ttype, type: n.config.type }));
     const finalInitialValues = editing
       ? R.assoc(
         'inject_contract',
         {
           id: initialValues.inject_contract,
-          label: injectTypesMap[initialValues.inject_contract]?.name,
+          label: tPick(injectTypesMap[initialValues.inject_contract]?.label),
         },
         initialValues,
       )
@@ -114,7 +114,7 @@ class InjectForm extends Component {
               multiple={false}
               options={sortedTypes}
               style={{ marginTop: 20 }}
-              groupBy={(option) => t(option.type)}
+              groupBy={(option) => t(option.group)}
               renderOption={(renderProps, option) => (
                 <Box component="li" {...renderProps}>
                   <div className={classes.icon}>
@@ -191,6 +191,7 @@ class InjectForm extends Component {
 InjectForm.propTypes = {
   classes: PropTypes.object,
   t: PropTypes.func,
+  tPick: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   handleClose: PropTypes.func,
   editing: PropTypes.bool,

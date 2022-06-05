@@ -67,7 +67,7 @@ const iconField = (type) => {
 const Integrations = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { t } = useFormatter();
+  const { t, tPick } = useFormatter();
   const injectTypes = useHelper((store) => store.getInjectTypes());
   useDataLoader(() => {
     dispatch(fetchInjectTypes());
@@ -80,9 +80,8 @@ const Integrations = () => {
   ]);
   const types = R.sortWith(
     [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-    R.values(injectTypes)
-      .filter((type) => type.expose === true)
-      .map((type) => ({ tname: t(type.name), ttype: t(type.type), ...type })),
+    R.values(injectTypes).filter((type) => type.config.expose === true)
+      .map((type) => ({ tname: tPick(type.label), ttype: tPick(type.config.label), ...type })),
   );
   const sortedTypes = filtering.filterAndSort(types);
   return (

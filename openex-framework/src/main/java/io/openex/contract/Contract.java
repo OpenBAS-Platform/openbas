@@ -2,7 +2,7 @@ package io.openex.contract;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.contract.fields.ContractElement;
-import org.checkerframework.checker.units.qual.C;
+import io.openex.helper.SupportedLanguage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,36 +10,33 @@ import java.util.Map;
 
 public class Contract {
 
+    private final ContractConfig config;
+
     @JsonProperty("contract_id")
     private String id;
 
-    private String name;
-
-    private final boolean expose;
+    private Map<SupportedLanguage, String> label;
 
     private final boolean manual;
-
-    private final String type;
 
     private List<ContractElement> fields;
 
     private final Map<String, String> context = new HashMap<>();
 
-    private Contract(String type, boolean manual, boolean expose, String id, String name, List<ContractElement> fields) {
-        this.type = type;
-        this.expose = expose;
-        this.manual = manual;
+    private Contract(ContractConfig config, String id, Map<SupportedLanguage, String> label, boolean manual, List<ContractElement> fields) {
+        this.config = config;
         this.id = id;
-        this.name = name;
+        this.label = label;
+        this.manual = manual;
         this.fields = fields;
     }
 
-    public static Contract manualContract(String type, boolean expose, String id, String name, List<ContractElement> fields) {
-        return new Contract(type, true, expose, id, name, fields);
+    public static Contract manualContract(ContractConfig config, String id, Map<SupportedLanguage, String> label, List<ContractElement> fields) {
+        return new Contract(config, id, label, true, fields);
     }
 
-    public static Contract executableContract(String type, boolean expose, String id, String name, List<ContractElement> fields) {
-        return new Contract(type, false, expose, id, name, fields);
+    public static Contract executableContract(ContractConfig config, String id, Map<SupportedLanguage, String> label, List<ContractElement> fields) {
+        return new Contract(config, id, label, false, fields);
     }
 
     public String getId() {
@@ -58,20 +55,12 @@ public class Contract {
         this.fields = fields;
     }
 
-    public String getName() {
-        return name;
+    public Map<SupportedLanguage, String> getLabel() {
+        return label;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public boolean isExpose() {
-        return expose;
+    public void setLabel(Map<SupportedLanguage, String> label) {
+        this.label = label;
     }
 
     public boolean isManual() {
@@ -84,5 +73,9 @@ public class Contract {
 
     public void addContext(String key, String value) {
         this.context.put(key, value);
+    }
+
+    public ContractConfig getConfig() {
+        return config;
     }
 }

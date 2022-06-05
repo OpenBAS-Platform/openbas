@@ -45,7 +45,7 @@ public abstract class Injector {
             // Inject contract must exist
             Contract contract = executableInject.getContract();
             // Inject contract must be exposed
-            if (!contract.isExpose()) {
+            if (!contract.getConfig().isExpose()) {
                 throw new UnsupportedOperationException("Inject is not activated for execution");
             }
             // If empty content, inject must be rejected

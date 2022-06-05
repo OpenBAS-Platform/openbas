@@ -715,8 +715,7 @@ class InjectDefinition extends Component {
                               disabled={isExerciseReadOnly(exercise)}
                             />
                           ) : (
-                            <TextField
-                              variant="standard"
+                            <TextField variant="standard"
                               key={field.key}
                               name={field.key}
                               fullWidth={true}
@@ -729,8 +728,7 @@ class InjectDefinition extends Component {
                           );
                         case 'checkbox':
                           return (
-                            <SwitchField
-                              key={field.key}
+                            <SwitchField key={field.key}
                               name={field.key}
                               label={t(field.label)}
                               style={{ marginTop: 10 }}
@@ -743,12 +741,14 @@ class InjectDefinition extends Component {
                           // eslint-disable-next-line no-case-declarations
                           const tuples = multiple ? (baseContent?.[field.key] ?? []) : [{ key: '', value: '' }];
                           return <div>
-                                <div style={{ marginTop: 20, fontSize: '0.9rem', color: 'rgba(0, 0, 0, 0.6)' }}>
+                                <div style={{ marginTop: 20 }}>
+                                  <Typography variant="body2" color="text.secondary">
                                     {t(field.key)}
                                     { field.cardinality === 'n'
                                     && <IconButton onClick={this.handleAddTuple.bind(this, field.key)} aria-haspopup="true" size="medium">
                                       <ControlPointOutlined color="primary" />
                                     </IconButton> }
+                                  </Typography>
                                 </div>
                                 <List style={{ marginTop: 8 }}>
                                   {tuples.map((tuple, index) => (
@@ -780,16 +780,14 @@ class InjectDefinition extends Component {
                               </div>;
                         case 'select':
                           return field.cardinality === 'n' ? (
-                            <Select
-                              variant="standard"
+                            <Select variant="standard"
                               label={t(field.label)}
                               key={field.key}
                               multiple
                               renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
                               name={field.key}
                               fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
+                              style={{ marginTop: 20 }}>
                               {Object.entries(field.choices)
                                 .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
@@ -799,15 +797,13 @@ class InjectDefinition extends Component {
                                 ))}
                             </Select>
                           ) : (
-                            <Select
-                              variant="standard"
+                            <Select variant="standard"
                               label={t(field.label)}
                               key={field.key}
                               renderValue={(v) => field.choices[v]}
                               name={field.key}
                               fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
+                              style={{ marginTop: 20 }}>
                               {Object.entries(field.choices)
                                 .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
@@ -828,12 +824,10 @@ class InjectDefinition extends Component {
                               label={t(field.label)}
                               key={field.key}
                               multiple
-                              renderValue={(v) => v.map((a) => choices[a]).join(', ')
-                              }
+                              renderValue={(v) => v.map((a) => choices[a]).join(', ')}
                               name={field.key}
                               fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
+                              style={{ marginTop: 20 }}>
                               {Object.entries(choices)
                                 .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
@@ -843,15 +837,13 @@ class InjectDefinition extends Component {
                                 ))}
                             </Select>
                           ) : (
-                            <Select
-                              variant="standard"
+                            <Select variant="standard"
                               label={t(field.label)}
                               key={field.key}
                               renderValue={(v) => choices[v]}
                               name={field.key}
                               fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
+                              style={{ marginTop: 20 }}>
                               {Object.entries(choices)
                                 .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
@@ -863,8 +855,7 @@ class InjectDefinition extends Component {
                           );
                         default:
                           return (
-                            <TextField
-                              variant="standard"
+                            <TextField variant="standard"
                               key={field.key}
                               name={field.key}
                               fullWidth={true}
@@ -881,19 +872,16 @@ class InjectDefinition extends Component {
                     {t('Inject documents')}
                   </Typography>
                   <List>
-                    <ListItem
-                      classes={{ root: classes.itemHead }}
+                    <ListItem classes={{ root: classes.itemHead }}
                       divider={false}
-                      style={{ paddingTop: 0 }}
-                    >
+                      style={{ paddingTop: 0 }}>
                       <ListItemIcon>
                         <span
                           style={{
                             padding: '0 8px 0 8px',
                             fontWeight: 700,
                             fontSize: 12,
-                          }}
-                        >
+                          }}>
                           &nbsp;
                         </span>
                       </ListItemIcon>

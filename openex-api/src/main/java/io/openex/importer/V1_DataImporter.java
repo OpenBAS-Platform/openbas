@@ -112,13 +112,13 @@ public class V1_DataImporter implements Importer {
             // In this case basic inject types must be mapped to corresponding default contract
             if (injectContractNode != null) {
                 contract = injectContractNode.textValue();
-            } else if (type.equals(EmailContract.TYPE)) {
+            } else if (type.equals("openex_email")) {
                 contract = EmailContract.EMAIL_DEFAULT;
             } else if (type.equals("openex_mastodon")) {
                 contract = "aeab9ed6-ae98-4b48-b8cc-2e91ac54f2f9";
             } else if (type.equals("openex_ovh_sms")) {
                 contract = "e9e902bc-b03d-4223-89e1-fca093ac79dd";
-            } else if (type.equals(ManualContract.TYPE)) {
+            } else if (type.equals("openex_manual")) {
                 contract = ManualContract.MANUAL_DEFAULT;
             }
             // If contract is not know, inject can't be imported

@@ -8,5 +8,7 @@ public abstract class Contractor {
 
     protected abstract String getType();
 
+    public abstract ContractConfig getConfig();
+
     public abstract List<Contract> contracts() throws Exception;
 }

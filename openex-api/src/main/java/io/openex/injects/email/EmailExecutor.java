@@ -25,7 +25,7 @@ import static io.openex.database.model.ExecutionTrace.traceSuccess;
 import static io.openex.injects.email.EmailContract.EMAIL_GLOBAL;
 import static java.util.stream.Collectors.joining;
 
-@Component("openex_email")
+@Component(EmailContract.TYPE)
 public class EmailExecutor extends Injector {
 
     private EmailService emailService;

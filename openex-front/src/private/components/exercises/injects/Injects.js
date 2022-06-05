@@ -185,7 +185,7 @@ const Injects = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { t } = useFormatter();
+  const { t, tPick } = useFormatter();
   const [selectedInject, setSelectedInject] = useState(null);
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
@@ -219,10 +219,8 @@ const Injects = () => {
   });
   const injectTypes = Object.values(injectTypesMap);
   const sortedInjects = filtering.filterAndSort(injects);
-  const types = injectTypes.map((type) => type.type);
-  const disabledTypes = injectTypes
-    .filter((type) => type.expose === false)
-    .map((type) => type.type);
+  const types = injectTypes.map((type) => type.config.type);
+  const disabledTypes = injectTypes.filter((type) => type.config.expose === false).map((type) => type.config.type);
   // Rendering
   return (
     <div className={classes.container}>
@@ -337,14 +335,12 @@ const Injects = () => {
           <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
         </ListItem>
         {sortedInjects.map((inject) => {
-          const injectTypeName = injectTypesMap[inject.inject_contract]?.name
-            || t(inject.inject_type);
+          const injectContract = injectTypesMap[inject.inject_contract];
+          const injectTypeName = tPick(injectContract?.label);
           const duration = splitDuration(inject.inject_depends_duration || 0);
           const isDisabled = disabledTypes.includes(inject.inject_type)
             || !types.includes(inject.inject_type);
-          const isNoAudience = injectTypesWithNoAudiences.includes(
-            inject.inject_type,
-          );
+          const isNoAudience = injectTypesWithNoAudiences.includes(inject.inject_type);
           let injectStatus = inject.inject_enabled
             ? t('Enabled')
             : t('Disabled');
@@ -358,37 +354,20 @@ const Injects = () => {
               divider={true}
               button={true}
               disabled={isDisabled}
-              onClick={() => setSelectedInject(inject.inject_id)}
-            >
+              onClick={() => setSelectedInject(inject.inject_id)}>
               <ListItemIcon>
-                <InjectIcon
-                  tooltip={t(inject.inject_type)}
-                  type={inject.inject_type}
-                />
+                <InjectIcon tooltip={t(inject.inject_type)} config={injectContract.config} type={inject.inject_type}/>
               </ListItemIcon>
               <ListItemText
                 primary={
                   <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_type}
-                    >
-                      <InjectType
-                        variant="list"
-                        type={inject.inject_type}
-                        label={t(injectTypeName)}
-                      />
+                    <div className={classes.bodyItem} style={inlineStyles.inject_type}>
+                      <InjectType variant="list" config={injectContract.config} label={injectTypeName}/>
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_title}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.inject_title}>
                       {inject.inject_title}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_depends_duration}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.inject_depends_duration}>
                       <Chip
                         classes={{ root: classes.duration }}
                         label={`${duration.days}
@@ -397,16 +376,10 @@ const Injects = () => {
                             ${t('m')}`}
                       />
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_users_number}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.inject_users_number}>
                       {isNoAudience ? t('N/A') : inject.inject_users_number}
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_enabled}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.inject_enabled}>
                       <ItemBoolean
                         status={
                           inject.inject_content === null
@@ -417,10 +390,7 @@ const Injects = () => {
                         variant="list"
                       />
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_tags}
-                    >
+                    <div className={classes.bodyItem} style={inlineStyles.inject_tags}>
                       <ItemTags variant="list" tags={inject.inject_tags} />
                     </div>
                   </div>

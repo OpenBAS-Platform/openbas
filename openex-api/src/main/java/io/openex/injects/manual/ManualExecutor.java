@@ -6,11 +6,11 @@ import io.openex.execution.ExecutableInject;
 import io.openex.database.model.Execution;
 import org.springframework.stereotype.Component;
 
-@Component("openex_manual")
+@Component(ManualContract.TYPE)
 public class ManualExecutor extends Injector {
 
     @Override
-    public void process(Execution execution, ExecutableInject injection, Contract contract) throws Exception {
+    public void process(Execution execution, ExecutableInject injection, Contract contract) {
         throw new UnsupportedOperationException("Manual inject cannot be executed");
     }
 }
