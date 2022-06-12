@@ -17,6 +17,7 @@ export const entitiesInitializer = Immutable({
     answers: Immutable({}),
     comchecks: Immutable({}),
     comcheckstatuses: Immutable({}),
+    mediareaders: Immutable({}),
     dryruns: Immutable({}),
     dryinjects: Immutable({}),
     audiences: Immutable({}),

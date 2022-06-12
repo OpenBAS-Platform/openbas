@@ -58,8 +58,8 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
             return true;
         }
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        List<User> planners = exercise.getObservers();
-        Optional<User> planner = planners.stream()
+        List<User> observers = exercise.getObservers();
+        Optional<User> planner = observers.stream()
                 .filter(user -> user.getId().equals(getUser().getId())).findAny();
         return planner.isPresent();
     }

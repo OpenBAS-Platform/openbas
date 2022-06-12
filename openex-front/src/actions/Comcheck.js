@@ -4,6 +4,7 @@ import {
   postReferential,
   delReferential,
 } from '../utils/Action';
+import {mediaReader} from "./Schema";
 
 export const fetchComchecks = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/comchecks`;
@@ -33,4 +34,9 @@ export const fetchComcheckStatuses = (exerciseId, comcheckId) => (dispatch) => {
 export const fetchComcheckStatus = (statusId) => (dispatch) => {
   const uri = `/api/comcheck/${statusId}`;
   return getReferential(schema.comcheckStatus, uri)(dispatch);
+};
+
+export const fetchMedia = (mediaId, userId, exerciseId) => (dispatch) => {
+  const uri = `/api/media-reader/${mediaId}/${userId}/${exerciseId}`;
+  return getReferential(schema.mediaReader, uri)(dispatch);
 };

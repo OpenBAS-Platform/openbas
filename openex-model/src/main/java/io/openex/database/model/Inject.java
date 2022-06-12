@@ -5,9 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.database.converter.ContentConverter;
 import io.openex.helper.MonoModelDeserializer;
 import io.openex.helper.MultiModelDeserializer;
-import io.openex.database.converter.ContentConverter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -139,6 +139,11 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_communications")
     @Fetch(FetchMode.SUBSELECT)
     private List<Communication> communications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER)
+    @JsonProperty("inject_expectations")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<InjectExpectation> expectations = new ArrayList<>();
 
     // region transient
     @Transient
@@ -385,6 +390,22 @@ public class Inject implements Base, Injection {
 
     public void setCommunications(List<Communication> communications) {
         this.communications = communications;
+    }
+
+    public List<InjectExpectation> getExpectations() {
+        return expectations;
+    }
+
+    public List<InjectExpectationExecution> getUserExpectationsForArticle(User user, MediaArticle article) {
+        return expectations.stream()
+                .flatMap(expectation -> expectation.getExecutions().stream())
+                .filter(execution -> execution.getExpectation().getArticle().equals(article))
+                .filter(execution -> execution.getUser().equals(user))
+                .toList();
+    }
+
+    public void setExpectations(List<InjectExpectation> expectations) {
+        this.expectations = expectations;
     }
 
     @JsonIgnore

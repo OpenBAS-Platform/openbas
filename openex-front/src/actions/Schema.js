@@ -154,6 +154,12 @@ export const statistics = new schema.Entity(
 export const log = new schema.Entity('logs', {}, { idAttribute: 'log_id' });
 export const arrayOfLogs = new schema.Array(log);
 
+export const mediaReader = new schema.Entity(
+  'mediareaders',
+  {},
+  { idAttribute: 'media_id' },
+);
+
 token.define({ token_user: user });
 user.define({ user_organization: organization });
 
@@ -212,9 +218,8 @@ export const storeHelper = (state) => ({
   // comcheck
   getComcheck: (id) => entity(id, 'comchecks', state),
   getComcheckStatus: (id) => entity(id, 'comcheckstatuses', state),
-  getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter(
-    (i) => i.comcheckstatus_comcheck === id,
-  ),
+  getMediaReader: (id) => entity(id, 'mediareaders', state),
+  getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter((i) => i.comcheckstatus_comcheck === id),
   // users
   getUsers: () => entities('users', state),
   getGroups: () => entities('groups', state),
