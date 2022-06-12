@@ -150,6 +150,12 @@ public class Exercise implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<Document> documents = new ArrayList<>();
 
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("exercise_articles")
+    private List<MediaArticle> articles = new ArrayList<>();
+
     // region transient
     @JsonProperty("exercise_injects_statistics")
     public Map<String, Long> getInjectStatistics() {
@@ -425,6 +431,18 @@ public class Exercise implements Base {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<MediaArticle> getArticles() {
+        return articles;
+    }
+
+    public List<MediaArticle> getArticlesForMedia(Media media) {
+        return articles.stream().filter(article -> article.getMedia().equals(media)).toList();
+    }
+
+    public void setArticles(List<MediaArticle> articles) {
+        this.articles = articles;
     }
 
     @Override

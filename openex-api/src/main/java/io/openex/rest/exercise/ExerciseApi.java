@@ -12,8 +12,8 @@ import io.openex.rest.exercise.exports.ExerciseExportMixins;
 import io.openex.rest.exercise.exports.ExerciseFileExport;
 import io.openex.rest.exercise.form.*;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.service.FileService;
 import io.openex.service.DryrunService;
+import io.openex.service.FileService;
 import io.openex.service.ImportService;
 import io.openex.service.InjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +80,7 @@ public class ExerciseApi extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
     private InjectRepository injectRepository;
+    private ArticleRepository articleRepository;
     // endregion
 
     // region services
@@ -89,6 +90,11 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setArticleRepository(ArticleRepository articleRepository) {
+        this.articleRepository = articleRepository;
+    }
+
     @Autowired
     public void setInjectService(InjectService injectService) {
         this.injectService = injectService;
@@ -392,6 +398,9 @@ public class ExerciseApi extends RestBehavior {
             // Reset pauses
             exercise.setCurrentPause(null);
             pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
+            // Reset medias
+            articleRepository.saveAll(exercise.getArticles().stream()
+                    .peek(article -> article.setPublished(false)).toList());
             // Reset injects status and outcome
             injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
                     .stream().peek(Inject::clean).toList());

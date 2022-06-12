@@ -851,6 +851,41 @@ class InjectDefinition extends Component {
                                 ))}
                             </Select>
                           );
+                        case 'exercise-select':
+                          return field.cardinality === 'n' ? (
+                              <Select variant="standard"
+                                      label={t(field.label)}
+                                      key={field.key}
+                                      multiple
+                                      renderValue={(v) => v.map((a) => field.choices[exerciseId][a]).join(', ')}
+                                      name={field.key}
+                                      fullWidth={true}
+                                      style={{ marginTop: 20 }}>
+                                {Object.entries(field.choices[exerciseId])
+                                  .sort((a, b) => a[1].localeCompare(b[1]))
+                                  .map(([k, v]) => (
+                                        <MenuItem key={k} value={k}>
+                                          <ListItemText>{v}</ListItemText>
+                                        </MenuItem>
+                                  ))}
+                              </Select>
+                          ) : (
+                              <Select variant="standard"
+                                      label={t(field.label)}
+                                      key={field.key}
+                                      renderValue={(v) => field.choices[exerciseId][v]}
+                                      name={field.key}
+                                      fullWidth={true}
+                                      style={{ marginTop: 20 }}>
+                                {Object.entries(field.choices[exerciseId])
+                                  .sort((a, b) => a[1].localeCompare(b[1]))
+                                  .map(([k, v]) => (
+                                        <MenuItem key={k} value={k}>
+                                          <ListItemText>{v}</ListItemText>
+                                        </MenuItem>
+                                  ))}
+                              </Select>
+                          );
                         case 'dependency-select':
                           // eslint-disable-next-line no-case-declarations
                           const depValue = values[field.dependencyField];

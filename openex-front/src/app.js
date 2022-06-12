@@ -13,6 +13,7 @@ const App = () => (
       <RedirectManager>
         <Switch>
           <Route path="/comcheck" component={RootPublic} />
+          <Route path="/media" component={RootPublic} />
           <Route component={Root} />
         </Switch>
       </RedirectManager>

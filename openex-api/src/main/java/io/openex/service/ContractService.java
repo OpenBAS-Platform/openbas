@@ -27,7 +27,7 @@ public class ContractService {
         this.baseContracts = baseContracts;
     }
 
-    // You build the contracts every minute
+    // Build the contracts every minute
     @Scheduled(fixedDelay = 60000, initialDelay = 0)
     public void buildContracts() {
         baseContracts.forEach(helper -> {
