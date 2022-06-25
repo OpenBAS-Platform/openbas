@@ -18,6 +18,7 @@ import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
+import static io.openex.helper.SupportedLanguage.fr;
 
 @Component
 public class EmailContract extends Contractor {
@@ -38,29 +39,18 @@ public class EmailContract extends Contractor {
 
     @Override
     public ContractConfig getConfig() {
-        return new ContractConfig(TYPE, Map.of(en, "Email"), "#cddc39", "/img/email.png", isExpose());
+        return new ContractConfig(TYPE, Map.of(en, "Email", fr, "Email"), "#cddc39", "/img/email.png", isExpose());
     }
 
     @Override
     public List<Contract> contracts() {
         ContractConfig contractConfig = getConfig();
         // Standard contract
-        List<ContractElement> standardInstance = contractBuilder()
-                .mandatory(audienceField("audiences", "Audiences", Multiple))
-                .mandatory(textField("subject", "Subject"))
-                .mandatory(richTextareaField("body", "Body"))
-                .optional(checkboxField("encrypted", "Encrypted", false))
-                .optional(attachmentField("attachments", "Attachments", Multiple)).build();
-        Contract standardEmail = executableContract(contractConfig,
-                EMAIL_DEFAULT, Map.of(en, "User based email"), standardInstance);
+        List<ContractElement> standardInstance = contractBuilder().mandatory(audienceField("audiences", "Audiences", Multiple)).mandatory(textField("subject", "Subject")).mandatory(richTextareaField("body", "Body")).optional(checkboxField("encrypted", "Encrypted", false)).optional(attachmentField("attachments", "Attachments", Multiple)).build();
+        Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT, Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance);
         // Global contract
-        List<ContractElement> globalInstance = contractBuilder()
-                .mandatory(audienceField("audiences", "Audiences", Multiple))
-                .mandatory(textField("subject", "Subject"))
-                .mandatory(richTextareaField("body", "Body"))
-                .optional(attachmentField("attachments", "Attachments", Multiple)).build();
-        Contract globalEmail = executableContract(contractConfig,
-                EMAIL_GLOBAL, Map.of(en, "Multi recipients email"), globalInstance);
+        List<ContractElement> globalInstance = contractBuilder().mandatory(audienceField("audiences", "Audiences", Multiple)).mandatory(textField("subject", "Subject")).mandatory(richTextareaField("body", "Body")).optional(attachmentField("attachments", "Attachments", Multiple)).build();
+        Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL, Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);
         return List.of(standardEmail, globalEmail);
     }
 }
