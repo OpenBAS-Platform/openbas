@@ -16,6 +16,12 @@ import java.util.Objects;
 @Table(name = "injects_expectations")
 public class InjectExpectation implements Base {
 
+    public enum EXPECTATION_TYPE {
+        DOCUMENT,
+        ARTICLE,
+        CHALLENGE,
+    }
+
     @Id
     @Column(name = "inject_expectation_id")
     @GeneratedValue(generator = "UUID")
@@ -31,7 +37,12 @@ public class InjectExpectation implements Base {
 
     @Column(name = "inject_expectation_type")
     @JsonProperty("inject_expectation_type")
-    private String type; // DOCUMENT, ARTICLE or CHALLENGE
+    @Enumerated(EnumType.STRING)
+    private EXPECTATION_TYPE type;
+
+    @Column(name = "inject_expectation_document")
+    @JsonProperty("inject_expectation_document")
+    private String documentName;
 
     @ManyToOne
     @JoinColumn(name = "article_id")
@@ -67,12 +78,20 @@ public class InjectExpectation implements Base {
         this.inject = inject;
     }
 
-    public String getType() {
+    public EXPECTATION_TYPE getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EXPECTATION_TYPE type) {
         this.type = type;
+    }
+
+    public String getDocumentName() {
+        return documentName;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
     }
 
     public MediaArticle getArticle() {

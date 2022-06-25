@@ -1,50 +1,57 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
 
 @Entity
-@Table(name = "challenges")
+@Table(name = "challenges_flags")
 @EntityListeners(ModelBaseListener.class)
-public class Challenge implements Base {
+public class ChallengeFlag implements Base {
+
+    public enum FLAG_TYPE {
+        VALUE,
+        VALUE_CASE,
+        REGEXP,
+    }
+
     @Id
-    @Column(name = "challenge_id")
+    @Column(name = "flag_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("challenge_id")
+    @JsonProperty("flag_id")
     private String id;
 
-    @Column(name = "challenge_created_at")
-    @JsonProperty("challenge_created_at")
+    @Column(name = "flag_created_at")
+    @JsonProperty("flag_created_at")
     private Instant createdAt = now();
 
-    @Column(name = "challenge_updated_at")
-    @JsonProperty("challenge_updated_at")
+    @Column(name = "flag_updated_at")
+    @JsonProperty("flag_updated_at")
     private Instant updatedAt = now();
 
-    @Column(name = "challenge_name")
-    @JsonProperty("challenge_name")
-    private String name;
+    @Column(name = "flag_type")
+    @JsonProperty("flag_type")
+    @Enumerated(EnumType.STRING)
+    private FLAG_TYPE type;
 
-    @Column(name = "challenge_description")
-    @JsonProperty("challenge_description")
-    private String description;
+    @Column(name = "flag_value")
+    @JsonProperty("flag_value")
+    private String value;
 
-    @OneToMany(mappedBy = "challenge", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JsonProperty("challenge_flags")
-    @Fetch(FetchMode.SUBSELECT)
-    private List<ChallengeFlag> flags = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JoinColumn(name = "flag_challenge")
+    @JsonProperty("flag_challenge")
+    private Challenge challenge;
 
     @Override
     public String getId() {
@@ -53,14 +60,6 @@ public class Challenge implements Base {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name.toLowerCase();
     }
 
     public Instant getCreatedAt() {
@@ -79,20 +78,28 @@ public class Challenge implements Base {
         this.updatedAt = updatedAt;
     }
 
-    public String getDescription() {
-        return description;
+    public FLAG_TYPE getType() {
+        return type;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setType(FLAG_TYPE type) {
+        this.type = type;
     }
 
-    public List<ChallengeFlag> getFlags() {
-        return flags;
+    public String getValue() {
+        return value;
     }
 
-    public void setFlags(List<ChallengeFlag> flags) {
-        this.flags = flags;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public Challenge getChallenge() {
+        return challenge;
+    }
+
+    public void setChallenge(Challenge challenge) {
+        this.challenge = challenge;
     }
 
     @Override

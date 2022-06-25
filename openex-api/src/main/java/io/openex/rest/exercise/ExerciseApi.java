@@ -80,6 +80,7 @@ public class ExerciseApi extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
     private InjectRepository injectRepository;
+    private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
     private ArticleRepository articleRepository;
     // endregion
 
@@ -90,6 +91,11 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region setters
+    @Autowired
+    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
+        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
+    }
+
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
@@ -404,6 +410,10 @@ public class ExerciseApi extends RestBehavior {
             // Reset injects status and outcome
             injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
                     .stream().peek(Inject::clean).toList());
+            // Reset expectations executions
+            injectExpectationExecutionRepository.deleteAll(
+                    injectExpectationExecutionRepository.findAllForExercise(exerciseId)
+            );
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
