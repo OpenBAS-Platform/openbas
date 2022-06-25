@@ -140,7 +140,7 @@ public class Inject implements Base, Injection {
     @Fetch(FetchMode.SUBSELECT)
     private List<Communication> communications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("inject_expectations")
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectExpectation> expectations = new ArrayList<>();

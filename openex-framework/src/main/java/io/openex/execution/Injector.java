@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.DocumentRepository;
+import io.openex.database.repository.InjectExpectationExecutionRepository;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,12 @@ public abstract class Injector {
     protected ObjectMapper mapper;
     private FileService fileService;
     private DocumentRepository documentRepository;
+    private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
+
+    @Autowired
+    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
+        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
+    }
 
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
@@ -39,7 +46,7 @@ public abstract class Injector {
 
     public abstract void process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
 
-    private Execution execute(ExecutableInject executableInject, boolean checkDateRange) {
+    private Execution execute(ExecutableInject executableInject, boolean scheduleInjection) {
         Execution execution = new Execution();
         try {
             // Inject contract must exist
@@ -53,11 +60,26 @@ public abstract class Injector {
                 throw new UnsupportedOperationException("Inject is empty");
             }
             // If inject is too old, reject the execution
-            if (checkDateRange && !isInInjectableRange(executableInject.getSource())) {
+            if (scheduleInjection && !isInInjectableRange(executableInject.getSource())) {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
             // Process the execution
             process(execution, executableInject, contract);
+            // Create the expectations
+            List<ExecutionContext> users = executableInject.getUsers();
+            if (scheduleInjection && users.size() > 0) {
+                List<InjectExpectation> expectations = executableInject.getInject().getExpectations();
+                List<InjectExpectationExecution> executions = users.stream()
+                        .flatMap(userContext -> expectations.stream().map(expectation -> {
+                            InjectExpectationExecution expectationExecution = new InjectExpectationExecution();
+                            expectationExecution.setExpectation(expectation);
+                            expectationExecution.setExercise(executableInject.getInject().getExercise());
+                            expectationExecution.setInject(executableInject.getInject());
+                            expectationExecution.setUser(userContext.getUser());
+                            return expectationExecution;
+                        })).toList();
+                injectExpectationExecutionRepository.saveAll(executions);
+            }
         } catch (Exception e) {
             execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));
         } finally {

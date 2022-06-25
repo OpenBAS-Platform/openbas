@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.model.Inject;
+import io.openex.database.model.InjectExpectation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,9 @@ public class InjectInput {
 
     @JsonProperty("inject_tags")
     private List<String> tagIds;
+
+    @JsonProperty("inject_expectations")
+    private List<InjectExpectationInput> expectations = new ArrayList<>();
 
     public String getTitle() {
         return title;
@@ -144,6 +148,14 @@ public class InjectInput {
 
     public void setTagIds(List<String> tagIds) {
         this.tagIds = tagIds;
+    }
+
+    public List<InjectExpectationInput> getExpectations() {
+        return expectations;
+    }
+
+    public void setExpectations(List<InjectExpectationInput> expectations) {
+        this.expectations = expectations;
     }
 
     public Inject toInject() {

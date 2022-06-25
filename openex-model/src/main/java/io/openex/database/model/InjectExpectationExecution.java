@@ -41,6 +41,18 @@ public class InjectExpectationExecution {
     private InjectExpectation expectation;
 
     @ManyToOne
+    @JoinColumn(name = "exercise_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("expectation_execution_exercise")
+    private Exercise exercise;
+
+    @ManyToOne
+    @JoinColumn(name = "inject_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("expectation_execution_inject")
+    private Inject inject;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("expectation_execution_user")
@@ -92,6 +104,22 @@ public class InjectExpectationExecution {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Exercise getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
+    }
+
+    public Inject getInject() {
+        return inject;
+    }
+
+    public void setInject(Inject inject) {
+        this.inject = inject;
     }
 
     @Override

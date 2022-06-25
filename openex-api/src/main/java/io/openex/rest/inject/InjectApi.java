@@ -2,12 +2,12 @@ package io.openex.rest.inject;
 
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
+import io.openex.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openex.database.repository.*;
 import io.openex.database.specification.InjectSpecification;
-import io.openex.execution.Injector;
 import io.openex.execution.ExecutableInject;
-import io.openex.database.model.Execution;
 import io.openex.execution.ExecutionContext;
+import io.openex.execution.Injector;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.inject.form.*;
 import io.openex.service.ContractService;
@@ -21,15 +21,14 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import static io.openex.helper.StreamHelper.fromIterable;
-import static io.openex.helper.UserHelper.currentUser;
-import static io.openex.database.specification.CommunicationSpecification.fromInject;
 import static io.openex.database.model.ExecutionTrace.traceSuccess;
+import static io.openex.database.specification.CommunicationSpecification.fromInject;
 import static io.openex.helper.DatabaseHelper.resolveOptionalRelation;
 import static io.openex.helper.DatabaseHelper.updateRelation;
+import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.currentUser;
 import static java.time.Instant.now;
 
 @RestController
@@ -42,11 +41,29 @@ public class InjectApi extends RestBehavior {
     private UserRepository userRepository;
     private InjectRepository injectRepository;
     private InjectDocumentRepository injectDocumentRepository;
+    private InjectExpectationRepository injectExpectationRepository;
     private AudienceRepository audienceRepository;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ApplicationContext context;
     private ContractService contractService;
+    private ArticleRepository articleRepository;
+    private ChallengeRepository challengeRepository;
+
+    @Autowired
+    public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+        this.injectExpectationRepository = injectExpectationRepository;
+    }
+
+    @Autowired
+    public void setArticleRepository(ArticleRepository articleRepository) {
+        this.articleRepository = articleRepository;
+    }
+
+    @Autowired
+    public void setChallengeRepository(ChallengeRepository challengeRepository) {
+        this.challengeRepository = challengeRepository;
+    }
 
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
@@ -118,6 +135,49 @@ public class InjectApi extends RestBehavior {
         return InjectStatus.fromExecution(execution, inject);
     }
 
+
+    private boolean isNotAlreadyExistingExpectation(InjectExpectationInput input, List<InjectExpectation> injectExpectations) {
+        List<String> currentExpectationIds = injectExpectations.stream()
+                .filter(expectation -> expectation.getArticle() != null || expectation.getChallenge() != null)
+                .map(expectation -> {
+                    if (expectation.getArticle() != null) {
+                        return expectation.getArticle().getId();
+                    } else {
+                        return expectation.getChallenge().getId();
+                    }
+                }).toList();
+        if (input.getArticleId() != null) {
+            return !currentExpectationIds.contains(input.getArticleId());
+        } else if (input.getChallengeId() != null) {
+            return !currentExpectationIds.contains(input.getChallengeId());
+        }
+        return true;
+    }
+
+    private void updateInjectExpectation(InjectExpectation expectation, InjectExpectationInput input, Inject inject) {
+        expectation.setInject(inject);
+        EXPECTATION_TYPE expectationType = EXPECTATION_TYPE.valueOf(input.getType());
+        expectation.setType(expectationType);
+        if (input.getArticleId() != null && input.getChallengeId() != null) {
+            throw new UnsupportedOperationException("Expectation cannot be based on article and challenge");
+        }
+        if (input.getDocument() != null && expectationType != EXPECTATION_TYPE.DOCUMENT) {
+            throw new UnsupportedOperationException("Expectation with document name must be typed as DOCUMENT type");
+        }
+        if (input.getArticleId() != null) {
+            if (expectationType != EXPECTATION_TYPE.ARTICLE) {
+                throw new UnsupportedOperationException("Expectation with article Id must be typed as ARTICLE type");
+            }
+            expectation.setArticle(articleRepository.findById(input.getArticleId()).orElse(null));
+        }
+        if (input.getChallengeId() != null) {
+            if (expectationType != EXPECTATION_TYPE.CHALLENGE) {
+                throw new UnsupportedOperationException("Expectation with challenge Id must be typed as CHALLENGE type");
+            }
+            expectation.setChallenge(challengeRepository.findById(input.getChallengeId()).orElse(null));
+        }
+    }
+
     @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/injects/{exerciseId}/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
@@ -134,6 +194,30 @@ public class InjectApi extends RestBehavior {
         List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
         List<String> currentDocumentIds = inject.getDocuments().stream()
                 .map(document -> document.getDocument().getId()).toList();
+        // region Set expectations
+        List<InjectExpectation> injectExpectations = inject.getExpectations();
+        // To delete
+        List<String> expectInputIds = input.getExpectations().stream().map(InjectExpectationInput::getId).toList();
+        List<InjectExpectation> expectationsToDelete = inject.getExpectations().stream()
+                .filter(expectation -> !expectInputIds.contains(expectation.getId())).toList();
+        if (expectationsToDelete.size() > 0) {
+            injectExpectationRepository.deleteAll(expectationsToDelete);
+            injectExpectations.removeAll(expectationsToDelete);
+        }
+        // To add / update
+        input.getExpectations().forEach(in -> {
+            if (in.getId() == null && isNotAlreadyExistingExpectation(in, injectExpectations)) {
+                InjectExpectation expectation = new InjectExpectation();
+                updateInjectExpectation(expectation, in, inject);
+                injectExpectations.add(expectation);
+            } else if (in.getId() != null) {
+                InjectExpectation expectation = injectExpectationRepository.findById(in.getId()).orElseThrow();
+                updateInjectExpectation(expectation, in, inject);
+            }
+        });
+        inject.setExpectations(injectExpectations);
+        // endregion
+        // region Set documents
         List<InjectDocument> injectDocuments = new ArrayList<>(inject.getDocuments());
         // To delete
         inject.getDocuments().stream()
@@ -171,6 +255,7 @@ public class InjectApi extends RestBehavior {
             injectDoc.setAttached(attached);
         });
         inject.setDocuments(injectDocuments);
+        // endregion
         return injectRepository.save(inject);
     }
 
