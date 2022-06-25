@@ -23,7 +23,10 @@ const config = {
             }
         }],
         "^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|json)$)": "<rootDir>/jest/jest.file.transform.js"
-    }
+    },
+    transformIgnorePatterns: [
+        "^.+\\.module\\.(css|sass|scss)$"
+    ]
 };
 
 module.exports = config;

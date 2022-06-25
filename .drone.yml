@@ -21,14 +21,14 @@ steps:
   - mvn install
 
 - name: frontend-tests
-  image: nikolaik/python-nodejs:python3.9-nodejs16-alpine
+  image: nikolaik/python-nodejs:python3.10-nodejs16-alpine
 
   commands: 
   - cd openex-front
   - yarn install
   - yarn lint
   - yarn build
-  - yarn test
+  - NODE_OPTIONS=--max_old_space_size=8192 yarn test
 
 - name: build-circleci
   image: curlimages/curl
