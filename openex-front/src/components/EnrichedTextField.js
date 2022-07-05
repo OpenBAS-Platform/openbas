@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Field } from 'react-final-form';
 import InputLabel from '@mui/material/InputLabel';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import Editor from 'ckeditor5-custom-build/build/ckeditor';
 import 'ckeditor5-custom-build/build/translations/fr';
-import '../resources/css/CKEditorDark.css';
+import { useTheme } from '@mui/styles';
 import locale from '../utils/BrowserLanguage';
 import { useHelper } from '../store';
 
@@ -14,6 +14,16 @@ const renderEnrichedTextField = ({
   style,
   disabled,
 }) => {
+  const theme = useTheme();
+  useEffect(() => {
+    if (theme.palette.type === 'dark') {
+      // eslint-disable-next-line global-require
+      require('../resources/css/CKEditorDark.css');
+    } else {
+      // eslint-disable-next-line global-require
+      require('../resources/css/CKEditorLight.css');
+    }
+  });
   const lang = useHelper((helper) => {
     const me = helper.getMe();
     const settings = helper.getSettings();
