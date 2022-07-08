@@ -10,9 +10,19 @@ import IconButton from '@mui/material/IconButton';
 import { AccountCircleOutlined } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import { logout } from '../../../actions/Application';
 import logo from '../../../resources/images/logo_openex_horizontal_small.png';
 import inject18n from '../../../components/i18n';
+import TopMenuDashboard from './TopMenuDashboard';
+import TopMenuSettings from './TopMenuSettings';
+import TopMenuExercises from './TopMenuExercises';
+import TopMenuExercise from './TopMenuExercise';
+import TopMenuPlayers from './TopMenuPlayers';
+import TopMenuOrganizations from './TopMenuOrganizations';
+import TopMenuDocuments from './TopMenuDocuments';
+import TopMenuIntegrations from './TopMenuIntegrations';
+import ImportUploader from '../exercises/ImportUploader';
 
 const styles = (theme) => ({
   appBar: {
@@ -77,7 +87,7 @@ class TopBar extends Component {
   }
 
   render() {
-    const { classes, t } = this.props;
+    const { classes, t, location } = this.props;
     return (
       <AppBar
         position="fixed"
@@ -87,11 +97,35 @@ class TopBar extends Component {
       >
         <Toolbar>
           <div className={classes.logoContainer}>
-            <Link to="/private">
+            <Link to="/admin">
               <img src={`/${logo}`} alt="logo" className={classes.logo} />
             </Link>
           </div>
+          <div className={classes.menuContainer}>
+            {(location.pathname === '/admin'
+              || location.pathname.includes('/admin/import')) && (
+              <TopMenuDashboard />
+            )}
+            {location.pathname === '/admin/exercises' && <TopMenuExercises />}
+            {location.pathname.includes('/admin/exercises/') && (
+              <TopMenuExercise />
+            )}
+            {location.pathname.includes('/admin/players') && <TopMenuPlayers />}
+            {location.pathname.includes('/admin/organizations') && (
+              <TopMenuOrganizations />
+            )}
+            {location.pathname.includes('/admin/documents') && (
+              <TopMenuDocuments />
+            )}
+            {location.pathname.includes('/admin/integrations') && (
+              <TopMenuIntegrations />
+            )}
+            {location.pathname.includes('/admin/settings') && (
+              <TopMenuSettings />
+            )}
+          </div>
           <div className={classes.barRight}>
+            <Button component={ImportUploader}>{t('Import exercise')}</Button>
             <IconButton onClick={this.handleOpen.bind(this)} size="small">
               <AccountCircleOutlined />
             </IconButton>
@@ -103,7 +137,7 @@ class TopBar extends Component {
               <MenuItem
                 onClick={this.handleClose.bind(this)}
                 component={Link}
-                to="/private/profile"
+                to="/admin/profile"
               >
                 {t('Profile')}
               </MenuItem>

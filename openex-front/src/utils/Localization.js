@@ -164,7 +164,7 @@ const i18n = {
       'No injects to send in this platform.':
         'Aucun stimuli à envoyer dans cette plateforme.',
       'Before starting the exercise, you can launch a comcheck to validate player email addresses and a dryrun to send injects to the animation team.':
-        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'animation.",
+        "Avant de démarrer l'exercice, vous pouvez lancer une vérification pour valider les adresses emails et une simulation pour envoyer les stimulis à l'équipe d'timeline.",
       'Auto assign': 'Auto assignation',
       'Auto observer': 'Auto observateur',
       'Auto planner': 'Auto planificateur',
@@ -243,6 +243,8 @@ const i18n = {
       'Manage content': 'Gérer le contenu',
       Controls: 'Contrôles',
       'Lessons learned': "Retour d'expérience",
+      Planning: 'Planification',
+      'Media pressure': 'Pression médiatique',
       Comchecks: 'Vérifications',
       Dryruns: 'Simulations',
       'Messages header': 'En-tête des messages',
@@ -255,7 +257,7 @@ const i18n = {
       'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: ${comcheck.url}':
         "Ceci est une vérification des moyens de communication avant le début de l'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : ${comcheck.url}",
       'Best regards': 'Bien cordialement',
-      'The exercise control team': "L'équipe d'animation de l'exercice",
+      'The exercise control team': "L'équipe d'timeline de l'exercice",
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
@@ -284,6 +286,7 @@ const i18n = {
       'Update the poll': 'Modifier le sondage',
       'Exercise logs': "Journal d'exercice",
       'Poll replies': 'Réponses au sondage',
+      Overview: 'Aperçu',
       Objectives: 'Objectifs',
       'Create a new objective': 'Créer un nouvel objectif',
       'Update the objective': "Modifier l'objectif",

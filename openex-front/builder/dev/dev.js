@@ -133,7 +133,7 @@ esbuild
             const withOptionValued = data.replace(/%BASE_PATH%/g, basePath);
             res.header(
                 "Cache-Control",
-                "private, no-cache, no-store, must-revalidate"
+                "admin, no-cache, no-store, must-revalidate"
             );
             res.header("Expires", "-1");
             res.header("Pragma", "no-cache");

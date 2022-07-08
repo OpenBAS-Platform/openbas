@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import PlayerForm from '../private/components/players/PlayerForm';
+import PlayerForm from '../admin/components/players/PlayerForm';
 import { fetchUsers, addUser } from '../actions/User';
 import { fetchOrganizations } from '../actions/Organization';
 import { Autocomplete } from './Autocomplete';

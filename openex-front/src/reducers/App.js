@@ -10,6 +10,10 @@ const app = (state = Immutable({}), action = {}) => {
         lang: user.user_lang,
         theme: user.user_theme,
         admin: user.user_admin,
+        isOnlyPlayer:
+          !user.user_is_manager
+          && !user.user_is_planner
+          && !user.user_is_observer,
       };
       return state.set('logged', logged);
     }
