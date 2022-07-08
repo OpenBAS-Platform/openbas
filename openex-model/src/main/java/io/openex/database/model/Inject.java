@@ -408,4 +408,22 @@ public class Inject implements Base, Injection {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @JsonProperty("inject_communications_number")
+    public long getCommunicationsNumber() {
+        return getCommunications().size();
+    }
+
+    @JsonProperty("inject_communications_not_ack_number")
+    public long getCommunicationsNotAckNumber() {
+        return getCommunications().stream().filter(communication -> !communication.getAck()).count();
+    }
+
+    @JsonProperty("inject_sent_at")
+    public Instant getSentAt() {
+        if (getStatus().isPresent()) {
+            return getStatus().orElseThrow().getDate();
+        }
+        return null;
+    }
 }

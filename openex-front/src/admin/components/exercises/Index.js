@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, useParams } from 'react-router-dom';
+import { Route, Switch, useParams, useLocation } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import Exercise from './Exercise';
@@ -32,6 +32,7 @@ const Index = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
+  const location = useLocation();
   const exercise = useHelper((helper) => helper.getExercise(exerciseId));
   useDataLoader(() => {
     dispatch(fetchTags());
@@ -41,7 +42,9 @@ const Index = () => {
     return (
       <div className={classes.root}>
         <TopBar />
-        <ExerciseHeader />
+        <ExerciseHeader
+          withPadding={location.pathname !== `/admin/exercises/${exerciseId}`}
+        />
         <div className="clearfix" />
         <Switch>
           <Route

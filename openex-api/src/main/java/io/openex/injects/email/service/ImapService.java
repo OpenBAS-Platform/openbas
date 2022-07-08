@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
+import static java.time.Instant.now;
 
 @Service
 public class ImapService {
@@ -185,8 +186,14 @@ public class ImapService {
                     communication.setIdentifier(messageID);
                     communication.setUsers(users);
                     communication.setInject(inject);
+                    if (inject != null) {
+                        inject.setUpdatedAt(now());
+                    }
                     try {
                         communicationRepository.save(communication);
+                        if (inject != null) {
+                            injectRepository.save(inject);
+                        }
                     } catch (Exception e) {
                         LOGGER.log(Level.SEVERE, e.getMessage(), e);
                     }

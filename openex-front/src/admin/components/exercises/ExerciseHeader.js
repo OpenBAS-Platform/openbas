@@ -24,6 +24,10 @@ const useStyles = makeStyles(() => ({
   container: {
     width: '100%',
   },
+  containerWithPadding: {
+    width: '100%',
+    paddingRight: 200,
+  },
   title: {
     float: 'left',
     textTransform: 'uppercase',
@@ -57,7 +61,8 @@ const TagChip = ({ tagId, isReadOnly, deleteTag }) => {
   );
 };
 
-const ExerciseHeader = () => {
+const ExerciseHeader = (props) => {
+  const { withPadding } = props;
   const classes = useStyles();
   const { t } = useFormatter();
   const { exerciseId } = useParams();
@@ -93,7 +98,7 @@ const ExerciseHeader = () => {
   };
   const { exercise_tags: tags } = exercise;
   return (
-    <div className={classes.container} ref={containerRef}>
+    <div className={withPadding ? classes.containerWithPadding : classes.container} ref={containerRef}>
       <Typography
         variant="h1"
         gutterBottom={true}

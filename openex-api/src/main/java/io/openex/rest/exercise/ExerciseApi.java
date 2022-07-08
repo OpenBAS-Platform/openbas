@@ -430,6 +430,17 @@ public class ExerciseApi extends RestBehavior {
     }
     // endregion
 
+    // region communication
+    @GetMapping("/api/exercises/{exerciseId}/communications")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<Communication> exerciseCommunications(@PathVariable String exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        List<Communication> communications = new ArrayList<>();
+        exercise.getInjects().forEach(injectDoc -> communications.addAll(injectDoc.getCommunications()));
+        return communications;
+    }
+    // endregion
+
     // region import/export
     @GetMapping("/api/exercises/{exerciseId}/export")
     @PreAuthorize("isExerciseObserver(#exerciseId)")

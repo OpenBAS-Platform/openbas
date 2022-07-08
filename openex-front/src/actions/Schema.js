@@ -138,6 +138,13 @@ export const inject = new schema.Entity(
 );
 export const arrayOfInjects = new schema.Array(inject);
 
+export const communication = new schema.Entity(
+  'communications',
+  {},
+  { idAttribute: 'communication_id' },
+);
+export const arrayOfCommunications = new schema.Array(communication);
+
 export const statistics = new schema.Entity(
   'statistics',
   {},
@@ -170,6 +177,12 @@ export const storeHelper = (state) => ({
   getExerciseComchecks: (id) => entities('comchecks', state).filter((i) => i.comcheck_exercise === id),
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
+  getExerciseCommunications: (id) => {
+    const injectsIds = entities('injects', state)
+      .filter((i) => i.inject_exercise === id)
+      .map((i) => i.inject_id);
+    return entities('communications', state).filter((i) => injectsIds.includes(i.communication_inject));
+  },
   getExerciseTechnicalInjectsPerType: (id) => {
     const typesWithNoAudiences = R.uniq(
       entities('inject_types', state)

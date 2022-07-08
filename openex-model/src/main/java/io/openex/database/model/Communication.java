@@ -64,6 +64,10 @@ public class Communication implements Base {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
+    @Column(name = "communication_ack")
+    @JsonProperty("communication_ack")
+    private Boolean ack = false;
+
     @Override
     public String getId() {
         return id;
@@ -127,6 +131,14 @@ public class Communication implements Base {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Boolean getAck() {
+        return ack;
+    }
+
+    public void setAck(Boolean ack) {
+        this.ack = ack;
     }
 
     @JsonIgnore
