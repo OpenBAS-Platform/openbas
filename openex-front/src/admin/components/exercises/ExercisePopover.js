@@ -96,7 +96,7 @@ class ExercisePopover extends Component {
   submitDelete() {
     this.props.deleteExercise(this.props.exercise.exercise_id);
     this.handleCloseDelete();
-    this.props.history.push('/exercises');
+    this.props.history.push('/admin/exercises');
   }
 
   handleOpenExport() {

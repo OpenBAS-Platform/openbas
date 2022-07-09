@@ -249,6 +249,9 @@ export const storeHelper = (state) => ({
     );
     return R.take(6, R.sort(sortFn, injects));
   },
+  getInjectCommunications: (id) => entities('communications', state).filter(
+    (i) => i.communication_inject === id,
+  ),
   // documents
   getDocuments: () => entities('documents', state),
   getDocumentsMap: () => maps('documents', state),

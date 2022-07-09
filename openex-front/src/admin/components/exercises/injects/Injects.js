@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -34,6 +35,7 @@ import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
 import PlanningMenu from '../PlanningMenu';
+import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -226,250 +228,258 @@ const Injects = () => {
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
   // Rendering
-  return (
-    <div className={classes.container}>
-      <PlanningMenu exerciseId={exerciseId} />
-      <div>
-        <div style={{ float: 'left', marginRight: 20 }}>
-          <SearchFilter
-            small={true}
-            onChange={filtering.handleSearch}
-            keyword={filtering.keyword}
-          />
+  if (exercise && injects && !R.isEmpty(injectTypesMap) > 0) {
+    return (
+      <div className={classes.container}>
+        <PlanningMenu exerciseId={exerciseId} />
+        <div>
+          <div style={{ float: 'left', marginRight: 20 }}>
+            <SearchFilter
+              small={true}
+              onChange={filtering.handleSearch}
+              keyword={filtering.keyword}
+            />
+          </div>
+          <div style={{ float: 'left', marginRight: 20 }}>
+            <TagsFilter
+              onAddTag={filtering.handleAddTag}
+              onRemoveTag={filtering.handleRemoveTag}
+              currentTags={filtering.tags}
+            />
+          </div>
+          <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
+            {sortedInjects.length > 0 ? (
+              <CSVLink
+                data={exportData(
+                  'inject',
+                  [
+                    'inject_type',
+                    'inject_title',
+                    'inject_description',
+                    'inject_depends_duration',
+                    'inject_users_number',
+                    'inject_enabled',
+                    'inject_tags',
+                    'inject_content',
+                  ],
+                  sortedInjects,
+                  tagsMap,
+                )}
+                filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
+              >
+                <Tooltip title={t('Export this list')}>
+                  <IconButton size="large">
+                    <FileDownloadOutlined color="primary" />
+                  </IconButton>
+                </Tooltip>
+              </CSVLink>
+            ) : (
+              <IconButton size="large" disabled={true}>
+                <FileDownloadOutlined />
+              </IconButton>
+            )}
+          </div>
         </div>
-        <div style={{ float: 'left', marginRight: 20 }}>
-          <TagsFilter
-            onAddTag={filtering.handleAddTag}
-            onRemoveTag={filtering.handleRemoveTag}
-            currentTags={filtering.tags}
-          />
-        </div>
-        <div style={{ float: 'right', margin: '-5px 15px 0 0' }}>
-          {sortedInjects.length > 0 ? (
-            <CSVLink
-              data={exportData(
-                'inject',
-                [
-                  'inject_type',
-                  'inject_title',
-                  'inject_description',
-                  'inject_depends_duration',
-                  'inject_users_number',
-                  'inject_enabled',
-                  'inject_tags',
-                  'inject_content',
-                ],
-                sortedInjects,
-                tagsMap,
-              )}
-              filename={`[${exercise.exercise_name}] ${t('Injects')}.csv`}
-            >
-              <Tooltip title={t('Export this list')}>
-                <IconButton size="large">
-                  <FileDownloadOutlined color="primary" />
-                </IconButton>
-              </Tooltip>
-            </CSVLink>
-          ) : (
-            <IconButton size="large" disabled={true}>
-              <FileDownloadOutlined />
-            </IconButton>
-          )}
-        </div>
-      </div>
-      <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
-          <ListItemIcon>
-            <span
-              style={{
-                padding: '0 8px 0 8px',
-                fontWeight: 700,
-                fontSize: 12,
-              }}
-            >
-              &nbsp;
-            </span>
-          </ListItemIcon>
-          <ListItemText
-            primary={
-              <div>
-                {filtering.buildHeader(
-                  'inject_type',
-                  'Type',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'inject_title',
-                  'Title',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'inject_depends_duration',
-                  'Trigger',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'inject_users_number',
-                  'Players',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'inject_enabled',
-                  'Status',
-                  true,
-                  headerStyles,
-                )}
-                {filtering.buildHeader(
-                  'inject_tags',
-                  'Tags',
-                  true,
-                  headerStyles,
-                )}
-              </div>
+        <div className="clearfix" />
+        <List classes={{ root: classes.container }}>
+          <ListItem
+            classes={{ root: classes.itemHead }}
+            divider={false}
+            style={{ paddingTop: 0 }}
+          >
+            <ListItemIcon>
+              <span
+                style={{
+                  padding: '0 8px 0 8px',
+                  fontWeight: 700,
+                  fontSize: 12,
+                }}
+              >
+                &nbsp;
+              </span>
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <div>
+                  {filtering.buildHeader(
+                    'inject_type',
+                    'Type',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'inject_title',
+                    'Title',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'inject_depends_duration',
+                    'Trigger',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'inject_users_number',
+                    'Players',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'inject_enabled',
+                    'Status',
+                    true,
+                    headerStyles,
+                  )}
+                  {filtering.buildHeader(
+                    'inject_tags',
+                    'Tags',
+                    true,
+                    headerStyles,
+                  )}
+                </div>
+              }
+            />
+            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+          </ListItem>
+          {sortedInjects.map((inject) => {
+            const injectContract = injectTypesMap[inject.inject_contract];
+            const injectTypeName = tPick(injectContract?.label);
+            const duration = splitDuration(inject.inject_depends_duration || 0);
+            const isDisabled = disabledTypes.includes(inject.inject_type)
+              || !types.includes(inject.inject_type);
+            const isNoAudience = injectTypesWithNoAudiences.includes(
+              inject.inject_type,
+            );
+            let injectStatus = inject.inject_enabled
+              ? t('Enabled')
+              : t('Disabled');
+            if (inject.inject_content === null) {
+              injectStatus = t('To fill');
             }
-          />
-          <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
-        </ListItem>
-        {sortedInjects.map((inject) => {
-          const injectContract = injectTypesMap[inject.inject_contract];
-          const injectTypeName = tPick(injectContract?.label);
-          const duration = splitDuration(inject.inject_depends_duration || 0);
-          const isDisabled = disabledTypes.includes(inject.inject_type)
-            || !types.includes(inject.inject_type);
-          const isNoAudience = injectTypesWithNoAudiences.includes(
-            inject.inject_type,
-          );
-          let injectStatus = inject.inject_enabled
-            ? t('Enabled')
-            : t('Disabled');
-          if (inject.inject_content === null) {
-            injectStatus = t('To fill');
-          }
-          return (
-            <ListItem
-              key={inject.inject_id}
-              classes={{ root: classes.item }}
-              divider={true}
-              button={true}
-              disabled={isDisabled}
-              onClick={() => setSelectedInject(inject.inject_id)}
-            >
-              <ListItemIcon>
-                <InjectIcon
-                  tooltip={t(inject.inject_type)}
-                  config={injectContract.config}
-                  type={inject.inject_type}
-                />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_type}
-                    >
-                      <InjectType
-                        variant="list"
-                        config={injectContract.config}
-                        label={injectTypeName}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_title}
-                    >
-                      {inject.inject_title}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_depends_duration}
-                    >
-                      <Chip
-                        classes={{ root: classes.duration }}
-                        label={`${duration.days}
+            return (
+              <ListItem
+                key={inject.inject_id}
+                classes={{ root: classes.item }}
+                divider={true}
+                button={true}
+                disabled={isDisabled}
+                onClick={() => setSelectedInject(inject.inject_id)}
+              >
+                <ListItemIcon>
+                  <InjectIcon
+                    tooltip={t(inject.inject_type)}
+                    config={injectContract.config}
+                    type={inject.inject_type}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_type}
+                      >
+                        <InjectType
+                          variant="list"
+                          config={injectContract.config}
+                          label={injectTypeName}
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_title}
+                      >
+                        {inject.inject_title}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_depends_duration}
+                      >
+                        <Chip
+                          classes={{ root: classes.duration }}
+                          label={`${duration.days}
                             ${t('d')}, ${duration.hours}
                             ${t('h')}, ${duration.minutes}
                             ${t('m')}`}
-                      />
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_users_number}
+                      >
+                        {isNoAudience ? t('N/A') : inject.inject_users_number}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_enabled}
+                      >
+                        <ItemBoolean
+                          status={
+                            inject.inject_content === null
+                              ? false
+                              : inject.inject_enabled
+                          }
+                          label={injectStatus}
+                          variant="list"
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.inject_tags}
+                      >
+                        <ItemTags variant="list" tags={inject.inject_tags} />
+                      </div>
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_users_number}
-                    >
-                      {isNoAudience ? t('N/A') : inject.inject_users_number}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_enabled}
-                    >
-                      <ItemBoolean
-                        status={
-                          inject.inject_content === null
-                            ? false
-                            : inject.inject_enabled
-                        }
-                        label={injectStatus}
-                        variant="list"
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.inject_tags}
-                    >
-                      <ItemTags variant="list" tags={inject.inject_tags} />
-                    </div>
-                  </div>
-                }
-              />
-              <ListItemSecondaryAction>
-                <InjectPopover
-                  exerciseId={exerciseId}
-                  exercise={exercise}
-                  inject={inject}
-                  injectTypesMap={injectTypesMap}
-                  tagsMap={tagsMap}
-                  setSelectedInject={setSelectedInject}
-                  isDisabled={isDisabled}
+                  }
                 />
-              </ListItemSecondaryAction>
-            </ListItem>
-          );
-        })}
-      </List>
-      <Drawer
-        open={selectedInject !== null}
-        keepMounted={false}
-        anchor="right"
-        sx={{ zIndex: 1202 }}
-        classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelectedInject(null)}
-        elevation={1}
-      >
-        <InjectDefinition
-          injectId={selectedInject}
-          exerciseId={exercise.exercise_id}
-          exercise={exercise}
-          injectTypes={injectTypes}
-          handleClose={() => setSelectedInject(null)}
-          exercisesMap={exercisesMap}
-          tagsMap={tagsMap}
-        />
-      </Drawer>
-      {isExerciseUpdatable(exercise) && (
-        <CreateInject
-          injectTypesMap={injectTypesMap}
-          exerciseId={exercise.exercise_id}
-        />
-      )}
+                <ListItemSecondaryAction>
+                  <InjectPopover
+                    exerciseId={exerciseId}
+                    exercise={exercise}
+                    inject={inject}
+                    injectTypesMap={injectTypesMap}
+                    tagsMap={tagsMap}
+                    setSelectedInject={setSelectedInject}
+                    isDisabled={isDisabled}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
+        </List>
+        <Drawer
+          open={selectedInject !== null}
+          keepMounted={false}
+          anchor="right"
+          sx={{ zIndex: 1202 }}
+          classes={{ paper: classes.drawerPaper }}
+          onClose={() => setSelectedInject(null)}
+          elevation={1}
+        >
+          <InjectDefinition
+            injectId={selectedInject}
+            exerciseId={exercise.exercise_id}
+            exercise={exercise}
+            injectTypes={injectTypes}
+            handleClose={() => setSelectedInject(null)}
+            exercisesMap={exercisesMap}
+            tagsMap={tagsMap}
+          />
+        </Drawer>
+        {isExerciseUpdatable(exercise) && (
+          <CreateInject
+            injectTypesMap={injectTypesMap}
+            exerciseId={exercise.exercise_id}
+          />
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className={classes.container}>
+      <PlanningMenu exerciseId={exerciseId} />
+      <Loader />
     </div>
   );
 };

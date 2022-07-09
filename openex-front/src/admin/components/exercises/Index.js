@@ -13,6 +13,7 @@ import Injects from './injects/Injects';
 import Media from './media/Media';
 import Timeline from './timeline/Timeline';
 import Mails from './mails/Mails';
+import MailsInject from './mails/Inject';
 import Chat from './chat/Chat';
 import Validations from './validations/Validations';
 import Dryrun from './controls/Dryrun';
@@ -89,6 +90,11 @@ const Index = () => {
           />
           <Route
             exact
+            path="/admin/exercises/:exerciseId/animation/mails/:injectId"
+            render={errorWrapper(MailsInject)}
+          />
+          <Route
+            exact
             path="/admin/exercises/:exerciseId/animation/chat"
             render={errorWrapper(Chat)}
           />
@@ -106,7 +112,12 @@ const Index = () => {
       </div>
     );
   }
-  return <Loader />;
+  return (
+    <div className={classes.root}>
+      <TopBar />
+      <Loader />
+    </div>
+  );
 };
 
 export default Index;

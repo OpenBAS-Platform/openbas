@@ -60,10 +60,9 @@ class AnimationMenu extends Component {
           <MenuItem
             component={Link}
             to={`/admin/exercises/${exerciseId}/animation/mails`}
-            selected={
-              location.pathname
-              === `/admin/exercises/${exerciseId}/animation/mails`
-            }
+            selected={location.pathname.includes(
+              `/admin/exercises/${exerciseId}/animation/mails`,
+            )}
             classes={{ root: classes.item }}
           >
             <ListItemIcon>

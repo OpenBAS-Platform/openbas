@@ -7,11 +7,11 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import Chip from '@mui/material/Chip';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { CSVLink } from 'react-csv';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
-import { FileDownloadOutlined } from '@mui/icons-material';
+import { FileDownloadOutlined, KeyboardArrowRight } from '@mui/icons-material';
 import ItemTags from '../../../../components/ItemTags';
 import SearchFilter from '../../../../components/SearchFilter';
 import TagsFilter from '../../../../components/TagsFilter';
@@ -49,8 +49,7 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.main,
   },
   goIcon: {
-    position: 'absolute',
-    right: -10,
+    paddingTop: 3,
   },
   inputLabel: {
     float: 'left',
@@ -198,11 +197,7 @@ const Mails = () => {
   const { t, fndt } = useFormatter();
   // Filter and sort hook
   const searchColumns = ['title', 'description', 'content'];
-  const filtering = useSearchAnFilter(
-    'inject',
-    'sent_at',
-    searchColumns,
-  );
+  const filtering = useSearchAnFilter('inject', 'sent_at', searchColumns);
   // Fetching data
   const { exerciseId } = useParams();
   const { exercise, injects, injectTypesMap, tagsMap } = useHelper((helper) => {
@@ -339,6 +334,8 @@ const Mails = () => {
           return (
             <ListItem
               key={inject.inject_id}
+              component={Link}
+              to={`/admin/exercises/${exerciseId}/animation/mails/${inject.inject_id}`}
               classes={{ root: classes.item }}
               divider={true}
               button={true}
@@ -398,7 +395,9 @@ const Mails = () => {
                   </div>
                 }
               />
-              <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+              <ListItemSecondaryAction classes={{ root: classes.goIcon }}>
+                <KeyboardArrowRight />
+              </ListItemSecondaryAction>
             </ListItem>
           );
         })}

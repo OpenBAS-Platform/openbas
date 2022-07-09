@@ -26,7 +26,7 @@ public class Communication implements Base {
     @Column(name = "communication_id")
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @JsonProperty("document_id")
+    @JsonProperty("communication_id")
     private String id;
 
     @Column(name = "communication_message_id")
@@ -67,6 +67,10 @@ public class Communication implements Base {
     @Column(name = "communication_ack")
     @JsonProperty("communication_ack")
     private Boolean ack = false;
+
+    @Column(name = "communication_animation")
+    @JsonProperty("communication_animation")
+    private Boolean animation = false;
 
     @Override
     public String getId() {
@@ -139,6 +143,14 @@ public class Communication implements Base {
 
     public void setAck(Boolean ack) {
         this.ack = ack;
+    }
+
+    public Boolean getAnimation() {
+        return animation;
+    }
+
+    public void setAnimation(Boolean animation) {
+        this.animation = animation;
     }
 
     @JsonIgnore

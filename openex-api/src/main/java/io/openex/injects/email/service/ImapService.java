@@ -157,7 +157,7 @@ public class ImapService {
                 .distinct().toList();
     }
 
-    private void parseMessages(Message[] messages) throws Exception {
+    private void parseMessages(Message[] messages, Boolean isSent) throws Exception {
         for (Message message : messages) {
             MimeMessage mimeMessage = (MimeMessage) message;
             String messageID = mimeMessage.getMessageID();
@@ -186,6 +186,7 @@ public class ImapService {
                     communication.setIdentifier(messageID);
                     communication.setUsers(users);
                     communication.setInject(inject);
+                    communication.setAnimation(isSent);
                     if (inject != null) {
                         inject.setUpdatedAt(now());
                     }
@@ -202,7 +203,7 @@ public class ImapService {
         }
     }
 
-    private void synchronizeBox(Folder inbox) throws Exception {
+    private void synchronizeBox(Folder inbox, Boolean isSent) throws Exception {
         String inboxKey = username + "-imap-" + inbox.getName();
         Optional<Setting> state = settingRepository.findByKey(inboxKey);
         Setting currentState = state.orElse(null);
@@ -216,7 +217,7 @@ public class ImapService {
             int start = startMessageNumber + 1;
             Message[] messages = inbox.getMessages(start, messageCount);
             if (messages.length > 0) {
-                parseMessages(messages);
+                parseMessages(messages, isSent);
             }
         }
         currentState.setValue(String.valueOf(messageCount));
@@ -227,12 +228,12 @@ public class ImapService {
         // Sync sent
         Folder sentBox = imapStore.getFolder(sentFolder);
         sentBox.open(Folder.READ_ONLY);
-        synchronizeBox(sentBox);
+        synchronizeBox(sentBox, true);
         // Sync received
         for (String listeningFolder : inboxFolders) {
             Folder inbox = imapStore.getFolder(listeningFolder);
             inbox.open(Folder.READ_ONLY);
-            synchronizeBox(inbox);
+            synchronizeBox(inbox, false);
         }
     }
 

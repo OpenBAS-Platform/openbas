@@ -23,6 +23,7 @@ export const entitiesInitializer = Immutable({
     injects: Immutable({}),
     inject_types: Immutable({}),
     inject_statuses: Immutable({}),
+    communications: Immutable({}),
     logs: Immutable({}),
     tags: Immutable({}),
     documents: Immutable({}),
