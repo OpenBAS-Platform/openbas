@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_36__Challenge_flags extends BaseJavaMigration {
+public class V2_38__Challenge_flags extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {

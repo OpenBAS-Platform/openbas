@@ -5,10 +5,9 @@ import org.flywaydb.core.api.migration.Context;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
-import java.util.UUID;
 
 @Component
-public class V2_35__Media_introduction extends BaseJavaMigration {
+public class V2_37__Media_introduction extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
