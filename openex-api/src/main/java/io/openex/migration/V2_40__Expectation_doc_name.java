@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 
 @Component
-public class V2_38__Expectation_doc_name extends BaseJavaMigration {
+public class V2_40__Expectation_doc_name extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
