@@ -275,6 +275,8 @@ export const storeHelper = (state) => ({
       ),
     );
   },
+  // medias
+  getMedias: () => entities('medias', state),
 });
 
 export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])

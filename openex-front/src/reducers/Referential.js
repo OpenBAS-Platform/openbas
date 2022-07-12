@@ -29,6 +29,7 @@ export const entitiesInitializer = Immutable({
     tags: Immutable({}),
     documents: Immutable({}),
     parameters: Immutable({}),
+    medias: Immutable({}),
   }),
 });
 

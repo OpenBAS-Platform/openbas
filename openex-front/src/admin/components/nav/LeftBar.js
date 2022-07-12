@@ -15,6 +15,7 @@ import {
   RowingOutlined,
   GroupsOutlined,
   DescriptionOutlined,
+  PermMediaOutlined,
   ExtensionOutlined,
   SettingsOutlined,
   DomainOutlined,
@@ -144,6 +145,16 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
           classes={{ primary: classes.menuItemText }}
           primary={t('Documents')}
         />
+      </MenuItem>
+      <MenuItem component={Link}
+          to="/admin/medias"
+          selected={location.pathname === '/admin/medias'}
+          dense={true}
+          classes={{ root: classes.menuItem }}>
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <PermMediaOutlined fontSize="small" color="primary" />
+        </ListItemIcon>
+        <ListItemText classes={{ primary: classes.menuItemText }} primary={t('Medias')}/>
       </MenuItem>
     </MenuList>
     <Divider />

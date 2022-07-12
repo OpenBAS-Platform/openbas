@@ -21,6 +21,7 @@ import TopMenuExercise from './TopMenuExercise';
 import TopMenuPlayers from './TopMenuPlayers';
 import TopMenuOrganizations from './TopMenuOrganizations';
 import TopMenuDocuments from './TopMenuDocuments';
+import TopMenuMedias from '../medias/TopMenuMedias';
 import TopMenuIntegrations from './TopMenuIntegrations';
 import ImportUploader from '../exercises/ImportUploader';
 
@@ -116,6 +117,9 @@ class TopBar extends Component {
             )}
             {location.pathname.includes('/admin/documents') && (
               <TopMenuDocuments />
+            )}
+            {location.pathname.includes('/admin/medias') && (
+              <TopMenuMedias />
             )}
             {location.pathname.includes('/admin/integrations') && (
               <TopMenuIntegrations />
