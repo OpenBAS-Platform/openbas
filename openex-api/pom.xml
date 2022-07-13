@@ -147,7 +147,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>8.5.11</version>
+            <version>8.5.12</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
