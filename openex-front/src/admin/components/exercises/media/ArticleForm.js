@@ -49,7 +49,7 @@ const ArticleForm = ({ onSubmit, handleClose, initialValues, editing }) => {
   // Validation
   const validate = (values) => {
     const errors = {};
-    const requiredFields = ['article_name'];
+    const requiredFields = ['article_name', 'article_media'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');

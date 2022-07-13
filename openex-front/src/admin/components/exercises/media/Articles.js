@@ -17,6 +17,7 @@ import { fetchExerciseArticles, fetchMedias } from '../../../../actions/Media';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import ArticlePopover from './ArticlePopover';
+import { useFormatter } from '../../../../components/i18n';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -34,13 +35,19 @@ const headerStyles = {
   },
   article_name: {
     float: 'left',
-    width: '30%',
+    width: '50%',
     fontSize: 12,
     fontWeight: '700',
   },
   article_type: {
     float: 'left',
-    width: '30%',
+    width: '25%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  article_published: {
+    float: 'left',
+    width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -49,7 +56,7 @@ const headerStyles = {
 const inlineStyles = {
   article_name: {
     float: 'left',
-    width: '30%',
+    width: '50%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -57,7 +64,15 @@ const inlineStyles = {
   },
   article_media: {
     float: 'left',
-    width: '30%',
+    width: '25%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  article_published: {
+    float: 'left',
+    width: '25%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -68,6 +83,7 @@ const inlineStyles = {
 const Articles = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { t } = useFormatter();
   // Fetching data
   const { exerciseId } = useParams();
   const { exercise, articles, mediasMap } = useHelper((helper) => ({
@@ -103,6 +119,7 @@ const Articles = () => {
             <div>
               <div>{filtering.buildHeader('article_name', 'Name', true, headerStyles)}</div>
               <div>{filtering.buildHeader('article_type', 'Media', true, headerStyles)}</div>
+              <div>{filtering.buildHeader('article_published', 'Published?', true, headerStyles)}</div>
             </div>
           }/>
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
@@ -117,6 +134,9 @@ const Articles = () => {
                           <div>
                               <div className={classes.bodyItem} style={inlineStyles.article_name}>{article.article_name}</div>
                               <div className={classes.bodyItem} style={inlineStyles.article_media}>{article.article_type}</div>
+                              <div className={classes.bodyItem} style={inlineStyles.article_published}>
+                                {article.article_published ? t('Yes') : t('No')}
+                              </div>
                           </div>
                       }
                   />
