@@ -48,7 +48,7 @@ public class InjectExpectation implements Base {
     @JoinColumn(name = "article_id")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_expectation_article")
-    private MediaArticle article;
+    private Article article;
 
     @ManyToOne
     @JoinColumn(name = "challenge_id")
@@ -94,11 +94,11 @@ public class InjectExpectation implements Base {
         this.documentName = documentName;
     }
 
-    public MediaArticle getArticle() {
+    public Article getArticle() {
         return article;
     }
 
-    public void setArticle(MediaArticle article) {
+    public void setArticle(Article article) {
         this.article = article;
     }
 

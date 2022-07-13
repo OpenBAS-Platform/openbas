@@ -10,7 +10,7 @@ import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
-import Media from './media/Media';
+import Articles from './media/Articles';
 import Timeline from './timeline/Timeline';
 import Mails from './mails/Mails';
 import MailsInject from './mails/Inject';
@@ -76,7 +76,7 @@ const Index = () => {
           <Route
             exact
             path="/admin/exercises/:exerciseId/planning/media"
-            render={errorWrapper(Media)}
+            render={errorWrapper(Articles)}
           />
           <Route
             exact

@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class ArticleCreateInput {
+public class ArticleUpdateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("article_name")

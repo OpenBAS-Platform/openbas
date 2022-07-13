@@ -182,6 +182,7 @@ export const storeHelper = (state) => ({
   getExerciseDryruns: (id) => entities('dryruns', state).filter((i) => i.dryrun_exercise === id),
   getExerciseComchecks: (id) => entities('comchecks', state).filter((i) => i.comcheck_exercise === id),
   getExerciseAudiences: (id) => entities('audiences', state).filter((i) => i.audience_exercise === id),
+  getExerciseArticles: (id) => entities('articles', state).filter((i) => i.article_exercise === id),
   getExerciseInjects: (id) => entities('injects', state).filter((i) => i.inject_exercise === id),
   getExerciseCommunications: (id) => {
     const injectsIds = entities('injects', state)
@@ -277,6 +278,7 @@ export const storeHelper = (state) => ({
   },
   // medias
   getMedias: () => entities('medias', state),
+  getMediasMap: () => maps('medias', state),
 });
 
 export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])

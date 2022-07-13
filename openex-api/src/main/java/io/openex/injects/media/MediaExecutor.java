@@ -2,7 +2,7 @@ package io.openex.injects.media;
 
 import io.openex.contract.Contract;
 import io.openex.database.model.Execution;
-import io.openex.database.model.MediaArticle;
+import io.openex.database.model.Article;
 import io.openex.database.repository.ArticleRepository;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.Injector;
@@ -29,7 +29,7 @@ public class MediaExecutor extends Injector {
         try {
             MediaContent content = contentConvert(injection, MediaContent.class);
             if (contract.getId().equals(MEDIA_PUBLISH)) {
-                MediaArticle article = articleRepository.findById(content.getArticleId()).orElseThrow();
+                Article article = articleRepository.findById(content.getArticleId()).orElseThrow();
                 article.setPublished(true);
                 articleRepository.save(article);
                 String message = "Article (" + article.getName() + ") successfully published";

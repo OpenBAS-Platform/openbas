@@ -154,7 +154,7 @@ public class Exercise implements Base {
     @Fetch(FetchMode.SUBSELECT)
     @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("exercise_articles")
-    private List<MediaArticle> articles = new ArrayList<>();
+    private List<Article> articles = new ArrayList<>();
 
     // region transient
     @JsonProperty("exercise_injects_statistics")
@@ -433,15 +433,15 @@ public class Exercise implements Base {
         this.tags = tags;
     }
 
-    public List<MediaArticle> getArticles() {
+    public List<Article> getArticles() {
         return articles;
     }
 
-    public List<MediaArticle> getArticlesForMedia(Media media) {
+    public List<Article> getArticlesForMedia(Media media) {
         return articles.stream().filter(article -> article.getMedia().equals(media)).toList();
     }
 
-    public void setArticles(List<MediaArticle> articles) {
+    public void setArticles(List<Article> articles) {
         this.articles = articles;
     }
 

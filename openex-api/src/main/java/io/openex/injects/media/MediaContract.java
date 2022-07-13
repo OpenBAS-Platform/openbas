@@ -5,10 +5,9 @@ import io.openex.contract.ContractCardinality;
 import io.openex.contract.ContractConfig;
 import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
-import io.openex.contract.fields.ContractSelect;
 import io.openex.contract.fields.ContractSelectExercise;
 import io.openex.database.model.Exercise;
-import io.openex.database.model.MediaArticle;
+import io.openex.database.model.Article;
 import io.openex.database.repository.ExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,8 +57,8 @@ public class MediaContract extends Contractor {
         Map<String, Map<String, String>> choices = new HashMap<>();
         Iterable<Exercise> exercises = exerciseRepository.findAll();
         exercises.forEach(exercise -> {
-            List<MediaArticle> articles = exercise.getArticles();
-            Map<String, String> articlesChoices = articles.stream().collect(Collectors.toMap(MediaArticle::getId, MediaArticle::getName));
+            List<Article> articles = exercise.getArticles();
+            Map<String, String> articlesChoices = articles.stream().collect(Collectors.toMap(Article::getId, Article::getName));
             choices.put(exercise.getId(), articlesChoices);
         });
         ContractSelectExercise contractSelect = new ContractSelectExercise("article_id", "Article", ContractCardinality.One);

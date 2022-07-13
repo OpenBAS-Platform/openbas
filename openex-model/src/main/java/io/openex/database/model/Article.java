@@ -16,7 +16,7 @@ import static java.time.Instant.now;
 @Entity
 @Table(name = "articles")
 @EntityListeners(ModelBaseListener.class)
-public class MediaArticle implements Base {
+public class Article implements Base {
     @Id
     @Column(name = "article_id")
     @GeneratedValue(generator = "UUID")

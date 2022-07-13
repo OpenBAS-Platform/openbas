@@ -2,13 +2,12 @@ package io.openex.rest.media;
 
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
-import io.openex.helper.UserHelper;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.media.form.ArticleCreateInput;
+import io.openex.rest.media.form.ArticleUpdateInput;
 import io.openex.rest.media.form.MediaCreateInput;
 import io.openex.rest.media.form.MediaUpdateInput;
 import io.openex.rest.media.response.MediaReader;
-import io.openex.rest.tag.form.TagCreateInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.util.List;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
-import static io.openex.helper.UserHelper.currentUser;
 
 @RestController
 public class MediaApi extends RestBehavior {
@@ -95,11 +93,35 @@ public class MediaApi extends RestBehavior {
 
     // region articles
     @RolesAllowed(ROLE_ADMIN)
-    @PostMapping("/api/articles")
-    public MediaArticle createArticle(@Valid @RequestBody ArticleCreateInput input) {
-        MediaArticle article = new MediaArticle();
+    @PostMapping("/api/exercises/{exerciseId}/articles")
+    public Article createArticle(@PathVariable String exerciseId, @Valid @RequestBody ArticleCreateInput input) {
+        Article article = new Article();
+        article.setUpdateAttributes(input);
+        article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
+        article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
+        return articleRepository.save(article);
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @PutMapping("/api/articles/{articleId}")
+    public Article updateArticle(@PathVariable String articleId, @Valid @RequestBody ArticleUpdateInput input) {
+        Article article = articleRepository.findById(articleId).orElseThrow();
+        article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setUpdateAttributes(input);
         return articleRepository.save(article);
+    }
+
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    @GetMapping("/api/exercises/{exerciseId}/articles")
+    public Iterable<Article> exerciseArticles(@PathVariable String exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        return exercise.getArticles();
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @DeleteMapping("/api/articles/{articleId}")
+    public void deleteArticle(@PathVariable String articleId) {
+        articleRepository.deleteById(articleId);
     }
     // endregion
 
@@ -113,8 +135,8 @@ public class MediaApi extends RestBehavior {
         // Fulfill visible article expectations
         MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
         if (exercise.getStatus().equals(Exercise.STATUS.RUNNING)) {
-            List<MediaArticle> articlesForMedia = exercise.getArticlesForMedia(media);
-            List<MediaArticle> publishedArticles = articlesForMedia.stream().filter(MediaArticle::isPublished).toList();
+            List<Article> articlesForMedia = exercise.getArticlesForMedia(media);
+            List<Article> publishedArticles = articlesForMedia.stream().filter(Article::isPublished).toList();
             List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()
                     .flatMap(article -> exercise.getInjects()
                             .stream().flatMap(inject -> inject.getUserExpectationsForArticle(user, article)

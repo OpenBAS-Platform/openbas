@@ -3,7 +3,7 @@ package io.openex.rest.media.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.database.model.Exercise;
 import io.openex.database.model.Media;
-import io.openex.database.model.MediaArticle;
+import io.openex.database.model.Article;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class MediaReader {
     private Media media;
 
     @JsonProperty("media_articles")
-    private List<MediaArticle> mediaArticles = new ArrayList<>();
+    private List<Article> mediaArticles = new ArrayList<>();
 
     public MediaReader(Exercise.STATUS exerciseStatus, Media media) {
         this.exerciseStatus = exerciseStatus;
@@ -36,11 +36,11 @@ public class MediaReader {
         this.exerciseStatus = exerciseStatus;
     }
 
-    public List<MediaArticle> getMediaArticles() {
+    public List<Article> getMediaArticles() {
         return mediaArticles;
     }
 
-    public void setMediaArticles(List<MediaArticle> mediaArticles) {
+    public void setMediaArticles(List<Article> mediaArticles) {
         this.mediaArticles = mediaArticles;
     }
 
