@@ -35,54 +35,35 @@ class PlanningMenu extends Component {
   render() {
     const { t, location, classes, exerciseId } = this.props;
     return (
-      <Drawer
-        variant="permanent"
-        anchor="right"
-        classes={{ paper: classes.drawer }}
-      >
+      <Drawer variant="permanent" anchor="right" classes={{ paper: classes.drawer }}>
         <div className={classes.toolbar} />
         <MenuList component="nav">
-          <MenuItem
-            component={Link}
+          <MenuItem component={Link}
             to={`/admin/exercises/${exerciseId}/planning/scenario`}
-            selected={
-              location.pathname
-              === `/admin/exercises/${exerciseId}/planning/scenario`
-            }
-            classes={{ root: classes.item }}
-          >
+            selected={ location.pathname === `/admin/exercises/${exerciseId}/planning/scenario`}
+            classes={{ root: classes.item }}>
             <ListItemIcon>
               <MovieFilterOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Scenario')} />
           </MenuItem>
-          <MenuItem
-            component={Link}
+          <MenuItem component={Link}
             to={`/admin/exercises/${exerciseId}/planning/audiences`}
-            selected={
-              location.pathname
-              === `/admin/exercises/${exerciseId}/planning/audiences`
-            }
-            classes={{ root: classes.item }}
-          >
+            selected={ location.pathname === `/admin/exercises/${exerciseId}/planning/audiences`}
+            classes={{ root: classes.item }}>
             <ListItemIcon>
               <CastForEducationOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Audiences')} />
           </MenuItem>
-          <MenuItem
-            component={Link}
+          <MenuItem component={Link}
             to={`/admin/exercises/${exerciseId}/planning/media`}
-            selected={
-              location.pathname
-              === `/admin/exercises/${exerciseId}/planning/media`
-            }
-            classes={{ root: classes.item }}
-          >
+            selected={ location.pathname === `/admin/exercises/${exerciseId}/planning/media`}
+            classes={{ root: classes.item }}>
             <ListItemIcon>
               <NewspaperOutlined />
             </ListItemIcon>
-            <ListItemText primary={t('Media pressure')} />
+            <ListItemText primary={t('Medias')} />
           </MenuItem>
         </MenuList>
       </Drawer>

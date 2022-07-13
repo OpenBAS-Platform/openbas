@@ -6,7 +6,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { PermMediaOutlined } from '@mui/icons-material';
+import { NewspaperOutlined } from '@mui/icons-material';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
@@ -102,12 +102,8 @@ const Medias = () => {
   const searchColumns = ['name'];
   const filtering = useSearchAnFilter('media', 'name', searchColumns);
   // Fetching data
-  const { medias } = useHelper((helper) => ({
-    medias: helper.getMedias(),
-  }));
-  useDataLoader(() => {
-    dispatch(fetchMedias());
-  });
+  const { medias } = useHelper((helper) => ({ medias: helper.getMedias() }));
+  useDataLoader(() => { dispatch(fetchMedias()); });
   const sortedMedias = filtering.filterAndSort(medias);
   return (
       <div>
@@ -124,34 +120,22 @@ const Medias = () => {
         <List classes={{ root: classes.container }}>
           <ListItem classes={{ root: classes.itemHead }} divider={false} style={{ paddingTop: 0 }}>
             <ListItemIcon>
-            <span style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}>
-              &nbsp;
-            </span>
+              <span style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}>&nbsp;</span>
             </ListItemIcon>
             <ListItemText
                 primary={
                   <div>
-                    {filtering.buildHeader(
-                      'media_name',
-                      'Name',
-                      true,
-                      headerStyles,
-                    )}
-                    {filtering.buildHeader(
-                      'media_color',
-                      'Color',
-                      true,
-                      headerStyles,
-                    )}
+                    {filtering.buildHeader('media_name', 'Name', true, headerStyles)}
+                    {filtering.buildHeader('media_color', 'Color', true, headerStyles)}
                   </div>
                 }
             />
-            <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
+            <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
           </ListItem>
           {sortedMedias.map((media) => (
               <ListItem key={media.media_id} classes={{ root: classes.item }} divider={true}>
                 <ListItemIcon>
-                  <PermMediaOutlined color="primary" />
+                  <NewspaperOutlined color="primary" />
                 </ListItemIcon>
                 <ListItemText
                     primary={

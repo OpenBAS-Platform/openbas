@@ -16,7 +16,7 @@ const Media = () => {
   return (
     <div className={classes.container}>
       <PlanningMenu exerciseId={exerciseId} />
-      Media pressure
+      Medias
     </div>
   );
 };

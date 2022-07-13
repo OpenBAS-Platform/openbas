@@ -15,7 +15,7 @@ import {
   RowingOutlined,
   GroupsOutlined,
   DescriptionOutlined,
-  PermMediaOutlined,
+  NewspaperOutlined,
   ExtensionOutlined,
   SettingsOutlined,
   DomainOutlined,
@@ -152,7 +152,7 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
           dense={true}
           classes={{ root: classes.menuItem }}>
         <ListItemIcon style={{ minWidth: 30 }}>
-          <PermMediaOutlined fontSize="small" color="primary" />
+          <NewspaperOutlined fontSize="small" color="primary" />
         </ListItemIcon>
         <ListItemText classes={{ primary: classes.menuItemText }} primary={t('Medias')}/>
       </MenuItem>

@@ -25,7 +25,7 @@ const styles = (theme) => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 30,
+    right: 230,
   },
   text: {
     fontSize: 15,
@@ -70,27 +70,17 @@ class CreateAudience extends Component {
     return (
       <div>
         {inline === true ? (
-          <ListItem
-            button={true}
-            divider={true}
-            onClick={this.handleOpen.bind(this)}
-            color="primary"
-          >
+          <ListItem button={true} divider={true} onClick={this.handleOpen.bind(this)} color="primary">
             <ListItemIcon color="primary">
               <ControlPointOutlined color="primary" />
             </ListItemIcon>
-            <ListItemText
-              primary={t('Create a new audience')}
-              classes={{ primary: classes.text }}
-            />
+            <ListItemText primary={t('Create a new audience')} classes={{ primary: classes.text }}/>
           </ListItem>
         ) : (
-          <Fab
-            onClick={this.handleOpen.bind(this)}
+          <Fab onClick={this.handleOpen.bind(this)}
             color="primary"
             aria-label="Add"
-            className={classes.createButton}
-          >
+            className={classes.createButton}>
             <Add />
           </Fab>
         )}

@@ -343,15 +343,12 @@ const Audiences = () => {
           </ListItem>
         ))}
       </List>
-      <Drawer
-        open={selectedAudience !== null}
+      <Drawer open={selectedAudience !== null}
         keepMounted={false}
         anchor="right"
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelectedAudience(null)}
-        elevation={1}
-      >
+        onClose={() => setSelectedAudience(null)} elevation={1}>
         {selectedAudience !== null && (
           <AudiencePlayers
             audienceId={selectedAudience}
