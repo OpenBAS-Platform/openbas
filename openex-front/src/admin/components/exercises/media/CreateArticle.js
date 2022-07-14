@@ -45,42 +45,65 @@ const CreateArticle = (props) => {
 
   const onSubmit = (data) => {
     const inputValues = { ...data, article_media: data.article_media.id };
-    return dispatch(addExerciseArticle(exerciseId, inputValues)).then((result) => {
-      if (result.result) {
-        if (onCreate) {
-          onCreate(result.result);
+    return dispatch(addExerciseArticle(exerciseId, inputValues)).then(
+      (result) => {
+        if (result.result) {
+          if (onCreate) {
+            onCreate(result.result);
+          }
+          return handleClose();
         }
-        return handleClose();
-      }
-      return result;
-    });
+        return result;
+      },
+    );
   };
 
   return (
-      <div>
-        {inline === true ? (
-          <ListItem button={true} divider={true} onClick={handleOpen} color="primary">
-            <ListItemIcon color="primary">
-              <ControlPointOutlined color="primary" />
-            </ListItemIcon>
-            <ListItemText primary={t('Create a new article')} classes={{ primary: classes.text }}/>
-          </ListItem>
-        ) : (
-          <Fab onClick={handleOpen} color="primary" aria-label="Add" className={classes.createButton}>
-            <Add />
-          </Fab>
-        )}
-        <Dialog open={open} TransitionComponent={Transition} onClose={handleClose}
-          fullWidth={true} maxWidth="md" PaperProps={{ elevation: 1 }}>
-          <DialogTitle>{t('Create a new article')}</DialogTitle>
-          <DialogContent>
-            <ArticleForm editing={false}
-                         onSubmit={onSubmit}
-                         handleClose={handleClose}
-                         initialValues={{ article_name: '', article_media: '' }}/>
-          </DialogContent>
-        </Dialog>
-      </div>
+    <div>
+      {inline === true ? (
+        <ListItem
+          button={true}
+          divider={true}
+          onClick={handleOpen}
+          color="primary"
+        >
+          <ListItemIcon color="primary">
+            <ControlPointOutlined color="primary" />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('Create a new article')}
+            classes={{ primary: classes.text }}
+          />
+        </ListItem>
+      ) : (
+        <Fab
+          onClick={handleOpen}
+          color="primary"
+          aria-label="Add"
+          className={classes.createButton}
+        >
+          <Add />
+        </Fab>
+      )}
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        onClose={handleClose}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{t('Create a new article')}</DialogTitle>
+        <DialogContent>
+          <ArticleForm
+            editing={false}
+            onSubmit={onSubmit}
+            handleClose={handleClose}
+            initialValues={{ article_name: '', article_media: '' }}
+          />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

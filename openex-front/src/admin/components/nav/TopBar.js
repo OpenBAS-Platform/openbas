@@ -118,9 +118,7 @@ class TopBar extends Component {
             {location.pathname.includes('/admin/documents') && (
               <TopMenuDocuments />
             )}
-            {location.pathname.includes('/admin/medias') && (
-              <TopMenuMedias />
-            )}
+            {location.pathname.includes('/admin/medias') && <TopMenuMedias />}
             {location.pathname.includes('/admin/integrations') && (
               <TopMenuIntegrations />
             )}

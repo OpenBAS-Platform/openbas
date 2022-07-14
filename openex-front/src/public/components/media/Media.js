@@ -44,7 +44,11 @@ const Media = () => {
   // const { fldt, t } = useFormatter();
   const { mediaId, userId, exerciseId } = useParams();
   const mediaReader = useHelper((helper) => helper.getMediaReader(mediaId));
-  const { exercise_status: status, media_articles: articles, media_information: info } = mediaReader ?? {};
+  const {
+    exercise_status: status,
+    media_articles: articles,
+    media_information: info,
+  } = mediaReader ?? {};
   useEffect(() => {
     dispatch(fetchMedia(mediaId, userId, exerciseId));
   }, []);
@@ -53,11 +57,17 @@ const Media = () => {
       <Paper variant="outlined">
         <AppBar color="primary" position="relative" className={classes.appBar}>
           <Toolbar>
-            <div className={classes.subtitle}>{info?.media_name} ({status})</div>
+            <div className={classes.subtitle}>
+              {info?.media_name} ({status})
+            </div>
           </Toolbar>
         </AppBar>
         <div className={classes.content}>
-          <ul>{(articles ?? []).map((article) => <li key={article.article_id}>{article.article_name}</li>)}</ul>
+          <ul>
+            {(articles ?? []).map((article) => (
+              <li key={article.article_id}>{article.article_name}</li>
+            ))}
+          </ul>
         </div>
       </Paper>
     </div>

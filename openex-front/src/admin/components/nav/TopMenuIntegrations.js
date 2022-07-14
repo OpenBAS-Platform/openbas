@@ -24,10 +24,14 @@ class TopMenuIntegrations extends Component {
         <Button
           component={Link}
           to="/admin"
-          variant={location.pathname === '/admin/integrations' ? 'contained' : 'text'}
+          variant={
+            location.pathname === '/admin/integrations' ? 'contained' : 'text'
+          }
           size="small"
           color={
-            location.pathname === '/admin/integrations' ? 'secondary' : 'primary'
+            location.pathname === '/admin/integrations'
+              ? 'secondary'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >

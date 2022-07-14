@@ -34,13 +34,11 @@ import { useHelper } from '../../../../store';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import ItemBoolean from '../../../../components/ItemBoolean';
 import { exportData } from '../../../../utils/Environment';
-import PlanningMenu from '../PlanningMenu';
 import Loader from '../../../../components/Loader';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: '10px 0 50px 0',
-    padding: '0 100px 0 0',
   },
   itemHead: {
     paddingLeft: 10,
@@ -231,7 +229,6 @@ const Injects = () => {
   if (exercise && injects && !R.isEmpty(injectTypesMap) > 0) {
     return (
       <div className={classes.container}>
-        <PlanningMenu exerciseId={exerciseId} />
         <div>
           <div style={{ float: 'left', marginRight: 20 }}>
             <SearchFilter
@@ -478,7 +475,6 @@ const Injects = () => {
   }
   return (
     <div className={classes.container}>
-      <PlanningMenu exerciseId={exerciseId} />
       <Loader />
     </div>
   );

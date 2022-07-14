@@ -59,7 +59,7 @@ class CreateControl extends Component {
     return this.props
       .addComcheck(this.props.exerciseId, data)
       .then((result) => this.props.history.push(
-        `/exercises/${this.props.exerciseId}/controls/comchecks/${result.result}`,
+        `/admin/exercises/${this.props.exerciseId}/controls/comchecks/${result.result}`,
       ));
   }
 
@@ -78,7 +78,7 @@ class CreateControl extends Component {
     return this.props
       .addDryrun(this.props.exerciseId, inputValues)
       .then((result) => this.props.history.push(
-        `/exercises/${this.props.exerciseId}/controls/dryruns/${result.result}`,
+        `/admin/exercises/${this.props.exerciseId}/controls/dryruns/${result.result}`,
       ));
   }
 

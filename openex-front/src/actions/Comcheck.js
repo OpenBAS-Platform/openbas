@@ -1,5 +1,9 @@
 import * as schema from './Schema';
-import { getReferential, postReferential, delReferential } from '../utils/Action';
+import {
+  getReferential,
+  postReferential,
+  delReferential,
+} from '../utils/Action';
 
 export const fetchComchecks = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/comchecks`;

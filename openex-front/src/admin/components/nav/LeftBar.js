@@ -74,7 +74,7 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
       <MenuItem
         component={Link}
         to="/admin"
-        selected={location.pathname === '/admin/'}
+        selected={location.pathname === '/admin'}
         dense={true}
         classes={{ root: classes.menuItem }}
       >
@@ -146,15 +146,20 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
           primary={t('Documents')}
         />
       </MenuItem>
-      <MenuItem component={Link}
-          to="/admin/medias"
-          selected={location.pathname === '/admin/medias'}
-          dense={true}
-          classes={{ root: classes.menuItem }}>
+      <MenuItem
+        component={Link}
+        to="/admin/medias"
+        selected={location.pathname === '/admin/medias'}
+        dense={true}
+        classes={{ root: classes.menuItem }}
+      >
         <ListItemIcon style={{ minWidth: 30 }}>
           <NewspaperOutlined fontSize="small" color="primary" />
         </ListItemIcon>
-        <ListItemText classes={{ primary: classes.menuItemText }} primary={t('Medias')}/>
+        <ListItemText
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Medias')}
+        />
       </MenuItem>
     </MenuList>
     <Divider />

@@ -18,6 +18,8 @@ import { fetchInjectCommunications } from '../../../../actions/Communication';
 import ItemTags from '../../../../components/ItemTags';
 import { resolveUserNames } from '../../../../utils/String';
 import { fetchPlayers } from '../../../../actions/User';
+import TruncatedContent from '../../../../components/TruncatedContent';
+import ExpandableHtml from '../../../../components/ExpandableHtml';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -29,6 +31,9 @@ const useStyles = makeStyles(() => ({
     padding: '20px 20px 0 20px',
     overflow: 'hidden',
     height: '100%',
+  },
+  card: {
+    margin: '0 0 20px 0',
   },
 }));
 
@@ -129,14 +134,28 @@ const Inject = () => {
                     borderBottom: `1px solid ${theme.palette.divider}`,
                   }}
                   title={
-                    <div>
+                    <div style={{ padding: '7px 0 7px 0' }}>
+                      <div
+                        style={{
+                          float: 'left',
+                          fontDecoration: 'none',
+                          textTransform: 'none',
+                          fontSize: 15,
+                        }}
+                      >
+                        <strong>
+                          <TruncatedContent
+                            content={communication.communication_subject}
+                            limit={50}
+                          />
+                        </strong>
+                      </div>
                       {communication.communication_animation ? (
                         <div
                           style={{
-                            float: 'left',
+                            float: 'right',
                             fontDecoration: 'none',
                             textTransform: 'none',
-                            paddingTop: 7,
                             fontSize: 15,
                           }}
                         >
@@ -145,7 +164,13 @@ const Inject = () => {
                           </span>
                           &nbsp;
                           <strong>
-                            {resolveUserNames(communicationUsers)}
+                            <TruncatedContent
+                              content={resolveUserNames(
+                                communicationUsers,
+                                true,
+                              )}
+                              limit={60}
+                            />
                           </strong>
                           &nbsp;
                           <span style={{ color: theme.palette.text.secondary }}>
@@ -156,29 +181,37 @@ const Inject = () => {
                       ) : (
                         <div
                           style={{
-                            float: 'left',
+                            float: 'right',
                             fontDecoration: 'none',
                             textTransform: 'none',
-                            paddingTop: 7,
                             fontSize: 15,
                           }}
                         >
                           <strong>
-                            {resolveUserNames(communicationUsers)}
+                            <TruncatedContent
+                              content={resolveUserNames(
+                                communicationUsers,
+                                true,
+                              )}
+                              limit={60}
+                            />
                           </strong>
                           &nbsp;
                           <span style={{ color: theme.palette.text.secondary }}>
-                            {t('sent an mail on on')}{' '}
+                            {t('sent an mail on')}{' '}
                             {nsdt(communication.communication_sent_at)}
                           </span>
                         </div>
                       )}
+                      <div className="clearfix" />
                     </div>
                   }
                 />
                 <CardContent>
-                  <strong>{communication.communication_subject}</strong>
-                  <p>{communication.communication_content}</p>
+                  <ExpandableHtml
+                    source={communication.communication_content}
+                    limit={200}
+                  />
                 </CardContent>
               </Card>
             );

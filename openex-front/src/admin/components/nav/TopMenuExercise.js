@@ -83,10 +83,10 @@ class TopMenuExercise extends Component {
         </Button>
         <Button
           component={Link}
-          to={`/admin/exercises/${exerciseId}/planning/scenario`}
+          to={`/admin/exercises/${exerciseId}/definition/audiences`}
           variant={
             location.pathname.includes(
-              `/admin/exercises/${exerciseId}/planning`,
+              `/admin/exercises/${exerciseId}/definition`,
             )
               ? 'contained'
               : 'text'
@@ -94,14 +94,36 @@ class TopMenuExercise extends Component {
           size="small"
           color={
             location.pathname.includes(
-              `/admin/exercises/${exerciseId}/planning`,
+              `/admin/exercises/${exerciseId}/definition`,
             )
               ? 'secondary'
               : 'primary'
           }
           classes={{ root: classes.button }}
         >
-          {t('Planning')}
+          {t('Definition')}
+        </Button>
+        <Button
+          component={Link}
+          to={`/admin/exercises/${exerciseId}/scenario`}
+          variant={
+            location.pathname.includes(
+              `/admin/exercises/${exerciseId}/scenario`,
+            )
+              ? 'contained'
+              : 'text'
+          }
+          size="small"
+          color={
+            location.pathname.includes(
+              `/admin/exercises/${exerciseId}/scenario`,
+            )
+              ? 'secondary'
+              : 'primary'
+          }
+          classes={{ root: classes.button }}
+        >
+          {t('Scenario')}
         </Button>
         <Button
           component={Link}

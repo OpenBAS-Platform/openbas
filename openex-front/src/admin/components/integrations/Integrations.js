@@ -80,8 +80,13 @@ const Integrations = () => {
   ]);
   const types = R.sortWith(
     [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-    R.values(injectTypes).filter((type) => type.config.expose === true)
-      .map((type) => ({ tname: tPick(type.label), ttype: tPick(type.config.label), ...type })),
+    R.values(injectTypes)
+      .filter((type) => type.config.expose === true)
+      .map((type) => ({
+        tname: tPick(type.label),
+        ttype: tPick(type.config.label),
+        ...type,
+      })),
   );
   const sortedTypes = filtering.filterAndSort(types);
   return (

@@ -24,6 +24,10 @@ const i18n = {
       Messages: 'Messages',
       Mails: 'Mails',
       Timeline: 'Chronologie',
+      Definition: 'Définition',
+      Medias: 'Médias',
+      'Create a new media': 'Créer un nouveau média',
+      'Update the media': 'Modifier le média',
       'Recent exercises': 'Exercices récents',
       'No audiences in this exercise.': 'Aucune audience dans cet exercice.',
       'No exercises in this platform.': 'Aucun exercice dans cette plateforme.',
@@ -63,6 +67,7 @@ const i18n = {
       'Do you want to delete this organization?':
         'Souhaitez-vous supprimer cette organisation ?',
       Manual: 'Manuel',
+      'Media entries': 'Entrées de média',
       Parameters: 'Paramètres',
       'Default theme': 'Thème par défaut',
       'Default language': 'Langue par défaut',

@@ -98,7 +98,10 @@ const ExerciseHeader = (props) => {
   };
   const { exercise_tags: tags } = exercise;
   return (
-    <div className={withPadding ? classes.containerWithPadding : classes.container} ref={containerRef}>
+    <div
+      className={withPadding ? classes.containerWithPadding : classes.container}
+      ref={containerRef}
+    >
       <Typography
         variant="h1"
         gutterBottom={true}

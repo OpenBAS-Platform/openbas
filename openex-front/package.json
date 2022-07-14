@@ -20,6 +20,7 @@
     "date-fns": "2.28.0",
     "final-form": "4.20.7",
     "history": "4.10.1",
+    "html-react-parser": "3.0.1",
     "http-proxy-middleware": "2.0.6",
     "leaflet": "1.8.0",
     "mdi-material-ui": "7.4.0",

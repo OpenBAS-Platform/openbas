@@ -72,9 +72,19 @@ class InjectForm extends Component {
     } = this.props;
     const sortedTypes = R.sortWith(
       [R.ascend(R.prop('ttype')), R.ascend(R.prop('tname'))],
-      R.values(injectTypesMap).filter((type) => type.config.expose === true)
-        .map((type) => ({ tname: tPick(type.label), ttype: tPick(type.config.label), ...type })),
-    ).map((n) => ({ id: n.contract_id, label: n.tname, group: n.ttype, type: n.config.type }));
+      R.values(injectTypesMap)
+        .filter((type) => type.config.expose === true)
+        .map((type) => ({
+          tname: tPick(type.label),
+          ttype: tPick(type.config.label),
+          ...type,
+        })),
+    ).map((n) => ({
+      id: n.contract_id,
+      label: n.tname,
+      group: n.ttype,
+      type: n.config.type,
+    }));
     const finalInitialValues = editing
       ? R.assoc(
         'inject_contract',

@@ -1,5 +1,10 @@
 import { schema } from 'normalizr';
-import { delReferential, getReferential, postReferential, putReferential } from '../utils/Action';
+import {
+  delReferential,
+  getReferential,
+  postReferential,
+  putReferential,
+} from '../utils/Action';
 
 // region media
 const media = new schema.Entity('medias', {}, { idAttribute: 'media_id' });
@@ -24,7 +29,11 @@ export const deleteMedia = (mediaId) => (dispatch) => {
 // endregion
 
 // region article
-const article = new schema.Entity('articles', {}, { idAttribute: 'article_id' });
+const article = new schema.Entity(
+  'articles',
+  {},
+  { idAttribute: 'article_id' },
+);
 const arrayOfArticles = new schema.Array(article);
 export const fetchExerciseArticles = (exerciseId) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/articles`;

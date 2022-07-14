@@ -29,7 +29,9 @@ class TopMenuOrganizations extends Component {
           }
           size="small"
           color={
-            location.pathname === '/admin/organizations' ? 'secondary' : 'primary'
+            location.pathname === '/admin/organizations'
+              ? 'secondary'
+              : 'primary'
           }
           classes={{ root: classes.button }}
         >

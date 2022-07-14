@@ -40,12 +40,17 @@ const Index = () => {
     dispatch(fetchExercise(exerciseId));
   });
   if (exercise) {
+    let withPadding = false;
+    if (
+      location.pathname.includes('/definition')
+      || location.pathname.includes('/animation')
+    ) {
+      withPadding = true;
+    }
     return (
       <div className={classes.root}>
         <TopBar />
-        <ExerciseHeader
-          withPadding={location.pathname !== `/admin/exercises/${exerciseId}`}
-        />
+        <ExerciseHeader withPadding={withPadding} />
         <div className="clearfix" />
         <Switch>
           <Route
@@ -65,18 +70,18 @@ const Index = () => {
           />
           <Route
             exact
-            path="/admin/exercises/:exerciseId/planning/scenario"
-            render={errorWrapper(Injects)}
-          />
-          <Route
-            exact
-            path="/admin/exercises/:exerciseId/planning/audiences"
+            path="/admin/exercises/:exerciseId/definition/audiences"
             render={errorWrapper(Audiences)}
           />
           <Route
             exact
-            path="/admin/exercises/:exerciseId/planning/media"
+            path="/admin/exercises/:exerciseId/definition/media"
             render={errorWrapper(Articles)}
+          />
+          <Route
+            exact
+            path="/admin/exercises/:exerciseId/scenario"
+            render={errorWrapper(Injects)}
           />
           <Route
             exact

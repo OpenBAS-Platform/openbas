@@ -19,11 +19,13 @@ export const resolveUserName = (user) => {
   return user.user_email;
 };
 
-export const resolveUserNames = (users) => {
+export const resolveUserNames = (users, withEmailAddress = false) => {
   return users
     .map((user) => {
       if (user.user_firstname && user.user_lastname) {
-        return `${user.user_firstname} ${user.user_lastname}`;
+        return `${user.user_firstname} ${user.user_lastname}${
+          withEmailAddress ? ` (${user.user_email})` : ''
+        }`;
       }
       return user.user_email;
     })

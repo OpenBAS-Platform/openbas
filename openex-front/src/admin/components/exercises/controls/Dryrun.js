@@ -32,6 +32,7 @@ import InjectStatus from '../injects/InjectStatus';
 import InjectStatusDetails from '../injects/InjectStatusDetails';
 import { resolveUserName } from '../../../../utils/String';
 import DryrunProgress from './DryrunProgress';
+import { fetchInjectTypes } from '../../../../actions/Inject';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -196,17 +197,18 @@ const Dryrun = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { nsdt, fldt, t, fndt } = useFormatter();
+  const { nsdt, fldt, t, fndt, tPick } = useFormatter();
   const { exerciseId, dryrunId } = useParams();
   // Filter and sort hook
   const searchColumns = ['type', 'title', 'date'];
   const filtering = useSearchAnFilter('dryinject', 'date', searchColumns);
   // Fetching data
-  const { dryrun, dryinjects, users } = useHelper((helper) => {
+  const { dryrun, dryinjects, users, injectTypesMap } = useHelper((helper) => {
     return {
       dryrun: helper.getDryrun(dryrunId),
       dryinjects: helper.getDryrunInjects(dryrunId),
       users: helper.getDryrunUsers(dryrunId),
+      injectTypesMap: helper.getInjectTypesMap(),
     };
   });
   useDataLoader(() => {
@@ -214,6 +216,7 @@ const Dryrun = () => {
     dispatch(fetchPlayers());
     dispatch(fetchDryrun(exerciseId, dryrunId));
     dispatch(fetchDryinjects(exerciseId, dryrunId));
+    dispatch(fetchInjectTypes());
   });
   return (
     <div className={classes.root}>
@@ -351,76 +354,81 @@ const Dryrun = () => {
             />
             <ListItemSecondaryAction> &nbsp; </ListItemSecondaryAction>
           </ListItem>
-          {filtering.filterAndSort(dryinjects).map((dryinject) => (
-            <ListItem
-              key={dryinject.dryinject_id}
-              classes={{ root: classes.item }}
-              divider={true}
-            >
-              <ListItemIcon>
-                <InjectIcon type={dryinject.dryinject_inject.inject_type} />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.dryinject_type}
-                    >
-                      <InjectType
-                        variant="list"
-                        type={dryinject.dryinject_inject.inject_type}
-                      />
+          {filtering.filterAndSort(dryinjects).map((dryinject) => {
+            const injectContract = injectTypesMap[dryinject.dryinject_inject.inject_contract];
+            const injectTypeName = tPick(injectContract?.label);
+            return (
+              <ListItem
+                key={dryinject.dryinject_id}
+                classes={{ root: classes.item }}
+                divider={true}
+              >
+                <ListItemIcon>
+                  <InjectIcon type={dryinject.dryinject_inject.inject_type} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.dryinject_type}
+                      >
+                        <InjectType
+                          variant="list"
+                          config={injectContract.config}
+                          label={injectTypeName}
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.dryinject_title}
+                      >
+                        {dryinject.dryinject_inject.inject_title}
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.dryinject_date}
+                      >
+                        <Chip
+                          classes={{ root: classes.date }}
+                          label={nsdt(dryinject.dryinject_date)}
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={inlineStyles.dryinject_status}
+                      >
+                        <InjectStatus
+                          variant="list"
+                          status={dryinject.dryinject_status?.status_name}
+                        />
+                      </div>
+                      <div
+                        className={classes.bodyItem}
+                        style={{
+                          fontFamily: 'Consolas, monaco, monospace',
+                          fontSize: 12,
+                          paddingTop: 3,
+                          marginRight: 15,
+                          float: 'left',
+                        }}
+                      >
+                        {fndt(dryinject.dryinject_status?.status_date)} (
+                        {dryinject.dryinject_status
+                          && (
+                            dryinject.dryinject_status.status_execution / 1000
+                          ).toFixed(2)}
+                        s)
+                      </div>
                     </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.dryinject_title}
-                    >
-                      {dryinject.dryinject_inject.inject_title}
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.dryinject_date}
-                    >
-                      <Chip
-                        classes={{ root: classes.date }}
-                        label={nsdt(dryinject.dryinject_date)}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={inlineStyles.dryinject_status}
-                    >
-                      <InjectStatus
-                        variant="list"
-                        status={dryinject.dryinject_status?.status_name}
-                      />
-                    </div>
-                    <div
-                      className={classes.bodyItem}
-                      style={{
-                        fontFamily: 'Consolas, monaco, monospace',
-                        fontSize: 12,
-                        paddingTop: 3,
-                        marginRight: 15,
-                        float: 'left',
-                      }}
-                    >
-                      {fndt(dryinject.dryinject_status?.status_date)} (
-                      {dryinject.dryinject_status
-                        && (
-                          dryinject.dryinject_status.status_execution / 1000
-                        ).toFixed(2)}
-                      s)
-                    </div>
-                  </div>
-                }
-              />
-              <ListItemSecondaryAction>
-                <InjectStatusDetails status={dryinject.dryinject_status} />
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <InjectStatusDetails status={dryinject.dryinject_status} />
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
         </List>
       </Paper>
     </div>

@@ -54,7 +54,8 @@ class CreateMedia extends Component {
           onClick={this.handleOpen.bind(this)}
           color="primary"
           aria-label="Add"
-          className={classes.createButton}>
+          className={classes.createButton}
+        >
           <Add />
         </Fab>
         <Dialog
@@ -63,12 +64,15 @@ class CreateMedia extends Component {
           onClose={this.handleClose.bind(this)}
           fullWidth={true}
           maxWidth="md"
-          PaperProps={{ elevation: 1 }}>
+          PaperProps={{ elevation: 1 }}
+        >
           <DialogTitle>{t('Create a new media')}</DialogTitle>
           <DialogContent>
-            <MediaForm onSubmit={this.onSubmit.bind(this)}
-                initialValues={{}}
-                handleClose={this.handleClose.bind(this)}/>
+            <MediaForm
+              onSubmit={this.onSubmit.bind(this)}
+              initialValues={{}}
+              handleClose={this.handleClose.bind(this)}
+            />
           </DialogContent>
         </Dialog>
       </div>

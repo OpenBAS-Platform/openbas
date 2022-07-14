@@ -29,12 +29,12 @@ import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { exportData } from '../../../../utils/Environment';
-import PlanningMenu from '../PlanningMenu';
+import DefinitionMenu from '../DefinitionMenu';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: '10px 0 50px 0',
-    padding: '0 100px 0 0',
+    padding: '0 200px 0 0',
   },
   itemHead: {
     textTransform: 'uppercase',
@@ -160,7 +160,10 @@ const Audiences = () => {
   const { t } = useFormatter();
   const [selectedAudience, setSelectedAudience] = useState(null);
   // Filter and sort hook
-  const filtering = useSearchAnFilter('audience', 'name', ['name', 'description']);
+  const filtering = useSearchAnFilter('audience', 'name', [
+    'name',
+    'description',
+  ]);
   // Fetching data
   const { exerciseId } = useParams();
   const { exercise, audiences, tagsMap } = useHelper((helper) => ({
@@ -174,7 +177,7 @@ const Audiences = () => {
   const sortedAudiences = filtering.filterAndSort(audiences);
   return (
     <div className={classes.container}>
-      <PlanningMenu exerciseId={exerciseId} />
+      <DefinitionMenu exerciseId={exerciseId} />
       <div>
         <div style={{ float: 'left', marginRight: 20 }}>
           <SearchFilter
@@ -221,19 +224,52 @@ const Audiences = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
-        <ListItem classes={{ root: classes.itemHead }} divider={false} style={{ paddingTop: 0 }}>
+      <List style={{ marginTop: 10 }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
           <ListItemIcon>
-            <span style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}>#</span>
+            <span
+              style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
+            >
+              #
+            </span>
           </ListItemIcon>
           <ListItemText
             primary={
               <div>
-                {filtering.buildHeader('audience_name', 'Name', true, headerStyles)}
-                {filtering.buildHeader('audience_description', 'Description', true, headerStyles)}
-                {filtering.buildHeader('audience_users_number', 'Players', true, headerStyles)}
-                {filtering.buildHeader('audience_enabled', 'Status', true, headerStyles)}
-                {filtering.buildHeader('audience_tags', 'Tags', true, headerStyles)}
+                {filtering.buildHeader(
+                  'audience_name',
+                  'Name',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_description',
+                  'Description',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_users_number',
+                  'Players',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_enabled',
+                  'Status',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'audience_tags',
+                  'Tags',
+                  true,
+                  headerStyles,
+                )}
               </div>
             }
           />
@@ -245,28 +281,48 @@ const Audiences = () => {
             classes={{ root: classes.item }}
             divider={true}
             button={true}
-            onClick={() => setSelectedAudience(audience.audience_id)}>
+            onClick={() => setSelectedAudience(audience.audience_id)}
+          >
             <ListItemIcon>
               <CastForEducationOutlined />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
-                  <div className={classes.bodyItem} style={inlineStyles.audience_name}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_name}
+                  >
                     {audience.audience_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.audience_description}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_description}
+                  >
                     {audience.audience_description}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.audience_users_number}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_users_number}
+                  >
                     {audience.audience_users_number}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.audience_enabled}>
-                    <ItemBoolean status={audience.audience_enabled}
-                      label={audience.audience_enabled ? t('Enabled') : t('Disabled')}
-                      variant="list"/>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_enabled}
+                  >
+                    <ItemBoolean
+                      status={audience.audience_enabled}
+                      label={
+                        audience.audience_enabled ? t('Enabled') : t('Disabled')
+                      }
+                      variant="list"
+                    />
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.audience_tags}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.audience_tags}
+                  >
                     <ItemTags variant="list" tags={audience.audience_tags} />
                   </div>
                 </div>
@@ -283,12 +339,15 @@ const Audiences = () => {
           </ListItem>
         ))}
       </List>
-      <Drawer open={selectedAudience !== null}
+      <Drawer
+        open={selectedAudience !== null}
         keepMounted={false}
         anchor="right"
         sx={{ zIndex: 1202 }}
         classes={{ paper: classes.drawerPaper }}
-        onClose={() => setSelectedAudience(null)} elevation={1}>
+        onClose={() => setSelectedAudience(null)}
+        elevation={1}
+      >
         {selectedAudience !== null && (
           <AudiencePlayers
             audienceId={selectedAudience}
@@ -298,7 +357,9 @@ const Audiences = () => {
           />
         )}
       </Drawer>
-      {isExerciseUpdatable(exercise) && (<CreateAudience exerciseId={exerciseId} />)}
+      {isExerciseUpdatable(exercise) && (
+        <CreateAudience exerciseId={exerciseId} />
+      )}
     </div>
   );
 };

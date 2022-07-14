@@ -24,9 +24,13 @@ class TopMenuDashboard extends Component {
         <Button
           component={Link}
           to="/admin"
-          variant={location.pathname === '/admin/documents' ? 'contained' : 'text'}
+          variant={
+            location.pathname === '/admin/documents' ? 'contained' : 'text'
+          }
           size="small"
-          color={location.pathname === '/admin/documents' ? 'secondary' : 'primary'}
+          color={
+            location.pathname === '/admin/documents' ? 'secondary' : 'primary'
+          }
           classes={{ root: classes.button }}
         >
           {t('Documents')}

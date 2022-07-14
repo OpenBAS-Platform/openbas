@@ -72,15 +72,14 @@ class MediaPopover extends Component {
 
   render() {
     const { t, media } = this.props;
-    const initialValues = R.pipe(
-      R.pick(['media_name', 'media_color']),
-    )(media);
+    const initialValues = R.pipe(R.pick(['media_name', 'media_color']))(media);
     return (
       <div>
         <IconButton
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
-          size="large">
+          size="large"
+        >
           <MoreVert />
         </IconButton>
         <Menu
@@ -129,14 +128,15 @@ class MediaPopover extends Component {
           onClose={this.handleCloseEdit.bind(this)}
           fullWidth={true}
           maxWidth="md"
-          PaperProps={{ elevation: 1 }}>
+          PaperProps={{ elevation: 1 }}
+        >
           <DialogTitle>{t('Update the media')}</DialogTitle>
           <DialogContent>
             <MediaForm
-                initialValues={initialValues}
-                editing={true}
-                onSubmit={this.onSubmitEdit.bind(this)}
-                handleClose={this.handleCloseEdit.bind(this)}
+              initialValues={initialValues}
+              editing={true}
+              onSubmit={this.onSubmitEdit.bind(this)}
+              handleClose={this.handleCloseEdit.bind(this)}
             />
           </DialogContent>
         </Dialog>

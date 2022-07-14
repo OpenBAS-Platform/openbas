@@ -30,7 +30,7 @@ import AnimationMenu from '../AnimationMenu';
 const useStyles = makeStyles((theme) => ({
   container: {
     margin: '10px 0 50px 0',
-    padding: '0 100px 0 0',
+    padding: '0 200px 0 0',
   },
   itemHead: {
     paddingLeft: 10,
@@ -268,7 +268,7 @@ const Mails = () => {
         </div>
       </div>
       <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
+      <List style={{ marginTop: 10 }}>
         <ListItem
           classes={{ root: classes.itemHead }}
           divider={false}
@@ -343,7 +343,7 @@ const Mails = () => {
               <ListItemIcon>
                 <InjectIcon
                   tooltip={t(inject.inject_type)}
-                  config={injectContract.config}
+                  config={injectContract?.config}
                   type={inject.inject_type}
                 />
               </ListItemIcon>

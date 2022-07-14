@@ -13,7 +13,10 @@ import Chip from '@mui/material/Chip';
 import ParametersForm from './ParametersForm';
 import inject18n from '../../../components/i18n';
 import { storeHelper } from '../../../actions/Schema';
-import { updateParameters, fetchParameters } from '../../../actions/Application';
+import {
+  updateParameters,
+  fetchParameters,
+} from '../../../actions/Application';
 import useDataLoader from '../../../utils/ServerSideEvent';
 
 const styles = () => ({

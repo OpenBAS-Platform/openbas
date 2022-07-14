@@ -42,11 +42,11 @@ class MediaForm extends Component {
               label={t('Name')}
             />
             <ColorPickerField
-                variant="standard"
-                name="media_color"
-                fullWidth={true}
-                label={t('Color')}
-                style={{ marginTop: 20 }}
+              variant="standard"
+              name="media_color"
+              fullWidth={true}
+              label={t('Color')}
+              style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button

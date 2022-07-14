@@ -8,7 +8,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { NewspaperOutlined } from '@mui/icons-material';
-import PlanningMenu from '../PlanningMenu';
+import DefinitionMenu from '../DefinitionMenu';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { useHelper } from '../../../../store';
 import CreateArticle from './CreateArticle';
@@ -22,7 +22,7 @@ import { useFormatter } from '../../../../components/i18n';
 const useStyles = makeStyles(() => ({
   container: {
     margin: '10px 0 50px 0',
-    padding: '0 100px 0 0',
+    padding: '0 200px 0 0',
   },
 }));
 
@@ -99,54 +99,111 @@ const Articles = () => {
   const searchColumns = ['name', 'type', 'content'];
   const filtering = useSearchAnFilter('article', 'name', searchColumns);
   // Rendering
-  const fullArticles = articles.map((item) => ({ ...item, article_type: mediasMap[item.article_media]?.media_name }));
+  const fullArticles = articles.map((item) => ({
+    ...item,
+    article_type: mediasMap[item.article_media]?.media_name,
+  }));
   const sortedArticles = filtering.filterAndSort(fullArticles);
   return (
     <div className={classes.container}>
-      <PlanningMenu exerciseId={exerciseId} />
+      <DefinitionMenu exerciseId={exerciseId} />
       <div>
         <div style={{ float: 'left', marginRight: 20 }}>
-          <SearchFilter small={true} onChange={filtering.handleSearch} keyword={filtering.keyword}/>
+          <SearchFilter
+            small={true}
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
         </div>
       </div>
       <div className="clearfix" />
-      <List classes={{ root: classes.container }}>
-        <ListItem classes={{ root: classes.itemHead }} divider={false} style={{ paddingTop: 0 }}>
+      <List style={{ marginTop: 10 }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
           <ListItemIcon>
-            <span style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}>#</span>
+            <span
+              style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
+            >
+              #
+            </span>
           </ListItemIcon>
-          <ListItemText primary={
-            <div>
-              <div>{filtering.buildHeader('article_name', 'Name', true, headerStyles)}</div>
-              <div>{filtering.buildHeader('article_type', 'Media', true, headerStyles)}</div>
-              <div>{filtering.buildHeader('article_published', 'Published?', true, headerStyles)}</div>
-            </div>
-          }/>
+          <ListItemText
+            primary={
+              <div>
+                <div>
+                  {filtering.buildHeader(
+                    'article_name',
+                    'Name',
+                    true,
+                    headerStyles,
+                  )}
+                </div>
+                <div>
+                  {filtering.buildHeader(
+                    'article_type',
+                    'Media',
+                    true,
+                    headerStyles,
+                  )}
+                </div>
+                <div>
+                  {filtering.buildHeader(
+                    'article_published',
+                    'Published?',
+                    true,
+                    headerStyles,
+                  )}
+                </div>
+              </div>
+            }
+          />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
-          {sortedArticles.map((article) => (
-              <ListItem key={article.article_id} classes={{ root: classes.item }} divider={true}>
-                  <ListItemIcon>
-                    <NewspaperOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                      primary={
-                          <div>
-                              <div className={classes.bodyItem} style={inlineStyles.article_name}>{article.article_name}</div>
-                              <div className={classes.bodyItem} style={inlineStyles.article_media}>{article.article_type}</div>
-                              <div className={classes.bodyItem} style={inlineStyles.article_published}>
-                                {article.article_published ? t('Yes') : t('No')}
-                              </div>
-                          </div>
-                      }
-                  />
-                  <ListItemSecondaryAction>
-                      <ArticlePopover article={article} />
-                  </ListItemSecondaryAction>
-              </ListItem>
-          ))}
+        {sortedArticles.map((article) => (
+          <ListItem
+            key={article.article_id}
+            classes={{ root: classes.item }}
+            divider={true}
+          >
+            <ListItemIcon>
+              <NewspaperOutlined />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.article_name}
+                  >
+                    {article.article_name}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.article_media}
+                  >
+                    {article.article_type}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.article_published}
+                  >
+                    {article.article_published ? t('Yes') : t('No')}
+                  </div>
+                </div>
+              }
+            />
+            <ListItemSecondaryAction>
+              <ArticlePopover article={article} />
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
       </List>
-      {isExerciseUpdatable(exercise) && (<CreateArticle exerciseId={exerciseId} />)}
+      {isExerciseUpdatable(exercise) && (
+        <CreateArticle exerciseId={exerciseId} />
+      )}
     </div>
   );
 };

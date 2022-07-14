@@ -103,60 +103,90 @@ const Medias = () => {
   const filtering = useSearchAnFilter('media', 'name', searchColumns);
   // Fetching data
   const { medias } = useHelper((helper) => ({ medias: helper.getMedias() }));
-  useDataLoader(() => { dispatch(fetchMedias()); });
+  useDataLoader(() => {
+    dispatch(fetchMedias());
+  });
   const sortedMedias = filtering.filterAndSort(medias);
   return (
-      <div>
-        <div className={classes.parameters}>
-          <div style={{ float: 'left', marginRight: 20 }}>
-            <SearchFilter
-                small={true}
-                onChange={filtering.handleSearch}
-                keyword={filtering.keyword}
-            />
-          </div>
+    <div>
+      <div className={classes.parameters}>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <SearchFilter
+            small={true}
+            onChange={filtering.handleSearch}
+            keyword={filtering.keyword}
+          />
         </div>
-        <div className="clearfix" />
-        <List classes={{ root: classes.container }}>
-          <ListItem classes={{ root: classes.itemHead }} divider={false} style={{ paddingTop: 0 }}>
+      </div>
+      <div className="clearfix" />
+      <List classes={{ root: classes.container }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
+          <ListItemIcon>
+            <span
+              style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
+            >
+              &nbsp;
+            </span>
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <div>
+                {filtering.buildHeader(
+                  'media_name',
+                  'Name',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'media_color',
+                  'Color',
+                  true,
+                  headerStyles,
+                )}
+              </div>
+            }
+          />
+          <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+        </ListItem>
+        {sortedMedias.map((media) => (
+          <ListItem
+            key={media.media_id}
+            classes={{ root: classes.item }}
+            divider={true}
+          >
             <ListItemIcon>
-              <span style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}>&nbsp;</span>
+              <NewspaperOutlined color="primary" />
             </ListItemIcon>
             <ListItemText
-                primary={
-                  <div>
-                    {filtering.buildHeader('media_name', 'Name', true, headerStyles)}
-                    {filtering.buildHeader('media_color', 'Color', true, headerStyles)}
+              primary={
+                <div>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.media_name}
+                  >
+                    {media.media_name}
                   </div>
-                }
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.media_color}
+                  >
+                    {media.media_color}
+                  </div>
+                </div>
+              }
             />
-            <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+            <ListItemSecondaryAction>
+              <MediaPopover media={media} />
+            </ListItemSecondaryAction>
           </ListItem>
-          {sortedMedias.map((media) => (
-              <ListItem key={media.media_id} classes={{ root: classes.item }} divider={true}>
-                <ListItemIcon>
-                  <NewspaperOutlined color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                    primary={
-                      <div>
-                        <div className={classes.bodyItem} style={inlineStyles.media_name}>
-                          {media.media_name}
-                        </div>
-                        <div className={classes.bodyItem} style={inlineStyles.media_color}>
-                          {media.media_color}
-                        </div>
-                      </div>
-                    }
-                />
-                <ListItemSecondaryAction>
-                  <MediaPopover media={media} />
-                </ListItemSecondaryAction>
-              </ListItem>
-          ))}
-        </List>
-        <CreateMedia />
-      </div>
+        ))}
+      </List>
+      <CreateMedia />
+    </div>
   );
 };
 

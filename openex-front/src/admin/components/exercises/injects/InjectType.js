@@ -31,13 +31,17 @@ class InjectType extends Component {
     const { config, classes, label, variant } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     return (
-        <Tooltip title={label}>
-          <Chip
-              classes={{ root: style }}
-              style={{ backgroundColor: `${config.color}20`, color: config.color, border: `1px solid ${config.color}` }}
-              label={label}
-          />
-        </Tooltip>
+      <Tooltip title={label}>
+        <Chip
+          classes={{ root: style }}
+          style={{
+            backgroundColor: `${config.color}20`,
+            color: config.color,
+            border: `1px solid ${config.color}`,
+          }}
+          label={label}
+        />
+      </Tooltip>
     );
   }
 }

@@ -6,7 +6,11 @@ import { errorWrapper } from '../../../components/Error';
 
 const Index = () => (
   <Switch>
-    <Route exact path="/admin/integrations" render={errorWrapper(Integrations)} />
+    <Route
+      exact
+      path="/admin/integrations"
+      render={errorWrapper(Integrations)}
+    />
   </Switch>
 );
 

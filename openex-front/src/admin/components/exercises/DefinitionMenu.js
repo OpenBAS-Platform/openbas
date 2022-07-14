@@ -9,7 +9,6 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import {
-  MovieFilterOutlined,
   CastForEducationOutlined,
   NewspaperOutlined,
 } from '@mui/icons-material';
@@ -31,39 +30,44 @@ const styles = (theme) => ({
   },
 });
 
-class PlanningMenu extends Component {
+class DefinitionMenu extends Component {
   render() {
     const { t, location, classes, exerciseId } = this.props;
     return (
-      <Drawer variant="permanent" anchor="right" classes={{ paper: classes.drawer }}>
+      <Drawer
+        variant="permanent"
+        anchor="right"
+        classes={{ paper: classes.drawer }}
+      >
         <div className={classes.toolbar} />
         <MenuList component="nav">
-          <MenuItem component={Link}
-            to={`/admin/exercises/${exerciseId}/planning/scenario`}
-            selected={ location.pathname === `/admin/exercises/${exerciseId}/planning/scenario`}
-            classes={{ root: classes.item }}>
-            <ListItemIcon>
-              <MovieFilterOutlined />
-            </ListItemIcon>
-            <ListItemText primary={t('Scenario')} />
-          </MenuItem>
-          <MenuItem component={Link}
-            to={`/admin/exercises/${exerciseId}/planning/audiences`}
-            selected={ location.pathname === `/admin/exercises/${exerciseId}/planning/audiences`}
-            classes={{ root: classes.item }}>
+          <MenuItem
+            component={Link}
+            to={`/admin/exercises/${exerciseId}/definition/audiences`}
+            selected={
+              location.pathname
+              === `/admin/exercises/${exerciseId}/definition/audiences`
+            }
+            classes={{ root: classes.item }}
+          >
             <ListItemIcon>
               <CastForEducationOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Audiences')} />
           </MenuItem>
-          <MenuItem component={Link}
-            to={`/admin/exercises/${exerciseId}/planning/media`}
-            selected={ location.pathname === `/admin/exercises/${exerciseId}/planning/media`}
-            classes={{ root: classes.item }}>
+          <MenuItem
+            component={Link}
+            to={`/admin/exercises/${exerciseId}/definition/media`}
+            selected={
+              location.pathname
+              === `/admin/exercises/${exerciseId}/definition/media`
+            }
+            classes={{ root: classes.item }}
+          >
             <ListItemIcon>
               <NewspaperOutlined />
             </ListItemIcon>
-            <ListItemText primary={t('Medias')} />
+            <ListItemText primary={t('Media entries')} />
           </MenuItem>
         </MenuList>
       </Drawer>
@@ -71,11 +75,15 @@ class PlanningMenu extends Component {
   }
 }
 
-PlanningMenu.propTypes = {
+DefinitionMenu.propTypes = {
   classes: PropTypes.object,
   location: PropTypes.object,
   t: PropTypes.func,
   exerciseId: PropTypes.string,
 };
 
-export default compose(inject18n, withRouter, withStyles(styles))(PlanningMenu);
+export default compose(
+  inject18n,
+  withRouter,
+  withStyles(styles),
+)(DefinitionMenu);

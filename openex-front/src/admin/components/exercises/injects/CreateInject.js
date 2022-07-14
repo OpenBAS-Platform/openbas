@@ -17,7 +17,7 @@ const styles = (theme) => ({
   createButton: {
     position: 'fixed',
     bottom: 30,
-    right: 230,
+    right: 30,
   },
   text: {
     fontSize: 15,

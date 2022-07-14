@@ -26,7 +26,9 @@ class TopMenuMedia extends Component {
           to="/admin"
           variant={location.pathname === '/admin/medias' ? 'contained' : 'text'}
           size="small"
-          color={location.pathname === '/admin/medias' ? 'secondary' : 'primary'}
+          color={
+            location.pathname === '/admin/medias' ? 'secondary' : 'primary'
+          }
           classes={{ root: classes.button }}
         >
           {t('Medias')}
@@ -43,8 +45,4 @@ TopMenuMedia.propTypes = {
   history: PropTypes.object,
 };
 
-export default compose(
-  inject18n,
-  withRouter,
-  withStyles(styles),
-)(TopMenuMedia);
+export default compose(inject18n, withRouter, withStyles(styles))(TopMenuMedia);

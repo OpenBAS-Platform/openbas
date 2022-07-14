@@ -34,9 +34,13 @@ class TopMenuExercises extends Component {
         <Button
           component={Link}
           to="/admin"
-          variant={location.pathname === '/admin/exercises' ? 'contained' : 'text'}
+          variant={
+            location.pathname === '/admin/exercises' ? 'contained' : 'text'
+          }
           size="small"
-          color={location.pathname === '/admin/exercises' ? 'secondary' : 'primary'}
+          color={
+            location.pathname === '/admin/exercises' ? 'secondary' : 'primary'
+          }
           classes={{ root: classes.button }}
         >
           {t('Exercises')}

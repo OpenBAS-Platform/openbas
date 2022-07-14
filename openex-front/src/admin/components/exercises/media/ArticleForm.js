@@ -59,45 +59,76 @@ const ArticleForm = ({ onSubmit, handleClose, initialValues, editing }) => {
   };
   // Fetching data
   const { medias } = useHelper((helper) => ({ medias: helper.getMedias() }));
-  useDataLoader(() => { dispatch(fetchMedias()); });
+  useDataLoader(() => {
+    dispatch(fetchMedias());
+  });
   // Preparing data
-  const sortedMedias = R.sortWith([R.ascend(R.prop('media_name'))], medias)
-    .map((n) => ({ id: n.media_id, label: n.media_name, icon: '' }));
-  const currentMedia = sortedMedias.find((m) => m.id === initialValues.article_media);
+  const sortedMedias = R.sortWith([R.ascend(R.prop('media_name'))], medias).map(
+    (n) => ({ id: n.media_id, label: n.media_name, icon: '' }),
+  );
+  const currentMedia = sortedMedias.find(
+    (m) => m.id === initialValues.article_media,
+  );
   const formData = { ...initialValues, article_media: currentMedia };
   // Rendering
   return (
-      <Form keepDirtyOnReinitialize={true} initialValues={formData} onSubmit={onSubmit} validate={validate}
-        mutators={{
-          setValue: ([field, value], state, { changeValue }) => {
-            changeValue(state, field, () => value);
-          },
-        }}>
-        {({ handleSubmit, submitting, pristine }) => (
-          <form id="articleForm" onSubmit={handleSubmit}>
-            <TextField variant="standard" name="article_name" fullWidth={true} label={t('Name')}/>
-            <Autocomplete variant="standard" size="small" name="article_media"
-                label={t('Media')} fullWidth={true} multiple={false} options={sortedMedias} style={{ marginTop: 20 }}
-                renderOption={(renderProps, option) => (
-                    <Box component="li" {...renderProps}>
-                        <div className={classes.icon}>
-                            <InjectIcon type={option.icon} />
-                        </div>
-                        <div className={classes.text}>{t(option.label)}</div>
-                    </Box>
-                )}
-                classes={{ clearIndicator: classes.autoCompleteIndicator }}/>
-            <div style={{ float: 'right', marginTop: 20 }}>
-              <Button onClick={handleClose} style={{ marginRight: 10 }} disabled={submitting}>
-                {t('Cancel')}
-              </Button>
-              <Button color="secondary" type="submit" disabled={pristine || submitting}>
-                {editing ? t('Update') : t('Create')}
-              </Button>
-            </div>
-          </form>
-        )}
-      </Form>
+    <Form
+      keepDirtyOnReinitialize={true}
+      initialValues={formData}
+      onSubmit={onSubmit}
+      validate={validate}
+      mutators={{
+        setValue: ([field, value], state, { changeValue }) => {
+          changeValue(state, field, () => value);
+        },
+      }}
+    >
+      {({ handleSubmit, submitting, pristine }) => (
+        <form id="articleForm" onSubmit={handleSubmit}>
+          <TextField
+            variant="standard"
+            name="article_name"
+            fullWidth={true}
+            label={t('Name')}
+          />
+          <Autocomplete
+            variant="standard"
+            size="small"
+            name="article_media"
+            label={t('Media')}
+            fullWidth={true}
+            multiple={false}
+            options={sortedMedias}
+            style={{ marginTop: 20 }}
+            renderOption={(renderProps, option) => (
+              <Box component="li" {...renderProps}>
+                <div className={classes.icon}>
+                  <InjectIcon type={option.icon} />
+                </div>
+                <div className={classes.text}>{t(option.label)}</div>
+              </Box>
+            )}
+            classes={{ clearIndicator: classes.autoCompleteIndicator }}
+          />
+          <div style={{ float: 'right', marginTop: 20 }}>
+            <Button
+              onClick={handleClose}
+              style={{ marginRight: 10 }}
+              disabled={submitting}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              color="secondary"
+              type="submit"
+              disabled={pristine || submitting}
+            >
+              {editing ? t('Update') : t('Create')}
+            </Button>
+          </div>
+        </form>
+      )}
+    </Form>
   );
 };
 
