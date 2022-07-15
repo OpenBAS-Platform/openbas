@@ -93,6 +93,7 @@ public abstract class Injector {
     }
 
     public Execution executeDirectly(ExecutableInject executableInject) {
+        executableInject.setDirect(true);
         return execute(executableInject, false);
     }
 

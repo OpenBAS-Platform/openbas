@@ -45,7 +45,7 @@ const headerStyles = {
     fontSize: 12,
     fontWeight: '700',
   },
-  article_published: {
+  article_scheduled: {
     float: 'left',
     width: '25%',
     fontSize: 12,
@@ -70,7 +70,7 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  article_published: {
+  article_scheduled: {
     float: 'left',
     width: '25%',
     height: 20,
@@ -118,79 +118,33 @@ const Articles = () => {
       </div>
       <div className="clearfix" />
       <List style={{ marginTop: 10 }}>
-        <ListItem
-          classes={{ root: classes.itemHead }}
-          divider={false}
-          style={{ paddingTop: 0 }}
-        >
+        <ListItem classes={{ root: classes.itemHead }} divider={false} style={{ paddingTop: 0 }}>
           <ListItemIcon>
-            <span
-              style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}
-            >
-              #
-            </span>
+            <span style={{ padding: '0 8px 0 10px', fontWeight: 700, fontSize: 12 }}>#</span>
           </ListItemIcon>
           <ListItemText
             primary={
               <div>
-                <div>
-                  {filtering.buildHeader(
-                    'article_name',
-                    'Name',
-                    true,
-                    headerStyles,
-                  )}
-                </div>
-                <div>
-                  {filtering.buildHeader(
-                    'article_type',
-                    'Media',
-                    true,
-                    headerStyles,
-                  )}
-                </div>
-                <div>
-                  {filtering.buildHeader(
-                    'article_published',
-                    'Published?',
-                    true,
-                    headerStyles,
-                  )}
-                </div>
+                <div>{filtering.buildHeader('article_name', 'Name', true, headerStyles)}</div>
+                <div>{filtering.buildHeader('article_type', 'Media', true, headerStyles)}</div>
+                <div>{filtering.buildHeader('article_scheduled', 'Scheduled?', true, headerStyles)}</div>
               </div>
             }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
         {sortedArticles.map((article) => (
-          <ListItem
-            key={article.article_id}
-            classes={{ root: classes.item }}
-            divider={true}
-          >
+          <ListItem key={article.article_id} classes={{ root: classes.item }} divider={true}>
             <ListItemIcon>
               <NewspaperOutlined />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.article_name}
-                  >
-                    {article.article_name}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.article_media}
-                  >
-                    {article.article_type}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.article_published}
-                  >
-                    {article.article_published ? t('Yes') : t('No')}
+                  <div className={classes.bodyItem} style={inlineStyles.article_name}>{article.article_name}</div>
+                  <div className={classes.bodyItem} style={inlineStyles.article_media}>{article.article_type}</div>
+                  <div className={classes.bodyItem} style={inlineStyles.article_scheduled}>
+                    {article.article_is_scheduled ? t('Yes') : t('No')}
                   </div>
                 </div>
               }

@@ -48,10 +48,6 @@ public class Article implements Base {
     @JsonProperty("article_footer")
     private String footer;
 
-    @Column(name = "article_published")
-    @JsonProperty("article_published")
-    private boolean published;
-
     @ManyToOne
     @JoinColumn(name = "article_exercise")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -127,14 +123,6 @@ public class Article implements Base {
         this.footer = footer;
     }
 
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
-    }
-
     public Exercise getExercise() {
         return exercise;
     }
@@ -149,6 +137,23 @@ public class Article implements Base {
 
     public void setMedia(Media media) {
         this.media = media;
+    }
+
+    @Transient
+    private Instant virtualPublication;
+
+    @JsonProperty("article_virtual_publication")
+    public Instant getVirtualPublication() {
+        return virtualPublication;
+    }
+
+    public void setVirtualPublication(Instant virtualPublication) {
+        this.virtualPublication = virtualPublication;
+    }
+
+    @JsonProperty("article_is_scheduled")
+    public boolean isScheduledPublication() {
+        return virtualPublication != null;
     }
 
     @Override

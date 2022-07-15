@@ -1,7 +1,9 @@
 package io.openex.rest.media;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
+import io.openex.injects.media.model.MediaContent;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.media.form.ArticleCreateInput;
 import io.openex.rest.media.form.ArticleUpdateInput;
@@ -15,11 +17,17 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static io.openex.database.model.Inject.SPEED_STANDARD;
 import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.helper.UserHelper.ANONYMOUS;
 import static io.openex.helper.UserHelper.currentUser;
+import static io.openex.injects.media.MediaContract.MEDIA_PUBLISH;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.nullsFirst;
 
 @RestController
 public class MediaApi extends RestBehavior {
@@ -82,16 +90,6 @@ public class MediaApi extends RestBehavior {
         mediaRepository.deleteById(mediaId);
     }
 
-    @GetMapping("/api/medias/{mediaId}/{exerciseId}")
-    @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public MediaReader media(@PathVariable String exerciseId, @PathVariable String mediaId) {
-        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        Media media = mediaRepository.findById(mediaId).orElseThrow();
-        MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
-        mediaReader.setMediaArticles(exercise.getArticlesForMedia(media));
-        return mediaReader;
-    }
-
     // region articles
     @RolesAllowed(ROLE_ADMIN)
     @PostMapping("/api/exercises/{exerciseId}/articles")
@@ -112,11 +110,33 @@ public class MediaApi extends RestBehavior {
         return articleRepository.save(article);
     }
 
+    private List<Article> enrichArticleWithVirtualPublication(Exercise exercise, List<Article> articles) {
+        Instant now = Instant.now();
+        Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
+                .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
+                .map(inject -> {
+                    Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
+                    try {
+                        MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
+                        return new VirtualArticle(virtualInjectDate, content.getArticleId());
+                    } catch (JsonProcessingException e) {
+                        // Invalid media content.
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
+        return articles.stream()
+                .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
+                .sorted(Comparator.comparing(Article::getVirtualPublication, nullsFirst(naturalOrder()))
+                        .thenComparing(Article::getCreatedAt).reversed()).toList();
+    }
+
     @PreAuthorize("isExerciseObserver(#exerciseId)")
     @GetMapping("/api/exercises/{exerciseId}/articles")
     public Iterable<Article> exerciseArticles(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        return exercise.getArticles();
+        return enrichArticleWithVirtualPublication(exercise, exercise.getArticles());
     }
 
     @RolesAllowed(ROLE_ADMIN)
@@ -138,16 +158,50 @@ public class MediaApi extends RestBehavior {
         return user;
     }
 
-    @GetMapping("/api/media-reader/{exerciseId}/{mediaId}")
-    public MediaReader mediaReader(@PathVariable String exerciseId, @PathVariable String mediaId, @RequestParam String userId) {
+    private record VirtualArticle(Instant date, String id) {
+    }
+
+    @GetMapping("/api/planner/medias/{exerciseId}/{mediaId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    public MediaReader plannerArticles(@PathVariable String exerciseId, @PathVariable String mediaId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        final User user = impersonateUser(userId);
         Media media = mediaRepository.findById(mediaId).orElseThrow();
         // Fulfill visible article expectations
         MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
-        if (user.isManager() || exercise.getStatus().equals(Exercise.STATUS.RUNNING)) {
-            List<Article> articlesForMedia = exercise.getArticlesForMedia(media);
-            List<Article> publishedArticles = articlesForMedia.stream().filter(Article::isPublished).toList();
+        List<Article> publishedArticles = exercise.getArticlesForMedia(media);
+        List<Article> articles = enrichArticleWithVirtualPublication(exercise, publishedArticles);
+        mediaReader.setMediaArticles(articles);
+        return mediaReader;
+    }
+
+    @GetMapping("/api/player/medias/{exerciseId}/{mediaId}")
+    public MediaReader playerArticles(@PathVariable String exerciseId, @PathVariable String mediaId,
+                                      @RequestParam Optional<String> userId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        Media media = mediaRepository.findById(mediaId).orElseThrow();
+        MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
+        List<String> publishedArticleIds = exercise.getInjects().stream()
+                .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
+                .filter(inject -> inject.getStatus().isPresent())
+                .sorted(Comparator.comparing(inject -> inject.getStatus().get().getDate()))
+                .map(inject -> {
+                    try {
+                        MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
+                        return content.getArticleId();
+                    } catch (JsonProcessingException e) {
+                        // Invalid media content.
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull).toList();
+        if (publishedArticleIds.size() > 0) {
+            List<Article> publishedArticles = fromIterable(articleRepository.findAllById(publishedArticleIds));
+            mediaReader.setMediaArticles(publishedArticles);
+            // Fulfill expectations if the exercise is currently running
             List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()
                     .flatMap(article -> exercise.getInjects()
                             .stream().flatMap(inject -> inject.getUserExpectationsForArticle(user, article)
@@ -156,7 +210,6 @@ public class MediaApi extends RestBehavior {
                 injectExpectationExecution.setResult(Instant.now().toString());
                 injectExpectationExecutionRepository.save(injectExpectationExecution);
             });
-            mediaReader.setMediaArticles(publishedArticles);
         }
         return mediaReader;
     }

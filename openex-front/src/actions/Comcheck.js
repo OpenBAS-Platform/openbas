@@ -36,6 +36,6 @@ export const fetchComcheckStatus = (statusId) => (dispatch) => {
 };
 
 export const fetchMedia = (mediaId, userId, exerciseId) => (dispatch) => {
-  const uri = `/api/media-reader/${exerciseId}/${mediaId}?userId=${userId}`;
+  const uri = `/api/player/medias/${exerciseId}/${mediaId}?userId=${userId}`;
   return getReferential(schema.mediaReader, uri)(dispatch);
 };

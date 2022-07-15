@@ -404,9 +404,6 @@ public class ExerciseApi extends RestBehavior {
             // Reset pauses
             exercise.setCurrentPause(null);
             pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
-            // Reset medias
-            articleRepository.saveAll(exercise.getArticles().stream()
-                    .peek(article -> article.setPublished(false)).toList());
             // Reset injects status and outcome
             injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
                     .stream().peek(Inject::clean).toList());

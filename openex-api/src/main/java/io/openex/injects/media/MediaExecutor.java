@@ -44,10 +44,8 @@ public class MediaExecutor extends Injector {
             MediaContent content = contentConvert(injection, MediaContent.class);
             Article article = articleRepository.findById(content.getArticleId()).orElseThrow();
             if (contract.getId().equals(MEDIA_PUBLISH)) {
-                // Publishing the article
-                article.setPublished(true);
-                articleRepository.save(article);
-                String publishedMessage = "Article (" + article.getName() + ") successfully published";
+                // Article publishing is only linked to execution date of this inject.
+                String publishedMessage = "Article (" + article.getName() + ") marked as published";
                 execution.addTrace(traceSuccess("media", publishedMessage));
                 // Send the publication message.
                 Exercise exercise = injection.getSource().getExercise();

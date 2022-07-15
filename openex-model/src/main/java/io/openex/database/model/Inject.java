@@ -25,7 +25,7 @@ import static java.util.Optional.ofNullable;
 @EntityListeners(ModelBaseListener.class)
 public class Inject implements Base, Injection {
 
-    private static final int SPEED_STANDARD = 1; // Standard speed define by the user.
+    public static final int SPEED_STANDARD = 1; // Standard speed define by the user.
 
     public static Comparator<Inject> executionComparator = (o1, o2) -> {
         if (o1.getDate().isPresent() && o2.getDate().isPresent()) {
@@ -178,7 +178,7 @@ public class Inject implements Base, Injection {
     }
 
     @JsonIgnore
-    private Instant computeInjectDate(Instant source, int speed) {
+    public Instant computeInjectDate(Instant source, int speed) {
         // Compute origin execution date
         Optional<Inject> dependsOnInject = ofNullable(getDependsOn());
         long duration = ofNullable(getDependsDuration()).orElse(0L) / speed;
