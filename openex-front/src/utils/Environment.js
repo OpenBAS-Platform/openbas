@@ -3,6 +3,7 @@ import { debounce } from 'rxjs/operators';
 import * as R from 'ramda';
 import React from 'react';
 import Slide from '@mui/material/Slide';
+import { useLocation } from 'react-router-dom';
 
 // Service bus
 const MESSENGER$ = new Subject().pipe(debounce(() => timer(500)));
@@ -20,6 +21,12 @@ export class ApplicationError extends Error {
     this.data = errors;
   }
 }
+
+export const useQueryParameter = (parameters) => {
+  const { search } = useLocation();
+  const query = React.useMemo(() => new URLSearchParams(search), [search]);
+  return parameters.map((p) => query.get(p));
+};
 
 // Network
 const isEmptyPath = R.isNil(window.BASE_PATH) || R.isEmpty(window.BASE_PATH);

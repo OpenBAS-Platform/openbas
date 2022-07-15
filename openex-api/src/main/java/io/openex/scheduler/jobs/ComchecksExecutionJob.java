@@ -35,6 +35,7 @@ import static java.util.stream.Collectors.groupingBy;
 @DisallowConcurrentExecution
 public class ComchecksExecutionJob implements Job {
 
+    @Resource
     private OpenExConfig openExConfig;
     private ApplicationContext context;
     private ComcheckRepository comcheckRepository;
@@ -103,7 +104,7 @@ public class ComchecksExecutionJob implements Job {
                 Exercise exercise = comCheck.getExercise();
                 List<ComcheckStatus> comcheckStatuses = entry.getValue();
                 List<ExecutionContext> userInjectContexts = comcheckStatuses.stream().map(comcheckStatus -> {
-                    ExecutionContext injectContext = new ExecutionContext(comcheckStatus.getUser(), exercise, "Comcheck");
+                    ExecutionContext injectContext = new ExecutionContext(openExConfig, comcheckStatus.getUser(), exercise, "Comcheck");
                     injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
                     return injectContext;
                 }).toList();

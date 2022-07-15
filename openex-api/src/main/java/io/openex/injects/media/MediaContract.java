@@ -18,7 +18,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.openex.contract.Contract.executableContract;
+import static io.openex.contract.ContractCardinality.Multiple;
 import static io.openex.contract.ContractDef.contractBuilder;
+import static io.openex.contract.fields.ContractAttachment.attachmentField;
+import static io.openex.contract.fields.ContractAudience.audienceField;
+import static io.openex.contract.fields.ContractCheckbox.checkboxField;
+import static io.openex.contract.fields.ContractText.textField;
+import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
 
 @Component
@@ -61,11 +67,23 @@ public class MediaContract extends Contractor {
             Map<String, String> articlesChoices = articles.stream().collect(Collectors.toMap(Article::getId, Article::getName));
             choices.put(exercise.getId(), articlesChoices);
         });
-        ContractSelectExercise contractSelect = new ContractSelectExercise("article_id", "Article", ContractCardinality.One);
+        ContractSelectExercise contractSelect = new ContractSelectExercise("article_id", "Article to publish", ContractCardinality.One);
         contractSelect.setChoices(choices);
         // In this "internal" contract we can't express choices.
         // Choices are contextual to a specific exercise.
-        List<ContractElement> publishInstance = contractBuilder().mandatory(contractSelect).build();
+        String messageBody = """
+                    Article can be read at <a href="${article_uri}">here</a>
+                    <br/><br/>
+                    Your player interface can be accessed through <a href="${player_uri}">this link</a>
+                """;
+        List<ContractElement> publishInstance = contractBuilder()
+                .mandatory(contractSelect)
+                .mandatory(textField("subject", "Subject", "A new article was published for you ${user.name}"))
+                .mandatory(richTextareaField("body", "Body", messageBody))
+                .optional(checkboxField("encrypted", "Encrypted", false))
+                .optional(audienceField("audiences", "Audiences", Multiple))
+                .optional(attachmentField("attachments", "Attachments", Multiple))
+                .build();
         Contract publishArticle = executableContract(contractConfig,
                 MEDIA_PUBLISH, Map.of(en, "Publish article"), publishInstance);
         return List.of(publishArticle);

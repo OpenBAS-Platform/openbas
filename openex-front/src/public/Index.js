@@ -3,9 +3,9 @@ import * as PropTypes from 'prop-types';
 import { Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Comcheck from './components/comcheck/Comcheck';
-import Media from './components/media/Media';
 import Login from './components/login/Login';
 import { errorWrapper } from '../components/Error';
+import Media from './components/media/Media';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,16 +35,8 @@ const Index = () => {
     <div className={classes.root}>
       <main className={classes.content}>
         <Switch>
-          <Route
-            exact
-            path="/comcheck/:statusId"
-            render={errorWrapper(Comcheck)}
-          />
-          <Route
-            exact
-            path="/media/:mediaId/:userId/:exerciseId"
-            render={errorWrapper(Media)}
-          />
+          <Route exact path="/comcheck/:statusId" render={errorWrapper(Comcheck)}/>
+          <Route path="/media/:exerciseId/:mediaId" render={errorWrapper(Media)}/>
           <Route component={Login} />
         </Switch>
       </main>

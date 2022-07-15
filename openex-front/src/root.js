@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import { StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import RootPublic from './public/Root';
@@ -27,19 +27,15 @@ const Root = () => {
   if (!logged) {
     return <RootPublic />;
   }
-  let redirect = '/admin';
-  if (logged.isOnlyPlayer) {
-    redirect = '/private';
-  }
   return (
     <StyledEngineProvider injectFirst={true}>
       <ConnectedThemeProvider>
         <CssBaseline />
         <ConnectedIntlProvider>
           <Switch>
-            <Route exact path="/" render={() => <Redirect to={redirect} />} />
-            <Route path="/admin" render={errorWrapper(IndexAdmin)} />
+            <Route exact path="/" render={() => <Redirect to={logged.isOnlyPlayer ? '/private' : '/admin'} />} />
             <Route path="/private" render={errorWrapper(IndexPrivate)} />
+            <Route path="/admin" render={errorWrapper(IndexAdmin)} />
             <Route component={NotFound} />
           </Switch>
         </ConnectedIntlProvider>

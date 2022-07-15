@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.util.List;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.helper.UserHelper.ANONYMOUS;
+import static io.openex.helper.UserHelper.currentUser;
 
 @RestController
 public class MediaApi extends RestBehavior {
@@ -60,8 +62,7 @@ public class MediaApi extends RestBehavior {
 
     @RolesAllowed(ROLE_ADMIN)
     @PutMapping("/api/medias/{mediaId}")
-    public Media updateMedia(@PathVariable String mediaId,
-                             @Valid @RequestBody MediaUpdateInput input) {
+    public Media updateMedia(@PathVariable String mediaId, @Valid @RequestBody MediaUpdateInput input) {
         Media media = mediaRepository.findById(mediaId).orElseThrow();
         media.setUpdateAttributes(input);
         return mediaRepository.save(media);
@@ -126,15 +127,25 @@ public class MediaApi extends RestBehavior {
     // endregion
 
     // --- Open media access
+    private User impersonateUser(String userId) {
+        User user = currentUser();
+        if (user.getId().equals(ANONYMOUS)) {
+            user = userRepository.findById(userId).orElseThrow();
+            if (!user.getId().equals(userId) || !user.isOnlyPlayer()) {
+                throw new UnsupportedOperationException("Only player can be impersonate");
+            }
+        }
+        return user;
+    }
 
-    @GetMapping("/api/media-reader/{mediaId}/{userId}/{exerciseId}")
-    public MediaReader mediaReader(@PathVariable String exerciseId, @PathVariable String userId, @PathVariable String mediaId) {
+    @GetMapping("/api/media-reader/{exerciseId}/{mediaId}")
+    public MediaReader mediaReader(@PathVariable String exerciseId, @PathVariable String mediaId, @RequestParam String userId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        User user = userRepository.findById(userId).orElseThrow();
+        final User user = impersonateUser(userId);
         Media media = mediaRepository.findById(mediaId).orElseThrow();
         // Fulfill visible article expectations
         MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
-        if (exercise.getStatus().equals(Exercise.STATUS.RUNNING)) {
+        if (user.isManager() || exercise.getStatus().equals(Exercise.STATUS.RUNNING)) {
             List<Article> articlesForMedia = exercise.getArticlesForMedia(media);
             List<Article> publishedArticles = articlesForMedia.stream().filter(Article::isPublished).toList();
             List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()

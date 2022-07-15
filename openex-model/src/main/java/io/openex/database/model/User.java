@@ -387,6 +387,11 @@ public class User implements Base, OAuth2User {
         this.communications = communications;
     }
 
+    @JsonProperty("user_is_only_player")
+    public boolean isOnlyPlayer() {
+        return !isAdmin() && !isManager();
+    }
+
     @Override
     public boolean isUserHasAccess(User user) {
         return user.isAdmin() || user.getId().equals(getId());

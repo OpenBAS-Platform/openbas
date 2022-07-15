@@ -1,29 +1,20 @@
 package io.openex.injects.email;
 
 import io.openex.contract.Contract;
-import io.openex.database.model.Document;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Inject;
-import io.openex.database.model.InjectDocument;
-import io.openex.execution.Injector;
+import io.openex.database.model.*;
 import io.openex.execution.ExecutableInject;
-import io.openex.database.model.Execution;
 import io.openex.execution.ExecutionContext;
+import io.openex.execution.Injector;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.email.service.EmailService;
-import io.openex.injects.email.service.ImapService;
-import io.openex.database.model.DataAttachment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.mail.internet.MimeMessage;
 import java.util.List;
 
 import static io.openex.database.model.ExecutionTrace.traceError;
-import static io.openex.database.model.ExecutionTrace.traceSuccess;
 import static io.openex.injects.email.EmailContract.EMAIL_GLOBAL;
-import static java.util.stream.Collectors.joining;
 
 @Component(EmailContract.TYPE)
 public class EmailExecutor extends Injector {
@@ -33,54 +24,28 @@ public class EmailExecutor extends Injector {
     @Value("${openex.mail.imap.enabled}")
     private boolean imapEnabled;
 
-    private ImapService imapService;
-
-    @Autowired
-    public void setImapService(ImapService imapService) {
-        this.imapService = imapService;
-    }
-
     @Autowired
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
     }
 
-    private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
-        if (imapEnabled) {
-            try {
-                imapService.storeSentMessage(mimeMessage);
-                execution.addTrace(traceSuccess("imap", "Mail stored in imap"));
-            } catch (Exception e) {
-                execution.addTrace(traceError("imap", e.getMessage(), e));
-            }
-        }
-    }
-
     private void sendMulti(Execution execution, List<ExecutionContext> users, String replyTo, String subject,
                            String message, List<DataAttachment> attachments) {
-        MimeMessage mimeMessage = null;
-        String emails = users.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
         try {
-            mimeMessage = emailService.sendEmail(users, replyTo, subject, message, attachments);
-            execution.addTrace(traceSuccess("email", "Mail sent to " + emails));
+            emailService.sendEmail(execution, users, replyTo, subject, message, attachments);
         } catch (Exception e) {
             execution.addTrace(traceError("email", e.getMessage(), e));
         }
-        storeMessageImap(execution, mimeMessage);
     }
 
     private void sendSingle(Execution execution, List<ExecutionContext> users, String replyTo, boolean mustBeEncrypted,
                             String subject, String message, List<DataAttachment> attachments) {
-        users.stream().parallel().forEach(userInjectContext -> {
-            MimeMessage mimeMessage = null;
-            String email = userInjectContext.getUser().getEmail();
+        users.stream().parallel().forEach(user -> {
             try {
-                mimeMessage = emailService.sendEmail(userInjectContext, replyTo, mustBeEncrypted, subject, message, attachments);
-                execution.addTrace(traceSuccess("email", "Mail sent to " + email));
+                emailService.sendEmail(execution, user, replyTo, mustBeEncrypted, subject, message, attachments);
             } catch (Exception e) {
                 execution.addTrace(traceError("email", e.getMessage(), e));
             }
-            storeMessageImap(execution, mimeMessage);
         });
     }
 

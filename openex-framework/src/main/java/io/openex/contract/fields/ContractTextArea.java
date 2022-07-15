@@ -20,6 +20,12 @@ public class ContractTextArea extends ContractElement {
         return new ContractTextArea(key, label, true);
     }
 
+    public static ContractTextArea richTextareaField(String key, String label, String defaultValue) {
+        ContractTextArea contractText = new ContractTextArea(key, label, true);
+        contractText.setDefaultValue(defaultValue);
+        return contractText;
+    }
+
     @Override
     public ContractType getType() {
         return ContractType.Textarea;

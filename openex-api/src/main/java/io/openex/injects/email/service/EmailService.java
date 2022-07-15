@@ -1,9 +1,11 @@
 package io.openex.injects.email.service;
 
 import io.openex.database.model.DataAttachment;
+import io.openex.database.model.Execution;
 import io.openex.execution.ExecutionContext;
 import org.bouncycastle.openpgp.PGPPublicKey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
@@ -16,13 +18,26 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.openex.database.model.ExecutionTrace.traceError;
+import static io.openex.database.model.ExecutionTrace.traceSuccess;
 import static io.openex.helper.TemplateHelper.buildContextualContent;
+import static java.util.stream.Collectors.joining;
 
 @Component
 public class EmailService {
 
     private JavaMailSender emailSender;
     private EmailPgp emailPgp;
+
+    @Value("${openex.mail.imap.enabled}")
+    private boolean imapEnabled;
+
+    private ImapService imapService;
+
+    @Autowired
+    public void setImapService(ImapService imapService) {
+        this.imapService = imapService;
+    }
 
     @Autowired
     public void setEmailSender(JavaMailSender emailSender) {
@@ -32,6 +47,17 @@ public class EmailService {
     @Autowired
     public void setEmailPgp(EmailPgp emailPgp) {
         this.emailPgp = emailPgp;
+    }
+
+    private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
+        if (imapEnabled) {
+            try {
+                imapService.storeSentMessage(mimeMessage);
+                execution.addTrace(traceSuccess("imap", "Mail successfully stored in imap"));
+            } catch (Exception e) {
+                execution.addTrace(traceError("imap", e.getMessage(), e));
+            }
+        }
     }
 
     private MimeMessage buildMimeMessage(String from, String subject, String body, List<DataAttachment> attachments) throws Exception {
@@ -56,8 +82,8 @@ public class EmailService {
         return mimeMessage;
     }
 
-    public MimeMessage sendEmail(List<ExecutionContext> usersContext, String from, String subject, String message,
-                                       List<DataAttachment> attachments) throws Exception {
+    public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from,
+                          String subject, String message, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
@@ -65,11 +91,14 @@ public class EmailService {
         }
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
         emailSender.send(mimeMessage);
-        return mimeMessage;
+        String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
+        execution.addTrace(traceSuccess("email", "Mail sent to " + emails));
+        // Store message in Imap after sending
+        storeMessageImap(execution, mimeMessage);
     }
 
-    public MimeMessage sendEmail(ExecutionContext userContext, String from, boolean mustBeEncrypted, String subject,
-                                 String message, List<DataAttachment> attachments) throws Exception {
+    public void sendEmail(Execution execution, ExecutionContext userContext, String from,
+                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);
@@ -102,10 +131,11 @@ public class EmailService {
             // Fill the message with the multipart content
             encMessage.setContent(encMultipart);
             emailSender.send(encMessage);
-            return encMessage;
         } else {
             emailSender.send(mimeMessage);
-            return mimeMessage;
         }
+        execution.addTrace(traceSuccess("email", "Mail sent to " + email));
+        // Store message in Imap after sending
+        storeMessageImap(execution, mimeMessage);
     }
 }

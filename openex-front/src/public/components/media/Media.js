@@ -7,6 +7,7 @@ import Paper from '@mui/material/Paper';
 import { useParams } from 'react-router-dom';
 import { fetchMedia } from '../../../actions/Comcheck';
 import { useHelper } from '../../../store';
+import { useQueryParameter } from '../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -41,17 +42,11 @@ const useStyles = makeStyles(() => ({
 const Media = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  // const { fldt, t } = useFormatter();
-  const { mediaId, userId, exerciseId } = useParams();
+  const [userId] = useQueryParameter(['user']);
+  const { mediaId, exerciseId } = useParams();
   const mediaReader = useHelper((helper) => helper.getMediaReader(mediaId));
-  const {
-    exercise_status: status,
-    media_articles: articles,
-    media_information: info,
-  } = mediaReader ?? {};
-  useEffect(() => {
-    dispatch(fetchMedia(mediaId, userId, exerciseId));
-  }, []);
+  const { exercise_status: status, media_articles: articles, media_information: info } = mediaReader ?? {};
+  useEffect(() => { dispatch(fetchMedia(mediaId, userId, exerciseId)); }, []);
   return (
     <div className={classes.container}>
       <Paper variant="outlined">

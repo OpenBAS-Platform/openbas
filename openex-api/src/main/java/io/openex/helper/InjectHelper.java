@@ -1,5 +1,6 @@
 package io.openex.helper;
 
+import io.openex.config.OpenExConfig;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.AudienceRepository;
@@ -13,6 +14,7 @@ import io.openex.service.ContractService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +28,8 @@ import static java.util.stream.Stream.concat;
 @Component
 public class InjectHelper {
 
+    @Resource
+    private OpenExConfig openExConfig;
     private InjectRepository injectRepository;
     private DryInjectRepository dryInjectRepository;
     private AudienceRepository audienceRepository;
@@ -52,25 +56,24 @@ public class InjectHelper {
     }
 
     private Stream<ExecutionContext> getUsersFromInjection(Injection injection) {
-        Exercise exercise = injection.getExercise();
         if (injection instanceof DryInject dryInject) {
             return dryInject.getRun().getUsers().stream()
-                    .map(user -> new ExecutionContext(user, exercise, "Dryrun"));
+                    .map(user -> new ExecutionContext(openExConfig, user, injection, "Dryrun"));
         } else if (injection instanceof Inject inject) {
+            Exercise exercise = injection.getExercise();
             List<Audience> audiences = inject.isAllAudiences() ?
                     fromIterable(audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
             return audiences.stream().filter(Audience::isEnabled)
                     .flatMap(audience -> audience.getUsers().stream()
-                            .map(user -> new ExecutionContext(user, exercise, audience.getName())));
+                            .map(user -> new ExecutionContext(openExConfig, user, injection, audience.getName())));
         }
         throw new UnsupportedOperationException("Unsupported type of Injection");
     }
 
     private List<ExecutionContext> usersFromInjection(Injection injection) {
-        Exercise exercise = injection.getExercise();
         return getUsersFromInjection(injection)
                 .collect(groupingBy(ExecutionContext::getUser)).entrySet().stream()
-                .map(entry -> new ExecutionContext(entry.getKey(), exercise,
+                .map(entry -> new ExecutionContext(openExConfig, entry.getKey(), injection,
                         entry.getValue().stream().flatMap(ua -> ua.getAudiences().stream()).toList()))
                 .toList();
     }

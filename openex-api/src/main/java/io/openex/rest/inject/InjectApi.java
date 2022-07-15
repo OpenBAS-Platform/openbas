@@ -1,5 +1,6 @@
 package io.openex.rest.inject;
 
+import io.openex.config.OpenExConfig;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.model.InjectExpectation.EXPECTATION_TYPE;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -35,6 +37,9 @@ import static java.time.Instant.now;
 public class InjectApi extends RestBehavior {
 
     private static final int MAX_NEXT_INJECTS = 6;
+
+    @Resource
+    private OpenExConfig openExConfig;
 
     private CommunicationRepository communicationRepository;
     private ExerciseRepository exerciseRepository;
@@ -123,8 +128,8 @@ public class InjectApi extends RestBehavior {
     @GetMapping("/api/injects/try/{injectId}")
     public InjectStatus execute(@PathVariable String injectId) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
-        List<ExecutionContext> userInjectContexts = List.of(new ExecutionContext(currentUser(),
-                inject.getExercise(), "Direct test"));
+        List<ExecutionContext> userInjectContexts =
+                List.of(new ExecutionContext(openExConfig, currentUser(), inject, "Direct test"));
         Contract contract = contractService.resolveContract(inject);
         if (contract == null) {
             throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
@@ -307,8 +312,7 @@ public class InjectApi extends RestBehavior {
         inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
         Iterable<User> users = userRepository.findAllById(input.getUserIds());
         List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
-                .map(user -> new ExecutionContext(user, inject.getExercise(), "Direct execution"))
-                .toList();
+                .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
         ExecutableInject injection = new ExecutableInject(inject, contract, userInjectContexts);
         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
