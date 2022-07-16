@@ -60,7 +60,7 @@ const Media = () => {
         <div className={classes.content}>
           <ul>
             {(articles ?? []).map((article) => (
-              <li key={article.article_id}>{article.article_name}</li>
+              <li key={article.article_id}>{article.article_name} ({article.article_virtual_publication})</li>
             ))}
           </ul>
         </div>

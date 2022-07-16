@@ -184,22 +184,25 @@ public class MediaApi extends RestBehavior {
         }
         Media media = mediaRepository.findById(mediaId).orElseThrow();
         MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
-        List<String> publishedArticleIds = exercise.getInjects().stream()
+        Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
                 .filter(inject -> inject.getStatus().isPresent())
                 .sorted(Comparator.comparing(inject -> inject.getStatus().get().getDate()))
                 .map(inject -> {
+                    Instant virtualInjectDate = inject.getStatus().get().getDate();
                     try {
                         MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
-                        return content.getArticleId();
+                        return new VirtualArticle(virtualInjectDate, content.getArticleId());
                     } catch (JsonProcessingException e) {
                         // Invalid media content.
                         return null;
                     }
                 })
-                .filter(Objects::nonNull).toList();
-        if (publishedArticleIds.size() > 0) {
-            List<Article> publishedArticles = fromIterable(articleRepository.findAllById(publishedArticleIds));
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
+        if (toPublishArticleIdsMap.size() > 0) {
+            List<Article> publishedArticles = fromIterable(articleRepository.findAllById(toPublishArticleIdsMap.keySet()))
+                    .stream().peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId()))).toList();
             mediaReader.setMediaArticles(publishedArticles);
             // Fulfill expectations if the exercise is currently running
             List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()
