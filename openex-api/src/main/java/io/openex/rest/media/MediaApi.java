@@ -9,6 +9,7 @@ import io.openex.rest.media.form.ArticleCreateInput;
 import io.openex.rest.media.form.ArticleUpdateInput;
 import io.openex.rest.media.form.MediaCreateInput;
 import io.openex.rest.media.form.MediaUpdateInput;
+import io.openex.rest.media.model.VirtualArticle;
 import io.openex.rest.media.response.MediaReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -213,8 +214,5 @@ public class MediaApi extends RestBehavior {
             });
         }
         return mediaReader;
-    }
-
-    private record VirtualArticle(Instant date, String id) {
     }
 }
