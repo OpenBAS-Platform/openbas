@@ -203,9 +203,9 @@ public class MediaApi extends RestBehavior {
             mediaReader.setMediaArticles(publishedArticles);
             // Fulfill article expectations
             List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()
-                    .flatMap(article -> exercise.getInjects().stream().flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream()))
-                    .filter(exec -> exec.getResult() == null)
-                    .toList();
+                    .flatMap(article -> exercise.getInjects().stream()
+                            .flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream()))
+                    .filter(exec -> exec.getResult() == null).toList();
             expectationExecutions.forEach(injectExpectationExecution -> {
                 injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResult(Instant.now().toString());

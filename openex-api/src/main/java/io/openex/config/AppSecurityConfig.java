@@ -60,7 +60,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**/.disable()
                 .authorizeRequests()
                 /**/.antMatchers("/api/comcheck/**").permitAll()
-                /**/.antMatchers("/api/media-reader/**").permitAll()
+                /**/.antMatchers("/api/player/**").permitAll()
                 /**/.antMatchers("/api/settings").permitAll()
                 /**/.antMatchers("/api/login").permitAll()
                 /**/.antMatchers("/api/**").authenticated()
