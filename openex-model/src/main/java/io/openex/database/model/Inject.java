@@ -411,7 +411,7 @@ public class Inject implements Base, Injection {
         return expectations.stream()
                 .flatMap(expectation -> expectation.getExecutions().stream())
                 .filter(execution -> execution.getExpectation().getArticle().equals(article))
-                .filter(execution -> execution.getUser().equals(user))
+                .filter(execution -> execution.getAudience().getUsers().contains(user))
                 .toList();
     }
 

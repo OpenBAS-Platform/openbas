@@ -7,7 +7,6 @@ import io.openex.database.model.Injection;
 import java.util.List;
 
 public class ExecutableInject {
-    private boolean direct = false;
     private final Inject inject;
     private final Contract contract;
     private final Injection source;
@@ -25,14 +24,6 @@ public class ExecutableInject {
         this.contract = contract;
         this.source = source;
         this.users = users;
-    }
-
-    public boolean isDirect() {
-        return direct;
-    }
-
-    public void setDirect(boolean direct) {
-        this.direct = direct;
     }
 
     public Inject getInject() {
