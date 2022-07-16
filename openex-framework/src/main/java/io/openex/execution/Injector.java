@@ -66,16 +66,16 @@ public abstract class Injector {
             // Process the execution
             process(execution, executableInject, contract);
             // Create the expectations
-            List<ExecutionContext> users = executableInject.getUsers();
-            if (scheduleInjection && users.size() > 0) {
-                List<InjectExpectation> expectations = executableInject.getInject().getExpectations();
-                List<InjectExpectationExecution> executions = users.stream()
-                        .flatMap(userContext -> expectations.stream().map(expectation -> {
+            List<Audience> audiences = executableInject.getInject().getAudiences();
+            List<InjectExpectation> expectations = executableInject.getInject().getExpectations();
+            if (scheduleInjection && audiences.size() > 0 && expectations.size() > 0) {
+                List<InjectExpectationExecution> executions = audiences.stream()
+                        .flatMap(audience -> expectations.stream().map(expectation -> {
                             InjectExpectationExecution expectationExecution = new InjectExpectationExecution();
                             expectationExecution.setExpectation(expectation);
                             expectationExecution.setExercise(executableInject.getInject().getExercise());
                             expectationExecution.setInject(executableInject.getInject());
-                            expectationExecution.setUser(userContext.getUser());
+                            expectationExecution.setAudience(audience);
                             return expectationExecution;
                         })).toList();
                 injectExpectationExecutionRepository.saveAll(executions);
@@ -93,7 +93,6 @@ public abstract class Injector {
     }
 
     public Execution executeDirectly(ExecutableInject executableInject) {
-        executableInject.setDirect(true);
         return execute(executableInject, false);
     }
 

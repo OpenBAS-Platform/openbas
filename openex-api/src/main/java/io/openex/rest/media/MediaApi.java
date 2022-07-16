@@ -158,9 +158,6 @@ public class MediaApi extends RestBehavior {
         return user;
     }
 
-    private record VirtualArticle(Instant date, String id) {
-    }
-
     @GetMapping("/api/planner/medias/{exerciseId}/{mediaId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public MediaReader plannerArticles(@PathVariable String exerciseId, @PathVariable String mediaId) {
@@ -206,14 +203,17 @@ public class MediaApi extends RestBehavior {
             mediaReader.setMediaArticles(publishedArticles);
             // Fulfill expectations if the exercise is currently running
             List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()
-                    .flatMap(article -> exercise.getInjects()
-                            .stream().flatMap(inject -> inject.getUserExpectationsForArticle(user, article)
-                                    .stream())).toList();
+                    .flatMap(article -> exercise.getInjects().stream()
+                            .flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream())).toList();
             expectationExecutions.forEach(injectExpectationExecution -> {
+                injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResult(Instant.now().toString());
                 injectExpectationExecutionRepository.save(injectExpectationExecution);
             });
         }
         return mediaReader;
+    }
+
+    private record VirtualArticle(Instant date, String id) {
     }
 }

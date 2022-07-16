@@ -58,6 +58,12 @@ public class InjectExpectationExecution {
     @JsonProperty("expectation_execution_user")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "audience_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("expectation_execution_audience")
+    private Audience audience;
+
     public String getId() {
         return id;
     }
@@ -120,6 +126,14 @@ public class InjectExpectationExecution {
 
     public void setInject(Inject inject) {
         this.inject = inject;
+    }
+
+    public Audience getAudience() {
+        return audience;
+    }
+
+    public void setAudience(Audience audience) {
+        this.audience = audience;
     }
 
     @Override
