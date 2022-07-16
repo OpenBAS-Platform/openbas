@@ -145,10 +145,10 @@ public class Inject implements Base, Injection {
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectExpectation> expectations = new ArrayList<>();
 
-    @JsonProperty("inject_direct")
+    // region transient
+    @Transient
     private boolean direct = false;
 
-    // region transient
     @Transient
     public String getHeader() {
         return ofNullable(getExercise()).map(Exercise::getHeader).orElse("");

@@ -50,7 +50,7 @@ const Inject = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const [reply, setReply] = useState(null);
-  const { t, fndt } = useFormatter();
+  const { t, fndt, fldt } = useFormatter();
   const { injectId, exerciseId } = useParams();
   // Fetching data
   const { exercise, inject, communications, usersMap } = useHelper((helper) => {
@@ -110,10 +110,11 @@ const Inject = () => {
             (o) => o.communication_subject
               .toLowerCase()
               .includes(`re: ${n.communication_subject.toLowerCase()}`)
-                && R.any(
-                  (p) => o.communication_from.includes(p),
-                  n.communication_mails,
-                ),
+                && (o.communication_animation
+                  || R.any(
+                    (p) => o.communication_from.includes(p),
+                    n.communication_mails,
+                  )),
             communicationsWithMails,
           ),
         ),
@@ -130,18 +131,29 @@ const Inject = () => {
       const lastCommunication = topic.communication_communications.length > 0
         ? R.head(topic.communication_communications)
         : topic;
-      defaultContent = `<br /><br />________________________________<br />
-From: ${lastCommunication.communication_from
+      defaultContent = `<br />
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr">
+<font face=3D"Calibri, sans-serif" style=3D"font-size:11pt">
+<b>From:</b> ${lastCommunication.communication_from
     .replaceAll('<', '&lt;')
-    .replaceAll('>', '&ngt;')}<br />
-Sent: ${lastCommunication.communication_sent_at}<br />
-Subject: ${lastCommunication.communication_subject}<br /><br />
-${
+    .replaceAll('>', '&gt;')}<br>
+<b>Sent:</b> ${fldt(lastCommunication.communication_sent_at)}<br>
+<b>Subject:</b> ${lastCommunication.communication_subject}
+</font>
+</div>
+<blockquote>
+<div dir=3D"ltr">
+<div class=3D"x_elementToProof" style=3D"font-family:Calibri,Arial,Helvetica,sans-serif; font-size:12pt;">
+ ${
   lastCommunication.communication_content
-  && lastCommunication.communication_content.length > 10
+   && lastCommunication.communication_content.length > 10
     ? lastCommunication.communication_content.replaceAll('\n', '<br />')
     : lastCommunication.communication_content_html
-}`;
+}
+</div>
+</div>
+</blockquote>`;
     }
     return (
       <div className={classes.container}>
