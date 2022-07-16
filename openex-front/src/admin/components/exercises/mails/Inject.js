@@ -24,7 +24,6 @@ import { fetchPlayers } from '../../../../actions/User';
 import Communication from './Communication';
 import { Transition } from '../../../../utils/Environment';
 import CommunicationForm from './CommunicationForm';
-import { addExerciseArticle } from '../../../../actions/Media';
 
 const useStyles = makeStyles(() => ({
   container: {
