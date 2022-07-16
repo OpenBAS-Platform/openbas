@@ -81,6 +81,7 @@ public class DirectInjectInput {
         inject.setDescription(getDescription());
         inject.setContent(getContent());
         inject.setContract(getContract());
+        inject.setDirect(true);
         return inject;
     }
 }

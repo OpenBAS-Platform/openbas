@@ -1,14 +1,18 @@
-import React from 'react';
-import { makeStyles, useTheme } from '@mui/styles';
+import React, { useState } from 'react';
+import * as R from 'ramda';
+import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import { fetchExerciseInjects } from '../../../../actions/Inject';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import {
+  executeInject,
+  fetchExerciseInjects,
+} from '../../../../actions/Inject';
 import { useFormatter } from '../../../../components/i18n';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { useHelper } from '../../../../store';
@@ -16,11 +20,11 @@ import AnimationMenu from '../AnimationMenu';
 import Loader from '../../../../components/Loader';
 import { fetchInjectCommunications } from '../../../../actions/Communication';
 import ItemTags from '../../../../components/ItemTags';
-import { resolveUserNames } from '../../../../utils/String';
 import { fetchPlayers } from '../../../../actions/User';
-import TruncatedText from '../../../../components/TruncatedText';
-import ExpandableHtml from '../../../../components/ExpandableHtml';
-import ExpandableText from '../../../../components/ExpandableText';
+import Communication from './Communication';
+import { Transition } from '../../../../utils/Environment';
+import CommunicationForm from './CommunicationForm';
+import { addExerciseArticle } from '../../../../actions/Media';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -36,14 +40,17 @@ const useStyles = makeStyles(() => ({
   card: {
     margin: '0 0 20px 0',
   },
+  cardNested: {
+    margin: '0 0 20px 20px',
+  },
 }));
 
 const Inject = () => {
   // Standard hooks
   const classes = useStyles();
-  const theme = useTheme();
   const dispatch = useDispatch();
-  const { t, fndt, nsdt } = useFormatter();
+  const [reply, setReply] = useState(null);
+  const { t, fndt } = useFormatter();
   const { injectId, exerciseId } = useParams();
   // Fetching data
   const { exercise, inject, communications, usersMap } = useHelper((helper) => {
@@ -59,10 +66,83 @@ const Inject = () => {
     dispatch(fetchInjectCommunications(exerciseId, injectId));
     dispatch(fetchPlayers());
   });
+  const sortCommunications = R.sortWith([
+    R.descend(R.prop('communication_received_at')),
+  ]);
   // Rendering
+  const handleOpenReply = (communicationId) => setReply(communicationId);
+  const handleCloseReply = () => setReply(null);
+  const onSubmitReply = (data) => {
+    const topic = R.head(
+      R.filter((n) => n.communication_id === reply, communications),
+    );
+    const inputValues = {
+      inject_title: 'Manual email',
+      inject_description: 'Manual email',
+      inject_contract: inject.inject_contract,
+      inject_content: {
+        subject: data.communication_subject,
+        body: data.communication_content,
+      },
+      inject_users: topic.communication_users,
+    };
+    return dispatch(executeInject(exerciseId, inputValues)).then(() => handleCloseReply());
+  };
   if (inject && communications) {
     // Group communication by subject
-    const topics = R.filter((n) => !n.communication_subject.includes('Re: '), communications)
+    const communicationsWithMails = R.map(
+      (n) => R.assoc(
+        'communication_mails',
+        R.map(
+          (o) => (usersMap[o] ? usersMap[o].user_email : '').toLowerCase(),
+          n.communication_users,
+        ),
+        n,
+      ),
+      communications,
+    );
+    const topics = R.pipe(
+      R.filter((n) => !n.communication_subject.includes('Re: ')),
+      R.map((n) => R.assoc(
+        'communication_communications',
+        sortCommunications(
+          R.filter(
+            (o) => o.communication_subject
+              .toLowerCase()
+              .includes(`re: ${n.communication_subject.toLowerCase()}`)
+                && R.any(
+                  (p) => o.communication_from.includes(p),
+                  n.communication_mails,
+                ),
+            communicationsWithMails,
+          ),
+        ),
+        n,
+      )),
+    )(communicationsWithMails);
+    let defaultSubject = '';
+    let defaultContent = '';
+    if (reply) {
+      const topic = R.head(
+        R.filter((n) => n.communication_id === reply, topics),
+      );
+      defaultSubject = `Re: ${topic.communication_subject}`;
+      const lastCommunication = topic.communication_communications.length > 0
+        ? R.head(topic.communication_communications)
+        : topic;
+      defaultContent = `<br /><br />________________________________<br />
+From: ${lastCommunication.communication_from
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&ngt;')}<br />
+Sent: ${lastCommunication.communication_sent_at}<br />
+Subject: ${lastCommunication.communication_subject}<br /><br />
+${
+  lastCommunication.communication_content
+  && lastCommunication.communication_content.length > 10
+    ? lastCommunication.communication_content.replaceAll('\n', '<br />')
+    : lastCommunication.communication_content_html
+}`;
+    }
     return (
       <div className={classes.container}>
         <AnimationMenu exerciseId={exerciseId} />
@@ -120,114 +200,56 @@ const Inject = () => {
             {t('Mails')}
           </Typography>
           <div className="clearfix" />
-          {communications.map((communication) => {
-            const communicationUsers = communication.communication_users.map(
+          {topics.map((topic) => {
+            const topicUsers = topic.communication_users.map(
               (userId) => usersMap[userId] ?? {},
             );
             return (
-              <Card
-                key={communication.communication_id}
-                classes={{ root: classes.card }}
-                raised={false}
-                variant="outlined"
-              >
-                <CardHeader
-                  style={{
-                    padding: '7px 10px 2px 15px',
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                  }}
-                  title={
-                    <div style={{ padding: '7px 0 7px 0' }}>
-                      <div
-                        style={{
-                          float: 'left',
-                          fontDecoration: 'none',
-                          textTransform: 'none',
-                          fontSize: 15,
-                        }}
-                      >
-                        <strong>
-                          <TruncatedText
-                            content={communication.communication_subject}
-                            limit={50}
-                          />
-                        </strong>
-                      </div>
-                      {communication.communication_animation ? (
-                        <div
-                          style={{
-                            float: 'right',
-                            fontDecoration: 'none',
-                            textTransform: 'none',
-                            fontSize: 15,
-                          }}
-                        >
-                          <span style={{ color: theme.palette.text.secondary }}>
-                            {t('Mail sent to')}
-                          </span>
-                          &nbsp;
-                          <strong>
-                            <TruncatedText
-                              content={resolveUserNames(
-                                communicationUsers,
-                                true,
-                              )}
-                              limit={60}
-                            />
-                          </strong>
-                          &nbsp;
-                          <span style={{ color: theme.palette.text.secondary }}>
-                            {t('on')}{' '}
-                            {nsdt(communication.communication_sent_at)}
-                          </span>
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            float: 'right',
-                            fontDecoration: 'none',
-                            textTransform: 'none',
-                            fontSize: 15,
-                          }}
-                        >
-                          <strong>
-                            <TruncatedText
-                              content={resolveUserNames(
-                                communicationUsers,
-                                true,
-                              )}
-                              limit={60}
-                            />
-                          </strong>
-                          &nbsp;
-                          <span style={{ color: theme.palette.text.secondary }}>
-                            {t('sent an mail on')}{' '}
-                            {nsdt(communication.communication_sent_at)}
-                          </span>
-                        </div>
-                      )}
-                      <div className="clearfix" />
-                    </div>
-                  }
+              <div key={topic.communication_id}>
+                <Communication
+                  communication={topic}
+                  communicationUsers={topicUsers}
+                  isTopic={true}
+                  handleOpenReply={handleOpenReply}
                 />
-                <CardContent>
-                  {communication.communication_content
-                  && communication.communication_content.length > 10 ? (
-                    <ExpandableText
-                      source={communication.communication_content}
-                      limit={500}
+                {topic.communication_communications.map((communication) => {
+                  const communicationUsers = communication.communication_users.map(
+                    (userId) => usersMap[userId] ?? {},
+                  );
+                  return (
+                    <Communication
+                      key={communication.communication_id}
+                      communication={communication}
+                      communicationUsers={communicationUsers}
+                      isTopic={false}
+                      handleOpenReply={handleOpenReply}
                     />
-                    ) : (
-                    <ExpandableHtml
-                      source={communication.communication_content_html}
-                      limit={500}
-                    />
-                    )}
-                </CardContent>
-              </Card>
+                  );
+                })}
+              </div>
             );
           })}
         </div>
+        <Dialog
+          open={reply !== null}
+          TransitionComponent={Transition}
+          onClose={handleCloseReply}
+          fullWidth={true}
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
+        >
+          <DialogTitle>{t('Reply')}</DialogTitle>
+          <DialogContent style={{ overflow: 'hidden' }}>
+            <CommunicationForm
+              initialValues={{
+                communication_subject: defaultSubject,
+                communication_content: defaultContent,
+              }}
+              onSubmit={onSubmitReply}
+              handleClose={handleCloseReply}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

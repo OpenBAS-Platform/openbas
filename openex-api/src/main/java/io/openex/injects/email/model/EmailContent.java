@@ -54,7 +54,7 @@ public class EmailContent {
             data.append(FOOTER_DIV).append(footer).append(END_DIV);
         }
         // If imap is enable we need to inject the id marker
-        if (imapEnabled) {
+        if (imapEnabled && !inject.isDirect()) {
             data.append(START_DIV)
                     .append("<br/><br/><br/><br/>")
                     .append("---------------------------------------------------------------------------------<br/>")

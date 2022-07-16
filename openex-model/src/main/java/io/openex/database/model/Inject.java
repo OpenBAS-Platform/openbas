@@ -145,6 +145,9 @@ public class Inject implements Base, Injection {
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectExpectation> expectations = new ArrayList<>();
 
+    @JsonProperty("inject_direct")
+    private boolean direct = false;
+
     // region transient
     @Transient
     public String getHeader() {
@@ -237,6 +240,14 @@ public class Inject implements Base, Injection {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isDirect() {
+        return direct;
+    }
+
+    public void setDirect(boolean direct) {
+        this.direct = direct;
     }
 
     public Instant getCreatedAt() {
