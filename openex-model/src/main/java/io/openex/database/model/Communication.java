@@ -49,6 +49,10 @@ public class Communication implements Base {
     @JsonProperty("communication_content")
     private String content;
 
+    @Column(name = "communication_content_html")
+    @JsonProperty("communication_content_html")
+    private String contentHtml;
+
     @ManyToOne
     @JoinColumn(name = "communication_inject")
     @JsonSerialize(using = MonoModelDeserializer.class)
@@ -71,6 +75,10 @@ public class Communication implements Base {
     @Column(name = "communication_animation")
     @JsonProperty("communication_animation")
     private Boolean animation = false;
+
+    @Column(name = "communication_from")
+    @JsonProperty("communication_from")
+    private String from;
 
     @Override
     public String getId() {
@@ -113,6 +121,14 @@ public class Communication implements Base {
         this.content = content;
     }
 
+    public String getContentHtml() {
+        return contentHtml;
+    }
+
+    public void setContentHtml(String contentHtml) {
+        this.contentHtml = contentHtml;
+    }
+
     public Inject getInject() {
         return inject;
     }
@@ -151,6 +167,14 @@ public class Communication implements Base {
 
     public void setAnimation(Boolean animation) {
         this.animation = animation;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
     }
 
     @JsonIgnore

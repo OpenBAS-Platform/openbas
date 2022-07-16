@@ -11,7 +11,7 @@ const AppThemeProvider = (props) => {
     const me = helper.getMe();
     const settings = helper.getSettings();
     const rawPlatformTheme = settings.platform_theme ?? 'auto';
-    const rawUserTheme = me?.user_theme ?? 'auto';
+    const rawUserTheme = me?.user_theme ?? 'default';
     return rawUserTheme !== 'default' ? rawUserTheme : rawPlatformTheme;
   });
 

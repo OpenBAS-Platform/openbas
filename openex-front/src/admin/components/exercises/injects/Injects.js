@@ -363,7 +363,7 @@ const Injects = () => {
                 disabled={isDisabled}
                 onClick={() => setSelectedInject(inject.inject_id)}
               >
-                <ListItemIcon>
+                <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     tooltip={t(inject.inject_type)}
                     config={injectContract.config}

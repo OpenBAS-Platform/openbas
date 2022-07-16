@@ -18,8 +18,9 @@ import { fetchInjectCommunications } from '../../../../actions/Communication';
 import ItemTags from '../../../../components/ItemTags';
 import { resolveUserNames } from '../../../../utils/String';
 import { fetchPlayers } from '../../../../actions/User';
-import TruncatedContent from '../../../../components/TruncatedContent';
+import TruncatedText from '../../../../components/TruncatedText';
 import ExpandableHtml from '../../../../components/ExpandableHtml';
+import ExpandableText from '../../../../components/ExpandableText';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -59,7 +60,9 @@ const Inject = () => {
     dispatch(fetchPlayers());
   });
   // Rendering
-  if (inject) {
+  if (inject && communications) {
+    // Group communication by subject
+    const topics = R.filter((n) => !n.communication_subject.includes('Re: '), communications)
     return (
       <div className={classes.container}>
         <AnimationMenu exerciseId={exerciseId} />
@@ -144,7 +147,7 @@ const Inject = () => {
                         }}
                       >
                         <strong>
-                          <TruncatedContent
+                          <TruncatedText
                             content={communication.communication_subject}
                             limit={50}
                           />
@@ -164,7 +167,7 @@ const Inject = () => {
                           </span>
                           &nbsp;
                           <strong>
-                            <TruncatedContent
+                            <TruncatedText
                               content={resolveUserNames(
                                 communicationUsers,
                                 true,
@@ -188,7 +191,7 @@ const Inject = () => {
                           }}
                         >
                           <strong>
-                            <TruncatedContent
+                            <TruncatedText
                               content={resolveUserNames(
                                 communicationUsers,
                                 true,
@@ -208,10 +211,18 @@ const Inject = () => {
                   }
                 />
                 <CardContent>
-                  <ExpandableHtml
-                    source={communication.communication_content}
-                    limit={200}
-                  />
+                  {communication.communication_content
+                  && communication.communication_content.length > 10 ? (
+                    <ExpandableText
+                      source={communication.communication_content}
+                      limit={500}
+                    />
+                    ) : (
+                    <ExpandableHtml
+                      source={communication.communication_content_html}
+                      limit={500}
+                    />
+                    )}
                 </CardContent>
               </Card>
             );

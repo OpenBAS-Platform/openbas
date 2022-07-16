@@ -111,11 +111,8 @@ public class ImapService {
         for (int i = 0; i < count; i++) {
             BodyPart bodyPart = mimeMultipart.getBodyPart(i);
             if (bodyPart.isMimeType("text/plain")) {
-                result.append("\n").append(bodyPart.getContent());
-                break; // without break same text appears twice in my tests
-            } else if (bodyPart.isMimeType("text/html")) {
-                // result = result + "\n" + org.jsoup.Jsoup.parse(html).text();
-                result.append((String) bodyPart.getContent());
+                result.append(bodyPart.getContent());
+                break;
             } else if (bodyPart.getContent() instanceof MimeMultipart) {
                 result.append(getTextFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
             }
@@ -123,13 +120,39 @@ public class ImapService {
         return result.toString();
     }
 
+    private String getHtmlFromMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
+        StringBuilder result = new StringBuilder();
+        int count = mimeMultipart.getCount();
+        for (int i = 0; i < count; i++) {
+            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
+            if (bodyPart.isMimeType("text/html")) {
+                result.append((String) bodyPart.getContent());
+                break;
+            } else if (bodyPart.getContent() instanceof MimeMultipart) {
+                result.append(getHtmlFromMimeMultipart((MimeMultipart) bodyPart.getContent()));
+            }
+        }
+        return result.toString();
+    }
+
     private String getTextFromMessage(Message message) throws MessagingException, IOException {
         String result = "";
-        if (message.isMimeType("text/plain")) {
-            result = message.getContent().toString();
-        } else if (message.isMimeType("multipart/*")) {
+        if (message.isMimeType("multipart/*")) {
             MimeMultipart mimeMultipart = (MimeMultipart) message.getContent();
             result = getTextFromMimeMultipart(mimeMultipart);
+        } else if (message.isMimeType("text/plain")) {
+            result = message.getContent().toString();
+        }
+        return result;
+    }
+
+    private String getHtmlFromMessage(Message message) throws MessagingException, IOException {
+        String result = "";
+        if (message.isMimeType("multipart/*")) {
+            MimeMultipart mimeMultipart = (MimeMultipart) message.getContent();
+            result = getHtmlFromMimeMultipart(mimeMultipart);
+        } else if (message.isMimeType("text/html")) {
+            result = message.getContent().toString();
         }
         return result;
     }
@@ -148,13 +171,9 @@ public class ImapService {
     }
 
     private List<String> computeParticipants(Message message) throws Exception {
-        List<String> from = Arrays.stream(message.getFrom())
-                .map(addr -> (((InternetAddress) addr).getAddress())).toList();
-        List<String> recipients = Arrays.stream(message.getAllRecipients())
-                .map(addr -> (((InternetAddress) addr).getAddress())).toList();
-        return Stream.concat(from.stream(), recipients.stream())
-                .filter(recipient -> !recipient.equals(username))
-                .distinct().toList();
+        List<String> from = Arrays.stream(message.getFrom()).map(addr -> (((InternetAddress) addr).getAddress())).toList();
+        List<String> recipients = Arrays.stream(message.getAllRecipients()).map(addr -> (((InternetAddress) addr).getAddress())).toList();
+        return Stream.concat(from.stream(), recipients.stream()).filter(recipient -> !recipient.equals(username)).distinct().toList();
     }
 
     private void parseMessages(Message[] messages, Boolean isSent) throws Exception {
@@ -164,17 +183,24 @@ public class ImapService {
             boolean messageAlreadyAvailable = communicationRepository.existsByIdentifier(messageID);
             if (!messageAlreadyAvailable) {
                 String content = getTextFromMessage(message);
+                String contentHtml = getHtmlFromMessage(message);
                 List<String> participants = computeParticipants(message);
                 List<User> users = userRepository.findAllByEmailIn(participants);
                 if (users.size() > 0) {
                     // Look for inject id in content
                     Inject inject = null;
-                    Matcher matcher = INJECT_ID_PATTERN.matcher(content);
+                    Matcher matcher = null;
+                    if (content.length() > 10) {
+                        matcher = INJECT_ID_PATTERN.matcher(content);
+                    } else {
+                        matcher = INJECT_ID_PATTERN.matcher(contentHtml);
+                    }
                     if (matcher.find()) {
                         String injectId = matcher.group(1);
                         inject = injectRepository.findById(injectId).orElse(null);
                     }
                     String subject = message.getSubject();
+                    String from = String.valueOf(Arrays.stream(message.getFrom()).toList().get(0));
                     Date receivedDate = message.getReceivedDate();
                     Date sentDate = message.getSentDate();
                     // Save messaging
@@ -183,10 +209,12 @@ public class ImapService {
                     communication.setSentAt(sentDate.toInstant());
                     communication.setSubject(subject);
                     communication.setContent(content);
+                    communication.setContentHtml(contentHtml);
                     communication.setIdentifier(messageID);
                     communication.setUsers(users);
                     communication.setInject(inject);
                     communication.setAnimation(isSent);
+                    communication.setFrom(from);
                     if (inject != null) {
                         inject.setUpdatedAt(now());
                     }

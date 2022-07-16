@@ -44,6 +44,6 @@ public class ManualContract extends Contractor {
         List<ContractElement> instance = contractBuilder()
                 .mandatory(textareaField("content", "Content")).build();
         return List.of(manualContract(contractConfig, MANUAL_DEFAULT,
-                Map.of(en, "Manual (reminder)", fr, "Manuel (rappel)"), instance));
+                Map.of(en, "Manual", fr, "Manuel"), instance));
     }
 }

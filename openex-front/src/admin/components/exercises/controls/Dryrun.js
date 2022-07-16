@@ -363,7 +363,7 @@ const Dryrun = () => {
                 classes={{ root: classes.item }}
                 divider={true}
               >
-                <ListItemIcon>
+                <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon type={dryinject.dryinject_inject.inject_type} />
                 </ListItemIcon>
                 <ListItemText

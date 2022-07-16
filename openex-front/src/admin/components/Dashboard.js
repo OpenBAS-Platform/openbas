@@ -312,7 +312,7 @@ const Dashboard = (props) => {
                       component={Link}
                       to={`/admin/exercises/${inject.inject_exercise}/animation`}
                     >
-                      <ListItemIcon>
+                      <ListItemIcon style={{ paddingTop: 5 }}>
                         <InjectIcon
                           type={inject.inject_type}
                           variant="inline"

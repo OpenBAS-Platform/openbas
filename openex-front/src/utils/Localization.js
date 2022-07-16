@@ -66,6 +66,8 @@ const i18n = {
       'Update the organization': "Modifier l'organisation",
       'Do you want to delete this organization?':
         'Souhaitez-vous supprimer cette organisation ?',
+      'Mail sent to': 'Mail envoyé à',
+      on: 'le',
       Manual: 'Manuel',
       'Media entries': 'Entrées de média',
       Parameters: 'Paramètres',

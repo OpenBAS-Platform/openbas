@@ -3,7 +3,7 @@ import * as PropTypes from 'prop-types';
 import Tooltip from '@mui/material/Tooltip';
 import { truncate } from '../utils/String';
 
-const TruncatedContent = (props) => {
+const TruncatedText = (props) => {
   const { content, limit } = props;
   return (
     <Tooltip title={content}>
@@ -12,9 +12,9 @@ const TruncatedContent = (props) => {
   );
 };
 
-TruncatedContent.propTypes = {
+TruncatedText.propTypes = {
   content: PropTypes.string,
   limit: PropTypes.number,
 };
 
-export default TruncatedContent;
+export default TruncatedText;

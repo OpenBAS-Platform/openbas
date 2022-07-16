@@ -340,7 +340,7 @@ const Mails = () => {
               divider={true}
               button={true}
             >
-              <ListItemIcon>
+              <ListItemIcon style={{ paddingTop: 5 }}>
                 <InjectIcon
                   tooltip={t(inject.inject_type)}
                   config={injectContract?.config}
