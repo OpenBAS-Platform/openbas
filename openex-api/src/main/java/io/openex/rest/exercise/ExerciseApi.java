@@ -80,8 +80,9 @@ public class ExerciseApi extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
     private InjectRepository injectRepository;
+
+    private CommunicationRepository communicationRepository;
     private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
-    private ArticleRepository articleRepository;
     // endregion
 
     // region services
@@ -92,13 +93,13 @@ public class ExerciseApi extends RestBehavior {
 
     // region setters
     @Autowired
-    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
-        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
+    public void setCommunicationRepository(CommunicationRepository communicationRepository) {
+        this.communicationRepository = communicationRepository;
     }
 
     @Autowired
-    public void setArticleRepository(ArticleRepository articleRepository) {
-        this.articleRepository = articleRepository;
+    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
+        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
     }
 
     @Autowired
@@ -405,12 +406,13 @@ public class ExerciseApi extends RestBehavior {
             exercise.setCurrentPause(null);
             pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
             // Reset injects status and outcome
-            injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
-                    .stream().peek(Inject::clean).toList());
+            injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId).stream().peek(Inject::clean).toList());
+            // Reset exercise communications
+            Iterable<Communication> communications = exerciseCommunications(exerciseId);
+            communicationRepository.deleteAll(communications);
             // Reset expectations executions
-            injectExpectationExecutionRepository.deleteAll(
-                    injectExpectationExecutionRepository.findAllForExercise(exerciseId)
-            );
+            List<InjectExpectationExecution> exerciseExpectations = injectExpectationExecutionRepository.findAllForExercise(exerciseId);
+            injectExpectationExecutionRepository.deleteAll(exerciseExpectations);
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {
