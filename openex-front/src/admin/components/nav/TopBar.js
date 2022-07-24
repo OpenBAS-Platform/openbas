@@ -24,6 +24,7 @@ import TopMenuDocuments from './TopMenuDocuments';
 import TopMenuMedias from '../medias/TopMenuMedias';
 import TopMenuIntegrations from './TopMenuIntegrations';
 import ImportUploader from '../exercises/ImportUploader';
+import TopMenuChallenges from '../challenges/TopMenuChallenges';
 
 const styles = (theme) => ({
   appBar: {
@@ -119,6 +120,7 @@ class TopBar extends Component {
               <TopMenuDocuments />
             )}
             {location.pathname.includes('/admin/medias') && <TopMenuMedias />}
+            {location.pathname.includes('/admin/challenges') && <TopMenuChallenges />}
             {location.pathname.includes('/admin/integrations') && (
               <TopMenuIntegrations />
             )}

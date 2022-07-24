@@ -19,6 +19,7 @@ import {
   ExtensionOutlined,
   SettingsOutlined,
   DomainOutlined,
+  EmojiEvents,
 } from '@mui/icons-material';
 import { connect } from 'react-redux';
 import inject18n from '../../../components/i18n';
@@ -159,6 +160,21 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
         <ListItemText
           classes={{ primary: classes.menuItemText }}
           primary={t('Medias')}
+        />
+      </MenuItem>
+      <MenuItem
+          component={Link}
+          to="/admin/challenges"
+          selected={location.pathname === '/admin/challenges'}
+          dense={true}
+          classes={{ root: classes.menuItem }}
+      >
+        <ListItemIcon style={{ minWidth: 30 }}>
+          <EmojiEvents fontSize="small" color="primary" />
+        </ListItemIcon>
+        <ListItemText
+            classes={{ primary: classes.menuItemText }}
+            primary={t('Challenges')}
         />
       </MenuItem>
     </MenuList>

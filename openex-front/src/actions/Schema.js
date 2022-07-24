@@ -281,6 +281,8 @@ export const storeHelper = (state) => ({
   // medias
   getMedias: () => entities('medias', state),
   getMediasMap: () => maps('medias', state),
+  // challenges
+  getChallenges: () => entities('challenges', state),
 });
 
 export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])

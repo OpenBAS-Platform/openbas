@@ -17,6 +17,7 @@ import { errorWrapper } from '../components/Error';
 import IndexSettings from './components/settings/Index';
 import useDataLoader from '../utils/ServerSideEvent';
 import { useHelper } from '../store';
+import Challenges from './components/challenges/Challenges';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +80,7 @@ const Index = () => {
             render={errorWrapper(Documents)}
           />
           <Route exact path="/admin/medias" render={errorWrapper(Medias)} />
+          <Route exact path="/admin/challenges" render={errorWrapper(Challenges)} />
           <Route
             exact
             path="/admin/integrations"

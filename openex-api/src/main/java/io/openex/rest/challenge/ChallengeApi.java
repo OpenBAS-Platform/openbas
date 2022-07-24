@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
@@ -45,6 +46,7 @@ public class ChallengeApi extends RestBehavior {
                                      @Valid @RequestBody ChallengeCreateInput input) {
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
         challenge.setUpdateAttributes(input);
+        challenge.setUpdatedAt(Instant.now());
         // Clear all flags
         List<ChallengeFlag> challengeFlags = challenge.getFlags();
         challengeFlagRepository.deleteAll(challengeFlags);

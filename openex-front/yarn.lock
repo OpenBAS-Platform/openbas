@@ -6725,6 +6725,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"final-form-arrays@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "final-form-arrays@npm:3.0.2"
+  peerDependencies:
+    final-form: ^4.18.2
+  checksum: bed684815967fa3e5b2cc91eb69e5d88e1048a5dbe421e2eb61b90434c634a09fec877ce52c85add8d009c20c052b6f2a884277d7ca80e9a628944a012d20205
+  languageName: node
+  linkType: hard
+
 "final-form@npm:4.20.7":
   version: 4.20.7
   resolution: "final-form@npm:4.20.7"
@@ -9749,6 +9758,7 @@ __metadata:
     eslint-plugin-react: 7.30.0
     express: 4.18.1
     final-form: 4.20.7
+    final-form-arrays: ^3.0.2
     fs-extra: 10.1.0
     history: 4.10.1
     html-react-parser: 3.0.1
@@ -9770,6 +9780,7 @@ __metadata:
     react-dom: 17.0.2
     react-dropzone: 14.2.2
     react-final-form: 6.5.9
+    react-final-form-arrays: 3.1.3
     react-intl: 6.0.5
     react-leaflet: 4.0.1
     react-redux: 8.0.2
@@ -10746,6 +10757,20 @@ __metadata:
   peerDependencies:
     react: ">= 16.8 || 18.0.0"
   checksum: ef9ea7b3b5734e8eade2d29efc26da410dd7d6d046216331f6a51e2df4459c35f3a8f950fa7f723f3db6b0ead8aa68f58f6adbd39b98575c9fc8d8dfe02b671f
+  languageName: node
+  linkType: hard
+
+"react-final-form-arrays@npm:3.1.3":
+  version: 3.1.3
+  resolution: "react-final-form-arrays@npm:3.1.3"
+  dependencies:
+    "@babel/runtime": ^7.12.1
+  peerDependencies:
+    final-form: ^4.15.0
+    final-form-arrays: ">=1.0.4"
+    react: ^16.8.0 || ^17.0.0
+    react-final-form: ^6.2.1
+  checksum: 1881244afe4e752d238e268e82ae899884abe830ce09c8f14ffb0a28830526b60cffcd0dcbb9202380f582d4e7f413ea97fcb1d4c4fd5aa434dd7c1d1c2cc722
   languageName: node
   linkType: hard
 
