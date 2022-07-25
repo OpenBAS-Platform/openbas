@@ -87,7 +87,7 @@ public class EmailService {
     }
 
     public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
-                          String subject, String message, List<DataAttachment> attachments) throws Exception {
+                          String subject, String message, List<DataAttachment> attachments, boolean storeInImap) throws Exception {
         MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
@@ -98,11 +98,13 @@ public class EmailService {
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
         execution.addTrace(traceSuccess("email", "Mail sent to " + emails));
         // Store message in Imap after sending
-        storeMessageImap(execution, mimeMessage);
+        if (storeInImap) {
+            storeMessageImap(execution, mimeMessage);
+        }
     }
 
     public void sendEmail(Execution execution, ExecutionContext userContext, String from, String inReplyTo,
-                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) throws Exception {
+                          boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments, boolean storeInImap) throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);
@@ -140,6 +142,8 @@ public class EmailService {
         }
         execution.addTrace(traceSuccess("email", "Mail sent to " + email));
         // Store message in Imap after sending
-        storeMessageImap(execution, mimeMessage);
+        if (storeInImap) {
+            storeMessageImap(execution, mimeMessage);
+        }
     }
 }

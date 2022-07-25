@@ -458,4 +458,7 @@ public class Inject implements Base, Injection {
         }
         return null;
     }
+
+    @Override
+    public boolean isDryInject() { return false; }
 }

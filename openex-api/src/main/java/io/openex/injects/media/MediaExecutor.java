@@ -41,6 +41,7 @@ public class MediaExecutor extends Injector {
     @Override
     public void process(Execution execution, ExecutableInject injection, Contract contract) {
         try {
+            boolean storeInImap = injection.getInject().isDryInject();
             MediaContent content = contentConvert(injection, MediaContent.class);
             Article article = articleRepository.findById(content.getArticleId()).orElseThrow();
             if (contract.getId().equals(MEDIA_PUBLISH)) {
@@ -62,7 +63,7 @@ public class MediaExecutor extends Injector {
                         userInjectContext.putArticle(article);
                         // Send the email.
                         emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
-                                content.getSubject(), message, attachments);
+                                content.getSubject(), message, attachments, storeInImap);
                     } catch (Exception e) {
                         execution.addTrace(traceError("email", e.getMessage(), e));
                     }

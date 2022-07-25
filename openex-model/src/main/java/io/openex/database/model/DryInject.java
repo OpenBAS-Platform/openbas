@@ -107,4 +107,7 @@ public class DryInject implements Base, Injection {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public boolean isDryInject() { return true; }
 }
