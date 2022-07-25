@@ -29,20 +29,20 @@ public class EmailExecutor extends Injector {
         this.emailService = emailService;
     }
 
-    private void sendMulti(Execution execution, List<ExecutionContext> users, String replyTo, String subject,
+    private void sendMulti(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo, String subject,
                            String message, List<DataAttachment> attachments) {
         try {
-            emailService.sendEmail(execution, users, replyTo, subject, message, attachments);
+            emailService.sendEmail(execution, users, replyTo, inReplyTo, subject, message, attachments);
         } catch (Exception e) {
             execution.addTrace(traceError("email", e.getMessage(), e));
         }
     }
 
-    private void sendSingle(Execution execution, List<ExecutionContext> users, String replyTo, boolean mustBeEncrypted,
+    private void sendSingle(Execution execution, List<ExecutionContext> users, String replyTo, String inReplyTo, boolean mustBeEncrypted,
                             String subject, String message, List<DataAttachment> attachments) {
         users.stream().parallel().forEach(user -> {
             try {
-                emailService.sendEmail(execution, user, replyTo, mustBeEncrypted, subject, message, attachments);
+                emailService.sendEmail(execution, user, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments);
             } catch (Exception e) {
                 execution.addTrace(traceError("email", e.getMessage(), e));
             }
@@ -57,6 +57,7 @@ public class EmailExecutor extends Injector {
                 .filter(InjectDocument::isAttached)
                 .map(InjectDocument::getDocument).toList();
         List<DataAttachment> attachments = resolveAttachments(execution, documents);
+        String inReplyTo = content.getInReplyTo();
         String subject = content.getSubject();
         String message = content.buildMessage(inject, imapEnabled);
         boolean mustBeEncrypted = content.isEncrypted();
@@ -69,8 +70,8 @@ public class EmailExecutor extends Injector {
         String replyTo = exercise.getReplyTo();
         //noinspection SwitchStatementWithTooFewBranches
         switch (contract.getId()) {
-            case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, subject, message, attachments);
-            default -> sendSingle(execution, users, replyTo, mustBeEncrypted, subject, message, attachments);
+            case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments);
+            default -> sendSingle(execution, users, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments);
         }
     }
 }

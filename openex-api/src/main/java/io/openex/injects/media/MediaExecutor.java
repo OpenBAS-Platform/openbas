@@ -61,7 +61,7 @@ public class MediaExecutor extends Injector {
                         // Put the article in the injection context
                         userInjectContext.putArticle(article);
                         // Send the email.
-                        emailService.sendEmail(execution, userInjectContext, replyTo, encrypted,
+                        emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
                                 content.getSubject(), message, attachments);
                     } catch (Exception e) {
                         execution.addTrace(traceError("email", e.getMessage(), e));

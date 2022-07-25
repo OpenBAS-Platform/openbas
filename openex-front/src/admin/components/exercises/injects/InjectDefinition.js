@@ -458,7 +458,10 @@ class InjectDefinition extends Component {
     // Enrich initialValues with default contract value
     if (inject.inject_content === null) {
       injectType.fields
-        .filter((f) => !['audiences', 'attachments'].includes(f.key))
+        .filter(
+          (f) => !['audiences', 'attachments'].includes(f.key)
+            && f.defaultValue !== 'HIDDEN',
+        )
         .forEach((field) => {
           if (!initialValues[field.key]) {
             if (field.cardinality && field.cardinality === '1') {
@@ -703,7 +706,8 @@ class InjectDefinition extends Component {
                 <div style={{ marginTop: -20, overflowX: 'hidden' }}>
                   {injectType.fields
                     .filter(
-                      (f) => !['audiences', 'attachments'].includes(f.key),
+                      (f) => !['audiences', 'attachments'].includes(f.key)
+                        && f.defaultValue !== 'HIDDEN',
                     )
                     .map((field) => {
                       switch (field.type) {

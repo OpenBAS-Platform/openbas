@@ -71,66 +71,12 @@ const Inject = () => {
   // Rendering
   const handleOpenReply = (communicationId) => setReply(communicationId);
   const handleCloseReply = () => setReply(null);
-  const onSubmitReply = (data) => {
-    const topic = R.head(
-      R.filter((n) => n.communication_id === reply, communications),
-    );
-    const inputValues = {
-      inject_title: 'Manual email',
-      inject_description: 'Manual email',
-      inject_contract: inject.inject_contract,
-      inject_content: {
-        subject: data.communication_subject,
-        body: data.communication_content,
-      },
-      inject_users: topic.communication_users,
-    };
-    return dispatch(executeInject(exerciseId, inputValues)).then(() => handleCloseReply());
-  };
-  if (inject && communications) {
-    // Group communication by subject
-    const communicationsWithMails = R.map(
-      (n) => R.assoc(
-        'communication_mails',
-        R.map(
-          (o) => (usersMap[o] ? usersMap[o].user_email : '').toLowerCase(),
-          n.communication_users,
-        ),
-        n,
-      ),
-      communications,
-    );
-    const topics = R.pipe(
-      R.filter((n) => !n.communication_subject.includes('Re: ')),
-      R.map((n) => R.assoc(
-        'communication_communications',
-        sortCommunications(
-          R.filter(
-            (o) => o.communication_subject
-              .toLowerCase()
-              .includes(`re: ${n.communication_subject.toLowerCase()}`)
-                && (o.communication_animation
-                  || R.any(
-                    (p) => o.communication_from.includes(p),
-                    n.communication_mails,
-                  )),
-            communicationsWithMails,
-          ),
-        ),
-        n,
-      )),
-    )(communicationsWithMails);
-    let defaultSubject = '';
-    let defaultContent = '';
-    if (reply) {
-      const topic = R.head(
-        R.filter((n) => n.communication_id === reply, topics),
-      );
-      defaultSubject = `Re: ${topic.communication_subject}`;
-      const lastCommunication = topic.communication_communications.length > 0
-        ? R.head(topic.communication_communications)
-        : topic;
-      defaultContent = `<br />
+  const onSubmitReply = (topic, data) => {
+    let body = data.communication_content;
+    const lastCommunication = topic.communication_communications.length > 0
+      ? R.head(topic.communication_communications)
+      : topic;
+    body += `<br />
 <hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
 <div id=3D"divRplyFwdMsg" dir=3D"ltr">
 <font face=3D"Calibri, sans-serif" style=3D"font-size:11pt">
@@ -153,6 +99,62 @@ const Inject = () => {
 </div>
 </div>
 </blockquote>`;
+    const inputValues = {
+      inject_title: 'Manual email',
+      inject_description: 'Manual email',
+      inject_contract: inject.inject_contract,
+      inject_content: {
+        inReplyTo: lastCommunication.communication_message_id,
+        subject: data.communication_subject,
+        body,
+      },
+      inject_users: topic.communication_users,
+    };
+    return dispatch(executeInject(exerciseId, inputValues)).then(() => handleCloseReply());
+  };
+  if (inject && communications) {
+    // Group communication by subject
+    const communicationsWithMails = R.map(
+      (n) => R.assoc(
+        'communication_mails',
+        R.map(
+          (o) => (usersMap[o] ? usersMap[o].user_email : '').toLowerCase(),
+          n.communication_users,
+        ),
+        n,
+      ),
+      communications,
+    );
+    const topics = R.pipe(
+      R.filter((n) => !n.communication_subject.toLowerCase().includes('re: ')),
+      R.map((n) => R.assoc(
+        'communication_communications',
+        sortCommunications(
+          R.filter(
+            (o) => o.communication_subject
+              .toLowerCase()
+              .includes(`re: ${n.communication_subject.toLowerCase()}`)
+                && ((o.communication_animation
+                  && R.any(
+                    (p) => o.communication_to.includes(p),
+                    n.communication_mails,
+                  ))
+                  || R.any(
+                    (p) => o.communication_from.includes(p),
+                    n.communication_mails,
+                  )),
+            communicationsWithMails,
+          ),
+        ),
+        n,
+      )),
+    )(communicationsWithMails);
+    let defaultSubject = '';
+    let topic = null;
+    const defaultContent = '';
+    if (reply) {
+      topic = R.head(R.filter((n) => n.communication_id === reply, topics));
+      defaultSubject = `Re: ${topic.communication_subject}`;
     }
     return (
       <div className={classes.container}>
@@ -211,32 +213,34 @@ const Inject = () => {
             {t('Mails')}
           </Typography>
           <div className="clearfix" />
-          {topics.map((topic) => {
-            const topicUsers = topic.communication_users.map(
+          {topics.map((currentTopic) => {
+            const topicUsers = currentTopic.communication_users.map(
               (userId) => usersMap[userId] ?? {},
             );
             return (
-              <div key={topic.communication_id}>
+              <div key={currentTopic.communication_id}>
                 <Communication
-                  communication={topic}
+                  communication={currentTopic}
                   communicationUsers={topicUsers}
                   isTopic={true}
                   handleOpenReply={handleOpenReply}
                 />
-                {topic.communication_communications.map((communication) => {
-                  const communicationUsers = communication.communication_users.map(
-                    (userId) => usersMap[userId] ?? {},
-                  );
-                  return (
-                    <Communication
-                      key={communication.communication_id}
-                      communication={communication}
-                      communicationUsers={communicationUsers}
-                      isTopic={false}
-                      handleOpenReply={handleOpenReply}
-                    />
-                  );
-                })}
+                {currentTopic.communication_communications.map(
+                  (communication) => {
+                    const communicationUsers = communication.communication_users.map(
+                      (userId) => usersMap[userId] ?? {},
+                    );
+                    return (
+                      <Communication
+                        key={communication.communication_id}
+                        communication={communication}
+                        communicationUsers={communicationUsers}
+                        isTopic={false}
+                        handleOpenReply={handleOpenReply}
+                      />
+                    );
+                  },
+                )}
               </div>
             );
           })}
@@ -256,7 +260,7 @@ const Inject = () => {
                 communication_subject: defaultSubject,
                 communication_content: defaultContent,
               }}
-              onSubmit={onSubmitReply}
+              onSubmit={(data) => onSubmitReply(topic, data)}
               handleClose={handleCloseReply}
             />
           </DialogContent>

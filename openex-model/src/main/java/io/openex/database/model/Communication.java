@@ -80,6 +80,10 @@ public class Communication implements Base {
     @JsonProperty("communication_from")
     private String from;
 
+    @Column(name = "communication_to")
+    @JsonProperty("communication_to")
+    private String to;
+
     @Override
     public String getId() {
         return id;
@@ -175,6 +179,14 @@ public class Communication implements Base {
 
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
     }
 
     @JsonIgnore

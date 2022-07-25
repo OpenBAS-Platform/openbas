@@ -53,16 +53,20 @@ public class EmailService {
         if (imapEnabled) {
             try {
                 imapService.storeSentMessage(mimeMessage);
-                execution.addTrace(traceSuccess("imap", "Mail successfully stored in imap"));
+                execution.addTrace(traceSuccess("imap", "Mail successfully stored in IMAP"));
             } catch (Exception e) {
                 execution.addTrace(traceError("imap", e.getMessage(), e));
             }
         }
     }
 
-    private MimeMessage buildMimeMessage(String from, String subject, String body, List<DataAttachment> attachments) throws Exception {
+    private MimeMessage buildMimeMessage(String from, String inReplyTo, String subject, String body, List<DataAttachment> attachments) throws Exception {
         MimeMessage mimeMessage = emailSender.createMimeMessage();
         mimeMessage.setFrom(from);
+        if (inReplyTo != null) {
+            mimeMessage.setHeader("In-Reply-To", inReplyTo);
+            mimeMessage.setHeader("References", inReplyTo);
+        }
         mimeMessage.setSubject(subject, "utf-8");
         Multipart mailMultipart = new MimeMultipart("mixed");
         // Add mail content
@@ -82,9 +86,9 @@ public class EmailService {
         return mimeMessage;
     }
 
-    public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from,
+    public void sendEmail(Execution execution, List<ExecutionContext> usersContext, String from, String inReplyTo,
                           String subject, String message, List<DataAttachment> attachments) throws Exception {
-        MimeMessage mimeMessage = buildMimeMessage(from, subject, message, attachments);
+        MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, subject, message, attachments);
         List<InternetAddress> recipients = new ArrayList<>();
         for (ExecutionContext userContext : usersContext) {
             recipients.add(new InternetAddress(userContext.getUser().getEmail()));
@@ -97,12 +101,12 @@ public class EmailService {
         storeMessageImap(execution, mimeMessage);
     }
 
-    public void sendEmail(Execution execution, ExecutionContext userContext, String from,
+    public void sendEmail(Execution execution, ExecutionContext userContext, String from, String inReplyTo,
                           boolean mustBeEncrypted, String subject, String message, List<DataAttachment> attachments) throws Exception {
         String email = userContext.getUser().getEmail();
         String contextualSubject = buildContextualContent(subject, userContext);
         String contextualBody = buildContextualContent(message, userContext);
-        MimeMessage mimeMessage = buildMimeMessage(from, contextualSubject, contextualBody, attachments);
+        MimeMessage mimeMessage = buildMimeMessage(from, inReplyTo, contextualSubject, contextualBody, attachments);
         mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(email));
         // Crypt if needed
         if (mustBeEncrypted) {

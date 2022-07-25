@@ -8,6 +8,7 @@ import { lightBlue } from '@mui/material/colors';
 import IconButton from '@mui/material/IconButton';
 import { ExpandLess, ExpandMore, ReplyOutlined } from '@mui/icons-material';
 import parse from 'html-react-parser';
+import DOMPurify from 'dompurify';
 import { useFormatter } from '../../../../components/i18n';
 import { resolveUserNames, truncate } from '../../../../utils/String';
 import TruncatedText from '../../../../components/TruncatedText';
@@ -150,7 +151,9 @@ const Communication = (props) => {
       <CardContent>
         {isHtml ? (
           <div style={{ marginTop: -5 }}>
-            {expand ? parse(content) : parse(truncate(content, limit))}
+            {expand
+              ? parse(DOMPurify.sanitize(content))
+              : parse(DOMPurify.sanitize(truncate(content, limit)))}
           </div>
         ) : (
           <div style={{ marginTop: -5, whiteSpace: 'pre-line' }}>

@@ -201,6 +201,7 @@ public class ImapService {
                     }
                     String subject = message.getSubject();
                     String from = String.valueOf(Arrays.stream(message.getFrom()).toList().get(0));
+                    String to = String.valueOf(Arrays.stream(message.getAllRecipients()).toList());
                     Date receivedDate = message.getReceivedDate();
                     Date sentDate = message.getSentDate();
                     // Save messaging
@@ -215,6 +216,7 @@ public class ImapService {
                     communication.setInject(inject);
                     communication.setAnimation(isSent);
                     communication.setFrom(from);
+                    communication.setTo(to);
                     if (inject != null) {
                         inject.setUpdatedAt(now());
                     }

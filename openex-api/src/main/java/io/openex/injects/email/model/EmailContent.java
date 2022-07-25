@@ -19,6 +19,9 @@ public class EmailContent {
     @JsonProperty("subject")
     private String subject;
 
+    @JsonProperty("inReplyTo")
+    private String inReplyTo;
+
     @JsonProperty("encrypted")
     private boolean encrypted;
 
@@ -34,6 +37,14 @@ public class EmailContent {
         this.subject = subject;
     }
 
+    public String getInReplyTo() {
+        return inReplyTo;
+    }
+
+    public void setInReplyTo(String inReplyTo) {
+        this.inReplyTo = inReplyTo;
+    }
+
     public boolean isEncrypted() {
         return encrypted;
     }
@@ -43,16 +54,16 @@ public class EmailContent {
     }
 
     public String buildMessage(Inject inject, boolean imapEnabled) {
-        String footer = inject.getFooter();
+        // String footer = inject.getFooter();
         String header = inject.getHeader();
         StringBuilder data = new StringBuilder();
         if (StringUtils.hasLength(header)) {
             data.append(HEADER_DIV).append(header).append(END_DIV);
         }
         data.append(START_DIV).append(body).append(END_DIV);
-        if (StringUtils.hasLength(footer)) {
-            data.append(FOOTER_DIV).append(footer).append(END_DIV);
-        }
+        // if (StringUtils.hasLength(footer)) {
+        //    data.append(FOOTER_DIV).append(footer).append(END_DIV);
+        // }
         // If imap is enable we need to inject the id marker
         if (imapEnabled && !inject.isDirect()) {
             data.append(START_DIV)

@@ -50,6 +50,7 @@ public class EmailContract extends Contractor {
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
+                .optional(textField("inReplyTo", "InReplyTo", "HIDDEN"))
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .optional(attachmentField("attachments", "Attachments", Multiple)).build();
         Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
@@ -59,6 +60,7 @@ public class EmailContract extends Contractor {
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
+                .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))
                 .optional(attachmentField("attachments", "Attachments", Multiple)).build();
         Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
                 Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);
