@@ -1,6 +1,7 @@
 package io.openex.execution;
 
 import io.openex.contract.Contract;
+import io.openex.database.model.Audience;
 import io.openex.database.model.Inject;
 import io.openex.database.model.Injection;
 
@@ -11,19 +12,22 @@ public class ExecutableInject {
     private final Contract contract;
     private final Injection source;
     private final List<ExecutionContext> users;
+    private final List<Audience> audiences;
 
-    public ExecutableInject(Inject inject, Contract contract, List<ExecutionContext> users) {
+    public ExecutableInject(Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
         this.inject = inject;
         this.contract = contract;
         this.source = inject;
         this.users = users;
+        this.audiences = audiences;
     }
 
-    public ExecutableInject(Injection source, Inject inject, Contract contract, List<ExecutionContext> users) {
+    public ExecutableInject(Injection source, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
         this.inject = inject;
         this.contract = contract;
         this.source = source;
         this.users = users;
+        this.audiences = audiences;
     }
 
     public Inject getInject() {
@@ -36,6 +40,10 @@ public class ExecutableInject {
 
     public Injection getSource() {
         return source;
+    }
+
+    public List<Audience> getAudiences() {
+        return audiences;
     }
 
     public List<ExecutionContext> getUsers() {

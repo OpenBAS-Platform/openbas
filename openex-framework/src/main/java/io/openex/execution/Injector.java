@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
+import io.openex.database.model.InjectExpectation.EXPECTATION_TYPE;
 import io.openex.database.repository.DocumentRepository;
-import io.openex.database.repository.InjectExpectationExecutionRepository;
+import io.openex.database.repository.InjectExpectationRepository;
+import io.openex.model.*;
+import io.openex.model.expectation.ChallengeExpectation;
+import io.openex.model.expectation.MediaExpectation;
 import io.openex.service.FileService;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +31,11 @@ public abstract class Injector {
     protected ObjectMapper mapper;
     private FileService fileService;
     private DocumentRepository documentRepository;
-    private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
+    private InjectExpectationRepository injectExpectationRepository;
 
     @Autowired
-    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
-        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
+    public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+        this.injectExpectationRepository = injectExpectationRepository;
     }
 
     @Autowired
@@ -44,7 +48,23 @@ public abstract class Injector {
         this.fileService = fileService;
     }
 
-    public abstract void process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
+    public abstract List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception;
+
+    private InjectExpectation expectationConverter(Audience audience, ExecutableInject executableInject, Expectation expectation) {
+        InjectExpectation expectationExecution = new InjectExpectation();
+        expectationExecution.setExercise(executableInject.getInject().getExercise());
+        expectationExecution.setInject(executableInject.getInject());
+        expectationExecution.setAudience(audience);
+        expectationExecution.setScore(0);
+        switch (expectation.type()) {
+            case ARTICLE -> expectationExecution.setArticle(((MediaExpectation)expectation).article());
+            case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation)expectation).challenge());
+            case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
+            case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
+            default -> throw new IllegalStateException("Unexpected value: " + expectation);
+        }
+        return expectationExecution;
+    }
 
     private Execution execute(ExecutableInject executableInject, boolean scheduleInjection) {
         Execution execution = new Execution();
@@ -64,21 +84,15 @@ public abstract class Injector {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
             // Process the execution
-            process(execution, executableInject, contract);
+            List<Expectation> expectations = process(execution, executableInject, contract);
             // Create the expectations
             List<Audience> audiences = executableInject.getInject().getAudiences();
-            List<InjectExpectation> expectations = executableInject.getInject().getExpectations();
             if (scheduleInjection && audiences.size() > 0 && expectations.size() > 0) {
-                List<InjectExpectationExecution> executions = audiences.stream()
-                        .flatMap(audience -> expectations.stream().map(expectation -> {
-                            InjectExpectationExecution expectationExecution = new InjectExpectationExecution();
-                            expectationExecution.setExpectation(expectation);
-                            expectationExecution.setExercise(executableInject.getInject().getExercise());
-                            expectationExecution.setInject(executableInject.getInject());
-                            expectationExecution.setAudience(audience);
-                            return expectationExecution;
-                        })).toList();
-                injectExpectationExecutionRepository.saveAll(executions);
+                List<InjectExpectation> executions = audiences.stream()
+                        .flatMap(audience -> expectations.stream()
+                                .map(expectation -> expectationConverter(audience, executableInject, expectation)))
+                        .toList();
+                injectExpectationRepository.saveAll(executions);
             }
         } catch (Exception e) {
             execution.addTrace(traceError(getClass().getSimpleName(), e.getMessage(), e));

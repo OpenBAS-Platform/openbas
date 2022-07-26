@@ -407,10 +407,10 @@ public class Inject implements Base, Injection {
         return expectations;
     }
 
-    public List<InjectExpectationExecution> getUserExpectationsForArticle(User user, Article article) {
+    public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
         return expectations.stream()
-                .flatMap(expectation -> expectation.getExecutions().stream())
-                .filter(execution -> execution.getExpectation().getArticle().equals(article))
+                .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
+                .filter(execution -> execution.getArticle().equals(article))
                 .filter(execution -> execution.getAudience().getUsers().contains(user))
                 .toList();
     }

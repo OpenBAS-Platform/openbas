@@ -2,26 +2,33 @@ package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 import java.util.Objects;
+
+import static java.time.Instant.now;
 
 @Entity
 @Table(name = "injects_expectations")
+@EntityListeners(ModelBaseListener.class)
 public class InjectExpectation implements Base {
-
     public enum EXPECTATION_TYPE {
+        TEXT,
         DOCUMENT,
         ARTICLE,
         CHALLENGE,
     }
 
+    @Column(name = "inject_expectation_type")
+    @JsonProperty("inject_expectation_type")
+    @Enumerated(EnumType.STRING)
+    private EXPECTATION_TYPE type;
+
+    // region basic
     @Id
     @Column(name = "inject_expectation_id")
     @GeneratedValue(generator = "UUID")
@@ -29,45 +36,107 @@ public class InjectExpectation implements Base {
     @JsonProperty("inject_expectation_id")
     private String id;
 
-    @ManyToOne
+    @Column(name = "inject_expectation_created_at")
+    @JsonProperty("inject_expectation_created_at")
+    private Instant createdAt = now();
+
+    @Column(name = "inject_expectation_updated_at")
+    @JsonProperty("inject_expectation_updated_at")
+    private Instant updatedAt = now();
+
+    @Column(name = "inject_expectation_result")
+    @JsonProperty("inject_expectation_result")
+    private String result;
+
+    @Column(name = "inject_expectation_score")
+    @JsonProperty("inject_expectation_score")
+    private Integer score;
+    // endregion
+
+    // region contextual relations
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "exercise_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("inject_expectation_exercise")
+    private Exercise exercise;
+
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "inject_id")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_expectation_inject")
     private Inject inject;
 
-    @Column(name = "inject_expectation_type")
-    @JsonProperty("inject_expectation_type")
-    @Enumerated(EnumType.STRING)
-    private EXPECTATION_TYPE type;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "user_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("inject_expectation_user")
+    private User user;
 
-    @Column(name = "inject_expectation_document")
-    @JsonProperty("inject_expectation_document")
-    private String documentName;
+    @ManyToOne(cascade = CascadeType.REFRESH)
+    @JoinColumn(name = "audience_id")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("inject_expectation_audience")
+    private Audience audience;
+    // endregion
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "article_id")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_expectation_article")
     private Article article;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "challenge_id")
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("inject_expectation_challenge")
     private Challenge challenge;
 
-    @OneToMany(mappedBy = "expectation", fetch = FetchType.EAGER)
-    @JsonProperty("inject_expectations_executions")
-    @Fetch(FetchMode.SUBSELECT)
-    private List<InjectExpectationExecution> executions = new ArrayList<>();
-
-    @Override
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Exercise getExercise() {
+        return exercise;
+    }
+
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
     }
 
     public Inject getInject() {
@@ -78,6 +147,14 @@ public class InjectExpectation implements Base {
         this.inject = inject;
     }
 
+    public Audience getAudience() {
+        return audience;
+    }
+
+    public void setAudience(Audience audience) {
+        this.audience = audience;
+    }
+
     public EXPECTATION_TYPE getType() {
         return type;
     }
@@ -86,12 +163,12 @@ public class InjectExpectation implements Base {
         this.type = type;
     }
 
-    public String getDocumentName() {
-        return documentName;
+    public Integer getScore() {
+        return score;
     }
 
-    public void setDocumentName(String documentName) {
-        this.documentName = documentName;
+    public void setScore(Integer score) {
+        this.score = score;
     }
 
     public Article getArticle() {
@@ -99,6 +176,7 @@ public class InjectExpectation implements Base {
     }
 
     public void setArticle(Article article) {
+        this.type = EXPECTATION_TYPE.ARTICLE;
         this.article = article;
     }
 
@@ -107,15 +185,12 @@ public class InjectExpectation implements Base {
     }
 
     public void setChallenge(Challenge challenge) {
+        this.type = EXPECTATION_TYPE.CHALLENGE;
         this.challenge = challenge;
     }
 
-    public List<InjectExpectationExecution> getExecutions() {
-        return executions;
-    }
-
-    public void setExecutions(List<InjectExpectationExecution> executions) {
-        this.executions = executions;
+    public boolean isUserHasAccess(User user) {
+        return getExercise().isUserHasAccess(user);
     }
 
     @Override

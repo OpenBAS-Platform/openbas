@@ -55,14 +55,18 @@ public class InjectHelper {
         this.dryInjectRepository = dryInjectRepository;
     }
 
+    private List<Audience> getInjectAudiences(Inject inject) {
+        Exercise exercise = inject.getExercise();
+        return inject.isAllAudiences() ?
+                fromIterable(audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
+    }
+
     private Stream<ExecutionContext> getUsersFromInjection(Injection injection) {
         if (injection instanceof DryInject dryInject) {
             return dryInject.getRun().getUsers().stream()
                     .map(user -> new ExecutionContext(openExConfig, user, injection, "Dryrun"));
         } else if (injection instanceof Inject inject) {
-            Exercise exercise = injection.getExercise();
-            List<Audience> audiences = inject.isAllAudiences() ?
-                    fromIterable(audienceRepository.findAll(fromExercise(exercise.getId()))) : inject.getAudiences();
+            List<Audience> audiences = getInjectAudiences(inject);
             return audiences.stream().filter(Audience::isEnabled)
                     .flatMap(audience -> audience.getUsers().stream()
                             .map(user -> new ExecutionContext(openExConfig, user, injection, audience.getName())));
@@ -92,7 +96,8 @@ public class InjectHelper {
                 .sorted(Inject.executionComparator)
                 .map(inject -> {
                     Contract contract = contractService.resolveContract(inject);
-                    return new ExecutableInject(inject, contract, usersFromInjection(inject));
+                    List<Audience> audiences = getInjectAudiences(inject);
+                    return new ExecutableInject(inject, contract, audiences, usersFromInjection(inject));
                 });
         // Get dry injects
         List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
@@ -102,7 +107,8 @@ public class InjectHelper {
                 .map(dry -> {
                     Inject inject = dry.getInject();
                     Contract contract = contractService.resolveContract(inject);
-                    return new ExecutableInject(dry, inject, contract, usersFromInjection(dry));
+                    List<Audience> audiences = getInjectAudiences(inject);
+                    return new ExecutableInject(dry, inject, contract, audiences, usersFromInjection(dry));
                 });
         // Combine injects and dry
         return concat(injects, dryInjects)

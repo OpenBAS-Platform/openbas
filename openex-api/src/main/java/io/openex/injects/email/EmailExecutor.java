@@ -7,6 +7,7 @@ import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.injects.email.model.EmailContent;
 import io.openex.injects.email.service.EmailService;
+import io.openex.model.Expectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -50,7 +51,7 @@ public class EmailExecutor extends Injector {
     }
 
     @Override
-    public void process(Execution execution, ExecutableInject injection, Contract contract) throws Exception {
+    public List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) throws Exception {
         boolean storeInImap = !injection.getSource().isDryInject();
         Inject inject = injection.getInject();
         EmailContent content = contentConvert(injection, EmailContent.class);
@@ -74,5 +75,6 @@ public class EmailExecutor extends Injector {
             case EMAIL_GLOBAL -> sendMulti(execution, users, replyTo, inReplyTo, subject, message, attachments, storeInImap);
             default -> sendSingle(execution, users, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments, storeInImap);
         }
+        return List.of();
     }
 }

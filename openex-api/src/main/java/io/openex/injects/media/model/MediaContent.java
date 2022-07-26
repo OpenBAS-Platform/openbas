@@ -8,11 +8,22 @@ public class MediaContent extends EmailContent {
     @JsonProperty("article_id")
     private String articleId;
 
+    @JsonProperty("expectation")
+    private boolean expectation;
+
     public String getArticleId() {
         return articleId;
     }
 
     public void setArticleId(String articleId) {
         this.articleId = articleId;
+    }
+
+    public boolean isExpectation() {
+        return expectation;
+    }
+
+    public void setExpectation(boolean expectation) {
+        this.expectation = expectation;
     }
 }

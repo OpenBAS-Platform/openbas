@@ -83,6 +83,7 @@ public class MediaContract extends Contractor {
                 """;
         List<ContractElement> publishInstance = contractBuilder()
                 .mandatory(contractSelect)
+                .optional(checkboxField("expectation", "Read expectation?", true))
                 .mandatory(textField("subject", "Subject", "A new media entry was published for you ${user.name}"))
                 .mandatory(richTextareaField("body", "Body", messageBody))
                 .optional(checkboxField("encrypted", "Encrypted", false))

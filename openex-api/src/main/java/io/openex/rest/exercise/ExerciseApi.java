@@ -82,7 +82,7 @@ public class ExerciseApi extends RestBehavior {
     private InjectRepository injectRepository;
 
     private CommunicationRepository communicationRepository;
-    private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
+    private InjectExpectationRepository injectExpectationRepository;
     // endregion
 
     // region services
@@ -98,8 +98,8 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
-        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
+    public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+        this.injectExpectationRepository = injectExpectationRepository;
     }
 
     @Autowired
@@ -392,8 +392,7 @@ public class ExerciseApi extends RestBehavior {
             Iterable<Communication> communications = exerciseCommunications(exerciseId);
             communicationRepository.deleteAll(communications);
             // Reset expectations executions
-            List<InjectExpectationExecution> exerciseExpectations = injectExpectationExecutionRepository.findAllForExercise(exerciseId);
-            injectExpectationExecutionRepository.deleteAll(exerciseExpectations);
+            injectExpectationRepository.deleteAllForExercise(exerciseId);
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {

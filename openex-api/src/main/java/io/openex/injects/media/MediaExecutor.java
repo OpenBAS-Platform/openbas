@@ -3,11 +3,14 @@ package io.openex.injects.media;
 import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.ArticleRepository;
+import io.openex.database.repository.InjectExpectationRepository;
 import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.injects.email.service.EmailService;
 import io.openex.injects.media.model.MediaContent;
+import io.openex.model.Expectation;
+import io.openex.model.expectation.MediaExpectation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,13 @@ public class MediaExecutor extends Injector {
     @Value("${openex.mail.imap.enabled}")
     private boolean imapEnabled;
 
+    private InjectExpectationRepository injectExpectationExecutionRepository;
+
+    @Autowired
+    public void setInjectExpectationExecutionRepository(InjectExpectationRepository injectExpectationExecutionRepository) {
+        this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
+    }
+
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
@@ -39,7 +49,7 @@ public class MediaExecutor extends Injector {
     }
 
     @Override
-    public void process(Execution execution, ExecutableInject injection, Contract contract) {
+    public List<Expectation> process(Execution execution, ExecutableInject injection, Contract contract) {
         try {
             boolean storeInImap = injection.getInject().isDryInject();
             MediaContent content = contentConvert(injection, MediaContent.class);
@@ -48,8 +58,8 @@ public class MediaExecutor extends Injector {
                 // Article publishing is only linked to execution date of this inject.
                 String publishedMessage = "Article (" + article.getName() + ") marked as published";
                 execution.addTrace(traceSuccess("media", publishedMessage));
-                // Send the publication message.
                 Exercise exercise = injection.getSource().getExercise();
+                // Send the publication message.
                 String replyTo = exercise.getReplyTo();
                 List<ExecutionContext> users = injection.getUsers();
                 List<Document> documents = injection.getInject().getDocuments().stream()
@@ -68,12 +78,16 @@ public class MediaExecutor extends Injector {
                         execution.addTrace(traceError("email", e.getMessage(), e));
                     }
                 });
-
+                // Return expectations
+                if (content.isExpectation()) {
+                    return List.of(new MediaExpectation(article));
+                }
             } else {
                 throw new UnsupportedOperationException("Unknown contract " + contract.getId());
             }
         } catch (Exception e) {
             execution.addTrace(traceError("media", e.getMessage(), e));
         }
+        return List.of();
     }
 }

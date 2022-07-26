@@ -35,7 +35,7 @@ public class MediaApi extends RestBehavior {
     private UserRepository userRepository;
     private MediaRepository mediaRepository;
     private DocumentRepository documentRepository;
-    private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
+    private InjectExpectationRepository injectExpectationExecutionRepository;
 
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
@@ -43,7 +43,7 @@ public class MediaApi extends RestBehavior {
     }
 
     @Autowired
-    public void setInjectExpectationExecutionRepository(InjectExpectationExecutionRepository injectExpectationExecutionRepository) {
+    public void setInjectExpectationExecutionRepository(InjectExpectationRepository injectExpectationExecutionRepository) {
         this.injectExpectationExecutionRepository = injectExpectationExecutionRepository;
     }
 
@@ -220,7 +220,7 @@ public class MediaApi extends RestBehavior {
                     .stream().peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId()))).toList();
             mediaReader.setMediaArticles(publishedArticles);
             // Fulfill article expectations
-            List<InjectExpectationExecution> expectationExecutions = publishedArticles.stream()
+            List<InjectExpectation> expectationExecutions = publishedArticles.stream()
                     .flatMap(article -> exercise.getInjects().stream()
                             .flatMap(inject -> inject.getUserExpectationsForArticle(user, article).stream()))
                     .filter(exec -> exec.getResult() == null).toList();
