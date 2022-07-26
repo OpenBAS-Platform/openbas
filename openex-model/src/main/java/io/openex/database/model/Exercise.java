@@ -69,12 +69,6 @@ public class Exercise implements Base {
     @JsonProperty("exercise_end_date")
     private Instant end;
 
-    @ManyToOne
-    @JoinColumn(name = "exercise_image")
-    @JsonSerialize(using = MonoModelDeserializer.class)
-    @JsonProperty("exercise_image")
-    private Document image;
-
     @Column(name = "exercise_message_header")
     @JsonProperty("exercise_message_header")
     private String header = "EXERCISE - EXERCISE - EXERCISE";
@@ -86,6 +80,18 @@ public class Exercise implements Base {
     @Column(name = "exercise_mail_from")
     @JsonProperty("exercise_mail_from")
     private String replyTo = "planners@openex.io";
+
+    @ManyToOne
+    @JoinColumn(name = "exercise_logo_dark")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("exercise_logo_dark")
+    private Document logoDark;
+
+    @ManyToOne
+    @JoinColumn(name = "exercise_logo_light")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("exercise_logo_light")
+    private Document logoLight;
 
     @Column(name = "exercise_created_at")
     @JsonProperty("exercise_created_at")
@@ -353,12 +359,20 @@ public class Exercise implements Base {
         this.end = end;
     }
 
-    public Document getImage() {
-        return image;
+    public Document getLogoDark() {
+        return logoDark;
     }
 
-    public void setImage(Document image) {
-        this.image = image;
+    public void setLogoDark(Document logoDark) {
+        this.logoDark = logoDark;
+    }
+
+    public Document getLogoLight() {
+        return logoLight;
+    }
+
+    public void setLogoLight(Document logoLight) {
+        this.logoLight = logoLight;
     }
 
     public List<Inject> getInjects() {

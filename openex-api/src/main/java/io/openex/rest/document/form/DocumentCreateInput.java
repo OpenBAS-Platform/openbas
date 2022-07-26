@@ -16,7 +16,6 @@ public class DocumentCreateInput {
     @JsonProperty("document_tags")
     private List<String> tagIds = new ArrayList<>();
 
-    @NotEmpty(message = EMPTY_MESSAGE)
     @JsonProperty("document_exercises")
     private List<String> exerciseIds = new ArrayList<>();
 

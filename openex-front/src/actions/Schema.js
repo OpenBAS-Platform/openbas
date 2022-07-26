@@ -280,6 +280,7 @@ export const storeHelper = (state) => ({
   },
   // medias
   getMedias: () => entities('medias', state),
+  getMedia: (id) => entity(id, 'medias', state),
   getMediasMap: () => maps('medias', state),
   // challenges
   getChallenges: () => entities('challenges', state),

@@ -15,12 +15,12 @@ import {
   RowingOutlined,
   GroupsOutlined,
   DescriptionOutlined,
-  NewspaperOutlined,
   ExtensionOutlined,
   SettingsOutlined,
   DomainOutlined,
   EmojiEvents,
 } from '@mui/icons-material';
+import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { connect } from 'react-redux';
 import inject18n from '../../../components/i18n';
 
@@ -155,7 +155,7 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
         classes={{ root: classes.menuItem }}
       >
         <ListItemIcon style={{ minWidth: 30 }}>
-          <NewspaperOutlined fontSize="small" color="primary" />
+          <NewspaperVariantMultipleOutline fontSize="small" color="primary" />
         </ListItemIcon>
         <ListItemText
           classes={{ primary: classes.menuItemText }}
@@ -163,18 +163,18 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
         />
       </MenuItem>
       <MenuItem
-          component={Link}
-          to="/admin/challenges"
-          selected={location.pathname === '/admin/challenges'}
-          dense={true}
-          classes={{ root: classes.menuItem }}
+        component={Link}
+        to="/admin/challenges"
+        selected={location.pathname === '/admin/challenges'}
+        dense={true}
+        classes={{ root: classes.menuItem }}
       >
         <ListItemIcon style={{ minWidth: 30 }}>
           <EmojiEvents fontSize="small" color="primary" />
         </ListItemIcon>
         <ListItemText
-            classes={{ primary: classes.menuItemText }}
-            primary={t('Challenges')}
+          classes={{ primary: classes.menuItemText }}
+          primary={t('Challenges')}
         />
       </MenuItem>
     </MenuList>

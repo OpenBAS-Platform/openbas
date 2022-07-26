@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import * as PropTypes from 'prop-types';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
 import { TextField } from '../../../components/TextField';
 import inject18n from '../../../components/i18n';
-import { ColorPickerField } from '../../../components/ColorPickerField';
+import { Select } from '../../../components/Select';
 
 class MediaForm extends Component {
   validate(values) {
     const { t } = this.props;
     const errors = {};
-    const requiredFields = ['media_name'];
+    const requiredFields = ['media_type', 'media_name', 'media_description'];
     requiredFields.forEach((field) => {
       if (!values[field]) {
         errors[field] = t('This field is required.');
@@ -35,17 +36,34 @@ class MediaForm extends Component {
       >
         {({ handleSubmit, submitting, pristine }) => (
           <form id="mediaForm" onSubmit={handleSubmit}>
+            <Select
+              variant="standard"
+              label={t('Type')}
+              name="media_type"
+              fullWidth={true}
+            >
+              <MenuItem key="newspaper" value="newspaper">
+                {t('newspaper')}
+              </MenuItem>
+              <MenuItem key="microblogging" value="microblogging">
+                {t('microblogging')}
+              </MenuItem>
+              <MenuItem key="tv" value="tv">
+                {t('tv')}
+              </MenuItem>
+            </Select>
             <TextField
               variant="standard"
               name="media_name"
               fullWidth={true}
               label={t('Name')}
+              style={{ marginTop: 20 }}
             />
-            <ColorPickerField
+            <TextField
               variant="standard"
-              name="media_color"
+              name="media_description"
               fullWidth={true}
-              label={t('Color')}
+              label={t('Subtitle')}
               style={{ marginTop: 20 }}
             />
             <div style={{ float: 'right', marginTop: 20 }}>

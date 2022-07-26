@@ -3,15 +3,11 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
@@ -35,17 +31,45 @@ public class Media implements Base {
     @JsonProperty("media_updated_at")
     private Instant updatedAt = now();
 
+    @Column(name = "media_type")
+    @JsonProperty("media_type")
+    private String type;
+
     @Column(name = "media_name")
     @JsonProperty("media_name")
     private String name;
 
-    @Column(name = "media_color")
-    @JsonProperty("media_color")
-    private String color;
+    @Column(name = "media_description")
+    @JsonProperty("media_description")
+    private String description;
 
-    @Column(name = "media_published")
-    @JsonProperty("media_published")
-    private boolean published;
+    @Column(name = "media_primary_color_dark")
+    @JsonProperty("media_primary_color_dark")
+    private String primaryColorDark;
+
+    @Column(name = "media_primary_color_light")
+    @JsonProperty("media_primary_color_light")
+    private String primaryColorLight;
+
+    @Column(name = "media_secondary_color_dark")
+    @JsonProperty("media_secondary_color_dark")
+    private String secondaryColorDark;
+
+    @Column(name = "media_secondary_color_light")
+    @JsonProperty("media_secondary_color_light")
+    private String secondaryColorLight;
+
+    @ManyToOne
+    @JoinColumn(name = "media_logo_dark")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("media_logo_dark")
+    private Document logoDark;
+
+    @ManyToOne
+    @JoinColumn(name = "media_logo_light")
+    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonProperty("media_logo_light")
+    private Document logoLight;
 
     @Override
     public String getId() {
@@ -56,20 +80,76 @@ public class Media implements Base {
         this.id = id;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name.toLowerCase();
+        this.name = name;
     }
 
-    public String getColor() {
-        return color;
+    public String getDescription() {
+        return description;
     }
 
-    public void setColor(String color) {
-        this.color = color.toLowerCase();
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPrimaryColorDark() {
+        return primaryColorDark;
+    }
+
+    public void setPrimaryColorDark(String primaryColorDark) {
+        this.primaryColorDark = primaryColorDark;
+    }
+
+    public String getPrimaryColorLight() {
+        return primaryColorLight;
+    }
+
+    public void setPrimaryColorLight(String primaryColorLight) {
+        this.primaryColorLight = primaryColorLight;
+    }
+
+    public String getSecondaryColorDark() {
+        return secondaryColorDark;
+    }
+
+    public void setSecondaryColorDark(String secondaryColorDark) {
+        this.secondaryColorDark = secondaryColorDark;
+    }
+
+    public String getSecondaryColorLight() {
+        return secondaryColorLight;
+    }
+
+    public void setSecondaryColorLight(String secondaryColorLight) {
+        this.secondaryColorLight = secondaryColorLight;
+    }
+
+    public Document getLogoDark() {
+        return logoDark;
+    }
+
+    public void setLogoDark(Document logoDark) {
+        this.logoDark = logoDark;
+    }
+
+    public Document getLogoLight() {
+        return logoLight;
+    }
+
+    public void setLogoLight(Document logoLight) {
+        this.logoLight = logoLight;
     }
 
     public Instant getCreatedAt() {
@@ -86,14 +166,6 @@ public class Media implements Base {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    public boolean isPublished() {
-        return published;
-    }
-
-    public void setPublished(boolean published) {
-        this.published = published;
     }
 
     @Override

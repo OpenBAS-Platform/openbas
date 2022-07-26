@@ -46,6 +46,9 @@ const i18n = {
       From: 'De',
       Tags: 'Tags',
       Reply: 'Répondre',
+      newspaper: 'Journal',
+      tv: 'Chaîne de télévision',
+      microblogging: 'Microblogging',
       'Targeted players': 'Joueurs ciblés',
       'Inject details': 'Détails du stimuli',
       'Export this list': 'Exporter cette liste',
@@ -344,6 +347,7 @@ const i18n = {
       'Send an email': 'Envoyer un email',
       'Send a SMS': 'Envoyer un SMS',
       'To fill': 'A remplir',
+      Unknown: 'Inconnu',
     },
     en: {
       openex_email: 'Email',
@@ -370,6 +374,9 @@ const i18n = {
       token: 'Account token',
       status: 'Status',
       Running: 'On-going',
+      newspaper: 'Newspaper',
+      tv: 'TV channel',
+      microblogging: 'Microblogging',
     },
   },
 };

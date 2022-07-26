@@ -12,6 +12,7 @@ import Players from './components/players/Players';
 import Organizations from './components/organizations/Organizations';
 import Documents from './components/documents/Documents';
 import Medias from './components/medias/Medias';
+import IndexMedia from './components/medias/Index';
 import IndexIntegrations from './components/integrations/Index';
 import { errorWrapper } from '../components/Error';
 import IndexSettings from './components/settings/Index';
@@ -80,7 +81,12 @@ const Index = () => {
             render={errorWrapper(Documents)}
           />
           <Route exact path="/admin/medias" render={errorWrapper(Medias)} />
-          <Route exact path="/admin/challenges" render={errorWrapper(Challenges)} />
+          <Route path="/admin/medias/:mediaId" render={errorWrapper(IndexMedia)} />
+          <Route
+            exact
+            path="/admin/challenges"
+            render={errorWrapper(Challenges)}
+          />
           <Route
             exact
             path="/admin/integrations"

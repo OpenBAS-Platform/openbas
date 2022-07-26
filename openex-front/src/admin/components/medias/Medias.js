@@ -6,14 +6,15 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { NewspaperOutlined } from '@mui/icons-material';
+import { ChevronRightOutlined, NewspaperOutlined } from '@mui/icons-material';
+import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
 import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { fetchMedias } from '../../../actions/Media';
-import MediaPopover from './MediaPopover';
 import CreateMedia from './CreateMedia';
+import { useFormatter } from '../../../components/i18n';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -61,21 +62,34 @@ const headerStyles = {
     padding: 0,
     top: '0px',
   },
+  media_type: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   media_name: {
     float: 'left',
     width: '25%',
     fontSize: 12,
     fontWeight: '700',
   },
-  media_color: {
+  media_description: {
     float: 'left',
-    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
 };
 
 const inlineStyles = {
+  media_type: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   media_name: {
     float: 'left',
     width: '25%',
@@ -84,9 +98,8 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  media_color: {
+  media_description: {
     float: 'left',
-    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -98,8 +111,9 @@ const Medias = () => {
   // Standard hooks
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { t } = useFormatter();
   // Filter and sort hook
-  const searchColumns = ['name'];
+  const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('media', 'name', searchColumns);
   // Fetching data
   const { medias } = useHelper((helper) => ({ medias: helper.getMedias() }));
@@ -136,14 +150,20 @@ const Medias = () => {
             primary={
               <div>
                 {filtering.buildHeader(
+                  'media_type',
+                  'Type',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
                   'media_name',
                   'Name',
                   true,
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'media_color',
-                  'Color',
+                  'media_description',
+                  'Subtitle',
                   true,
                   headerStyles,
                 )}
@@ -157,6 +177,9 @@ const Medias = () => {
             key={media.media_id}
             classes={{ root: classes.item }}
             divider={true}
+            component={Link}
+            button={true}
+            to={`/admin/medias/${media.media_id}`}
           >
             <ListItemIcon>
               <NewspaperOutlined color="primary" />
@@ -166,21 +189,27 @@ const Medias = () => {
                 <div>
                   <div
                     className={classes.bodyItem}
+                    style={inlineStyles.media_type}
+                  >
+                    {t(media.media_type || 'Unknown')}
+                  </div>
+                  <div
+                    className={classes.bodyItem}
                     style={inlineStyles.media_name}
                   >
                     {media.media_name}
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.media_color}
+                    style={inlineStyles.media_description}
                   >
-                    {media.media_color}
+                    {media.media_description}
                   </div>
                 </div>
               }
             />
             <ListItemSecondaryAction>
-              <MediaPopover media={media} />
+              <ChevronRightOutlined />
             </ListItemSecondaryAction>
           </ListItem>
         ))}

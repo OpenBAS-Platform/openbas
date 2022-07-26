@@ -310,7 +310,7 @@ const Dashboard = (props) => {
                       divider={true}
                       button={true}
                       component={Link}
-                      to={`/admin/exercises/${inject.inject_exercise}/animation`}
+                      to={`/admin/exercises/${inject.inject_exercise}/animation/timeline`}
                     >
                       <ListItemIcon style={{ paddingTop: 5 }}>
                         <InjectIcon

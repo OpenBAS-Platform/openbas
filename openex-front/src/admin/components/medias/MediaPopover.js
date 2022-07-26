@@ -13,6 +13,8 @@ import Slide from '@mui/material/Slide';
 import { MoreVert } from '@mui/icons-material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { withRouter } from 'react-router-dom';
+import withStyles from '@mui/styles/withStyles';
 import inject18n from '../../../components/i18n';
 import { updateMedia, deleteMedia } from '../../../actions/Media';
 import MediaForm from './MediaForm';
@@ -21,6 +23,13 @@ const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
 ));
 Transition.displayName = 'TransitionSlide';
+
+const styles = () => ({
+  button: {
+    float: 'left',
+    margin: '-10px 0 0 5px',
+  },
+});
 
 class MediaPopover extends Component {
   constructor(props) {
@@ -68,14 +77,18 @@ class MediaPopover extends Component {
   submitDelete() {
     this.props.deleteMedia(this.props.media.media_id);
     this.handleCloseDelete();
+    this.props.history.push('/admin/medias');
   }
 
   render() {
-    const { t, media } = this.props;
-    const initialValues = R.pipe(R.pick(['media_name', 'media_color']))(media);
+    const { t, media, classes } = this.props;
+    const initialValues = R.pipe(
+      R.pick(['media_type', 'media_name', 'media_description']),
+    )(media);
     return (
       <div>
         <IconButton
+          classes={{ root: classes.button }}
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
@@ -154,5 +167,7 @@ MediaPopover.propTypes = {
 
 export default R.compose(
   connect(null, { updateMedia, deleteMedia }),
+  withStyles(styles),
+  withRouter,
   inject18n,
 )(MediaPopover);

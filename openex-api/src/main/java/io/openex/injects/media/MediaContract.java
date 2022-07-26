@@ -26,6 +26,7 @@ import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
+import static io.openex.helper.SupportedLanguage.fr;
 
 @Component
 public class MediaContract extends Contractor {
@@ -53,7 +54,7 @@ public class MediaContract extends Contractor {
 
     @Override
     public ContractConfig getConfig() {
-        return new ContractConfig(TYPE, Map.of(en, "Media"), "#cddc39", "/img/media.png", isExpose());
+        return new ContractConfig(TYPE, Map.of(en, "Media pressure", fr, "Pression médiatique"), "#cddc39", "/img/media.png", isExpose());
     }
 
     @Override
@@ -67,25 +68,29 @@ public class MediaContract extends Contractor {
             Map<String, String> articlesChoices = articles.stream().collect(Collectors.toMap(Article::getId, Article::getName));
             choices.put(exercise.getId(), articlesChoices);
         });
-        ContractSelectExercise contractSelect = new ContractSelectExercise("article_id", "Article to publish", ContractCardinality.One);
+        ContractSelectExercise contractSelect = new ContractSelectExercise("article_id", "Media pressure to publish", ContractCardinality.One);
         contractSelect.setChoices(choices);
         // In this "internal" contract we can't express choices.
         // Choices are contextual to a specific exercise.
         String messageBody = """
-                    Article can be read at <a href="${article_uri}">here</a>
+                    Hello,<br /><br />
+                    A <a href="${article_uri}">new media entry</a> has been published.
                     <br/><br/>
-                    Your player interface can be accessed through <a href="${player_uri}">this link</a>
+                    Link: <a href="${article_uri}">${article_uri}</a>
+                    <br/><br/>
+                    Kind regards,<br />
+                    The media team
                 """;
         List<ContractElement> publishInstance = contractBuilder()
                 .mandatory(contractSelect)
-                .mandatory(textField("subject", "Subject", "A new article was published for you ${user.name}"))
+                .mandatory(textField("subject", "Subject", "A new media entry was published for you ${user.name}"))
                 .mandatory(richTextareaField("body", "Body", messageBody))
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .optional(audienceField("audiences", "Audiences", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .build();
         Contract publishArticle = executableContract(contractConfig,
-                MEDIA_PUBLISH, Map.of(en, "Publish article"), publishInstance);
+                MEDIA_PUBLISH, Map.of(en, "Publish media pressure", fr, "Publier une pression médiatique"), publishInstance);
         return List.of(publishArticle);
     }
 }

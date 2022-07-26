@@ -190,8 +190,7 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/logs")
-    public Log createLog(@PathVariable String exerciseId,
-                         @Valid @RequestBody LogCreateInput input) {
+    public Log createLog(@PathVariable String exerciseId, @Valid @RequestBody LogCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Log log = new Log();
         log.setUpdateAttributes(input);
@@ -203,9 +202,7 @@ public class ExerciseApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/logs/{logId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Log updateLog(@PathVariable String exerciseId,
-                         @PathVariable String logId,
-                         @Valid @RequestBody LogCreateInput input) {
+    public Log updateLog(@PathVariable String exerciseId, @PathVariable String logId, @Valid @RequestBody LogCreateInput input) {
         Log log = logRepository.findById(logId).orElseThrow();
         log.setUpdateAttributes(input);
         log.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
@@ -227,21 +224,17 @@ public class ExerciseApi extends RestBehavior {
 
     @PostMapping("/api/exercises/{exerciseId}/dryruns")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Dryrun createDryrun(@PathVariable String exerciseId,
-                               @Valid @RequestBody DryrunCreateInput input) {
+    public Dryrun createDryrun(@PathVariable String exerciseId, @Valid @RequestBody DryrunCreateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<String> userIds = input.getUserIds();
-        List<User> users = userIds.size() == 0 ?
-                List.of(currentUser()) : fromIterable(userRepository.findAllById(userIds));
+        List<User> users = userIds.size() == 0 ? List.of(currentUser()) : fromIterable(userRepository.findAllById(userIds));
         return dryrunService.provisionDryrun(exercise, users, input.getName());
     }
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public Dryrun dryrun(@PathVariable String exerciseId,
-                         @PathVariable String dryrunId) {
-        Specification<Dryrun> filters = DryRunSpecification
-                .fromExercise(exerciseId).and(DryRunSpecification.id(dryrunId));
+    public Dryrun dryrun(@PathVariable String exerciseId, @PathVariable String dryrunId) {
+        Specification<Dryrun> filters = DryRunSpecification.fromExercise(exerciseId).and(DryRunSpecification.id(dryrunId));
         return dryRunRepository.findOne(filters).orElseThrow();
     }
 
@@ -253,8 +246,7 @@ public class ExerciseApi extends RestBehavior {
 
     @GetMapping("/api/exercises/{exerciseId}/dryruns/{dryrunId}/dryinjects")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public List<DryInject> dryrunInjects(@PathVariable String exerciseId,
-                                         @PathVariable String dryrunId) {
+    public List<DryInject> dryrunInjects(@PathVariable String exerciseId, @PathVariable String dryrunId) {
         return dryrun(exerciseId, dryrunId).getInjects();
     }
     // endregion
@@ -266,16 +258,13 @@ public class ExerciseApi extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exercise}/comchecks/{comcheck}")
-    public Comcheck comcheck(@PathVariable String exercise,
-                             @PathVariable String comcheck) {
-        Specification<Comcheck> filters = ComcheckSpecification
-                .fromExercise(exercise).and(ComcheckSpecification.id(comcheck));
+    public Comcheck comcheck(@PathVariable String exercise, @PathVariable String comcheck) {
+        Specification<Comcheck> filters = ComcheckSpecification.fromExercise(exercise).and(ComcheckSpecification.id(comcheck));
         return comcheckRepository.findOne(filters).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exercise}/comchecks/{comcheck}/statuses")
-    public List<ComcheckStatus> comcheckStatuses(@PathVariable String exercise,
-                                                 @PathVariable String comcheck) {
+    public List<ComcheckStatus> comcheckStatuses(@PathVariable String exercise, @PathVariable String comcheck) {
         return comcheck(exercise, comcheck).getComcheckStatus();
     }
     // endregion
@@ -293,16 +282,13 @@ public class ExerciseApi extends RestBehavior {
 
         // Find automatic groups to grants
         List<Group> groups = fromIterable(groupRepository.findAll());
-        List<Grant> grants = groups.stream()
-                .filter(group -> group.getExercisesDefaultGrants().size() > 0)
-                .flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s)))
-                .map(tuple -> {
-                    Grant grant = new Grant();
-                    grant.setGroup(tuple.getT1());
-                    grant.setName(tuple.getT2());
-                    grant.setExercise(exercise);
-                    return grant;
-                }).toList();
+        List<Grant> grants = groups.stream().filter(group -> group.getExercisesDefaultGrants().size() > 0).flatMap(group -> group.getExercisesDefaultGrants().stream().map(s -> Tuples.of(group, s))).map(tuple -> {
+            Grant grant = new Grant();
+            grant.setGroup(tuple.getT1());
+            grant.setName(tuple.getT2());
+            grant.setExercise(exercise);
+            return grant;
+        }).toList();
         if (grants.size() > 0) {
             Iterable<Grant> exerciseGrants = grantRepository.saveAll(grants);
             exercise.setGrants(fromIterable(exerciseGrants));
@@ -312,8 +298,7 @@ public class ExerciseApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseInformation(@PathVariable String exerciseId,
-                                              @Valid @RequestBody ExerciseUpdateInput input) {
+    public Exercise updateExerciseInformation(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdateAttributes(input);
         return exerciseRepository.save(exercise);
@@ -321,8 +306,7 @@ public class ExerciseApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/start_date")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseStart(@PathVariable String exerciseId,
-                                        @Valid @RequestBody ExerciseUpdateStartDateInput input) throws InputValidationException {
+    public Exercise updateExerciseStart(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStartDateInput input) throws InputValidationException {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         if (!exercise.getStatus().equals(SCHEDULED)) {
             String message = "Change date is only possible in scheduling state";
@@ -334,19 +318,18 @@ public class ExerciseApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/tags")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseTags(@PathVariable String exerciseId,
-                                       @Valid @RequestBody ExerciseUpdateTagsInput input) {
+    public Exercise updateExerciseTags(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateTagsInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         return exerciseRepository.save(exercise);
     }
 
-    @PutMapping("/api/exercises/{exerciseId}/image")
+    @PutMapping("/api/exercises/{exerciseId}/logos")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise updateExerciseImage(@PathVariable String exerciseId,
-                                        @Valid @RequestBody ExerciseUpdateImageInput input) {
+    public Exercise updateExerciseLogos(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateLogoInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        exercise.setImage(documentRepository.findById(input.getImageId()).orElse(null));
+        exercise.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
+        exercise.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
         return exerciseRepository.save(exercise);
     }
 
@@ -369,8 +352,7 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         exercise.setUpdatedAt(now());
         Document doc = documentRepository.findById(documentId).orElseThrow();
-        List<Exercise> docExercises = doc.getExercises().stream()
-                .filter(ex -> !ex.getId().equals(exerciseId)).toList();
+        List<Exercise> docExercises = doc.getExercises().stream().filter(ex -> !ex.getId().equals(exerciseId)).toList();
         if (docExercises.size() == 0) {
             // Document is no longer associate to any exercise, delete it
             documentRepository.delete(doc);
@@ -388,8 +370,7 @@ public class ExerciseApi extends RestBehavior {
     @Transactional(rollbackOn = Exception.class)
     @PutMapping("/api/exercises/{exerciseId}/status")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Exercise changeExerciseStatus(@PathVariable String exerciseId,
-                                         @Valid @RequestBody ExerciseUpdateStatusInput input) {
+    public Exercise changeExerciseStatus(@PathVariable String exerciseId, @Valid @RequestBody ExerciseUpdateStatusInput input) {
         STATUS status = input.getStatus();
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Check if next status is possible
@@ -442,9 +423,7 @@ public class ExerciseApi extends RestBehavior {
     @GetMapping("/api/exercises")
     @RolesAllowed(ROLE_USER)
     public Iterable<Exercise> exercises() {
-        return currentUser().isAdmin() ?
-                exerciseRepository.findAll() :
-                exerciseRepository.findAllGranted(currentUser().getId());
+        return currentUser().isAdmin() ? exerciseRepository.findAll() : exerciseRepository.findAllGranted(currentUser().getId());
     }
     // endregion
 
@@ -462,9 +441,7 @@ public class ExerciseApi extends RestBehavior {
     // region import/export
     @GetMapping("/api/exercises/{exerciseId}/export")
     @PreAuthorize("isExerciseObserver(#exerciseId)")
-    public void exerciseExport(@PathVariable String exerciseId,
-                               @RequestParam(required = false) boolean isWithPlayers,
-                               HttpServletResponse response) throws IOException {
+    public void exerciseExport(@PathVariable String exerciseId, @RequestParam(required = false) boolean isWithPlayers, HttpServletResponse response) throws IOException {
         // Setup the mapper for export
         ObjectMapper objectMapper = mapper.copy();
         if (!isWithPlayers) {
@@ -476,8 +453,7 @@ public class ExerciseApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         objectMapper.addMixIn(Exercise.class, ExerciseExportMixins.Exercise.class);
         // Build the response
-        String zipName = (exercise.getName() + "_" + now().toString()) + "_"
-                + (isWithPlayers ? "(with_players)" : "(no_players)") + ".zip";
+        String zipName = (exercise.getName() + "_" + now().toString()) + "_" + (isWithPlayers ? "(with_players)" : "(no_players)") + ".zip";
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + zipName);
         response.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -497,21 +473,16 @@ public class ExerciseApi extends RestBehavior {
         // Audiences
         List<Audience> audiences = exercise.getAudiences();
         importExport.setAudiences(audiences);
-        objectMapper.addMixIn(Audience.class, isWithPlayers
-                ? ExerciseExportMixins.Audience.class : ExerciseExportMixins.EmptyAudience.class);
+        objectMapper.addMixIn(Audience.class, isWithPlayers ? ExerciseExportMixins.Audience.class : ExerciseExportMixins.EmptyAudience.class);
         exerciseTags.addAll(audiences.stream().flatMap(audience -> audience.getTags().stream()).toList());
         if (isWithPlayers) {
             // players
-            List<User> players = audiences.stream()
-                    .flatMap(audience -> audience.getUsers().stream())
-                    .distinct().toList();
+            List<User> players = audiences.stream().flatMap(audience -> audience.getUsers().stream()).distinct().toList();
             exerciseTags.addAll(players.stream().flatMap(user -> user.getTags().stream()).toList());
             importExport.setUsers(players);
             objectMapper.addMixIn(User.class, ExerciseExportMixins.User.class);
             // organizations
-            List<Organization> organizations = players.stream()
-                    .map(User::getOrganization)
-                    .filter(Objects::nonNull).toList();
+            List<Organization> organizations = players.stream().map(User::getOrganization).filter(Objects::nonNull).toList();
             exerciseTags.addAll(organizations.stream().flatMap(org -> org.getTags().stream()).toList());
             importExport.setOrganizations(organizations);
             objectMapper.addMixIn(Organization.class, ExerciseExportMixins.Organization.class);

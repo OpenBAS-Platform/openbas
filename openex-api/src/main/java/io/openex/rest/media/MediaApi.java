@@ -5,10 +5,7 @@ import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.media.model.MediaContent;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.media.form.ArticleCreateInput;
-import io.openex.rest.media.form.ArticleUpdateInput;
-import io.openex.rest.media.form.MediaCreateInput;
-import io.openex.rest.media.form.MediaUpdateInput;
+import io.openex.rest.media.form.*;
 import io.openex.rest.media.model.VirtualArticle;
 import io.openex.rest.media.response.MediaReader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +34,7 @@ public class MediaApi extends RestBehavior {
     private ArticleRepository articleRepository;
     private UserRepository userRepository;
     private MediaRepository mediaRepository;
+    private DocumentRepository documentRepository;
     private InjectExpectationExecutionRepository injectExpectationExecutionRepository;
 
     @Autowired
@@ -64,9 +62,19 @@ public class MediaApi extends RestBehavior {
         this.userRepository = userRepository;
     }
 
+    @Autowired
+    public void setDocumentRepository(DocumentRepository documentRepository) {
+        this.documentRepository = documentRepository;
+    }
+
     @GetMapping("/api/medias")
     public Iterable<Media> medias() {
         return mediaRepository.findAll();
+    }
+
+    @GetMapping("/api/medias/{mediaId}")
+    public Media media(@PathVariable String mediaId) {
+        return mediaRepository.findById(mediaId).orElseThrow();
     }
 
     @RolesAllowed(ROLE_ADMIN)
@@ -74,6 +82,15 @@ public class MediaApi extends RestBehavior {
     public Media updateMedia(@PathVariable String mediaId, @Valid @RequestBody MediaUpdateInput input) {
         Media media = mediaRepository.findById(mediaId).orElseThrow();
         media.setUpdateAttributes(input);
+        return mediaRepository.save(media);
+    }
+
+    @RolesAllowed(ROLE_ADMIN)
+    @PutMapping("/api/medias/{mediaId}/logos")
+    public Media updateMediaLogos(@PathVariable String mediaId, @Valid @RequestBody MediaUpdateLogoInput input) {
+        Media media = mediaRepository.findById(mediaId).orElseThrow();
+        media.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
+        media.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
         return mediaRepository.save(media);
     }
 

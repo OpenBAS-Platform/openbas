@@ -94,14 +94,16 @@ public class DocumentApi extends RestBehavior {
         if (targetDocument.isPresent()) {
             Document document = targetDocument.get();
             // Compute exercises
-            List<Exercise> exercises = new ArrayList<>(document.getExercises());
-            List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
-            inputExercises.forEach(inputExercise -> {
-                if (!exercises.contains(inputExercise)) {
-                    exercises.add(inputExercise);
-                }
-            });
-            document.setExercises(exercises);
+            if (document.getExercises().size() > 0) {
+                List<Exercise> exercises = new ArrayList<>(document.getExercises());
+                List<Exercise> inputExercises = fromIterable(exerciseRepository.findAllById(input.getExerciseIds()));
+                inputExercises.forEach(inputExercise -> {
+                    if (!exercises.contains(inputExercise)) {
+                        exercises.add(inputExercise);
+                    }
+                });
+                document.setExercises(exercises);
+            }
             // Compute tags
             List<Tag> tags = new ArrayList<>(document.getTags());
             List<Tag> inputTags = fromIterable(tagRepository.findAllById(input.getTagIds()));
@@ -118,7 +120,9 @@ public class DocumentApi extends RestBehavior {
             document.setTarget(fileTarget);
             document.setName(file.getOriginalFilename());
             document.setDescription(input.getDescription());
-            document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+            if (input.getExerciseIds().size() > 0) {
+                document.setExercises(fromIterable(exerciseRepository.findAllById(input.getExerciseIds())));
+            }
             document.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
             document.setType(file.getContentType());
             return documentRepository.save(document);

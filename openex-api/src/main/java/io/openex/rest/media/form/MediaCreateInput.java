@@ -9,12 +9,24 @@ import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 public class MediaCreateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
+    @JsonProperty("media_type")
+    private String type;
+
+    @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("media_name")
     private String name;
 
     @NotBlank(message = MANDATORY_MESSAGE)
-    @JsonProperty("media_color")
-    private String color;
+    @JsonProperty("media_description")
+    private String description;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getName() {
         return name;
@@ -24,11 +36,11 @@ public class MediaCreateInput {
         this.name = name;
     }
 
-    public String getColor() {
-        return color;
+    public String getDescription() {
+        return description;
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
