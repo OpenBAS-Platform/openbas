@@ -1,8 +1,12 @@
 package io.openex.rest.media.form;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.openex.rest.inject.form.InjectDocumentInput;
 
 import javax.validation.constraints.NotBlank;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
@@ -12,21 +16,30 @@ public class ArticleCreateInput {
     @JsonProperty("article_name")
     private String name;
 
-    @JsonProperty("article_header")
-    private String header;
-
     @JsonProperty("article_content")
     private String content;
 
-    @JsonProperty("article_footer")
-    private String footer;
+    @JsonProperty("article_author")
+    private String author;
 
-    @JsonProperty("article_published")
-    private boolean published;
+    @JsonProperty("article_shares")
+    private Integer shares;
+
+    @JsonProperty("article_likes")
+    private Integer likes;
+
+    @JsonProperty("article_comments")
+    private Integer comments;
+
+    @JsonProperty("article_documents")
+    private List<ArticleDocumentInput> documents = new ArrayList<>();
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("article_media")
     private String mediaId;
+
+    @JsonProperty("article_published")
+    private boolean published;
 
     public String getName() {
         return name;
@@ -34,14 +47,6 @@ public class ArticleCreateInput {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getHeader() {
-        return header;
-    }
-
-    public void setHeader(String header) {
-        this.header = header;
     }
 
     public String getContent() {
@@ -52,12 +57,44 @@ public class ArticleCreateInput {
         this.content = content;
     }
 
-    public String getFooter() {
-        return footer;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setFooter(String footer) {
-        this.footer = footer;
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Integer getShares() {
+        return shares;
+    }
+
+    public void setShares(Integer shares) {
+        this.shares = shares;
+    }
+
+    public Integer getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
+    public Integer getComments() {
+        return comments;
+    }
+
+    public void setComments(Integer comments) {
+        this.comments = comments;
+    }
+
+    public List<ArticleDocumentInput> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<ArticleDocumentInput> documents) {
+        this.documents = documents;
     }
 
     public boolean isPublished() {

@@ -5,6 +5,7 @@ import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.media.model.MediaContent;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.inject.form.InjectDocumentInput;
 import io.openex.rest.media.form.*;
 import io.openex.rest.media.model.VirtualArticle;
 import io.openex.rest.media.response.MediaReader;
@@ -32,6 +33,7 @@ public class MediaApi extends RestBehavior {
 
     private ExerciseRepository exerciseRepository;
     private ArticleRepository articleRepository;
+    private ArticleDocumentRepository articleDocumentRepository;
     private UserRepository userRepository;
     private MediaRepository mediaRepository;
     private DocumentRepository documentRepository;
@@ -40,6 +42,11 @@ public class MediaApi extends RestBehavior {
     @Autowired
     public void setArticleRepository(ArticleRepository articleRepository) {
         this.articleRepository = articleRepository;
+    }
+
+    @Autowired
+    public void setArticleDocumentRepository(ArticleDocumentRepository articleDocumentRepository) {
+        this.articleDocumentRepository = articleDocumentRepository;
     }
 
     @Autowired
@@ -117,7 +124,7 @@ public class MediaApi extends RestBehavior {
     }
 
     // region articles
-    @RolesAllowed(ROLE_ADMIN)
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     @PostMapping("/api/exercises/{exerciseId}/articles")
     public Article createArticle(@PathVariable String exerciseId, @Valid @RequestBody ArticleCreateInput input) {
         Article article = new Article();
@@ -127,12 +134,40 @@ public class MediaApi extends RestBehavior {
         return articleRepository.save(article);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
-    @PutMapping("/api/articles/{articleId}")
-    public Article updateArticle(@PathVariable String articleId, @Valid @RequestBody ArticleUpdateInput input) {
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @PutMapping("/api/exercises/{exerciseId}/articles/{articleId}")
+    public Article updateArticle(@PathVariable String exerciseId, @PathVariable String articleId, @Valid @RequestBody ArticleUpdateInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Article article = articleRepository.findById(articleId).orElseThrow();
+        List<ArticleDocumentInput> documents = input.getDocuments();
+        List<String> askedDocumentIds = documents.stream().map(ArticleDocumentInput::getDocumentId).toList();
+        List<String> currentDocumentIds = article.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
         article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setUpdateAttributes(input);
+        // region Set documents
+        List<ArticleDocument> articleDocuments = new ArrayList<>(article.getDocuments());
+        // To delete
+        article.getDocuments().stream().filter(articleDoc -> !askedDocumentIds.contains(articleDoc.getDocument().getId())).forEach(articleDoc -> {
+            articleDocuments.remove(articleDoc);
+            articleDocumentRepository.delete(articleDoc);
+        });
+        // To add
+        documents.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
+            Optional<Document> doc = documentRepository.findById(in.getDocumentId());
+            if (doc.isPresent()) {
+                ArticleDocument articleDocument = new ArticleDocument();
+                articleDocument.setArticle(article);
+                Document document = doc.get();
+                articleDocument.setDocument(document);
+                ArticleDocument savedArticleDoc = articleDocumentRepository.save(articleDocument);
+                articleDocuments.add(savedArticleDoc);
+                // If Document not yet linked directly to the exercise, attached it
+                if (!document.getExercises().contains(exercise)) {
+                    exercise.getDocuments().add(document);
+                    exerciseRepository.save(exercise);
+                }
+            }
+        });
         return articleRepository.save(article);
     }
 

@@ -34,10 +34,14 @@ const Media = () => {
   const { mediaId } = useParams();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-  const { media, documentsMap } = useHelper((helper) => {
+  const { media, documentsMap, userAdmin } = useHelper((helper) => {
     const med = helper.getMedia(mediaId);
     const docsMap = helper.getDocumentsMap();
-    return { media: med, documentsMap: docsMap };
+    return {
+      media: med,
+      documentsMap: docsMap,
+      userAdmin: helper.getMe()?.user_admin ?? false,
+    };
   });
   useDataLoader(() => {
     dispatch(fetchDocuments());
@@ -81,6 +85,7 @@ const Media = () => {
             <MediaParametersForm
               onSubmit={submitUpdate}
               initialValues={initialValues}
+              disabled={!userAdmin}
             />
           </Paper>
           <Typography variant="h4" style={{ marginTop: 20 }}>
@@ -104,9 +109,12 @@ const Media = () => {
                     variant="rectangular"
                   />
                 )}
-                <MediaAddLogo
-                  handleAddLogo={(documentId) => submitLogo(documentId, 'dark')}
-                />
+                {userAdmin && (
+                  <MediaAddLogo
+                    handleAddLogo={(documentId) => submitLogo(documentId, 'dark')
+                    }
+                  />
+                )}
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
@@ -124,10 +132,12 @@ const Media = () => {
                     variant="rectangular"
                   />
                 )}
-                <MediaAddLogo
-                  handleAddLogo={(documentId) => submitLogo(documentId, 'light')
-                  }
-                />
+                {userAdmin && (
+                  <MediaAddLogo
+                    handleAddLogo={(documentId) => submitLogo(documentId, 'light')
+                    }
+                  />
+                )}
               </Grid>
             </Grid>
           </Paper>

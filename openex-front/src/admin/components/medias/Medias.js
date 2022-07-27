@@ -6,7 +6,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { ChevronRightOutlined, NewspaperOutlined } from '@mui/icons-material';
+import { ChevronRightOutlined } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
@@ -15,6 +15,7 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { fetchMedias } from '../../../actions/Media';
 import CreateMedia from './CreateMedia';
 import { useFormatter } from '../../../components/i18n';
+import MediaIcon from './MediaIcon';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -185,7 +186,10 @@ const Medias = () => {
             to={`/admin/medias/${media.media_id}`}
           >
             <ListItemIcon>
-              <NewspaperOutlined color="primary" />
+              <MediaIcon
+                type={media.media_type}
+                tooltip={t(media.media_type)}
+              />
             </ListItemIcon>
             <ListItemText
               primary={

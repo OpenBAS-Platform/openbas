@@ -11,7 +11,7 @@ import { TextField } from '../../../components/TextField';
 
 class MediaParametersForm extends Component {
   render() {
-    const { t, onSubmit, initialValues } = this.props;
+    const { t, onSubmit, initialValues, disabled } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -32,6 +32,7 @@ class MediaParametersForm extends Component {
                   label={t('Type')}
                   name="media_type"
                   fullWidth={true}
+                  disabled={disabled}
                 >
                   <MenuItem key="newspaper" value="newspaper">
                     {t('newspaper')}
@@ -47,6 +48,7 @@ class MediaParametersForm extends Component {
                   variant="standard"
                   name="media_name"
                   fullWidth={true}
+                  disabled={disabled}
                   label={t('Name')}
                   style={{ marginTop: 20 }}
                 />
@@ -54,6 +56,7 @@ class MediaParametersForm extends Component {
                   variant="standard"
                   name="media_primary_color_dark"
                   fullWidth={true}
+                  disabled={disabled}
                   label={t('Primary color (dark)')}
                   style={{ marginTop: 20 }}
                 />
@@ -61,6 +64,7 @@ class MediaParametersForm extends Component {
                   variant="standard"
                   name="media_secondary_color_dark"
                   fullWidth={true}
+                  disabled={disabled}
                   label={t('Secondary color (dark)')}
                   style={{ marginTop: 20 }}
                 />
@@ -70,6 +74,7 @@ class MediaParametersForm extends Component {
                   variant="standard"
                   name="media_description"
                   fullWidth={true}
+                  disabled={disabled}
                   label={t('Subtitle')}
                 />
                 <Select
@@ -77,6 +82,7 @@ class MediaParametersForm extends Component {
                   label={t('Header mode')}
                   name="media_mode"
                   fullWidth={true}
+                  disabled={disabled}
                   style={{ marginTop: 20 }}
                 >
                   <MenuItem key="title" value="title">
@@ -93,6 +99,7 @@ class MediaParametersForm extends Component {
                   variant="standard"
                   name="media_primary_color_light"
                   fullWidth={true}
+                  disabled={disabled}
                   label={t('Primary color (light)')}
                   style={{ marginTop: 20 }}
                 />
@@ -100,21 +107,24 @@ class MediaParametersForm extends Component {
                   variant="standard"
                   name="media_secondary_color_light"
                   fullWidth={true}
+                  disabled={disabled}
                   label={t('Secondary color (light)')}
                   style={{ marginTop: 20 }}
                 />
               </Grid>
             </Grid>
-            <div style={{ marginTop: 20 }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                type="submit"
-                disabled={pristine || submitting}
-              >
-                {t('Update')}
-              </Button>
-            </div>
+            {!disabled && (
+              <div style={{ marginTop: 20 }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  type="submit"
+                  disabled={pristine || submitting}
+                >
+                  {t('Update')}
+                </Button>
+              </div>
+            )}
           </form>
         )}
       </Form>

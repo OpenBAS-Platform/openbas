@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
@@ -36,17 +40,25 @@ public class Article implements Base {
     @JsonProperty("article_name")
     private String name;
 
-    @Column(name = "article_header")
-    @JsonProperty("article_header")
-    private String header;
-
     @Column(name = "article_content")
     @JsonProperty("article_content")
     private String content;
 
-    @Column(name = "article_footer")
-    @JsonProperty("article_footer")
-    private String footer;
+    @Column(name = "article_author")
+    @JsonProperty("article_author")
+    private String author;
+
+    @Column(name = "article_shares")
+    @JsonProperty("article_shares")
+    private Integer shares;
+
+    @Column(name = "article_likes")
+    @JsonProperty("article_likes")
+    private Integer likes;
+
+    @Column(name = "article_comments")
+    @JsonProperty("article_comments")
+    private Integer comments;
 
     @ManyToOne
     @JoinColumn(name = "article_exercise")
@@ -59,6 +71,11 @@ public class Article implements Base {
     @JsonSerialize(using = MonoModelDeserializer.class)
     @JsonProperty("article_media")
     private Media media;
+
+    @OneToMany(mappedBy = "article", fetch = FetchType.EAGER)
+    @JsonProperty("article_documents")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<ArticleDocument> documents = new ArrayList<>();
 
     @JsonIgnore
     @Override
@@ -99,14 +116,6 @@ public class Article implements Base {
         this.name = name;
     }
 
-    public String getHeader() {
-        return header;
-    }
-
-    public void setHeader(String header) {
-        this.header = header;
-    }
-
     public String getContent() {
         return content;
     }
@@ -115,12 +124,44 @@ public class Article implements Base {
         this.content = content;
     }
 
-    public String getFooter() {
-        return footer;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setFooter(String footer) {
-        this.footer = footer;
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public Integer getShares() {
+        return shares;
+    }
+
+    public void setShares(Integer shares) {
+        this.shares = shares;
+    }
+
+    public Integer getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
+    public Integer getComments() {
+        return comments;
+    }
+
+    public void setComments(Integer comments) {
+        this.comments = comments;
+    }
+
+    public List<ArticleDocument> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<ArticleDocument> documents) {
+        this.documents = documents;
     }
 
     public Exercise getExercise() {

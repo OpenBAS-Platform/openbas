@@ -8,10 +8,8 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {
-  CastForEducationOutlined,
-  NewspaperOutlined,
-} from '@mui/icons-material';
+import { CastForEducationOutlined } from '@mui/icons-material';
+import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import inject18n from '../../../components/i18n';
 
 const styles = (theme) => ({
@@ -65,9 +63,9 @@ class DefinitionMenu extends Component {
             classes={{ root: classes.item }}
           >
             <ListItemIcon>
-              <NewspaperOutlined />
+              <NewspaperVariantMultipleOutline />
             </ListItemIcon>
-            <ListItemText primary={t('Media entries')} />
+            <ListItemText primary={t('Media pressure')} />
           </MenuItem>
         </MenuList>
       </Drawer>
