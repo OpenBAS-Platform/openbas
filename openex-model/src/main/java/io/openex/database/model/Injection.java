@@ -9,6 +9,4 @@ public interface Injection {
     Exercise getExercise();
 
     Optional<Instant> getDate();
-
-    boolean isDryInject();
 }

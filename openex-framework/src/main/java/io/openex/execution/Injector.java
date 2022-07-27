@@ -66,11 +66,12 @@ public abstract class Injector {
         return expectationExecution;
     }
 
-    private Execution execute(ExecutableInject executableInject, boolean scheduleInjection) {
+    private Execution execute(ExecutableInject executableInject) {
         Execution execution = new Execution();
         try {
             // Inject contract must exist
             Contract contract = executableInject.getContract();
+            boolean isScheduledInject = !executableInject.isTestingInject();
             // Inject contract must be exposed
             if (!contract.getConfig().isExpose()) {
                 throw new UnsupportedOperationException("Inject is not activated for execution");
@@ -80,14 +81,14 @@ public abstract class Injector {
                 throw new UnsupportedOperationException("Inject is empty");
             }
             // If inject is too old, reject the execution
-            if (scheduleInjection && !isInInjectableRange(executableInject.getSource())) {
+            if (isScheduledInject && !isInInjectableRange(executableInject.getSource())) {
                 throw new UnsupportedOperationException("Inject is now too old for execution");
             }
             // Process the execution
             List<Expectation> expectations = process(execution, executableInject, contract);
             // Create the expectations
             List<Audience> audiences = executableInject.getInject().getAudiences();
-            if (scheduleInjection && audiences.size() > 0 && expectations.size() > 0) {
+            if (isScheduledInject && audiences.size() > 0 && expectations.size() > 0) {
                 List<InjectExpectation> executions = audiences.stream()
                         .flatMap(audience -> expectations.stream()
                                 .map(expectation -> expectationConverter(audience, executableInject, expectation)))
@@ -103,11 +104,11 @@ public abstract class Injector {
     }
 
     public Execution executeInRange(ExecutableInject executableInject) {
-        return execute(executableInject, true);
+        return execute(executableInject);
     }
 
     public Execution executeDirectly(ExecutableInject executableInject) {
-        return execute(executableInject, false);
+        return execute(executableInject);
     }
 
     // region utils

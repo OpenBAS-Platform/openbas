@@ -9,7 +9,6 @@ import java.util.Objects;
 public class EmailContent {
 
     private static final String HEADER_DIV = "<div style=\"text-align: center; margin-bottom: 10px;\">";
-    private static final String FOOTER_DIV = "<div style=\"text-align: center; margin-top: 10px;\">";
     private static final String START_DIV = "<div>";
     private static final String END_DIV = "</div>";
 
@@ -24,6 +23,9 @@ public class EmailContent {
 
     @JsonProperty("encrypted")
     private boolean encrypted;
+
+    @JsonProperty("expectationType")
+    private String expectationType;
 
     public EmailContent() {
         // For mapper
@@ -83,6 +85,14 @@ public class EmailContent {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public String getExpectationType() {
+        return expectationType;
+    }
+
+    public void setExpectationType(String expectationType) {
+        this.expectationType = expectationType;
     }
 
     @Override

@@ -13,19 +13,22 @@ public class ExecutableInject {
     private final Injection source;
     private final List<ExecutionContext> users;
     private final List<Audience> audiences;
+    private final boolean testingInject;
 
-    public ExecutableInject(Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
+    public ExecutableInject(boolean testing, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
+        this.testingInject = testing;
+        this.source = inject;
         this.inject = inject;
         this.contract = contract;
-        this.source = inject;
         this.users = users;
         this.audiences = audiences;
     }
 
-    public ExecutableInject(Injection source, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
+    public ExecutableInject(boolean testing, Injection source, Inject inject, Contract contract, List<Audience> audiences, List<ExecutionContext> users) {
+        this.testingInject = testing;
+        this.source = source;
         this.inject = inject;
         this.contract = contract;
-        this.source = source;
         this.users = users;
         this.audiences = audiences;
     }
@@ -48,5 +51,9 @@ public class ExecutableInject {
 
     public List<ExecutionContext> getUsers() {
         return users;
+    }
+
+    public boolean isTestingInject() {
+        return testingInject;
     }
 }

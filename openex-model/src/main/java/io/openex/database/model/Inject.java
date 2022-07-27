@@ -407,16 +407,16 @@ public class Inject implements Base, Injection {
         return expectations;
     }
 
+    public void setExpectations(List<InjectExpectation> expectations) {
+        this.expectations = expectations;
+    }
+
     public List<InjectExpectation> getUserExpectationsForArticle(User user, Article article) {
         return expectations.stream()
                 .filter(execution -> execution.getType().equals(InjectExpectation.EXPECTATION_TYPE.ARTICLE))
                 .filter(execution -> execution.getArticle().equals(article))
                 .filter(execution -> execution.getAudience().getUsers().contains(user))
                 .toList();
-    }
-
-    public void setExpectations(List<InjectExpectation> expectations) {
-        this.expectations = expectations;
     }
 
     @JsonIgnore
@@ -458,7 +458,4 @@ public class Inject implements Base, Injection {
         }
         return null;
     }
-
-    @Override
-    public boolean isDryInject() { return false; }
 }

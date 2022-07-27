@@ -107,14 +107,14 @@ public class InjectApi extends RestBehavior {
     }
 
     @GetMapping("/api/injects/try/{injectId}")
-    public InjectStatus execute(@PathVariable String injectId) {
+    public InjectStatus tryInject(@PathVariable String injectId) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         List<ExecutionContext> userInjectContexts = List.of(new ExecutionContext(openExConfig, currentUser(), inject, "Direct test"));
         Contract contract = contractService.resolveContract(inject);
         if (contract == null) {
             throw new UnsupportedOperationException("Unknown inject contract " + inject.getContract());
         }
-        ExecutableInject injection = new ExecutableInject(inject, contract, List.of(), userInjectContexts);
+        ExecutableInject injection = new ExecutableInject(true, inject, contract, List.of(), userInjectContexts);
         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);
@@ -218,8 +218,9 @@ public class InjectApi extends RestBehavior {
         inject.setUser(currentUser());
         inject.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
         Iterable<User> users = userRepository.findAllById(input.getUserIds());
-        List<ExecutionContext> userInjectContexts = fromIterable(users).stream().map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
-        ExecutableInject injection = new ExecutableInject(inject, contract, List.of(), userInjectContexts);
+        List<ExecutionContext> userInjectContexts = fromIterable(users).stream()
+                .map(user -> new ExecutionContext(openExConfig, user, inject, "Direct execution")).toList();
+        ExecutableInject injection = new ExecutableInject(false, inject, contract, List.of(), userInjectContexts);
         Injector executor = context.getBean(contract.getConfig().getType(), Injector.class);
         Execution execution = executor.executeDirectly(injection);
         return InjectStatus.fromExecution(execution, inject);

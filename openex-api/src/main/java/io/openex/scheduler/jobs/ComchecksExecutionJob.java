@@ -104,13 +104,13 @@ public class ComchecksExecutionJob implements Job {
                 Exercise exercise = comCheck.getExercise();
                 List<ComcheckStatus> comcheckStatuses = entry.getValue();
                 List<ExecutionContext> userInjectContexts = comcheckStatuses.stream().map(comcheckStatus -> {
-                    ExecutionContext injectContext = new ExecutionContext(openExConfig, comcheckStatus.getUser(), exercise, "Comcheck");
+                    ExecutionContext injectContext = new ExecutionContext(comcheckStatus.getUser(), exercise, "Comcheck");
                     injectContext.put(COMCHECK, buildComcheckLink(comcheckStatus)); // Add specific inject variable for comcheck link
                     return injectContext;
                 }).toList();
                 Inject emailInject = buildComcheckEmail(comCheck);
                 Contract contract = contractService.resolveContract(emailInject);
-                ExecutableInject injection = new ExecutableInject(emailInject, contract, List.of(), userInjectContexts);
+                ExecutableInject injection = new ExecutableInject(true, emailInject, contract, List.of(), userInjectContexts);
                 EmailExecutor emailExecutor = context.getBean(EmailExecutor.class);
                 Execution execution = emailExecutor.executeDirectly(injection);
                 // Save the status sent date

@@ -97,7 +97,7 @@ public class InjectHelper {
                 .map(inject -> {
                     Contract contract = contractService.resolveContract(inject);
                     List<Audience> audiences = getInjectAudiences(inject);
-                    return new ExecutableInject(inject, contract, audiences, usersFromInjection(inject));
+                    return new ExecutableInject(false, inject, contract, audiences, usersFromInjection(inject));
                 });
         // Get dry injects
         List<DryInject> executableDryInjects = dryInjectRepository.findAll(DryInjectSpecification.executable());
@@ -108,7 +108,7 @@ public class InjectHelper {
                     Inject inject = dry.getInject();
                     Contract contract = contractService.resolveContract(inject);
                     List<Audience> audiences = getInjectAudiences(inject);
-                    return new ExecutableInject(dry, inject, contract, audiences, usersFromInjection(dry));
+                    return new ExecutableInject(true, dry, inject, contract, audiences, usersFromInjection(dry));
                 });
         // Combine injects and dry
         return concat(injects, dryInjects)

@@ -59,6 +59,10 @@ public class DryInject implements Base, Injection {
         return of(date);
     }
 
+    public void setDate(Instant date) {
+        this.date = date;
+    }
+
     public String getId() {
         return id;
     }
@@ -83,10 +87,6 @@ public class DryInject implements Base, Injection {
         this.inject = inject;
     }
 
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
     public DryInjectStatus getStatus() {
         return status;
     }
@@ -107,7 +107,4 @@ public class DryInject implements Base, Injection {
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    @Override
-    public boolean isDryInject() { return true; }
 }
