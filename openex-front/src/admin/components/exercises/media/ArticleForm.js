@@ -8,10 +8,11 @@ import * as R from 'ramda';
 import { useFormatter } from '../../../../components/i18n';
 import { TextField } from '../../../../components/TextField';
 import { Autocomplete } from '../../../../components/Autocomplete';
-import InjectIcon from '../injects/InjectIcon';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchMedias } from '../../../../actions/Media';
+import MediaIcon from '../../medias/MediaIcon';
+import { EnrichedTextField } from '../../../../components/EnrichedTextField';
 
 const useStyles = makeStyles((theme) => ({
   duration: {
@@ -64,7 +65,7 @@ const ArticleForm = ({ onSubmit, handleClose, initialValues, editing }) => {
   });
   // Preparing data
   const sortedMedias = R.sortWith([R.ascend(R.prop('media_name'))], medias).map(
-    (n) => ({ id: n.media_id, label: n.media_name, icon: '' }),
+    (n) => ({ id: n.media_id, label: n.media_name, type: n.media_type }),
   );
   const currentMedia = sortedMedias.find(
     (m) => m.id === initialValues.article_media,
@@ -85,12 +86,6 @@ const ArticleForm = ({ onSubmit, handleClose, initialValues, editing }) => {
     >
       {({ handleSubmit, submitting, pristine }) => (
         <form id="articleForm" onSubmit={handleSubmit}>
-          <TextField
-            variant="standard"
-            name="article_name"
-            fullWidth={true}
-            label={t('Name')}
-          />
           <Autocomplete
             variant="standard"
             size="small"
@@ -99,16 +94,35 @@ const ArticleForm = ({ onSubmit, handleClose, initialValues, editing }) => {
             fullWidth={true}
             multiple={false}
             options={sortedMedias}
-            style={{ marginTop: 20 }}
             renderOption={(renderProps, option) => (
               <Box component="li" {...renderProps}>
                 <div className={classes.icon}>
-                  <InjectIcon type={option.icon} />
+                  <MediaIcon type={option.type} />
                 </div>
                 <div className={classes.text}>{t(option.label)}</div>
               </Box>
             )}
             classes={{ clearIndicator: classes.autoCompleteIndicator }}
+          />
+          <TextField
+            variant="standard"
+            name="article_name"
+            fullWidth={true}
+            style={{ marginTop: 20 }}
+            label={t('Title')}
+          />
+          <TextField
+            variant="standard"
+            name="article_author"
+            fullWidth={true}
+            style={{ marginTop: 20 }}
+            label={t('Author')}
+          />
+          <EnrichedTextField
+            name="article_content"
+            label={t('Content')}
+            fullWidth={true}
+            style={{ marginTop: 20, height: 300 }}
           />
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button

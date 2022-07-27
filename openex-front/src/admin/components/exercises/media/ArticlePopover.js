@@ -24,7 +24,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ArticlePopover = ({ article }) => {
+const ArticlePopover = ({ exercise, article }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -47,7 +47,11 @@ const ArticlePopover = ({ article }) => {
   const onSubmitEdit = (data) => {
     const inputValues = { ...data, article_media: data.article_media.id };
     return dispatch(
-      updateExerciseArticle(article.article_id, inputValues),
+      updateExerciseArticle(
+        exercise.exercise_id,
+        article.article_id,
+        inputValues,
+      ),
     ).then(() => handleCloseEdit());
   };
   // Delete action
@@ -57,14 +61,24 @@ const ArticlePopover = ({ article }) => {
   };
   const handleCloseDelete = () => setOpenDelete(false);
   const submitDelete = () => {
-    dispatch(deleteExerciseArticle(article.article_id)).then(() => handleCloseDelete());
+    return dispatch(
+      deleteExerciseArticle(exercise.exercise_id, article.article_id),
+    ).then(() => handleCloseDelete());
   };
   // Rendering
-  const initialValues = R.pipe(R.pick(['article_name', 'article_media']))(
-    article,
-  );
+  const initialValues = R.pipe(
+    R.pick([
+      'article_name',
+      'article_content',
+      'article_author',
+      'article_shares',
+      'articles_likes',
+      'article_comments',
+      'article_media',
+    ]),
+  )(article);
   return (
-    <div>
+    <React.Fragment>
       <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
@@ -84,18 +98,12 @@ const ArticlePopover = ({ article }) => {
       >
         <DialogContent>
           <DialogContentText>
-            {t('Do you want to delete this article?')}
+            {t('Do you want to delete this media pressure?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleCloseDelete}
-          >
-            {t('Cancel')}
-          </Button>
-          <Button variant="contained" color="primary" onClick={submitDelete}>
+          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>
         </DialogActions>
@@ -108,8 +116,8 @@ const ArticlePopover = ({ article }) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Update the article')}</DialogTitle>
-        <DialogContent>
+        <DialogTitle>{t('Update the media pressure')}</DialogTitle>
+        <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
             editing={true}
             onSubmit={onSubmitEdit}
@@ -118,7 +126,7 @@ const ArticlePopover = ({ article }) => {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </React.Fragment>
   );
 };
 

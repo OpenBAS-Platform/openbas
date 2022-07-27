@@ -12,6 +12,7 @@ import {
   ArrowDropUpOutlined,
   DescriptionOutlined,
   FileDownloadOutlined,
+  RowingOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { interval } from 'rxjs';
@@ -78,7 +79,7 @@ const styles = (theme) => ({
     height: 20,
     float: 'left',
     marginRight: 7,
-    width: 100,
+    width: 120,
   },
 });
 
@@ -373,6 +374,7 @@ class Documents extends Component {
                             title={exercise.exercise_name}
                           >
                             <Chip
+                              icon={<RowingOutlined style={{ fontSize: 12 }} />}
                               classes={{ root: classes.exercise }}
                               variant="outlined"
                               label={exercise.exercise_name}

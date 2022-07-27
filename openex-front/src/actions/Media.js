@@ -47,12 +47,12 @@ export const addExerciseArticle = (exerciseId, data) => (dispatch) => {
   const uri = `/api/exercises/${exerciseId}/articles`;
   return postReferential(article, uri, data)(dispatch);
 };
-export const deleteExerciseArticle = (articleId) => (dispatch) => {
-  const uri = `/api/articles/${articleId}`;
+export const deleteExerciseArticle = (exerciseId, articleId) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/articles/${articleId}`;
   return delReferential(uri, 'articles', articleId)(dispatch);
 };
-export const updateExerciseArticle = (articleId, data) => (dispatch) => {
-  const uri = `/api/articles/${articleId}`;
+export const updateExerciseArticle = (exerciseId, articleId, data) => (dispatch) => {
+  const uri = `/api/exercises/${exerciseId}/articles/${articleId}`;
   return putReferential(article, uri, data)(dispatch);
 };
 // endregion

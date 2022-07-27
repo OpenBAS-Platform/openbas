@@ -71,7 +71,7 @@ const CreateArticle = (props) => {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Create a new article')}
+            primary={t('Create a new media pressure')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -93,8 +93,8 @@ const CreateArticle = (props) => {
         maxWidth="md"
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Create a new article')}</DialogTitle>
-        <DialogContent>
+        <DialogTitle>{t('Create a new media pressure')}</DialogTitle>
+        <DialogContent style={{ overflowX: 'hidden' }}>
           <ArticleForm
             editing={false}
             onSubmit={onSubmit}

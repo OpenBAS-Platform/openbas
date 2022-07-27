@@ -127,10 +127,29 @@ public class MediaApi extends RestBehavior {
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @PostMapping("/api/exercises/{exerciseId}/articles")
     public Article createArticle(@PathVariable String exerciseId, @Valid @RequestBody ArticleCreateInput input) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Article article = new Article();
         article.setUpdateAttributes(input);
         article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
+        List<ArticleDocument> articleDocuments = new ArrayList<>(article.getDocuments());
+        List<ArticleDocumentInput> documents = input.getDocuments();
+        documents.forEach(in -> {
+            Optional<Document> doc = documentRepository.findById(in.getDocumentId());
+            if (doc.isPresent()) {
+                ArticleDocument articleDocument = new ArticleDocument();
+                articleDocument.setArticle(article);
+                Document document = doc.get();
+                articleDocument.setDocument(document);
+                ArticleDocument savedArticleDoc = articleDocumentRepository.save(articleDocument);
+                articleDocuments.add(savedArticleDoc);
+                // If Document not yet linked directly to the exercise, attached it
+                if (!document.getExercises().contains(exercise)) {
+                    exercise.getDocuments().add(document);
+                    exerciseRepository.save(exercise);
+                }
+            }
+        });
         return articleRepository.save(article);
     }
 
@@ -200,8 +219,8 @@ public class MediaApi extends RestBehavior {
         return enrichArticleWithVirtualPublication(exercise, exercise.getArticles());
     }
 
-    @RolesAllowed(ROLE_ADMIN)
-    @DeleteMapping("/api/articles/{articleId}")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
+    @DeleteMapping("/api/exercises/{exerciseId}/articles/{articleId}")
     public void deleteArticle(@PathVariable String articleId) {
         articleRepository.deleteById(articleId);
     }
