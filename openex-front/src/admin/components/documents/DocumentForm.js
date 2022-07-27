@@ -78,11 +78,21 @@ class DocumentForm extends Component {
               setFieldValue={form.mutators.setValue}
               style={{ marginTop: 20 }}
             />
-            {!editing && (
+            {!editing && !image && (
               <FileField
                 variant="standard"
                 type="file"
                 name="document_file"
+                label={t('File')}
+                style={{ marginTop: 20 }}
+              />
+            )}
+            {!editing && image && (
+              <FileField
+                variant="standard"
+                type="file"
+                name="document_file"
+                accept='image/*'
                 label={t('File')}
                 style={{ marginTop: 20 }}
               />

@@ -1,67 +1,236 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
-import { useParams } from 'react-router-dom';
-import Grid from '@mui/material/Grid';
+import { makeStyles, useTheme } from '@mui/styles';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import * as R from 'ramda';
-import { useDispatch } from 'react-redux';
-import { useHelper } from '../../../store';
-import { useFormatter } from '../../../components/i18n';
-import { updateMedia } from '../../../actions/Media';
-import MediaParametersForm from './MediaParametersForm';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Skeleton from '@mui/material/Skeleton';
 
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     paddingBottom: 50,
   },
-  paper: {
-    padding: 20,
-    marginBottom: 40,
+  logo: {
+    maxHeight: 200,
+    maxWidth: 300,
   },
 }));
 
-const Media = () => {
+const MediaOverviewMicroBlogging = ({ media }) => {
   const classes = useStyles();
-  const { mediaId } = useParams();
-  const dispatch = useDispatch();
-  const { t } = useFormatter();
-  const { media } = useHelper((helper) => {
-    const med = helper.getMedia(mediaId);
-    return { media: med };
-  });
-  const submitUpdate = (data) => dispatch(updateMedia(mediaId, data));
-  const initialValues = R.pipe(
-    R.pick([
-      'media_type',
-      'media_name',
-      'media_description',
-      'media_primary_color_dark',
-      'media_primary_color_light',
-      'media_secondary_color_dark',
-      'media_secondary_color_light',
-    ]),
-  )(media);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const logo = isDark ? media.logoDark : media.logoLight;
   return (
     <div className={classes.root}>
-      <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
-        <Grid item={true} xs={6} style={{ marginTop: -14 }}>
-          <Typography variant="h4">{t('Parameters')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            <MediaParametersForm
-              onSubmit={submitUpdate}
-              initialValues={initialValues}
+      {logo && media.media_mode !== 'title' && (
+        <div
+          style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
+        >
+          <img
+            src={`/api/documents/${logo.document_id}/file`}
+            className={classes.logo}
+          />
+        </div>
+      )}
+      {media.media_mode !== 'logo' && (
+        <Typography
+          variant="h1"
+          style={{
+            textAlign: 'center',
+            color: isDark
+              ? media.media_primary_color_dark
+              : media.media_primary_color_light,
+            fontSize: 40,
+          }}
+        >
+          {media.media_name}
+        </Typography>
+      )}
+      <Typography
+        variant="h2"
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        {media.media_description}
+      </Typography>
+      <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
+        <CardHeader
+          avatar={
+            <Skeleton
+              animation={false}
+              variant="circular"
+              width={40}
+              height={40}
             />
-          </Paper>
+          }
+          title={
+            <Skeleton
+              animation={false}
+              height={10}
+              width="80%"
+              style={{ marginBottom: 6 }}
+            />
+          }
+          subheader={
+            <React.Fragment>
+              <Skeleton
+                animation={false}
+                height={10}
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation={false} height={10} width="80%" />
+            </React.Fragment>
+          }
+        />
+      </Card>
+      <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
+        <CardHeader
+          avatar={
+            <Skeleton
+              animation={false}
+              variant="circular"
+              width={40}
+              height={40}
+            />
+          }
+          title={
+            <Skeleton
+              animation={false}
+              height={10}
+              width="80%"
+              style={{ marginBottom: 6 }}
+            />
+          }
+          subheader={
+            <React.Fragment>
+              <Skeleton
+                animation={false}
+                height={10}
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation={false} height={10} width="80%" />
+            </React.Fragment>
+          }
+        />
+      </Card>
+      <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
+        <CardHeader
+          avatar={
+            <Skeleton
+              animation={false}
+              variant="circular"
+              width={40}
+              height={40}
+            />
+          }
+          title={
+            <Skeleton
+              animation={false}
+              height={10}
+              width="80%"
+              style={{ marginBottom: 6 }}
+            />
+          }
+          subheader={
+            <React.Fragment>
+              <Skeleton
+                animation={false}
+                height={10}
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation={false} height={10} width="80%" />
+            </React.Fragment>
+          }
+        />
+        <Grid container={true} spacing={3}>
+          <Grid item={true} xs={4}>
+            <Skeleton
+              sx={{ height: 180 }}
+              animation={false}
+              variant="rectangular"
+            />
+          </Grid>
+          <Grid item={true} xs={4}>
+            <Skeleton
+              sx={{ height: 180 }}
+              animation={false}
+              variant="rectangular"
+            />
+          </Grid>
+          <Grid item={true} xs={4}>
+            <Skeleton
+              sx={{ height: 180 }}
+              animation={false}
+              variant="rectangular"
+            />
+          </Grid>
         </Grid>
-        <Grid item={true} xs={6} style={{ marginTop: -14 }}>
-          <Typography variant="h4">{t('Overview')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}></Paper>
-        </Grid>
-      </Grid>
+      </Card>
+      <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
+        <CardHeader
+          avatar={
+            <Skeleton
+              animation={false}
+              variant="circular"
+              width={40}
+              height={40}
+            />
+          }
+          title={
+            <Skeleton
+              animation={false}
+              height={10}
+              width="80%"
+              style={{ marginBottom: 6 }}
+            />
+          }
+          subheader={
+            <React.Fragment>
+              <Skeleton
+                animation={false}
+                height={10}
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation={false} height={10} width="80%" />
+            </React.Fragment>
+          }
+        />
+      </Card>
+      <Card sx={{ width: '100%' }} style={{ marginBottom: 20 }}>
+        <CardHeader
+          avatar={
+            <Skeleton
+              animation={false}
+              variant="circular"
+              width={40}
+              height={40}
+            />
+          }
+          title={
+            <Skeleton
+              animation={false}
+              height={10}
+              width="80%"
+              style={{ marginBottom: 6 }}
+            />
+          }
+          subheader={
+            <React.Fragment>
+              <Skeleton
+                animation={false}
+                height={10}
+                style={{ marginBottom: 6 }}
+              />
+              <Skeleton animation={false} height={10} width="80%" />
+            </React.Fragment>
+          }
+        />
+      </Card>
     </div>
   );
 };
 
-export default Media;
+export default MediaOverviewMicroBlogging;

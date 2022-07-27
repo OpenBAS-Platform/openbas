@@ -90,7 +90,7 @@ const Media = () => {
             <Grid container={true} spacing={3}>
               <Grid item={true} xs={6}>
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
-                  {t('Dark mode')}
+                  {t('Dark theme')}
                 </Typography>
                 {logoDark ? (
                   <img
@@ -110,7 +110,7 @@ const Media = () => {
               </Grid>
               <Grid item={true} xs={6}>
                 <Typography variant="h5" style={{ marginBottom: 20 }}>
-                  {t('Light mode')}
+                  {t('Light theme')}
                 </Typography>
                 {logoLight ? (
                   <img

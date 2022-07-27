@@ -66,7 +66,7 @@ const CreateDocument = (props) => {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Create a new document')}
+            primary={image ? t('Create an image') : t('Create a new document')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -88,7 +88,9 @@ const CreateDocument = (props) => {
         onClose={() => setOpen(false)}
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>{t('Create a new document')}</DialogTitle>
+        <DialogTitle>
+          {image ? t('Create an image') : t('Create a new document')}
+        </DialogTitle>
         <DialogContent>
           <DocumentForm
             onSubmit={onSubmit}

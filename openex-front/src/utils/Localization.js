@@ -357,6 +357,12 @@ const i18n = {
       logo: 'Logo seulement',
       title: 'Titre seulement',
       'logo-title': 'Logo et titre',
+      'Dark theme': 'Thème sombre',
+      'Light theme': 'Thème clair',
+      'Header mode': 'Mode du bandeau supérieur',
+      'Select an image': 'Sélectionner une image',
+      'Create an image': 'Créer une image',
+      'Change logo': 'Changer le logo',
     },
     en: {
       openex_email: 'Email',
