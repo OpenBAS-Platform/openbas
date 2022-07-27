@@ -4,7 +4,8 @@ import { withRouter, Link } from 'react-router-dom';
 import withStyles from '@mui/styles/withStyles';
 import { compose } from 'ramda';
 import Button from '@mui/material/Button';
-import { RowingOutlined, ArrowForwardIosOutlined } from '@mui/icons-material';
+import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
+import { ArrowForwardIosOutlined } from '@mui/icons-material';
 import inject18n from '../../../components/i18n';
 
 const styles = (theme) => ({
@@ -50,7 +51,10 @@ class TopMenuExercise extends Component {
           color="primary"
           classes={{ root: classes.buttonHome }}
         >
-          <RowingOutlined className={classes.icon} fontSize="small" />
+          <NewspaperVariantMultipleOutline
+            className={classes.icon}
+            fontSize="small"
+          />
           {t('Medias')}
         </Button>
         <ArrowForwardIosOutlined

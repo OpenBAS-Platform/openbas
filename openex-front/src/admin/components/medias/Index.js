@@ -21,7 +21,9 @@ const Index = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { mediaId } = useParams();
-  const media = useHelper((helper) => helper.getMedia(mediaId));
+  const { media } = useHelper((helper) => ({
+    media: helper.getMedia(mediaId),
+  }));
   useDataLoader(() => {
     dispatch(fetchMedia(mediaId));
   });

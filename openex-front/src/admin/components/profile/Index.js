@@ -53,18 +53,15 @@ const Index = () => {
   const { t } = useFormatter();
   const dispatch = useDispatch();
   const classes = useStyles();
-
   useDataLoader(() => {
     dispatch(fetchOrganizations());
     dispatch(meTokens());
   });
-
   const { user, tokens, organizationsMap } = useHelper((helper) => ({
     user: helper.getMe(),
     tokens: helper.getMeTokens(),
     organizationsMap: helper.getOrganizationsMap(),
   }));
-
   const onRenew = (tokenId) => dispatch(renewToken(tokenId));
   const onUpdate = (data) => {
     const inputValues = R.pipe(
@@ -81,7 +78,6 @@ const Index = () => {
   const onUpdatePassword = (data) => dispatch(
     updateMePassword(data.user_current_password, data.user_plain_password),
   );
-
   const userOrganizationValue = organizationsMap[user.user_organization];
   const userOrganization = userOrganizationValue
     ? {

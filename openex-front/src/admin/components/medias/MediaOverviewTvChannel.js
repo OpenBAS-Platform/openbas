@@ -10,9 +10,6 @@ import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { updateMedia } from '../../../actions/Media';
 import MediaParametersForm from './MediaParametersForm';
-import MediaOverviewNewspaper from './MediaOverviewNewspaper';
-import MediaOverviewMicroblogging from './MediaOverviewMicroblogging';
-import MediaOverviewTvChannel from './MediaOverviewTvChannel';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -60,17 +57,7 @@ const Media = () => {
         </Grid>
         <Grid item={true} xs={6} style={{ marginTop: -14 }}>
           <Typography variant="h4">{t('Overview')}</Typography>
-          <Paper variant="outlined" classes={{ root: classes.paper }}>
-            {media.media_type === 'newspaper' && (
-              <MediaOverviewNewspaper media={media} />
-            )}
-            {media.media_type === 'microblogging' && (
-              <MediaOverviewMicroblogging media={media} />
-            )}
-            {media.media_type === 'tv' && (
-              <MediaOverviewTvChannel media={media} />
-            )}
-          </Paper>
+          <Paper variant="outlined" classes={{ root: classes.paper }}></Paper>
         </Grid>
       </Grid>
     </div>

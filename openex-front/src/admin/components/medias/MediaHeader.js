@@ -34,11 +34,10 @@ const useStyles = makeStyles(() => ({
 const MediaHeader = () => {
   const classes = useStyles();
   const { mediaId } = useParams();
-  const { media } = useHelper((helper) => {
-    return {
-      media: helper.getMedia(mediaId),
-    };
-  });
+  const { media, userAdmin } = useHelper((helper) => ({
+    media: helper.getMedia(mediaId),
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
   return (
     <div className={classes.container}>
       <Typography
@@ -48,7 +47,7 @@ const MediaHeader = () => {
       >
         {media.media_name}
       </Typography>
-      <MediaPopover media={media} />
+      {userAdmin && <MediaPopover media={media} />}
     </div>
   );
 };

@@ -150,7 +150,7 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
       <MenuItem
         component={Link}
         to="/admin/medias"
-        selected={location.pathname === '/admin/medias'}
+        selected={location.pathname.includes('/admin/medias')}
         dense={true}
         classes={{ root: classes.menuItem }}
       >

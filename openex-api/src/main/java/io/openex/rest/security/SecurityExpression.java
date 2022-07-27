@@ -64,6 +64,17 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
         return planner.isPresent();
     }
 
+    public boolean isExercisePlayer(String exerciseId) {
+        if (isUserHasBypass()) {
+            return true;
+        }
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        List<User> players = exercise.getPlayers();
+        Optional<User> player = players.stream()
+                .filter(user -> user.getId().equals(getUser().getId())).findAny();
+        return player.isPresent();
+    }
+
     @SuppressWarnings("unused")
     public boolean isPlanner() {
         if (isUserHasBypass()) {

@@ -218,6 +218,13 @@ public class Exercise implements Base {
         return getAudiences().stream().mapToLong(audience -> audience.getUsers().size()).sum();
     }
 
+    @JsonIgnore
+    public List<User> getPlayers() {
+        return getAudiences().stream().flatMap(audience -> audience.getUsers().stream())
+                .distinct()
+                .toList();
+    }
+
     @JsonProperty("exercise_score")
     public Double getEvaluationAverage() {
         double evaluationAverage = getObjectives().stream().mapToDouble(Objective::getEvaluationAverage).average().orElse(0D);

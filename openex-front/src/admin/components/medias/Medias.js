@@ -116,7 +116,10 @@ const Medias = () => {
   const searchColumns = ['type', 'name', 'description'];
   const filtering = useSearchAnFilter('media', 'name', searchColumns);
   // Fetching data
-  const { medias } = useHelper((helper) => ({ medias: helper.getMedias() }));
+  const { medias, userAdmin } = useHelper((helper) => ({
+    medias: helper.getMedias(),
+    userAdmin: helper.getMe()?.user_admin ?? false,
+  }));
   useDataLoader(() => {
     dispatch(fetchMedias());
   });
@@ -214,7 +217,7 @@ const Medias = () => {
           </ListItem>
         ))}
       </List>
-      <CreateMedia />
+      {userAdmin && <CreateMedia />}
     </div>
   );
 };

@@ -194,6 +194,11 @@ public class User implements Base, OAuth2User {
         return isPlanner() || isObserver();
     }
 
+    @JsonProperty("user_is_player")
+    public boolean isPlayer() {
+        return isAdmin() || isPlanner() || isObserver() || getAudiences().size() > 0;
+    }
+
     @JsonProperty("user_last_comcheck")
     public Optional<Instant> getLastComcheck() {
         return getComcheckStatuses().stream()

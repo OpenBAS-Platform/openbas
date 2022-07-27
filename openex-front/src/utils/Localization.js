@@ -348,6 +348,10 @@ const i18n = {
       'Send a SMS': 'Envoyer un SMS',
       'To fill': 'A remplir',
       Unknown: 'Inconnu',
+      'Primary color (dark)': 'Couleur primaire (sombre)',
+      'Secondary color (dark)': 'Couleur secondaire (sombre)',
+      'Primary color (light)': 'Couleur primaire (clair)',
+      'Secondary color (light)': 'Couleur secondaire (clair)',
     },
     en: {
       openex_email: 'Email',
