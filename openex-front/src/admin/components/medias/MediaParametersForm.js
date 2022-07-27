@@ -72,19 +72,29 @@ class MediaParametersForm extends Component {
                   fullWidth={true}
                   label={t('Subtitle')}
                 />
-                <TextField
+                <Select
                   variant="standard"
-                  name="media_text"
+                  label={t('Header mode')}
+                  name="media_mode"
                   fullWidth={true}
-                  label={t('Text')}
                   style={{ marginTop: 20 }}
-                />
+                >
+                  <MenuItem key="title" value="title">
+                    {t('title')}
+                  </MenuItem>
+                  <MenuItem key="logo" value="logo">
+                    {t('logo')}
+                  </MenuItem>
+                  <MenuItem key="logo-title" value="logo-title">
+                    {t('logo-title')}
+                  </MenuItem>
+                </Select>
                 <ColorPickerField
                   variant="standard"
                   name="media_primary_color_light"
                   fullWidth={true}
                   label={t('Primary color (light)')}
-                  style={{ marginTop: 18 }}
+                  style={{ marginTop: 20 }}
                 />
                 <ColorPickerField
                   variant="standard"

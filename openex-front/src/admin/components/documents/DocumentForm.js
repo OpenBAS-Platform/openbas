@@ -11,11 +11,14 @@ import ExerciseField from '../../../components/ExerciseField';
 
 class DocumentForm extends Component {
   validate(values) {
-    const { t, editing } = this.props;
+    const { t, editing, image } = this.props;
     const errors = {};
-    const requiredFields = editing
-      ? ['document_exercises']
-      : ['document_file', 'document_exercises'];
+    let requiredFields = [];
+    if (!image && editing) {
+      requiredFields = ['document_exercises'];
+    } else if (!image && !editing) {
+      requiredFields = ['document_file', 'document_exercises'];
+    }
     requiredFields.forEach((field) => {
       const data = values[field];
       if (Array.isArray(data) && data.length === 0) {
@@ -28,7 +31,15 @@ class DocumentForm extends Component {
   }
 
   render() {
-    const { t, editing, onSubmit, initialValues, handleClose, hideExercises } = this.props;
+    const {
+      t,
+      editing,
+      onSubmit,
+      initialValues,
+      handleClose,
+      hideExercises,
+      image,
+    } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -51,7 +62,7 @@ class DocumentForm extends Component {
               rows={2}
               label={t('Description')}
             />
-            {!hideExercises && (
+            {!hideExercises && !image && (
               <ExerciseField
                 name="document_exercises"
                 values={values}

@@ -43,6 +43,10 @@ public class Media implements Base {
     @JsonProperty("media_description")
     private String description;
 
+    @Column(name = "media_mode")
+    @JsonProperty("media_mode")
+    private String mode;
+
     @Column(name = "media_primary_color_dark")
     @JsonProperty("media_primary_color_dark")
     private String primaryColorDark;
@@ -102,6 +106,14 @@ public class Media implements Base {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
     public String getPrimaryColorDark() {

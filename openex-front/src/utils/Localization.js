@@ -61,6 +61,8 @@ const i18n = {
         'Souhaitez-vous supprimer ce joueur ?',
       'Do you want to delete this inject?':
         'Souhaitez-vous supprimer ce stimuli ?',
+      'Do you want to delete this media?':
+        'Souhaitez-vous supprimer ce média ?',
       'Start date (optional)': 'Date de début (optionnel)',
       'Create a new player': 'Créer un nouveau joueur',
       'Update the player': 'Modifier le joueur',
@@ -352,6 +354,9 @@ const i18n = {
       'Secondary color (dark)': 'Couleur secondaire (sombre)',
       'Primary color (light)': 'Couleur primaire (clair)',
       'Secondary color (light)': 'Couleur secondaire (clair)',
+      logo: 'Logo seulement',
+      title: 'Titre seulement',
+      'logo-title': 'Logo et titre',
     },
     en: {
       openex_email: 'Email',
@@ -381,6 +386,9 @@ const i18n = {
       newspaper: 'Newspaper',
       tv: 'TV channel',
       microblogging: 'Microblogging',
+      logo: 'Logo only',
+      title: 'Title only',
+      'logo-title': 'Logo and title',
     },
   },
 };

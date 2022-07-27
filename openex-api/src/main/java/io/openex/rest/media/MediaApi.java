@@ -89,8 +89,16 @@ public class MediaApi extends RestBehavior {
     @PutMapping("/api/medias/{mediaId}/logos")
     public Media updateMediaLogos(@PathVariable String mediaId, @Valid @RequestBody MediaUpdateLogoInput input) {
         Media media = mediaRepository.findById(mediaId).orElseThrow();
-        media.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
-        media.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
+        if (input.getLogoDark() != null) {
+            media.setLogoDark(documentRepository.findById(input.getLogoDark()).orElse(null));
+        } else {
+            media.setLogoDark(null);
+        }
+        if (input.getLogoLight() != null) {
+            media.setLogoLight(documentRepository.findById(input.getLogoLight()).orElse(null));
+        } else {
+            media.setLogoLight(null);
+        }
         return mediaRepository.save(media);
     }
 

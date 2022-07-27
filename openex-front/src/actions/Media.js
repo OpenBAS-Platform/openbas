@@ -21,6 +21,10 @@ export const updateMedia = (mediaId, data) => (dispatch) => {
   const uri = `/api/medias/${mediaId}`;
   return putReferential(media, uri, data)(dispatch);
 };
+export const updateMediaLogos = (mediaId, data) => (dispatch) => {
+  const uri = `/api/medias/${mediaId}/logos`;
+  return putReferential(media, uri, data)(dispatch);
+};
 export const addMedia = (data) => (dispatch) => postReferential(media, '/api/medias', data)(dispatch);
 export const deleteMedia = (mediaId) => (dispatch) => {
   const uri = `/api/medias/${mediaId}`;

@@ -19,6 +19,9 @@ public class MediaUpdateInput {
     @JsonProperty("media_description")
     private String description;
 
+    @JsonProperty("media_mode")
+    private String mode;
+
     @JsonProperty("media_primary_color_dark")
     private String primaryColorDark;
 
@@ -49,6 +52,14 @@ public class MediaUpdateInput {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
     public void setDescription(String description) {
