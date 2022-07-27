@@ -44,6 +44,10 @@ public class ExecutionTrace {
         return new ExecutionTrace(ExecutionStatus.ERROR, identifier, message, e);
     }
 
+    public static ExecutionTrace traceError(String identifier, String message) {
+        return new ExecutionTrace(ExecutionStatus.ERROR, identifier, message, null);
+    }
+
     public String getIdentifier() {
         return identifier;
     }
