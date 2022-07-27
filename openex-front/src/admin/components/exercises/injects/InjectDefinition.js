@@ -25,6 +25,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
+import arrayMutators from 'final-form-arrays';
+import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -218,7 +220,6 @@ class InjectDefinition extends Component {
       allAudiences: props.inject.inject_all_audiences,
       audiencesIds: props.inject.inject_audiences,
       documents: props.inject.inject_documents,
-      baseContent: props.inject.inject_content,
       audiencesSortBy: 'audience_name',
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
@@ -252,23 +253,6 @@ class InjectDefinition extends Component {
     this.setState({
       documents: [...this.state.documents, ...documents],
     });
-  }
-
-  handleAddTuple(attributeKey) {
-    const newContent = { ...this.state.baseContent };
-    if (newContent[attributeKey]) {
-      newContent[attributeKey].push({ key: '', value: '' });
-    } else {
-      newContent[attributeKey] = [{ key: '', value: '' }];
-    }
-    this.setState({ baseContent: newContent });
-  }
-
-  handleRemoveTuple(attributeKey, index, values) {
-    values[attributeKey].splice(index, 1);
-    const newContent = { ...this.state.baseContent };
-    newContent[attributeKey].splice(index, 1);
-    this.setState({ baseContent: newContent });
   }
 
   handleRemoveDocument(documentId) {
@@ -413,7 +397,6 @@ class InjectDefinition extends Component {
       return <Loader variant="inElement" />;
     }
     const {
-      baseContent,
       allAudiences,
       audiencesIds,
       documents,
@@ -496,6 +479,7 @@ class InjectDefinition extends Component {
             onSubmit={this.onSubmit.bind(this)}
             validate={this.validate.bind(this)}
             mutators={{
+              ...arrayMutators,
               setValue: ([field, value], state, { changeValue }) => {
                 changeValue(state, field, () => value);
               },
@@ -510,8 +494,7 @@ class InjectDefinition extends Component {
                     </Typography>
                     <FormGroup
                       row={true}
-                      classes={{ root: classes.allAudiences }}
-                    >
+                      classes={{ root: classes.allAudiences }}>
                       <FormControlLabel
                         control={
                           <Switch
@@ -745,74 +728,47 @@ class InjectDefinition extends Component {
                             />
                           );
                         case 'tuple':
-                          // eslint-disable-next-line no-case-declarations
-                          const multiple = field.cardinality === 'n';
-                          // eslint-disable-next-line no-case-declarations
-                          const tuples = multiple
-                            ? baseContent?.[field.key] ?? []
-                            : [{ key: '', value: '' }];
                           return (
                             <div>
-                              <div style={{ marginTop: 20 }}>
-                                <Typography variant="body2">
-                                  {t(field.label)}
-                                  {field.cardinality === 'n' && (
-                                    <IconButton
-                                      onClick={this.handleAddTuple.bind(
-                                        this,
-                                        field.key,
-                                      )}
-                                      aria-haspopup="true"
-                                      size="medium"
-                                      style={{ marginTop: -2 }}
-                                    >
-                                      <ControlPointOutlined color="primary" />
-                                    </IconButton>
+                                <FieldArray name={field.key}>
+                                  {({ fields }) => (
+                                      <div>
+                                        <div style={{ marginTop: 20 }}>
+                                          <Typography variant="body2">
+                                            {t(field.label)}
+                                            {field.cardinality === 'n' && (
+                                                <IconButton onClick={() => fields.push({ key: '', value: '' })}
+                                                            aria-haspopup="true" size="medium"
+                                                            style={{ marginTop: -2 }}>
+                                                  <ControlPointOutlined color="primary" />
+                                                </IconButton>
+                                            )}
+                                          </Typography>
+                                        </div>
+                                        <List style={{ marginTop: 0 }}>
+                                          {fields.map((name, index) => (
+                                            <ListItem key={`${field.key}_list_${index}`} classes={{ root: classes.tuple }} divider={false}>
+                                              <TextField variant="standard" name={`${name}.key`}
+                                                  fullWidth={true} label={t('Key')} style={{ marginRight: 20 }}
+                                                  disabled={isExerciseReadOnly(exercise)}
+                                              />
+                                              <TextField variant="standard" name={`${name}.value`}
+                                                  fullWidth={true} label={t('Value')} style={{ marginRight: 20 }}
+                                                  disabled={isExerciseReadOnly(exercise)}
+                                              />
+                                              {field.cardinality === 'n' && (
+                                                  <IconButton onClick={() => fields.remove(index)}
+                                                      aria-haspopup="true"
+                                                      size="small">
+                                                    <DeleteOutlined color="primary" />
+                                                  </IconButton>
+                                              )}
+                                            </ListItem>
+                                          ))}
+                                        </List>
+                                      </div>
                                   )}
-                                </Typography>
-                              </div>
-                              <List style={{ marginTop: 0 }}>
-                                {tuples.map((tuple, index) => (
-                                  <ListItem
-                                    key={`${field.key}_list_${index}`}
-                                    classes={{ root: classes.tuple }}
-                                    divider={false}
-                                  >
-                                    <TextField
-                                      variant="standard"
-                                      key={`key_${field.key}_${index}`}
-                                      name={`${field.key}[${index}][key]`}
-                                      fullWidth={true}
-                                      label={t('Key')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    />
-                                    <TextField
-                                      variant="standard"
-                                      key={`value_${field.key}_${index}`}
-                                      name={`${field.key}[${index}][value]`}
-                                      fullWidth={true}
-                                      label={t('Value')}
-                                      style={{ marginRight: 20 }}
-                                      disabled={isExerciseReadOnly(exercise)}
-                                    />
-                                    {field.cardinality === 'n' && (
-                                      <IconButton
-                                        onClick={this.handleRemoveTuple.bind(
-                                          this,
-                                          field.key,
-                                          index,
-                                          values,
-                                        )}
-                                        aria-haspopup="true"
-                                        size="small"
-                                      >
-                                        <DeleteOutlined color="primary" />
-                                      </IconButton>
-                                    )}
-                                  </ListItem>
-                                ))}
-                              </List>
+                                </FieldArray>
                             </div>
                           );
                         case 'select':

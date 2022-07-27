@@ -8,8 +8,8 @@ public class ContractTuple extends ContractCardinalityElement {
     public ContractTuple(String key, String label, ContractCardinality cardinality) {
         super(key, label, cardinality);
     }
-    public static ContractTuple tupleField(String key, String label, ContractCardinality cardinality) {
-        return new ContractTuple(key, label, cardinality);
+    public static ContractTuple tupleField(String key, String label) {
+        return new ContractTuple(key, label, ContractCardinality.Multiple);
     }
 
     @Override
