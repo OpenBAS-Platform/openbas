@@ -134,7 +134,7 @@ public abstract class Injector {
                 Document doc = askedDocument.orElseThrow();
                 InputStream fileInputStream = fileService.getFile(doc).orElseThrow();
                 byte[] content = IOUtils.toByteArray(fileInputStream);
-                resolved.add(new DataAttachment(doc.getName(), content, doc.getType()));
+                resolved.add(new DataAttachment(documentId, doc.getName(), content, doc.getType()));
             } catch (Exception e) {
                 // Can't fetch the attachments, ignore
                 String docInfo = askedDocument.map(Document::getName).orElse(documentId);

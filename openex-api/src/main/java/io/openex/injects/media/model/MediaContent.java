@@ -14,6 +14,9 @@ public class MediaContent extends EmailContent {
     @JsonProperty("expectation")
     private boolean expectation;
 
+    @JsonProperty("emailing")
+    private boolean emailing;
+
     public List<String> getArticles() {
         return articles;
     }
@@ -28,5 +31,13 @@ public class MediaContent extends EmailContent {
 
     public void setExpectation(boolean expectation) {
         this.expectation = expectation;
+    }
+
+    public boolean isEmailing() {
+        return emailing;
+    }
+
+    public void setEmailing(boolean emailing) {
+        this.emailing = emailing;
     }
 }

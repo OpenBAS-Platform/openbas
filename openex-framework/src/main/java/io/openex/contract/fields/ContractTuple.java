@@ -1,9 +1,13 @@
 package io.openex.contract.fields;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.contract.ContractCardinality;
 import io.openex.contract.ContractType;
 
 public class ContractTuple extends ContractCardinalityElement {
+
+    public static final String FILE_PREFIX = "file :: ";
+
     private String attachmentKey;
 
     public ContractTuple(String key, String label, ContractCardinality cardinality) {
@@ -35,5 +39,10 @@ public class ContractTuple extends ContractCardinalityElement {
 
     public Boolean isContractAttachment() {
         return attachmentKey != null;
+    }
+
+    @JsonProperty("tupleFilePrefix")
+    public String tupleFilePrefix() {
+        return FILE_PREFIX;
     }
 }

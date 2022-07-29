@@ -1,6 +1,10 @@
 package io.openex.contract.fields;
 
 import io.openex.contract.ContractType;
+import io.openex.model.LinkedFieldModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class ContractElement {
 
@@ -9,6 +13,8 @@ public abstract class ContractElement {
     private String label;
 
     private boolean mandatory = true;
+
+    private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
     public ContractElement(String key, String label) {
         this.key = key;
@@ -39,5 +45,13 @@ public abstract class ContractElement {
         this.mandatory = mandatory;
     }
 
-    protected abstract ContractType getType();
+    public List<LinkedFieldModel> getLinkedFields() {
+        return linkedFields;
+    }
+
+    public void setLinkedFields(List<ContractElement> linkedFields) {
+        this.linkedFields = linkedFields.stream().map(LinkedFieldModel::fromField).toList();
+    }
+
+    public abstract ContractType getType();
 }

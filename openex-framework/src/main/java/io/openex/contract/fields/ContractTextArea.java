@@ -2,6 +2,8 @@ package io.openex.contract.fields;
 
 import io.openex.contract.ContractType;
 
+import java.util.List;
+
 public class ContractTextArea extends ContractElement {
 
     private String defaultValue = "";
@@ -23,6 +25,13 @@ public class ContractTextArea extends ContractElement {
     public static ContractTextArea richTextareaField(String key, String label, String defaultValue) {
         ContractTextArea contractText = new ContractTextArea(key, label, true);
         contractText.setDefaultValue(defaultValue);
+        return contractText;
+    }
+
+    public static ContractTextArea richTextareaField(String key, String label, String defaultValue, List<ContractElement> linkedFields) {
+        ContractTextArea contractText = new ContractTextArea(key, label, true);
+        contractText.setDefaultValue(defaultValue);
+        contractText.setLinkedFields(linkedFields);
         return contractText;
     }
 

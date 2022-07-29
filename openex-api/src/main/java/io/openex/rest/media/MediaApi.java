@@ -123,6 +123,32 @@ public class MediaApi extends RestBehavior {
         mediaRepository.deleteById(mediaId);
     }
 
+    private List<Article> enrichArticleWithVirtualPublication(Exercise exercise, List<Article> articles) {
+        Instant now = Instant.now();
+        Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
+                .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
+                .flatMap(inject -> {
+                    Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
+                    try {
+                        MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
+                        return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
+                    } catch (JsonProcessingException e) {
+                        // Invalid media content.
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
+        return articles.stream()
+                .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
+                .sorted(Comparator.comparing(Article::getVirtualPublication, nullsFirst(naturalOrder()))
+                        .thenComparing(Article::getCreatedAt).reversed()).toList();
+    }
+
+    private Article enrichArticleWithVirtualPublication(Exercise exercise, Article article) {
+        return enrichArticleWithVirtualPublication(exercise, List.of(article)).stream().findFirst().orElseThrow();
+    }
+
     // region articles
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @PostMapping("/api/exercises/{exerciseId}/articles")
@@ -150,7 +176,8 @@ public class MediaApi extends RestBehavior {
                 }
             }
         });
-        return articleRepository.save(article);
+        Article savedArticle = articleRepository.save(article);
+        return enrichArticleWithVirtualPublication(exercise, savedArticle);
     }
 
     @PreAuthorize("isExercisePlanner(#exerciseId)")
@@ -187,29 +214,8 @@ public class MediaApi extends RestBehavior {
                 }
             }
         });
-        return articleRepository.save(article);
-    }
-
-    private List<Article> enrichArticleWithVirtualPublication(Exercise exercise, List<Article> articles) {
-        Instant now = Instant.now();
-        Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
-                .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
-                .flatMap(inject -> {
-                    Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
-                    try {
-                        MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
-                        return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
-                    } catch (JsonProcessingException e) {
-                        // Invalid media content.
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
-        return articles.stream()
-                .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
-                .sorted(Comparator.comparing(Article::getVirtualPublication, nullsFirst(naturalOrder()))
-                        .thenComparing(Article::getCreatedAt).reversed()).toList();
+        Article savedArticle = articleRepository.save(article);
+        return enrichArticleWithVirtualPublication(exercise, savedArticle);
     }
 
     @PreAuthorize("isExerciseObserver(#exerciseId)")

@@ -70,28 +70,32 @@ public class MediaExecutor extends Injector {
                 execution.addTrace(traceSuccess("article", publishedMessage));
                 Exercise exercise = injection.getSource().getExercise();
                 // Send the publication message.
-                String replyTo = exercise.getReplyTo();
-                List<ExecutionContext> users = injection.getUsers();
-                List<Document> documents = injection.getInject().getDocuments().stream()
-                        .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
-                List<DataAttachment> attachments = resolveAttachments(execution, documents);
-                String message = content.buildMessage(injection.getInject(), imapEnabled);
-                boolean encrypted = content.isEncrypted();
-                users.stream().parallel().forEach(userInjectContext -> {
-                    try {
-                        // Put the challenges variables in the injection context
-                        List<ArticleVariable> articleVariables = articles.stream()
+                if (content.isEmailing()) {
+                    String replyTo = exercise.getReplyTo();
+                    List<ExecutionContext> users = injection.getUsers();
+                    List<Document> documents = injection.getInject().getDocuments().stream()
+                            .filter(InjectDocument::isAttached).map(InjectDocument::getDocument).toList();
+                    List<DataAttachment> attachments = resolveAttachments(execution, documents);
+                    String message = content.buildMessage(injection.getInject(), imapEnabled);
+                    boolean encrypted = content.isEncrypted();
+                    users.stream().parallel().forEach(userInjectContext -> {
+                        try {
+                            // Put the challenges variables in the injection context
+                            List<ArticleVariable> articleVariables = articles.stream()
                                 .map(article -> new ArticleVariable(article.getId(), article.getName(),
-                                        buildArticleUri(userInjectContext, article)))
+                             buildArticleUri(userInjectContext, article)))
                                 .toList();
                         userInjectContext.put("articles", articleVariables);
-                        // Send the email.
-                        emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
-                                content.getSubject(), message, attachments, storeInImap);
-                    } catch (Exception e) {
-                        execution.addTrace(traceError("email", e.getMessage(), e));
-                    }
-                });
+                            // Send the email.
+                            emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
+                                    content.getSubject(), message, attachments, storeInImap);
+                        } catch (Exception e) {
+                            execution.addTrace(traceError("email", e.getMessage(), e));
+                        }
+                    });
+                } else {
+                    execution.addTrace(traceSuccess("article", "Email disabled for this inject"));
+                }
                 // Return expectations
                 if (content.isExpectation()) {
                     // Return expectations

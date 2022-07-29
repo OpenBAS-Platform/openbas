@@ -450,33 +450,22 @@ class InjectDefinition extends Component {
 
   onSubmit(data) {
     const { inject, injectTypes } = this.props;
-    const injectType = R.head(
-      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
-    );
+    const injectType = R.head(injectTypes.filter((i) => i.contract_id === inject.inject_contract));
     const finalData = {};
     injectType.fields
-      .filter(
-        (f) => !['audiences', 'articles', 'attachments'].includes(f.key)
-          && f.defaultValue !== 'HIDDEN',
-      )
+      .filter((f) => !['audiences', 'articles', 'attachments'].includes(f.key))
       .forEach((field) => {
         if (data[field.key] && field.type === 'tuple') {
           if (field.cardinality && field.cardinality === '1') {
             if (finalData[field.key].type === 'attachment') {
-              finalData[field.key] = {
-                key: data[field.key].key,
-                value: `${field.attachmentKey} :: ${data[field.key].value}`,
-              };
+              finalData[field.key] = { key: data[field.key].key, value: `${field.tupleFilePrefix}${data[field.key].value}` };
             } else {
               finalData[field.key] = R.dissoc('type', data[field.key]);
             }
           } else {
             finalData[field.key] = data[field.key].map((pair) => {
               if (pair.type === 'attachment') {
-                return {
-                  key: pair.key,
-                  value: `${field.attachmentKey} :: ${pair.value}`,
-                };
+                return { key: pair.key, value: `${field.tupleFilePrefix}${pair.value}` };
               }
               return R.dissoc('type', pair);
             });
@@ -596,23 +585,15 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAudiences = injectType.fields
-      .map((f) => f.key)
-      .includes('audiences');
-    const hasArticles = injectType.fields
-      .map((f) => f.key)
-      .includes('articles');
-    const hasAttachments = injectType.fields
-      .map((f) => f.key)
-      .includes('attachments');
+    const hasAudiences = injectType.fields.map((f) => f.key).includes('audiences');
+    const hasArticles = injectType.fields.map((f) => f.key).includes('articles');
+    const hasAttachments = injectType.fields.map((f) => f.key).includes('attachments');
     const initialValues = { ...inject.inject_content };
     // Enrich initialValues with default contract value
+    const buildInFields = ['audiences', 'articles', 'attachments'];
     if (inject.inject_content === null) {
       injectType.fields
-        .filter(
-          (f) => !['audiences', 'articles', 'attachments'].includes(f.key)
-            && f.defaultValue !== 'HIDDEN',
-        )
+        .filter((f) => !buildInFields.includes(f.key))
         .forEach((field) => {
           if (!initialValues[field.key]) {
             if (field.cardinality && field.cardinality === '1') {
@@ -625,48 +606,27 @@ class InjectDefinition extends Component {
     } else {
       // handle tuple with attachments
       injectType.fields
-        .filter(
-          (f) => !['audiences', 'articles', 'attachments'].includes(f.key)
-            && f.defaultValue !== 'HIDDEN',
-        )
+        .filter((f) => !buildInFields.includes(f.key))
         .forEach((field) => {
           if (field.type === 'tuple' && initialValues[field.key]) {
             if (field.cardinality && field.cardinality === '1') {
-              if (
-                initialValues[field.key].value
-                && initialValues[field.key].value.includes(
-                  `${field.attachmentKey} :: `,
-                )
-              ) {
+              if (initialValues[field.key].value && initialValues[field.key].value.includes(`${field.tupleFilePrefix}`)) {
                 initialValues[field.key] = {
                   type: 'attachment',
                   key: initialValues[field.key].key,
-                  value: initialValues[field.key].value.replace(
-                    `${field.attachmentKey} :: `,
-                    '',
-                  ),
+                  value: initialValues[field.key].value.replace(`${field.tupleFilePrefix}`, ''),
                 };
               } else {
-                initialValues[field.key] = R.assoc(
-                  'type',
-                  'text',
-                  initialValues[field.key],
-                );
+                initialValues[field.key] = R.assoc('type', 'text', initialValues[field.key]);
               }
             } else {
               initialValues[field.key] = initialValues[field.key].map(
                 (pair) => {
-                  if (
-                    pair.value
-                    && pair.value.includes(`${field.attachmentKey} :: `)
-                  ) {
+                  if (pair.value && pair.value.includes(`${field.tupleFilePrefix}`)) {
                     return {
                       type: 'attachment',
                       key: pair.key,
-                      value: pair.value.replace(
-                        `${field.attachmentKey} :: `,
-                        '',
-                      ),
+                      value: pair.value.replace(`${field.tupleFilePrefix}`, ''),
                     };
                   }
                   return R.assoc('type', 'text', pair);
@@ -1017,21 +977,23 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <Typography
-                  variant="h2"
-                  style={{ marginTop: hasAudiences ? 30 : 0 }}
-                >
+                <Typography variant="h2" style={{ marginTop: hasAudiences ? 30 : 0 }}>
                   {t('Inject data')}
                   <b>{injectType.name}</b>
                 </Typography>
                 <div style={{ marginTop: -20, overflowX: 'hidden' }}>
                   {injectType.fields
-                    .filter(
-                      (f) => !['audiences', 'articles', 'attachments'].includes(
-                        f.key,
-                      ) && f.defaultValue !== 'HIDDEN',
-                    )
-                    .map((field) => {
+                    .filter((f) => !buildInFields.includes(f.key))
+                    .filter((f) => { // Filter display if linked fields
+                      for (let index = 0; index < f.linkedFields.length; index += 1) {
+                        const linkedField = f.linkedFields[index];
+                        if (linkedField.type === 'checkbox' && values[linkedField.key] === false) {
+                          return false;
+                        }
+                      }
+                      return true;
+                    })
+                    .map((field, position) => {
                       switch (field.type) {
                         case 'textarea':
                           return field.richText ? (
@@ -1062,7 +1024,7 @@ class InjectDefinition extends Component {
                               key={field.key}
                               name={field.key}
                               label={t(field.label)}
-                              style={{ marginTop: 10 }}
+                              style={{ marginTop: position > 0 ? 10 : 20 }}
                               disabled={isExerciseReadOnly(exercise)}
                             />
                           );
@@ -1231,48 +1193,6 @@ class InjectDefinition extends Component {
                               style={{ marginTop: 20 }}
                             >
                               {Object.entries(field.choices)
-                                .sort((a, b) => a[1].localeCompare(b[1]))
-                                .map(([k, v]) => (
-                                  <MenuItem key={k} value={k}>
-                                    <ListItemText>{v}</ListItemText>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          );
-                        case 'exercise-select':
-                          return field.cardinality === 'n' ? (
-                            <Select
-                              variant="standard"
-                              label={t(field.label)}
-                              key={field.key}
-                              multiple
-                              renderValue={(v) => v
-                                .map((a) => field.choices[exerciseId][a])
-                                .join(', ')
-                              }
-                              name={field.key}
-                              fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
-                              {Object.entries(field.choices[exerciseId])
-                                .sort((a, b) => a[1].localeCompare(b[1]))
-                                .map(([k, v]) => (
-                                  <MenuItem key={k} value={k}>
-                                    <ListItemText>{v}</ListItemText>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          ) : (
-                            <Select
-                              variant="standard"
-                              label={t(field.label)}
-                              key={field.key}
-                              renderValue={(v) => field.choices[exerciseId][v]}
-                              name={field.key}
-                              fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
-                              {Object.entries(field.choices[exerciseId])
                                 .sort((a, b) => a[1].localeCompare(b[1]))
                                 .map(([k, v]) => (
                                   <MenuItem key={k} value={k}>
