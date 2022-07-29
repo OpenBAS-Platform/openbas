@@ -2,6 +2,7 @@ import React from 'react';
 import { Form } from 'react-final-form';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import { makeStyles } from '@mui/styles';
 import { useDispatch } from 'react-redux';
 import * as R from 'ramda';
@@ -12,7 +13,7 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchMedias } from '../../../../actions/Media';
 import MediaIcon from '../../medias/MediaIcon';
-import { EnrichedTextField } from '../../../../components/EnrichedTextField';
+import { MarkDownField } from '../../../../components/MarkDownField';
 
 const useStyles = makeStyles((theme) => ({
   duration: {
@@ -118,12 +119,41 @@ const ArticleForm = ({ onSubmit, handleClose, initialValues, editing }) => {
             style={{ marginTop: 20 }}
             label={t('Author')}
           />
-          <EnrichedTextField
+          <MarkDownField
             name="article_content"
             label={t('Content')}
             fullWidth={true}
             style={{ marginTop: 20, height: 300 }}
           />
+          <Grid container={true} spacing={3} style={{ marginTop: -40 }}>
+            <Grid item={true} xs={4}>
+              <TextField
+                variant="standard"
+                name="article_comments"
+                fullWidth={true}
+                type="number"
+                label={t('Comments')}
+              />
+            </Grid>
+            <Grid item={true} xs={4}>
+              <TextField
+                variant="standard"
+                name="article_shares"
+                fullWidth={true}
+                type="number"
+                label={t('Shares')}
+              />
+            </Grid>
+            <Grid item={true} xs={4}>
+              <TextField
+                variant="standard"
+                name="article_likes"
+                fullWidth={true}
+                type="number"
+                label={t('Likes')}
+              />
+            </Grid>
+          </Grid>
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
               onClick={handleClose}

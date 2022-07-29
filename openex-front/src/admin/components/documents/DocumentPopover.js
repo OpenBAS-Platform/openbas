@@ -103,6 +103,7 @@ class DocumentPopover extends Component {
       attached,
       tagsMap,
       exercisesMap,
+      disabled,
     } = this.props;
     const documentTags = tagsConverter(document.document_tags, tagsMap);
     const documentExercises = exercisesConverter(
@@ -126,6 +127,7 @@ class DocumentPopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
+          disabled={disabled}
         >
           <MoreVert />
         </IconButton>
@@ -237,6 +239,7 @@ DocumentPopover.propTypes = {
   onRemoveDocument: PropTypes.func,
   onToggleAttach: PropTypes.func,
   attached: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export default R.compose(

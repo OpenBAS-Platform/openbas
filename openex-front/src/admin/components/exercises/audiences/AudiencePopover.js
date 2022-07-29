@@ -155,6 +155,7 @@ class AudiencePopover extends Component {
       exercise,
       onRemoveAudience,
       tagsMap,
+      disabled,
     } = this.props;
     const audienceTags = tagsConverter(exercise.audience_tags, tagsMap);
     const initialValues = R.pipe(
@@ -167,6 +168,7 @@ class AudiencePopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
+          disabled={disabled}
         >
           <MoreVert />
         </IconButton>
@@ -363,6 +365,7 @@ AudiencePopover.propTypes = {
   deleteAudience: PropTypes.func,
   setSelectedAudience: PropTypes.func,
   onRemoveAudience: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 const select = (state) => {

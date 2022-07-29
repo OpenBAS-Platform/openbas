@@ -72,7 +72,7 @@ const ArticlePopover = ({ exercise, article }) => {
       'article_content',
       'article_author',
       'article_shares',
-      'articles_likes',
+      'article_likes',
       'article_comments',
       'article_media',
     ]),

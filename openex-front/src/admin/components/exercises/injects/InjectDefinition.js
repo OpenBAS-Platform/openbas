@@ -759,6 +759,7 @@ class InjectDefinition extends Component {
                                   onRemoveAudience={this.handleRemoveAudience.bind(
                                     this,
                                   )}
+                                  disabled={isExerciseReadOnly(exercise)}
                                 />
                               </ListItemSecondaryAction>
                             </ListItem>
@@ -843,6 +844,9 @@ class InjectDefinition extends Component {
                                             aria-haspopup="true"
                                             size="medium"
                                             style={{ marginTop: -2 }}
+                                            disabled={isExerciseReadOnly(
+                                              exercise,
+                                            )}
                                           >
                                             <ControlPointOutlined color="primary" />
                                           </IconButton>
@@ -937,6 +941,9 @@ class InjectDefinition extends Component {
                                                 }
                                                 aria-haspopup="true"
                                                 size="small"
+                                                disabled={isExerciseReadOnly(
+                                                  exercise,
+                                                )}
                                               >
                                                 <DeleteOutlined color="primary" />
                                               </IconButton>
@@ -1199,7 +1206,10 @@ class InjectDefinition extends Component {
                                     event.preventDefault();
                                     this.toggleAttachment(document.document_id);
                                   }}
-                                  disabled={!hasAttachments}
+                                  disabled={
+                                    isExerciseReadOnly(exercise)
+                                    || !hasAttachments
+                                  }
                                 />
                               </div>
                             </div>
@@ -1220,6 +1230,7 @@ class InjectDefinition extends Component {
                                 : null
                             }
                             attached={document.document_attached}
+                            disabled={isExerciseReadOnly(exercise)}
                           />
                         </ListItemSecondaryAction>
                       </ListItem>

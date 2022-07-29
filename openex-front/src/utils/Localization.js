@@ -233,6 +233,7 @@ const i18n = {
       'Do you want to change the status of this exercise?':
         'Souhaitez-vous changer le statut de cet exercice ?',
       Confirm: 'Confirmer',
+      Text: 'Texte',
       'Sender email address': "Adresse email de l'expéditeur",
       'Creation date': 'Date de création',
       'Next inject': 'Prochain stimuli',

@@ -7,14 +7,17 @@ import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import CardActions from '@mui/material/CardActions';
 import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import * as R from 'ramda';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
-import parse from 'html-react-parser';
-import DOMPurify from 'dompurify';
+import Button from '@mui/material/Button';
+import {
+  ChatBubbleOutlineOutlined,
+  ShareOutlined,
+  FavoriteBorderOutlined,
+} from '@mui/icons-material';
 import DefinitionMenu from '../DefinitionMenu';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { useHelper } from '../../../../store';
@@ -26,9 +29,9 @@ import SearchFilter from '../../../../components/SearchFilter';
 import { useFormatter } from '../../../../components/i18n';
 import MediasFilter from '../../medias/MediasFilter';
 import { fetchDocuments } from '../../../../actions/Document';
-import { truncate } from '../../../../utils/String';
 import ArticlePopover from './ArticlePopover';
 import MediaIcon from '../../medias/MediaIcon';
+import ExpandableMarkdown from '../../../../components/ExpandableMarkdown';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -39,7 +42,11 @@ const useStyles = makeStyles(() => ({
     fontSize: 12,
     float: 'left',
     marginRight: 7,
-    width: 120,
+    maxWidth: 300,
+  },
+  footer: {
+    margin: '10px 0 0 0',
+    padding: '0 0 20px 0',
   },
 }));
 
@@ -128,6 +135,7 @@ const Articles = () => {
           } else {
             columns = 3;
           }
+          // const shouldBeTruncated = (article.article_content || '').length > 500;
           return (
             <Grid item={true} xs={4}>
               <Card
@@ -168,29 +176,62 @@ const Articles = () => {
                   ))}
                 </Grid>
                 <CardContent>
-                  <Typography gutterBottom variant="h1" component="div">
+                  <Typography
+                    gutterBottom
+                    variant="h1"
+                    component="div"
+                    style={{ margin: '0 auto', textAlign: 'center' }}
+                  >
                     {article.article_name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {parse(
-                      DOMPurify.sanitize(truncate(article.article_content, 500)),
-                    )}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Tooltip title={article.article_fullmedia.media_name}>
-                    <Chip
-                      icon={
-                        <MediaIcon
-                          type={article.article_fullmedia.media_type}
+                  <ExpandableMarkdown
+                    source={article.article_content}
+                    limit={500}
+                    controlled={true}
+                  />
+                  <div className={classes.footer}>
+                    <div style={{ float: 'left' }}>
+                      <Tooltip title={article.article_fullmedia.media_name}>
+                        <Chip
+                          icon={
+                            <MediaIcon
+                              type={article.article_fullmedia.media_type}
+                              variant="chip"
+                            />
+                          }
+                          classes={{ root: classes.media }}
+                          style={{
+                            color: mediaColor(
+                              article.article_fullmedia.media_type,
+                            ),
+                            borderColor: mediaColor(
+                              article.article_fullmedia.media_type,
+                            ),
+                          }}
+                          variant="outlined"
+                          label={article.article_fullmedia.media_name}
                         />
-                      }
-                      classes={{ root: classes.media }}
-                      variant="outlined"
-                      label={article.article_fullmedia.media_name}
-                    />
-                  </Tooltip>
-                </CardActions>
+                      </Tooltip>
+                    </div>
+                    <div style={{ float: 'right' }}>
+                      <Button
+                        size="small"
+                        startIcon={<ChatBubbleOutlineOutlined />}
+                      >
+                        {article.article_comments || 0}
+                      </Button>
+                      <Button size="small" startIcon={<ShareOutlined />}>
+                        {article.article_shares || 0}
+                      </Button>
+                      <Button
+                        size="small"
+                        startIcon={<FavoriteBorderOutlined />}
+                      >
+                        {article.article_likes || 0}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
               </Card>
             </Grid>
           );

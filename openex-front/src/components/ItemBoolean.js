@@ -53,7 +53,7 @@ const inlineStyles = {
 
 class ItemBoolean extends Component {
   render() {
-    const { classes, label, status, variant, t, reverse, onClick } = this.props;
+    const { classes, label, status, variant, t, reverse, onClick, disabled } = this.props;
     const style = variant === 'list' ? classes.chipInList : classes.chip;
     const inlineStyleRed = onClick
       ? inlineStyles.redClickable
@@ -67,7 +67,7 @@ class ItemBoolean extends Component {
           classes={{ root: style }}
           style={reverse ? inlineStyleRed : inlineStyleGreen}
           label={label}
-          onClick={onClick ? onClick.bind(this) : null}
+          onClick={!disabled && onClick ? onClick.bind(this) : null}
         />
       );
     }
@@ -77,7 +77,7 @@ class ItemBoolean extends Component {
           classes={{ root: style }}
           style={inlineStyles.grey}
           label={t('N/A')}
-          onClick={onClick ? onClick.bind(this) : null}
+          onClick={!disabled && onClick ? onClick.bind(this) : null}
         />
       );
     }
@@ -86,7 +86,7 @@ class ItemBoolean extends Component {
         classes={{ root: style }}
         style={reverse ? inlineStyleGreen : inlineStyleRed}
         label={label}
-        onClick={onClick ? onClick.bind(this) : null}
+        onClick={!disabled && onClick ? onClick.bind(this) : null}
       />
     );
   }
@@ -99,6 +99,7 @@ ItemBoolean.propTypes = {
   variant: PropTypes.string,
   reverse: PropTypes.bool,
   onClick: PropTypes.func,
+  disabled: PropTypes.bool,
 };
 
 export default R.compose(inject18n, withStyles(styles))(ItemBoolean);
