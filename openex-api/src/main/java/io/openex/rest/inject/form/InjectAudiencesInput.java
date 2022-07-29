@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class UpdateAudiencesInjectInput {
+public class InjectAudiencesInput {
 
     @JsonProperty("inject_audiences")
     private List<String> audienceIds;

@@ -204,6 +204,8 @@ const i18n = {
         'Aucun stimuli traité dans cet exercice.',
       'No pending injects in this exercise.':
         'Aucun stimuli en attente dans cet exercice.',
+      'Add media pressure in this inject':
+        'Ajouter de la pression médiatique da ce stimuli',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_mastodon: 'Mastodon',
@@ -219,7 +221,9 @@ const i18n = {
       Attachment: 'Pièce jointe',
       Content: 'Contenu',
       Audiences: 'Audiences',
+      'Add media pressure': 'Ajouter de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
+      'Media pressure to publish': 'Pression médiatique à publier',
       'Form request data': 'Données de formulaire de la requête',
       Key: 'Clé',
       Headers: 'En-têtes',

@@ -30,6 +30,7 @@ import { FieldArray } from 'react-final-form-arrays';
 import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
+import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
@@ -44,6 +45,8 @@ import Loader from '../../../../components/Loader';
 import DocumentType from '../../documents/DocumentType';
 import DocumentPopover from '../../documents/DocumentPopover';
 import { Select } from '../../../../components/Select';
+import ArticlePopover from '../media/ArticlePopover';
+import InjectAddArticles from './InjectAddArticles';
 
 const styles = (theme) => ({
   header: {
@@ -120,6 +123,29 @@ const inlineStylesHeaders = {
     fontSize: 12,
     fontWeight: '700',
   },
+  article_media_type: {
+    float: 'left',
+    width: '15%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  article_media_name: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  article_name: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  article_author: {
+    float: 'left',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   document_name: {
     float: 'left',
     width: '35%',
@@ -179,6 +205,37 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  article_media_type: {
+    float: 'left',
+    width: '15%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  article_media_name: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  article_name: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  article_author: {
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   document_name: {
     float: 'left',
     width: '35%',
@@ -216,6 +273,9 @@ const inlineStyles = {
 class InjectDefinition extends Component {
   constructor(props) {
     super(props);
+    const articlesIds = props.inject?.inject_content?.articles
+      ? props.inject.inject_content.articles.map((a) => a.article_id)
+      : [];
     this.state = {
       allAudiences: props.inject.inject_all_audiences,
       audiencesIds: props.inject.inject_audiences,
@@ -224,6 +284,9 @@ class InjectDefinition extends Component {
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
+      articlesIds,
+      articlesSortBy: 'article_name',
+      articlesOrderAsc: true,
     };
   }
 
@@ -231,6 +294,7 @@ class InjectDefinition extends Component {
     const { exerciseId, injectId } = this.props;
     this.props.fetchDocuments();
     this.props.fetchInjectAudiences(exerciseId, injectId);
+    this.props.fetchExerciseArticles(exerciseId);
   }
 
   toggleAll() {
@@ -246,6 +310,18 @@ class InjectDefinition extends Component {
   handleRemoveAudience(audienceId) {
     this.setState({
       audiencesIds: this.state.audiencesIds.filter((a) => a !== audienceId),
+    });
+  }
+
+  handleAddArticles(articlesIds) {
+    this.setState({
+      articlesIds: [...this.state.articlesIds, ...articlesIds],
+    });
+  }
+
+  handleRemoveArticle(articleId) {
+    this.setState({
+      articlesIds: this.state.articlesIds.filter((a) => a !== articleId),
     });
   }
 
@@ -313,6 +389,32 @@ class InjectDefinition extends Component {
     );
   }
 
+  articlesSortHeader(field, label, isSortable) {
+    const { t } = this.props;
+    const { audiencesSortBy, audiencesOrderAsc } = this.state;
+    const sortComponent = audiencesOrderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
+    if (isSortable) {
+      return (
+        <div
+          style={inlineStylesHeaders[field]}
+          onClick={this.audiencesReverseBy.bind(this, field)}
+        >
+          <span>{t(label)}</span>
+          {audiencesSortBy === field ? sortComponent : ''}
+        </div>
+      );
+    }
+    return (
+      <div style={inlineStylesHeaders[field]}>
+        <span>{t(label)}</span>
+      </div>
+    );
+  }
+
   documentsReverseBy(field) {
     this.setState({
       documentsSortBy: field,
@@ -354,7 +456,7 @@ class InjectDefinition extends Component {
     const finalData = {};
     injectType.fields
       .filter(
-        (f) => !['audiences', 'attachments'].includes(f.key)
+        (f) => !['audiences', 'articles', 'attachments'].includes(f.key)
           && f.defaultValue !== 'HIDDEN',
       )
       .forEach((field) => {
@@ -409,7 +511,9 @@ class InjectDefinition extends Component {
     );
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
-        .filter((f) => !['audiences', 'attachments'].includes(f.key))
+        .filter(
+          (f) => !['audiences', 'articles', 'attachments'].includes(f.key),
+        )
         .forEach((field) => {
           const value = values[field.key];
           if (field.mandatory && R.isEmpty(value)) {
@@ -433,6 +537,8 @@ class InjectDefinition extends Component {
       documentsMap,
       exercisesMap,
       tagsMap,
+      articlesMap,
+      mediasMap,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -445,6 +551,9 @@ class InjectDefinition extends Component {
       audiencesOrderAsc,
       documentsSortBy,
       documentsOrderAsc,
+      articlesOrderAsc,
+      articlesSortBy,
+      articlesIds,
     } = this.state;
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === inject.inject_contract),
@@ -458,6 +567,20 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(audiencesSortBy))],
     );
     const sortedAudiences = sortAudiences(audiences);
+    const articles = articlesIds
+      .map((a) => articlesMap[a])
+      .filter((a) => a !== undefined)
+      .map((a) => ({
+        ...a,
+        article_media_type: mediasMap[a.article_media]?.media_type || '',
+        article_media_name: mediasMap[a.article_media]?.media_name || '',
+      }));
+    const sortArticles = R.sortWith(
+      articlesOrderAsc
+        ? [R.ascend(R.prop(articlesSortBy))]
+        : [R.descend(R.prop(articlesSortBy))],
+    );
+    const sortedArticles = sortArticles(articles);
     const docs = documents
       .map((d) => (documentsMap[d.document_id]
         ? {
@@ -476,6 +599,9 @@ class InjectDefinition extends Component {
     const hasAudiences = injectType.fields
       .map((f) => f.key)
       .includes('audiences');
+    const hasArticles = injectType.fields
+      .map((f) => f.key)
+      .includes('articles');
     const hasAttachments = injectType.fields
       .map((f) => f.key)
       .includes('attachments');
@@ -484,7 +610,7 @@ class InjectDefinition extends Component {
     if (inject.inject_content === null) {
       injectType.fields
         .filter(
-          (f) => !['audiences', 'attachments'].includes(f.key)
+          (f) => !['audiences', 'articles', 'attachments'].includes(f.key)
             && f.defaultValue !== 'HIDDEN',
         )
         .forEach((field) => {
@@ -500,7 +626,7 @@ class InjectDefinition extends Component {
       // handle tuple with attachments
       injectType.fields
         .filter(
-          (f) => !['audiences', 'attachments'].includes(f.key)
+          (f) => !['audiences', 'articles', 'attachments'].includes(f.key)
             && f.defaultValue !== 'HIDDEN',
         )
         .forEach((field) => {
@@ -776,6 +902,121 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
+                {hasArticles && (
+                  <div>
+                    <Typography
+                      variant="h2"
+                      style={{ marginTop: hasAudiences ? 30 : 0 }}
+                    >
+                      {t('Media pressure to publish')}
+                    </Typography>
+                    <List>
+                      <ListItem
+                        classes={{ root: classes.itemHead }}
+                        divider={false}
+                        style={{ paddingTop: 0 }}
+                      >
+                        <ListItemIcon>
+                          <span
+                            style={{
+                              padding: '0 8px 0 8px',
+                              fontWeight: 700,
+                              fontSize: 12,
+                            }}
+                          >
+                            &nbsp;
+                          </span>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <div>
+                              {this.articlesSortHeader(
+                                'article_media_type',
+                                'Type',
+                                true,
+                              )}
+                              {this.articlesSortHeader(
+                                'article_media_name',
+                                'Media',
+                                true,
+                              )}
+                              {this.articlesSortHeader(
+                                'article_name',
+                                'Name',
+                                true,
+                              )}
+                              {this.articlesSortHeader(
+                                'article_author',
+                                'Author',
+                                true,
+                              )}
+                            </div>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          &nbsp;
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      {sortedArticles.map((article) => (
+                        <ListItem
+                          key={article.article_id}
+                          classes={{ root: classes.item }}
+                          divider={true}
+                        >
+                          <ListItemIcon>
+                            <CastForEducationOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.article_media_type}
+                                >
+                                  {article.article_media_type}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.article_media_name}
+                                >
+                                  {article.article_media_name}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.article_name}
+                                >
+                                  {article.article_name}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.article_author}
+                                >
+                                  {article.article_author}
+                                </div>
+                              </div>
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <ArticlePopover
+                              exerciseId={exerciseId}
+                              exercise={exercise}
+                              article={article}
+                              onRemoveArticle={this.handleRemoveArticle.bind(
+                                this,
+                              )}
+                              disabled={isExerciseReadOnly(exercise)}
+                            />
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                      <InjectAddArticles
+                        exerciseId={exerciseId}
+                        injectArticlesIds={articlesIds}
+                        handleAddArticles={this.handleAddArticles.bind(this)}
+                      />
+                    </List>
+                  </div>
+                )}
                 <Typography
                   variant="h2"
                   style={{ marginTop: hasAudiences ? 30 : 0 }}
@@ -786,8 +1027,9 @@ class InjectDefinition extends Component {
                 <div style={{ marginTop: -20, overflowX: 'hidden' }}>
                   {injectType.fields
                     .filter(
-                      (f) => !['audiences', 'attachments'].includes(f.key)
-                        && f.defaultValue !== 'HIDDEN',
+                      (f) => !['audiences', 'articles', 'attachments'].includes(
+                        f.key,
+                      ) && f.defaultValue !== 'HIDDEN',
                     )
                     .map((field) => {
                       switch (field.type) {
@@ -1272,6 +1514,7 @@ InjectDefinition.propTypes = {
   injectId: PropTypes.string,
   inject: PropTypes.object,
   fetchInjectAudiences: PropTypes.func,
+  fetchExerciseArticles: PropTypes.func,
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
@@ -1286,11 +1529,19 @@ const select = (state, ownProps) => {
   const inject = helper.getInject(injectId);
   const documentsMap = helper.getDocumentsMap();
   const audiencesMap = helper.getAudiencesMap();
-  return { inject, documentsMap, audiencesMap };
+  const mediasMap = helper.getMediasMap();
+  const articlesMap = helper.getArticlesMap();
+  return { inject, documentsMap, audiencesMap, articlesMap, mediasMap };
 };
 
 export default R.compose(
-  connect(select, { fetchInjectAudiences, updateInject, fetchDocuments }),
+  connect(select, {
+    fetchInjectAudiences,
+    updateInject,
+    fetchDocuments,
+    fetchExerciseArticles,
+    fetchMedias,
+  }),
   inject18n,
   withStyles(styles),
 )(InjectDefinition);

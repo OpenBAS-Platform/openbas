@@ -44,9 +44,15 @@ const useStyles = makeStyles(() => ({
     marginRight: 7,
     maxWidth: 300,
   },
+  card: {
+    position: 'relative',
+  },
   footer: {
-    margin: '10px 0 0 0',
-    padding: '0 0 20px 0',
+    width: '100%',
+    position: 'absolute',
+    padding: '0 15px 0 15px',
+    left: 0,
+    bottom: 10,
   },
 }));
 
@@ -139,6 +145,7 @@ const Articles = () => {
           return (
             <Grid item={true} xs={4}>
               <Card
+                classes={{ root: classes.card }}
                 sx={{ width: '100%', height: '100%' }}
                 key={article.article_id}
               >
@@ -175,7 +182,7 @@ const Articles = () => {
                     </Grid>
                   ))}
                 </Grid>
-                <CardContent>
+                <CardContent style={{ marginBottom: 30 }}>
                   <Typography
                     gutterBottom
                     variant="h1"

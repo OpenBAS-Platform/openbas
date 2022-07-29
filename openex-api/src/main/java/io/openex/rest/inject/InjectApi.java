@@ -262,7 +262,7 @@ public class InjectApi extends RestBehavior {
 
     @PutMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public Inject updateInjectAudiences(@PathVariable String exerciseId, @PathVariable String injectId, @Valid @RequestBody UpdateAudiencesInjectInput input) {
+    public Inject updateInjectAudiences(@PathVariable String exerciseId, @PathVariable String injectId, @Valid @RequestBody InjectAudiencesInput input) {
         Inject inject = injectRepository.findById(injectId).orElseThrow();
         Iterable<Audience> injectAudiences = audienceRepository.findAllById(input.getAudienceIds());
         inject.setAudiences(fromIterable(injectAudiences));

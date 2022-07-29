@@ -194,11 +194,11 @@ public class MediaApi extends RestBehavior {
         Instant now = Instant.now();
         Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
-                .map(inject -> {
+                .flatMap(inject -> {
                     Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
                     try {
                         MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
-                        return new VirtualArticle(virtualInjectDate, content.getArticleId());
+                        return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
                     } catch (JsonProcessingException e) {
                         // Invalid media content.
                         return null;
@@ -265,11 +265,11 @@ public class MediaApi extends RestBehavior {
                 .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
                 .filter(inject -> inject.getStatus().isPresent())
                 .sorted(Comparator.comparing(inject -> inject.getStatus().get().getDate()))
-                .map(inject -> {
+                .flatMap(inject -> {
                     Instant virtualInjectDate = inject.getStatus().get().getDate();
                     try {
                         MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
-                        return new VirtualArticle(virtualInjectDate, content.getArticleId());
+                        return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
                     } catch (JsonProcessingException e) {
                         // Invalid media content.
                         return null;

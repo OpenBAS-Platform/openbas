@@ -98,7 +98,7 @@ const headerStyles = {
   },
   inject_type: {
     float: 'left',
-    width: '10%',
+    width: '15%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -136,7 +136,7 @@ const headerStyles = {
 const inlineStyles = {
   inject_type: {
     float: 'left',
-    width: '10%',
+    width: '15%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',

@@ -13,8 +13,8 @@ public enum ContractType {
     Textarea,
     @JsonProperty("select")
     Select,
-    @JsonProperty("exercise-select")
-    ExerciseSelect,
+    @JsonProperty("article")
+    Article,
     @JsonProperty("dependency-select")
     DependencySelect,
     @JsonProperty("attachment")

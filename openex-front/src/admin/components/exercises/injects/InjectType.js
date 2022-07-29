@@ -13,7 +13,7 @@ const styles = () => ({
     height: 30,
     margin: '0 7px 7px 0',
     borderRadius: 5,
-    width: 140,
+    width: 160,
   },
   chipInList: {
     fontSize: 12,
@@ -22,7 +22,7 @@ const styles = () => ({
     float: 'left',
     marginRight: 7,
     borderRadius: 5,
-    width: 120,
+    width: 140,
   },
 });
 

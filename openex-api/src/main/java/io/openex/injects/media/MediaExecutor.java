@@ -8,6 +8,7 @@ import io.openex.execution.ExecutableInject;
 import io.openex.execution.ExecutionContext;
 import io.openex.execution.Injector;
 import io.openex.injects.email.service.EmailService;
+import io.openex.injects.media.model.ArticleVariable;
 import io.openex.injects.media.model.MediaContent;
 import io.openex.model.Expectation;
 import io.openex.model.expectation.MediaExpectation;
@@ -16,10 +17,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.openex.database.model.ExecutionTrace.traceError;
 import static io.openex.database.model.ExecutionTrace.traceSuccess;
+import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.injects.media.MediaContract.MEDIA_PUBLISH;
 
 @Component(MediaContract.TYPE)
@@ -58,11 +62,12 @@ public class MediaExecutor extends Injector {
         try {
             boolean storeInImap = !injection.isTestingInject();
             MediaContent content = contentConvert(injection, MediaContent.class);
-            Article article = articleRepository.findById(content.getArticleId()).orElseThrow();
+            List<Article> articles = fromIterable(articleRepository.findAllById(content.getArticles()));
             if (contract.getId().equals(MEDIA_PUBLISH)) {
                 // Article publishing is only linked to execution date of this inject.
-                String publishedMessage = "Article (" + article.getName() + ") marked as published";
-                execution.addTrace(traceSuccess("media", publishedMessage));
+                String articleNames = articles.stream().map(Article::getName).collect(Collectors.joining(","));
+                String publishedMessage = "Articles (" + articleNames + ") marked as published";
+                execution.addTrace(traceSuccess("article", publishedMessage));
                 Exercise exercise = injection.getSource().getExercise();
                 // Send the publication message.
                 String replyTo = exercise.getReplyTo();
@@ -74,9 +79,12 @@ public class MediaExecutor extends Injector {
                 boolean encrypted = content.isEncrypted();
                 users.stream().parallel().forEach(userInjectContext -> {
                     try {
-                        // Put the article variables in the injection context
-                        userInjectContext.put("article", article);
-                        userInjectContext.put("article_uri", buildArticleUri(userInjectContext, article));
+                        // Put the challenges variables in the injection context
+                        List<ArticleVariable> articleVariables = articles.stream()
+                                .map(article -> new ArticleVariable(article.getId(), article.getName(),
+                                        buildArticleUri(userInjectContext, article)))
+                                .toList();
+                        userInjectContext.put("articles", articleVariables);
                         // Send the email.
                         emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
                                 content.getSubject(), message, attachments, storeInImap);
@@ -86,7 +94,10 @@ public class MediaExecutor extends Injector {
                 });
                 // Return expectations
                 if (content.isExpectation()) {
-                    return List.of(new MediaExpectation(article));
+                    // Return expectations
+                    List<Expectation> expectations = new ArrayList<>();
+                    articles.forEach(article -> expectations.add(new MediaExpectation(article)));
+                    return expectations;
                 }
             } else {
                 throw new UnsupportedOperationException("Unknown contract " + contract.getId());

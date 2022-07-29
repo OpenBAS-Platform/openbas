@@ -8,7 +8,11 @@ import {
   SpeakerNotesOutlined,
   ApiOutlined,
 } from '@mui/icons-material';
-import { Mastodon, Twitter } from 'mdi-material-ui';
+import {
+  Mastodon,
+  NewspaperVariantMultipleOutline,
+  Twitter,
+} from 'mdi-material-ui';
 import Airbus from '../../../../resources/images/contracts/airbus.png';
 import CustomTooltip from '../../../../components/CustomTooltip';
 
@@ -95,6 +99,14 @@ const iconSelector = (type, variant, fontSize, done) => {
           style={style}
           fontSize={fontSize}
           sx={{ color: done ? '#4caf50' : '#00bcd4' }}
+        />
+      );
+    case 'openex_media':
+      return (
+        <NewspaperVariantMultipleOutline
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#4caf50' : '#ff9800' }}
         />
       );
     default:

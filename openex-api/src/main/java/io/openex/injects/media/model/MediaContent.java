@@ -3,20 +3,23 @@ package io.openex.injects.media.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.openex.injects.email.model.EmailContent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MediaContent extends EmailContent {
 
-    @JsonProperty("article_id")
-    private String articleId;
+    @JsonProperty("articles")
+    private List<String> articles = new ArrayList<>();
 
     @JsonProperty("expectation")
     private boolean expectation;
 
-    public String getArticleId() {
-        return articleId;
+    public List<String> getArticles() {
+        return articles;
     }
 
-    public void setArticleId(String articleId) {
-        this.articleId = articleId;
+    public void setArticles(List<String> articles) {
+        this.articles = articles;
     }
 
     public boolean isExpectation() {
