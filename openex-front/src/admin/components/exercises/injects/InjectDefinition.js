@@ -274,6 +274,12 @@ class InjectDefinition extends Component {
     });
   }
 
+  selectTupleFieldType(name, type) {
+    this.setState({
+      tupleFieldTypes: R.assoc(name, type, this.state.tupleFieldTypes),
+    });
+  }
+
   audiencesReverseBy(field) {
     this.setState({
       audiencesSortBy: field,
@@ -341,7 +347,42 @@ class InjectDefinition extends Component {
   }
 
   onSubmit(data) {
-    const { inject } = this.props;
+    const { inject, injectTypes } = this.props;
+    const injectType = R.head(
+      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    );
+    const finalData = {};
+    injectType.fields
+      .filter(
+        (f) => !['audiences', 'attachments'].includes(f.key)
+          && f.defaultValue !== 'HIDDEN',
+      )
+      .forEach((field) => {
+        if (data[field.key] && field.type === 'tuple') {
+          if (field.cardinality && field.cardinality === '1') {
+            if (finalData[field.key].type === 'attachment') {
+              finalData[field.key] = {
+                key: data[field.key].key,
+                value: `${field.attachmentKey} :: ${data[field.key].value}`,
+              };
+            } else {
+              finalData[field.key] = R.dissoc('type', data[field.key]);
+            }
+          } else {
+            finalData[field.key] = data[field.key].map((pair) => {
+              if (pair.type === 'attachment') {
+                return {
+                  key: pair.key,
+                  value: `${field.attachmentKey} :: ${pair.value}`,
+                };
+              }
+              return R.dissoc('type', pair);
+            });
+          }
+        } else {
+          finalData[field.key] = data[field.key];
+        }
+      });
     const { allAudiences, audiencesIds, documents } = this.state;
     const values = {
       inject_title: inject.inject_title,
@@ -350,7 +391,7 @@ class InjectDefinition extends Component {
       inject_tags: inject.inject_tags,
       inject_depends_duration: inject.inject_depends_duration,
       inject_depends_from_another: inject.inject_depends_from_another,
-      inject_content: data,
+      inject_content: finalData,
       inject_all_audiences: allAudiences,
       inject_audiences: audiencesIds,
       inject_documents: documents,
@@ -425,6 +466,7 @@ class InjectDefinition extends Component {
         }
         : undefined))
       .filter((d) => d !== undefined);
+    const attachedDocs = docs.filter((n) => n.document_attached);
     const sortDocuments = R.sortWith(
       documentsOrderAsc
         ? [R.ascend(R.prop(documentsSortBy))]
@@ -451,6 +493,59 @@ class InjectDefinition extends Component {
               initialValues[field.key] = R.head(field.defaultValue);
             } else {
               initialValues[field.key] = field.defaultValue;
+            }
+          }
+        });
+    } else {
+      // handle tuple with attachments
+      injectType.fields
+        .filter(
+          (f) => !['audiences', 'attachments'].includes(f.key)
+            && f.defaultValue !== 'HIDDEN',
+        )
+        .forEach((field) => {
+          if (field.type === 'tuple' && initialValues[field.key]) {
+            if (field.cardinality && field.cardinality === '1') {
+              if (
+                initialValues[field.key].value
+                && initialValues[field.key].value.includes(
+                  `${field.attachmentKey} :: `,
+                )
+              ) {
+                initialValues[field.key] = {
+                  type: 'attachment',
+                  key: initialValues[field.key].key,
+                  value: initialValues[field.key].value.replace(
+                    `${field.attachmentKey} :: `,
+                    '',
+                  ),
+                };
+              } else {
+                initialValues[field.key] = R.assoc(
+                  'type',
+                  'text',
+                  initialValues[field.key],
+                );
+              }
+            } else {
+              initialValues[field.key] = initialValues[field.key].map(
+                (pair) => {
+                  if (
+                    pair.value
+                    && pair.value.includes(`${field.attachmentKey} :: `)
+                  ) {
+                    return {
+                      type: 'attachment',
+                      key: pair.key,
+                      value: pair.value.replace(
+                        `${field.attachmentKey} :: `,
+                        '',
+                      ),
+                    };
+                  }
+                  return R.assoc('type', 'text', pair);
+                },
+              );
             }
           }
         });
@@ -494,7 +589,8 @@ class InjectDefinition extends Component {
                     </Typography>
                     <FormGroup
                       row={true}
-                      classes={{ root: classes.allAudiences }}>
+                      classes={{ root: classes.allAudiences }}
+                    >
                       <FormControlLabel
                         control={
                           <Switch
@@ -730,45 +826,128 @@ class InjectDefinition extends Component {
                         case 'tuple':
                           return (
                             <div>
-                                <FieldArray name={field.key}>
-                                  {({ fields }) => (
-                                      <div>
-                                        <div style={{ marginTop: 20 }}>
-                                          <Typography variant="body2">
-                                            {t(field.label)}
-                                            {field.cardinality === 'n' && (
-                                                <IconButton onClick={() => fields.push({ key: '', value: '' })}
-                                                            aria-haspopup="true" size="medium"
-                                                            style={{ marginTop: -2 }}>
-                                                  <ControlPointOutlined color="primary" />
-                                                </IconButton>
-                                            )}
-                                          </Typography>
-                                        </div>
-                                        <List style={{ marginTop: 0 }}>
-                                          {fields.map((name, index) => (
-                                            <ListItem key={`${field.key}_list_${index}`} classes={{ root: classes.tuple }} divider={false}>
-                                              <TextField variant="standard" name={`${name}.key`}
-                                                  fullWidth={true} label={t('Key')} style={{ marginRight: 20 }}
-                                                  disabled={isExerciseReadOnly(exercise)}
-                                              />
-                                              <TextField variant="standard" name={`${name}.value`}
-                                                  fullWidth={true} label={t('Value')} style={{ marginRight: 20 }}
-                                                  disabled={isExerciseReadOnly(exercise)}
-                                              />
-                                              {field.cardinality === 'n' && (
-                                                  <IconButton onClick={() => fields.remove(index)}
-                                                      aria-haspopup="true"
-                                                      size="small">
-                                                    <DeleteOutlined color="primary" />
-                                                  </IconButton>
+                              <FieldArray name={field.key}>
+                                {({ fields }) => (
+                                  <div>
+                                    <div style={{ marginTop: 20 }}>
+                                      <Typography variant="body2">
+                                        {t(field.label)}
+                                        {field.cardinality === 'n' && (
+                                          <IconButton
+                                            onClick={() => fields.push({
+                                              type: 'text',
+                                              key: '',
+                                              value: '',
+                                            })
+                                            }
+                                            aria-haspopup="true"
+                                            size="medium"
+                                            style={{ marginTop: -2 }}
+                                          >
+                                            <ControlPointOutlined color="primary" />
+                                          </IconButton>
+                                        )}
+                                      </Typography>
+                                    </div>
+                                    <List style={{ marginTop: 0 }}>
+                                      {fields.map((name, index) => {
+                                        return (
+                                          <ListItem
+                                            key={`${field.key}_list_${index}`}
+                                            classes={{ root: classes.tuple }}
+                                            divider={false}
+                                          >
+                                            <Select
+                                              variant="standard"
+                                              name={`${name}.type`}
+                                              fullWidth={true}
+                                              label={t('Type')}
+                                              style={{ marginRight: 20 }}
+                                              disabled={isExerciseReadOnly(
+                                                exercise,
                                               )}
-                                            </ListItem>
-                                          ))}
-                                        </List>
-                                      </div>
-                                  )}
-                                </FieldArray>
+                                            >
+                                              <MenuItem key="text" value="text">
+                                                <ListItemText>
+                                                  {t('Text')}
+                                                </ListItemText>
+                                              </MenuItem>
+                                              {field.contractAttachment && (
+                                                <MenuItem
+                                                  key="attachment"
+                                                  value="attachment"
+                                                >
+                                                  <ListItemText>
+                                                    {t('Attachment')}
+                                                  </ListItemText>
+                                                </MenuItem>
+                                              )}
+                                            </Select>
+                                            <TextField
+                                              variant="standard"
+                                              name={`${name}.key`}
+                                              fullWidth={true}
+                                              label={t('Key')}
+                                              style={{ marginRight: 20 }}
+                                              disabled={isExerciseReadOnly(
+                                                exercise,
+                                              )}
+                                            />
+                                            {values
+                                            && values[field.key]
+                                            && values[field.key][index]
+                                            && values[field.key][index].type
+                                              === 'attachment' ? (
+                                              <Select
+                                                variant="standard"
+                                                name={`${name}.value`}
+                                                fullWidth={true}
+                                                label={t('Value')}
+                                                style={{ marginRight: 20 }}
+                                                disabled={isExerciseReadOnly(
+                                                  exercise,
+                                                )}
+                                              >
+                                                {attachedDocs.map((doc) => (
+                                                  <MenuItem
+                                                    key={doc.document_id}
+                                                    value={doc.document_id}
+                                                  >
+                                                    <ListItemText>
+                                                      {doc.document_name}
+                                                    </ListItemText>
+                                                  </MenuItem>
+                                                ))}
+                                              </Select>
+                                              ) : (
+                                              <TextField
+                                                variant="standard"
+                                                name={`${name}.value`}
+                                                fullWidth={true}
+                                                label={t('Value')}
+                                                style={{ marginRight: 20 }}
+                                                disabled={isExerciseReadOnly(
+                                                  exercise,
+                                                )}
+                                              />
+                                              )}
+                                            {field.cardinality === 'n' && (
+                                              <IconButton
+                                                onClick={() => fields.remove(index)
+                                                }
+                                                aria-haspopup="true"
+                                                size="small"
+                                              >
+                                                <DeleteOutlined color="primary" />
+                                              </IconButton>
+                                            )}
+                                          </ListItem>
+                                        );
+                                      })}
+                                    </List>
+                                  </div>
+                                )}
+                              </FieldArray>
                             </div>
                           );
                         case 'select':
@@ -1016,14 +1195,10 @@ class InjectDefinition extends Component {
                                       : t('No')
                                   }
                                   variant="list"
-                                  onClick={
-                                    hasAttachments
-                                      ? this.toggleAttachment.bind(
-                                        this,
-                                        document.document_id,
-                                      )
-                                      : null
-                                  }
+                                  onClick={(event) => {
+                                    event.preventDefault();
+                                    this.toggleAttachment(document.document_id);
+                                  }}
                                   disabled={!hasAttachments}
                                 />
                               </div>
@@ -1055,6 +1230,7 @@ class InjectDefinition extends Component {
                         .filter((a) => !a.inject_document_attached)
                         .map((d) => d.document_id)}
                       handleAddDocuments={this.handleAddDocuments.bind(this)}
+                      hasAttachments={hasAttachments}
                     />
                   </List>
                 </div>

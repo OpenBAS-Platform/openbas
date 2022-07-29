@@ -103,10 +103,11 @@ class InjectAddDocuments extends Component {
   }
 
   submitAddDocuments() {
+    const { hasAttachments } = this.props;
     this.props.handleAddDocuments(
       this.state.documentsIds.map((n) => ({
         document_id: n,
-        document_attached: false,
+        document_attached: hasAttachments,
       })),
     );
     this.handleClose();
@@ -266,6 +267,7 @@ InjectAddDocuments.propTypes = {
   documents: PropTypes.object,
   injectDocumentsIds: PropTypes.array,
   handleAddDocuments: PropTypes.func,
+  hasAttachments: PropTypes.bool,
 };
 
 const select = (state, ownProps) => {
