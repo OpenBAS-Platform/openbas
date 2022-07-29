@@ -159,7 +159,7 @@ const i18n = {
       'Do you want to delete this document?':
         'Souhaitez-vous supprimer ce document ?',
       'Update the document': 'Modifier le document',
-      'Inject data: ': 'Données du stimuli : ',
+      'Inject data': 'Données du stimuli',
       'Add target audiences in this inject':
         'Ajouter des audiences cibles dans ce stimuli',
       'Targeted audiences': 'Audiences ciblées',
@@ -216,10 +216,11 @@ const i18n = {
       Body: 'Corps du mail',
       Encrypted: 'Chiffrer ce mail',
       Attachments: 'Pièces jointes',
-      Attachmenta: 'Pièce jointe',
+      Attachment: 'Pièce jointe',
       Content: 'Contenu',
       Audiences: 'Audiences',
-      'Raw request body': 'Corps brut de la requête',
+      'Raw request data': 'Données brutes de la requête',
+      'Form request data': 'Données de formulaire de la requête',
       Key: 'Clé',
       Headers: 'En-têtes',
       audience: 'Audience',

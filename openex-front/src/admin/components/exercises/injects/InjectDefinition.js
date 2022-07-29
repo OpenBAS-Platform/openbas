@@ -683,7 +683,7 @@ class InjectDefinition extends Component {
                   variant="h2"
                   style={{ marginTop: hasAudiences ? 30 : 0 }}
                 >
-                  {t('Inject data: ')}
+                  {t('Inject data')}
                   <b>{injectType.name}</b>
                 </Typography>
                 <div style={{ marginTop: -20, overflowX: 'hidden' }}>

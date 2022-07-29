@@ -58,7 +58,7 @@ public class EmailContract extends Contractor {
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
-                .optional(textField("inReplyTo", "InReplyTo", "HIDDEN"))
+//                .optional(textField("inReplyTo", "InReplyTo", "HIDDEN"))
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(expectationSelect)
@@ -70,7 +70,7 @@ public class EmailContract extends Contractor {
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
-                .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))
+//                .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(expectationSelect)
                 .build();
