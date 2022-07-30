@@ -136,11 +136,15 @@ const Inject = () => {
               .includes(`re: ${n.communication_subject.toLowerCase()}`)
                 && ((o.communication_animation
                   && R.any(
-                    (p) => o.communication_to.includes(p),
+                    (p) => o.communication_to
+                      .toLowerCase()
+                      .includes(p.toLowerCase()),
                     n.communication_mails,
                   ))
                   || R.any(
-                    (p) => o.communication_from.includes(p),
+                    (p) => o.communication_from
+                      .toLowerCase()
+                      .includes(p.toLowerCase()),
                     n.communication_mails,
                   )),
             communicationsWithMails,

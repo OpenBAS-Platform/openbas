@@ -268,9 +268,9 @@ const ArticleForm = ({
             name="article_content"
             label={t('Content')}
             fullWidth={true}
-            style={{ marginTop: 20, height: 300 }}
+            style={{ marginTop: 20 }}
           />
-          <Grid container={true} spacing={3} style={{ marginTop: -40 }}>
+          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
             <Grid item={true} xs={4}>
               <TextField
                 variant="standard"
