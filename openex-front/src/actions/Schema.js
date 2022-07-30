@@ -285,7 +285,7 @@ export const storeHelper = (state) => ({
   // articles
   getArticles: () => entities('articles', state),
   getArticle: (id) => entity(id, 'articles', state),
-  getArticlesMap: () => maps('medias', state),
+  getArticlesMap: () => maps('articles', state),
   // challenges
   getChallenges: () => entities('challenges', state),
 });

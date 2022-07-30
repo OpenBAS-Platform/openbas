@@ -59,13 +59,15 @@ public class MediaContract extends Contractor {
                     The media team
                 """;
         ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
+        ContractCheckbox expectationField = checkboxField("expectation", "Expect audiences to read the article(s)", true);
+        expectationField.setExpectation(true);
         List<ContractElement> publishInstance = contractBuilder()
                 // built in
                 .optional(audienceField("audiences", "Audiences", Multiple))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(articleField("articles", "Articles", Multiple))
                 // Contract specific
-                .optional(checkboxField("expectation", "Expect audiences to read the article", true))
+                .optional(expectationField)
                 // Emailing zone
                 .optional(emailingField)
                 .mandatory(textField("subject", "Subject", "A new media entry was published for you ${user.name}",

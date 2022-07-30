@@ -131,14 +131,16 @@ const Articles = () => {
       <Grid container={true} spacing={3}>
         {sortedArticles.map((article) => {
           const docs = article.article_documents
-            .map((d) => (documentsMap[d] ? documentsMap[d] : undefined))
+            .map((d) => (documentsMap[d.document_id]
+              ? documentsMap[d.document_id]
+              : undefined))
             .filter((d) => d !== undefined);
           let columns = 12;
           if (docs.length === 2) {
             columns = 6;
           } else if (docs.length === 3) {
             columns = 4;
-          } else {
+          } else if (docs.length >= 4) {
             columns = 3;
           }
           // const shouldBeTruncated = (article.article_content || '').length > 500;
@@ -168,7 +170,11 @@ const Articles = () => {
                       : t('Not used in the exercise')
                   }
                   action={
-                    <ArticlePopover exercise={exercise} article={article} />
+                    <ArticlePopover
+                      exercise={exercise}
+                      article={article}
+                      images={docs}
+                    />
                   }
                 />
                 <Grid container={true} spacing={3}>

@@ -34,15 +34,12 @@ const useStyles = makeStyles((theme) => ({
 
 const CreateArticle = (props) => {
   const { exerciseId, onCreate, inline } = props;
-
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const onSubmit = (data) => {
     const inputValues = { ...data, article_media: data.article_media.id };
     return dispatch(addExerciseArticle(exerciseId, inputValues)).then(
@@ -57,7 +54,6 @@ const CreateArticle = (props) => {
       },
     );
   };
-
   return (
     <div>
       {inline === true ? (
@@ -99,6 +95,7 @@ const CreateArticle = (props) => {
             editing={false}
             onSubmit={onSubmit}
             handleClose={handleClose}
+            exerciseId={exerciseId}
             initialValues={{ article_name: '', article_media: '' }}
           />
         </DialogContent>

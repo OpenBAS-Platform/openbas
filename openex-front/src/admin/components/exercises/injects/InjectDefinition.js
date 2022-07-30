@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import { Form } from 'react-final-form';
+import InputLabel from '@mui/material/InputLabel';
 import { connect } from 'react-redux';
 import {
   ArrowDropDownOutlined,
@@ -47,6 +48,7 @@ import DocumentPopover from '../../documents/DocumentPopover';
 import { Select } from '../../../../components/Select';
 import ArticlePopover from '../media/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
+import MediaIcon from '../../medias/MediaIcon';
 
 const styles = (theme) => ({
   header: {
@@ -273,9 +275,6 @@ const inlineStyles = {
 class InjectDefinition extends Component {
   constructor(props) {
     super(props);
-    const articlesIds = props.inject?.inject_content?.articles
-      ? props.inject.inject_content.articles.map((a) => a.article_id)
-      : [];
     this.state = {
       allAudiences: props.inject.inject_all_audiences,
       audiencesIds: props.inject.inject_audiences,
@@ -284,7 +283,7 @@ class InjectDefinition extends Component {
       audiencesOrderAsc: true,
       documentsSortBy: 'document_name',
       documentsOrderAsc: true,
-      articlesIds,
+      articlesIds: props.inject.inject_content?.articles || [],
       articlesSortBy: 'article_name',
       articlesOrderAsc: true,
     };
@@ -295,6 +294,7 @@ class InjectDefinition extends Component {
     this.props.fetchDocuments();
     this.props.fetchInjectAudiences(exerciseId, injectId);
     this.props.fetchExerciseArticles(exerciseId);
+    this.props.fetchMedias();
   }
 
   toggleAll() {
@@ -450,22 +450,36 @@ class InjectDefinition extends Component {
 
   onSubmit(data) {
     const { inject, injectTypes } = this.props;
-    const injectType = R.head(injectTypes.filter((i) => i.contract_id === inject.inject_contract));
+    const injectType = R.head(
+      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    );
+    const hasArticles = injectType.fields
+      .map((f) => f.key)
+      .includes('articles');
     const finalData = {};
+    if (hasArticles) {
+      finalData.articles = this.state.articlesIds;
+    }
     injectType.fields
       .filter((f) => !['audiences', 'articles', 'attachments'].includes(f.key))
       .forEach((field) => {
         if (data[field.key] && field.type === 'tuple') {
           if (field.cardinality && field.cardinality === '1') {
             if (finalData[field.key].type === 'attachment') {
-              finalData[field.key] = { key: data[field.key].key, value: `${field.tupleFilePrefix}${data[field.key].value}` };
+              finalData[field.key] = {
+                key: data[field.key].key,
+                value: `${field.tupleFilePrefix}${data[field.key].value}`,
+              };
             } else {
               finalData[field.key] = R.dissoc('type', data[field.key]);
             }
           } else {
             finalData[field.key] = data[field.key].map((pair) => {
               if (pair.type === 'attachment') {
-                return { key: pair.key, value: `${field.tupleFilePrefix}${pair.value}` };
+                return {
+                  key: pair.key,
+                  value: `${field.tupleFilePrefix}${pair.value}`,
+                };
               }
               return R.dissoc('type', pair);
             });
@@ -511,6 +525,269 @@ class InjectDefinition extends Component {
         });
     }
     return errors;
+  }
+
+  renderFields(renderedFields, values, attachedDocs) {
+    const { exercise, classes, t } = this.props;
+    return (
+      <div>
+        {renderedFields.map((field, position) => {
+          switch (field.type) {
+            case 'textarea':
+              return field.richText ? (
+                <EnrichedTextField
+                  key={field.key}
+                  name={field.key}
+                  label={t(field.label)}
+                  fullWidth={true}
+                  style={{ marginTop: 20, height: 250 }}
+                  disabled={isExerciseReadOnly(exercise)}
+                />
+              ) : (
+                <TextField
+                  variant="standard"
+                  key={field.key}
+                  name={field.key}
+                  fullWidth={true}
+                  multiline={true}
+                  rows={10}
+                  label={t(field.label)}
+                  style={{ marginTop: 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
+                />
+              );
+            case 'checkbox':
+              return (
+                <SwitchField
+                  key={field.key}
+                  name={field.key}
+                  label={t(field.label)}
+                  style={{ marginTop: position > 0 ? 10 : 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
+                />
+              );
+            case 'tuple':
+              return (
+                <div>
+                  <FieldArray name={field.key}>
+                    {({ fields }) => (
+                      <div>
+                        <div style={{ marginTop: 20 }}>
+                          <InputLabel
+                            variant="standard"
+                            shrink={true}
+                            disabled={isExerciseReadOnly(exercise)}
+                          >
+                            {t(field.label)}
+                            {field.cardinality === 'n' && (
+                              <IconButton
+                                onClick={() => fields.push({
+                                  type: 'text',
+                                  key: '',
+                                  value: '',
+                                })
+                                }
+                                aria-haspopup="true"
+                                size="medium"
+                                style={{ marginTop: -2 }}
+                                disabled={isExerciseReadOnly(exercise)}
+                                color="primary"
+                              >
+                                <ControlPointOutlined />
+                              </IconButton>
+                            )}
+                          </InputLabel>
+                        </div>
+                        <List style={{ marginTop: -20 }}>
+                          {fields.map((name, index) => {
+                            return (
+                              <ListItem
+                                key={`${field.key}_list_${index}`}
+                                classes={{ root: classes.tuple }}
+                                divider={false}
+                              >
+                                <Select
+                                  variant="standard"
+                                  name={`${name}.type`}
+                                  fullWidth={true}
+                                  label={t('Type')}
+                                  style={{ marginRight: 20 }}
+                                  disabled={isExerciseReadOnly(exercise)}
+                                >
+                                  <MenuItem key="text" value="text">
+                                    <ListItemText>{t('Text')}</ListItemText>
+                                  </MenuItem>
+                                  {field.contractAttachment && (
+                                    <MenuItem
+                                      key="attachment"
+                                      value="attachment"
+                                    >
+                                      <ListItemText>
+                                        {t('Attachment')}
+                                      </ListItemText>
+                                    </MenuItem>
+                                  )}
+                                </Select>
+                                <TextField
+                                  variant="standard"
+                                  name={`${name}.key`}
+                                  fullWidth={true}
+                                  label={t('Key')}
+                                  style={{ marginRight: 20 }}
+                                  disabled={isExerciseReadOnly(exercise)}
+                                />
+                                {values
+                                && values[field.key]
+                                && values[field.key][index]
+                                && values[field.key][index].type
+                                  === 'attachment' ? (
+                                  <Select
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  >
+                                    {attachedDocs.map((doc) => (
+                                      <MenuItem
+                                        key={doc.document_id}
+                                        value={doc.document_id}
+                                      >
+                                        <ListItemText>
+                                          {doc.document_name}
+                                        </ListItemText>
+                                      </MenuItem>
+                                    ))}
+                                  </Select>
+                                  ) : (
+                                  <TextField
+                                    variant="standard"
+                                    name={`${name}.value`}
+                                    fullWidth={true}
+                                    label={t('Value')}
+                                    style={{ marginRight: 20 }}
+                                    disabled={isExerciseReadOnly(exercise)}
+                                  />
+                                  )}
+                                {field.cardinality === 'n' && (
+                                  <IconButton
+                                    onClick={() => fields.remove(index)}
+                                    aria-haspopup="true"
+                                    size="small"
+                                    disabled={isExerciseReadOnly(exercise)}
+                                    color="primary"
+                                  >
+                                    <DeleteOutlined />
+                                  </IconButton>
+                                )}
+                              </ListItem>
+                            );
+                          })}
+                        </List>
+                      </div>
+                    )}
+                  </FieldArray>
+                </div>
+              );
+            case 'select':
+              return field.cardinality === 'n' ? (
+                <Select
+                  variant="standard"
+                  label={t(field.label)}
+                  key={field.key}
+                  multiple
+                  renderValue={(v) => v.map((a) => field.choices[a]).join(', ')}
+                  name={field.key}
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                >
+                  {Object.entries(field.choices)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .map(([k, v]) => (
+                      <MenuItem key={k} value={k}>
+                        <ListItemText>{v}</ListItemText>
+                      </MenuItem>
+                    ))}
+                </Select>
+              ) : (
+                <Select
+                  variant="standard"
+                  label={t(field.label)}
+                  key={field.key}
+                  renderValue={(v) => field.choices[v]}
+                  name={field.key}
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                >
+                  {Object.entries(field.choices)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .map(([k, v]) => (
+                      <MenuItem key={k} value={k}>
+                        <ListItemText>{v}</ListItemText>
+                      </MenuItem>
+                    ))}
+                </Select>
+              );
+            case 'dependency-select':
+              // eslint-disable-next-line no-case-declarations
+              const depValue = values[field.dependencyField];
+              // eslint-disable-next-line no-case-declarations
+              const choices = field.choices[depValue] ?? {};
+              return field.cardinality === 'n' ? (
+                <Select
+                  variant="standard"
+                  label={t(field.label)}
+                  key={field.key}
+                  multiple
+                  renderValue={(v) => v.map((a) => choices[a]).join(', ')}
+                  name={field.key}
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                >
+                  {Object.entries(choices)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .map(([k, v]) => (
+                      <MenuItem key={k} value={k}>
+                        <ListItemText>{v}</ListItemText>
+                      </MenuItem>
+                    ))}
+                </Select>
+              ) : (
+                <Select
+                  variant="standard"
+                  label={t(field.label)}
+                  key={field.key}
+                  renderValue={(v) => choices[v]}
+                  name={field.key}
+                  fullWidth={true}
+                  style={{ marginTop: 20 }}
+                >
+                  {Object.entries(choices)
+                    .sort((a, b) => a[1].localeCompare(b[1]))
+                    .map(([k, v]) => (
+                      <MenuItem key={k} value={k}>
+                        <ListItemText>{v}</ListItemText>
+                      </MenuItem>
+                    ))}
+                </Select>
+              );
+            default:
+              return (
+                <TextField
+                  variant="standard"
+                  key={field.key}
+                  name={field.key}
+                  fullWidth={true}
+                  label={t(field.label)}
+                  style={{ marginTop: 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
+                />
+              );
+          }
+        })}
+      </div>
+    );
   }
 
   render() {
@@ -585,15 +862,24 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(documentsSortBy))],
     );
     const sortedDocuments = sortDocuments(docs);
-    const hasAudiences = injectType.fields.map((f) => f.key).includes('audiences');
-    const hasArticles = injectType.fields.map((f) => f.key).includes('articles');
-    const hasAttachments = injectType.fields.map((f) => f.key).includes('attachments');
+    const hasAudiences = injectType.fields
+      .map((f) => f.key)
+      .includes('audiences');
+    const hasArticles = injectType.fields
+      .map((f) => f.key)
+      .includes('articles');
+    const hasAttachments = injectType.fields
+      .map((f) => f.key)
+      .includes('attachments');
+    const expectations = injectType.fields.filter(
+      (f) => f.expectation === true,
+    );
     const initialValues = { ...inject.inject_content };
     // Enrich initialValues with default contract value
-    const buildInFields = ['audiences', 'articles', 'attachments'];
+    const builtInFields = ['audiences', 'articles', 'attachments'];
     if (inject.inject_content === null) {
       injectType.fields
-        .filter((f) => !buildInFields.includes(f.key))
+        .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
         .forEach((field) => {
           if (!initialValues[field.key]) {
             if (field.cardinality && field.cardinality === '1') {
@@ -606,23 +892,38 @@ class InjectDefinition extends Component {
     } else {
       // handle tuple with attachments
       injectType.fields
-        .filter((f) => !buildInFields.includes(f.key))
+        .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
         .forEach((field) => {
           if (field.type === 'tuple' && initialValues[field.key]) {
             if (field.cardinality && field.cardinality === '1') {
-              if (initialValues[field.key].value && initialValues[field.key].value.includes(`${field.tupleFilePrefix}`)) {
+              if (
+                initialValues[field.key].value
+                && initialValues[field.key].value.includes(
+                  `${field.tupleFilePrefix}`,
+                )
+              ) {
                 initialValues[field.key] = {
                   type: 'attachment',
                   key: initialValues[field.key].key,
-                  value: initialValues[field.key].value.replace(`${field.tupleFilePrefix}`, ''),
+                  value: initialValues[field.key].value.replace(
+                    `${field.tupleFilePrefix}`,
+                    '',
+                  ),
                 };
               } else {
-                initialValues[field.key] = R.assoc('type', 'text', initialValues[field.key]);
+                initialValues[field.key] = R.assoc(
+                  'type',
+                  'text',
+                  initialValues[field.key],
+                );
               }
             } else {
               initialValues[field.key] = initialValues[field.key].map(
                 (pair) => {
-                  if (pair.value && pair.value.includes(`${field.tupleFilePrefix}`)) {
+                  if (
+                    pair.value
+                    && pair.value.includes(`${field.tupleFilePrefix}`)
+                  ) {
                     return {
                       type: 'attachment',
                       key: pair.key,
@@ -924,7 +1225,10 @@ class InjectDefinition extends Component {
                           divider={true}
                         >
                           <ListItemIcon>
-                            <CastForEducationOutlined />
+                            <MediaIcon
+                              type={article.article_media_type}
+                              variant="inline"
+                            />
                           </ListItemIcon>
                           <ListItemText
                             primary={
@@ -933,7 +1237,7 @@ class InjectDefinition extends Component {
                                   className={classes.bodyItem}
                                   style={inlineStyles.article_media_type}
                                 >
-                                  {article.article_media_type}
+                                  {t(article.article_media_type || 'Unknown')}
                                 </div>
                                 <div
                                   className={classes.bodyItem}
@@ -977,289 +1281,69 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
-                <Typography variant="h2" style={{ marginTop: hasAudiences ? 30 : 0 }}>
+                <Typography
+                  variant="h2"
+                  style={{ marginTop: hasAudiences ? 30 : 0 }}
+                >
                   {t('Inject data')}
-                  <b>{injectType.name}</b>
                 </Typography>
-                <div style={{ marginTop: -20, overflowX: 'hidden' }}>
-                  {injectType.fields
-                    .filter((f) => !buildInFields.includes(f.key))
-                    .filter((f) => { // Filter display if linked fields
-                      for (let index = 0; index < f.linkedFields.length; index += 1) {
-                        const linkedField = f.linkedFields[index];
-                        if (linkedField.type === 'checkbox' && values[linkedField.key] === false) {
-                          return false;
+                <div style={{ marginTop: -15 }}>
+                  {this.renderFields(
+                    injectType.fields
+                      .filter(
+                        (f) => !builtInFields.includes(f.key) && !f.expectation,
+                      )
+                      .filter((f) => {
+                        // Filter display if linked fields
+                        for (
+                          let index = 0;
+                          index < f.linkedFields.length;
+                          index += 1
+                        ) {
+                          const linkedField = f.linkedFields[index];
+                          if (
+                            linkedField.type === 'checkbox'
+                            && values[linkedField.key] === false
+                          ) {
+                            return false;
+                          }
                         }
-                      }
-                      return true;
-                    })
-                    .map((field, position) => {
-                      switch (field.type) {
-                        case 'textarea':
-                          return field.richText ? (
-                            <EnrichedTextField
-                              key={field.key}
-                              name={field.key}
-                              label={t(field.label)}
-                              fullWidth={true}
-                              style={{ marginTop: 20, height: 250 }}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          ) : (
-                            <TextField
-                              variant="standard"
-                              key={field.key}
-                              name={field.key}
-                              fullWidth={true}
-                              multiline={true}
-                              rows={10}
-                              label={t(field.label)}
-                              style={{ marginTop: 20 }}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          );
-                        case 'checkbox':
-                          return (
-                            <SwitchField
-                              key={field.key}
-                              name={field.key}
-                              label={t(field.label)}
-                              style={{ marginTop: position > 0 ? 10 : 20 }}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          );
-                        case 'tuple':
-                          return (
-                            <div>
-                              <FieldArray name={field.key}>
-                                {({ fields }) => (
-                                  <div>
-                                    <div style={{ marginTop: 20 }}>
-                                      <Typography variant="body2">
-                                        {t(field.label)}
-                                        {field.cardinality === 'n' && (
-                                          <IconButton
-                                            onClick={() => fields.push({
-                                              type: 'text',
-                                              key: '',
-                                              value: '',
-                                            })
-                                            }
-                                            aria-haspopup="true"
-                                            size="medium"
-                                            style={{ marginTop: -2 }}
-                                            disabled={isExerciseReadOnly(
-                                              exercise,
-                                            )}
-                                          >
-                                            <ControlPointOutlined color="primary" />
-                                          </IconButton>
-                                        )}
-                                      </Typography>
-                                    </div>
-                                    <List style={{ marginTop: 0 }}>
-                                      {fields.map((name, index) => {
-                                        return (
-                                          <ListItem
-                                            key={`${field.key}_list_${index}`}
-                                            classes={{ root: classes.tuple }}
-                                            divider={false}
-                                          >
-                                            <Select
-                                              variant="standard"
-                                              name={`${name}.type`}
-                                              fullWidth={true}
-                                              label={t('Type')}
-                                              style={{ marginRight: 20 }}
-                                              disabled={isExerciseReadOnly(
-                                                exercise,
-                                              )}
-                                            >
-                                              <MenuItem key="text" value="text">
-                                                <ListItemText>
-                                                  {t('Text')}
-                                                </ListItemText>
-                                              </MenuItem>
-                                              {field.contractAttachment && (
-                                                <MenuItem
-                                                  key="attachment"
-                                                  value="attachment"
-                                                >
-                                                  <ListItemText>
-                                                    {t('Attachment')}
-                                                  </ListItemText>
-                                                </MenuItem>
-                                              )}
-                                            </Select>
-                                            <TextField
-                                              variant="standard"
-                                              name={`${name}.key`}
-                                              fullWidth={true}
-                                              label={t('Key')}
-                                              style={{ marginRight: 20 }}
-                                              disabled={isExerciseReadOnly(
-                                                exercise,
-                                              )}
-                                            />
-                                            {values
-                                            && values[field.key]
-                                            && values[field.key][index]
-                                            && values[field.key][index].type
-                                              === 'attachment' ? (
-                                              <Select
-                                                variant="standard"
-                                                name={`${name}.value`}
-                                                fullWidth={true}
-                                                label={t('Value')}
-                                                style={{ marginRight: 20 }}
-                                                disabled={isExerciseReadOnly(
-                                                  exercise,
-                                                )}
-                                              >
-                                                {attachedDocs.map((doc) => (
-                                                  <MenuItem
-                                                    key={doc.document_id}
-                                                    value={doc.document_id}
-                                                  >
-                                                    <ListItemText>
-                                                      {doc.document_name}
-                                                    </ListItemText>
-                                                  </MenuItem>
-                                                ))}
-                                              </Select>
-                                              ) : (
-                                              <TextField
-                                                variant="standard"
-                                                name={`${name}.value`}
-                                                fullWidth={true}
-                                                label={t('Value')}
-                                                style={{ marginRight: 20 }}
-                                                disabled={isExerciseReadOnly(
-                                                  exercise,
-                                                )}
-                                              />
-                                              )}
-                                            {field.cardinality === 'n' && (
-                                              <IconButton
-                                                onClick={() => fields.remove(index)
-                                                }
-                                                aria-haspopup="true"
-                                                size="small"
-                                                disabled={isExerciseReadOnly(
-                                                  exercise,
-                                                )}
-                                              >
-                                                <DeleteOutlined color="primary" />
-                                              </IconButton>
-                                            )}
-                                          </ListItem>
-                                        );
-                                      })}
-                                    </List>
-                                  </div>
-                                )}
-                              </FieldArray>
-                            </div>
-                          );
-                        case 'select':
-                          return field.cardinality === 'n' ? (
-                            <Select
-                              variant="standard"
-                              label={t(field.label)}
-                              key={field.key}
-                              multiple
-                              renderValue={(v) => v.map((a) => field.choices[a]).join(', ')
-                              }
-                              name={field.key}
-                              fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
-                              {Object.entries(field.choices)
-                                .sort((a, b) => a[1].localeCompare(b[1]))
-                                .map(([k, v]) => (
-                                  <MenuItem key={k} value={k}>
-                                    <ListItemText>{v}</ListItemText>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          ) : (
-                            <Select
-                              variant="standard"
-                              label={t(field.label)}
-                              key={field.key}
-                              renderValue={(v) => field.choices[v]}
-                              name={field.key}
-                              fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
-                              {Object.entries(field.choices)
-                                .sort((a, b) => a[1].localeCompare(b[1]))
-                                .map(([k, v]) => (
-                                  <MenuItem key={k} value={k}>
-                                    <ListItemText>{v}</ListItemText>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          );
-                        case 'dependency-select':
-                          // eslint-disable-next-line no-case-declarations
-                          const depValue = values[field.dependencyField];
-                          // eslint-disable-next-line no-case-declarations
-                          const choices = field.choices[depValue] ?? {};
-                          return field.cardinality === 'n' ? (
-                            <Select
-                              variant="standard"
-                              label={t(field.label)}
-                              key={field.key}
-                              multiple
-                              renderValue={(v) => v.map((a) => choices[a]).join(', ')
-                              }
-                              name={field.key}
-                              fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
-                              {Object.entries(choices)
-                                .sort((a, b) => a[1].localeCompare(b[1]))
-                                .map(([k, v]) => (
-                                  <MenuItem key={k} value={k}>
-                                    <ListItemText>{v}</ListItemText>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          ) : (
-                            <Select
-                              variant="standard"
-                              label={t(field.label)}
-                              key={field.key}
-                              renderValue={(v) => choices[v]}
-                              name={field.key}
-                              fullWidth={true}
-                              style={{ marginTop: 20 }}
-                            >
-                              {Object.entries(choices)
-                                .sort((a, b) => a[1].localeCompare(b[1]))
-                                .map(([k, v]) => (
-                                  <MenuItem key={k} value={k}>
-                                    <ListItemText>{v}</ListItemText>
-                                  </MenuItem>
-                                ))}
-                            </Select>
-                          );
-                        default:
-                          return (
-                            <TextField
-                              variant="standard"
-                              key={field.key}
-                              name={field.key}
-                              fullWidth={true}
-                              label={t(field.label)}
-                              style={{ marginTop: 20 }}
-                              disabled={isExerciseReadOnly(exercise)}
-                            />
-                          );
-                      }
-                    })}
+                        return true;
+                      }),
+                    values,
+                    attachedDocs,
+                  )}
                 </div>
+                {expectations.length > 0 && (
+                  <div>
+                    <Typography variant="h2" style={{ marginTop: 30 }}>
+                      {t('Inject expectations')}
+                    </Typography>
+                    <div style={{ marginTop: -15 }}>
+                      {this.renderFields(
+                        expectations.filter((f) => {
+                          // Filter display if linked fields
+                          for (
+                            let index = 0;
+                            index < f.linkedFields.length;
+                            index += 1
+                          ) {
+                            const linkedField = f.linkedFields[index];
+                            if (
+                              linkedField.type === 'checkbox'
+                              && values[linkedField.key] === false
+                            ) {
+                              return false;
+                            }
+                          }
+                          return true;
+                        }),
+                        values,
+                        attachedDocs,
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <Typography variant="h2" style={{ marginTop: 30 }}>
                     {t('Inject documents')}

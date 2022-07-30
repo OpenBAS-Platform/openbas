@@ -146,7 +146,7 @@ class DocumentPopover extends Component {
           )}
           {onRemoveDocument && (
             <MenuItem onClick={this.handleOpenRemove.bind(this)}>
-              {t('Remove from the inject')}
+              {t('Remove from the element')}
             </MenuItem>
           )}
           {!onRemoveDocument && (
@@ -202,7 +202,7 @@ class DocumentPopover extends Component {
         >
           <DialogContent>
             <DialogContentText>
-              {t('Do you want to remove the document from the inject?')}
+              {t('Do you want to remove the document from the element?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

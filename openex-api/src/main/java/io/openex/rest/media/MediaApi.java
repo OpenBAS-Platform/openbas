@@ -127,6 +127,7 @@ public class MediaApi extends RestBehavior {
         Instant now = Instant.now();
         Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
+                .filter(inject -> inject.getContent() != null)
                 .flatMap(inject -> {
                     Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
                     try {
@@ -158,17 +159,14 @@ public class MediaApi extends RestBehavior {
         article.setUpdateAttributes(input);
         article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
-        List<ArticleDocument> articleDocuments = new ArrayList<>(article.getDocuments());
-        List<ArticleDocumentInput> documents = input.getDocuments();
-        documents.forEach(in -> {
-            Optional<Document> doc = documentRepository.findById(in.getDocumentId());
+        List<String> articleDocuments = input.getDocuments();
+        articleDocuments.forEach(articleDcoument -> {
+            Optional<Document> doc = documentRepository.findById(articleDcoument);
             if (doc.isPresent()) {
                 ArticleDocument articleDocument = new ArticleDocument();
                 articleDocument.setArticle(article);
                 Document document = doc.get();
                 articleDocument.setDocument(document);
-                ArticleDocument savedArticleDoc = articleDocumentRepository.save(articleDocument);
-                articleDocuments.add(savedArticleDoc);
                 // If Document not yet linked directly to the exercise, attached it
                 if (!document.getExercises().contains(exercise)) {
                     exercise.getDocuments().add(document);
@@ -185,28 +183,28 @@ public class MediaApi extends RestBehavior {
     public Article updateArticle(@PathVariable String exerciseId, @PathVariable String articleId, @Valid @RequestBody ArticleUpdateInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Article article = articleRepository.findById(articleId).orElseThrow();
-        List<ArticleDocumentInput> documents = input.getDocuments();
-        List<String> askedDocumentIds = documents.stream().map(ArticleDocumentInput::getDocumentId).toList();
+        List<String> newDocumentsIds = input.getDocuments();
         List<String> currentDocumentIds = article.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
         article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setUpdateAttributes(input);
-        // region Set documents
+        // Original List
         List<ArticleDocument> articleDocuments = new ArrayList<>(article.getDocuments());
+        // region Set documents
         // To delete
-        article.getDocuments().stream().filter(articleDoc -> !askedDocumentIds.contains(articleDoc.getDocument().getId())).forEach(articleDoc -> {
+        article.getDocuments().stream().filter(articleDoc -> !newDocumentsIds.contains(articleDoc.getDocument().getId())).forEach(articleDoc -> {
             articleDocuments.remove(articleDoc);
             articleDocumentRepository.delete(articleDoc);
         });
         // To add
-        documents.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
-            Optional<Document> doc = documentRepository.findById(in.getDocumentId());
+        newDocumentsIds.stream().filter(doc -> !currentDocumentIds.contains(doc)).forEach(in -> {
+            Optional<Document> doc = documentRepository.findById(in);
             if (doc.isPresent()) {
                 ArticleDocument articleDocument = new ArticleDocument();
                 articleDocument.setArticle(article);
                 Document document = doc.get();
                 articleDocument.setDocument(document);
-                ArticleDocument savedArticleDoc = articleDocumentRepository.save(articleDocument);
-                articleDocuments.add(savedArticleDoc);
+                articleDocumentRepository.save(articleDocument);
+                articleDocuments.add(articleDocument);
                 // If Document not yet linked directly to the exercise, attached it
                 if (!document.getExercises().contains(exercise)) {
                     exercise.getDocuments().add(document);
@@ -214,6 +212,7 @@ public class MediaApi extends RestBehavior {
                 }
             }
         });
+        article.setDocuments(articleDocuments);
         Article savedArticle = articleRepository.save(article);
         return enrichArticleWithVirtualPublication(exercise, savedArticle);
     }

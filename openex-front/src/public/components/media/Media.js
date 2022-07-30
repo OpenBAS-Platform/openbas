@@ -45,8 +45,14 @@ const Media = () => {
   const [userId] = useQueryParameter(['user']);
   const { mediaId, exerciseId } = useParams();
   const mediaReader = useHelper((helper) => helper.getMediaReader(mediaId));
-  const { exercise_status: status, media_articles: articles, media_information: info } = mediaReader ?? {};
-  useEffect(() => { dispatch(fetchMedia(mediaId, userId, exerciseId)); }, []);
+  const {
+    exercise_status: status,
+    media_articles: articles,
+    media_information: info,
+  } = mediaReader ?? {};
+  useEffect(() => {
+    dispatch(fetchMedia(mediaId, userId, exerciseId));
+  }, []);
   return (
     <div className={classes.container}>
       <Paper variant="outlined">
@@ -60,7 +66,9 @@ const Media = () => {
         <div className={classes.content}>
           <ul>
             {(articles ?? []).map((article) => (
-              <li key={article.article_id}>{article.article_name} ({article.article_virtual_publication})</li>
+              <li key={article.article_id}>
+                {article.article_name} ({article.article_virtual_publication})
+              </li>
             ))}
           </ul>
         </div>

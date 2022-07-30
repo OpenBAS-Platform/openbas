@@ -81,7 +81,10 @@ const Index = () => {
             render={errorWrapper(Documents)}
           />
           <Route exact path="/admin/medias" render={errorWrapper(Medias)} />
-          <Route path="/admin/medias/:mediaId" render={errorWrapper(IndexMedia)} />
+          <Route
+            path="/admin/medias/:mediaId"
+            render={errorWrapper(IndexMedia)}
+          />
           <Route
             exact
             path="/admin/challenges"

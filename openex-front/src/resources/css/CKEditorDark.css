@@ -1,4 +1,6 @@
 :root {
+  --ck-z-modal: 1300 !important;
+
   /* Overrides the border radius setting in the theme. */
   --ck-border-radius: 4px !important;
 
@@ -148,4 +150,8 @@
 
 .ck-read-only {
   color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.ck-balloon-panel {
+  z-index: 1300 !important;
 }

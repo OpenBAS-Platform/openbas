@@ -102,7 +102,9 @@ const Challenges = () => {
   const searchColumns = ['name', 'description'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
   // Fetching data
-  const { challenges } = useHelper((helper) => ({ challenges: helper.getChallenges() }));
+  const { challenges } = useHelper((helper) => ({
+    challenges: helper.getChallenges(),
+  }));
   useDataLoader(() => {
     dispatch(fetchChallenges());
   });
@@ -120,34 +122,60 @@ const Challenges = () => {
       </div>
       <div className="clearfix" />
       <List classes={{ root: classes.container }}>
-        <ListItem classes={{ root: classes.itemHead }} divider={false} style={{ paddingTop: 0 }}>
+        <ListItem
+          classes={{ root: classes.itemHead }}
+          divider={false}
+          style={{ paddingTop: 0 }}
+        >
           <ListItemIcon>
-            <span style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}>
+            <span
+              style={{ padding: '0 8px 0 8px', fontWeight: 700, fontSize: 12 }}
+            >
               &nbsp;
             </span>
           </ListItemIcon>
           <ListItemText
             primary={
               <div>
-                {filtering.buildHeader('challenge_name', 'Name', true, headerStyles)}
-                {filtering.buildHeader('challenge_description', 'Description', true, headerStyles)}
+                {filtering.buildHeader(
+                  'challenge_name',
+                  'Name',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_description',
+                  'Description',
+                  true,
+                  headerStyles,
+                )}
               </div>
             }
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
         {sortedChallenges.map((challenge) => (
-          <ListItem key={challenge.challenge_id} classes={{ root: classes.item }} divider={true}>
+          <ListItem
+            key={challenge.challenge_id}
+            classes={{ root: classes.item }}
+            divider={true}
+          >
             <ListItemIcon>
               <EmojiEvents color="primary" />
             </ListItemIcon>
             <ListItemText
               primary={
                 <div>
-                  <div className={classes.bodyItem} style={inlineStyles.challenge_name}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.challenge_name}
+                  >
                     {challenge.challenge_name}
                   </div>
-                  <div className={classes.bodyItem} style={inlineStyles.challenge_description}>
+                  <div
+                    className={classes.bodyItem}
+                    style={inlineStyles.challenge_description}
+                  >
                     {challenge.challenge_description}
                   </div>
                 </div>

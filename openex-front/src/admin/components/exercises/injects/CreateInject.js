@@ -65,6 +65,10 @@ class CreateInject extends Component {
       .addInject(this.props.exerciseId, inputValues)
       .then((result) => {
         if (result.result) {
+          if (this.props.onCreate) {
+            this.handleClose();
+            return this.props.onCreate(result.result);
+          }
           return this.handleClose();
         }
         return result;
@@ -118,6 +122,7 @@ CreateInject.propTypes = {
   exerciseId: PropTypes.string,
   addInject: PropTypes.func,
   injectTypesMap: PropTypes.object,
+  onCreate: PropTypes.func,
 };
 
 export default R.compose(

@@ -54,27 +54,39 @@ const ChallengePopover = ({ challenge }) => {
     dispatch(deleteChallenge(challenge.challenge_id)).then(() => handleCloseDelete());
   };
   // Rendering
-  const initialValues = R.pipe(R.pick(['challenge_name', 'challenge_description', 'challenge_flags']))(challenge);
+  const initialValues = R.pipe(
+    R.pick(['challenge_name', 'challenge_description', 'challenge_flags']),
+  )(challenge);
   return (
     <div>
       <IconButton onClick={handlePopoverOpen} aria-haspopup="true" size="large">
         <MoreVert />
       </IconButton>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handlePopoverClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handlePopoverClose}
+      >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
-      <Dialog open={openDelete}
+      <Dialog
+        open={openDelete}
         TransitionComponent={Transition}
         onClose={handleCloseDelete}
-        PaperProps={{ elevation: 1 }}>
+        PaperProps={{ elevation: 1 }}
+      >
         <DialogContent>
           <DialogContentText>
             {t('Do you want to delete this challenge?')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" color="secondary" onClick={handleCloseDelete}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleCloseDelete}
+          >
             {t('Cancel')}
           </Button>
           <Button variant="contained" color="primary" onClick={submitDelete}>
@@ -82,12 +94,14 @@ const ChallengePopover = ({ challenge }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog TransitionComponent={Transition}
+      <Dialog
+        TransitionComponent={Transition}
         open={openEdit}
         onClose={handleCloseEdit}
         fullWidth={true}
         maxWidth="md"
-        PaperProps={{ elevation: 1 }}>
+        PaperProps={{ elevation: 1 }}
+      >
         <DialogTitle>{t('Update the challenge')}</DialogTitle>
         <DialogContent>
           <ChallengeForm

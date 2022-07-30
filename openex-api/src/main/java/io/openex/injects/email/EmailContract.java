@@ -53,6 +53,7 @@ public class EmailContract extends Contractor {
         choices.put("text", "Animation team must validate");
         ContractSelect expectationSelect = ContractSelect
                 .selectFieldWithDefault("expectationType", "Inject expectation", choices, "none");
+        expectationSelect.setExpectation(true);
         // Standard contract
         List<ContractElement> standardInstance = contractBuilder()
                 .mandatory(audienceField("audiences", "Audiences", Multiple))

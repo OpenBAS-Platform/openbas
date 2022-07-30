@@ -177,6 +177,7 @@ const i18n = {
       'Add players in this audience': 'Ajouter des joueurs dans cette audience',
       'Create a new audience': 'Créer une nouvelle audience',
       'Remove from the inject': 'Retirer du stimuli',
+      'Remove from the element': "Retirer de l'élément",
       'Do you want to remove the audience from the inject?':
         "Souhaitez-vous retirer l'audience du stimuli ?",
       'Do you want to delete this exercise?':
@@ -205,7 +206,7 @@ const i18n = {
       'No pending injects in this exercise.':
         'Aucun stimuli en attente dans cet exercice.',
       'Add media pressure in this inject':
-        'Ajouter de la pression médiatique da ce stimuli',
+        'Ajouter de la pression médiatique dans ce stimuli',
       openex_email: 'Email',
       openex_ovh_sms: 'SMS (OVH)',
       openex_mastodon: 'Mastodon',
@@ -221,6 +222,12 @@ const i18n = {
       Attachment: 'Pièce jointe',
       Content: 'Contenu',
       Audiences: 'Audiences',
+      'Send email': 'Envoyer le mail',
+      'Inject expectations': 'Attendus du stimuli',
+      'Add images in this media pressure':
+        'Ajouter des images à cette pression médiatique',
+      'Expect audiences to read the article(s)':
+        'Les audiences doivent lire le(s) article(s)',
       'Add media pressure': 'Ajouter de la pression médiatique',
       'Raw request data': 'Données brutes de la requête',
       'Media pressure to publish': 'Pression médiatique à publier',
@@ -230,6 +237,7 @@ const i18n = {
       audience: 'Audience',
       attachment: 'Document',
       'Executed in': 'Exécuté en',
+      'Use basic authentication': 'Utiliser une authentification basique',
       Success: 'Succès',
       m: 'm',
       h: 'h',
@@ -344,8 +352,8 @@ const i18n = {
       'Not applicable': 'Non applicable',
       'Enable attachment': 'Activer la pièce jointe',
       'Disable attachment': 'Désativer la pièce jointe',
-      'Do you want to remove the document from the inject?':
-        'Souhaitez-vous retirer ce document du stimuli ?',
+      'Do you want to remove the document from the element?':
+        'Souhaitez-vous retirer ce document de cet élément ?',
       'Import an exercise': 'Importer un exercice',
       Export: 'Exporter',
       'Export the exercise': 'Exporter cet exercice',
@@ -355,6 +363,7 @@ const i18n = {
       'Send an email': 'Envoyer un email',
       'Send a SMS': 'Envoyer un SMS',
       'To fill': 'A remplir',
+      Username: "Nom d'utilisateur",
       Unknown: 'Inconnu',
       'Primary color (dark)': 'Couleur primaire (sombre)',
       'Secondary color (dark)': 'Couleur secondaire (sombre)',

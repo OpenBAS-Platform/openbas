@@ -19,14 +19,22 @@ const TopMenuChallenges = () => {
   const { t } = useFormatter();
   const location = useLocation();
   return (
-      <div>
-        <Button component={Link} to="/admin"
-          variant={location.pathname === '/admin/challenges' ? 'contained' : 'text'}
-          size="small" color={location.pathname === '/admin/challenges' ? 'secondary' : 'primary'}
-          classes={{ root: classes.button }}>
-          {t('Challenges')}
-        </Button>
-      </div>
+    <div>
+      <Button
+        component={Link}
+        to="/admin"
+        variant={
+          location.pathname === '/admin/challenges' ? 'contained' : 'text'
+        }
+        size="small"
+        color={
+          location.pathname === '/admin/challenges' ? 'secondary' : 'primary'
+        }
+        classes={{ root: classes.button }}
+      >
+        {t('Challenges')}
+      </Button>
+    </div>
   );
 };
 

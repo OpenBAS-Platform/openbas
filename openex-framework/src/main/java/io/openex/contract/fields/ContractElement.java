@@ -14,6 +14,8 @@ public abstract class ContractElement {
 
     private boolean mandatory = true;
 
+    private boolean expectation = false;
+
     private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
     public ContractElement(String key, String label) {
@@ -51,6 +53,14 @@ public abstract class ContractElement {
 
     public void setLinkedFields(List<ContractElement> linkedFields) {
         this.linkedFields = linkedFields.stream().map(LinkedFieldModel::fromField).toList();
+    }
+
+    public boolean isExpectation() {
+        return expectation;
+    }
+
+    public void setExpectation(boolean expectation) {
+        this.expectation = expectation;
     }
 
     public abstract ContractType getType();

@@ -92,7 +92,7 @@ class DocumentForm extends Component {
                 variant="standard"
                 type="file"
                 name="document_file"
-                accept='image/*'
+                accept="image/*"
                 label={t('File')}
                 style={{ marginTop: 20 }}
               />

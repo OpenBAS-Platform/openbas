@@ -468,6 +468,7 @@ const Injects = () => {
           <CreateInject
             injectTypesMap={injectTypesMap}
             exerciseId={exercise.exercise_id}
+            onCreate={setSelectedInject}
           />
         )}
       </div>

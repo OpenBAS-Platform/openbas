@@ -32,7 +32,7 @@ public class ArticleCreateInput {
     private Integer comments;
 
     @JsonProperty("article_documents")
-    private List<ArticleDocumentInput> documents = new ArrayList<>();
+    private List<String> documents = new ArrayList<>();
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("article_media")
@@ -89,11 +89,11 @@ public class ArticleCreateInput {
         this.comments = comments;
     }
 
-    public List<ArticleDocumentInput> getDocuments() {
+    public List<String> getDocuments() {
         return documents;
     }
 
-    public void setDocuments(List<ArticleDocumentInput> documents) {
+    public void setDocuments(List<String> documents) {
         this.documents = documents;
     }
 

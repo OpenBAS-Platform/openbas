@@ -44,17 +44,15 @@ const CreateChallenge = (props) => {
   const handleClose = () => setOpen(false);
 
   const onSubmit = (data) => {
-    return dispatch(addChallenge(data)).then(
-      (result) => {
-        if (result.result) {
-          if (onCreate) {
-            onCreate(result.result);
-          }
-          return handleClose();
+    return dispatch(addChallenge(data)).then((result) => {
+      if (result.result) {
+        if (onCreate) {
+          onCreate(result.result);
         }
-        return result;
-      },
-    );
+        return handleClose();
+      }
+      return result;
+    });
   };
 
   return (

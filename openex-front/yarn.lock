@@ -1476,7 +1476,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-alignment@npm:^34.0.0":
+"@ckeditor/ckeditor5-alignment@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-alignment@npm:34.2.0"
   dependencies:
@@ -1485,7 +1485,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-basic-styles@npm:^34.0.0":
+"@ckeditor/ckeditor5-basic-styles@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-basic-styles@npm:34.2.0"
   dependencies:
@@ -1494,7 +1494,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-block-quote@npm:^34.0.0":
+"@ckeditor/ckeditor5-block-quote@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-block-quote@npm:34.2.0"
   dependencies:
@@ -1516,7 +1516,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-code-block@npm:^34.0.0":
+"@ckeditor/ckeditor5-code-block@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-code-block@npm:34.2.0"
   dependencies:
@@ -1537,7 +1537,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-dev-utils@npm:^30.1.1, @ckeditor/ckeditor5-dev-utils@npm:^30.3.5":
+"@ckeditor/ckeditor5-dev-utils@npm:^30.3.1, @ckeditor/ckeditor5-dev-utils@npm:^30.3.5":
   version: 30.3.5
   resolution: "@ckeditor/ckeditor5-dev-utils@npm:30.3.5"
   dependencies:
@@ -1571,7 +1571,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-dev-webpack-plugin@npm:^30.1.1, @ckeditor/ckeditor5-dev-webpack-plugin@npm:^30.3.5":
+"@ckeditor/ckeditor5-dev-webpack-plugin@npm:^30.3.1, @ckeditor/ckeditor5-dev-webpack-plugin@npm:^30.3.5":
   version: 30.3.5
   resolution: "@ckeditor/ckeditor5-dev-webpack-plugin@npm:30.3.5"
   dependencies:
@@ -1586,7 +1586,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-editor-classic@npm:^34.0.0":
+"@ckeditor/ckeditor5-editor-classic@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-editor-classic@npm:34.2.0"
   dependencies:
@@ -1617,7 +1617,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-essentials@npm:^34.0.0":
+"@ckeditor/ckeditor5-essentials@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-essentials@npm:34.2.0"
   dependencies:
@@ -1626,7 +1626,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-font@npm:^34.0.0":
+"@ckeditor/ckeditor5-font@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-font@npm:34.2.0"
   dependencies:
@@ -1635,16 +1635,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-heading@npm:^34.0.0":
-  version: 34.2.0
-  resolution: "@ckeditor/ckeditor5-heading@npm:34.2.0"
-  dependencies:
-    ckeditor5: ^34.2.0
-  checksum: 6c604975e27561a0fe04a1526c3d3768e6c7ff663b34aa88c6c7502367b19515ffe5242e5670051cd0fcd4d0ac58107238521219193bddbb1df90962dba8317a
-  languageName: node
-  linkType: hard
-
-"@ckeditor/ckeditor5-highlight@npm:^34.0.0":
+"@ckeditor/ckeditor5-highlight@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-highlight@npm:34.2.0"
   dependencies:
@@ -1653,16 +1644,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-horizontal-line@npm:^34.0.0":
-  version: 34.2.0
-  resolution: "@ckeditor/ckeditor5-horizontal-line@npm:34.2.0"
-  dependencies:
-    ckeditor5: ^34.2.0
-  checksum: 6344e9afb2d2c91893bd950368f56d1751063528a88e5a7d37c5f97c43a713b47158867854a67b05f2af69a516a1db6483f5abf6fc52b9afac304d3d499d7788
-  languageName: node
-  linkType: hard
-
-"@ckeditor/ckeditor5-image@npm:^34.0.0":
+"@ckeditor/ckeditor5-image@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-image@npm:34.2.0"
   dependencies:
@@ -1673,7 +1655,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-indent@npm:^34.0.0":
+"@ckeditor/ckeditor5-indent@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-indent@npm:34.2.0"
   dependencies:
@@ -1682,7 +1664,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-link@npm:^34.0.0":
+"@ckeditor/ckeditor5-link@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-link@npm:34.2.0"
   dependencies:
@@ -1693,7 +1675,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-list@npm:^34.0.0":
+"@ckeditor/ckeditor5-list@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-list@npm:34.2.0"
   dependencies:
@@ -1703,7 +1685,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-media-embed@npm:^34.0.0":
+"@ckeditor/ckeditor5-media-embed@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-media-embed@npm:34.2.0"
   dependencies:
@@ -1713,17 +1695,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-mention@npm:^34.0.0":
-  version: 34.2.0
-  resolution: "@ckeditor/ckeditor5-mention@npm:34.2.0"
-  dependencies:
-    ckeditor5: ^34.2.0
-    lodash-es: ^4.17.15
-  checksum: 8181206b277290a8818ee42387d8a99147c56681489754a9a0b0e0a953f4603b5b871d399bc3f87bc531b95f03923a7c54065337047f4469b4758776af96f5c4
-  languageName: node
-  linkType: hard
-
-"@ckeditor/ckeditor5-paragraph@npm:^34.0.0, @ckeditor/ckeditor5-paragraph@npm:^34.2.0":
+"@ckeditor/ckeditor5-paragraph@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-paragraph@npm:34.2.0"
   dependencies:
@@ -1734,7 +1706,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-paste-from-office@npm:^34.0.0":
+"@ckeditor/ckeditor5-paste-from-office@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-paste-from-office@npm:34.2.0"
   dependencies:
@@ -1754,6 +1726,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ckeditor/ckeditor5-remove-format@npm:^34.2.0":
+  version: 34.2.0
+  resolution: "@ckeditor/ckeditor5-remove-format@npm:34.2.0"
+  dependencies:
+    ckeditor5: ^34.2.0
+  checksum: cf6c9b8ee8ac17e736ad23a257561cf06baab7b0f42f639667f0194b27d7d00df39896c439d766e62a44062e1dae97afb71a23b1d0550aeac9129dc78bb23fda
+  languageName: node
+  linkType: hard
+
 "@ckeditor/ckeditor5-select-all@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-select-all@npm:34.2.0"
@@ -1765,26 +1746,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-source-editing@npm:^34.0.0":
-  version: 34.2.0
-  resolution: "@ckeditor/ckeditor5-source-editing@npm:34.2.0"
-  dependencies:
-    "@ckeditor/ckeditor5-theme-lark": ^34.2.0
-    ckeditor5: ^34.2.0
-  checksum: 36fbc30121a68ab9b7b5d94b74394bc788fd77867c4bbd7574c2e266b07ae097a378e2f3bf95e098ccbf3235d441ee651f538f001e2afd73885f22b2ed401d4a
-  languageName: node
-  linkType: hard
-
-"@ckeditor/ckeditor5-special-characters@npm:^34.0.0":
-  version: 34.2.0
-  resolution: "@ckeditor/ckeditor5-special-characters@npm:34.2.0"
-  dependencies:
-    ckeditor5: ^34.2.0
-  checksum: 84c6fba2fb49dd68d0427b562ed3a43a5460f6758ddd2457d5cdad53e08bb4a8d54f10fab60c91dd7f95cf10bcb8b2eb658ad944e0b231dafa61cb8662a097e6
-  languageName: node
-  linkType: hard
-
-"@ckeditor/ckeditor5-table@npm:^34.0.0":
+"@ckeditor/ckeditor5-table@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-table@npm:34.2.0"
   dependencies:
@@ -1794,7 +1756,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-theme-lark@npm:^34.0.0, @ckeditor/ckeditor5-theme-lark@npm:^34.2.0":
+"@ckeditor/ckeditor5-theme-lark@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-theme-lark@npm:34.2.0"
   dependencies:
@@ -1803,7 +1765,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ckeditor/ckeditor5-typing@npm:^34.0.0, @ckeditor/ckeditor5-typing@npm:^34.2.0":
+"@ckeditor/ckeditor5-typing@npm:^34.2.0":
   version: 34.2.0
   resolution: "@ckeditor/ckeditor5-typing@npm:34.2.0"
   dependencies:
@@ -4403,7 +4365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.0.0, browserslist@npm:^4.14.5, browserslist@npm:^4.16.6, browserslist@npm:^4.20.2, browserslist@npm:^4.20.3, browserslist@npm:^4.21.2":
+"browserslist@npm:^4.0.0, browserslist@npm:^4.14.5, browserslist@npm:^4.16.6, browserslist@npm:^4.20.2, browserslist@npm:^4.20.3, browserslist@npm:^4.21.3":
   version: 4.21.3
   resolution: "browserslist@npm:4.21.3"
   dependencies:
@@ -4692,39 +4654,35 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ckeditor5-custom-build@workspace:packages/ckeditor5-custom-build"
   dependencies:
-    "@ckeditor/ckeditor5-alignment": ^34.0.0
-    "@ckeditor/ckeditor5-basic-styles": ^34.0.0
-    "@ckeditor/ckeditor5-block-quote": ^34.0.0
-    "@ckeditor/ckeditor5-code-block": ^34.0.0
-    "@ckeditor/ckeditor5-dev-utils": ^30.1.1
-    "@ckeditor/ckeditor5-dev-webpack-plugin": ^30.1.1
-    "@ckeditor/ckeditor5-editor-classic": ^34.0.0
-    "@ckeditor/ckeditor5-essentials": ^34.0.0
-    "@ckeditor/ckeditor5-font": ^34.0.0
-    "@ckeditor/ckeditor5-heading": ^34.0.0
-    "@ckeditor/ckeditor5-highlight": ^34.0.0
-    "@ckeditor/ckeditor5-horizontal-line": ^34.0.0
-    "@ckeditor/ckeditor5-image": ^34.0.0
-    "@ckeditor/ckeditor5-indent": ^34.0.0
-    "@ckeditor/ckeditor5-link": ^34.0.0
-    "@ckeditor/ckeditor5-list": ^34.0.0
-    "@ckeditor/ckeditor5-media-embed": ^34.0.0
-    "@ckeditor/ckeditor5-mention": ^34.0.0
-    "@ckeditor/ckeditor5-paragraph": ^34.0.0
-    "@ckeditor/ckeditor5-paste-from-office": ^34.0.0
-    "@ckeditor/ckeditor5-source-editing": ^34.0.0
-    "@ckeditor/ckeditor5-special-characters": ^34.0.0
-    "@ckeditor/ckeditor5-table": ^34.0.0
-    "@ckeditor/ckeditor5-theme-lark": ^34.0.0
-    "@ckeditor/ckeditor5-typing": ^34.0.0
+    "@ckeditor/ckeditor5-alignment": ^34.2.0
+    "@ckeditor/ckeditor5-basic-styles": ^34.2.0
+    "@ckeditor/ckeditor5-block-quote": ^34.2.0
+    "@ckeditor/ckeditor5-code-block": ^34.2.0
+    "@ckeditor/ckeditor5-dev-utils": ^30.3.1
+    "@ckeditor/ckeditor5-dev-webpack-plugin": ^30.3.1
+    "@ckeditor/ckeditor5-editor-classic": ^34.2.0
+    "@ckeditor/ckeditor5-essentials": ^34.2.0
+    "@ckeditor/ckeditor5-font": ^34.2.0
+    "@ckeditor/ckeditor5-highlight": ^34.2.0
+    "@ckeditor/ckeditor5-image": ^34.2.0
+    "@ckeditor/ckeditor5-indent": ^34.2.0
+    "@ckeditor/ckeditor5-link": ^34.2.0
+    "@ckeditor/ckeditor5-list": ^34.2.0
+    "@ckeditor/ckeditor5-media-embed": ^34.2.0
+    "@ckeditor/ckeditor5-paragraph": ^34.2.0
+    "@ckeditor/ckeditor5-paste-from-office": ^34.2.0
+    "@ckeditor/ckeditor5-remove-format": ^34.2.0
+    "@ckeditor/ckeditor5-table": ^34.2.0
+    "@ckeditor/ckeditor5-theme-lark": ^34.2.0
+    "@ckeditor/ckeditor5-upload": ^34.2.0
     css-loader: ^5.2.7
-    postcss: ^8.4.12
+    postcss: ^8.4.14
     postcss-loader: ^4.3.0
     raw-loader: ^4.0.2
     style-loader: ^2.0.0
     terser-webpack-plugin: ^4.2.3
-    webpack: ^5.72.0
-    webpack-cli: ^4.9.2
+    webpack: ^5.73.0
+    webpack-cli: ^4.10.0
   languageName: unknown
   linkType: soft
 
@@ -5050,19 +5008,19 @@ __metadata:
   linkType: hard
 
 "core-js-compat@npm:^3.21.0, core-js-compat@npm:^3.22.1":
-  version: 3.24.0
-  resolution: "core-js-compat@npm:3.24.0"
+  version: 3.24.1
+  resolution: "core-js-compat@npm:3.24.1"
   dependencies:
-    browserslist: ^4.21.2
+    browserslist: ^4.21.3
     semver: 7.0.0
-  checksum: dbfa9154de02310cdfd121a04e9030f947b31c9c46abe8f6b50a1fe1677d200315e015d4644bdabacd89432cb0564c19e2a5c81aca5c4db4f7efbba994a410c9
+  checksum: b14516add9d59a9fae3b96d0de6e1d8864df80b714232814fce56ce946af3696cb50a4f83c717f8f36e43e1a37adf99a4cde6fc921e6ee56021eee2ea3bdc4dc
   languageName: node
   linkType: hard
 
 "core-js-pure@npm:^3.20.2":
-  version: 3.24.0
-  resolution: "core-js-pure@npm:3.24.0"
-  checksum: 9ed3ec22e3c428ef346ab4a8f25fffe7938734513fbe738d4b46cc59735a2b98319ffd2f65e3e29fe5f1df5963faeb22e518d2576bf93efa02f49ef0f4d1a0ce
+  version: 3.24.1
+  resolution: "core-js-pure@npm:3.24.1"
+  checksum: 4b8990a65c58e2320ff607f6168656fdcbfb4f60bd4af0ce7b09f5c0e0099b0cfc2632836986cfcb11f6ffe7ea46a5b8679651bc83ca3f41690f5ef7472d6f33
   languageName: node
   linkType: hard
 
@@ -11142,7 +11100,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.2.15, postcss@npm:^8.4.12":
+"postcss@npm:^8.2.15, postcss@npm:^8.4.12, postcss@npm:^8.4.14":
   version: 8.4.14
   resolution: "postcss@npm:8.4.14"
   dependencies:
@@ -11596,7 +11554,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-transition-group@npm:^4.4.2":
+"react-transition-group@npm:4.4.2":
   version: 4.4.2
   resolution: "react-transition-group@npm:4.4.2"
   dependencies:
@@ -13601,7 +13559,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-cli@npm:^4.9.2":
+"webpack-cli@npm:^4.10.0":
   version: 4.10.0
   resolution: "webpack-cli@npm:4.10.0"
   dependencies:
@@ -13671,7 +13629,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.72.0":
+"webpack@npm:^5.73.0":
   version: 5.74.0
   resolution: "webpack@npm:5.74.0"
   dependencies:

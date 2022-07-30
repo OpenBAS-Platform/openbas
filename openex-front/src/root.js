@@ -33,7 +33,13 @@ const Root = () => {
         <CssBaseline />
         <ConnectedIntlProvider>
           <Switch>
-            <Route exact path="/" render={() => <Redirect to={logged.isOnlyPlayer ? '/private' : '/admin'} />} />
+            <Route
+              exact
+              path="/"
+              render={() => (
+                <Redirect to={logged.isOnlyPlayer ? '/private' : '/admin'} />
+              )}
+            />
             <Route path="/private" render={errorWrapper(IndexPrivate)} />
             <Route path="/admin" render={errorWrapper(IndexAdmin)} />
             <Route component={NotFound} />
