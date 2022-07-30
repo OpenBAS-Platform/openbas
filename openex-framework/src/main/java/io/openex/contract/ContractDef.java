@@ -14,6 +14,11 @@ public class ContractDef {
         //private constructor
     }
 
+    public ContractDef addFields(List<ContractElement> fields) {
+        this.fields.addAll(fields);
+        return this;
+    }
+
     public static ContractDef contractBuilder() {
         return new ContractDef();
     }
