@@ -5,7 +5,6 @@ import io.openex.database.model.*;
 import io.openex.database.repository.*;
 import io.openex.injects.media.model.MediaContent;
 import io.openex.rest.helper.RestBehavior;
-import io.openex.rest.inject.form.InjectDocumentInput;
 import io.openex.rest.media.form.*;
 import io.openex.rest.media.model.VirtualArticle;
 import io.openex.rest.media.response.MediaReader;
