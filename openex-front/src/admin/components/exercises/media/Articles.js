@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -13,11 +13,14 @@ import * as R from 'ramda';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
+import { green, orange } from '@mui/material/colors';
 import {
   ChatBubbleOutlineOutlined,
   ShareOutlined,
   FavoriteBorderOutlined,
+  VisibilityOutlined,
 } from '@mui/icons-material';
+import IconButton from '@mui/material/IconButton';
 import DefinitionMenu from '../DefinitionMenu';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
 import { useHelper } from '../../../../store';
@@ -135,12 +138,22 @@ const Articles = () => {
               ? documentsMap[d.document_id]
               : undefined))
             .filter((d) => d !== undefined);
+          const images = docs.filter((d) => d.document_type.includes('image/'));
+          const videos = docs.filter((d) => d.document_type.includes('video/'));
+          let headersDocs = [];
+          if (article.article_fullmedia.media_type === 'newspaper') {
+            headersDocs = images;
+          } else if (article.article_fullmedia.media_type === 'tv') {
+            headersDocs = videos;
+          } else {
+            headersDocs = [...images, ...videos];
+          }
           let columns = 12;
-          if (docs.length === 2) {
+          if (headersDocs.length === 2) {
             columns = 6;
-          } else if (docs.length === 3) {
+          } else if (headersDocs.length === 3) {
             columns = 4;
-          } else if (docs.length >= 4) {
+          } else if (headersDocs.length >= 4) {
             columns = 3;
           }
           // const shouldBeTruncated = (article.article_content || '').length > 500;
@@ -165,26 +178,53 @@ const Articles = () => {
                   }
                   title={article.article_author || t('Unknown')}
                   subheader={
-                    article.article_is_scheduled
-                      ? t('Scheduled / in use')
-                      : t('Not used in the exercise')
+                    article.article_is_scheduled ? (
+                      <span style={{ color: green[500] }}>
+                        {t('Scheduled')}
+                      </span>
+                    ) : (
+                      <span style={{ color: orange[500] }}>
+                        {t('Not used in the exercise')}
+                      </span>
+                    )
                   }
                   action={
-                    <ArticlePopover
-                      exercise={exercise}
-                      article={article}
-                      images={docs}
-                    />
+                    <React.Fragment>
+                      <IconButton
+                        aria-haspopup="true"
+                        size="large"
+                        component={Link}
+                        to={`/medias/${exerciseId}/${article.article_fullmedia.media_id}?preview=true`}
+                        target="_blank"
+                      >
+                        <VisibilityOutlined />
+                      </IconButton>
+                      <ArticlePopover
+                        exercise={exercise}
+                        article={article}
+                        documents={docs}
+                      />
+                    </React.Fragment>
                   }
                 />
                 <Grid container={true} spacing={3}>
-                  {docs.map((doc) => (
+                  {headersDocs.map((doc) => (
                     <Grid item={true} xs={columns}>
-                      <CardMedia
-                        component="img"
-                        height="150"
-                        image={`/api/documents/${doc.document_id}/file`}
-                      />
+                      {doc.document_type.includes('image/') && (
+                        <CardMedia
+                          component="img"
+                          height="150"
+                          src={`/api/documents/${doc.document_id}/file`}
+                        />
+                      )}
+                      {doc.document_type.includes('video/') && (
+                        <CardMedia
+                          component="video"
+                          height="150"
+                          src={`/api/documents/${doc.document_id}/file`}
+                          controls={true}
+                        />
+                      )}
                     </Grid>
                   ))}
                 </Grid>

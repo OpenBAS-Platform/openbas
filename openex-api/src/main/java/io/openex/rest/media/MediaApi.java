@@ -33,7 +33,6 @@ public class MediaApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private ArticleRepository articleRepository;
     private ArticleDocumentRepository articleDocumentRepository;
-    private UserRepository userRepository;
     private MediaRepository mediaRepository;
     private DocumentRepository documentRepository;
     private InjectExpectationRepository injectExpectationExecutionRepository;
@@ -61,11 +60,6 @@ public class MediaApi extends RestBehavior {
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
     }
 
     @Autowired
@@ -166,6 +160,7 @@ public class MediaApi extends RestBehavior {
                 articleDocument.setArticle(article);
                 Document document = doc.get();
                 articleDocument.setDocument(document);
+                articleDocumentRepository.save(articleDocument);
                 // If Document not yet linked directly to the exercise, attached it
                 if (!document.getExercises().contains(exercise)) {
                     exercise.getDocuments().add(document);
@@ -230,25 +225,13 @@ public class MediaApi extends RestBehavior {
     }
     // endregion
 
-    // --- Open media access
-    private User impersonateUser(String userId) {
-        User user = currentUser();
-        if (user.getId().equals(ANONYMOUS)) {
-            user = userRepository.findById(userId).orElseThrow();
-            if (!user.getId().equals(userId) || !user.isOnlyPlayer()) {
-                throw new UnsupportedOperationException("Only player can be impersonate");
-            }
-        }
-        return user;
-    }
-
-    @GetMapping("/api/planner/medias/{exerciseId}/{mediaId}")
-    @PreAuthorize("isExercisePlanner(#exerciseId)")
-    public MediaReader plannerArticles(@PathVariable String exerciseId, @PathVariable String mediaId) {
+    @GetMapping("/api/observer/medias/{exerciseId}/{mediaId}")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public MediaReader observerArticles(@PathVariable String exerciseId, @PathVariable String mediaId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         Media media = mediaRepository.findById(mediaId).orElseThrow();
         // Fulfill visible article expectations
-        MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
+        MediaReader mediaReader = new MediaReader(media, exercise);
         List<Article> publishedArticles = exercise.getArticlesForMedia(media);
         List<Article> articles = enrichArticleWithVirtualPublication(exercise, publishedArticles);
         mediaReader.setMediaArticles(articles);
@@ -264,7 +247,7 @@ public class MediaApi extends RestBehavior {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
         Media media = mediaRepository.findById(mediaId).orElseThrow();
-        MediaReader mediaReader = new MediaReader(exercise.getStatus(), media);
+        MediaReader mediaReader = new MediaReader(media, exercise);
         Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
                 .filter(inject -> inject.getStatus().isPresent())
@@ -283,7 +266,9 @@ public class MediaApi extends RestBehavior {
                 .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
         if (toPublishArticleIdsMap.size() > 0) {
             List<Article> publishedArticles = fromIterable(articleRepository.findAllById(toPublishArticleIdsMap.keySet()))
-                    .stream().peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId()))).toList();
+                    .stream().peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
+                    .sorted(Comparator.comparing(Article::getVirtualPublication).reversed())
+                    .toList();
             mediaReader.setMediaArticles(publishedArticles);
             // Fulfill article expectations
             List<InjectExpectation> expectationExecutions = publishedArticles.stream()

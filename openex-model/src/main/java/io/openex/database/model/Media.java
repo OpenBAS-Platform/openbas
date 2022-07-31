@@ -1,16 +1,22 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.collect.Lists;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.helper.MonoModelDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import static java.time.Instant.now;
+import static java.util.Arrays.asList;
 
 @Entity
 @Table(name = "medias")
@@ -178,6 +184,17 @@ public class Media implements Base {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<Document> getLogos() {
+        List<Document> logos = new ArrayList<>();
+        if (logoLight != null) {
+            logos.add(logoLight);
+        }
+        if (logoDark != null) {
+            logos.add(logoDark);
+        }
+        return logos;
     }
 
     @Override

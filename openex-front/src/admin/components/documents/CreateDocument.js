@@ -30,7 +30,7 @@ const styles = (theme) => ({
 });
 
 const CreateDocument = (props) => {
-  const { classes, t, inline, exerciseId, image } = props;
+  const { classes, t, inline, exerciseId, hideExercises } = props;
   const [open, setOpen] = useState(false);
   const onSubmit = (data) => {
     const inputValues = R.pipe(
@@ -66,7 +66,7 @@ const CreateDocument = (props) => {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={image ? t('Create an image') : t('Create a new document')}
+            primary={t('Create a new document')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -88,9 +88,7 @@ const CreateDocument = (props) => {
         onClose={() => setOpen(false)}
         PaperProps={{ elevation: 1 }}
       >
-        <DialogTitle>
-          {image ? t('Create an image') : t('Create a new document')}
-        </DialogTitle>
+        <DialogTitle>{t('Create a new document')}</DialogTitle>
         <DialogContent>
           <DocumentForm
             onSubmit={onSubmit}
@@ -99,8 +97,7 @@ const CreateDocument = (props) => {
               document_exercises: exerciseId ? [exerciseId] : [],
             }}
             handleClose={() => setOpen(false)}
-            image={image}
-            hideExercises={!!exerciseId}
+            hideExercises={hideExercises || !!exerciseId}
           />
         </DialogContent>
       </Dialog>
@@ -114,8 +111,8 @@ CreateDocument.propTypes = {
   addDocument: PropTypes.func,
   fetchDocument: PropTypes.func,
   inline: PropTypes.bool,
-  image: PropTypes.bool,
   exerciseId: PropTypes.string,
+  hideExercises: PropTypes.bool,
 };
 
 export default R.compose(

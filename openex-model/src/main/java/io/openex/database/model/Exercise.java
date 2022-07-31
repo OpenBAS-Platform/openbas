@@ -193,7 +193,8 @@ public class Exercise implements Base {
         return getUsersByType(PLANNER);
     }
 
-    @JsonIgnore
+    @JsonProperty("exercise_observers")
+    @JsonSerialize(using = MultiModelDeserializer.class)
     public List<User> getObservers() {
         return getUsersByType(PLANNER, OBSERVER);
     }
@@ -218,7 +219,8 @@ public class Exercise implements Base {
         return getAudiences().stream().mapToLong(audience -> audience.getUsers().size()).sum();
     }
 
-    @JsonIgnore
+    @JsonProperty("exercise_players")
+    @JsonSerialize(using = MultiModelDeserializer.class)
     public List<User> getPlayers() {
         return getAudiences().stream().flatMap(audience -> audience.getUsers().stream())
                 .distinct()

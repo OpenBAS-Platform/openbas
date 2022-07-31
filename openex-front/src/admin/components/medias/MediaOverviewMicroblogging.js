@@ -17,7 +17,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const MediaOverviewMicroBlogging = ({ media }) => {
+const MediaOverviewMicroblogging = ({ media }) => {
   const classes = useStyles();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -233,4 +233,4 @@ const MediaOverviewMicroBlogging = ({ media }) => {
   );
 };
 
-export default MediaOverviewMicroBlogging;
+export default MediaOverviewMicroblogging;

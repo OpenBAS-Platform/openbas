@@ -59,9 +59,9 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
         }
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<User> observers = exercise.getObservers();
-        Optional<User> planner = observers.stream()
+        Optional<User> observer = observers.stream()
                 .filter(user -> user.getId().equals(getUser().getId())).findAny();
-        return planner.isPresent();
+        return observer.isPresent();
     }
 
     public boolean isExercisePlayer(String exerciseId) {
@@ -73,6 +73,11 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
         Optional<User> player = players.stream()
                 .filter(user -> user.getId().equals(getUser().getId())).findAny();
         return player.isPresent();
+    }
+
+    // All read only or playable access
+    public boolean isExerciseObserverOrPlayer(String exerciseId) {
+        return isExerciseObserver(exerciseId) || isExercisePlayer(exerciseId);
     }
 
     @SuppressWarnings("unused")
@@ -91,6 +96,11 @@ public class SecurityExpression extends SecurityExpressionRoot implements Method
         }
         User user = userRepository.findById(getUser().getId()).orElseThrow();
         return user.isObserver();
+    }
+
+    public boolean isPlayer() {
+        User user = userRepository.findById(getUser().getId()).orElseThrow();
+        return user.isPlayer();
     }
     // endregion
 

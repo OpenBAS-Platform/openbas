@@ -11,12 +11,12 @@ import ExerciseField from '../../../components/ExerciseField';
 
 class DocumentForm extends Component {
   validate(values) {
-    const { t, editing, image } = this.props;
+    const { t, editing, hideExercises } = this.props;
     const errors = {};
     let requiredFields = [];
-    if (!image && editing) {
+    if (!hideExercises && editing) {
       requiredFields = ['document_exercises'];
-    } else if (!image && !editing) {
+    } else if (!hideExercises && !editing) {
       requiredFields = ['document_file', 'document_exercises'];
     }
     requiredFields.forEach((field) => {
@@ -31,15 +31,7 @@ class DocumentForm extends Component {
   }
 
   render() {
-    const {
-      t,
-      editing,
-      onSubmit,
-      initialValues,
-      handleClose,
-      hideExercises,
-      image,
-    } = this.props;
+    const { t, editing, onSubmit, initialValues, handleClose, hideExercises } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -62,7 +54,7 @@ class DocumentForm extends Component {
               rows={2}
               label={t('Description')}
             />
-            {!hideExercises && !image && (
+            {!hideExercises && (
               <ExerciseField
                 name="document_exercises"
                 values={values}
@@ -78,21 +70,11 @@ class DocumentForm extends Component {
               setFieldValue={form.mutators.setValue}
               style={{ marginTop: 20 }}
             />
-            {!editing && !image && (
+            {!editing && (
               <FileField
                 variant="standard"
                 type="file"
                 name="document_file"
-                label={t('File')}
-                style={{ marginTop: 20 }}
-              />
-            )}
-            {!editing && image && (
-              <FileField
-                variant="standard"
-                type="file"
-                name="document_file"
-                accept="image/*"
                 label={t('File')}
                 style={{ marginTop: 20 }}
               />

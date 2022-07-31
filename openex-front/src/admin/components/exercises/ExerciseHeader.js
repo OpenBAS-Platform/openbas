@@ -18,7 +18,7 @@ import ExercisePopover from './ExercisePopover';
 import { useHelper } from '../../../store';
 import { useFormatter } from '../../../components/i18n';
 import { Transition } from '../../../utils/Environment';
-import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/Exercise';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -66,6 +66,7 @@ const ExerciseHeader = (props) => {
   const classes = useStyles();
   const { t } = useFormatter();
   const { exerciseId } = useParams();
+  const permissions = usePermissions(exerciseId);
   const dispatch = useDispatch();
   const { exercise, tagsMap } = useHelper((helper) => {
     return {
@@ -115,7 +116,7 @@ const ExerciseHeader = (props) => {
           <TagChip
             key={tag}
             tagId={tag}
-            isReadOnly={isExerciseReadOnly(exercise, true)}
+            isReadOnly={permissions.readOnlyBypassStatus}
             deleteTag={deleteTag}
           />
         ))}
@@ -125,7 +126,7 @@ const ExerciseHeader = (props) => {
             color="primary"
             aria-label="Tag"
             onClick={handleToggleAddTag}
-            disabled={isExerciseReadOnly(exercise, true)}
+            isReadOnly={permissions.readOnlyBypassStatus}
           >
             {<AddOutlined />}
           </IconButton>

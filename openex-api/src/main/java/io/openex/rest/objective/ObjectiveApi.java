@@ -46,6 +46,7 @@ public class ObjectiveApi extends RestBehavior {
 
     // region objectives
     @GetMapping("/api/exercises/{exerciseId}/objectives")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Objective> getMainObjectives(@PathVariable String exerciseId) {
         return objectiveRepository.findAll(ObjectiveSpecification.fromExercise(exerciseId));
     }
@@ -80,11 +81,13 @@ public class ObjectiveApi extends RestBehavior {
 
     // region evaluations
     @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations/{evaluationId}")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Evaluation getEvaluation(@PathVariable String evaluationId) {
         return evaluationRepository.findById(evaluationId).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/objectives/{objectiveId}/evaluations")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Evaluation> getEvaluations(@PathVariable String objectiveId) {
         return evaluationRepository.findAll(EvaluationSpecification.fromObjective(objectiveId));
     }

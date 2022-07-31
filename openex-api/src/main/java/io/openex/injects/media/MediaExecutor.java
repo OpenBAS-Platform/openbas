@@ -54,7 +54,7 @@ public class MediaExecutor extends Injector {
         String mediaId = article.getMedia().getId();
         String exerciseId = article.getExercise().getId();
         String queryOptions = "article=" + article.getId() + "&user=" + userId;
-        return openExConfig.getBaseUrl() + "/media/" + exerciseId + "/" + mediaId + "?" + queryOptions;
+        return openExConfig.getBaseUrl() + "/medias/" + exerciseId + "/" + mediaId + "?" + queryOptions;
     }
 
     @Override
