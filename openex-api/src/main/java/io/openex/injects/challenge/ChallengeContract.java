@@ -65,18 +65,18 @@ public class ChallengeContract extends Contractor {
         // In this "internal" contract we can't express choices.
         // Choices are contextual to a specific exercise.
         String messageBody = """
-                    Hello,<br /><br />
-                    News challenges has been published.<br />
+                    Dear player,<br /><br />
+                    News challenges have been published.<br /><br />
                     <#list challenges as challenge>
                         - <a href="${challenge.uri}">${challenge.name}</a><br />
                     </#list>
                     <br/><br/>
                     Kind regards,<br />
-                    The challenge team
+                    The animation team
                 """;
         List<ContractElement> publishInstance = contractBuilder()
                 .mandatory(contractSelect)
-                .mandatory(textField("subject", "Subject", "A new challenge was published for you ${user.name}"))
+                .mandatory(textField("subject", "Subject", "New challenges published for you ${user.name}"))
                 .mandatory(richTextareaField("body", "Body", messageBody))
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .mandatory(audienceField("audiences", "Audiences", Multiple))

@@ -224,8 +224,8 @@ const i18n = {
       Audiences: 'Audiences',
       'Send email': 'Envoyer le mail',
       'Inject expectations': 'Attendus du stimuli',
-      'Add images in this media pressure':
-        'Ajouter des images à cette pression médiatique',
+      'Add documents in this media pressure':
+        'Ajouter des documents à cette pression médiatique',
       'Expect audiences to read the article(s)':
         'Les audiences doivent lire le(s) article(s)',
       'Add media pressure': 'Ajouter de la pression médiatique',
@@ -294,11 +294,12 @@ const i18n = {
       'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: ${comcheck.url}':
         "Ceci est une vérification des moyens de communication avant le début de l'exercice. Merci de bien vouloir cliquer sur le lien ci-dessous afin de confirmer que vous avez reçu ce message avec succès : ${comcheck.url}",
       'Best regards': 'Bien cordialement',
-      'The exercise control team': "L'équipe d'timeline de l'exercice",
+      'The exercise control team': "L'équipe d'animation de l'exercice",
       'Do you want to launch a new dryrun?':
         'Souhaitez-vous lancer une nouvelle simulation ?',
       'Add tags to this exercise': 'Ajouter des tags à cet exercice',
       'No comcheck in this exercise.': 'Aucune vérification dans cet exercice',
+      'There is nothing to see here...': "Il n'y a rien à voir ici...",
       None: 'Aucune',
       message: 'Message',
       Pending: 'En attente',
@@ -309,6 +310,8 @@ const i18n = {
       Running: 'En cours',
       Failure: 'Echec',
       Expired: 'Expiré',
+      'No media pressure entry in this media yet.':
+        'Encore aucune entrée de pression médiatique dans ce média.',
       'Your communication check is': 'Votre test de communication est',
       successfull: 'un succès',
       'Verification done at': 'Vérification faite le',
@@ -357,6 +360,7 @@ const i18n = {
       'Import an exercise': 'Importer un exercice',
       Export: 'Exporter',
       'Export the exercise': 'Exporter cet exercice',
+      'Reset to default values': 'Réinitialiser les valeurs par défaut',
       Elements: 'Eléments',
       'Scenario (including attached files)':
         'Scénario (fichiers joints inclus)',

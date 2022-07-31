@@ -1,9 +1,6 @@
 package io.openex.rest.document;
 
-import io.openex.database.model.Document;
-import io.openex.database.model.Exercise;
-import io.openex.database.model.Tag;
-import io.openex.database.model.User;
+import io.openex.database.model.*;
 import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.ExerciseRepository;
 import io.openex.database.repository.InjectDocumentRepository;
@@ -33,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.helper.UserHelper.ANONYMOUS;
 import static io.openex.helper.UserHelper.currentUser;
 
 
@@ -180,6 +178,47 @@ public class DocumentApi extends RestBehavior {
     @GetMapping("/api/documents/{documentId}/file")
     public void downloadDocument(@PathVariable String documentId, HttpServletResponse response) throws IOException {
         Document document = resolveDocument(documentId).orElseThrow();
+        response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
+        response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
+        response.setStatus(HttpServletResponse.SC_OK);
+        InputStream fileStream = fileService.getFile(document).orElseThrow();
+        fileStream.transferTo(response.getOutputStream());
+    }
+
+    private List<Document> getExerciseMediaDocuments(Exercise exercise) {
+        Stream<Document> mediasDocs = exercise.getArticles().stream()
+                .map(Article::getMedia)
+                .flatMap(media -> media.getLogos().stream());
+        Stream<Document> articlesDocs = exercise.getArticles().stream()
+                .flatMap(article -> article.getDocuments().stream())
+                .map(ArticleDocument::getDocument);
+        return Stream.concat(mediasDocs, articlesDocs).distinct().toList();
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/media_documents")
+    public List<Document> mediaDocuments(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        if (!exercise.isUserHasAccess(user) && !exercise.getPlayers().contains(user)) {
+            throw new UnsupportedOperationException("The given player is not in this exercise");
+        }
+        return getExerciseMediaDocuments(exercise);
+    }
+
+    @GetMapping("/api/exercises/{exerciseId}/documents/{documentId}/media_file")
+    public void downloadMediaDocument(@PathVariable String exerciseId, @PathVariable String documentId, @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        final User user = userId.map(this::impersonateUser).orElse(currentUser());
+        if (user.getId().equals(ANONYMOUS)) {
+            throw new UnsupportedOperationException("User must be logged or dynamic player is required");
+        }
+        if (!exercise.isUserHasAccess(user) && !exercise.getPlayers().contains(user)) {
+            throw new UnsupportedOperationException("The given player is not in this exercise");
+        }
+        Document document = getExerciseMediaDocuments(exercise).stream().filter(doc -> doc.getId().equals(documentId)).findFirst().orElseThrow();
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
         response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
         response.setStatus(HttpServletResponse.SC_OK);

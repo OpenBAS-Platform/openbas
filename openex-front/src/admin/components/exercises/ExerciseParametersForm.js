@@ -51,16 +51,6 @@ class ExerciseParametersForm extends Component {
               style={{ marginTop: 20 }}
               disabled={disabled}
             />
-            <TextField
-              variant="standard"
-              name="exercise_message_footer"
-              label={t('Messages footer')}
-              multiline={true}
-              fullWidth={true}
-              rows={3}
-              style={{ marginTop: 20 }}
-              disabled={disabled}
-            />
             <div style={{ float: 'right', marginTop: 20 }}>
               <Button
                 variant="contained"

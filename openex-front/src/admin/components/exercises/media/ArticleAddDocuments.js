@@ -123,7 +123,6 @@ class ArticleAddDocuments extends Component {
       || (n.document_type || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1;
     const filteredDocuments = R.pipe(
-      R.filter((n) => n.document_type.includes('image/')),
       R.filter(
         (n) => tags.length === 0
           || R.any(
@@ -166,7 +165,7 @@ class ArticleAddDocuments extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add images in this media pressure')}</DialogTitle>
+          <DialogTitle>{t('Add documents in this media pressure')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
@@ -219,8 +218,8 @@ class ArticleAddDocuments extends Component {
                   <CreateDocument
                     exerciseId={exerciseId}
                     inline={true}
-                    image={true}
                     onCreate={this.onCreate.bind(this)}
+                    hideExercises={true}
                   />
                 </List>
               </Grid>

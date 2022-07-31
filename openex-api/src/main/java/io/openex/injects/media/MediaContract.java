@@ -50,13 +50,14 @@ public class MediaContract extends Contractor {
         // In this "internal" contract we can't express choices.
         // Choices are contextual to a specific exercise.
         String messageBody = """
-                    Hello,<br /><br />
-                    A <a href="${article_uri}">new media entry</a> has been published.
-                    <br/><br/>
-                    Link: <a href="${article_uri}">${article_uri}</a>
+                    Dear player,<br /><br />
+                    New media pressure entries have been published.<br /><br />
+                    <#list articles as article>
+                        - <a href="${article.uri}">${article.name}</a><br />
+                    </#list>
                     <br/><br/>
                     Kind regards,<br />
-                    The media team
+                    The animation team
                 """;
         ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
         ContractCheckbox expectationField = checkboxField("expectation", "Expect audiences to read the article(s)", true);
@@ -70,7 +71,7 @@ public class MediaContract extends Contractor {
                 .optional(expectationField)
                 // Emailing zone
                 .optional(emailingField)
-                .mandatory(textField("subject", "Subject", "A new media entry was published for you ${user.name}",
+                .mandatory(textField("subject", "Subject", "New media pressure entries published for you ${user.name}",
                         List.of(emailingField)))
                 .mandatory(richTextareaField("body", "Body", messageBody,
                         List.of(emailingField)))

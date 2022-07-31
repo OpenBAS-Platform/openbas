@@ -5,6 +5,7 @@ import {
   postReferential,
   putReferential,
 } from '../utils/Action';
+import { mediaReader } from './Schema';
 
 // region media
 const media = new schema.Entity('medias', {}, { idAttribute: 'media_id' });
@@ -55,4 +56,13 @@ export const updateExerciseArticle = (exerciseId, articleId, data) => (dispatch)
   const uri = `/api/exercises/${exerciseId}/articles/${articleId}`;
   return putReferential(article, uri, data)(dispatch);
 };
+export const fetchPlayerMedia = (exerciseId, mediaId, userId) => (dispatch) => {
+  const uri = `/api/player/medias/${exerciseId}/${mediaId}?userId=${userId}`;
+  return getReferential(mediaReader, uri)(dispatch);
+};
+export const fetchObserverMedia = (exerciseId, mediaId) => (dispatch) => {
+  const uri = `/api/observer/medias/${exerciseId}/${mediaId}`;
+  return getReferential(mediaReader, uri)(dispatch);
+};
+
 // endregion

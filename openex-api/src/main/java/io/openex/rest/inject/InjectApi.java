@@ -171,21 +171,25 @@ public class InjectApi extends RestBehavior {
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Inject> exerciseInjects(@PathVariable String exerciseId) {
         return injectRepository.findAll(InjectSpecification.fromExercise(exerciseId)).stream().sorted(Inject.executionComparator).toList();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Inject exerciseInject(@PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/audiences")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Audience> exerciseInjectAudiences(@PathVariable String injectId) {
         return injectRepository.findById(injectId).orElseThrow().getAudiences();
     }
 
     @GetMapping("/api/exercises/{exerciseId}/injects/{injectId}/communications")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
     public Iterable<Communication> exerciseInjectCommunications(@PathVariable String injectId) {
         List<Communication> coms = communicationRepository.findAll(fromInject(injectId), Sort.by(Sort.Direction.DESC, "receivedAt"));
         List<Communication> ackComs = coms.stream().peek(com -> com.setAck(true)).toList();
@@ -193,6 +197,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/injects")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public Inject createInject(@PathVariable String exerciseId, @Valid @RequestBody InjectInput input) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         // Get common attributes
@@ -208,6 +213,7 @@ public class InjectApi extends RestBehavior {
     }
 
     @PostMapping("/api/exercises/{exerciseId}/inject")
+    @PreAuthorize("isExercisePlanner(#exerciseId)")
     public InjectStatus executeInject(@PathVariable String exerciseId, @Valid @RequestBody DirectInjectInput input) {
         Inject inject = input.toInject();
         Contract contract = contractService.resolveContract(inject);

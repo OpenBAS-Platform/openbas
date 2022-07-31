@@ -463,7 +463,23 @@ class InjectDefinition extends Component {
     injectType.fields
       .filter((f) => !['audiences', 'articles', 'attachments'].includes(f.key))
       .forEach((field) => {
-        if (data[field.key] && field.type === 'tuple') {
+        if (
+          field.type === 'textarea'
+          && field.richText
+          && data[field.key]
+          && data[field.key].length > 0
+        ) {
+          finalData[field.key] = data[field.key]
+            .replaceAll(
+              '&lt;#list challenges as challenge&gt;',
+              '<#list challenges as challenge>',
+            )
+            .replaceAll(
+              '&lt;#list articles as article&gt;',
+              '<#list articles as article>',
+            )
+            .replaceAll('&lt;/#list&gt;', '</#list>');
+        } else if (data[field.key] && field.type === 'tuple') {
           if (field.cardinality && field.cardinality === '1') {
             if (finalData[field.key].type === 'attachment') {
               finalData[field.key] = {
@@ -790,6 +806,58 @@ class InjectDefinition extends Component {
     );
   }
 
+  resetDefaultvalues(setFieldValue, builtInFields) {
+    const { inject, injectTypes } = this.props;
+    const injectType = R.head(
+      injectTypes.filter((i) => i.contract_id === inject.inject_contract),
+    );
+    injectType.fields
+      .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
+      .forEach((field) => {
+        if (field.cardinality && field.cardinality === '1') {
+          let defaultValue = R.head(field.defaultValue);
+          if (
+            field.type === 'textarea'
+            && field.richText
+            && defaultValue
+            && defaultValue.length > 0
+          ) {
+            defaultValue = defaultValue
+              .replaceAll(
+                '<#list challenges as challenge>',
+                '&lt;#list challenges as challenge&gt;',
+              )
+              .replaceAll(
+                '<#list articles as article>',
+                '&lt;#list articles as article&gt;',
+              )
+              .replaceAll('</#list>', '&lt;/#list&gt;');
+          }
+          setFieldValue(field.key, defaultValue);
+        } else {
+          let { defaultValue } = field;
+          if (
+            field.type === 'textarea'
+            && field.richText
+            && defaultValue
+            && defaultValue.length > 0
+          ) {
+            defaultValue = defaultValue
+              .replaceAll(
+                '<#list challenges as challenge>',
+                '&lt;#list challenges as challenge&gt;',
+              )
+              .replaceAll(
+                '<#list articles as article>',
+                '&lt;#list articles as article&gt;',
+              )
+              .replaceAll('</#list>', '&lt;/#list&gt;');
+          }
+          setFieldValue(field.key, defaultValue);
+        }
+      });
+  }
+
   render() {
     const {
       t,
@@ -879,7 +947,7 @@ class InjectDefinition extends Component {
     const builtInFields = ['audiences', 'articles', 'attachments'];
     if (inject.inject_content === null) {
       injectType.fields
-        .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
+        .filter((f) => !builtInFields.includes(f.key))
         .forEach((field) => {
           if (!initialValues[field.key]) {
             if (field.cardinality && field.cardinality === '1') {
@@ -889,54 +957,67 @@ class InjectDefinition extends Component {
             }
           }
         });
-    } else {
-      // handle tuple with attachments
-      injectType.fields
-        .filter((f) => !builtInFields.includes(f.key) && !f.expectation)
-        .forEach((field) => {
-          if (field.type === 'tuple' && initialValues[field.key]) {
-            if (field.cardinality && field.cardinality === '1') {
-              if (
-                initialValues[field.key].value
-                && initialValues[field.key].value.includes(
+    }
+    // Specific processing for some field
+    injectType.fields
+      .filter((f) => !builtInFields.includes(f.key))
+      .forEach((field) => {
+        if (
+          field.type === 'textarea'
+          && field.richText
+          && initialValues[field.key]
+          && initialValues[field.key].length > 0
+        ) {
+          initialValues[field.key] = initialValues[field.key]
+            .replaceAll(
+              '<#list challenges as challenge>',
+              '&lt;#list challenges as challenge&gt;',
+            )
+            .replaceAll(
+              '<#list articles as article>',
+              '&lt;#list articles as article&gt;',
+            )
+            .replaceAll('</#list>', '&lt;/#list&gt;');
+        } else if (field.type === 'tuple' && initialValues[field.key]) {
+          if (field.cardinality && field.cardinality === '1') {
+            if (
+              initialValues[field.key].value
+              && initialValues[field.key].value.includes(
+                `${field.tupleFilePrefix}`,
+              )
+            ) {
+              initialValues[field.key] = {
+                type: 'attachment',
+                key: initialValues[field.key].key,
+                value: initialValues[field.key].value.replace(
                   `${field.tupleFilePrefix}`,
-                )
-              ) {
-                initialValues[field.key] = {
-                  type: 'attachment',
-                  key: initialValues[field.key].key,
-                  value: initialValues[field.key].value.replace(
-                    `${field.tupleFilePrefix}`,
-                    '',
-                  ),
-                };
-              } else {
-                initialValues[field.key] = R.assoc(
-                  'type',
-                  'text',
-                  initialValues[field.key],
-                );
-              }
+                  '',
+                ),
+              };
             } else {
-              initialValues[field.key] = initialValues[field.key].map(
-                (pair) => {
-                  if (
-                    pair.value
-                    && pair.value.includes(`${field.tupleFilePrefix}`)
-                  ) {
-                    return {
-                      type: 'attachment',
-                      key: pair.key,
-                      value: pair.value.replace(`${field.tupleFilePrefix}`, ''),
-                    };
-                  }
-                  return R.assoc('type', 'text', pair);
-                },
+              initialValues[field.key] = R.assoc(
+                'type',
+                'text',
+                initialValues[field.key],
               );
             }
+          } else {
+            initialValues[field.key] = initialValues[field.key].map((pair) => {
+              if (
+                pair.value
+                && pair.value.includes(`${field.tupleFilePrefix}`)
+              ) {
+                return {
+                  type: 'attachment',
+                  key: pair.key,
+                  value: pair.value.replace(`${field.tupleFilePrefix}`, ''),
+                };
+              }
+              return R.assoc('type', 'text', pair);
+            });
           }
-        });
-    }
+        }
+      });
     return (
       <div>
         <div className={classes.header}>
@@ -967,7 +1048,7 @@ class InjectDefinition extends Component {
               },
             }}
           >
-            {({ handleSubmit, submitting, values }) => (
+            {({ form, handleSubmit, submitting, values }) => (
               <form id="injectContentForm" onSubmit={handleSubmit}>
                 {hasAudiences && (
                   <div>
@@ -1313,6 +1394,19 @@ class InjectDefinition extends Component {
                     values,
                     attachedDocs,
                   )}
+                  <Button
+                    color="secondary"
+                    variant="outlined"
+                    disabled={submitting || isExerciseReadOnly(exercise)}
+                    onClick={this.resetDefaultvalues.bind(
+                      this,
+                      form.mutators.setValue,
+                      builtInFields,
+                    )}
+                    style={{ marginTop: 10 }}
+                  >
+                    {t('Reset to default values')}
+                  </Button>
                 </div>
                 {expectations.length > 0 && (
                   <div>

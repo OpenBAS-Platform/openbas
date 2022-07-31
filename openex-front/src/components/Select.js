@@ -52,7 +52,7 @@ const renderSelectField = ({
       {...inputProps}
       {...others}
       inputProps={{ name, id: name }}
-      style={{ height: 29 }}
+      style={{ height: 30 }}
     >
       {children}
     </MUISelect>

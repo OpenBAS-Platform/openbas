@@ -50,7 +50,7 @@ import { fetchAudiences } from '../../../actions/Audience';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
 import { distributionChartOptions } from '../../../utils/Charts';
-import { isExerciseReadOnly } from '../../../utils/Exercise';
+import { usePermissions } from '../../../utils/Exercise';
 import { Transition } from '../../../utils/Environment';
 import ExerciseDatePopover from './ExerciseDatePopover';
 import CreateControl from './controls/CreateControl';
@@ -159,6 +159,7 @@ const Exercise = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { exerciseId } = useParams();
+  const permissions = usePermissions(exerciseId);
   const [openChangeStatus, setOpenChangeStatus] = useState(null);
   const [openComcheckDelete, setOpenComcheckDelete] = useState(null);
   const [openDryrunDelete, setOpenDryrunDelete] = useState(null);
@@ -194,7 +195,6 @@ const Exercise = () => {
       'exercise_description',
       'exercise_subtitle',
       'exercise_message_header',
-      'exercise_message_footer',
       'exercise_mail_from',
     ]),
   )(exercise);
@@ -225,7 +225,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PlayArrowOutlined />}
             color="success"
-            disabled={isExerciseReadOnly(exercise, true)}
+            disabled={permissions.readOnlyBypassStatus}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
             {t('Start')}
@@ -237,7 +237,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PauseOutlined />}
             color="warning"
-            disabled={isExerciseReadOnly(exercise, true)}
+            disabled={permissions.readOnlyBypassStatus}
             onClick={() => setOpenChangeStatus('PAUSED')}
           >
             {t('Pause')}
@@ -249,7 +249,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<PlayArrowOutlined />}
             color="success"
-            disabled={isExerciseReadOnly(exercise, true)}
+            disabled={permissions.readOnlyBypassStatus}
             onClick={() => setOpenChangeStatus('RUNNING')}
           >
             {t('Resume')}
@@ -278,7 +278,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<CancelOutlined />}
             color="error"
-            disabled={isExerciseReadOnly(exercise, true)}
+            disabled={permissions.readOnlyBypassStatus}
             onClick={() => setOpenChangeStatus('CANCELED')}
           >
             {t('Cancel')}
@@ -291,7 +291,7 @@ const Exercise = () => {
             variant="contained"
             startIcon={<RestartAltOutlined />}
             color="warning"
-            disabled={isExerciseReadOnly(exercise, true)}
+            disabled={permissions.readOnlyBypassStatus}
             onClick={() => setOpenChangeStatus('SCHEDULED')}
           >
             {t('Reset')}
@@ -454,7 +454,7 @@ const Exercise = () => {
             <ExerciseParametersForm
               initialValues={initialValues}
               onSubmit={submitUpdate}
-              disabled={isExerciseReadOnly(exercise)}
+              disabled={permissions.readOnly}
             />
           </Paper>
         </Grid>
@@ -517,7 +517,7 @@ const Exercise = () => {
                         onClick={() => setOpenDryrunDelete(dryrun.dryrun_id)}
                         aria-haspopup="true"
                         size="large"
-                        disabled={isExerciseReadOnly(exercise, true)}
+                        disabled={permissions.readOnlyBypassStatus}
                       >
                         <DeleteOutlined />
                       </IconButton>
@@ -587,7 +587,7 @@ const Exercise = () => {
                         }
                         aria-haspopup="true"
                         size="large"
-                        disabled={isExerciseReadOnly(exercise, true)}
+                        disabled={permissions.readOnlyBypassStatus}
                       >
                         <DeleteOutlined />
                       </IconButton>

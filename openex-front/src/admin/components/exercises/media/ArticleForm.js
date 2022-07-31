@@ -136,7 +136,7 @@ const ArticleForm = ({
   onSubmit,
   handleClose,
   initialValues,
-  imagesIds,
+  documentsIds,
   editing,
 }) => {
   const { t } = useFormatter();
@@ -144,7 +144,7 @@ const ArticleForm = ({
   const dispatch = useDispatch();
   const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
   const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
-  const [documents, setDocuments] = useState(imagesIds || []);
+  const [documents, setDocuments] = useState(documentsIds || []);
   // Validation
   const validate = (values) => {
     const errors = {};
@@ -170,8 +170,8 @@ const ArticleForm = ({
     dispatch(fetchExercises());
     dispatch(fetchDocuments());
   });
-  const handleAddDocuments = (documentsIds) => setDocuments([...documents, ...documentsIds]);
-  const handleRemoveDocument = (documentId) => setDocuments(documents.filter((n) => n !== documentId));
+  const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);
+  const handleRemoveDocument = (docId) => setDocuments(documents.filter((n) => n !== docId));
   // Preparing data
   const sortedMedias = R.sortWith([R.ascend(R.prop('media_name'))], medias).map(
     (n) => ({ id: n.media_id, label: n.media_name, type: n.media_type }),
@@ -300,7 +300,7 @@ const ArticleForm = ({
             </Grid>
           </Grid>
           <Typography variant="h2" style={{ marginTop: 30 }}>
-            {t('Images')}
+            {t('Documents')}
           </Typography>
           <List>
             <ListItem

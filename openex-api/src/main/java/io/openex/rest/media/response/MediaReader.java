@@ -13,27 +13,27 @@ public class MediaReader {
     @JsonProperty("media_id")
     private String id;
 
-    @JsonProperty("exercise_status")
-    private Exercise.STATUS exerciseStatus;
-
     @JsonProperty("media_information")
     private Media media;
+
+    @JsonProperty("media_exercise")
+    private Exercise exercise;
 
     @JsonProperty("media_articles")
     private List<Article> mediaArticles = new ArrayList<>();
 
-    public MediaReader(Exercise.STATUS exerciseStatus, Media media) {
-        this.exerciseStatus = exerciseStatus;
+    public MediaReader(Media media, Exercise exercise) {
         this.id = media.getId();
         this.media = media;
+        this.exercise = exercise;
     }
 
-    public Exercise.STATUS getExerciseStatus() {
-        return exerciseStatus;
+    public Exercise getExercise() {
+        return exercise;
     }
 
-    public void setExerciseStatus(Exercise.STATUS exerciseStatus) {
-        this.exerciseStatus = exerciseStatus;
+    public void setExercise(Exercise exercise) {
+        this.exercise = exercise;
     }
 
     public List<Article> getMediaArticles() {

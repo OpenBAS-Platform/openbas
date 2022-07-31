@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
+import io.openex.database.model.User;
+import io.openex.database.repository.UserRepository;
 import io.openex.rest.exception.InputValidationException;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,12 +23,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static io.openex.helper.UserHelper.ANONYMOUS;
+import static io.openex.helper.UserHelper.currentUser;
 import static java.util.stream.StreamSupport.stream;
 
 public class RestBehavior {
 
     @Resource
     protected ObjectMapper mapper;
+
+    private UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     // Build the mapping between json specific name and the actual database field name
     private Map<String, String> buildJsonMappingFields(MethodArgumentNotValidException ex) {
@@ -91,5 +103,17 @@ public class RestBehavior {
             errorBag.setError(e.getMessage());
         }
         return errorBag;
+    }
+
+    // --- Open media access
+    public User impersonateUser(String userId) {
+        User user = currentUser();
+        if (user.getId().equals(ANONYMOUS)) {
+            user = userRepository.findById(userId).orElseThrow();
+            if (!user.getId().equals(userId) || !user.isOnlyPlayer()) {
+                throw new UnsupportedOperationException("Only player can be impersonate");
+            }
+        }
+        return user;
     }
 }

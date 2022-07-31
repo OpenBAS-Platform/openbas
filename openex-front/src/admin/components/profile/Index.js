@@ -175,7 +175,7 @@ const Index = () => {
             variant="contained"
             color="primary"
             component="a"
-            href="/swagger-ui/"
+            href="/swagger-ui/index.html"
           >
             {t('API specifications')}
           </Button>

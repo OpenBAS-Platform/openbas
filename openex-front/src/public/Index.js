@@ -41,7 +41,7 @@ const Index = () => {
             render={errorWrapper(Comcheck)}
           />
           <Route
-            path="/media/:exerciseId/:mediaId"
+            path="/medias/:exerciseId/:mediaId"
             render={errorWrapper(Media)}
           />
           <Route component={Login} />

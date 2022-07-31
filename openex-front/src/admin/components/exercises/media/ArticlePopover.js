@@ -24,7 +24,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ArticlePopover = ({ exercise, article, images }) => {
+const ArticlePopover = ({ exercise, article, documents }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -124,7 +124,7 @@ const ArticlePopover = ({ exercise, article, images }) => {
             handleClose={handleCloseEdit}
             exerciseId={exercise.exercise_id}
             initialValues={initialValues}
-            imagesIds={(images || []).map((i) => i.document_id)}
+            documentsIds={(documents || []).map((i) => i.document_id)}
           />
         </DialogContent>
       </Dialog>
