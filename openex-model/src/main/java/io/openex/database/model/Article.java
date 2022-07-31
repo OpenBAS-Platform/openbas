@@ -72,7 +72,7 @@ public class Article implements Base {
     @JsonProperty("article_media")
     private Media media;
 
-    @OneToMany(mappedBy = "article", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "article", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("article_documents")
     @Fetch(FetchMode.SUBSELECT)
     private List<ArticleDocument> documents = new ArrayList<>();
