@@ -96,7 +96,8 @@ public class EmailService {
         mimeMessage.setRecipients(Message.RecipientType.TO, recipients.toArray(InternetAddress[]::new));
         emailSender.send(mimeMessage);
         String emails = usersContext.stream().map(c -> c.getUser().getEmail()).collect(joining(", "));
-        execution.addTrace(traceSuccess("email", "Mail sent to " + emails));
+        List<String> userIds = usersContext.stream().map(c -> c.getUser().getId()).toList();
+        execution.addTrace(traceSuccess("email", "Mail sent to " + emails, userIds));
         // Store message in Imap after sending
         if (storeInImap) {
             storeMessageImap(execution, mimeMessage);
@@ -140,7 +141,8 @@ public class EmailService {
         } else {
             emailSender.send(mimeMessage);
         }
-        execution.addTrace(traceSuccess("email", "Mail sent to " + email));
+        List<String> userIds = List.of(userContext.getUser().getId());
+        execution.addTrace(traceSuccess("email", "Mail sent to " + email, userIds));
         // Store message in Imap after sending
         if (storeInImap) {
             storeMessageImap(execution, mimeMessage);

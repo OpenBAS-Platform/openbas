@@ -118,7 +118,7 @@ public class ComchecksExecutionJob implements Job {
                 // Save the status sent date
                 List<String> usersSuccessfullyNotified = execution.getTraces().stream()
                         .filter(executionTrace -> executionTrace.getStatus().equals(ExecutionStatus.SUCCESS))
-                        .map(ExecutionTrace::getIdentifier).toList();
+                        .flatMap(t -> t.getUserIds().stream()).toList();
                 List<ComcheckStatus> statusToUpdate = comcheckStatuses.stream()
                         .filter(comcheckStatus -> usersSuccessfullyNotified.contains(comcheckStatus.getUser().getId()))
                         .toList();
