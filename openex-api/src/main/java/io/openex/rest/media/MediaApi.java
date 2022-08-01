@@ -152,7 +152,9 @@ public class MediaApi extends RestBehavior {
         article.setUpdateAttributes(input);
         article.setMedia(mediaRepository.findById(input.getMediaId()).orElseThrow());
         article.setExercise(exerciseRepository.findById(exerciseId).orElseThrow());
+        Article savedArticle = articleRepository.save(article);
         List<String> articleDocuments = input.getDocuments();
+        List<ArticleDocument> finalArticleDocuments = new ArrayList<>();
         articleDocuments.forEach(articleDcoument -> {
             Optional<Document> doc = documentRepository.findById(articleDcoument);
             if (doc.isPresent()) {
@@ -161,6 +163,7 @@ public class MediaApi extends RestBehavior {
                 Document document = doc.get();
                 articleDocument.setDocument(document);
                 articleDocumentRepository.save(articleDocument);
+                finalArticleDocuments.add(articleDocument);
                 // If Document not yet linked directly to the exercise, attached it
                 if (!document.getExercises().contains(exercise)) {
                     exercise.getDocuments().add(document);
@@ -168,7 +171,7 @@ public class MediaApi extends RestBehavior {
                 }
             }
         });
-        Article savedArticle = articleRepository.save(article);
+        savedArticle.setDocuments(finalArticleDocuments);
         return enrichArticleWithVirtualPublication(exercise, savedArticle);
     }
 
