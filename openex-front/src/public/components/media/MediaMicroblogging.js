@@ -25,6 +25,7 @@ const useStyles = makeStyles(() => ({
   },
   card: {
     position: 'relative',
+    marginBottom: 15,
   },
   logo: {
     maxHeight: 200,
