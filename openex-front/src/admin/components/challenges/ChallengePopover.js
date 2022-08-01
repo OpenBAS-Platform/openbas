@@ -21,7 +21,7 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ChallengePopover = ({ challenge }) => {
+const ChallengePopover = ({ challenge, documents }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -55,7 +55,14 @@ const ChallengePopover = ({ challenge }) => {
   };
   // Rendering
   const initialValues = R.pipe(
-    R.pick(['challenge_name', 'challenge_description', 'challenge_flags']),
+    R.pick([
+      'challenge_name',
+      'challenge_category',
+      'challenge_content',
+      'challenge_score',
+      'challenge_max_attempts',
+      'challenge_flags',
+    ]),
   )(challenge);
   return (
     <div>
@@ -82,14 +89,8 @@ const ChallengePopover = ({ challenge }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleCloseDelete}
-          >
-            {t('Cancel')}
-          </Button>
-          <Button variant="contained" color="primary" onClick={submitDelete}>
+          <Button onClick={handleCloseDelete}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitDelete}>
             {t('Delete')}
           </Button>
         </DialogActions>
@@ -109,6 +110,7 @@ const ChallengePopover = ({ challenge }) => {
             onSubmit={onSubmitEdit}
             handleClose={handleCloseEdit}
             initialValues={initialValues}
+            documentsIds={(documents || []).map((i) => i.document_id)}
           />
         </DialogContent>
       </Dialog>

@@ -1,18 +1,138 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import { FieldArray } from 'react-final-form-arrays';
 import Button from '@mui/material/Button';
-import { ListItem } from '@mui/material';
+import { ListItem, ListItemIcon } from '@mui/material';
 import List from '@mui/material/List';
 import MenuItem from '@mui/material/MenuItem';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  ControlPointOutlined,
+  DeleteOutlined,
+} from '@mui/icons-material';
+import { makeStyles } from '@mui/styles';
+import { useDispatch } from 'react-redux';
+import IconButton from '@mui/material/IconButton';
 import { TextField } from '../../../components/TextField';
 import { useFormatter } from '../../../components/i18n';
 import { Select } from '../../../components/Select';
+import { MarkDownField } from '../../../components/MarkDownField';
+import DocumentType from '../documents/DocumentType';
+import ItemTags from '../../../components/ItemTags';
+import DocumentPopover from '../documents/DocumentPopover';
+import { useHelper } from '../../../store';
+import useDataLoader from '../../../utils/ServerSideEvent';
+import { fetchExercises } from '../../../actions/Exercise';
+import { fetchDocuments } from '../../../actions/Document';
+import ChallengeAddDocuments from './ChallengeAddDocuments';
+
+const useStyles = makeStyles((theme) => ({
+  icon: {
+    paddingTop: 4,
+    display: 'inline-block',
+  },
+  text: {
+    display: 'inline-block',
+    flexGrow: 1,
+    marginLeft: 10,
+  },
+  autoCompleteIndicator: {
+    display: 'none',
+  },
+  itemHead: {
+    paddingLeft: 10,
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+  },
+  item: {
+    paddingLeft: 10,
+    height: 50,
+  },
+  bodyItem: {
+    height: '100%',
+    fontSize: 13,
+  },
+  itemIcon: {
+    color: theme.palette.primary.main,
+  },
+  tuple: {
+    marginTop: 5,
+    paddingTop: 0,
+    paddingLeft: 0,
+  },
+}));
+
+const inlineStylesHeaders = {
+  iconSort: {
+    position: 'absolute',
+    margin: '0 0 0 5px',
+    padding: 0,
+    top: '0px',
+  },
+  document_name: {
+    float: 'left',
+    width: '35%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_type: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_tags: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+};
+
+const inlineStyles = {
+  document_name: {
+    float: 'left',
+    width: '35%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_type: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_tags: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
 
 const ChallengeForm = (props) => {
+  const classes = useStyles();
   const { t } = useFormatter();
-  const { onSubmit, handleClose, initialValues, editing } = props;
+  const dispatch = useDispatch();
+  const { onSubmit, handleClose, initialValues, editing, documentsIds } = props;
+  const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
+  const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
+  const [documents, setDocuments] = useState(documentsIds || []);
+  const handleAddDocuments = (docsIds) => setDocuments([...documents, ...docsIds]);
+  const handleRemoveDocument = (docId) => setDocuments(documents.filter((n) => n !== docId));
   // Functions
   const validate = (values) => {
     const errors = {};
@@ -26,12 +146,52 @@ const ChallengeForm = (props) => {
   };
   const required = (value) => (value ? undefined : t('This field is required.'));
   const requiredArray = (value) => (value && value.length > 0 ? undefined : t('This field is required.'));
+  const { exercisesMap, documentsMap, tagsMap } = useHelper((helper) => ({
+    exercisesMap: helper.getExercisesMap(),
+    documentsMap: helper.getDocumentsMap(),
+    tagsMap: helper.getTagsMap(),
+  }));
+  useDataLoader(() => {
+    dispatch(fetchExercises());
+    dispatch(fetchDocuments());
+  });
+  const documentsReverseBy = (field) => {
+    setDocumentsSortBy(field);
+    setDocumentsOrderAsc(!documentsSortBy);
+  };
+  const documentsSortHeader = (field, label, isSortable) => {
+    const sortComponent = documentsOrderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
+    if (isSortable) {
+      return (
+        <div
+          style={inlineStylesHeaders[field]}
+          onClick={() => documentsReverseBy(field)}
+        >
+          <span>{t(label)}</span>
+          {documentsSortBy === field ? sortComponent : ''}
+        </div>
+      );
+    }
+    return (
+      <div style={inlineStylesHeaders[field]}>
+        <span>{t(label)}</span>
+      </div>
+    );
+  };
+
+  const submitForm = (data) => {
+    return onSubmit({ ...data, challenge_documents: documents });
+  };
   // Rendering
   return (
     <Form
       keepDirtyOnReinitialize={true}
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={submitForm}
       validate={validate}
       mutators={{
         ...arrayMutators,
@@ -40,7 +200,7 @@ const ChallengeForm = (props) => {
         },
       }}
     >
-      {({ handleSubmit, submitting, pristine, errors }) => (
+      {({ handleSubmit, submitting, errors }) => (
         <form id="challengeForm" onSubmit={handleSubmit}>
           <TextField
             variant="standard"
@@ -50,61 +210,194 @@ const ChallengeForm = (props) => {
           />
           <TextField
             variant="standard"
-            name="challenge_description"
+            name="challenge_category"
             fullWidth={true}
-            label={t('Description')}
+            label={t('Category')}
+            style={{ marginTop: 20 }}
           />
+          <MarkDownField
+            name="challenge_content"
+            label={t('Content')}
+            fullWidth={true}
+            style={{ marginTop: 20 }}
+          />
+          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+            <Grid item={true} xs={6}>
+              <TextField
+                variant="standard"
+                name="challenge_score"
+                fullWidth={true}
+                type="number"
+                label={t('Score')}
+              />
+            </Grid>
+            <Grid item={true} xs={6}>
+              <TextField
+                variant="standard"
+                name="challenge_max_attempts"
+                fullWidth={true}
+                type="number"
+                label={t('Max number of attempts')}
+              />
+            </Grid>
+          </Grid>
+          <Typography variant="h2" style={{ marginTop: 30 }}>
+            {t('Documents')}
+          </Typography>
+          <List>
+            <ListItem
+              classes={{ root: classes.itemHead }}
+              divider={false}
+              style={{ paddingTop: 0 }}
+            >
+              <ListItemIcon>
+                <span
+                  style={{
+                    padding: '0 8px 0 8px',
+                    fontWeight: 700,
+                    fontSize: 12,
+                  }}
+                >
+                  &nbsp;
+                </span>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div>
+                    {documentsSortHeader('document_name', 'Name', true)}
+                    {documentsSortHeader('document_type', 'Type', true)}
+                    {documentsSortHeader('document_tags', 'Tags', true)}
+                  </div>
+                }
+              />
+              <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+            </ListItem>
+            {documents.map((documentId) => {
+              const document = documentsMap[documentId] || {};
+              return (
+                <ListItem
+                  key={document.document_id}
+                  classes={{ root: classes.item }}
+                  divider={true}
+                  button={true}
+                  component="a"
+                  href={`/api/documents/${document.document_id}/file`}
+                >
+                  <ListItemIcon>
+                    <AttachmentOutlined />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_name}
+                        >
+                          {document.document_name}
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_type}
+                        >
+                          <DocumentType
+                            type={document.document_type}
+                            variant="list"
+                          />
+                        </div>
+                        <div
+                          className={classes.bodyItem}
+                          style={inlineStyles.document_tags}
+                        >
+                          <ItemTags
+                            variant="list"
+                            tags={document.document_tags}
+                          />
+                        </div>
+                      </div>
+                    }
+                  />
+                  <ListItemSecondaryAction>
+                    <DocumentPopover
+                      document={document}
+                      exercisesMap={exercisesMap}
+                      tagsMap={tagsMap}
+                      onRemoveDocument={handleRemoveDocument}
+                    />
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })}
+            <ChallengeAddDocuments
+              challengeDocumentsIds={documents}
+              handleAddDocuments={handleAddDocuments}
+            />
+          </List>
           <FieldArray name="challenge_flags" validate={requiredArray}>
             {({ fields }) => (
-              <List>
-                {fields.map((name, index) => (
-                  <ListItem key={`flag_index_${index}`}>
-                    <Select
-                      variant="standard"
-                      name={`${name}.flag_type`}
-                      label={t('Flag type')}
-                      fullWidth={true}
-                      style={{ marginTop: 20 }}
-                    >
-                      <MenuItem key="VALUE" value="VALUE">
-                        {t('Text')}
-                      </MenuItem>
-                      <MenuItem key="VALUE_CASE" value="VALUE_CASE">
-                        {t('Text (sensitive)')}
-                      </MenuItem>
-                      <MenuItem key="REGEXP" value="REGEXP">
-                        {t('Regexp')}
-                      </MenuItem>
-                    </Select>
-                    <TextField
-                      variant="standard"
-                      name={`${name}.flag_value`}
-                      validate={required}
-                      fullWidth={true}
-                      label={t('Value')}
-                    />
-                    <Button
-                      type="button"
-                      color="secondary"
-                      onClick={() => fields.remove(index)}
-                    >
-                      X
-                    </Button>
-                  </ListItem>
-                ))}
-                <Button
-                  type="button"
-                  color="secondary"
+              <div style={{ marginTop: 30 }}>
+                <Typography variant="h2" style={{ float: 'left' }}>
+                  {t('Flags')}
+                </Typography>
+                <IconButton
                   onClick={() => fields.push({ flag_type: 'VALUE', flag_value: '' })
                   }
+                  size="small"
+                  color="primary"
+                  style={{ float: 'left', margin: '-8px 0 0 10px' }}
                 >
-                  {t('Add')}
-                </Button>
-              </List>
+                  <ControlPointOutlined />
+                </IconButton>
+                <div className="clearfix" />
+                <List>
+                  {fields.map((name, index) => (
+                    <ListItem
+                      key={`flag_index_${index}`}
+                      classes={{ root: classes.tuple }}
+                      divider={false}
+                    >
+                      <Select
+                        variant="standard"
+                        name={`${name}.flag_type`}
+                        label={t('Flag type')}
+                        fullWidth={true}
+                        style={{ marginRight: 20 }}
+                      >
+                        <MenuItem key="VALUE" value="VALUE">
+                          {t('Text')}
+                        </MenuItem>
+                        <MenuItem key="VALUE_CASE" value="VALUE_CASE">
+                          {t('Text (case-sensitive)')}
+                        </MenuItem>
+                        <MenuItem key="REGEXP" value="REGEXP">
+                          {t('Regular expression')}
+                        </MenuItem>
+                      </Select>
+                      <TextField
+                        variant="standard"
+                        name={`${name}.flag_value`}
+                        validate={required}
+                        fullWidth={true}
+                        label={t('Value')}
+                        style={{ marginRight: 20 }}
+                      />
+                      <IconButton
+                        onClick={() => fields.remove(index)}
+                        aria-haspopup="true"
+                        size="small"
+                        color="primary"
+                      >
+                        <DeleteOutlined />
+                      </IconButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </div>
             )}
           </FieldArray>
           {errors.challenge_flags && errors.challenge_flags.length === 0 && (
-            <div>{t('A list of flags is required')}</div>
+            <Typography variant="body2">
+              {t('At least one flag is required for a challenge.')}
+            </Typography>
           )}
           <div style={{ float: 'right', marginTop: 20 }}>
             <Button
@@ -117,9 +410,7 @@ const ChallengeForm = (props) => {
             <Button
               color="secondary"
               type="submit"
-              disabled={
-                pristine || submitting || Object.keys(errors).length > 0
-              }
+              disabled={submitting || Object.keys(errors).length > 0}
             >
               {editing ? t('Update') : t('Create')}
             </Button>

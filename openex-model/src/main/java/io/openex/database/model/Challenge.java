@@ -70,6 +70,15 @@ public class Challenge implements Base {
     @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "challenges_documents",
+            joinColumns = @JoinColumn(name = "challenge_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("challenge_documents")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Document> documents = new ArrayList<>();
+
     @Override
     public String getId() {
         return id;
@@ -149,6 +158,14 @@ public class Challenge implements Base {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 
     @Override

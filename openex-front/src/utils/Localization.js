@@ -388,8 +388,17 @@ const i18n = {
       'Do you want to delete this media pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
+      Category: 'Catégorie',
+      'Create a new challenge': 'Créer un nouveau challenge',
       Media: 'Média',
       Author: 'Auteur',
+      'Max number of attempts': "Nombre maximum d'essais",
+      'Add documents in this challenge': 'Ajouter un document à ce challenge',
+      'At least one flag is required for a challenge.':
+        'Au moins un flag est requis pour un challenge.',
+      'Text (case-sensitive)': 'Texte (sensible à la casse)',
+      'Regular expression': 'Expression régulière',
+      'Update the challenge': 'Modifier le challenge',
     },
     en: {
       openex_email: 'Email',

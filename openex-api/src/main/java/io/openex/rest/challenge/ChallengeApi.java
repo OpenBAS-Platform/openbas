@@ -5,6 +5,7 @@ import io.openex.database.model.ChallengeFlag;
 import io.openex.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openex.database.repository.ChallengeFlagRepository;
 import io.openex.database.repository.ChallengeRepository;
+import io.openex.database.repository.DocumentRepository;
 import io.openex.database.repository.TagRepository;
 import io.openex.rest.challenge.form.ChallengeCreateInput;
 import io.openex.rest.challenge.form.ChallengeUpdateInput;
@@ -27,6 +28,7 @@ public class ChallengeApi extends RestBehavior {
     private ChallengeRepository challengeRepository;
     private ChallengeFlagRepository challengeFlagRepository;
     private TagRepository tagRepository;
+    private DocumentRepository documentRepository;
 
     @Autowired
     public void setChallengeFlagRepository(ChallengeFlagRepository challengeFlagRepository) {
@@ -43,6 +45,11 @@ public class ChallengeApi extends RestBehavior {
         this.tagRepository = tagRepository;
     }
 
+    @Autowired
+    public void setDocumentRepository(DocumentRepository documentRepository) {
+        this.documentRepository = documentRepository;
+    }
+
     @GetMapping("/api/challenges")
     public Iterable<Challenge> medias() {
         return challengeRepository.findAll();
@@ -55,6 +62,7 @@ public class ChallengeApi extends RestBehavior {
                                      @Valid @RequestBody ChallengeUpdateInput input) {
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
         challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
         challenge.setUpdateAttributes(input);
         challenge.setUpdatedAt(Instant.now());
         // Clear all flags
@@ -79,6 +87,7 @@ public class ChallengeApi extends RestBehavior {
         Challenge challenge = new Challenge();
         challenge.setUpdateAttributes(input);
         challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
+        challenge.setDocuments(fromIterable(documentRepository.findAllById(input.getDocumentIds())));
         List<ChallengeFlag> challengeFlags = input.getFlags().stream().map(flagInput -> {
             ChallengeFlag challengeFlag = new ChallengeFlag();
             challengeFlag.setType(FLAG_TYPE.valueOf(flagInput.getType()));

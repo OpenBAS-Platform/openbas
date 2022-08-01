@@ -31,7 +31,10 @@ public class ChallengeCreateInput {
 
     @JsonProperty("challenge_tags")
     private List<String> tagIds = new ArrayList<>();
-    
+
+    @JsonProperty("challenge_documents")
+    private List<String> documentIds = new ArrayList<>();
+
     @NotEmpty(message = EMPTY_MESSAGE)
     @JsonProperty("challenge_flags")
     private List<FlagInput> flags = new ArrayList<>();
@@ -82,6 +85,14 @@ public class ChallengeCreateInput {
 
     public void setTagIds(List<String> tagIds) {
         this.tagIds = tagIds;
+    }
+
+    public List<String> getDocumentIds() {
+        return documentIds;
+    }
+
+    public void setDocumentIds(List<String> documentIds) {
+        this.documentIds = documentIds;
     }
 
     public List<FlagInput> getFlags() {

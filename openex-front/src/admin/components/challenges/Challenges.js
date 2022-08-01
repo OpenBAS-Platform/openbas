@@ -17,6 +17,7 @@ import CreateChallenge from './CreateChallenge';
 import { fetchTags } from '../../../actions/Tag';
 import TagsFilter from '../../../components/TagsFilter';
 import ItemTags from '../../../components/ItemTags';
+import { fetchDocuments } from '../../../actions/Document';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -145,12 +146,14 @@ const Challenges = () => {
   const searchColumns = ['name', 'content', 'category', 'score'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
   // Fetching data
-  const { challenges } = useHelper((helper) => ({
+  const { challenges, documentsMap } = useHelper((helper) => ({
     challenges: helper.getChallenges(),
+    documentsMap: helper.getDocumentsMap(),
   }));
   useDataLoader(() => {
     dispatch(fetchChallenges());
     dispatch(fetchTags());
+    dispatch(fetchDocuments());
   });
   const sortedChallenges = filtering.filterAndSort(challenges);
   return (
@@ -223,56 +226,64 @@ const Challenges = () => {
           />
           <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
         </ListItem>
-        {sortedChallenges.map((challenge) => (
-          <ListItem
-            key={challenge.challenge_id}
-            classes={{ root: classes.item }}
-            divider={true}
-          >
-            <ListItemIcon>
-              <EmojiEvents color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.challenge_name}
-                  >
-                    {challenge.challenge_name}
-                  </div>
-                  <div
-                    className={classes.bodyItem}
-                    style={inlineStyles.challenge_category}
-                  >
-                    {challenge.challenge_category}
-                  </div>
-                  <div
+        {sortedChallenges.map((challenge) => {
+          const docs = challenge.challenge_documents
+            .map((d) => (documentsMap[d] ? documentsMap[d] : undefined))
+            .filter((d) => d !== undefined);
+          return (
+            <ListItem
+              key={challenge.challenge_id}
+              classes={{ root: classes.item }}
+              divider={true}
+            >
+              <ListItemIcon>
+                <EmojiEvents color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_name}
+                    >
+                      {challenge.challenge_name}
+                    </div>
+                    <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_category}
+                    >
+                      {challenge.challenge_category}
+                    </div>
+                    <div
                       className={classes.bodyItem}
                       style={inlineStyles.challenge_score}
-                  >
-                    {challenge.challenge_score}
-                  </div>
-                  <div
+                    >
+                      {challenge.challenge_score}
+                    </div>
+                    <div
                       className={classes.bodyItem}
                       style={inlineStyles.challenge_exercises}
-                  >
-                    {challenge.challenge_exercises}
-                  </div>
-                  <div
+                    >
+                      {challenge.challenge_exercises}
+                    </div>
+                    <div
                       className={classes.bodyItem}
                       style={inlineStyles.challenge_tags}
-                  >
-                    <ItemTags variant="list" tags={challenge.challenge_tags} />
+                    >
+                      <ItemTags
+                        variant="list"
+                        tags={challenge.challenge_tags}
+                      />
+                    </div>
                   </div>
-                </div>
-              }
-            />
-            <ListItemSecondaryAction>
-              <ChallengePopover challenge={challenge} />
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
+                }
+              />
+              <ListItemSecondaryAction>
+                <ChallengePopover challenge={challenge} documents={docs} />
+              </ListItemSecondaryAction>
+            </ListItem>
+          );
+        })}
       </List>
       <CreateChallenge />
     </div>

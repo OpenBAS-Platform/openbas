@@ -33,20 +33,6 @@ import DocumentPopover from '../../documents/DocumentPopover';
 import ArticleAddDocuments from './ArticleAddDocuments';
 
 const useStyles = makeStyles((theme) => ({
-  duration: {
-    marginTop: 20,
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    border: `1px solid ${theme.palette.primary.main}`,
-    padding: 15,
-  },
-  trigger: {
-    fontFamily: ' Consolas, monaco, monospace',
-    fontSize: 12,
-    paddingTop: 15,
-    color: theme.palette.primary.main,
-  },
   icon: {
     paddingTop: 4,
     display: 'inline-block',

@@ -34,15 +34,12 @@ const useStyles = makeStyles((theme) => ({
 
 const CreateChallenge = (props) => {
   const { onCreate, inline } = props;
-
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
-
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   const onSubmit = (data) => {
     return dispatch(addChallenge(data)).then((result) => {
       if (result.result) {
@@ -54,7 +51,6 @@ const CreateChallenge = (props) => {
       return result;
     });
   };
-
   return (
     <div>
       {inline === true ? (
@@ -68,7 +64,7 @@ const CreateChallenge = (props) => {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Create a new article')}
+            primary={t('Create a new challenge')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
