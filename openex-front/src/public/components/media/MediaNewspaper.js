@@ -160,7 +160,14 @@ const MediaNewspaper = ({ mediaReader }) => {
                 </Typography>
                 <ExpandableMarkdown
                   source={firstArticle.article_content}
-                  limit={headArticles.length > 1 ? 2000 : 500}
+                  limit={
+                    // eslint-disable-next-line no-nested-ternary
+                    headArticles.length === 1
+                      ? 500
+                      : headArticles.length === 2
+                        ? 1000
+                        : 1500
+                  }
                   controlled={true}
                 />
                 <div className={classes.footer}>
