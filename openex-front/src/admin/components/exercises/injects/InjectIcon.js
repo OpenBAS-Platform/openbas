@@ -7,6 +7,7 @@ import {
   HelpOutlined,
   SpeakerNotesOutlined,
   ApiOutlined,
+  EmojiEventsOutlined,
 } from '@mui/icons-material';
 import {
   Mastodon,
@@ -63,7 +64,7 @@ const iconSelector = (type, variant, fontSize, done) => {
         <Mastodon
           style={style}
           fontSize={fontSize}
-          sx={{ color: done ? '#4caf50' : '#e91e63' }}
+          sx={{ color: done ? '#4caf50' : '#ad1457' }}
         />
       );
     case 'openex_lade':
@@ -107,6 +108,14 @@ const iconSelector = (type, variant, fontSize, done) => {
           style={style}
           fontSize={fontSize}
           sx={{ color: done ? '#4caf50' : '#ff9800' }}
+        />
+      );
+    case 'openex_challenge':
+      return (
+        <EmojiEventsOutlined
+          style={style}
+          fontSize={fontSize}
+          sx={{ color: done ? '#4caf50' : '#e91e63' }}
         />
       );
     default:

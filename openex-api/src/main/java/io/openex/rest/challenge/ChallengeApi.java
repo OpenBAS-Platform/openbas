@@ -11,6 +11,7 @@ import io.openex.rest.challenge.form.ChallengeCreateInput;
 import io.openex.rest.challenge.form.ChallengeUpdateInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -55,7 +56,7 @@ public class ChallengeApi extends RestBehavior {
         return challengeRepository.findAll();
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @PreAuthorize("isPlanner()")
     @PutMapping("/api/challenges/{challengeId}")
     @Transactional(rollbackOn = Exception.class)
     public Challenge updateChallenge(@PathVariable String challengeId,
@@ -80,7 +81,7 @@ public class ChallengeApi extends RestBehavior {
         return challengeRepository.save(challenge);
     }
 
-    @RolesAllowed(ROLE_ADMIN)
+    @PreAuthorize("isPlanner()")
     @PostMapping("/api/challenges")
     @Transactional(rollbackOn = Exception.class)
     public Challenge createChallenge(@Valid @RequestBody ChallengeCreateInput input) {

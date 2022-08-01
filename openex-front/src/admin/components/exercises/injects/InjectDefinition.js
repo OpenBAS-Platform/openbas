@@ -18,6 +18,7 @@ import {
   CloseRounded,
   ControlPointOutlined,
   DeleteOutlined,
+  EmojiEventsOutlined,
 } from '@mui/icons-material';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import IconButton from '@mui/material/IconButton';
@@ -32,6 +33,7 @@ import inject18n from '../../../../components/i18n';
 import { fetchInjectAudiences, updateInject } from '../../../../actions/Inject';
 import { fetchDocuments } from '../../../../actions/Document';
 import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
+import { fetchChallenges } from '../../../../actions/Challenge';
 import ItemTags from '../../../../components/ItemTags';
 import { storeHelper } from '../../../../actions/Schema';
 import AudiencePopover from '../audiences/AudiencePopover';
@@ -49,6 +51,8 @@ import { Select } from '../../../../components/Select';
 import ArticlePopover from '../media/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
+import ChallengePopover from '../../challenges/ChallengePopover';
+import InjectAddChallenges from './InjectAddChallenges';
 
 const styles = (theme) => ({
   header: {
@@ -148,6 +152,23 @@ const inlineStylesHeaders = {
     fontSize: 12,
     fontWeight: '700',
   },
+  challenge_category: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_name: {
+    float: 'left',
+    width: '35%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_tags: {
+    float: 'left',
+    fontSize: 12,
+    fontWeight: '700',
+  },
   document_name: {
     float: 'left',
     width: '35%',
@@ -238,6 +259,29 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  challenge_category: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_name: {
+    float: 'left',
+    width: '35%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_tags: {
+    float: 'left',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   document_name: {
     float: 'left',
     width: '35%',
@@ -286,6 +330,9 @@ class InjectDefinition extends Component {
       articlesIds: props.inject.inject_content?.articles || [],
       articlesSortBy: 'article_name',
       articlesOrderAsc: true,
+      challengesIds: props.inject.inject_content?.challenges || [],
+      challengesSortBy: 'article_name',
+      challengesOrderAsc: true,
     };
   }
 
@@ -295,6 +342,7 @@ class InjectDefinition extends Component {
     this.props.fetchInjectAudiences(exerciseId, injectId);
     this.props.fetchExerciseArticles(exerciseId);
     this.props.fetchMedias();
+    this.props.fetchChallenges();
   }
 
   toggleAll() {
@@ -322,6 +370,18 @@ class InjectDefinition extends Component {
   handleRemoveArticle(articleId) {
     this.setState({
       articlesIds: this.state.articlesIds.filter((a) => a !== articleId),
+    });
+  }
+
+  handleAddChallenges(challengesIds) {
+    this.setState({
+      challengesIds: [...this.state.challengesIds, ...challengesIds],
+    });
+  }
+
+  handleRemoveChallenge(challengeId) {
+    this.setState({
+      challengesIds: this.state.challengesIds.filter((a) => a !== challengeId),
     });
   }
 
@@ -456,12 +516,22 @@ class InjectDefinition extends Component {
     const hasArticles = injectType.fields
       .map((f) => f.key)
       .includes('articles');
+    const hasChallenges = injectType.fields
+      .map((f) => f.key)
+      .includes('challenges');
     const finalData = {};
     if (hasArticles) {
       finalData.articles = this.state.articlesIds;
     }
+    if (hasChallenges) {
+      finalData.challenges = this.state.challengesIds;
+    }
     injectType.fields
-      .filter((f) => !['audiences', 'articles', 'attachments'].includes(f.key))
+      .filter(
+        (f) => !['audiences', 'articles', 'challenges', 'attachments'].includes(
+          f.key,
+        ),
+      )
       .forEach((field) => {
         if (
           field.type === 'textarea'
@@ -531,7 +601,9 @@ class InjectDefinition extends Component {
     if (injectType && Array.isArray(injectType.fields)) {
       injectType.fields
         .filter(
-          (f) => !['audiences', 'articles', 'attachments'].includes(f.key),
+          (f) => !['audiences', 'articles', 'challenges', 'attachments'].includes(
+            f.key,
+          ),
         )
         .forEach((field) => {
           const value = values[field.key];
@@ -873,6 +945,7 @@ class InjectDefinition extends Component {
       tagsMap,
       articlesMap,
       mediasMap,
+      challengesMap,
     } = this.props;
     if (!inject) {
       return <Loader variant="inElement" />;
@@ -888,6 +961,9 @@ class InjectDefinition extends Component {
       articlesOrderAsc,
       articlesSortBy,
       articlesIds,
+      challengesOrderAsc,
+      challengesSortBy,
+      challengesIds,
     } = this.state;
     const injectType = R.head(
       injectTypes.filter((i) => i.contract_id === inject.inject_contract),
@@ -915,6 +991,15 @@ class InjectDefinition extends Component {
         : [R.descend(R.prop(articlesSortBy))],
     );
     const sortedArticles = sortArticles(articles);
+    const challenges = challengesIds
+      .map((a) => challengesMap[a])
+      .filter((a) => a !== undefined);
+    const sortChallenges = R.sortWith(
+      challengesOrderAsc
+        ? [R.ascend(R.prop(challengesSortBy))]
+        : [R.descend(R.prop(challengesSortBy))],
+    );
+    const sortedChallenges = sortChallenges(challenges);
     const docs = documents
       .map((d) => (documentsMap[d.document_id]
         ? {
@@ -936,6 +1021,9 @@ class InjectDefinition extends Component {
     const hasArticles = injectType.fields
       .map((f) => f.key)
       .includes('articles');
+    const hasChallenges = injectType.fields
+      .map((f) => f.key)
+      .includes('challenges');
     const hasAttachments = injectType.fields
       .map((f) => f.key)
       .includes('attachments');
@@ -944,7 +1032,12 @@ class InjectDefinition extends Component {
     );
     const initialValues = { ...inject.inject_content };
     // Enrich initialValues with default contract value
-    const builtInFields = ['audiences', 'articles', 'attachments'];
+    const builtInFields = [
+      'audiences',
+      'articles',
+      'challenges',
+      'attachments',
+    ];
     if (inject.inject_content === null) {
       injectType.fields
         .filter((f) => !builtInFields.includes(f.key))
@@ -1362,6 +1455,113 @@ class InjectDefinition extends Component {
                     </List>
                   </div>
                 )}
+                {hasChallenges && (
+                  <div>
+                    <Typography
+                      variant="h2"
+                      style={{ marginTop: hasAudiences ? 30 : 0 }}
+                    >
+                      {t('Challenges to publish')}
+                    </Typography>
+                    <List>
+                      <ListItem
+                        classes={{ root: classes.itemHead }}
+                        divider={false}
+                        style={{ paddingTop: 0 }}
+                      >
+                        <ListItemIcon>
+                          <span
+                            style={{
+                              padding: '0 8px 0 8px',
+                              fontWeight: 700,
+                              fontSize: 12,
+                            }}
+                          >
+                            &nbsp;
+                          </span>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <div>
+                              {this.articlesSortHeader(
+                                'challenge_category',
+                                'Category',
+                                true,
+                              )}
+                              {this.articlesSortHeader(
+                                'challenge_name',
+                                'Name',
+                                true,
+                              )}
+                              {this.articlesSortHeader(
+                                'challenge_tags',
+                                'Tags',
+                                true,
+                              )}
+                            </div>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          &nbsp;
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                      {sortedChallenges.map((challenge) => (
+                        <ListItem
+                          key={challenge.challenge_id}
+                          classes={{ root: classes.item }}
+                          divider={true}
+                        >
+                          <ListItemIcon>
+                            <EmojiEventsOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.challenge_category}
+                                >
+                                  {t(challenge.challenge_category || 'Unknown')}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.challenge_name}
+                                >
+                                  {challenge.challenge_name}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.challenge_tags}
+                                >
+                                  <ItemTags
+                                    variant="list"
+                                    tags={challenge.challenge_tags}
+                                  />
+                                </div>
+                              </div>
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <ChallengePopover
+                              challenge={challenge}
+                              onRemoveChallenge={this.handleRemoveChallenge.bind(
+                                this,
+                              )}
+                              disabled={isExerciseReadOnly(exercise)}
+                            />
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                      <InjectAddChallenges
+                        exerciseId={exerciseId}
+                        injectChallengesIds={challengesIds}
+                        handleAddChallenges={this.handleAddChallenges.bind(
+                          this,
+                        )}
+                      />
+                    </List>
+                  </div>
+                )}
                 <Typography
                   variant="h2"
                   style={{ marginTop: hasAudiences ? 30 : 0 }}
@@ -1613,6 +1813,8 @@ InjectDefinition.propTypes = {
   inject: PropTypes.object,
   fetchInjectAudiences: PropTypes.func,
   fetchExerciseArticles: PropTypes.func,
+  fetchMedias: PropTypes.func,
+  fetchChallenges: PropTypes.func,
   updateInject: PropTypes.func,
   handleClose: PropTypes.func,
   injectTypes: PropTypes.array,
@@ -1629,7 +1831,15 @@ const select = (state, ownProps) => {
   const audiencesMap = helper.getAudiencesMap();
   const mediasMap = helper.getMediasMap();
   const articlesMap = helper.getArticlesMap();
-  return { inject, documentsMap, audiencesMap, articlesMap, mediasMap };
+  const challengesMap = helper.getChallengesMap();
+  return {
+    inject,
+    documentsMap,
+    audiencesMap,
+    articlesMap,
+    mediasMap,
+    challengesMap,
+  };
 };
 
 export default R.compose(
@@ -1639,6 +1849,7 @@ export default R.compose(
     fetchDocuments,
     fetchExerciseArticles,
     fetchMedias,
+    fetchChallenges,
   }),
   inject18n,
   withStyles(styles),

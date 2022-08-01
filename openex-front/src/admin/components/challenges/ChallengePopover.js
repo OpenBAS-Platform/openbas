@@ -21,12 +21,13 @@ const Transition = React.forwardRef((props, ref) => (
 ));
 Transition.displayName = 'TransitionSlide';
 
-const ChallengePopover = ({ challenge, documents }) => {
+const ChallengePopover = ({ challenge, documents, onRemoveChallenge }) => {
   // utils
   const dispatch = useDispatch();
   const { t } = useFormatter();
   // states
   const [openDelete, setOpenDelete] = useState(false);
+  const [openRemove, setOpenRemove] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   // popover management
@@ -53,6 +54,17 @@ const ChallengePopover = ({ challenge, documents }) => {
   const submitDelete = () => {
     dispatch(deleteChallenge(challenge.challenge_id)).then(() => handleCloseDelete());
   };
+  const handleOpenRemove = () => {
+    setOpenRemove(true);
+    handlePopoverClose();
+  };
+  const handleCloseRemove = () => {
+    setOpenRemove(false);
+  };
+  const submitRemove = () => {
+    onRemoveChallenge(challenge.challenge_id);
+    handleCloseRemove();
+  };
   // Rendering
   const initialValues = R.pipe(
     R.pick([
@@ -75,6 +87,11 @@ const ChallengePopover = ({ challenge, documents }) => {
         onClose={handlePopoverClose}
       >
         <MenuItem onClick={handleOpenEdit}>{t('Update')}</MenuItem>
+        {onRemoveChallenge && (
+          <MenuItem onClick={handleOpenRemove}>
+            {t('Remove from the inject')}
+          </MenuItem>
+        )}
         <MenuItem onClick={handleOpenDelete}>{t('Delete')}</MenuItem>
       </Menu>
       <Dialog
@@ -113,6 +130,24 @@ const ChallengePopover = ({ challenge, documents }) => {
             documentsIds={(documents || []).map((i) => i.document_id)}
           />
         </DialogContent>
+      </Dialog>
+      <Dialog
+        open={openRemove}
+        TransitionComponent={Transition}
+        onClose={handleCloseRemove}
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            {t('Do you want to remove this challenge from the inject?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRemove}>{t('Cancel')}</Button>
+          <Button color="secondary" onClick={submitRemove}>
+            {t('Remove')}
+          </Button>
+        </DialogActions>
       </Dialog>
     </div>
   );

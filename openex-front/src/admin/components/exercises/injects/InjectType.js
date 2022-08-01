@@ -35,9 +35,9 @@ class InjectType extends Component {
         <Chip
           classes={{ root: style }}
           style={{
-            backgroundColor: `${config.color}20`,
-            color: config.color,
-            border: `1px solid ${config.color}`,
+            backgroundColor: `${config?.color}20`,
+            color: config?.color,
+            border: `1px solid ${config?.color}`,
           }}
           label={label}
         />

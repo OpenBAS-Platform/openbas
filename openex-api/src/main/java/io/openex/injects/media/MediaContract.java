@@ -79,7 +79,7 @@ public class MediaContract extends Contractor {
                         List.of(emailingField)))
                 .build();
         Contract publishArticle = executableContract(contractConfig,
-                MEDIA_PUBLISH, Map.of(en, "Publish media pressure", fr, "Publier une pression médiatique"), publishInstance);
+                MEDIA_PUBLISH, Map.of(en, "Publish media pressure", fr, "Publier de la pression médiatique"), publishInstance);
         return List.of(publishArticle);
     }
 }

@@ -366,7 +366,7 @@ const Injects = () => {
                 <ListItemIcon style={{ paddingTop: 5 }}>
                   <InjectIcon
                     tooltip={t(inject.inject_type)}
-                    config={injectContract.config}
+                    config={injectContract?.config}
                     type={inject.inject_type}
                   />
                 </ListItemIcon>
@@ -379,7 +379,7 @@ const Injects = () => {
                       >
                         <InjectType
                           variant="list"
-                          config={injectContract.config}
+                          config={injectContract?.config}
                           label={injectTypeName}
                         />
                       </div>

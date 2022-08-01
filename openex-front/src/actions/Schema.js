@@ -288,6 +288,7 @@ export const storeHelper = (state) => ({
   getArticlesMap: () => maps('articles', state),
   // challenges
   getChallenges: () => entities('challenges', state),
+  getChallengesMap: () => maps('challenges', state),
 });
 
 export const tagsConverter = (tag_ids, tagsMap) => (tag_ids ?? [])

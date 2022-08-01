@@ -11,7 +11,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import { ControlPointOutlined } from '@mui/icons-material';
+import { ControlPointOutlined, EmojiEventsOutlined } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import withStyles from '@mui/styles/withStyles';
 import { ListItemIcon } from '@mui/material';
@@ -19,12 +19,12 @@ import Grid from '@mui/material/Grid';
 import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
-import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
-import CreateArticle from '../media/CreateArticle';
+import { fetchChallenges } from '../../../../actions/Challenge';
+import CreateChallenge from '../../challenges/CreateChallenge';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';
-import MediaIcon from '../../medias/MediaIcon';
+import TagsFilter from '../../../../components/TagsFilter';
 
 const styles = (theme) => ({
   createButton: {
@@ -52,19 +52,19 @@ const styles = (theme) => ({
   },
 });
 
-class InjectAddArticles extends Component {
+class InjectAddChallenges extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
       keyword: '',
-      articlesIds: [],
+      challengesIds: [],
+      tags: [],
     };
   }
 
   componentDidMount() {
-    this.props.fetchMedias();
-    this.props.fetchExerciseArticles(this.props.exerciseId);
+    this.props.fetchChallenges();
   }
 
   handleOpen() {
@@ -72,63 +72,77 @@ class InjectAddArticles extends Component {
   }
 
   handleClose() {
-    this.setState({ open: false, keyword: '', articlesIds: [] });
+    this.setState({ open: false, keyword: '', challengesIds: [] });
   }
 
-  handleSearchArticles(value) {
+  handleSearchChallenges(value) {
     this.setState({ keyword: value });
   }
 
-  addArticle(articleId) {
+  handleAddTag(value) {
+    if (value) {
+      this.setState({ tags: [value] });
+    }
+  }
+
+  handleClearTag() {
+    this.setState({ tags: [] });
+  }
+
+  addChallenge(challengeId) {
     this.setState({
-      articlesIds: R.append(articleId, this.state.articlesIds),
+      challengesIds: R.append(challengeId, this.state.challengesIds),
     });
   }
 
-  removeArticle(articleId) {
+  removeChallenge(challengeId) {
     this.setState({
-      articlesIds: R.filter((u) => u !== articleId, this.state.articlesIds),
+      challengesIds: R.filter(
+        (u) => u !== challengeId,
+        this.state.challengesIds,
+      ),
     });
   }
 
-  submitAddArticles() {
-    this.props.handleAddArticles(this.state.articlesIds);
+  submitAddChallenges() {
+    this.props.handleAddChallenges(this.state.challengesIds);
     this.handleClose();
   }
 
   onCreate(result) {
-    this.addArticle(result.article_id);
+    this.addChallenge(result.challenge_id);
   }
 
   render() {
     const {
       classes,
       t,
-      articles,
-      injectArticlesIds,
-      exerciseId,
+      challenges,
+      injectChallengesIds,
+      challengesMap,
       exercise,
-      articlesMap,
-      mediasMap,
     } = this.props;
-    const { keyword, articlesIds } = this.state;
+    const { keyword, challengesIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
-      || (n.article_name || '').toLowerCase().indexOf(keyword.toLowerCase())
+      || (n.challenge_name || '').toLowerCase().indexOf(keyword.toLowerCase())
         !== -1
-      || (n.article_description || '')
+      || (n.challenge_content || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1
-      || (n.article_fullmedia?.media_name || '')
+      || (n.challenge_category || '')
         .toLowerCase()
         .indexOf(keyword.toLowerCase()) !== -1;
-    const fullArticles = articles.map((item) => ({
-      ...item,
-      article_fullmedia: mediasMap[item.article_media] || {},
-    }));
-    const filteredArticles = R.pipe(
+    const filteredChallenges = R.pipe(
+      R.filter(
+        (n) => tags.length === 0
+          || R.any(
+            (filter) => R.includes(filter, n.challenge_tags),
+            R.pluck('id', tags),
+          ),
+      ),
       R.filter(filterByKeyword),
       R.take(10),
-    )(fullArticles);
+    )(challenges);
     return (
       <div>
         <ListItem
@@ -143,7 +157,7 @@ class InjectAddArticles extends Component {
             <ControlPointOutlined color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={t('Add media pressure')}
+            primary={t('Add challenges')}
             classes={{ primary: classes.text }}
           />
         </ListItem>
@@ -161,46 +175,53 @@ class InjectAddArticles extends Component {
             },
           }}
         >
-          <DialogTitle>{t('Add media pressure in this inject')}</DialogTitle>
+          <DialogTitle>{t('Add challenge in this inject')}</DialogTitle>
           <DialogContent>
             <Grid container={true} spacing={3} style={{ marginTop: -15 }}>
               <Grid item={true} xs={8}>
                 <Grid container={true} spacing={3}>
                   <Grid item={true} xs={6}>
                     <SearchFilter
-                      onChange={this.handleSearchArticles.bind(this)}
+                      onChange={this.handleSearchChallenges.bind(this)}
+                      fullWidth={true}
+                    />
+                  </Grid>
+                  <Grid item={true} xs={6}>
+                    <TagsFilter
+                      onAddTag={this.handleAddTag.bind(this)}
+                      onClearTag={this.handleClearTag.bind(this)}
+                      currentTags={tags}
                       fullWidth={true}
                     />
                   </Grid>
                 </Grid>
                 <List>
-                  {filteredArticles.map((article) => {
-                    const disabled = articlesIds.includes(article.article_id)
-                      || injectArticlesIds.includes(article.article_id);
+                  {filteredChallenges.map((challenge) => {
+                    const disabled = challengesIds.includes(challenge.challenge_id)
+                      || injectChallengesIds.includes(challenge.challenge_id);
                     return (
                       <ListItem
-                        key={article.article_id}
+                        key={challenge.challenge_id}
                         disabled={disabled}
                         button={true}
                         divider={true}
                         dense={true}
-                        onClick={this.addArticle.bind(this, article.article_id)}
+                        onClick={this.addChallenge.bind(
+                          this,
+                          challenge.challenge_id,
+                        )}
                       >
                         <ListItemIcon>
-                          <MediaIcon
-                            type={article.article_fullmedia.media_type}
-                            variant="inline"
-                          />
+                          <EmojiEventsOutlined />
                         </ListItemIcon>
                         <ListItemText
-                          primary={article.article_name}
-                          secondary={article.article_author}
+                          primary={challenge.challenge_name}
+                          secondary={challenge.challenge_category}
                         />
                       </ListItem>
                     );
                   })}
-                  <CreateArticle
-                    exerciseId={exerciseId}
+                  <CreateChallenge
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
                   />
@@ -208,17 +229,14 @@ class InjectAddArticles extends Component {
               </Grid>
               <Grid item={true} xs={4}>
                 <Box className={classes.box}>
-                  {this.state.articlesIds.map((articleId) => {
-                    const article = articlesMap[articleId];
-                    const media = mediasMap[article.article_media] || {};
+                  {this.state.challengesIds.map((challengeId) => {
+                    const challenge = challengesMap[challengeId];
                     return (
                       <Chip
-                        key={articleId}
-                        onDelete={this.removeArticle.bind(this, articleId)}
-                        label={truncate(article.article_name, 22)}
-                        icon={
-                          <MediaIcon type={media.media_type} variant="chip" />
-                        }
+                        key={challengeId}
+                        onDelete={this.removeChallenge.bind(this, challengeId)}
+                        label={truncate(challenge.challenge_name, 22)}
+                        icon={<EmojiEventsOutlined />}
                         classes={{ root: classes.chip }}
                       />
                     );
@@ -231,7 +249,7 @@ class InjectAddArticles extends Component {
             <Button onClick={this.handleClose.bind(this)}>{t('Cancel')}</Button>
             <Button
               color="secondary"
-              onClick={this.submitAddArticles.bind(this)}
+              onClick={this.submitAddChallenges.bind(this)}
             >
               {t('Add')}
             </Button>
@@ -242,30 +260,25 @@ class InjectAddArticles extends Component {
   }
 }
 
-InjectAddArticles.propTypes = {
+InjectAddChallenges.propTypes = {
   t: PropTypes.func,
-  exerciseId: PropTypes.string,
-  exercise: PropTypes.object,
-  fetchExerciseArticles: PropTypes.func,
-  handleAddArticles: PropTypes.func,
-  organizations: PropTypes.array,
-  articles: PropTypes.array,
-  injectArticlesIds: PropTypes.array,
-  attachment: PropTypes.bool,
+  fetchChallenges: PropTypes.func,
+  handleAddChallenges: PropTypes.func,
+  challenges: PropTypes.array,
+  injectChallengesIds: PropTypes.array,
 };
 
 const select = (state, ownProps) => {
   const helper = storeHelper(state);
   const { exerciseId } = ownProps;
   const exercise = helper.getExercise(exerciseId);
-  const articles = helper.getExerciseArticles(exerciseId);
-  const articlesMap = helper.getArticlesMap();
-  const mediasMap = helper.getMediasMap();
-  return { exercise, articles, articlesMap, mediasMap };
+  const challenges = helper.getChallenges();
+  const challengesMap = helper.getChallengesMap();
+  return { challenges, challengesMap, exercise };
 };
 
 export default R.compose(
-  connect(select, { fetchExerciseArticles, fetchMedias }),
+  connect(select, { fetchChallenges }),
   inject18n,
   withStyles(styles),
-)(InjectAddArticles);
+)(InjectAddChallenges);

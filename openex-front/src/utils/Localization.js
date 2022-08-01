@@ -387,6 +387,8 @@ const i18n = {
       'Update the media pressure': 'Modifier la pression médiatique',
       'Do you want to delete this media pressure?':
         'Souhaitez-vous supprimer cette pression médiatique ?',
+      'Do you want to delete this challenge?':
+        'Souhaitez-vous supprimer ce challenge ?',
       'Create a new media pressure': 'Créer une nouvelle pression médiatique',
       Category: 'Catégorie',
       'Create a new challenge': 'Créer un nouveau challenge',
@@ -399,6 +401,13 @@ const i18n = {
       'Text (case-sensitive)': 'Texte (sensible à la casse)',
       'Regular expression': 'Expression régulière',
       'Update the challenge': 'Modifier le challenge',
+      'Challenges to publish': 'Challenges à publier',
+      'Add challenge in this inject': 'Ajouter des challenges à ce stimuli',
+      'Add challenges': 'Ajouter des challenges',
+      'Do you want to remove this media pressure from the inject?':
+        'Souhaitez-vous retirer cette pression médiatique de ce stimuli ?',
+      'Do you want to remove this challenge from the inject?':
+        'Souhaitez-vous retirer ce challenge de ce stimuli ?',
     },
     en: {
       openex_email: 'Email',

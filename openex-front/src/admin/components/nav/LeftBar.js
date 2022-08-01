@@ -18,7 +18,7 @@ import {
   ExtensionOutlined,
   SettingsOutlined,
   DomainOutlined,
-  EmojiEvents,
+  EmojiEventsOutlined,
 } from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import { connect } from 'react-redux';
@@ -170,7 +170,7 @@ const LeftBar = ({ location, classes, userAdmin, t }) => (
         classes={{ root: classes.menuItem }}
       >
         <ListItemIcon style={{ minWidth: 30 }}>
-          <EmojiEvents fontSize="small" color="primary" />
+          <EmojiEventsOutlined fontSize="small" color="primary" />
         </ListItemIcon>
         <ListItemText
           classes={{ primary: classes.menuItemText }}
