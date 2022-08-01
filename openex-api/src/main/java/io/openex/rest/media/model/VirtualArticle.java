@@ -1,7 +1,20 @@
 package io.openex.rest.media.model;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public record VirtualArticle(Instant date, String id) {
-    // Nothing to define outside the record
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VirtualArticle that = (VirtualArticle) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
+
