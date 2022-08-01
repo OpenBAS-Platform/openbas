@@ -4,19 +4,15 @@ import io.openex.contract.Contract;
 import io.openex.contract.ContractConfig;
 import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
-import io.openex.contract.fields.ContractSelect;
-import io.openex.database.model.Challenge;
-import io.openex.database.repository.ChallengeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static io.openex.contract.Contract.executableContract;
 import static io.openex.contract.ContractCardinality.Multiple;
 import static io.openex.contract.ContractDef.contractBuilder;
+import static io.openex.contract.fields.ContractChallenge.challengeField;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
@@ -31,13 +27,6 @@ public class ChallengeContract extends Contractor {
     public static final String CHALLENGE_PUBLISH = "f8e70b27-a69c-4b9f-a2df-e217c36b3981";
 
     public static final String TYPE = "openex_challenge";
-
-    private ChallengeRepository challengeRepository;
-
-    @Autowired
-    public void setChallengeRepository(ChallengeRepository challengeRepository) {
-        this.challengeRepository = challengeRepository;
-    }
 
     @Override
     protected boolean isExpose() {
@@ -57,11 +46,6 @@ public class ChallengeContract extends Contractor {
     @Override
     public List<Contract> contracts() {
         ContractConfig contractConfig = getConfig();
-        // Standard contract
-        Map<String, String> choices = new HashMap<>();
-        Iterable<Challenge> challenges = challengeRepository.findAll();
-        challenges.forEach(challenge -> choices.put(challenge.getId(), challenge.getName()));
-        ContractSelect contractSelect = ContractSelect.multiSelectField("challenge_ids", "Challenges to activate", choices);
         // In this "internal" contract we can't express choices.
         // Choices are contextual to a specific exercise.
         String messageBody = """
@@ -75,7 +59,7 @@ public class ChallengeContract extends Contractor {
                     The animation team
                 """;
         List<ContractElement> publishInstance = contractBuilder()
-                .mandatory(contractSelect)
+                .mandatory(challengeField("challenges", "Challenges", Multiple))
                 .mandatory(textField("subject", "Subject", "New challenges published for you ${user.name}"))
                 .mandatory(richTextareaField("body", "Body", messageBody))
                 .optional(checkboxField("encrypted", "Encrypted", false))

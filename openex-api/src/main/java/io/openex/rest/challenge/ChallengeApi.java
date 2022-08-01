@@ -5,7 +5,9 @@ import io.openex.database.model.ChallengeFlag;
 import io.openex.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openex.database.repository.ChallengeFlagRepository;
 import io.openex.database.repository.ChallengeRepository;
+import io.openex.database.repository.TagRepository;
 import io.openex.rest.challenge.form.ChallengeCreateInput;
+import io.openex.rest.challenge.form.ChallengeUpdateInput;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +19,14 @@ import java.time.Instant;
 import java.util.List;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
+import static io.openex.helper.StreamHelper.fromIterable;
 
 @RestController
 public class ChallengeApi extends RestBehavior {
 
     private ChallengeRepository challengeRepository;
     private ChallengeFlagRepository challengeFlagRepository;
+    private TagRepository tagRepository;
 
     @Autowired
     public void setChallengeFlagRepository(ChallengeFlagRepository challengeFlagRepository) {
@@ -34,6 +38,11 @@ public class ChallengeApi extends RestBehavior {
         this.challengeRepository = challengeRepository;
     }
 
+    @Autowired
+    public void setTagRepository(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
+
     @GetMapping("/api/challenges")
     public Iterable<Challenge> medias() {
         return challengeRepository.findAll();
@@ -43,8 +52,9 @@ public class ChallengeApi extends RestBehavior {
     @PutMapping("/api/challenges/{challengeId}")
     @Transactional(rollbackOn = Exception.class)
     public Challenge updateChallenge(@PathVariable String challengeId,
-                                     @Valid @RequestBody ChallengeCreateInput input) {
+                                     @Valid @RequestBody ChallengeUpdateInput input) {
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
+        challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         challenge.setUpdateAttributes(input);
         challenge.setUpdatedAt(Instant.now());
         // Clear all flags
@@ -68,6 +78,7 @@ public class ChallengeApi extends RestBehavior {
     public Challenge createChallenge(@Valid @RequestBody ChallengeCreateInput input) {
         Challenge challenge = new Challenge();
         challenge.setUpdateAttributes(input);
+        challenge.setTags(fromIterable(tagRepository.findAllById(input.getTagIds())));
         List<ChallengeFlag> challengeFlags = input.getFlags().stream().map(flagInput -> {
             ChallengeFlag challengeFlag = new ChallengeFlag();
             challengeFlag.setType(FLAG_TYPE.valueOf(flagInput.getType()));

@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import * as R from 'ramda';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
-import { useDispatch } from 'react-redux';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import {
@@ -16,14 +14,14 @@ import {
   ShareOutlined,
 } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
-import { fetchMediaDocuments } from '../../../actions/Document';
 import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+import { useQueryParameter } from '../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
   container: {
     margin: '0 auto',
-    width: 1200,
+    width: 900,
   },
   card: {
     position: 'relative',
@@ -41,10 +39,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const MediaMicroblogging = ({ mediaReader, preview }) => {
+const MediaMicroblogging = ({ mediaReader }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const [userId] = useQueryParameter(['user']);
   const { t, fldt } = useFormatter();
   const isDark = theme.palette.mode === 'dark';
   const {
@@ -55,13 +53,8 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
   const { documentsMap } = useHelper((helper) => ({
     documentsMap: helper.getDocumentsMap(),
   }));
-  useEffect(() => {
-    dispatch(fetchMediaDocuments(exercise.exercise_id));
-  }, []);
   const logo = isDark ? media.media_logo_dark : media.media_logo_light;
-  const filteredArticles = preview
-    ? R.filter((n) => n.article_is_scheduled === true, articles)
-    : R.filter((n) => n.article_is_scheduled !== true, articles);
+  const queryParams = userId && userId.length > 0 && userId !== 'null' ? `?userId=${userId}` : '';
   return (
     <div className={classes.container}>
       {logo && media.media_mode !== 'title' && (
@@ -69,7 +62,7 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/exercises/${exercise.exercise_id}/documents/${logo}/media_file`}
+            src={`/api/player/${exercise.exercise_id}/documents/${logo}/media_file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -96,90 +89,86 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
       >
         {media.media_description}
       </Typography>
-      <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-        {filteredArticles.length > 0 && (
-          <Grid item={true} xs={4}>
-            {filteredArticles.map((article) => {
-              const videos = article.article_documents
-                .map((d) => (documentsMap[d.document_id]
-                  ? documentsMap[d.document_id]
-                  : undefined))
-                .filter((d) => d !== undefined)
-                .filter((d) => d.document_type.includes('video/'));
-              let columns = 12;
-              if (videos.length === 2) {
-                columns = 6;
-              } else if (videos.length === 3) {
-                columns = 4;
-              } else if (videos.length >= 4) {
-                columns = 3;
+      {articles.map((article) => {
+        const docs = article.article_documents
+          .map((d) => (documentsMap[d.document_id]
+            ? documentsMap[d.document_id]
+            : undefined))
+          .filter((d) => d !== undefined)
+          .filter(
+            (d) => d.document_type.includes('image/')
+              || d.document_type.includes('video/'),
+          );
+        let columns = 12;
+        if (docs.length === 2) {
+          columns = 6;
+        } else if (docs.length === 3) {
+          columns = 4;
+        } else if (docs.length >= 4) {
+          columns = 3;
+        }
+        return (
+          <Card
+            key={article.article_id}
+            classes={{ root: classes.card }}
+            sx={{ width: '100%' }}
+          >
+            <CardHeader
+              avatar={
+                <Avatar>
+                  {(article.article_author || t('Unknown')).charAt(0)}
+                </Avatar>
               }
-              return (
-                <Card
-                  key={article.article_id}
-                  classes={{ root: classes.card }}
-                  sx={{ width: '100%' }}
-                >
-                  <CardHeader
-                    avatar={
-                      <Avatar>
-                        {(article.article_author || t('Unknown')).charAt(0)}
-                      </Avatar>
-                    }
-                    title={article.article_author || t('Unknown')}
-                    subheader={fldt(article.article_virtual_publication)}
-                  />
-                  <Grid container={true} spacing={3}>
-                    {videos.map((doc) => (
-                      <Grid item={true} xs={columns}>
-                        <CardMedia
-                          component="img"
-                          height="150"
-                          src={`/api/documents/${doc.document_id}/file`}
-                        />
-                      </Grid>
-                    ))}
+              title={article.article_author || t('Unknown')}
+              subheader={fldt(article.article_virtual_publication)}
+            />
+            <CardContent style={{ marginTop: -20, paddingBottom: 50 }}>
+              <ExpandableMarkdown
+                source={article.article_content}
+                limit={200}
+                controlled={true}
+              />
+              <Grid container={true} spacing={3}>
+                {docs.map((doc) => (
+                  <Grid item={true} xs={columns}>
+                    {doc.document_type.includes('image/') && (
+                      <CardMedia
+                        component="img"
+                        height="150"
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                      />
+                    )}
+                    {doc.document_type.includes('video/') && (
+                      <CardMedia
+                        component="video"
+                        height="150"
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                        controls={true}
+                      />
+                    )}
                   </Grid>
-                  <CardContent style={{ marginBottom: 30 }}>
-                    <Typography
-                      gutterBottom
-                      variant="h1"
-                      component="div"
-                      style={{ margin: '0 auto', textAlign: 'center' }}
-                    >
-                      {article.article_name}
-                    </Typography>
-                    <ExpandableMarkdown
-                      source={article.article_content}
-                      limit={200}
-                      controlled={true}
-                    />
-                    <div className={classes.footer}>
-                      <div style={{ float: 'right' }}>
-                        <Button
-                          size="small"
-                          startIcon={<ChatBubbleOutlineOutlined />}
-                        >
-                          {article.article_comments || 0}
-                        </Button>
-                        <Button size="small" startIcon={<ShareOutlined />}>
-                          {article.article_shares || 0}
-                        </Button>
-                        <Button
-                          size="small"
-                          startIcon={<FavoriteBorderOutlined />}
-                        >
-                          {article.article_likes || 0}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </Grid>
-        )}
-      </Grid>
+                ))}
+              </Grid>
+              <div className={classes.footer}>
+                <div style={{ float: 'right' }}>
+                  <Button
+                    size="small"
+                    startIcon={<ChatBubbleOutlineOutlined />}
+                  >
+                    {article.article_comments || 0}
+                  </Button>
+                  <Button size="small" startIcon={<ShareOutlined />}>
+                    {article.article_shares || 0}
+                  </Button>
+                  <Button size="small" startIcon={<FavoriteBorderOutlined />}>
+                    {article.article_likes || 0}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };

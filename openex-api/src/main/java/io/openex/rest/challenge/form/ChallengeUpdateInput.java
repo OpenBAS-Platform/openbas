@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import static io.openex.config.AppConfig.EMPTY_MESSAGE;
 import static io.openex.config.AppConfig.MANDATORY_MESSAGE;
 
-public class ChallengeCreateInput {
+public class ChallengeUpdateInput {
 
     @NotBlank(message = MANDATORY_MESSAGE)
     @JsonProperty("challenge_name")

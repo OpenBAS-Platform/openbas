@@ -110,8 +110,8 @@ public class RestBehavior {
         User user = currentUser();
         if (user.getId().equals(ANONYMOUS)) {
             user = userRepository.findById(userId).orElseThrow();
-            if (!user.getId().equals(userId) || !user.isOnlyPlayer()) {
-                throw new UnsupportedOperationException("Only player can be impersonate");
+            if (!user.getId().equals(userId)) {
+                throw new UnsupportedOperationException("Only player can be impersonated");
             }
         }
         return user;

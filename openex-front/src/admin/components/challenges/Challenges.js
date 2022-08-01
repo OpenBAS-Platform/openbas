@@ -14,6 +14,9 @@ import useSearchAnFilter from '../../../utils/SortingFiltering';
 import { fetchChallenges } from '../../../actions/Challenge';
 import ChallengePopover from './ChallengePopover';
 import CreateChallenge from './CreateChallenge';
+import { fetchTags } from '../../../actions/Tag';
+import TagsFilter from '../../../components/TagsFilter';
+import ItemTags from '../../../components/ItemTags';
 
 const useStyles = makeStyles((theme) => ({
   parameters: {
@@ -67,9 +70,26 @@ const headerStyles = {
     fontSize: 12,
     fontWeight: '700',
   },
-  challenge_description: {
+  challenge_category: {
     float: 'left',
-    width: '15%',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_score: {
+    float: 'left',
+    width: '10%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_exercises: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  challenge_tags: {
+    float: 'left',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -84,9 +104,32 @@ const inlineStyles = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  challenge_description: {
+  challenge_category: {
     float: 'left',
-    width: '15%',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_score: {
+    float: 'left',
+    width: '10%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_exercises: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  challenge_tags: {
+    float: 'left',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -99,7 +142,7 @@ const Challenges = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   // Filter and sort hook
-  const searchColumns = ['name', 'description'];
+  const searchColumns = ['name', 'content', 'category', 'score'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
   // Fetching data
   const { challenges } = useHelper((helper) => ({
@@ -107,6 +150,7 @@ const Challenges = () => {
   }));
   useDataLoader(() => {
     dispatch(fetchChallenges());
+    dispatch(fetchTags());
   });
   const sortedChallenges = filtering.filterAndSort(challenges);
   return (
@@ -117,6 +161,13 @@ const Challenges = () => {
             small={true}
             onChange={filtering.handleSearch}
             keyword={filtering.keyword}
+          />
+        </div>
+        <div style={{ float: 'left', marginRight: 20 }}>
+          <TagsFilter
+            onAddTag={filtering.handleAddTag}
+            onRemoveTag={filtering.handleRemoveTag}
+            currentTags={filtering.tags}
           />
         </div>
       </div>
@@ -144,8 +195,26 @@ const Challenges = () => {
                   headerStyles,
                 )}
                 {filtering.buildHeader(
-                  'challenge_description',
-                  'Description',
+                  'challenge_category',
+                  'Category',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_score',
+                  'Score',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_exercises',
+                  'Exercises',
+                  true,
+                  headerStyles,
+                )}
+                {filtering.buildHeader(
+                  'challenge_tags',
+                  'Tags',
                   true,
                   headerStyles,
                 )}
@@ -174,9 +243,27 @@ const Challenges = () => {
                   </div>
                   <div
                     className={classes.bodyItem}
-                    style={inlineStyles.challenge_description}
+                    style={inlineStyles.challenge_category}
                   >
-                    {challenge.challenge_description}
+                    {challenge.challenge_category}
+                  </div>
+                  <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_score}
+                  >
+                    {challenge.challenge_score}
+                  </div>
+                  <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_exercises}
+                  >
+                    {challenge.challenge_exercises}
+                  </div>
+                  <div
+                      className={classes.bodyItem}
+                      style={inlineStyles.challenge_tags}
+                  >
+                    <ItemTags variant="list" tags={challenge.challenge_tags} />
                   </div>
                 </div>
               }

@@ -15,6 +15,8 @@ public enum ContractType {
     Select,
     @JsonProperty("article")
     Article,
+    @JsonProperty("challenge")
+    Challenge,
     @JsonProperty("dependency-select")
     DependencySelect,
     @JsonProperty("attachment")

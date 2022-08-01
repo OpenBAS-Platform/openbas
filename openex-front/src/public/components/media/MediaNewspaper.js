@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import Typography from '@mui/material/Typography';
@@ -7,19 +7,28 @@ import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
-import { useDispatch } from 'react-redux';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
   ShareOutlined,
+  MoreHorizOutlined,
 } from '@mui/icons-material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Slide from '@mui/material/Slide';
 import { useFormatter } from '../../../components/i18n';
 import Empty from '../../../components/Empty';
-import { fetchMediaDocuments } from '../../../actions/Document';
 import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+import { useQueryParameter } from '../../../utils/Environment';
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -42,11 +51,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const MediaNewspaper = ({ mediaReader, preview }) => {
+const MediaNewspaper = ({ mediaReader }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const dispatch = useDispatch();
   const { t, fldt } = useFormatter();
+  const [userId] = useQueryParameter(['user']);
+  const [currentArticle, setCurrentArticle] = useState(null);
   const isDark = theme.palette.mode === 'dark';
   const {
     media_exercise: exercise,
@@ -56,14 +66,8 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
   const { documentsMap } = useHelper((helper) => ({
     documentsMap: helper.getDocumentsMap(),
   }));
-  useEffect(() => {
-    dispatch(fetchMediaDocuments(exercise.exercise_id));
-  }, []);
   const logo = isDark ? media.media_logo_dark : media.media_logo_light;
-  const filteredArticles = preview
-    ? R.filter((n) => n.article_is_scheduled === true, articles)
-    : R.filter((n) => n.article_is_scheduled !== true, articles);
-  const firstArticle = R.head(filteredArticles) || null;
+  const firstArticle = R.head(articles) || null;
   const firstArticleImages = (firstArticle?.article_documents || [])
     .map((d) => (documentsMap[d.document_id] ? documentsMap[d.document_id] : undefined))
     .filter((d) => d !== undefined)
@@ -76,8 +80,9 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
   } else if (firstArticleImages.length >= 4) {
     firstArticleColumns = 3;
   }
-  const headArticles = R.tail(R.take(3, filteredArticles)) || [];
-  const otherArticles = R.drop(3, filteredArticles) || [];
+  const headArticles = R.tail(R.take(3, articles)) || [];
+  const otherArticles = R.drop(3, articles) || [];
+  const queryParams = userId && userId.length > 0 && userId !== 'null' ? `?userId=${userId}` : '';
   return (
     <div className={classes.container}>
       {logo && media.media_mode !== 'title' && (
@@ -85,7 +90,7 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/exercises/${exercise.exercise_id}/documents/${logo}/media_file`}
+            src={`/api/player/${exercise.exercise_id}/documents/${logo}/media_file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -138,8 +143,8 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                   <Grid item={true} xs={firstArticleColumns}>
                     <CardMedia
                       component="img"
-                      height="150"
-                      src={`/api/documents/${doc.document_id}/file`}
+                      height="200"
+                      src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                     />
                   </Grid>
                 ))}
@@ -155,10 +160,28 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                 </Typography>
                 <ExpandableMarkdown
                   source={firstArticle.article_content}
-                  limit={500}
+                  limit={
+                    // eslint-disable-next-line no-nested-ternary
+                    headArticles.length === 1
+                      ? 500
+                      : headArticles.length === 2
+                        ? 1000
+                        : 1500
+                  }
                   controlled={true}
                 />
                 <div className={classes.footer}>
+                  <div style={{ float: 'left' }}>
+                    <Button
+                      color="secondary"
+                      size="small"
+                      variant="outlined"
+                      startIcon={<MoreHorizOutlined />}
+                      onClick={() => setCurrentArticle(firstArticle)}
+                    >
+                      {t('Read more')}
+                    </Button>
+                  </div>
                   <div style={{ float: 'right' }}>
                     <Button
                       size="small"
@@ -216,8 +239,8 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                       <Grid item={true} xs={columns}>
                         <CardMedia
                           component="img"
-                          height="150"
-                          src={`/api/documents/${doc.document_id}/file`}
+                          height="100"
+                          src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                         />
                       </Grid>
                     ))}
@@ -233,10 +256,21 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                     </Typography>
                     <ExpandableMarkdown
                       source={article.article_content}
-                      limit={200}
+                      limit={150}
                       controlled={true}
                     />
                     <div className={classes.footer}>
+                      <div style={{ float: 'left' }}>
+                        <Button
+                          color="secondary"
+                          size="small"
+                          variant="outlined"
+                          startIcon={<MoreHorizOutlined />}
+                          onClick={() => setCurrentArticle(article)}
+                        >
+                          {t('Read more')}
+                        </Button>
+                      </div>
                       <div style={{ float: 'right' }}>
                         <Button
                           size="small"
@@ -301,7 +335,7 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                         <CardMedia
                           component="img"
                           height="150"
-                          src={`/api/documents/${doc.document_id}/file`}
+                          src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                         />
                       </Grid>
                     ))}
@@ -321,6 +355,17 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                       controlled={true}
                     />
                     <div className={classes.footer}>
+                      <div style={{ float: 'left' }}>
+                        <Button
+                          color="secondary"
+                          size="small"
+                          variant="outlined"
+                          startIcon={<MoreHorizOutlined />}
+                          onClick={() => setCurrentArticle(article)}
+                        >
+                          {t('Read more')}
+                        </Button>
+                      </div>
                       <div style={{ float: 'right' }}>
                         <Button
                           size="small"
@@ -346,6 +391,26 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
           </Grid>
         )}
       </Grid>
+      <Dialog
+        TransitionComponent={Transition}
+        open={currentArticle !== null}
+        onClose={() => setCurrentArticle(null)}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{currentArticle?.article_name}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">
+            {t('By')} {currentArticle?.article_author || t('Unknown')},{' '}
+            {fldt(currentArticle?.article_virtual_publication)}
+          </Typography>
+          <ExpandableMarkdown
+            source={currentArticle?.article_content}
+            limit={5000}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

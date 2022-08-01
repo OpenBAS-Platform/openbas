@@ -1,7 +1,9 @@
 package io.openex.database.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.helper.MultiModelDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -37,14 +39,35 @@ public class Challenge implements Base {
     @JsonProperty("challenge_name")
     private String name;
 
-    @Column(name = "challenge_description")
-    @JsonProperty("challenge_description")
-    private String description;
+    @Column(name = "challenge_category")
+    @JsonProperty("challenge_category")
+    private String category;
+
+    @Column(name = "challenge_content")
+    @JsonProperty("challenge_content")
+    private String content;
+
+    @Column(name = "challenge_score")
+    @JsonProperty("challenge_score")
+    private Integer score;
+
+    @Column(name = "challenge_max_attempts")
+    @JsonProperty("challenge_max_attempts")
+    private Integer maxAttempts;
 
     @OneToMany(mappedBy = "challenge", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("challenge_flags")
     @Fetch(FetchMode.SUBSELECT)
     private List<ChallengeFlag> flags = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "challenges_tags",
+            joinColumns = @JoinColumn(name = "challenge_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonProperty("challenge_tags")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<Tag> tags = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -79,20 +102,52 @@ public class Challenge implements Base {
         this.updatedAt = updatedAt;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public List<ChallengeFlag> getFlags() {
         return flags;
     }
 
     public void setFlags(List<ChallengeFlag> flags) {
         this.flags = flags;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public Integer getMaxAttempts() {
+        return maxAttempts;
+    }
+
+    public void setMaxAttempts(Integer maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     @Override
