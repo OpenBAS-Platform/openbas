@@ -17,6 +17,7 @@ import { useFormatter } from '../../../components/i18n';
 import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
 import { useQueryParameter } from '../../../utils/Environment';
+import Empty from '../../../components/Empty';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -90,6 +91,11 @@ const MediaMicroblogging = ({ mediaReader }) => {
       >
         {media.media_description}
       </Typography>
+      {articles.length === 0 && (
+        <div style={{ marginTop: 150 }}>
+          <Empty message={t('No media pressure entry in this media yet.')} />
+        </div>
+      )}
       {articles.map((article) => {
         const docs = article.article_documents
           .map((d) => (documentsMap[d.document_id]
