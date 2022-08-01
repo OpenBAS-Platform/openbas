@@ -206,6 +206,9 @@ public class Inject implements Base, Injection {
 
     @JsonProperty("inject_date")
     public Optional<Instant> getDate() {
+        if (getExercise().getStatus().equals(Exercise.STATUS.CANCELED)) {
+            return Optional.empty();
+        }
         return getExercise().getStart()
                 .map(source -> computeInjectDate(source, SPEED_STANDARD));
     }
