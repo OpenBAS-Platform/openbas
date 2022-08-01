@@ -252,6 +252,7 @@ class InjectPopover extends Component {
           onClick={this.handlePopoverOpen.bind(this)}
           aria-haspopup="true"
           size="large"
+          disabled={isExerciseReadOnly(exercise)}
         >
           <MoreVert />
         </IconButton>
@@ -262,14 +263,14 @@ class InjectPopover extends Component {
         >
           <MenuItem
             onClick={this.handleOpenEdit.bind(this)}
-            disabled={isExerciseReadOnly(exercise) || isDisabled}
+            disabled={isDisabled}
           >
             {t('Update')}
           </MenuItem>
           {setSelectedInject && (
             <MenuItem
               onClick={this.handleOpenEditContent.bind(this)}
-              disabled={isExerciseReadOnly(exercise) || isDisabled}
+              disabled={isDisabled}
             >
               {t('Manage content')}
             </MenuItem>
@@ -277,7 +278,7 @@ class InjectPopover extends Component {
           {!inject.inject_status && (
             <MenuItem
               onClick={this.handleOpenDone.bind(this)}
-              disabled={isExerciseReadOnly(exercise) || isDisabled}
+              disabled={isDisabled}
             >
               {t('Mark as done')}
             </MenuItem>
@@ -285,7 +286,7 @@ class InjectPopover extends Component {
           {inject.inject_type !== 'openex_manual' && (
             <MenuItem
               onClick={this.handleOpenTry.bind(this)}
-              disabled={isExerciseReadOnly(exercise) || isDisabled}
+              disabled={isDisabled}
             >
               {t('Try the inject')}
             </MenuItem>
@@ -293,22 +294,19 @@ class InjectPopover extends Component {
           {inject.inject_enabled ? (
             <MenuItem
               onClick={this.handleOpenDisable.bind(this)}
-              disabled={isExerciseReadOnly(exercise) || isDisabled}
+              disabled={isDisabled}
             >
               {t('Disable')}
             </MenuItem>
           ) : (
             <MenuItem
               onClick={this.handleOpenEnable.bind(this)}
-              disabled={isExerciseReadOnly(exercise) || isDisabled}
+              disabled={isDisabled}
             >
               {t('Enable')}
             </MenuItem>
           )}
-          <MenuItem
-            onClick={this.handleOpenDelete.bind(this)}
-            disabled={isExerciseReadOnly(exercise)}
-          >
+          <MenuItem onClick={this.handleOpenDelete.bind(this)}>
             {t('Delete')}
           </MenuItem>
         </Menu>

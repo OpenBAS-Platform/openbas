@@ -331,7 +331,7 @@ class InjectDefinition extends Component {
       articlesSortBy: 'article_name',
       articlesOrderAsc: true,
       challengesIds: props.inject.inject_content?.challenges || [],
-      challengesSortBy: 'article_name',
+      challengesSortBy: 'challenge_name',
       challengesOrderAsc: true,
     };
   }
@@ -449,10 +449,17 @@ class InjectDefinition extends Component {
     );
   }
 
+  articlesReverseBy(field) {
+    this.setState({
+      articlesSortBy: field,
+      articlesOrderAsc: !this.state.articlesOrderAsc,
+    });
+  }
+
   articlesSortHeader(field, label, isSortable) {
     const { t } = this.props;
-    const { audiencesSortBy, audiencesOrderAsc } = this.state;
-    const sortComponent = audiencesOrderAsc ? (
+    const { articlesSortBy, articlesOrderAsc } = this.state;
+    const sortComponent = articlesOrderAsc ? (
       <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
     ) : (
       <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
@@ -461,10 +468,43 @@ class InjectDefinition extends Component {
       return (
         <div
           style={inlineStylesHeaders[field]}
-          onClick={this.audiencesReverseBy.bind(this, field)}
+          onClick={this.articlesReverseBy.bind(this, field)}
         >
           <span>{t(label)}</span>
-          {audiencesSortBy === field ? sortComponent : ''}
+          {articlesSortBy === field ? sortComponent : ''}
+        </div>
+      );
+    }
+    return (
+      <div style={inlineStylesHeaders[field]}>
+        <span>{t(label)}</span>
+      </div>
+    );
+  }
+
+  challengesReverseBy(field) {
+    this.setState({
+      challengesSortBy: field,
+      challengesOrderAsc: !this.state.challengesOrderAsc,
+    });
+  }
+
+  challengesSortHeader(field, label, isSortable) {
+    const { t } = this.props;
+    const { challengesSortBy, challengesOrderAsc } = this.state;
+    const sortComponent = challengesOrderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
+    if (isSortable) {
+      return (
+        <div
+          style={inlineStylesHeaders[field]}
+          onClick={this.challengesReverseBy.bind(this, field)}
+        >
+          <span>{t(label)}</span>
+          {challengesSortBy === field ? sortComponent : ''}
         </div>
       );
     }
@@ -1483,17 +1523,17 @@ class InjectDefinition extends Component {
                         <ListItemText
                           primary={
                             <div>
-                              {this.articlesSortHeader(
+                              {this.challengesSortHeader(
                                 'challenge_category',
                                 'Category',
                                 true,
                               )}
-                              {this.articlesSortHeader(
+                              {this.challengesSortHeader(
                                 'challenge_name',
                                 'Name',
                                 true,
                               )}
-                              {this.articlesSortHeader(
+                              {this.challengesSortHeader(
                                 'challenge_tags',
                                 'Tags',
                                 true,

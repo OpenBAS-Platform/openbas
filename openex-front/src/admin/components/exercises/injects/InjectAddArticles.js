@@ -97,7 +97,7 @@ class InjectAddArticles extends Component {
   }
 
   onCreate(result) {
-    this.addArticle(result.article_id);
+    this.addArticle(result);
   }
 
   render() {
@@ -210,14 +210,16 @@ class InjectAddArticles extends Component {
                 <Box className={classes.box}>
                   {this.state.articlesIds.map((articleId) => {
                     const article = articlesMap[articleId];
-                    const media = mediasMap[article.article_media] || {};
+                    const media = article
+                      ? mediasMap[article.article_media] || {}
+                      : '';
                     return (
                       <Chip
                         key={articleId}
                         onDelete={this.removeArticle.bind(this, articleId)}
-                        label={truncate(article.article_name, 22)}
+                        label={truncate(article?.article_name, 22)}
                         icon={
-                          <MediaIcon type={media.media_type} variant="chip" />
+                          <MediaIcon type={media?.media_type} variant="chip" />
                         }
                         classes={{ root: classes.chip }}
                       />

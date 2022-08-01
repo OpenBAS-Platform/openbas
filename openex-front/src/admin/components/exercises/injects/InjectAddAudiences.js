@@ -239,7 +239,7 @@ class InjectAddAudiences extends Component {
                       <Chip
                         key={audienceId}
                         onDelete={this.removeAudience.bind(this, audienceId)}
-                        label={truncate(audience.audience_name, 22)}
+                        label={truncate(audience?.audience_name || '', 22)}
                         icon={<CastForEducationOutlined />}
                         classes={{ root: classes.chip }}
                       />

@@ -110,7 +110,7 @@ class InjectAddChallenges extends Component {
   }
 
   onCreate(result) {
-    this.addChallenge(result.challenge_id);
+    this.addChallenge(result);
   }
 
   render() {
@@ -235,7 +235,7 @@ class InjectAddChallenges extends Component {
                       <Chip
                         key={challengeId}
                         onDelete={this.removeChallenge.bind(this, challengeId)}
-                        label={truncate(challenge.challenge_name, 22)}
+                        label={truncate(challenge?.challenge_name || '', 22)}
                         icon={<EmojiEventsOutlined />}
                         classes={{ root: classes.chip }}
                       />
