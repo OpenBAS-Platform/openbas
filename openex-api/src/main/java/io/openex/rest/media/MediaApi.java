@@ -122,6 +122,8 @@ public class MediaApi extends RestBehavior {
         Map<String, Instant> toPublishArticleIdsMap = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(MEDIA_PUBLISH))
                 .filter(inject -> inject.getContent() != null)
+                // TODO take into account depends_another here, depends_duration is not enough to order articles
+                .sorted(Comparator.comparing(Inject::getDependsDuration))
                 .flatMap(inject -> {
                     Instant virtualInjectDate = inject.computeInjectDate(now, SPEED_STANDARD);
                     try {
@@ -133,6 +135,7 @@ public class MediaApi extends RestBehavior {
                     }
                 })
                 .filter(Objects::nonNull)
+                .distinct()
                 .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
         return articles.stream()
                 .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
@@ -269,6 +272,7 @@ public class MediaApi extends RestBehavior {
                     }
                 })
                 .filter(Objects::nonNull)
+                .distinct()
                 .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
         if (toPublishArticleIdsMap.size() > 0) {
             List<Article> publishedArticles = fromIterable(articleRepository.findAllById(toPublishArticleIdsMap.keySet()))

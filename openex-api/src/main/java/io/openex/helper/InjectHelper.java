@@ -112,7 +112,7 @@ public class InjectHelper {
                 });
         // Combine injects and dry
         return concat(injects, dryInjects)
-                .filter(executableInject -> !executableInject.getContract().isManual())
+                .filter(executableInject -> executableInject.getContract() == null || !executableInject.getContract().isManual())
                 .collect(Collectors.toList());
     }
 }

@@ -93,7 +93,7 @@ public class Challenge implements Base {
     }
 
     public void setName(String name) {
-        this.name = name.toLowerCase();
+        this.name = name;
     }
 
     public Instant getCreatedAt() {

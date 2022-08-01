@@ -17,6 +17,7 @@ import javax.mail.util.ByteArrayDataSource;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static io.openex.database.model.ExecutionTrace.traceError;
 import static io.openex.database.model.ExecutionTrace.traceSuccess;
@@ -51,12 +52,16 @@ public class EmailService {
 
     private void storeMessageImap(Execution execution, MimeMessage mimeMessage) {
         if (imapEnabled) {
-            try {
-                imapService.storeSentMessage(mimeMessage);
-                execution.addTrace(traceSuccess("imap", "Mail successfully stored in IMAP"));
-            } catch (Exception e) {
-                execution.addTrace(traceError("imap", e.getMessage(), e));
+            for (int i = 0; i < 3; i++) {
+                try {
+                    imapService.storeSentMessage(mimeMessage);
+                    execution.addTrace(traceSuccess("imap", "Mail successfully stored in IMAP"));
+                    return;
+                } catch (Exception e) {
+                    execution.addTrace(traceError("imap", e.getMessage(), e));
+                }
             }
+            execution.addTrace(traceError("imap", "Fail to store mail in IMAP after 3 attempts"));
         }
     }
 
