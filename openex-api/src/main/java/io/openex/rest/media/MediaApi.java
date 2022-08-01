@@ -276,7 +276,8 @@ public class MediaApi extends RestBehavior {
                 .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
         if (toPublishArticleIdsMap.size() > 0) {
             List<Article> publishedArticles = fromIterable(articleRepository.findAllById(toPublishArticleIdsMap.keySet()))
-                    .stream().peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
+                    .stream().filter(article -> article.getMedia().equals(media))
+                    .peek(article -> article.setVirtualPublication(toPublishArticleIdsMap.get(article.getId())))
                     .sorted(Comparator.comparing(Article::getVirtualPublication).reversed())
                     .toList();
             mediaReader.setMediaArticles(publishedArticles);

@@ -69,8 +69,8 @@ const MediaTvChannel = ({ mediaReader }) => {
   } else if (firstArticleVideos.length >= 4) {
     firstArticleColumns = 3;
   }
-  const headArticles = R.tail(R.take(3, articles)) || [];
-  const otherArticles = R.drop(3, articles) || [];
+  const headArticles = R.tail(R.take(4, articles)) || [];
+  const otherArticles = R.drop(4, articles) || [];
   const queryParams = userId && userId.length > 0 && userId !== 'null' ? `?userId=${userId}` : '';
   return (
     <div className={classes.container}>
@@ -257,88 +257,86 @@ const MediaTvChannel = ({ mediaReader }) => {
         )}
       </Grid>
       <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-        {otherArticles.length > 0 && (
-          <Grid item={true} xs={4}>
-            {otherArticles.map((article) => {
-              const videos = article.article_documents
-                .map((d) => (documentsMap[d.document_id]
-                  ? documentsMap[d.document_id]
-                  : undefined))
-                .filter((d) => d !== undefined)
-                .filter((d) => d.document_type.includes('video/'));
-              let columns = 12;
-              if (videos.length === 2) {
-                columns = 6;
-              } else if (videos.length === 3) {
-                columns = 4;
-              } else if (videos.length >= 4) {
-                columns = 3;
-              }
-              return (
-                <Card
-                  key={article.article_id}
-                  classes={{ root: classes.card }}
-                  sx={{ width: '100%' }}
-                >
-                  <CardHeader
-                    avatar={
-                      <Avatar>
-                        {(article.article_author || t('Unknown')).charAt(0)}
-                      </Avatar>
-                    }
-                    title={article.article_author || t('Unknown')}
-                    subheader={fldt(article.article_virtual_publication)}
+        {otherArticles.map((article) => {
+          const videos = article.article_documents
+            .map((d) => (documentsMap[d.document_id]
+              ? documentsMap[d.document_id]
+              : undefined))
+            .filter((d) => d !== undefined)
+            .filter((d) => d.document_type.includes('video/'));
+          let columns = 12;
+          if (videos.length === 2) {
+            columns = 6;
+          } else if (videos.length === 3) {
+            columns = 4;
+          } else if (videos.length >= 4) {
+            columns = 3;
+          }
+          return (
+            <Grid item={true} xs={4}>
+              <Card
+                key={article.article_id}
+                classes={{ root: classes.card }}
+                sx={{ width: '100%', height: '100%' }}
+              >
+                <CardHeader
+                  avatar={
+                    <Avatar>
+                      {(article.article_author || t('Unknown')).charAt(0)}
+                    </Avatar>
+                  }
+                  title={article.article_author || t('Unknown')}
+                  subheader={fldt(article.article_virtual_publication)}
+                />
+                <Grid container={true} spacing={3}>
+                  {videos.map((doc) => (
+                    <Grid item={true} xs={columns}>
+                      <CardMedia
+                        component="img"
+                        height="150"
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+                <CardContent style={{ marginBottom: 30 }}>
+                  <Typography
+                    gutterBottom
+                    variant="h1"
+                    component="div"
+                    style={{ margin: '0 auto', textAlign: 'center' }}
+                  >
+                    {article.article_name}
+                  </Typography>
+                  <ExpandableMarkdown
+                    source={article.article_content}
+                    limit={200}
+                    controlled={true}
                   />
-                  <Grid container={true} spacing={3}>
-                    {videos.map((doc) => (
-                      <Grid item={true} xs={columns}>
-                        <CardMedia
-                          component="img"
-                          height="150"
-                          src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                  <CardContent style={{ marginBottom: 30 }}>
-                    <Typography
-                      gutterBottom
-                      variant="h1"
-                      component="div"
-                      style={{ margin: '0 auto', textAlign: 'center' }}
-                    >
-                      {article.article_name}
-                    </Typography>
-                    <ExpandableMarkdown
-                      source={article.article_content}
-                      limit={200}
-                      controlled={true}
-                    />
-                    <div className={classes.footer}>
-                      <div style={{ float: 'right' }}>
-                        <Button
-                          size="small"
-                          startIcon={<ChatBubbleOutlineOutlined />}
-                        >
-                          {article.article_comments || 0}
-                        </Button>
-                        <Button size="small" startIcon={<ShareOutlined />}>
-                          {article.article_shares || 0}
-                        </Button>
-                        <Button
-                          size="small"
-                          startIcon={<FavoriteBorderOutlined />}
-                        >
-                          {article.article_likes || 0}
-                        </Button>
-                      </div>
+                  <div className={classes.footer}>
+                    <div style={{ float: 'right' }}>
+                      <Button
+                        size="small"
+                        startIcon={<ChatBubbleOutlineOutlined />}
+                      >
+                        {article.article_comments || 0}
+                      </Button>
+                      <Button size="small" startIcon={<ShareOutlined />}>
+                        {article.article_shares || 0}
+                      </Button>
+                      <Button
+                        size="small"
+                        startIcon={<FavoriteBorderOutlined />}
+                      >
+                        {article.article_likes || 0}
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </Grid>
-        )}
+                  </div>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
     </div>
   );
