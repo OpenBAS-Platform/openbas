@@ -143,7 +143,7 @@ const MediaNewspaper = ({ mediaReader }) => {
                   <Grid item={true} xs={firstArticleColumns}>
                     <CardMedia
                       component="img"
-                      height="150"
+                      height="200"
                       src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                     />
                   </Grid>
@@ -160,7 +160,7 @@ const MediaNewspaper = ({ mediaReader }) => {
                 </Typography>
                 <ExpandableMarkdown
                   source={firstArticle.article_content}
-                  limit={500}
+                  limit={headArticles.length > 1 ? 2000 : 500}
                   controlled={true}
                 />
                 <div className={classes.footer}>
@@ -232,7 +232,7 @@ const MediaNewspaper = ({ mediaReader }) => {
                       <Grid item={true} xs={columns}>
                         <CardMedia
                           component="img"
-                          height="150"
+                          height="100"
                           src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                         />
                       </Grid>
@@ -249,7 +249,7 @@ const MediaNewspaper = ({ mediaReader }) => {
                     </Typography>
                     <ExpandableMarkdown
                       source={article.article_content}
-                      limit={200}
+                      limit={150}
                       controlled={true}
                     />
                     <div className={classes.footer}>

@@ -132,7 +132,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                   <Grid item={true} xs={firstArticleColumns}>
                     <CardMedia
                       component="img"
-                      height="150"
+                      height="200"
                       src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                     />
                   </Grid>
@@ -210,7 +210,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                       <Grid item={true} xs={columns}>
                         <CardMedia
                           component="img"
-                          height="150"
+                          height="100"
                           src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                         />
                       </Grid>
