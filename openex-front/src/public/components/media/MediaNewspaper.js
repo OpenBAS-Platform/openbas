@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
 import * as R from 'ramda';
 import Typography from '@mui/material/Typography';
@@ -14,12 +14,22 @@ import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
   ShareOutlined,
+  MoreHorizOutlined,
 } from '@mui/icons-material';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Slide from '@mui/material/Slide';
 import { useFormatter } from '../../../components/i18n';
 import Empty from '../../../components/Empty';
 import { fetchMediaDocuments } from '../../../actions/Document';
 import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -47,6 +57,7 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const { t, fldt } = useFormatter();
+  const [currentArticle, setCurrentArticle] = useState(null);
   const isDark = theme.palette.mode === 'dark';
   const {
     media_exercise: exercise,
@@ -159,6 +170,17 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                   controlled={true}
                 />
                 <div className={classes.footer}>
+                  <div style={{ float: 'left' }}>
+                    <Button
+                      color="secondary"
+                      size="small"
+                      variant="outlined"
+                      startIcon={<MoreHorizOutlined />}
+                      onClick={() => setCurrentArticle(firstArticle)}
+                    >
+                      {t('Read more')}
+                    </Button>
+                  </div>
                   <div style={{ float: 'right' }}>
                     <Button
                       size="small"
@@ -237,6 +259,17 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                       controlled={true}
                     />
                     <div className={classes.footer}>
+                      <div style={{ float: 'left' }}>
+                        <Button
+                          color="secondary"
+                          size="small"
+                          variant="outlined"
+                          startIcon={<MoreHorizOutlined />}
+                          onClick={() => setCurrentArticle(article)}
+                        >
+                          {t('Read more')}
+                        </Button>
+                      </div>
                       <div style={{ float: 'right' }}>
                         <Button
                           size="small"
@@ -321,6 +354,17 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
                       controlled={true}
                     />
                     <div className={classes.footer}>
+                      <div style={{ float: 'left' }}>
+                        <Button
+                          color="secondary"
+                          size="small"
+                          variant="outlined"
+                          startIcon={<MoreHorizOutlined />}
+                          onClick={() => setCurrentArticle(article)}
+                        >
+                          {t('Read more')}
+                        </Button>
+                      </div>
                       <div style={{ float: 'right' }}>
                         <Button
                           size="small"
@@ -346,6 +390,26 @@ const MediaNewspaper = ({ mediaReader, preview }) => {
           </Grid>
         )}
       </Grid>
+      <Dialog
+        TransitionComponent={Transition}
+        open={currentArticle !== null}
+        onClose={() => setCurrentArticle(null)}
+        fullWidth={true}
+        maxWidth="md"
+        PaperProps={{ elevation: 1 }}
+      >
+        <DialogTitle>{currentArticle?.article_name}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">
+            {t('By')} {firstArticle.article_author || t('Unknown')},{' '}
+            {fldt(firstArticle.article_virtual_publication)}
+          </Typography>
+          <ExpandableMarkdown
+            source={currentArticle?.article_content}
+            limit={5000}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
