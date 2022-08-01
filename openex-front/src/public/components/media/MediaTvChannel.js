@@ -291,7 +291,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                   {videos.map((doc) => (
                     <Grid item={true} xs={columns}>
                       <CardMedia
-                        component="img"
+                        component="video"
                         height="150"
                         src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                       />
