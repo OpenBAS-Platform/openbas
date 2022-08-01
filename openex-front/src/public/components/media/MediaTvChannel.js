@@ -273,9 +273,8 @@ const MediaTvChannel = ({ mediaReader }) => {
             columns = 3;
           }
           return (
-            <Grid item={true} xs={4}>
+            <Grid key={article.article_id} item={true} xs={4}>
               <Card
-                key={article.article_id}
                 classes={{ root: classes.card }}
                 sx={{ width: '100%', height: '100%' }}
               >

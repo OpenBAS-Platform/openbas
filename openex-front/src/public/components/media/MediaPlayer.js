@@ -9,11 +9,11 @@ import { useQueryParameter } from '../../../utils/Environment';
 import MediaNewspaper from './MediaNewspaper';
 import MediaMicroblogging from './MediaMicroblogging';
 import MediaTvChannel from './MediaTvChannel';
-import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
 import { fetchMediaDocuments } from '../../../actions/Document';
+import Loader from '../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -66,26 +66,7 @@ const Media = () => {
       </div>
     );
   }
-  return (
-    <div className={classes.root}>
-      {permissions.isLoggedIn && permissions.canRead && (
-        <Button
-          color="secondary"
-          variant="outlined"
-          component={Link}
-          to={`/medias/${exerciseId}/${mediaId}?article=${articleId}&user=${userId}&preview=true`}
-          style={{ position: 'fixed', top: 10, right: 10 }}
-        >
-          {t('Switch to preview mode')}
-        </Button>
-      )}
-      <Empty
-        message={t(
-          'You are not a player in this exercise or you are not logged in.',
-        )}
-      />
-    </div>
-  );
+  return <Loader />;
 };
 
 export default Media;
