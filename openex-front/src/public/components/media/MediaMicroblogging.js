@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { makeStyles, useTheme } from '@mui/styles';
-import * as R from 'ramda';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import Avatar from '@mui/material/Avatar';
-import { useDispatch } from 'react-redux';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import {
@@ -16,9 +14,9 @@ import {
   ShareOutlined,
 } from '@mui/icons-material';
 import { useFormatter } from '../../../components/i18n';
-import { fetchMediaDocuments } from '../../../actions/Document';
 import { useHelper } from '../../../store';
 import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+import { useQueryParameter } from '../../../utils/Environment';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -41,10 +39,10 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const MediaMicroblogging = ({ mediaReader, preview }) => {
+const MediaMicroblogging = ({ mediaReader }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const dispatch = useDispatch();
+  const [userId] = useQueryParameter(['user']);
   const { t, fldt } = useFormatter();
   const isDark = theme.palette.mode === 'dark';
   const {
@@ -55,13 +53,8 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
   const { documentsMap } = useHelper((helper) => ({
     documentsMap: helper.getDocumentsMap(),
   }));
-  useEffect(() => {
-    dispatch(fetchMediaDocuments(exercise.exercise_id));
-  }, []);
   const logo = isDark ? media.media_logo_dark : media.media_logo_light;
-  const filteredArticles = preview
-    ? R.filter((n) => n.article_is_scheduled === true, articles)
-    : R.filter((n) => n.article_is_scheduled !== true, articles);
+  const queryParams = userId && userId.length > 0 && userId !== 'null' ? `?userId=${userId}` : '';
   return (
     <div className={classes.container}>
       {logo && media.media_mode !== 'title' && (
@@ -69,7 +62,7 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/exercises/${exercise.exercise_id}/documents/${logo}/media_file`}
+            src={`/api/player/${exercise.exercise_id}/documents/${logo}/media_file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -96,7 +89,7 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
       >
         {media.media_description}
       </Typography>
-      {filteredArticles.map((article) => {
+      {articles.map((article) => {
         const docs = article.article_documents
           .map((d) => (documentsMap[d.document_id]
             ? documentsMap[d.document_id]
@@ -142,14 +135,14 @@ const MediaMicroblogging = ({ mediaReader, preview }) => {
                       <CardMedia
                         component="img"
                         height="150"
-                        src={`/api/documents/${doc.document_id}/file`}
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                       />
                     )}
                     {doc.document_type.includes('video/') && (
                       <CardMedia
                         component="video"
                         height="150"
-                        src={`/api/documents/${doc.document_id}/file`}
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
                         controls={true}
                       />
                     )}

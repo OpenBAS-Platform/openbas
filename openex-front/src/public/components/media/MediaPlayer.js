@@ -13,6 +13,7 @@ import Empty from '../../../components/Empty';
 import { useFormatter } from '../../../components/i18n';
 import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
+import { fetchMediaDocuments } from '../../../actions/Document';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -37,6 +38,7 @@ const Media = () => {
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchPlayerMedia(exerciseId, mediaId, userId));
+    dispatch(fetchMediaDocuments(exerciseId, userId));
   }, []);
   if (media) {
     return (
@@ -53,25 +55,13 @@ const Media = () => {
           </Button>
         )}
         {media.media_type === 'newspaper' && (
-          <MediaNewspaper
-            mediaReader={mediaReader}
-            articleId={articleId}
-            preview={false}
-          />
+          <MediaNewspaper mediaReader={mediaReader} />
         )}
         {media.media_type === 'microblogging' && (
-          <MediaMicroblogging
-            mediaReader={mediaReader}
-            articleId={articleId}
-            preview={false}
-          />
+          <MediaMicroblogging mediaReader={mediaReader} />
         )}
         {media.media_type === 'tv' && (
-          <MediaTvChannel
-            mediaReader={mediaReader}
-            articleId={articleId}
-            preview={false}
-          />
+          <MediaTvChannel mediaReader={mediaReader} />
         )}
       </div>
     );

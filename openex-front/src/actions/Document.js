@@ -26,7 +26,9 @@ export const deleteDocument = (documentId) => (dispatch) => {
   return delReferential(uri, 'documents', documentId)(dispatch);
 };
 
-export const fetchMediaDocuments = (exerciseId) => (dispatch) => getReferential(
+export const fetchMediaDocuments = (exerciseId, userId = null) => (dispatch) => getReferential(
   schema.arrayOfDocuments,
-  `/api/exercises/${exerciseId}/media_documents`,
+  `/api/player/${exerciseId}/media_documents${
+    userId ? `?userId=${userId}` : ''
+  }`,
 )(dispatch);
