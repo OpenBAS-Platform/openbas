@@ -88,7 +88,7 @@ public class EmailContent {
     }
 
     public String getExpectationType() {
-        return expectationType;
+        return expectationType != null ? expectationType : "none";
     }
 
     public void setExpectationType(String expectationType) {

@@ -80,7 +80,9 @@ public class EmailExecutor extends Injector {
         }
         // If a doc upload is required, add the doc uri variable
         if (content.getExpectationType().equals("document")) {
-            users = users.stream().peek(context -> context.put("document_uri", buildDocumentUri(context, inject))).toList();
+            users = users.stream().peek(context ->
+                    context.put("document_uri", buildDocumentUri(context, inject)))
+                    .toList();
         }
         Exercise exercise = injection.getSource().getExercise();
         String replyTo = exercise.getReplyTo();
