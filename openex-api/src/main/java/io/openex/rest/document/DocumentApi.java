@@ -1,10 +1,7 @@
 package io.openex.rest.document;
 
 import io.openex.database.model.*;
-import io.openex.database.repository.DocumentRepository;
-import io.openex.database.repository.ExerciseRepository;
-import io.openex.database.repository.InjectDocumentRepository;
-import io.openex.database.repository.TagRepository;
+import io.openex.database.repository.*;
 import io.openex.rest.document.form.DocumentCreateInput;
 import io.openex.rest.document.form.DocumentTagUpdateInput;
 import io.openex.rest.document.form.DocumentUpdateInput;
@@ -43,10 +40,16 @@ public class DocumentApi extends RestBehavior {
     private ExerciseRepository exerciseRepository;
     private InjectService injectService;
     private InjectDocumentRepository injectDocumentRepository;
+    private ArticleDocumentRepository articleDocumentRepository;
 
     @Autowired
     public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
         this.injectDocumentRepository = injectDocumentRepository;
+    }
+
+    @Autowired
+    public void setArticleDocumentRepository(ArticleDocumentRepository articleDocumentRepository) {
+        this.articleDocumentRepository = articleDocumentRepository;
     }
 
     @Autowired
@@ -228,10 +231,16 @@ public class DocumentApi extends RestBehavior {
 
     @Transactional(rollbackOn = Exception.class)
     @DeleteMapping("/api/documents/{documentId}")
-    public void deleteDocument(@PathVariable String documentId) throws Exception {
-        Document document = resolveDocument(documentId).orElseThrow();
-        fileService.deleteFile(document.getTarget());
-        injectDocumentRepository.deleteAll(document.getDocuments());
-        documentRepository.delete(document);
+    public void deleteDocument(@PathVariable String documentId) {
+        injectDocumentRepository.deleteDocumentFromAllReferences(documentId);
+        articleDocumentRepository.deleteDocumentFromAllReferences(documentId);
+        List<Document> documents = documentRepository.removeById(documentId);
+        documents.forEach(document -> {
+            try {
+                fileService.deleteFile(document.getTarget());
+            } catch (Exception e) {
+                // Fail no longer available in the storage.
+            }
+        });
     }
 }

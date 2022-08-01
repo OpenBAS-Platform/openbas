@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.Instant;
 import java.util.*;
@@ -221,9 +222,11 @@ public class MediaApi extends RestBehavior {
         return enrichArticleWithVirtualPublication(exercise, exercise.getArticles());
     }
 
+    @Transactional(rollbackOn = Exception.class)
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     @DeleteMapping("/api/exercises/{exerciseId}/articles/{articleId}")
     public void deleteArticle(@PathVariable String articleId) {
+        articleDocumentRepository.deleteDocumentsFromArticle(articleId);
         articleRepository.deleteById(articleId);
     }
     // endregion

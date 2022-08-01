@@ -62,6 +62,7 @@ public class Comcheck implements Base {
     @JsonProperty("comcheck_exercise")
     private Exercise exercise;
 
+    // CascadeType.ALL is required here because comcheck statuses are embedded
     @OneToMany(mappedBy = "comcheck", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonSerialize(using = MultiModelDeserializer.class)
     @JsonProperty("comcheck_statuses")

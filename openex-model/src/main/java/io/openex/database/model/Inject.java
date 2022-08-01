@@ -108,6 +108,7 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_user")
     private User user;
 
+    // CascadeType.ALL is required here because inject status are embedded
     @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonProperty("inject_status")
     private InjectStatus status;
@@ -130,16 +131,19 @@ public class Inject implements Base, Injection {
     @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
 
+    // CascadeType.ALL is required here because of complex relationships
     @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("inject_documents")
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectDocument> documents = new ArrayList<>();
 
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER)
+    // CascadeType.ALL is required here because communications are embedded
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("inject_communications")
     @Fetch(FetchMode.SUBSELECT)
     private List<Communication> communications = new ArrayList<>();
 
+    // CascadeType.ALL is required here because expectations are embedded
     @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("inject_expectations")
     @Fetch(FetchMode.SUBSELECT)

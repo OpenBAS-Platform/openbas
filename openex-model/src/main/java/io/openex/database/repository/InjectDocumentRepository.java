@@ -1,7 +1,7 @@
 package io.openex.database.repository;
 
 import io.openex.database.model.InjectDocument;
-import javax.validation.constraints.NotNull;
+import io.openex.database.model.InjectDocumentId;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,13 +9,22 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @Repository
-public interface InjectDocumentRepository extends CrudRepository<InjectDocument, String>, JpaSpecificationExecutor<InjectDocument> {
+public interface InjectDocumentRepository extends CrudRepository<InjectDocument, InjectDocumentId>, JpaSpecificationExecutor<InjectDocument> {
 
     @NotNull
-    Optional<InjectDocument> findById(@NotNull String id);
+    Optional<InjectDocument> findById(@NotNull InjectDocumentId id);
+
+    @Modifying
+    @Query(value = "delete from injects_documents i where i.document_id = :documentId", nativeQuery = true)
+    void deleteDocumentFromAllReferences(@Param("documentId") String docId);
+
+    @Modifying
+    @Query(value = "delete from injects_documents i where i.inject_id = :injectId", nativeQuery = true)
+    void deleteDocumentsFromInject(@Param("injectId") String injectId);
 
     @Modifying
     @Query(value = "insert into injects_documents (inject_id, document_id, document_attached) " +

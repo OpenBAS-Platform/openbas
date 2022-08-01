@@ -55,6 +55,7 @@ public class Challenge implements Base {
     @JsonProperty("challenge_max_attempts")
     private Integer maxAttempts;
 
+    // CascadeType.ALL is required here because Flags are embedded
     @OneToMany(mappedBy = "challenge", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonProperty("challenge_flags")
     @Fetch(FetchMode.SUBSELECT)

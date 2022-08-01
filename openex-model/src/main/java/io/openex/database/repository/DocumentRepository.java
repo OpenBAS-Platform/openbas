@@ -17,6 +17,7 @@ public interface DocumentRepository extends CrudRepository<Document, String>, Jp
 
     @NotNull
     Optional<Document> findById(@NotNull String id);
+    List<Document> removeById(@NotNull String id);
 
     @NotNull
     Optional<Document> findByTarget(@NotNull String target);

@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "injects_documents")
-public class InjectDocument implements Base {
+public class InjectDocument {
 
     @EmbeddedId
     @JsonIgnore
@@ -66,8 +67,15 @@ public class InjectDocument implements Base {
     }
 
     @Override
-    @JsonIgnore
-    public String getId() {
-        return compositeId.getDocumentId() + "|" + compositeId.getInjectId();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InjectDocument that = (InjectDocument) o;
+        return compositeId.equals(that.compositeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(compositeId);
     }
 }

@@ -232,9 +232,11 @@ public class InjectApi extends RestBehavior {
         return InjectStatus.fromExecution(execution, inject);
     }
 
+    @Transactional(rollbackOn = Exception.class)
     @DeleteMapping("/api/exercises/{exerciseId}/injects/{injectId}")
     @PreAuthorize("isExercisePlanner(#exerciseId)")
     public void deleteInject(@PathVariable String exerciseId, @PathVariable String injectId) {
+        injectDocumentRepository.deleteDocumentsFromInject(injectId);
         injectRepository.deleteById(injectId);
     }
 

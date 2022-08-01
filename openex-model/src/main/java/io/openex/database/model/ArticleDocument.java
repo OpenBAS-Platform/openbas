@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.helper.MonoModelDeserializer;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "articles_documents")
-public class ArticleDocument implements Base {
+public class ArticleDocument {
 
     @EmbeddedId
     @JsonIgnore
@@ -54,8 +55,15 @@ public class ArticleDocument implements Base {
     }
 
     @Override
-    @JsonIgnore
-    public String getId() {
-        return compositeId.getDocumentId() + "|" + compositeId.getArticleId();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ArticleDocument that = (ArticleDocument) o;
+        return compositeId.equals(that.compositeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(compositeId);
     }
 }

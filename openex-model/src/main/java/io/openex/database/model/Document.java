@@ -1,5 +1,6 @@
 package io.openex.database.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
@@ -62,9 +63,14 @@ public class Document implements Base {
     private List<Exercise> exercises = new ArrayList<>();
 
     @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
-    @JsonProperty("inject_documents")
+    @JsonIgnore
     @Fetch(FetchMode.SUBSELECT)
-    private List<InjectDocument> documents = new ArrayList<>();
+    private List<InjectDocument> injectDocuments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
+    @JsonIgnore
+    @Fetch(FetchMode.SUBSELECT)
+    private List<ArticleDocument> articleDocuments = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -122,12 +128,20 @@ public class Document implements Base {
         this.exercises = exercises;
     }
 
-    public List<InjectDocument> getDocuments() {
-        return documents;
+    public List<InjectDocument> getInjectDocuments() {
+        return injectDocuments;
     }
 
-    public void setDocuments(List<InjectDocument> documents) {
-        this.documents = documents;
+    public void setInjectDocuments(List<InjectDocument> injectDocuments) {
+        this.injectDocuments = injectDocuments;
+    }
+
+    public List<ArticleDocument> getArticleDocuments() {
+        return articleDocuments;
+    }
+
+    public void setArticleDocuments(List<ArticleDocument> articleDocuments) {
+        this.articleDocuments = articleDocuments;
     }
 
     @Override
