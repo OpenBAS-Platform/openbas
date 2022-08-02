@@ -131,7 +131,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                 {firstArticleVideos.map((doc) => (
                   <Grid item={true} xs={firstArticleColumns}>
                     <CardMedia
-                      component="img"
+                      component="video"
                       height="200"
                       src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                     />
@@ -209,7 +209,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                     {videos.map((doc) => (
                       <Grid item={true} xs={columns}>
                         <CardMedia
-                          component="img"
+                          component="video"
                           height="100"
                           src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                         />
