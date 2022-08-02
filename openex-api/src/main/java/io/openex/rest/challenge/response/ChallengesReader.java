@@ -16,7 +16,7 @@ public class ChallengesReader {
     private Exercise exercise;
 
     @JsonProperty("exercise_challenges")
-    private List<Challenge> exerciseChallenges = new ArrayList<>();
+    private List<ChallengeInformation> exerciseChallenges = new ArrayList<>();
 
     public ChallengesReader(Exercise exercise) {
         this.id = exercise.getId();
@@ -39,11 +39,11 @@ public class ChallengesReader {
         this.exercise = exercise;
     }
 
-    public List<Challenge> getExerciseChallenges() {
+    public List<ChallengeInformation> getExerciseChallenges() {
         return exerciseChallenges;
     }
 
-    public void setExerciseChallenges(List<Challenge> exerciseChallenges) {
+    public void setExerciseChallenges(List<ChallengeInformation> exerciseChallenges) {
         this.exerciseChallenges = exerciseChallenges;
     }
 }

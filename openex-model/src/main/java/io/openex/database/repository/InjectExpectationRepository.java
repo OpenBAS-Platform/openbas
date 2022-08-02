@@ -21,6 +21,17 @@ public interface InjectExpectationRepository extends CrudRepository<InjectExpect
     @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId")
     List<InjectExpectation> findAllForExercise(@Param("exerciseId") String exerciseId);
 
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
+            "and i.type = 'CHALLENGE' and i.audience.id IN (:audienceIds)")
+    List<InjectExpectation> findChallengeExpectations(@Param("exerciseId") String exerciseId,
+                                                     @Param("audienceIds") List<String> audienceIds);
+
+    @Query(value = "select i from InjectExpectation i where i.exercise.id = :exerciseId " +
+            "and i.challenge.id = :challengeId and i.audience.id IN (:audienceIds)")
+    List<InjectExpectation> findChallengeExpectations(@Param("exerciseId") String exerciseId,
+                                               @Param("audienceIds") List<String> audienceIds,
+                                               @Param("challengeId") String challengeId);
+
     @Modifying
     @Query(value = "delete from InjectExpectation i where i.exercise.id = :exerciseId")
     void deleteAllForExercise(@Param("exerciseId") String exerciseId);
