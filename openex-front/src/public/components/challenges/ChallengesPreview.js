@@ -66,10 +66,10 @@ const ChallengesPreview = () => {
             color="secondary"
             variant="outlined"
             component={Link}
-            to={`/challenges/${exerciseId}?challenge=${challengeId}&user=${userId}&preview=true`}
+            to={`/challenges/${exerciseId}?challenge=${challengeId}&user=${userId}&preview=false`}
             style={{ position: 'absolute', top: 20, right: 20 }}
           >
-            {t('Switch to preview mode')}
+            {t('Switch to player mode')}
           </Button>
         )}
         <div className={classes.container}>

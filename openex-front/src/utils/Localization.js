@@ -26,6 +26,8 @@ const i18n = {
       Timeline: 'Chronologie',
       Definition: 'Définition',
       Medias: 'Médias',
+      'Switch to preview mode': 'Basculer en mode aperçu',
+      'Switch to player mode': 'Basculer en mode joueur',
       'Create a new media': 'Créer un nouveau média',
       'Update the media': 'Modifier le média',
       'Recent exercises': 'Exercices récents',
