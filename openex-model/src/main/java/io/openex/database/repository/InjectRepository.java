@@ -22,6 +22,10 @@ public interface InjectRepository extends CrudRepository<Inject, String>, JpaSpe
     @Query(value = "select i from Inject i where i.exercise.id = :exerciseId")
     List<Inject> findAllForExercise(@Param("exerciseId") String exerciseId);
 
+    @Query(value = "select i.* from injects i where i.inject_type = 'openex_challenge'" +
+            " and i.inject_content like :challengeId", nativeQuery = true)
+    List<Inject> findAllForChallengeId(@Param("challengeId") String challengeId);
+
     @Query(value = "select i from Inject i " +
             "join i.documents as doc_rel " +
             "join doc_rel.document as doc " +

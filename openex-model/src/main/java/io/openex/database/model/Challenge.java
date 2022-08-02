@@ -77,8 +77,19 @@ public class Challenge implements Base {
     private List<Document> documents = new ArrayList<>();
 
     @Transient
-    @JsonProperty("challenge_exercises")
-    private List<String> exercises;
+    private List<String> exerciseIds;
+
+    @Transient
+    private Instant virtualPublication;
+
+    @JsonProperty("challenge_virtual_publication")
+    public Instant getVirtualPublication() {
+        return virtualPublication;
+    }
+
+    public void setVirtualPublication(Instant virtualPublication) {
+        this.virtualPublication = virtualPublication;
+    }
 
     @Override
     public String getId() {
@@ -169,12 +180,13 @@ public class Challenge implements Base {
         this.documents = documents;
     }
 
-    public List<String> getExercises() {
-        return exercises;
+    @JsonProperty("challenge_exercises")
+    public List<String> getExerciseIds() {
+        return exerciseIds;
     }
 
-    public void setExercises(List<String> exercises) {
-        this.exercises = exercises;
+    public void setExerciseIds(List<String> exerciseIds) {
+        this.exerciseIds = exerciseIds;
     }
 
     @Override

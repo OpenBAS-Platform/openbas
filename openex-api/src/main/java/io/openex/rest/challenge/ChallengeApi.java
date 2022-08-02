@@ -5,12 +5,14 @@ import io.openex.database.model.Challenge;
 import io.openex.database.model.ChallengeFlag;
 import io.openex.database.model.ChallengeFlag.FLAG_TYPE;
 import io.openex.database.model.Exercise;
+import io.openex.database.model.Inject;
 import io.openex.database.repository.*;
 import io.openex.injects.challenge.model.ChallengeContent;
 import io.openex.rest.challenge.form.ChallengeCreateInput;
 import io.openex.rest.challenge.form.ChallengeUpdateInput;
 import io.openex.rest.challenge.response.ChallengesReader;
 import io.openex.rest.helper.RestBehavior;
+import io.openex.rest.media.model.VirtualArticle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +21,11 @@ import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
@@ -34,6 +40,12 @@ public class ChallengeApi extends RestBehavior {
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
     private ExerciseRepository exerciseRepository;
+    private InjectRepository injectRepository;
+
+    @Autowired
+    public void setInjectRepository(InjectRepository injectRepository) {
+        this.injectRepository = injectRepository;
+    }
 
     @Autowired
     public void setChallengeFlagRepository(ChallengeFlagRepository challengeFlagRepository) {
@@ -60,9 +72,18 @@ public class ChallengeApi extends RestBehavior {
         this.exerciseRepository = exerciseRepository;
     }
 
+    private Challenge enrichChallengeWithExercises(Challenge challenge) {
+        List<Inject> injects = fromIterable(injectRepository
+                .findAllForChallengeId("%" + challenge.getId() + "%"));
+        List<String> exerciseIds = injects.stream().map(i -> i.getExercise().getId()).distinct().toList();
+        challenge.setExerciseIds(exerciseIds);
+        return challenge;
+    }
+
     @GetMapping("/api/challenges")
     public Iterable<Challenge> challenges() {
-        return challengeRepository.findAll();
+        return fromIterable(challengeRepository.findAll()).stream()
+                .map(this::enrichChallengeWithExercises).toList();
     }
 
     @PreAuthorize("isPlanner()")
@@ -87,7 +108,8 @@ public class ChallengeApi extends RestBehavior {
             challengeFlag.setChallenge(challenge);
             challengeFlags.add(challengeFlag);
         });
-        return challengeRepository.save(challenge);
+        Challenge saveChallenge = challengeRepository.save(challenge);
+        return enrichChallengeWithExercises(saveChallenge);
     }
 
     @PreAuthorize("isPlanner()")
@@ -115,6 +137,7 @@ public class ChallengeApi extends RestBehavior {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         List<String> challenges = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
+                .filter(inject -> inject.getContent() != null)
                 .flatMap(inject -> {
                     try {
                         ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
@@ -124,50 +147,51 @@ public class ChallengeApi extends RestBehavior {
                     }
                 })
                 .distinct().toList();
-        return challengeRepository.findAllById(challenges);
+        return fromIterable(challengeRepository.findAllById(challenges)).stream()
+                .map(this::enrichChallengeWithExercises).toList();
     }
 
     @GetMapping("/api/player/challenges/{exerciseId}")
     public ChallengesReader playerChallenges(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        List<String> challengesIds = exercise.getInjects().stream()
+        ChallengesReader reader = new ChallengesReader(exercise);
+        Map<String, Instant> toPublishChallengeIdsMap = exercise.getInjects().stream()
                 .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
+                .filter(inject -> inject.getStatus().isPresent())
+                .sorted(Comparator.comparing(inject -> inject.getStatus().get().getDate()))
                 .flatMap(inject -> {
+                    Instant virtualInjectDate = inject.getStatus().get().getDate();
                     try {
                         ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
                         if (content.getChallenges() != null) {
-                            return content.getChallenges().stream();
+                            return content.getChallenges().stream().map(
+                                    challenge -> new VirtualArticle(virtualInjectDate, challenge));
                         }
-                        return Stream.empty();
+                        return null;
                     } catch (JsonProcessingException e) {
-                        return Stream.empty();
+                        // Invalid media content.
+                        return null;
                     }
                 })
-                .distinct().toList();
-        ChallengesReader challengesReader = new ChallengesReader(exercise);
-        challengesReader.setExerciseChallenges(fromIterable(challengeRepository.findAllById(challengesIds)));
-        return challengesReader;
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toMap(VirtualArticle::id, VirtualArticle::date));
+        if (toPublishChallengeIdsMap.size() > 0) {
+            List<Challenge> publishedChallenges = fromIterable(challengeRepository.findAllById(toPublishChallengeIdsMap.keySet())).stream()
+                    .peek(challenge -> challenge.setVirtualPublication(toPublishChallengeIdsMap.get(challenge.getId())))
+                    .sorted(Comparator.comparing(Challenge::getVirtualPublication).reversed())
+                    .toList();
+            reader.setExerciseChallenges(publishedChallenges);
+        }
+        return reader;
     }
 
     @GetMapping("/api/observer/challenges/{exerciseId}")
     public ChallengesReader observerChallenges(@PathVariable String exerciseId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
-        List<String> challengesIds = exercise.getInjects().stream()
-                .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
-                .flatMap(inject -> {
-                    try {
-                        ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-                        if (content.getChallenges() != null) {
-                            return content.getChallenges().stream();
-                        }
-                        return Stream.empty();
-                    } catch (JsonProcessingException e) {
-                        return Stream.empty();
-                    }
-                })
-                .distinct().toList();
         ChallengesReader challengesReader = new ChallengesReader(exercise);
-        challengesReader.setExerciseChallenges(fromIterable(challengeRepository.findAllById(challengesIds)));
+        Iterable<Challenge> challenges = exerciseChallenges(exerciseId);
+        challengesReader.setExerciseChallenges(fromIterable(challenges));
         return challengesReader;
     }
 
@@ -176,5 +200,4 @@ public class ChallengeApi extends RestBehavior {
     public void deleteChallenge(@PathVariable String challengeId) {
         challengeRepository.deleteById(challengeId);
     }
-
 }
