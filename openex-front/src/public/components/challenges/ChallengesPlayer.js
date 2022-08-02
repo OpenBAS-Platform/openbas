@@ -1,10 +1,43 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import { Link, useParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { fetchPlayerChallenges } from '../../../actions/Challenge';
+import * as R from 'ramda';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Avatar from '@mui/material/Avatar';
+import {
+  ArrowDropDownOutlined,
+  ArrowDropUpOutlined,
+  AttachmentOutlined,
+  CrisisAlertOutlined,
+  DescriptionOutlined,
+  EmojiEventsOutlined,
+  OutlinedFlagOutlined,
+  SportsScoreOutlined,
+  PendingActionsOutlined,
+} from '@mui/icons-material';
+import CardContent from '@mui/material/CardContent';
+import CardActionArea from '@mui/material/CardActionArea';
+import Tooltip from '@mui/material/Tooltip';
+import Chip from '@mui/material/Chip';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import Alert from '@mui/material/Alert';
+import Slide from '@mui/material/Slide';
+import List from '@mui/material/List';
+import IconButton from '@mui/material/IconButton';
+import { ListItem, ListItemIcon } from '@mui/material';
+import ListItemText from '@mui/material/ListItemText';
+import {
+  validateChallenge,
+  fetchPlayerChallenges,
+} from '../../../actions/Challenge';
 import { useHelper } from '../../../store';
 import { useQueryParameter } from '../../../utils/Environment';
 import { useFormatter } from '../../../components/i18n';
@@ -14,8 +47,17 @@ import { fetchPlayerDocuments } from '../../../actions/Document';
 import Loader from '../../../components/Loader';
 import Empty from '../../../components/Empty';
 import logo from '../../../resources/images/logo.png';
+import ExpandableMarkdown from '../../../components/ExpandableMarkdown';
+import DocumentType from '../../../admin/components/documents/DocumentType';
+import ItemTags from '../../../components/ItemTags';
+import { TextField } from '../../../components/TextField';
 
-const useStyles = makeStyles(() => ({
+const Transition = React.forwardRef((props, ref) => (
+  <Slide direction="up" ref={ref} {...props} />
+));
+Transition.displayName = 'TransitionSlide';
+
+const useStyles = makeStyles((theme) => ({
   root: {
     position: 'relative',
     flexGrow: 1,
@@ -27,7 +69,13 @@ const useStyles = makeStyles(() => ({
   },
   container: {
     margin: '0 auto',
-    width: 1200,
+    width: '90%',
+  },
+  flag: {
+    fontSize: 12,
+    float: 'left',
+    marginRight: 7,
+    maxWidth: 300,
   },
   card: {
     position: 'relative',
@@ -39,26 +87,169 @@ const useStyles = makeStyles(() => ({
     left: 0,
     bottom: 10,
   },
+  button: {
+    cursor: 'default',
+  },
+  itemHead: {
+    paddingLeft: 10,
+    textTransform: 'uppercase',
+    cursor: 'pointer',
+  },
+  item: {
+    paddingLeft: 10,
+    height: 50,
+  },
+  bodyItem: {
+    height: '100%',
+    fontSize: 13,
+  },
+  itemIcon: {
+    color: theme.palette.primary.main,
+  },
 }));
 
-const ChallengesPlayer = () => {
+const inlineStylesHeaders = {
+  iconSort: {
+    position: 'absolute',
+    margin: '0 0 0 5px',
+    padding: 0,
+    top: '0px',
+  },
+  document_name: {
+    float: 'left',
+    width: '35%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_type: {
+    float: 'left',
+    width: '20%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  document_tags: {
+    float: 'left',
+    width: '30%',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+};
+
+const inlineStyles = {
+  document_name: {
+    float: 'left',
+    width: '35%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_type: {
+    float: 'left',
+    width: '20%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  document_tags: {
+    float: 'left',
+    width: '30%',
+    height: 20,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+};
+
+const ChallengePlayer = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
+  const [currentChallengeEntry, setCurrentChallengeEntry] = useState(null);
+  const [currentResult, setCurrentResult] = useState(null);
   const [userId, challengeId] = useQueryParameter(['user', 'challenge']);
+  const [documentsSortBy, setDocumentsSortBy] = useState('document_name');
+  const [documentsOrderAsc, setDocumentsOrderAsc] = useState(true);
   const { exerciseId } = useParams();
-  const { challengesReader } = useHelper((helper) => ({
+  const { challengesReader, documentsMap } = useHelper((helper) => ({
     challengesReader: helper.getChallengesReader(exerciseId),
+    documentsMap: helper.getDocumentsMap(),
   }));
   const { exercise_information: exercise, exercise_challenges: challenges } = challengesReader ?? {};
+  const {
+    challenge_detail: currentChallenge,
+    challenge_expectation: currentExpectation,
+  } = currentChallengeEntry ?? {};
   // Pass the full exercise because the exercise is never loaded in the store at this point
   const permissions = usePermissions(exerciseId, exercise);
+  const handleClose = () => {
+    setCurrentChallengeEntry(null);
+    setCurrentResult(null);
+  };
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchPlayerChallenges(exerciseId, userId));
     dispatch(fetchPlayerDocuments(exerciseId, userId));
   }, []);
+  const documentsReverseBy = (field) => {
+    setDocumentsSortBy(field);
+    setDocumentsOrderAsc(!documentsSortBy);
+  };
+  const documentsSortHeader = (field, label, isSortable) => {
+    const sortComponent = documentsOrderAsc ? (
+      <ArrowDropDownOutlined style={inlineStylesHeaders.iconSort} />
+    ) : (
+      <ArrowDropUpOutlined style={inlineStylesHeaders.iconSort} />
+    );
+    if (isSortable) {
+      return (
+        <div
+          style={inlineStylesHeaders[field]}
+          onClick={() => documentsReverseBy(field)}
+        >
+          <span>{t(label)}</span>
+          {documentsSortBy === field ? sortComponent : ''}
+        </div>
+      );
+    }
+    return (
+      <div style={inlineStylesHeaders[field]}>
+        <span>{t(label)}</span>
+      </div>
+    );
+  };
+  const validate = (values) => {
+    const errors = {};
+    const requiredFields = ['challenge_value'];
+    requiredFields.forEach((field) => {
+      if (!values[field]) {
+        errors[field] = t('This field is required.');
+      }
+    });
+    return errors;
+  };
+  const submit = (cid, data) => {
+    return dispatch(validateChallenge(exerciseId, cid, userId, data)).then(
+      (result) => {
+        const challengeEntries = result.entities?.challengesreaders[result.result]
+          .exercise_challenges || [];
+        setCurrentChallengeEntry(
+          R.head(
+            challengeEntries.filter(
+              (n) => n.challenge_detail.challenge_id === cid,
+            ),
+          ),
+        );
+        setCurrentResult('submitted');
+      },
+    );
+  };
   if (exercise) {
+    const groupChallenges = R.groupBy(
+      R.path(['challenge_detail', 'challenge_category']),
+    );
+    const sortedChallenges = groupChallenges(challenges);
     return (
       <div className={classes.root}>
         {permissions.isLoggedIn && permissions.canRead && (
@@ -91,18 +282,287 @@ const ChallengesPlayer = () => {
               textAlign: 'center',
             }}
           >
-            {exercise.exercise_description}
+            {exercise.exercise_subtitle}
           </Typography>
           {challenges.length === 0 && (
             <div style={{ marginTop: 150 }}>
               <Empty message={t('No challenge in this exercise yet.')} />
             </div>
           )}
+          {Object.keys(sortedChallenges).map((category) => {
+            return (
+              <div key={category}>
+                <Typography variant="h1" style={{ margin: '40px 0 30px 0' }}>
+                  {category !== 'null' ? category : t('No category')}
+                </Typography>
+                <Grid container={true} spacing={3}>
+                  {sortedChallenges[category].map((challengeEntry) => {
+                    const challenge = challengeEntry.challenge_detail;
+                    const expectation = challengeEntry.challenge_expectation;
+                    return (
+                      <Grid key={challenge.challenge_id} item={true} xs={4}>
+                        <Card
+                          classes={{ root: classes.card }}
+                          sx={{ width: '100%', height: '100%' }}
+                        >
+                          <CardActionArea
+                            onClick={() => setCurrentChallengeEntry(challengeEntry)
+                            }
+                          >
+                            <CardHeader
+                              avatar={
+                                <Avatar sx={{ bgcolor: '#e91e63' }}>
+                                  <EmojiEventsOutlined />
+                                </Avatar>
+                              }
+                              title={challenge.challenge_name}
+                              subheader={challenge.challenge_category}
+                              action={
+                                <IconButton
+                                  size="large"
+                                  color={
+                                    expectation.inject_expectation_result
+                                      ? 'success'
+                                      : 'inherit'
+                                  }
+                                >
+                                  <PendingActionsOutlined fontSize="large" />
+                                </IconButton>
+                              }
+                            />
+                            <CardContent style={{ margin: '-20px 0 30px 0' }}>
+                              <ExpandableMarkdown
+                                source={challenge.challenge_content}
+                                limit={500}
+                                controlled={true}
+                              />
+                              <div className={classes.footer}>
+                                <div style={{ float: 'left' }}>
+                                  {challenge.challenge_flags.map((flag) => {
+                                    return (
+                                      <Tooltip
+                                        key={flag.flag_id}
+                                        title={t(flag.flag_type)}
+                                      >
+                                        <Chip
+                                          icon={<OutlinedFlagOutlined />}
+                                          classes={{ root: classes.flag }}
+                                          variant="outlined"
+                                          label={t(flag.flag_type)}
+                                        />
+                                      </Tooltip>
+                                    );
+                                  })}
+                                </div>
+                                <div style={{ float: 'right' }}>
+                                  <Button
+                                    size="small"
+                                    startIcon={<SportsScoreOutlined />}
+                                    className={classes.button}
+                                  >
+                                    {challenge.challenge_score || 0}
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    startIcon={<CrisisAlertOutlined />}
+                                    className={classes.button}
+                                  >
+                                    {challenge.challenge_max_attempts || 0}
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    startIcon={<DescriptionOutlined />}
+                                    className={classes.button}
+                                  >
+                                    {challenge.challenge_documents.length || 0}
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </div>
+            );
+          })}
         </div>
+        <Dialog
+          TransitionComponent={Transition}
+          open={currentChallengeEntry !== null}
+          onClose={handleClose}
+          fullWidth={true}
+          maxWidth="md"
+          PaperProps={{ elevation: 1 }}
+        >
+          <DialogTitle>{currentChallenge?.challenge_name}</DialogTitle>
+          <DialogContent>
+            <ExpandableMarkdown
+              source={currentChallenge?.challenge_content}
+              limit={5000}
+            />
+            {(currentChallenge?.challenge_documents || []).length > 0 && (
+              <div>
+                <Typography variant="h2" style={{ marginTop: 30 }}>
+                  {t('Documents')}
+                </Typography>
+                <List>
+                  <ListItem
+                    classes={{ root: classes.itemHead }}
+                    divider={false}
+                    style={{ paddingTop: 0 }}
+                  >
+                    <ListItemIcon>
+                      <span
+                        style={{
+                          padding: '0 8px 0 8px',
+                          fontWeight: 700,
+                          fontSize: 12,
+                        }}
+                      >
+                        &nbsp;
+                      </span>
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          {documentsSortHeader('document_name', 'Name', true)}
+                          {documentsSortHeader('document_type', 'Type', true)}
+                          {documentsSortHeader('document_tags', 'Tags', true)}
+                        </div>
+                      }
+                    />
+                  </ListItem>
+                  {(currentChallenge?.challenge_documents || []).map(
+                    (documentId) => {
+                      const document = documentsMap[documentId] || {};
+                      return (
+                        <ListItem
+                          key={document.document_id}
+                          classes={{ root: classes.item }}
+                          divider={true}
+                          button={true}
+                          component="a"
+                          href={`/api/documents/${document.document_id}/file`}
+                        >
+                          <ListItemIcon>
+                            <AttachmentOutlined />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_name}
+                                >
+                                  {document.document_name}
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_type}
+                                >
+                                  <DocumentType
+                                    type={document.document_type}
+                                    variant="list"
+                                  />
+                                </div>
+                                <div
+                                  className={classes.bodyItem}
+                                  style={inlineStyles.document_tags}
+                                >
+                                  <ItemTags
+                                    variant="list"
+                                    tags={document.document_tags}
+                                  />
+                                </div>
+                              </div>
+                            }
+                          />
+                        </ListItem>
+                      );
+                    },
+                  )}
+                </List>
+              </div>
+            )}
+            <Typography variant="h2" style={{ marginTop: 30 }}>
+              {t('Results')}
+            </Typography>
+            {(currentExpectation?.inject_expectation_result !== null
+              || currentResult !== null) && (
+              <div>
+                {currentExpectation?.inject_expectation_result !== null && (
+                  <Alert severity="success">
+                    {t('Flag is correct! It has been successfully submitted.')}
+                  </Alert>
+                )}
+                {currentExpectation?.inject_expectation_result === null
+                  && currentResult !== null && (
+                    <Alert
+                      severity="error"
+                      onClose={() => setCurrentResult(null)}
+                    >
+                      {t('Flag is not correct! Try again...')}
+                    </Alert>
+                )}
+                <div style={{ float: 'right', marginTop: 20 }}>
+                  <Button onClick={handleClose} style={{ marginRight: 10 }}>
+                    {t('Close')}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {currentExpectation?.inject_expectation_result === null
+              && currentResult === null && (
+                <Form
+                  keepDirtyOnReinitialize={true}
+                  onSubmit={(data) => submit(currentChallenge?.challenge_id, data)
+                  }
+                  validate={validate}
+                  mutators={{
+                    setValue: ([field, value], state, { changeValue }) => {
+                      changeValue(state, field, () => value);
+                    },
+                  }}
+                >
+                  {({ handleSubmit, submitting, errors }) => (
+                    <form id="challengeForm" onSubmit={handleSubmit}>
+                      <TextField
+                        variant="standard"
+                        name="challenge_value"
+                        fullWidth={true}
+                        label={t('Flag')}
+                      />
+                      <div style={{ float: 'right', marginTop: 20 }}>
+                        <Button
+                          onClick={handleClose}
+                          style={{ marginRight: 10 }}
+                          disabled={submitting}
+                        >
+                          {t('Cancel')}
+                        </Button>
+                        <Button
+                          color="secondary"
+                          type="submit"
+                          disabled={
+                            submitting || Object.keys(errors).length > 0
+                          }
+                        >
+                          {t('Submit')}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </Form>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
   return <Loader />;
 };
 
-export default ChallengesPlayer;
+export default ChallengePlayer;

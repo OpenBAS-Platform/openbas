@@ -9,6 +9,7 @@ import io.openex.rest.challenge.form.ChallengeCreateInput;
 import io.openex.rest.challenge.form.ChallengeTryInput;
 import io.openex.rest.challenge.form.ChallengeUpdateInput;
 import io.openex.rest.challenge.response.ChallengeInformation;
+import io.openex.rest.challenge.response.ChallengeResult;
 import io.openex.rest.challenge.response.ChallengesReader;
 import io.openex.rest.helper.RestBehavior;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,17 +213,17 @@ public class ChallengeApi extends RestBehavior {
     }
 
     @PostMapping("/api/challenges/{challengeId}/try")
-    public boolean tryChallenge(@PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input) {
+    public ChallengeResult tryChallenge(@PathVariable String challengeId, @Valid @RequestBody ChallengeTryInput input) {
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
         for (ChallengeFlag flag : challenge.getFlags()) {
             if (checkFlag(flag, input.getValue())) {
-                return true;
+                return new ChallengeResult(true);
             }
         }
-        return false;
+        return new ChallengeResult(false);
     }
 
-    @PostMapping("/api/challenges/{exerciseId}/{challengeId}/validate")
+    @PostMapping("/api/player/challenges/{exerciseId}/{challengeId}/validate")
     public ChallengesReader validateChallenge(@PathVariable String exerciseId,
                                               @PathVariable String challengeId,
                                               @Valid @RequestBody ChallengeTryInput input,
@@ -231,8 +232,8 @@ public class ChallengeApi extends RestBehavior {
         if (user.getId().equals(ANONYMOUS)) {
             throw new UnsupportedOperationException("User must be logged or dynamic player is required");
         }
-        boolean successChallenge = tryChallenge(challengeId, input);
-        if (successChallenge) {
+        ChallengeResult challengeResult = tryChallenge(challengeId, input);
+        if (challengeResult.getResult()) {
             List<String> audienceIds = user.getAudiences().stream().map(Audience::getId).toList();
             List<InjectExpectation> challengeExpectations = injectExpectationRepository.findChallengeExpectations(exerciseId, audienceIds, challengeId);
             challengeExpectations.forEach(injectExpectationExecution -> {

@@ -2,7 +2,7 @@ import React from 'react';
 import { makeStyles } from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -15,6 +15,7 @@ import {
   DescriptionOutlined,
   OutlinedFlagOutlined,
   EmojiEventsOutlined,
+  VisibilityOutlined,
 } from '@mui/icons-material';
 import Tooltip from '@mui/material/Tooltip';
 import Chip from '@mui/material/Chip';
@@ -95,6 +96,17 @@ const Challenges = () => {
             onRemoveTag={filtering.handleRemoveTag}
             currentTags={filtering.tags}
           />
+        </div>
+        <div style={{ float: 'right' }}>
+          <Button
+            startIcon={<VisibilityOutlined />}
+            color="secondary"
+            variant="outlined"
+            component={Link}
+            to={`/challenges/${exerciseId}?preview=true`}
+          >
+            {t('Preview challenges page')}
+          </Button>
         </div>
       </div>
       <div className="clearfix" />

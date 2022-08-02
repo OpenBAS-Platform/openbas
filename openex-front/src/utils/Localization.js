@@ -25,7 +25,14 @@ const i18n = {
       Mails: 'Mails',
       Timeline: 'Chronologie',
       Definition: 'Définition',
+      Results: 'Résultats',
       Medias: 'Médias',
+      Submit: 'Soumettre',
+      'Flag is correct! It has been successfully submitted.':
+        'Le flag est correct! Il a été soumis avec succès.',
+      'Flag is not correct! Try again...':
+        'Le flag est incorrect! Merci de rééssayer...',
+      'Preview challenges page': 'Aperçu des challenges',
       'Switch to preview mode': 'Basculer en mode aperçu',
       'Switch to player mode': 'Basculer en mode joueur',
       'Create a new media': 'Créer un nouveau média',

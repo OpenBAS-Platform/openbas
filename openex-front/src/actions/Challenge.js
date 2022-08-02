@@ -36,6 +36,14 @@ export const updateChallenge = (challengeId, data) => (dispatch) => {
 
 export const addChallenge = (data) => (dispatch) => postReferential(challenge, '/api/challenges', data)(dispatch);
 
+export const tryChallenge = (challengeId, data) => (dispatch) => postReferential(null, `/api/challenges/${challengeId}/try`, data)(dispatch);
+
+export const validateChallenge = (exerciseId, challengeId, userId, data) => (dispatch) => postReferential(
+  challengesReader,
+  `/api/player/challenges/${exerciseId}/${challengeId}/validate?userId=${userId}`,
+  data,
+)(dispatch);
+
 export const deleteChallenge = (mediaId) => (dispatch) => {
   const uri = `/api/challenges/${mediaId}`;
   return delReferential(uri, 'challenges', mediaId)(dispatch);

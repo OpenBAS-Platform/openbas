@@ -1,7 +1,9 @@
 package io.openex.rest.document;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openex.database.model.*;
 import io.openex.database.repository.*;
+import io.openex.injects.challenge.model.ChallengeContent;
 import io.openex.rest.document.form.DocumentCreateInput;
 import io.openex.rest.document.form.DocumentTagUpdateInput;
 import io.openex.rest.document.form.DocumentUpdateInput;
@@ -29,6 +31,7 @@ import java.util.stream.Stream;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.helper.UserHelper.ANONYMOUS;
 import static io.openex.helper.UserHelper.currentUser;
+import static io.openex.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 
 @RestController
@@ -41,6 +44,7 @@ public class DocumentApi extends RestBehavior {
     private InjectService injectService;
     private InjectDocumentRepository injectDocumentRepository;
     private ArticleDocumentRepository articleDocumentRepository;
+    private ChallengeRepository challengeRepository;
 
     @Autowired
     public void setInjectDocumentRepository(InjectDocumentRepository injectDocumentRepository) {
@@ -70,6 +74,11 @@ public class DocumentApi extends RestBehavior {
     @Autowired
     public void setDocumentRepository(DocumentRepository documentRepository) {
         this.documentRepository = documentRepository;
+    }
+
+    @Autowired
+    public void setChallengeRepository(ChallengeRepository challengeRepository) {
+        this.challengeRepository = challengeRepository;
     }
 
     @Autowired
@@ -188,18 +197,31 @@ public class DocumentApi extends RestBehavior {
         fileStream.transferTo(response.getOutputStream());
     }
 
-    private List<Document> getExerciseMediaDocuments(Exercise exercise) {
+    private List<Document> getExercisePlayerDocuments(Exercise exercise) {
         Stream<Document> mediasDocs = exercise.getArticles().stream()
                 .map(Article::getMedia)
                 .flatMap(media -> media.getLogos().stream());
         Stream<Document> articlesDocs = exercise.getArticles().stream()
                 .flatMap(article -> article.getDocuments().stream())
                 .map(ArticleDocument::getDocument);
-        return Stream.concat(mediasDocs, articlesDocs).distinct().toList();
+        List<String> challenges = exercise.getInjects().stream()
+                .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
+                .filter(inject -> inject.getContent() != null)
+                .flatMap(inject -> {
+                    try {
+                        ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
+                        return content.getChallenges().stream();
+                    } catch (JsonProcessingException e) {
+                        return Stream.empty();
+                    }
+                })
+                .toList();
+        Stream<Document> challengesDocs = fromIterable(challengeRepository.findAllById(challenges)).stream().flatMap(challenge -> challenge.getDocuments().stream());
+        return Stream.of(mediasDocs, articlesDocs, challengesDocs).flatMap(documentStream -> documentStream).distinct().toList();
     }
 
     @GetMapping("/api/player/{exerciseId}/documents")
-    public List<Document> mediaDocuments(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
+    public List<Document> playerDocuments(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         final User user = userId.map(this::impersonateUser).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
@@ -208,11 +230,11 @@ public class DocumentApi extends RestBehavior {
         if (!exercise.isUserHasAccess(user) && !exercise.getPlayers().contains(user)) {
             throw new UnsupportedOperationException("The given player is not in this exercise");
         }
-        return getExerciseMediaDocuments(exercise);
+        return getExercisePlayerDocuments(exercise);
     }
 
     @GetMapping("/api/player/{exerciseId}/documents/{documentId}/file")
-    public void downloadMediaDocument(@PathVariable String exerciseId, @PathVariable String documentId, @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
+    public void downloadPlayerDocument(@PathVariable String exerciseId, @PathVariable String documentId, @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         final User user = userId.map(this::impersonateUser).orElse(currentUser());
         if (user.getId().equals(ANONYMOUS)) {
@@ -221,7 +243,7 @@ public class DocumentApi extends RestBehavior {
         if (!exercise.isUserHasAccess(user) && !exercise.getPlayers().contains(user)) {
             throw new UnsupportedOperationException("The given player is not in this exercise");
         }
-        Document document = getExerciseMediaDocuments(exercise).stream().filter(doc -> doc.getId().equals(documentId)).findFirst().orElseThrow();
+        Document document = getExercisePlayerDocuments(exercise).stream().filter(doc -> doc.getId().equals(documentId)).findFirst().orElseThrow();
         response.addHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + document.getName());
         response.addHeader(HttpHeaders.CONTENT_TYPE, document.getType());
         response.setStatus(HttpServletResponse.SC_OK);

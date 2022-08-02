@@ -183,7 +183,6 @@ const ChallengeForm = (props) => {
       </div>
     );
   };
-
   const submitForm = (data) => {
     return onSubmit({ ...data, challenge_documents: documents });
   };
