@@ -102,7 +102,7 @@ const Challenges = () => {
         return (
           <div>
             <Typography variant="h1" style={{ margin: '30px 0 30px 0' }}>
-              {category || t('No category')}
+              {category !== 'null' ? category : t('No category')}
             </Typography>
             <Grid container={true} spacing={3}>
               {sortedChallenges[category].map((challenge) => {

@@ -279,7 +279,10 @@ const Challenges = () => {
                 }
               />
               <ListItemSecondaryAction>
-                <ChallengePopover challenge={challenge} documents={docs} />
+                <ChallengePopover
+                  challenge={challenge}
+                  documents={docs}
+                />
               </ListItemSecondaryAction>
             </ListItem>
           );

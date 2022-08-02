@@ -157,7 +157,7 @@ class AudiencePopover extends Component {
       tagsMap,
       disabled,
     } = this.props;
-    const audienceTags = tagsConverter(exercise.audience_tags, tagsMap);
+    const audienceTags = tagsConverter(audience.audience_tags, tagsMap);
     const initialValues = R.pipe(
       R.assoc('audience_tags', audienceTags),
       R.pick(['audience_name', 'audience_description', 'audience_tags']),
