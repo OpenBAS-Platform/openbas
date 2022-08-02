@@ -161,11 +161,10 @@ const Articles = () => {
           }
           // const shouldBeTruncated = (article.article_content || '').length > 500;
           return (
-            <Grid item={true} xs={4}>
+            <Grid key={article.article_id} item={true} xs={4}>
               <Card
                 classes={{ root: classes.card }}
                 sx={{ width: '100%', height: '100%' }}
-                key={article.article_id}
               >
                 <CardHeader
                   avatar={
@@ -212,7 +211,7 @@ const Articles = () => {
                 />
                 <Grid container={true} spacing={3}>
                   {headersDocs.map((doc) => (
-                    <Grid hey={doc.document_id} item={true} xs={columns}>
+                    <Grid key={doc.document_id} item={true} xs={columns}>
                       {doc.document_type.includes('image/') && (
                         <CardMedia
                           component="img"

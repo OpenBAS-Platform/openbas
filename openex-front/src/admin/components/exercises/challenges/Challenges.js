@@ -100,18 +100,17 @@ const Challenges = () => {
       <div className="clearfix" />
       {Object.keys(sortedChallenges).map((category) => {
         return (
-          <div>
+          <div key={category}>
             <Typography variant="h1" style={{ margin: '30px 0 30px 0' }}>
               {category !== 'null' ? category : t('No category')}
             </Typography>
             <Grid container={true} spacing={3}>
               {sortedChallenges[category].map((challenge) => {
                 return (
-                  <Grid item={true} xs={4}>
+                  <Grid key={challenge.challenge_id} item={true} xs={4}>
                     <Card
                       classes={{ root: classes.card }}
                       sx={{ width: '100%', height: '100%' }}
-                      key={challenge.challenge_id}
                     >
                       <CardHeader
                         avatar={
