@@ -27,7 +27,10 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import AudiencePlayers from './AudiencePlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import { isExerciseUpdatable } from '../../../../utils/Exercise';
+import {
+  isExerciseUpdatable,
+  usePermissions,
+} from '../../../../utils/Exercise';
 import { exportData } from '../../../../utils/Environment';
 import DefinitionMenu from '../DefinitionMenu';
 
@@ -166,6 +169,7 @@ const Audiences = () => {
   ]);
   // Fetching data
   const { exerciseId } = useParams();
+  const permissions = usePermissions(exerciseId);
   const { exercise, audiences, tagsMap } = useHelper((helper) => ({
     exercise: helper.getExercise(exerciseId),
     audiences: helper.getExerciseAudiences(exerciseId),
@@ -334,6 +338,7 @@ const Audiences = () => {
                 exercise={exercise}
                 audience={audience}
                 setSelectedAudience={setSelectedAudience}
+                disabled={permissions.readOnly}
               />
             </ListItemSecondaryAction>
           </ListItem>
@@ -357,9 +362,7 @@ const Audiences = () => {
           />
         )}
       </Drawer>
-      {isExerciseUpdatable(exercise) && (
-        <CreateAudience exerciseId={exerciseId} />
-      )}
+      {permissions.canWrite && <CreateAudience exerciseId={exerciseId} />}
     </div>
   );
 };

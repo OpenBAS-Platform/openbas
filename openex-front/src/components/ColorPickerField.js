@@ -32,6 +32,7 @@ const renderColorPickerField = ({
               <IconButton
                 aria-label="open"
                 onClick={(event) => setAnchorEl(event.currentTarget)}
+                disabled={others.disabled}
               >
                 <ColorLensOutlined />
               </IconButton>

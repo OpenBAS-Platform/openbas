@@ -31,7 +31,15 @@ class DocumentForm extends Component {
   }
 
   render() {
-    const { t, editing, onSubmit, initialValues, handleClose, hideExercises } = this.props;
+    const {
+      t,
+      editing,
+      onSubmit,
+      initialValues,
+      handleClose,
+      hideExercises,
+      filters,
+    } = this.props;
     return (
       <Form
         keepDirtyOnReinitialize={true}
@@ -109,6 +117,7 @@ DocumentForm.propTypes = {
   handleClose: PropTypes.func,
   editing: PropTypes.bool,
   hideExercises: PropTypes.bool,
+  filters: PropTypes.array,
 };
 
 export default inject18n(DocumentForm);

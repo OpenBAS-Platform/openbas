@@ -49,6 +49,14 @@ public class MediaExecutor extends Injector {
         this.emailService = emailService;
     }
 
+    private String buildMediaUri(ExecutionContext context, Exercise exercise, Media media) {
+        String userId = context.getUser().getId();
+        String exerciseId = exercise.getId();
+        String mediaId = media.getId();
+        String queryOptions = "user=" + userId;
+        return openExConfig.getBaseUrl() + "/medias/" + exerciseId + "/" + mediaId + "?" + queryOptions;
+    }
+
     private String buildArticleUri(ExecutionContext context, Article article) {
         String userId = context.getUser().getId();
         String mediaId = article.getMedia().getId();
@@ -82,10 +90,10 @@ public class MediaExecutor extends Injector {
                         try {
                             // Put the challenges variables in the injection context
                             List<ArticleVariable> articleVariables = articles.stream()
-                                .map(article -> new ArticleVariable(article.getId(), article.getName(),
-                             buildArticleUri(userInjectContext, article)))
-                                .toList();
-                        userInjectContext.put("articles", articleVariables);
+                                    .map(article -> new ArticleVariable(article.getId(), article.getName(),
+                                            buildArticleUri(userInjectContext, article)))
+                                    .toList();
+                            userInjectContext.put("articles", articleVariables);
                             // Send the email.
                             emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
                                     content.getSubject(), message, attachments, storeInImap);

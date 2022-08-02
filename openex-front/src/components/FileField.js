@@ -3,17 +3,10 @@ import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
-import * as R from 'ramda';
 import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
 
-const FileFieldInput = ({
-  required,
-  input,
-  dropZoneProps,
-  accept,
-  ...props
-}) => {
+const FileFieldInput = ({ required, input, dropZoneProps, ...props }) => {
   const { t } = useFormatter();
   const onDrop = useCallback(
     (files) => {
@@ -24,6 +17,9 @@ const FileFieldInput = ({
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     onDrop,
     noDrag: true,
+    accept: {
+      'image/*': [],
+    },
     ...dropZoneProps,
   });
   const files = acceptedFiles.map((file) => (
@@ -34,11 +30,7 @@ const FileFieldInput = ({
   ));
   return (
     <div {...getRootProps()} style={{ marginTop: 20 }}>
-      {accept ? (
-        <input accept={accept} {...R.dissoc('accept', getInputProps())} />
-      ) : (
-        <input {...getInputProps()} />
-      )}
+      <input {...getInputProps()} />
       <Button {...props} variant="outlined" color="primary">
         {t('Select a file')}
       </Button>

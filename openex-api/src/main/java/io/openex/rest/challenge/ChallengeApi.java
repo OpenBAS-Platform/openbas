@@ -118,7 +118,7 @@ public class ChallengeApi extends RestBehavior {
                 .flatMap(inject -> {
                     try {
                         ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-                        return content.getChallengeIds().stream();
+                        return content.getChallenges().stream();
                     } catch (JsonProcessingException e) {
                         return Stream.empty();
                     }
@@ -135,8 +135,8 @@ public class ChallengeApi extends RestBehavior {
                 .flatMap(inject -> {
                     try {
                         ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-                        if (content.getChallengeIds() != null) {
-                            return content.getChallengeIds().stream();
+                        if (content.getChallenges() != null) {
+                            return content.getChallenges().stream();
                         }
                         return Stream.empty();
                     } catch (JsonProcessingException e) {
@@ -157,8 +157,8 @@ public class ChallengeApi extends RestBehavior {
                 .flatMap(inject -> {
                     try {
                         ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
-                        if (content.getChallengeIds() != null) {
-                            return content.getChallengeIds().stream();
+                        if (content.getChallenges() != null) {
+                            return content.getChallenges().stream();
                         }
                         return Stream.empty();
                     } catch (JsonProcessingException e) {

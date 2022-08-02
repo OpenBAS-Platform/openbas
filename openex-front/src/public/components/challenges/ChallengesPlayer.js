@@ -22,8 +22,8 @@ const useStyles = makeStyles(() => ({
     padding: 20,
   },
   logo: {
-    width: 200,
-    margin: '0px 0px 50px 0px',
+    width: 100,
+    margin: '0px 0px 10px 0px',
   },
   container: {
     margin: '0 auto',
@@ -73,7 +73,9 @@ const ChallengesPlayer = () => {
           </Button>
         )}
         <div className={classes.container}>
-          <img src={logo} alt="logo" className={classes.logo} />
+          <div style={{ margin: '0 auto', textAlign: 'center' }}>
+            <img src={`/${logo}`} alt="logo" className={classes.logo} />
+          </div>
           <Typography
             variant="h1"
             style={{
@@ -93,9 +95,7 @@ const ChallengesPlayer = () => {
           </Typography>
           {challenges.length === 0 && (
             <div style={{ marginTop: 150 }}>
-              <Empty
-                message={t('No challenge in this exercise yet.')}
-              />
+              <Empty message={t('No challenge in this exercise yet.')} />
             </div>
           )}
         </div>

@@ -141,11 +141,13 @@ class ArticleAddDocuments extends Component {
       R.filter(filterByKeyword),
     )(Object.values(documents));
     let finalDocuments = R.take(10, filteredDocuments);
+    let filters = null;
     if (mediaType === 'newspaper') {
       finalDocuments = R.take(
         10,
         filteredDocuments.filter((d) => d.document_type.includes('image/')),
       );
+      filters = ['image/'];
     } else if (mediaType === 'microblogging') {
       finalDocuments = R.take(
         10,
@@ -154,11 +156,13 @@ class ArticleAddDocuments extends Component {
             || d.document_type.includes('video/'),
         ),
       );
+      filters = ['image/', 'video/'];
     } else if (mediaType === 'tv') {
       finalDocuments = R.take(
         10,
         filteredDocuments.filter((d) => d.document_type.includes('video/')),
       );
+      filters = ['video/'];
     }
     return (
       <div>
@@ -247,6 +251,7 @@ class ArticleAddDocuments extends Component {
                     inline={true}
                     onCreate={this.onCreate.bind(this)}
                     hideExercises={true}
+                    filters={filters}
                   />
                 </List>
               </Grid>

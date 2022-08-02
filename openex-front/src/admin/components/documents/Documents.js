@@ -409,6 +409,7 @@ class Documents extends Component {
                   document={document}
                   tagsMap={tagsMap}
                   exercisesMap={exercisesMap}
+                  disabled={!userAdmin}
                 />
               </ListItemSecondaryAction>
             </ListItem>

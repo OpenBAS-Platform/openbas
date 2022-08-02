@@ -49,6 +49,12 @@ public class ChallengeExecutor extends Injector {
         this.emailService = emailService;
     }
 
+    private String buildChallengesUri(ExecutionContext context) {
+        String userId = context.getUser().getId();
+        String exerciseId = context.getExercise().getId();
+        return openExConfig.getBaseUrl() + "/challenges/" + exerciseId + "?user=" + userId;
+    }
+
     private String buildChallengeUri(ExecutionContext context, Challenge challenge) {
         String userId = context.getUser().getId();
         String challengeId = challenge.getId();
@@ -61,7 +67,7 @@ public class ChallengeExecutor extends Injector {
         try {
             boolean storeInImap = !injection.isTestingInject();
             ChallengeContent content = contentConvert(injection, ChallengeContent.class);
-            List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallengeIds()));
+            List<Challenge> challenges = fromIterable(challengeRepository.findAllById(content.getChallenges()));
             if (contract.getId().equals(CHALLENGE_PUBLISH)) {
                 // Challenge publishing is only linked to execution date of this inject.
                 String challengeNames = challenges.stream().map(Challenge::getName).collect(Collectors.joining(","));

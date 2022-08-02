@@ -7,14 +7,14 @@ import java.util.List;
 
 public class ChallengeContent extends EmailContent {
 
-    @JsonProperty("challenge_ids")
-    private List<String> challengeIds;
+    @JsonProperty("challenges")
+    private List<String> challenges;
 
-    public List<String> getChallengeIds() {
-        return challengeIds;
+    public List<String> getChallenges() {
+        return challenges;
     }
 
-    public void setChallengeIds(List<String> challengeIds) {
-        this.challengeIds = challengeIds;
+    public void setChallenges(List<String> challenges) {
+        this.challenges = challenges;
     }
 }

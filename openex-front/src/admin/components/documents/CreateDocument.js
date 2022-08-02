@@ -30,7 +30,7 @@ const styles = (theme) => ({
 });
 
 const CreateDocument = (props) => {
-  const { classes, t, inline, exerciseId, hideExercises } = props;
+  const { classes, t, inline, exerciseId, hideExercises, filters } = props;
   const [open, setOpen] = useState(false);
   const onSubmit = (data) => {
     const inputValues = R.pipe(
@@ -98,6 +98,7 @@ const CreateDocument = (props) => {
             }}
             handleClose={() => setOpen(false)}
             hideExercises={hideExercises || !!exerciseId}
+            filters={filters}
           />
         </DialogContent>
       </Dialog>
@@ -113,6 +114,7 @@ CreateDocument.propTypes = {
   inline: PropTypes.bool,
   exerciseId: PropTypes.string,
   hideExercises: PropTypes.bool,
+  filters: PropTypes.array,
 };
 
 export default R.compose(
