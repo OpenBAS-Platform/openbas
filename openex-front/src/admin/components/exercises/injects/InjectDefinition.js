@@ -696,7 +696,7 @@ class InjectDefinition extends Component {
               );
             case 'tuple':
               return (
-                <div>
+                <div key={field.key}>
                   <FieldArray name={field.key}>
                     {({ fields }) => (
                       <div>

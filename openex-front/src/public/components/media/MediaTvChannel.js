@@ -129,11 +129,16 @@ const MediaTvChannel = ({ mediaReader }) => {
               />
               <Grid container={true} spacing={3}>
                 {firstArticleVideos.map((doc) => (
-                  <Grid item={true} xs={firstArticleColumns}>
+                  <Grid
+                    key={doc.document_id}
+                    item={true}
+                    xs={firstArticleColumns}
+                  >
                     <CardMedia
                       component="video"
                       height="200"
                       src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                      controls={true}
                     />
                   </Grid>
                 ))}
@@ -207,11 +212,12 @@ const MediaTvChannel = ({ mediaReader }) => {
                   />
                   <Grid container={true} spacing={3}>
                     {videos.map((doc) => (
-                      <Grid item={true} xs={columns}>
+                      <Grid key={doc.document_id} item={true} xs={columns}>
                         <CardMedia
                           component="video"
                           height="100"
                           src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                          controls={true}
                         />
                       </Grid>
                     ))}
@@ -289,11 +295,12 @@ const MediaTvChannel = ({ mediaReader }) => {
                 />
                 <Grid container={true} spacing={3}>
                   {videos.map((doc) => (
-                    <Grid item={true} xs={columns}>
+                    <Grid key={doc.document_id} item={true} xs={columns}>
                       <CardMedia
                         component="video"
                         height="150"
                         src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
+                        controls={true}
                       />
                     </Grid>
                   ))}

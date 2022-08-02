@@ -140,7 +140,11 @@ const MediaNewspaper = ({ mediaReader }) => {
               />
               <Grid container={true} spacing={3}>
                 {firstArticleImages.map((doc) => (
-                  <Grid item={true} xs={firstArticleColumns}>
+                  <Grid
+                    key={doc.document_id}
+                    item={true}
+                    xs={firstArticleColumns}
+                  >
                     <CardMedia
                       component="img"
                       height="200"
@@ -236,7 +240,7 @@ const MediaNewspaper = ({ mediaReader }) => {
                   />
                   <Grid container={true} spacing={3}>
                     {images.map((doc) => (
-                      <Grid item={true} xs={columns}>
+                      <Grid key={doc.document_id} item={true} xs={columns}>
                         <CardMedia
                           component="img"
                           height="100"
@@ -329,7 +333,7 @@ const MediaNewspaper = ({ mediaReader }) => {
                 />
                 <Grid container={true} spacing={3}>
                   {images.map((doc) => (
-                    <Grid item={true} xs={columns}>
+                    <Grid key={doc.document_id} item={true} xs={columns}>
                       <CardMedia
                         component="img"
                         height="150"

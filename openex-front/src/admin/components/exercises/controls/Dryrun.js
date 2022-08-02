@@ -375,7 +375,7 @@ const Dryrun = () => {
                       >
                         <InjectType
                           variant="list"
-                          config={injectContract.config}
+                          config={injectContract?.config}
                           label={injectTypeName}
                         />
                       </div>

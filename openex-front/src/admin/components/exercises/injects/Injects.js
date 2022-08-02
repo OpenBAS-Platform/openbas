@@ -226,7 +226,7 @@ const Injects = () => {
     .filter((type) => type.config.expose === false)
     .map((type) => type.config.type);
   // Rendering
-  if (exercise && injects && !R.isEmpty(injectTypesMap) > 0) {
+  if (exercise && injects && !R.isEmpty(injectTypesMap)) {
     return (
       <div className={classes.container}>
         <div>

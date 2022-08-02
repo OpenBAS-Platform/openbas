@@ -212,7 +212,7 @@ const Articles = () => {
                 />
                 <Grid container={true} spacing={3}>
                   {headersDocs.map((doc) => (
-                    <Grid item={true} xs={columns}>
+                    <Grid hey={doc.document_id} item={true} xs={columns}>
                       {doc.document_type.includes('image/') && (
                         <CardMedia
                           component="img"

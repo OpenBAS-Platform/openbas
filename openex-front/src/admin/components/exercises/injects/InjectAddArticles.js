@@ -212,14 +212,14 @@ class InjectAddArticles extends Component {
                     const article = articlesMap[articleId];
                     const media = article
                       ? mediasMap[article.article_media] || {}
-                      : '';
+                      : {};
                     return (
                       <Chip
                         key={articleId}
                         onDelete={this.removeArticle.bind(this, articleId)}
                         label={truncate(article?.article_name, 22)}
                         icon={
-                          <MediaIcon type={media?.media_type} variant="chip" />
+                          <MediaIcon type={media.media_type} variant="chip" />
                         }
                         classes={{ root: classes.chip }}
                       />

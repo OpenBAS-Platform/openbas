@@ -46,7 +46,7 @@ const renderMarkDownField = ({
       />
       {touched && invalid && (
         <FormHelperText error={true}>
-          {touched && ((error && t(error)) || (submitError && t(submitError)))}
+          {(error && t(error)) || (submitError && t(submitError))}
         </FormHelperText>
       )}
     </div>

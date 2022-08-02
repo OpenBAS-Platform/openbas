@@ -112,7 +112,15 @@ class ArticleAddDocuments extends Component {
   }
 
   render() {
-    const { classes, t, documents, articleDocumentsIds, exerciseId, exercise } = this.props;
+    const {
+      classes,
+      t,
+      documents,
+      articleDocumentsIds,
+      exerciseId,
+      exercise,
+      mediaType,
+    } = this.props;
     const { keyword, documentsIds, tags } = this.state;
     const filterByKeyword = (n) => keyword === ''
       || (n.document_name || '').toLowerCase().indexOf(keyword.toLowerCase())
@@ -131,8 +139,27 @@ class ArticleAddDocuments extends Component {
           ),
       ),
       R.filter(filterByKeyword),
-      R.take(10),
     )(Object.values(documents));
+    let finalDocuments = R.take(10, filteredDocuments);
+    if (mediaType === 'newspaper') {
+      finalDocuments = R.take(
+        10,
+        filteredDocuments.filter((d) => d.document_type.includes('image/')),
+      );
+    } else if (mediaType === 'microblogging') {
+      finalDocuments = R.take(
+        10,
+        filteredDocuments.filter(
+          (d) => d.document_type.includes('image/')
+            || d.document_type.includes('video/'),
+        ),
+      );
+    } else if (mediaType === 'tv') {
+      finalDocuments = R.take(
+        10,
+        filteredDocuments.filter((d) => d.document_type.includes('video/')),
+      );
+    }
     return (
       <div>
         <ListItem
@@ -186,7 +213,7 @@ class ArticleAddDocuments extends Component {
                   </Grid>
                 </Grid>
                 <List>
-                  {filteredDocuments.map((document) => {
+                  {finalDocuments.map((document) => {
                     const disabled = documentsIds.includes(document.document_id)
                       || articleDocumentsIds.includes(document.document_id);
                     return (

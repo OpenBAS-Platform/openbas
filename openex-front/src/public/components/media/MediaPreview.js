@@ -37,7 +37,7 @@ const Media = () => {
   const permissions = usePermissions(exerciseId, exercise);
   useEffect(() => {
     dispatch(fetchMe());
-    dispatch(fetchObserverMedia(exerciseId, mediaId, userId));
+    dispatch(fetchObserverMedia(exerciseId, mediaId));
     dispatch(fetchPlayerDocuments(exerciseId));
   }, []);
   if (media) {

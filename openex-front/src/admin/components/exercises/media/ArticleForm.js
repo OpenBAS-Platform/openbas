@@ -213,186 +213,191 @@ const ArticleForm = ({
         },
       }}
     >
-      {({ handleSubmit, submitting }) => (
-        <form id="articleForm" onSubmit={handleSubmit}>
-          <Typography variant="h2" style={{ marginTop: 0 }}>
-            {t('Information')}
-          </Typography>
-          <Autocomplete
-            variant="standard"
-            size="small"
-            name="article_media"
-            label={t('Media')}
-            fullWidth={true}
-            multiple={false}
-            options={sortedMedias}
-            renderOption={(renderProps, option) => (
-              <Box component="li" {...renderProps}>
-                <div className={classes.icon}>
-                  <MediaIcon type={option.type} />
-                </div>
-                <div className={classes.text}>{t(option.label)}</div>
-              </Box>
-            )}
-            classes={{ clearIndicator: classes.autoCompleteIndicator }}
-          />
-          <TextField
-            variant="standard"
-            name="article_name"
-            fullWidth={true}
-            style={{ marginTop: 20 }}
-            label={t('Title')}
-          />
-          <TextField
-            variant="standard"
-            name="article_author"
-            fullWidth={true}
-            style={{ marginTop: 20 }}
-            label={t('Author')}
-          />
-          <MarkDownField
-            name="article_content"
-            label={t('Content')}
-            fullWidth={true}
-            style={{ marginTop: 20 }}
-          />
-          <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
-            <Grid item={true} xs={4}>
-              <TextField
-                variant="standard"
-                name="article_comments"
-                fullWidth={true}
-                type="number"
-                label={t('Comments')}
-              />
-            </Grid>
-            <Grid item={true} xs={4}>
-              <TextField
-                variant="standard"
-                name="article_shares"
-                fullWidth={true}
-                type="number"
-                label={t('Shares')}
-              />
-            </Grid>
-            <Grid item={true} xs={4}>
-              <TextField
-                variant="standard"
-                name="article_likes"
-                fullWidth={true}
-                type="number"
-                label={t('Likes')}
-              />
-            </Grid>
-          </Grid>
-          <Typography variant="h2" style={{ marginTop: 30 }}>
-            {t('Documents')}
-          </Typography>
-          <List>
-            <ListItem
-              classes={{ root: classes.itemHead }}
-              divider={false}
-              style={{ paddingTop: 0 }}
-            >
-              <ListItemIcon>
-                <span
-                  style={{
-                    padding: '0 8px 0 8px',
-                    fontWeight: 700,
-                    fontSize: 12,
-                  }}
-                >
-                  &nbsp;
-                </span>
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <div>
-                    {documentsSortHeader('document_name', 'Name', true)}
-                    {documentsSortHeader('document_type', 'Type', true)}
-                    {documentsSortHeader('document_tags', 'Tags', true)}
+      {({ handleSubmit, submitting, values }) => {
+        return (
+          <form id="articleForm" onSubmit={handleSubmit}>
+            <Typography variant="h2" style={{ marginTop: 0 }}>
+              {t('Information')}
+            </Typography>
+            <Autocomplete
+              variant="standard"
+              size="small"
+              name="article_media"
+              label={t('Media')}
+              fullWidth={true}
+              multiple={false}
+              options={sortedMedias}
+              renderOption={(renderProps, option) => (
+                <Box component="li" {...renderProps}>
+                  <div className={classes.icon}>
+                    <MediaIcon type={option.type} />
                   </div>
-                }
-              />
-              <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
-            </ListItem>
-            {documents.map((documentId) => {
-              const document = documentsMap[documentId] || {};
-              return (
-                <ListItem
-                  key={document.document_id}
-                  classes={{ root: classes.item }}
-                  divider={true}
-                  button={true}
-                  component="a"
-                  href={`/api/documents/${document.document_id}/file`}
-                >
-                  <ListItemIcon>
-                    <AttachmentOutlined />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_name}
-                        >
-                          {document.document_name}
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_type}
-                        >
-                          <DocumentType
-                            type={document.document_type}
-                            variant="list"
-                          />
-                        </div>
-                        <div
-                          className={classes.bodyItem}
-                          style={inlineStyles.document_tags}
-                        >
-                          <ItemTags
-                            variant="list"
-                            tags={document.document_tags}
-                          />
-                        </div>
-                      </div>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <DocumentPopover
-                      exerciseId={exerciseId}
-                      document={document}
-                      exercisesMap={exercisesMap}
-                      tagsMap={tagsMap}
-                      removeChoice={t('Remove from the media pressure')}
-                      onRemoveDocument={handleRemoveDocument}
-                    />
-                  </ListItemSecondaryAction>
-                </ListItem>
-              );
-            })}
-            <ArticleAddDocuments
-              exerciseId={exerciseId}
-              articleDocumentsIds={documents}
-              handleAddDocuments={handleAddDocuments}
+                  <div className={classes.text}>{t(option.label)}</div>
+                </Box>
+              )}
+              classes={{ clearIndicator: classes.autoCompleteIndicator }}
             />
-          </List>
-          <div style={{ float: 'right', marginTop: 20 }}>
-            <Button
-              onClick={handleClose}
-              style={{ marginRight: 10 }}
-              disabled={submitting}
-            >
-              {t('Cancel')}
-            </Button>
-            <Button color="secondary" type="submit" disabled={submitting}>
-              {editing ? t('Update') : t('Create')}
-            </Button>
-          </div>
-        </form>
-      )}
+            <TextField
+              variant="standard"
+              name="article_name"
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              label={t('Title')}
+            />
+            <TextField
+              variant="standard"
+              name="article_author"
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+              label={t('Author')}
+            />
+            <MarkDownField
+              name="article_content"
+              label={t('Content')}
+              fullWidth={true}
+              style={{ marginTop: 20 }}
+            />
+            <Grid container={true} spacing={3} style={{ marginTop: 0 }}>
+              <Grid item={true} xs={4}>
+                <TextField
+                  variant="standard"
+                  name="article_comments"
+                  fullWidth={true}
+                  type="number"
+                  label={t('Comments')}
+                />
+              </Grid>
+              <Grid item={true} xs={4}>
+                <TextField
+                  variant="standard"
+                  name="article_shares"
+                  fullWidth={true}
+                  type="number"
+                  label={t('Shares')}
+                />
+              </Grid>
+              <Grid item={true} xs={4}>
+                <TextField
+                  variant="standard"
+                  name="article_likes"
+                  fullWidth={true}
+                  type="number"
+                  label={t('Likes')}
+                />
+              </Grid>
+            </Grid>
+            <Typography variant="h2" style={{ marginTop: 30 }}>
+              {t('Documents')}
+            </Typography>
+            <List>
+              <ListItem
+                classes={{ root: classes.itemHead }}
+                divider={false}
+                style={{ paddingTop: 0 }}
+              >
+                <ListItemIcon>
+                  <span
+                    style={{
+                      padding: '0 8px 0 8px',
+                      fontWeight: 700,
+                      fontSize: 12,
+                    }}
+                  >
+                    &nbsp;
+                  </span>
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <div>
+                      {documentsSortHeader('document_name', 'Name', true)}
+                      {documentsSortHeader('document_type', 'Type', true)}
+                      {documentsSortHeader('document_tags', 'Tags', true)}
+                    </div>
+                  }
+                />
+                <ListItemSecondaryAction>&nbsp;</ListItemSecondaryAction>
+              </ListItem>
+              {documents.map((documentId) => {
+                const document = documentsMap[documentId] || {};
+                return (
+                  <ListItem
+                    key={document.document_id}
+                    classes={{ root: classes.item }}
+                    divider={true}
+                    button={true}
+                    component="a"
+                    href={`/api/documents/${document.document_id}/file`}
+                  >
+                    <ListItemIcon>
+                      <AttachmentOutlined />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_name}
+                          >
+                            {document.document_name}
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_type}
+                          >
+                            <DocumentType
+                              type={document.document_type}
+                              variant="list"
+                            />
+                          </div>
+                          <div
+                            className={classes.bodyItem}
+                            style={inlineStyles.document_tags}
+                          >
+                            <ItemTags
+                              variant="list"
+                              tags={document.document_tags}
+                            />
+                          </div>
+                        </div>
+                      }
+                    />
+                    <ListItemSecondaryAction>
+                      <DocumentPopover
+                        exerciseId={exerciseId}
+                        document={document}
+                        exercisesMap={exercisesMap}
+                        tagsMap={tagsMap}
+                        removeChoice={t('Remove from the media pressure')}
+                        onRemoveDocument={handleRemoveDocument}
+                      />
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                );
+              })}
+              {values.article_media?.type && (
+                <ArticleAddDocuments
+                  exerciseId={exerciseId}
+                  articleDocumentsIds={documents}
+                  handleAddDocuments={handleAddDocuments}
+                  mediaType={values.article_media.type}
+                />
+              )}
+            </List>
+            <div style={{ float: 'right', marginTop: 20 }}>
+              <Button
+                onClick={handleClose}
+                style={{ marginRight: 10 }}
+                disabled={submitting}
+              >
+                {t('Cancel')}
+              </Button>
+              <Button color="secondary" type="submit" disabled={submitting}>
+                {editing ? t('Update') : t('Create')}
+              </Button>
+            </div>
+          </form>
+        );
+      }}
     </Form>
   );
 };

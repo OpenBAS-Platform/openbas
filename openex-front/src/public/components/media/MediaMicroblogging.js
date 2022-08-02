@@ -137,7 +137,7 @@ const MediaMicroblogging = ({ mediaReader }) => {
               />
               <Grid container={true} spacing={3}>
                 {docs.map((doc) => (
-                  <Grid item={true} xs={columns}>
+                  <Grid key={doc.document_id} item={true} xs={columns}>
                     {doc.document_type.includes('image/') && (
                       <CardMedia
                         component="img"
