@@ -80,9 +80,6 @@ public class ExerciseApi extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
     private InjectRepository injectRepository;
-
-    private CommunicationRepository communicationRepository;
-    private InjectExpectationRepository injectExpectationRepository;
     // endregion
 
     // region services
@@ -92,16 +89,6 @@ public class ExerciseApi extends RestBehavior {
     // endregion
 
     // region setters
-    @Autowired
-    public void setCommunicationRepository(CommunicationRepository communicationRepository) {
-        this.communicationRepository = communicationRepository;
-    }
-
-    @Autowired
-    public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
-        this.injectExpectationRepository = injectExpectationRepository;
-    }
-
     @Autowired
     public void setInjectService(InjectService injectService) {
         this.injectService = injectService;
@@ -386,13 +373,9 @@ public class ExerciseApi extends RestBehavior {
             // Reset pauses
             exercise.setCurrentPause(null);
             pauseRepository.deleteAll(pauseRepository.findAllForExercise(exerciseId));
-            // Reset injects status and outcome
-            injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId).stream().peek(Inject::clean).toList());
-            // Reset exercise communications
-            Iterable<Communication> communications = exerciseCommunications(exerciseId);
-            communicationRepository.deleteAll(communications);
-            // Reset expectations executions
-            injectExpectationRepository.deleteAllForExercise(exerciseId);
+            // Reset injects outcome, communications and expectations
+            injectRepository.saveAll(injectRepository.findAllForExercise(exerciseId)
+                    .stream().peek(Inject::clean).toList());
         }
         // In case of manual start
         if (SCHEDULED.equals(exercise.getStatus()) && RUNNING.equals(status)) {

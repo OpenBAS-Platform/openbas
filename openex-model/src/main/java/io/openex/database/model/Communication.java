@@ -14,6 +14,7 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static java.time.Instant.now;
 
@@ -194,5 +195,18 @@ public class Communication implements Base {
     public boolean isUserHasAccess(User user) {
         Inject inject = getInject();
         return user.isAdmin() || getUsers().contains(user) || (inject != null && inject.isUserHasAccess(user));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

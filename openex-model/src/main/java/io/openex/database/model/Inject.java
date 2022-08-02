@@ -132,19 +132,19 @@ public class Inject implements Base, Injection {
     private List<Audience> audiences = new ArrayList<>();
 
     // CascadeType.ALL is required here because of complex relationships
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_documents")
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectDocument> documents = new ArrayList<>();
 
     // CascadeType.ALL is required here because communications are embedded
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_communications")
     @Fetch(FetchMode.SUBSELECT)
     private List<Communication> communications = new ArrayList<>();
 
     // CascadeType.ALL is required here because expectations are embedded
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_expectations")
     @Fetch(FetchMode.SUBSELECT)
     private List<InjectExpectation> expectations = new ArrayList<>();
@@ -171,7 +171,9 @@ public class Inject implements Base, Injection {
 
     @JsonIgnore
     public void clean() {
-        setStatus(null);
+        status = null;
+        communications.clear();
+        expectations.clear();
     }
 
     @JsonProperty("inject_users_number")
@@ -435,19 +437,6 @@ public class Inject implements Base, Injection {
         return dryInject;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
-        Base base = (Base) o;
-        return id.equals(base.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
     @JsonProperty("inject_communications_number")
     public long getCommunicationsNumber() {
         return getCommunications().size();
@@ -464,5 +453,18 @@ public class Inject implements Base, Injection {
             return getStatus().orElseThrow().getDate();
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !Base.class.isAssignableFrom(o.getClass())) return false;
+        Base base = (Base) o;
+        return id.equals(base.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
