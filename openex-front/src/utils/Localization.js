@@ -40,6 +40,8 @@ const i18n = {
       'Players distribution': 'Distribution des joueurs',
       'Inject context': 'Contexte du stimuli',
       'added an entry on': 'a ajouté une entrée le',
+      'This file type is not accepted here.':
+        "Ce type de fichier n'est pas accepté ici",
       Name: 'Nom',
       Subtitle: 'Sous-titre',
       'Start date': 'Date de début',

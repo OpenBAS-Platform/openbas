@@ -14,7 +14,7 @@ const App = () => (
         <Switch>
           <Route path="/comcheck" component={RootPublic} />
           <Route path="/medias" component={RootPublic} />
-            <Route path="/challenges" component={RootPublic} />
+          <Route path="/challenges" component={RootPublic} />
           <Route component={Root} />
         </Switch>
       </RedirectManager>

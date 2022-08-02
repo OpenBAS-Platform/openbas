@@ -27,10 +27,7 @@ import ItemBoolean from '../../../../components/ItemBoolean';
 import AudiencePlayers from './AudiencePlayers';
 import { useHelper } from '../../../../store';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
-import {
-  isExerciseUpdatable,
-  usePermissions,
-} from '../../../../utils/Exercise';
+import { usePermissions } from '../../../../utils/Exercise';
 import { exportData } from '../../../../utils/Environment';
 import DefinitionMenu from '../DefinitionMenu';
 

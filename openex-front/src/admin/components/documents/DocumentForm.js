@@ -85,6 +85,7 @@ class DocumentForm extends Component {
                 name="document_file"
                 label={t('File')}
                 style={{ marginTop: 20 }}
+                filters={filters}
               />
             )}
             <div style={{ float: 'right', marginTop: 20 }}>

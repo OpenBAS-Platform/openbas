@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import * as R from 'ramda';
 import { Field } from 'react-final-form';
 import { useDropzone } from 'react-dropzone';
 import Button from '@mui/material/Button';
@@ -6,28 +7,47 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { useFormatter } from './i18n';
 import { bytesFormat } from '../utils/Number';
 
-const FileFieldInput = ({ required, input, dropZoneProps, ...props }) => {
+const FileFieldInput = ({
+  required,
+  input,
+  dropZoneProps,
+  filters,
+  ...props
+}) => {
   const { t } = useFormatter();
   const onDrop = useCallback(
     (files) => {
-      input.onChange(files);
+      const isErroredFile = files.length > 0
+        && files.filter(
+          (f) => !filters || R.any((n) => f.type.includes(n), filters),
+        ).length === 0;
+      if (!isErroredFile) {
+        input.onChange(files);
+      }
     },
     [input],
   );
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     onDrop,
     noDrag: true,
-    accept: {
-      'image/*': [],
-    },
     ...dropZoneProps,
   });
-  const files = acceptedFiles.map((file) => (
-    <FormHelperText key={file.path} focused={true}>
-      {file.path} - {bytesFormat(file.size).number}
-      {bytesFormat(file.size).symbol}
-    </FormHelperText>
-  ));
+  const isErroredFile = acceptedFiles.length > 0
+    && acceptedFiles.filter(
+      (f) => !filters || R.any((n) => f.type.includes(n), filters),
+    ).length === 0;
+  const files = isErroredFile
+    ? [
+        <FormHelperText error={true} focused={true}>
+          {t('This file type is not accepted here.')}
+        </FormHelperText>,
+    ]
+    : acceptedFiles.map((file) => (
+        <FormHelperText key={file.path} focused={true}>
+          {file.path} - {bytesFormat(file.size).number}
+          {bytesFormat(file.size).symbol}
+        </FormHelperText>
+    ));
   return (
     <div {...getRootProps()} style={{ marginTop: 20 }}>
       <input {...getInputProps()} />
