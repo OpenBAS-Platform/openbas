@@ -141,7 +141,7 @@ const ArticlePopover = ({ exercise, article, documents, onRemoveArticle }) => {
             handleClose={handleCloseEdit}
             exerciseId={exercise.exercise_id}
             initialValues={initialValues}
-            docmentsIds={(documents || []).map((i) => i.document_id)}
+            documentsIds={(documents || []).map((i) => i.document_id)}
           />
         </DialogContent>
       </Dialog>
