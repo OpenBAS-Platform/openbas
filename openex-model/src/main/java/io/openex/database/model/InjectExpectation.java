@@ -3,7 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -54,40 +54,40 @@ public class InjectExpectation implements Base {
     // endregion
 
     // region contextual relations
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_exercise")
     private Exercise exercise;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inject_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_inject")
     private Inject inject;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_user")
     private User user;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "audience_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_audience")
     private Audience audience;
     // endregion
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_article")
     private Article article;
 
-    @ManyToOne(cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_expectation_challenge")
     private Challenge challenge;
 

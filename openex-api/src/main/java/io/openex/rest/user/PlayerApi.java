@@ -2,13 +2,9 @@ package io.openex.rest.user;
 
 import io.openex.config.SessionManager;
 import io.openex.database.model.Communication;
+import io.openex.database.model.Inject;
 import io.openex.database.model.User;
-import io.openex.database.model.basic.BasicInject;
-import io.openex.database.repository.CommunicationRepository;
-import io.openex.database.repository.OrganizationRepository;
-import io.openex.database.repository.TagRepository;
-import io.openex.database.repository.UserRepository;
-import io.openex.database.repository.basic.BasicInjectRepository;
+import io.openex.database.repository.*;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.user.form.player.CreatePlayerInput;
 import io.openex.rest.user.form.player.UpdatePlayerInput;
@@ -21,10 +17,9 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import static io.openex.helper.DatabaseHelper.updateRelation;
 import static io.openex.helper.StreamHelper.fromIterable;
 import static io.openex.helper.UserHelper.currentUser;
-import static io.openex.helper.DatabaseHelper.updateRelation;
-import static java.util.Comparator.comparing;
 
 @RestController
 public class PlayerApi extends RestBehavior {
@@ -34,7 +29,7 @@ public class PlayerApi extends RestBehavior {
 
     private CommunicationRepository communicationRepository;
     private OrganizationRepository organizationRepository;
-    private BasicInjectRepository basicInjectRepository;
+    private InjectRepository injectRepository;
     private UserRepository userRepository;
     private TagRepository tagRepository;
     private UserService userService;
@@ -45,8 +40,8 @@ public class PlayerApi extends RestBehavior {
     }
 
     @Autowired
-    public void setBasicInjectRepository(BasicInjectRepository basicInjectRepository) {
-        this.basicInjectRepository = basicInjectRepository;
+    public void setInjectRepository(InjectRepository injectRepository) {
+        this.injectRepository = injectRepository;
     }
 
     @Autowired
@@ -72,7 +67,7 @@ public class PlayerApi extends RestBehavior {
     @GetMapping("/api/players")
     @PreAuthorize("isObserver()")
     public Iterable<User> players() {
-        Iterable<BasicInject> injects = basicInjectRepository.findAll();
+        Iterable<Inject> injects = injectRepository.findAll();
         return fromIterable(userRepository.findAll()).stream()
                 .peek(user -> user.resolveInjects(injects)).toList();
     }

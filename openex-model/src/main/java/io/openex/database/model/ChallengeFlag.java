@@ -3,7 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -47,8 +47,8 @@ public class ChallengeFlag implements Base {
     @JsonProperty("flag_value")
     private String value;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JoinColumn(name = "flag_challenge")
     @JsonProperty("flag_challenge")
     private Challenge challenge;

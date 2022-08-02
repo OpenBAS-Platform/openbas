@@ -6,10 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.openex.database.audit.ModelBaseListener;
 import io.openex.database.converter.ContentConverter;
-import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -86,15 +85,15 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_all_audiences")
     private boolean allAudiences;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inject_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_exercise")
     private Exercise exercise;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inject_depends_from_another")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("inject_depends_on")
     private Inject dependsOn;
 
@@ -102,51 +101,49 @@ public class Inject implements Base, Injection {
     @JsonProperty("inject_depends_duration")
     private Long dependsDuration;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JoinColumn(name = "inject_user")
     @JsonProperty("inject_user")
     private User user;
 
     // CascadeType.ALL is required here because inject status are embedded
-    @OneToOne(mappedBy = "inject", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToOne(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_status")
     private InjectStatus status;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "injects_tags",
             joinColumns = @JoinColumn(name = "inject_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("inject_tags")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "injects_audiences",
             joinColumns = @JoinColumn(name = "inject_id"),
             inverseJoinColumns = @JoinColumn(name = "audience_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("inject_audiences")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
 
     // CascadeType.ALL is required here because of complex relationships
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_documents")
-    @Fetch(FetchMode.SUBSELECT)
+    @JsonSerialize(using = MultiModelDeserializer.class)
     private List<InjectDocument> documents = new ArrayList<>();
 
     // CascadeType.ALL is required here because communications are embedded
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_communications")
-    @Fetch(FetchMode.SUBSELECT)
+    @JsonSerialize(using = MultiModelDeserializer.class)
     private List<Communication> communications = new ArrayList<>();
 
     // CascadeType.ALL is required here because expectations are embedded
-    @OneToMany(mappedBy = "inject", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "inject", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty("inject_expectations")
-    @Fetch(FetchMode.SUBSELECT)
+    @JsonSerialize(using = MultiModelDeserializer.class)
     private List<InjectExpectation> expectations = new ArrayList<>();
 
     // region transient
@@ -196,7 +193,7 @@ public class Inject implements Base, Injection {
                 .orElse(source);
         Instant standardExecutionDate = dependingStart.plusSeconds(duration);
         // Compute execution dates with previous terminated pauses
-        long previousPauseDelay = getExercise().getPauses().stream()
+        long previousPauseDelay = exercise.getPauses().stream()
                 .filter(pause -> pause.getDate().isBefore(standardExecutionDate))
                 .mapToLong(pause -> pause.getDuration().orElse(0L)).sum();
         Instant afterPausesExecutionDate = standardExecutionDate.plusSeconds(previousPauseDelay);

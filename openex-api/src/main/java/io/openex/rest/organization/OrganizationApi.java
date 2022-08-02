@@ -1,10 +1,10 @@
 package io.openex.rest.organization;
 
+import io.openex.database.model.Inject;
 import io.openex.database.model.Organization;
-import io.openex.database.model.basic.BasicInject;
+import io.openex.database.repository.InjectRepository;
 import io.openex.database.repository.OrganizationRepository;
 import io.openex.database.repository.TagRepository;
-import io.openex.database.repository.basic.BasicInjectRepository;
 import io.openex.rest.helper.RestBehavior;
 import io.openex.rest.organization.form.OrganizationCreateInput;
 import io.openex.rest.organization.form.OrganizationUpdateInput;
@@ -19,15 +19,15 @@ import static io.openex.helper.StreamHelper.fromIterable;
 import static java.time.Instant.now;
 
 @RestController
-public class OrganizationApi<T> extends RestBehavior {
+public class OrganizationApi extends RestBehavior {
 
-    private BasicInjectRepository basicInjectRepository;
+    private InjectRepository injectRepository;
     private OrganizationRepository organizationRepository;
     private TagRepository tagRepository;
 
     @Autowired
-    public void setBasicInjectRepository(BasicInjectRepository basicInjectRepository) {
-        this.basicInjectRepository = basicInjectRepository;
+    public void setInjectRepository(InjectRepository injectRepository) {
+        this.injectRepository = injectRepository;
     }
 
     @Autowired
@@ -42,7 +42,7 @@ public class OrganizationApi<T> extends RestBehavior {
 
     @GetMapping("/api/organizations")
     public Iterable<Organization> organizations() {
-        Iterable<BasicInject> injects = basicInjectRepository.findAll();
+        Iterable<Inject> injects = injectRepository.findAll();
         return fromIterable(organizationRepository.findAll()).stream()
                 .peek(org -> org.resolveInjects(injects)).toList();
     }

@@ -135,12 +135,12 @@ public class InjectApi extends RestBehavior {
         List<String> askedDocumentIds = documents.stream().map(InjectDocumentInput::getDocumentId).toList();
         List<String> currentDocumentIds = inject.getDocuments().stream().map(document -> document.getDocument().getId()).toList();
         // region Set documents
-        List<InjectDocument> injectDocuments = new ArrayList<>(inject.getDocuments());
+        List<InjectDocument> injectDocuments = inject.getDocuments();
         // To delete
-        inject.getDocuments().stream().filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId())).forEach(injectDoc -> {
-            injectDocuments.remove(injectDoc);
-            injectDocumentRepository.delete(injectDoc);
-        });
+        List<InjectDocument> toRemoveDocuments = inject.getDocuments().stream()
+                .filter(injectDoc -> !askedDocumentIds.contains(injectDoc.getDocument().getId()))
+                .toList();
+        injectDocuments.removeAll(toRemoveDocuments);
         // To add
         documents.stream().filter(doc -> !currentDocumentIds.contains(doc.getDocumentId())).forEach(in -> {
             Optional<Document> doc = documentRepository.findById(in.getDocumentId());
@@ -161,7 +161,8 @@ public class InjectApi extends RestBehavior {
         });
         // Remap the attached boolean
         injectDocuments.forEach(injectDoc -> {
-            Optional<InjectDocumentInput> inputInjectDoc = input.getDocuments().stream().filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId())).findFirst();
+            Optional<InjectDocumentInput> inputInjectDoc = input.getDocuments().stream()
+                    .filter(id -> id.getDocumentId().equals(injectDoc.getDocument().getId())).findFirst();
             Boolean attached = inputInjectDoc.map(InjectDocumentInput::isAttached).orElse(false);
             injectDoc.setAttached(attached);
         });

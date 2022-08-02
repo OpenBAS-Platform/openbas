@@ -3,7 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -32,15 +32,15 @@ public class ComcheckStatus implements Base {
     @JsonProperty("comcheckstatus_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_user")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("comcheckstatus_user")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_comcheck")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("comcheckstatus_comcheck")
     private Comcheck comcheck;
 

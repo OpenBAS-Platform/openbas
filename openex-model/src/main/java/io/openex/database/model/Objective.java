@@ -3,10 +3,8 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -28,9 +26,9 @@ public class Objective implements Base {
     @JsonProperty("objective_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "objective_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("objective_exercise")
     private Exercise exercise;
 
@@ -54,9 +52,8 @@ public class Objective implements Base {
     @JsonProperty("objective_updated_at")
     private Instant updatedAt = now();
 
-    @OneToMany(mappedBy = "objective", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @OneToMany(mappedBy = "objective", fetch = FetchType.LAZY)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("objective_evaluations")
     private List<Evaluation> evaluations = new ArrayList<>();
 

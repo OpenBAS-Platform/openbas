@@ -3,10 +3,8 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -28,15 +26,15 @@ public class Log implements Base {
     @JsonProperty("log_id")
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "log_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("log_exercise")
     private Exercise exercise;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "log_user")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("log_user")
     private User user;
 
@@ -56,13 +54,12 @@ public class Log implements Base {
     @JsonProperty("log_updated_at")
     private Instant updated = now();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "logs_tags",
             joinColumns = @JoinColumn(name = "log_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("log_tags")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
     @Override

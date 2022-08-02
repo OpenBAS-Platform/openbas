@@ -3,10 +3,8 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -28,9 +26,9 @@ public class Poll implements Base {
     @JsonProperty("poll_id")
     private String id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poll_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("poll_exercise")
     private Exercise exercise;
 
@@ -46,9 +44,8 @@ public class Poll implements Base {
     @JsonProperty("poll_updated_at")
     private Instant updated = now();
 
-    @OneToMany(mappedBy = "poll", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @OneToMany(mappedBy = "poll", fetch = FetchType.LAZY)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("poll_answers")
     private List<Answer> answers = new ArrayList<>();
 

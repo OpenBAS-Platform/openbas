@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -81,15 +79,15 @@ public class Exercise implements Base {
     @JsonProperty("exercise_mail_from")
     private String replyTo = "planners@openex.io";
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_logo_dark")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("exercise_logo_dark")
     private Document logoDark;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exercise_logo_light")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("exercise_logo_light")
     private Document logoLight;
 
@@ -101,64 +99,54 @@ public class Exercise implements Base {
     @JsonProperty("exercise_updated_at")
     private Instant updatedAt = now();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Audience> audiences = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Grant> grants = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonProperty("exercise_injects")
-    @Fetch(FetchMode.SUBSELECT)
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Inject> injects = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Objective> objectives = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Log> logs = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Poll> polls = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
     @JsonProperty("exercise_pauses")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    @Fetch(FetchMode.SUBSELECT)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     private List<Pause> pauses = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_tags",
             joinColumns = @JoinColumn(name = "exercise_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("exercise_tags")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_documents",
             joinColumns = @JoinColumn(name = "exercise_id"),
             inverseJoinColumns = @JoinColumn(name = "document_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("exercise_documents")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Document> documents = new ArrayList<>();
 
-    @OneToMany(mappedBy = "exercise", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("exercise_articles")
     private List<Article> articles = new ArrayList<>();
 
@@ -188,13 +176,13 @@ public class Exercise implements Base {
     }
 
     @JsonProperty("exercise_planners")
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getPlanners() {
         return getUsersByType(PLANNER);
     }
 
     @JsonProperty("exercise_observers")
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getObservers() {
         return getUsersByType(PLANNER, OBSERVER);
     }
@@ -220,7 +208,7 @@ public class Exercise implements Base {
     }
 
     @JsonProperty("exercise_players")
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     public List<User> getPlayers() {
         return getAudiences().stream().flatMap(audience -> audience.getUsers().stream())
                 .distinct()

@@ -4,12 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.database.model.basic.BasicInject;
 import io.openex.helper.CryptoHelper;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -86,9 +83,9 @@ public class User implements Base, OAuth2User {
     @JsonProperty("user_updated_at")
     private Instant updatedAt = now();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_organization")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("user_organization")
     private Organization organization;
 
@@ -108,51 +105,46 @@ public class User implements Base, OAuth2User {
     @JoinTable(name = "users_groups",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("user_groups")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Group> groups = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_audiences",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "audience_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("user_audiences")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Audience> audiences = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_tags",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("user_tags")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "communications_users",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "communication_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("user_communications")
-    @Fetch(value = FetchMode.SUBSELECT)
     private List<Communication> communications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Token> tokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
-    @Fetch(FetchMode.SUBSELECT)
     private List<ComcheckStatus> comcheckStatuses = new ArrayList<>();
 
     // region transient
-    private transient List<BasicInject> injects = new ArrayList<>();
+    private transient List<Inject> injects = new ArrayList<>();
 
-    public void resolveInjects(Iterable<BasicInject> injects) {
+    public void resolveInjects(Iterable<Inject> injects) {
         this.injects = stream(injects.spliterator(), false)
                 .filter(inject -> inject.isAllAudiences() || inject.getAudiences().stream()
                         .anyMatch(audience -> getAudiences().contains(audience)))
@@ -160,8 +152,8 @@ public class User implements Base, OAuth2User {
     }
 
     @JsonProperty("user_injects")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    public List<BasicInject> getUserInject() {
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    public List<Inject> getUserInject() {
         return injects;
     }
 

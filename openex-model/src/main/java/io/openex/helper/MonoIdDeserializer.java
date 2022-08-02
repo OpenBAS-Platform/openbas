@@ -7,13 +7,13 @@ import io.openex.database.model.Base;
 
 import java.io.IOException;
 
-public class MonoModelDeserializer extends StdSerializer<Base> {
+public class MonoIdDeserializer extends StdSerializer<Base> {
 
-    public MonoModelDeserializer() {
+    public MonoIdDeserializer() {
         this(null);
     }
 
-    public MonoModelDeserializer(Class<Base> t) {
+    public MonoIdDeserializer(Class<Base> t) {
         super(t);
     }
 

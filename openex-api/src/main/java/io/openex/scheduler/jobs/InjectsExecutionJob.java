@@ -16,8 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static io.openex.database.model.Execution.executionError;
 import static java.time.Instant.now;
@@ -27,6 +30,7 @@ import static java.util.stream.Collectors.groupingBy;
 @DisallowConcurrentExecution
 public class InjectsExecutionJob implements Job {
 
+    private static final Logger LOGGER = Logger.getLogger(InjectsExecutionJob.class.getName());
     private ApplicationContext context;
     private InjectHelper injectHelper;
     private DryInjectRepository dryInjectRepository;
@@ -59,6 +63,7 @@ public class InjectsExecutionJob implements Job {
     }
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
             // Handle starting exercises if needed.
@@ -112,6 +117,7 @@ public class InjectsExecutionJob implements Job {
                         exercise.setUpdatedAt(now());
                     }).toList());
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new JobExecutionException(e);
         }
     }

@@ -3,7 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -16,18 +16,18 @@ public class ArticleDocument {
     @JsonIgnore
     private ArticleDocumentId compositeId = new ArticleDocumentId();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("articleId")
     @JoinColumn(name = "article_id")
     @JsonProperty("article_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     private Article article;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("documentId")
     @JoinColumn(name = "document_id")
     @JsonProperty("document_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     private Document document;
 
     public ArticleDocumentId getCompositeId() {

@@ -8,7 +8,8 @@ import io.openex.contract.Contract;
 import io.openex.database.model.*;
 import io.openex.database.repository.ComcheckRepository;
 import io.openex.database.repository.ComcheckStatusRepository;
-import io.openex.execution.*;
+import io.openex.execution.ExecutableInject;
+import io.openex.execution.ExecutionContext;
 import io.openex.injects.email.EmailContract;
 import io.openex.injects.email.EmailExecutor;
 import io.openex.service.ContractService;
@@ -21,9 +22,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static io.openex.database.model.Comcheck.COMCHECK_STATUS.EXPIRED;
 import static io.openex.database.specification.ComcheckStatusSpecification.thatNeedExecution;
@@ -35,6 +39,7 @@ import static java.util.stream.Collectors.groupingBy;
 @DisallowConcurrentExecution
 public class ComchecksExecutionJob implements Job {
 
+    private static final Logger LOGGER = Logger.getLogger(ComchecksExecutionJob.class.getName());
     @Resource
     private OpenExConfig openExConfig;
     private ApplicationContext context;
@@ -90,6 +95,7 @@ public class ComchecksExecutionJob implements Job {
     }
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         Instant now = now();
         try {
@@ -129,6 +135,7 @@ public class ComchecksExecutionJob implements Job {
                 }
             });
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new JobExecutionException(e);
         }
     }

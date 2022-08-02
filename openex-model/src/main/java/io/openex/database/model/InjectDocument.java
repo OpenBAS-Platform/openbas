@@ -3,7 +3,7 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.openex.helper.MonoModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -16,18 +16,18 @@ public class InjectDocument {
     @JsonIgnore
     private InjectDocumentId compositeId = new InjectDocumentId();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("injectId")
     @JoinColumn(name = "inject_id")
     @JsonProperty("inject_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     private Inject inject;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("documentId")
     @JoinColumn(name = "document_id")
     @JsonProperty("document_id")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     private Document document;
 
     @Column(name = "document_attached")

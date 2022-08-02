@@ -26,7 +26,6 @@ public class PlatformTriggers {
                 .withIdentity("InjectsExecutionTrigger")
                 .withSchedule(cronSchedule("0 0/1 * * * ?")) // Every minute align on clock
                 .build();
-
     }
 
     @Bean
@@ -36,6 +35,5 @@ public class PlatformTriggers {
                 .withIdentity("ComchecksExecutionTrigger")
                 .withSchedule(repeatMinutelyForever())
                 .build();
-
     }
 }

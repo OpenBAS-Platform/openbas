@@ -29,19 +29,20 @@ public class StreamApi extends RestBehavior {
     public static final String EVENT_TYPE_MESSAGE = "message";
     public static final String EVENT_TYPE_PING = "ping";
     public static final String X_ACCEL_BUFFERING = "X-Accel-Buffering";
-
     private final Map<String, Tuple2<User, FluxSink<Object>>> consumers = new HashMap<>();
 
     @EventListener
     public void listenDatabaseUpdate(BaseEvent event) {
         consumers.entrySet().stream()
                 .parallel().forEach(entry -> {
-                    String currentSessionId = entry.getKey();
+                    // String currentSessionId = entry.getKey();
                     Tuple2<User, FluxSink<Object>> tupleFlux = entry.getValue();
                     User listener = tupleFlux.getT1();
                     // boolean isValidSession = !currentSessionId.equals(event.getSessionId());
                     // TODO @Sam filter event and broadcast events when necessary
                     if (event.isUserObserver(listener)) {
+                        // Serialize the instance now for lazy session decoupling
+                        event.setInstanceData(mapper.valueToTree(event.getInstance()));
                         ServerSentEvent<BaseEvent> message = ServerSentEvent.builder(event)
                                 .event(EVENT_TYPE_MESSAGE).build();
                         tupleFlux.getT2().next(message);

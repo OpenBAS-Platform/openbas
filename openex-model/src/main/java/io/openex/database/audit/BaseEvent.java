@@ -2,6 +2,8 @@ package io.openex.database.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openex.database.model.Base;
 import io.openex.database.model.User;
 import org.springframework.web.context.request.RequestAttributes;
@@ -21,12 +23,16 @@ public class BaseEvent {
     @JsonProperty("attribute_schema")
     private String schema;
 
-    @JsonProperty("instance")
-    private Base instance;
+    @JsonIgnore
+    private final Base instance;
 
-    public BaseEvent(String type, Base data) {
+    @JsonProperty("instance")
+    private JsonNode instanceData;
+
+    public BaseEvent(String type, Base data, ObjectMapper mapper) {
         this.type = type;
         this.instance = data;
+        this.instanceData = mapper.valueToTree(instance);
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         this.sessionId = requestAttributes != null ? requestAttributes.getSessionId() : null;
         Class<? extends Base> currentClass = data.getClass();
@@ -69,8 +75,12 @@ public class BaseEvent {
         return instance;
     }
 
-    public void setInstance(Base instance) {
-        this.instance = instance;
+    public JsonNode getInstanceData() {
+        return instanceData;
+    }
+
+    public void setInstanceData(JsonNode instanceData) {
+        this.instanceData = instanceData;
     }
 
     @JsonIgnore

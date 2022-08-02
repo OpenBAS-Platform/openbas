@@ -404,8 +404,10 @@ public class ExerciseApi extends RestBehavior {
 
     @GetMapping("/api/exercises")
     @RolesAllowed(ROLE_USER)
-    public Iterable<Exercise> exercises() {
-        return currentUser().isAdmin() ? exerciseRepository.findAll() : exerciseRepository.findAllGranted(currentUser().getId());
+    public List<ExerciseSimple> exercises() {
+        Iterable<Exercise> exercises = currentUser().isAdmin() ? exerciseRepository.findAll()
+                : exerciseRepository.findAllGranted(currentUser().getId());
+        return fromIterable(exercises).stream().map(ExerciseSimple::fromExercise).toList();
     }
     // endregion
 

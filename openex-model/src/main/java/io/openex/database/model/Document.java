@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MultiModelDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
@@ -44,32 +44,28 @@ public class Document implements Base {
     @JsonProperty("document_type")
     private String type;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "documents_tags",
             joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("document_tags")
-    @Fetch(value = FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "exercises_documents",
             joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "exercise_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("document_exercises")
-    @Fetch(value = FetchMode.SUBSELECT)
     private List<Exercise> exercises = new ArrayList<>();
 
-    @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
     @JsonIgnore
-    @Fetch(FetchMode.SUBSELECT)
     private List<InjectDocument> injectDocuments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "document", fetch = FetchType.LAZY)
     @JsonIgnore
-    @Fetch(FetchMode.SUBSELECT)
     private List<ArticleDocument> articleDocuments = new ArrayList<>();
 
     public String getId() {

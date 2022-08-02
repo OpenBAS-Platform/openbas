@@ -94,7 +94,7 @@ public class GroupApi extends RestBehavior {
         // Publish exercises impacted by this group change.
         savedGroup.getGrants().stream()
                 .map(Grant::getExercise)
-                .forEach(exercise -> appPublisher.publishEvent(new BaseEvent(DATA_UPDATE, exercise)));
+                .forEach(exercise -> appPublisher.publishEvent(new BaseEvent(DATA_UPDATE, exercise, mapper)));
         return savedGroup;
     }
 

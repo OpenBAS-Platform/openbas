@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.database.model.basic.BasicInject;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -51,18 +48,17 @@ public class Organization implements Base {
     @JsonIgnore
     private List<User> users = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "organizations_tags",
             joinColumns = @JoinColumn(name = "organization_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("organization_tags")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
     // region transient
-    private transient List<BasicInject> injects = new ArrayList<>();
-    public void resolveInjects(Iterable<BasicInject> injects) {
+    private transient List<Inject> injects = new ArrayList<>();
+    public void resolveInjects(Iterable<Inject> injects) {
         this.injects = stream(injects.spliterator(), false)
                 .filter(inject -> inject.isAllAudiences() || inject.getAudiences().stream()
                         .anyMatch(audience -> getUsers().stream()
@@ -72,8 +68,8 @@ public class Organization implements Base {
     }
 
     @JsonProperty("organization_injects")
-    @JsonSerialize(using = MultiModelDeserializer.class)
-    public List<BasicInject> getOrganizationInject() {
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    public List<Inject> getOrganizationInject() {
         return injects;
     }
 

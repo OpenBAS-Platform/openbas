@@ -3,8 +3,8 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -56,15 +56,15 @@ public class Comcheck implements Base {
     @JsonProperty("comcheck_message")
     private String message;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comcheck_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("comcheck_exercise")
     private Exercise exercise;
 
     // CascadeType.ALL is required here because comcheck statuses are embedded
-    @OneToMany(mappedBy = "comcheck", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @OneToMany(mappedBy = "comcheck", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("comcheck_statuses")
     private List<ComcheckStatus> comcheckStatus = new ArrayList<>();
 

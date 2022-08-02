@@ -3,9 +3,8 @@ package io.openex.database.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
+import io.openex.helper.MultiIdDeserializer;
 import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -45,15 +44,15 @@ public class Group implements Base {
 
     @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     @JsonProperty("group_grants")
+    @JsonSerialize(using = MultiModelDeserializer.class)
     private List<Grant> grants = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_groups",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("group_users")
-    @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
     // region transient

@@ -4,10 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.openex.database.audit.ModelBaseListener;
-import io.openex.helper.MonoModelDeserializer;
-import io.openex.helper.MultiModelDeserializer;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import io.openex.helper.MonoIdDeserializer;
+import io.openex.helper.MultiIdDeserializer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -42,9 +40,9 @@ public class Audience implements Base {
     @JsonProperty("audience_enabled")
     private boolean enabled = true;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "audience_exercise")
-    @JsonSerialize(using = MonoModelDeserializer.class)
+    @JsonSerialize(using = MonoIdDeserializer.class)
     @JsonProperty("audience_exercise")
     private Exercise exercise;
 
@@ -56,22 +54,20 @@ public class Audience implements Base {
     @JsonProperty("audience_updated_at")
     private Instant updatedAt = now();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "audiences_tags",
             joinColumns = @JoinColumn(name = "audience_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("audience_tags")
-    @Fetch(FetchMode.SUBSELECT)
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_audiences",
             joinColumns = @JoinColumn(name = "audience_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     @JsonProperty("audience_users")
-    @Fetch(FetchMode.SUBSELECT)
     private List<User> users = new ArrayList<>();
 
     @JsonProperty("audience_users_number")
@@ -81,7 +77,7 @@ public class Audience implements Base {
 
     // region transient
     @JsonProperty("audience_injects")
-    @JsonSerialize(using = MultiModelDeserializer.class)
+    @JsonSerialize(using = MultiIdDeserializer.class)
     public List<Inject> getInjects() {
         Predicate<Inject> selectedInject = inject -> inject.isAllAudiences() || inject.getAudiences().contains(this);
         return getExercise().getInjects().stream().filter(selectedInject).distinct().toList();
