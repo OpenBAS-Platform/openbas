@@ -79,7 +79,7 @@ const MediaTvChannel = ({ mediaReader }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/player/${exercise.exercise_id}/documents/${logo}/media_file${queryParams}`}
+            src={`/api/player/${exercise.exercise_id}/documents/${logo}/file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -133,7 +133,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                     <CardMedia
                       component="img"
                       height="200"
-                      src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                      src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                     />
                   </Grid>
                 ))}
@@ -211,7 +211,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                         <CardMedia
                           component="img"
                           height="100"
-                          src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                          src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                         />
                       </Grid>
                     ))}
@@ -293,7 +293,7 @@ const MediaTvChannel = ({ mediaReader }) => {
                       <CardMedia
                         component="video"
                         height="150"
-                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                       />
                     </Grid>
                   ))}

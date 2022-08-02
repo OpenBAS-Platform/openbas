@@ -11,6 +11,7 @@ import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
 import Articles from './media/Articles';
+import Challenges from './challenges/Challenges';
 import Timeline from './timeline/Timeline';
 import Mails from './mails/Mails';
 import MailsInject from './mails/Inject';
@@ -77,6 +78,11 @@ const Index = () => {
             exact
             path="/admin/exercises/:exerciseId/definition/media"
             render={errorWrapper(Articles)}
+          />
+          <Route
+            exact
+            path="/admin/exercises/:exerciseId/definition/challenges"
+            render={errorWrapper(Challenges)}
           />
           <Route
             exact

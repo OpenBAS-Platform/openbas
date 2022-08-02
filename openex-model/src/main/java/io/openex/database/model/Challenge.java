@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.time.Instant.now;
 
@@ -78,6 +79,10 @@ public class Challenge implements Base {
     @JsonProperty("challenge_documents")
     @Fetch(FetchMode.SUBSELECT)
     private List<Document> documents = new ArrayList<>();
+
+    @Transient
+    @JsonProperty("challenge_exercises")
+    private List<String> exercises;
 
     @Override
     public String getId() {
@@ -166,6 +171,14 @@ public class Challenge implements Base {
 
     public void setDocuments(List<Document> documents) {
         this.documents = documents;
+    }
+
+    public List<String> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<String> exercises) {
+        this.exercises = exercises;
     }
 
     @Override

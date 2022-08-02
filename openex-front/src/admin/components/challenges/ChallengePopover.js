@@ -43,7 +43,12 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge }) => {
   };
   const handleCloseEdit = () => setOpenEdit(false);
   const onSubmitEdit = (data) => {
-    return dispatch(updateChallenge(challenge.challenge_id, data)).then(() => handleCloseEdit());
+    const inputValues = R.pipe(
+      R.assoc('challenge_tags', R.pluck('id', data.challenge_tags)),
+    )(data);
+    return dispatch(updateChallenge(challenge.challenge_id, inputValues)).then(
+      () => handleCloseEdit(),
+    );
   };
   // Delete action
   const handleOpenDelete = () => {
@@ -72,6 +77,7 @@ const ChallengePopover = ({ challenge, documents, onRemoveChallenge }) => {
       'challenge_category',
       'challenge_content',
       'challenge_score',
+      'challenge_tags',
       'challenge_max_attempts',
       'challenge_flags',
     ]),

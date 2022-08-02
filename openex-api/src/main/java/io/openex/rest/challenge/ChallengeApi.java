@@ -1,12 +1,12 @@
 package io.openex.rest.challenge;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.openex.database.model.Challenge;
 import io.openex.database.model.ChallengeFlag;
 import io.openex.database.model.ChallengeFlag.FLAG_TYPE;
-import io.openex.database.repository.ChallengeFlagRepository;
-import io.openex.database.repository.ChallengeRepository;
-import io.openex.database.repository.DocumentRepository;
-import io.openex.database.repository.TagRepository;
+import io.openex.database.model.Exercise;
+import io.openex.database.repository.*;
+import io.openex.injects.challenge.model.ChallengeContent;
 import io.openex.rest.challenge.form.ChallengeCreateInput;
 import io.openex.rest.challenge.form.ChallengeUpdateInput;
 import io.openex.rest.helper.RestBehavior;
@@ -18,10 +18,13 @@ import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static io.openex.database.model.User.ROLE_ADMIN;
 import static io.openex.helper.StreamHelper.fromIterable;
+import static io.openex.injects.challenge.ChallengeContract.CHALLENGE_PUBLISH;
 
 @RestController
 public class ChallengeApi extends RestBehavior {
@@ -30,6 +33,7 @@ public class ChallengeApi extends RestBehavior {
     private ChallengeFlagRepository challengeFlagRepository;
     private TagRepository tagRepository;
     private DocumentRepository documentRepository;
+    private ExerciseRepository exerciseRepository;
 
     @Autowired
     public void setChallengeFlagRepository(ChallengeFlagRepository challengeFlagRepository) {
@@ -51,8 +55,13 @@ public class ChallengeApi extends RestBehavior {
         this.documentRepository = documentRepository;
     }
 
+    @Autowired
+    public void setExerciseRepository(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
+
     @GetMapping("/api/challenges")
-    public Iterable<Challenge> medias() {
+    public Iterable<Challenge> challenges() {
         return challengeRepository.findAll();
     }
 
@@ -98,6 +107,24 @@ public class ChallengeApi extends RestBehavior {
         }).toList();
         challenge.setFlags(challengeFlags);
         return challengeRepository.save(challenge);
+    }
+
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    @GetMapping("/api/exercises/{exerciseId}/challenges")
+    public Iterable<Challenge> exerciseChallenges(@PathVariable String exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        List<String> challenges = exercise.getInjects().stream()
+                .filter(inject -> inject.getContract().equals(CHALLENGE_PUBLISH))
+                .flatMap(inject -> {
+                    try {
+                        ChallengeContent content = mapper.treeToValue(inject.getContent(), ChallengeContent.class);
+                        return content.getChallengeIds().stream();
+                    } catch (JsonProcessingException e) {
+                        return Stream.empty();
+                    }
+                })
+                .distinct().toList();
+        return challengeRepository.findAllById(challenges);
     }
 
     @RolesAllowed(ROLE_ADMIN)

@@ -198,7 +198,7 @@ public class DocumentApi extends RestBehavior {
         return Stream.concat(mediasDocs, articlesDocs).distinct().toList();
     }
 
-    @GetMapping("/api/player/{exerciseId}/media_documents")
+    @GetMapping("/api/player/{exerciseId}/documents")
     public List<Document> mediaDocuments(@PathVariable String exerciseId, @RequestParam Optional<String> userId) {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         final User user = userId.map(this::impersonateUser).orElse(currentUser());
@@ -211,7 +211,7 @@ public class DocumentApi extends RestBehavior {
         return getExerciseMediaDocuments(exercise);
     }
 
-    @GetMapping("/api/player/{exerciseId}/documents/{documentId}/media_file")
+    @GetMapping("/api/player/{exerciseId}/documents/{documentId}/file")
     public void downloadMediaDocument(@PathVariable String exerciseId, @PathVariable String documentId, @RequestParam Optional<String> userId, HttpServletResponse response) throws IOException {
         Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
         final User user = userId.map(this::impersonateUser).orElse(currentUser());

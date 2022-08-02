@@ -64,7 +64,7 @@ const MediaMicroblogging = ({ mediaReader }) => {
           style={{ margin: '0 auto', textAlign: 'center', marginBottom: 15 }}
         >
           <img
-            src={`/api/player/${exercise.exercise_id}/documents/${logo}/media_file${queryParams}`}
+            src={`/api/player/${exercise.exercise_id}/documents/${logo}/file${queryParams}`}
             className={classes.logo}
           />
         </div>
@@ -142,14 +142,14 @@ const MediaMicroblogging = ({ mediaReader }) => {
                       <CardMedia
                         component="img"
                         height="150"
-                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                       />
                     )}
                     {doc.document_type.includes('video/') && (
                       <CardMedia
                         component="video"
                         height="150"
-                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/media_file${queryParams}`}
+                        src={`/api/player/${exercise.exercise_id}/documents/${doc.document_id}/file${queryParams}`}
                         controls={true}
                       />
                     )}

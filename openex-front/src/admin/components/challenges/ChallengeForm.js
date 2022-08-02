@@ -32,6 +32,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchExercises } from '../../../actions/Exercise';
 import { fetchDocuments } from '../../../actions/Document';
 import ChallengeAddDocuments from './ChallengeAddDocuments';
+import TagField from '../../../components/TagField';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -200,7 +201,7 @@ const ChallengeForm = (props) => {
         },
       }}
     >
-      {({ handleSubmit, submitting, errors }) => (
+      {({ form, handleSubmit, submitting, errors, values }) => (
         <form id="challengeForm" onSubmit={handleSubmit}>
           <TextField
             variant="standard"
@@ -241,6 +242,13 @@ const ChallengeForm = (props) => {
               />
             </Grid>
           </Grid>
+          <TagField
+            name="challenge_tags"
+            label={t('Tags')}
+            values={values}
+            setFieldValue={form.mutators.setValue}
+            style={{ marginTop: 20 }}
+          />
           <Typography variant="h2" style={{ marginTop: 30 }}>
             {t('Documents')}
           </Typography>

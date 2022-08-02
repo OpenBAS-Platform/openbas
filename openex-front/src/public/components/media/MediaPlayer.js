@@ -12,7 +12,7 @@ import MediaTvChannel from './MediaTvChannel';
 import { useFormatter } from '../../../components/i18n';
 import { usePermissions } from '../../../utils/Exercise';
 import { fetchMe } from '../../../actions/Application';
-import { fetchMediaDocuments } from '../../../actions/Document';
+import { fetchPlayerDocuments } from '../../../actions/Document';
 import Loader from '../../../components/Loader';
 
 const useStyles = makeStyles(() => ({
@@ -38,7 +38,7 @@ const Media = () => {
   useEffect(() => {
     dispatch(fetchMe());
     dispatch(fetchPlayerMedia(exerciseId, mediaId, userId));
-    dispatch(fetchMediaDocuments(exerciseId, userId));
+    dispatch(fetchPlayerDocuments(exerciseId, userId));
   }, []);
   if (media) {
     return (

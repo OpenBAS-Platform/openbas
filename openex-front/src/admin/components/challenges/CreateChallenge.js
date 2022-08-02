@@ -10,6 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import { ListItemIcon } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import { makeStyles } from '@mui/styles';
+import * as R from 'ramda';
 import { useFormatter } from '../../../components/i18n';
 import { addChallenge } from '../../../actions/Challenge';
 import ChallengeForm from './ChallengeForm';
@@ -41,7 +42,10 @@ const CreateChallenge = (props) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const onSubmit = (data) => {
-    return dispatch(addChallenge(data)).then((result) => {
+    const inputValues = R.pipe(
+      R.assoc('challenge_tags', R.pluck('id', data.challenge_tags)),
+    )(data);
+    return dispatch(addChallenge(inputValues)).then((result) => {
       if (result.result) {
         if (onCreate) {
           onCreate(result.result);
@@ -92,7 +96,7 @@ const CreateChallenge = (props) => {
             editing={false}
             onSubmit={onSubmit}
             handleClose={handleClose}
-            initialValues={{ challenge_name: '', challenge_description: '' }}
+            initialValues={{ challenge_tags: [] }}
           />
         </DialogContent>
       </Dialog>

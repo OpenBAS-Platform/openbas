@@ -8,7 +8,10 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { CastForEducationOutlined } from '@mui/icons-material';
+import {
+  CastForEducationOutlined,
+  EmojiEventsOutlined,
+} from '@mui/icons-material';
 import { NewspaperVariantMultipleOutline } from 'mdi-material-ui';
 import inject18n from '../../../components/i18n';
 
@@ -66,6 +69,20 @@ class DefinitionMenu extends Component {
               <NewspaperVariantMultipleOutline />
             </ListItemIcon>
             <ListItemText primary={t('Media pressure')} />
+          </MenuItem>
+          <MenuItem
+            component={Link}
+            to={`/admin/exercises/${exerciseId}/definition/challenges`}
+            selected={
+              location.pathname
+              === `/admin/exercises/${exerciseId}/definition/challenges`
+            }
+            classes={{ root: classes.item }}
+          >
+            <ListItemIcon>
+              <EmojiEventsOutlined />
+            </ListItemIcon>
+            <ListItemText primary={t('Challenges')} />
           </MenuItem>
         </MenuList>
       </Drawer>

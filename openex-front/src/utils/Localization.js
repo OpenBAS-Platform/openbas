@@ -408,6 +408,10 @@ const i18n = {
         'Souhaitez-vous retirer cette pression médiatique de ce stimuli ?',
       'Do you want to remove this challenge from the inject?':
         'Souhaitez-vous retirer ce challenge de ce stimuli ?',
+      VALUE: 'Texte',
+      VALUE_CASE: 'Texte (sensible à la casse)',
+      REGEXP: 'Expression régulière',
+      'No category': 'Aucune catégorie',
     },
     en: {
       openex_email: 'Email',
@@ -439,6 +443,9 @@ const i18n = {
       logo: 'Logo only',
       title: 'Title only',
       'logo-title': 'Logo and title',
+      VALUE: 'Text',
+      VALUE_CASE: 'Text (case-sensitive)',
+      REGEXP: 'Regular expression',
     },
   },
 };

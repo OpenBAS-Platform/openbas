@@ -6,7 +6,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
 import { useDispatch } from 'react-redux';
-import { EmojiEvents } from '@mui/icons-material';
+import { EmojiEventsOutlined } from '@mui/icons-material';
 import SearchFilter from '../../../components/SearchFilter';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
@@ -67,7 +67,7 @@ const headerStyles = {
   },
   challenge_name: {
     float: 'left',
-    width: '25%',
+    width: '30%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -85,7 +85,7 @@ const headerStyles = {
   },
   challenge_exercises: {
     float: 'left',
-    width: '20%',
+    width: '10%',
     fontSize: 12,
     fontWeight: '700',
   },
@@ -99,7 +99,7 @@ const headerStyles = {
 const inlineStyles = {
   challenge_name: {
     float: 'left',
-    width: '25%',
+    width: '30%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -123,7 +123,7 @@ const inlineStyles = {
   },
   challenge_exercises: {
     float: 'left',
-    width: '20%',
+    width: '10%',
     height: 20,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -143,7 +143,7 @@ const Challenges = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   // Filter and sort hook
-  const searchColumns = ['name', 'content', 'category', 'score'];
+  const searchColumns = ['name', 'content', 'category'];
   const filtering = useSearchAnFilter('challenge', 'name', searchColumns);
   // Fetching data
   const { challenges, documentsMap } = useHelper((helper) => ({
@@ -237,7 +237,7 @@ const Challenges = () => {
               divider={true}
             >
               <ListItemIcon>
-                <EmojiEvents color="primary" />
+                <EmojiEventsOutlined color="primary" />
               </ListItemIcon>
               <ListItemText
                 primary={

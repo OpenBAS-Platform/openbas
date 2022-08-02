@@ -57,6 +57,9 @@ const useStyles = makeStyles(() => ({
     left: 0,
     bottom: 10,
   },
+  button: {
+    cursor: 'default',
+  },
 }));
 
 const Articles = () => {
@@ -270,15 +273,21 @@ const Articles = () => {
                       <Button
                         size="small"
                         startIcon={<ChatBubbleOutlineOutlined />}
+                        className={classes.button}
                       >
                         {article.article_comments || 0}
                       </Button>
-                      <Button size="small" startIcon={<ShareOutlined />}>
+                      <Button
+                        size="small"
+                        startIcon={<ShareOutlined />}
+                        className={classes.button}
+                      >
                         {article.article_shares || 0}
                       </Button>
                       <Button
                         size="small"
                         startIcon={<FavoriteBorderOutlined />}
+                        className={classes.button}
                       >
                         {article.article_likes || 0}
                       </Button>
