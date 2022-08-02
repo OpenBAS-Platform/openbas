@@ -93,9 +93,7 @@ const ChallengesPreview = () => {
           </Typography>
           {challenges.length === 0 && (
             <div style={{ marginTop: 150 }}>
-              <Empty
-                message={t('No media pressure entry in this media yet.')}
-              />
+              <Empty message={t('No challenge in this exercise yet.')} />
             </div>
           )}
         </div>
