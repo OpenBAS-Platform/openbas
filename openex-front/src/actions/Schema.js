@@ -159,6 +159,11 @@ export const mediaReader = new schema.Entity(
   {},
   { idAttribute: 'media_id' },
 );
+export const challengesReader = new schema.Entity(
+  'challengesreaders',
+  {},
+  { idAttribute: 'exercise_id' },
+);
 
 token.define({ token_user: user });
 user.define({ user_organization: organization });
@@ -219,10 +224,11 @@ export const storeHelper = (state) => ({
   // comcheck
   getComcheck: (id) => entity(id, 'comchecks', state),
   getComcheckStatus: (id) => entity(id, 'comcheckstatuses', state),
-  getMediaReader: (id) => entity(id, 'mediareaders', state),
   getComcheckStatuses: (id) => entities('comcheckstatuses', state).filter(
     (i) => i.comcheckstatus_comcheck === id,
   ),
+  getMediaReader: (id) => entity(id, 'mediareaders', state),
+  getChallengesReader: (id) => entity(id, 'challengesreaders', state),
   // users
   getUsers: () => entities('users', state),
   getGroups: () => entities('groups', state),

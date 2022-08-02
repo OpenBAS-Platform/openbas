@@ -412,6 +412,8 @@ const i18n = {
       VALUE_CASE: 'Texte (sensible à la casse)',
       REGEXP: 'Expression régulière',
       'No category': 'Aucune catégorie',
+      'No challenge in this exercise yet.':
+        'Encore aucun challenge dans cet exercice.',
     },
     en: {
       openex_email: 'Email',

@@ -7,7 +7,7 @@ import {
 } from '../utils/Action';
 import { mediaReader } from './Schema';
 
-// region media
+// region medias
 const media = new schema.Entity('medias', {}, { idAttribute: 'media_id' });
 const arrayOfMedias = new schema.Array(media);
 export const fetchMedias = () => (dispatch) => {

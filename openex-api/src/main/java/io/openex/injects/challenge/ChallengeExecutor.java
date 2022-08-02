@@ -53,7 +53,7 @@ public class ChallengeExecutor extends Injector {
         String userId = context.getUser().getId();
         String challengeId = challenge.getId();
         String exerciseId = context.getExercise().getId();
-        return openExConfig.getBaseUrl() + "/challenge/" + exerciseId + "/" + challengeId + "?user=" + userId;
+        return openExConfig.getBaseUrl() + "/challenges/" + exerciseId + "?user=" + userId + "&challenge=" + challengeId;
     }
 
     @Override

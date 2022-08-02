@@ -5,6 +5,7 @@ import {
   postReferential,
   putReferential,
 } from '../utils/Action';
+import { challengesReader } from './Schema';
 
 const challenge = new schema.Entity(
   'challenges',
@@ -38,4 +39,14 @@ export const addChallenge = (data) => (dispatch) => postReferential(challenge, '
 export const deleteChallenge = (mediaId) => (dispatch) => {
   const uri = `/api/challenges/${mediaId}`;
   return delReferential(uri, 'challenges', mediaId)(dispatch);
+};
+
+export const fetchPlayerChallenges = (exerciseId, userId) => (dispatch) => {
+  const uri = `/api/player/challenges/${exerciseId}?userId=${userId}`;
+  return getReferential(challengesReader, uri)(dispatch);
+};
+
+export const fetchObserverChallenges = (exerciseId, userId) => (dispatch) => {
+  const uri = `/api/observer/challenges/${exerciseId}?userId=${userId}`;
+  return getReferential(challengesReader, uri)(dispatch);
 };

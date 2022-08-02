@@ -5,7 +5,8 @@ import { makeStyles } from '@mui/styles';
 import Comcheck from './components/comcheck/Comcheck';
 import Login from './components/login/Login';
 import { errorWrapper } from '../components/Error';
-import Media from './components/media/Media';
+import Media from './components/medias/Media';
+import Challenges from './components/challenges/Challenges';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -44,6 +45,7 @@ const Index = () => {
             path="/medias/:exerciseId/:mediaId"
             render={errorWrapper(Media)}
           />
+          <Route path="/challenges/:exerciseId" render={errorWrapper(Challenges)} />
           <Route component={Login} />
         </Switch>
       </main>

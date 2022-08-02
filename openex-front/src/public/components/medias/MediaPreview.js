@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Media = () => {
+const MediaPreview = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { t } = useFormatter();
@@ -69,4 +69,4 @@ const Media = () => {
   return <Loader />;
 };
 
-export default Media;
+export default MediaPreview;

@@ -48,7 +48,7 @@ import Loader from '../../../../components/Loader';
 import DocumentType from '../../documents/DocumentType';
 import DocumentPopover from '../../documents/DocumentPopover';
 import { Select } from '../../../../components/Select';
-import ArticlePopover from '../media/ArticlePopover';
+import ArticlePopover from '../articles/ArticlePopover';
 import InjectAddArticles from './InjectAddArticles';
 import MediaIcon from '../../medias/MediaIcon';
 import ChallengePopover from '../../challenges/ChallengePopover';

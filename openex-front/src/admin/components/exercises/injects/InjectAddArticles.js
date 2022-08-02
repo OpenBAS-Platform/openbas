@@ -20,7 +20,7 @@ import SearchFilter from '../../../../components/SearchFilter';
 import inject18n from '../../../../components/i18n';
 import { storeHelper } from '../../../../actions/Schema';
 import { fetchMedias, fetchExerciseArticles } from '../../../../actions/Media';
-import CreateArticle from '../media/CreateArticle';
+import CreateArticle from '../articles/CreateArticle';
 import { truncate } from '../../../../utils/String';
 import { isExerciseReadOnly } from '../../../../utils/Exercise';
 import { Transition } from '../../../../utils/Environment';

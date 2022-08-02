@@ -265,7 +265,10 @@ public class MediaApi extends RestBehavior {
                     Instant virtualInjectDate = inject.getStatus().get().getDate();
                     try {
                         MediaContent content = mapper.treeToValue(inject.getContent(), MediaContent.class);
-                        return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
+                        if (content.getArticles() != null) {
+                            return content.getArticles().stream().map(article -> new VirtualArticle(virtualInjectDate, article));
+                        }
+                        return null;
                     } catch (JsonProcessingException e) {
                         // Invalid media content.
                         return null;

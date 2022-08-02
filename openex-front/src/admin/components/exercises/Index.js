@@ -10,7 +10,7 @@ import ExerciseHeader from './ExerciseHeader';
 import TopBar from '../nav/TopBar';
 import Audiences from './audiences/Audiences';
 import Injects from './injects/Injects';
-import Articles from './media/Articles';
+import Articles from './articles/Articles';
 import Challenges from './challenges/Challenges';
 import Timeline from './timeline/Timeline';
 import Mails from './mails/Mails';
