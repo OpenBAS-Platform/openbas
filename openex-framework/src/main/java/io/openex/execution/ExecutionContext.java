@@ -14,9 +14,17 @@ public class ExecutionContext extends HashMap<String, Object> {
     public static final String EXERCISE = "exercise";
     public static final String AUDIENCES = "audiences";
     public static final String COMCHECK = "comcheck";
+    public static final String PLAYER_URI = "player_uri";
+    public static final String CHALLENGES_URI = "challenges_uri";
 
-    public ExecutionContext(User user, Exercise exercise, List<String> audiences) {
-        this.put(USER, user);
+    private ExecutionContext(User user, Exercise exercise, List<String> audiences) {
+        User protectUser = new User();
+        protectUser.setId(user.getId());
+        protectUser.setEmail(user.getEmail());
+        protectUser.setFirstname(user.getFirstname());
+        protectUser.setLastname(user.getLastname());
+        protectUser.setLang(user.getLang());
+        this.put(USER, protectUser);
         this.put(EXERCISE, exercise);
         this.put(AUDIENCES, audiences);
     }
@@ -24,8 +32,9 @@ public class ExecutionContext extends HashMap<String, Object> {
     public ExecutionContext(OpenExConfig config, User user, Injection injection, List<String> audiences) {
         this(user, injection.getExercise(), audiences);
         String exerciseId = injection.getExercise().getId();
-        String playerUri = config.getBaseUrl() + "/private/" + exerciseId + "/" + injection.getId() + "?user=" + user.getId();
-        this.put("player_uri", playerUri);
+        String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
+        this.put(PLAYER_URI, config.getBaseUrl() + "/private/" + exerciseId + queryParams);
+        this.put(CHALLENGES_URI, config.getBaseUrl() + "/challenges/" + exerciseId + queryParams);
     }
 
     public ExecutionContext(User user, Exercise exercise, String audience) {

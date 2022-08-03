@@ -29,6 +29,10 @@ import static io.openex.injects.media.MediaContract.MEDIA_PUBLISH;
 @Component(MediaContract.TYPE)
 public class MediaExecutor extends Injector {
 
+    public static final String VARIABLE_ARTICLES = "articles";
+
+    public static final String VARIABLE_ARTICLE = "article";
+
     @Resource
     private OpenExConfig openExConfig;
 
@@ -47,14 +51,6 @@ public class MediaExecutor extends Injector {
     @Autowired
     public void setEmailService(EmailService emailService) {
         this.emailService = emailService;
-    }
-
-    private String buildMediaUri(ExecutionContext context, Exercise exercise, Media media) {
-        String userId = context.getUser().getId();
-        String exerciseId = exercise.getId();
-        String mediaId = media.getId();
-        String queryOptions = "user=" + userId;
-        return openExConfig.getBaseUrl() + "/medias/" + exerciseId + "/" + mediaId + "?" + queryOptions;
     }
 
     private String buildArticleUri(ExecutionContext context, Article article) {
@@ -93,7 +89,7 @@ public class MediaExecutor extends Injector {
                                     .map(article -> new ArticleVariable(article.getId(), article.getName(),
                                             buildArticleUri(userInjectContext, article)))
                                     .toList();
-                            userInjectContext.put("articles", articleVariables);
+                            userInjectContext.put(VARIABLE_ARTICLES, articleVariables);
                             // Send the email.
                             emailService.sendEmail(execution, userInjectContext, replyTo, content.getInReplyTo(), encrypted,
                                     content.getSubject(), message, attachments, storeInImap);
