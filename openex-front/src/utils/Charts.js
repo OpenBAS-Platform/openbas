@@ -28,6 +28,7 @@ export const lineChartOptions = (
   xFormatter = null,
   yFormatter = null,
   tickAmount = undefined,
+  distributed = false,
 ) => ({
   chart: {
     type: 'line',
@@ -41,13 +42,11 @@ export const lineChartOptions = (
     mode: theme.palette.mode,
   },
   dataLabels: {
-    enabled: false,
+    enabled: true,
   },
-  stroke: {
-    curve: 'smooth',
-    width: 2,
-  },
-  colors: [theme.palette.primary.main],
+  colors: distributed
+    ? colors(theme.palette.mode === 'dark' ? 400 : 600)
+    : [theme.palette.primary.main],
   states: {
     hover: {
       filter: {
@@ -64,23 +63,14 @@ export const lineChartOptions = (
     strokeDashArray: 3,
   },
   legend: {
-    show: false,
+    show: true,
+    itemMargin: {
+      horizontal: 5,
+      vertical: 20,
+    },
   },
   tooltip: {
     theme: theme.palette.mode,
-  },
-  fill: {
-    type: 'gradient',
-    gradient: {
-      shade: theme.palette.mode,
-      shadeIntensity: 1,
-      opacityFrom: 0.7,
-      opacityTo: 0.1,
-      gradientToColors: [
-        theme.palette.primary.main,
-        theme.palette.primary.main,
-      ],
-    },
   },
   xaxis: {
     type: isTimeSeries ? 'datetime' : 'category',

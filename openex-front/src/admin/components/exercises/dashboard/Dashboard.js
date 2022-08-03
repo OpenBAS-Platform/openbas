@@ -18,7 +18,10 @@ import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../../actions/Audience';
 import ResultsMenu from '../ResultsMenu';
-import { horizontalBarsChartOptions } from '../../../../utils/Charts';
+import {
+  horizontalBarsChartOptions,
+  lineChartOptions,
+} from '../../../../utils/Charts';
 import Empty from '../../../../components/Empty';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
@@ -78,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
 const Dashboard = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { t, tPick } = useFormatter();
+  const { t, nsdt, tPick } = useFormatter();
   const theme = useTheme();
   // Fetching data
   const { exerciseId } = useParams();
@@ -182,6 +185,44 @@ const Dashboard = () => {
       })),
     },
   ];
+  const audiencesScores = [
+    {
+      name: 'SOC Team',
+      data: [
+        { x: '2022-08-03 10:09:06.012204', y: 0 },
+        { x: '2022-08-03 10:12:06.012204', y: 200 },
+        { x: '2022-08-03 10:58:06.012204', y: 350 },
+        { x: '2022-08-03 11:09:06.012204', y: 450 },
+        { x: '2022-08-03 11:30:06.012204', y: 500 },
+        { x: '2022-08-03 11:40:06.012204', y: 700 },
+        { x: '2022-08-03 11:50:06.012204', y: 900 },
+      ],
+    },
+    {
+      name: 'CSIRT Team',
+      data: [
+        { x: '2022-08-03 10:05:06.012204', y: 0 },
+        { x: '2022-08-03 10:10:06.012204', y: 500 },
+        { x: '2022-08-03 10:30:06.012204', y: 700 },
+        { x: '2022-08-03 11:20:06.012204', y: 1200 },
+        { x: '2022-08-03 11:25:06.012204', y: 1500 },
+        { x: '2022-08-03 11:30:06.012204', y: 2000 },
+        { x: '2022-08-03 11:32:06.012204', y: 2500 },
+      ],
+    },
+    {
+      name: 'Test',
+      data: [
+        { x: '2022-08-03 10:05:06.012204', y: 10 },
+        { x: '2022-08-03 10:10:06.012204', y: 50 },
+        { x: '2022-08-03 10:30:06.012204', y: 100 },
+        { x: '2022-08-03 11:20:06.012204', y: 200 },
+        { x: '2022-08-03 11:25:06.012204', y: 250 },
+        { x: '2022-08-03 12:30:06.012204', y: 300 },
+        { x: '2022-08-03 13:32:06.012204', y: 350 },
+      ],
+    },
+  ];
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -277,7 +318,13 @@ const Dashboard = () => {
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {sortedAudiencesByExpectation.length > 0 ? (
               <Chart
-                options={horizontalBarsChartOptions(theme)}
+                options={horizontalBarsChartOptions(
+                  theme,
+                  false,
+                  null,
+                  null,
+                  true,
+                )}
                 series={expectationsByAudienceData}
                 type="bar"
                 width="100%"
@@ -295,7 +342,13 @@ const Dashboard = () => {
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {sortedAudiencesByExpectedScore.length > 0 ? (
               <Chart
-                options={horizontalBarsChartOptions(theme)}
+                options={horizontalBarsChartOptions(
+                  theme,
+                  false,
+                  null,
+                  null,
+                  true,
+                )}
                 series={expectedScoreByAudienceData}
                 type="bar"
                 width="100%"
@@ -310,9 +363,31 @@ const Dashboard = () => {
       <Typography variant="h1" style={{ marginTop: 60 }}>
         {t('Exercise results')}
       </Typography>
-      <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
-        <Grid item={true} xs={6} style={{ marginTop: -14 }}>
-
+      <Grid container={true} spacing={3} style={{ marginTop: -10 }}>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">
+            {t('Audiences scores over time')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {audiences.length > 0 ? (
+              <Chart
+                options={lineChartOptions(
+                  theme,
+                  true,
+                  nsdt,
+                  null,
+                  undefined,
+                  true,
+                )}
+                series={audiencesScores}
+                type="line"
+                width="100%"
+                height={350}
+              />
+            ) : (
+              <Empty message={t('No audiences in this exercise.')} />
+            )}
+          </Paper>
         </Grid>
       </Grid>
     </div>

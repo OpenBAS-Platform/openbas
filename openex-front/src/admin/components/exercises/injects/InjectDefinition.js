@@ -844,6 +844,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
                 >
                   {Object.entries(field.choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -865,6 +866,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
                 >
                   {Object.entries(field.choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
@@ -892,6 +894,7 @@ class InjectDefinition extends Component {
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
                 >
                   {Object.entries(choices)
                     .sort((a, b) => a[1].localeCompare(b[1]))
