@@ -450,6 +450,8 @@ const i18n = {
       'Audiences scores over time': 'Score des audiences dans le temps',
       'Inject types scores over time':
         'Score des types de stimuli dans le temps',
+      'The animation team can validate the audience reaction':
+        "L'équipe d'animation peut valider la réaction de l'audience",
     },
     en: {
       openex_email: 'Email',
