@@ -114,6 +114,7 @@ public class Contract {
         // Direct uris
         variables.add(variable(PLAYER_URI, "Player interface platform link", String, One));
         variables.add(variable(CHALLENGES_URI, "Player interface platform link", String, One));
+        variables.add(variable(SCOREBOARD_URI, "Scoreboard interface platform link", String, One));
         return variables;
     }
 }

@@ -16,6 +16,7 @@ public class ExecutionContext extends HashMap<String, Object> {
     public static final String COMCHECK = "comcheck";
     public static final String PLAYER_URI = "player_uri";
     public static final String CHALLENGES_URI = "challenges_uri";
+    public static final String SCOREBOARD_URI = "scoreboard_uri";
 
     private ExecutionContext(User user, Exercise exercise, List<String> audiences) {
         User protectUser = new User();
@@ -35,6 +36,7 @@ public class ExecutionContext extends HashMap<String, Object> {
         String queryParams = "?user=" + user.getId() + "&inject=" + injection.getId();
         this.put(PLAYER_URI, config.getBaseUrl() + "/private/" + exerciseId + queryParams);
         this.put(CHALLENGES_URI, config.getBaseUrl() + "/challenges/" + exerciseId + queryParams);
+        this.put(SCOREBOARD_URI, config.getBaseUrl() + "/scoreboard/" + exerciseId + queryParams);
     }
 
     public ExecutionContext(User user, Exercise exercise, String audience) {
