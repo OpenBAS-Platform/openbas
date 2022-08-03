@@ -2,6 +2,7 @@ package io.openex.injects.email;
 
 import io.openex.contract.Contract;
 import io.openex.contract.ContractConfig;
+import io.openex.contract.ContractVariable;
 import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
 import io.openex.contract.fields.ContractNumber;
@@ -14,12 +15,15 @@ import java.util.Map;
 
 import static io.openex.contract.Contract.executableContract;
 import static io.openex.contract.ContractCardinality.Multiple;
+import static io.openex.contract.ContractCardinality.One;
 import static io.openex.contract.ContractDef.contractBuilder;
+import static io.openex.contract.ContractVariable.variable;
+import static io.openex.contract.VariableType.String;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
-import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractNumber.numberField;
+import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
 import static io.openex.helper.SupportedLanguage.fr;
@@ -48,6 +52,10 @@ public class EmailContract extends Contractor {
 
     @Override
     public List<Contract> contracts() {
+        // variables
+        ContractVariable documentUriVariable = variable("document_uri",
+                "Http user link to upload the document (only for document expectation)", String, One);
+        // Contracts
         ContractConfig contractConfig = getConfig();
         HashMap<String, String> choices = new HashMap<>();
         choices.put("none", "-");
@@ -64,7 +72,7 @@ public class EmailContract extends Contractor {
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
-//                .optional(textField("inReplyTo", "InReplyTo", "HIDDEN"))
+                // .optional(textField("inReplyTo", "InReplyTo", "HIDDEN")) - Use for direct injection
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(expectationSelect)
@@ -72,18 +80,20 @@ public class EmailContract extends Contractor {
                 .build();
         Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
                 Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance);
+        standardEmail.addVariable(documentUriVariable);
         // Global contract
         List<ContractElement> globalInstance = contractBuilder()
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
                 .mandatory(textField("subject", "Subject"))
                 .mandatory(richTextareaField("body", "Body"))
-//                .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))
+                // .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))  - Use for direct injection
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(expectationSelect)
                 .optional(expectationScore)
                 .build();
         Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
                 Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);
+        globalEmail.addVariable(documentUriVariable);
         return List.of(standardEmail, globalEmail);
     }
 }
