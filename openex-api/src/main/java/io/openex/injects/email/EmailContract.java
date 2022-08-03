@@ -6,7 +6,6 @@ import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
 import io.openex.contract.fields.ContractNumber;
 import io.openex.contract.fields.ContractSelect;
-import io.openex.contract.fields.ContractText;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -52,12 +51,13 @@ public class EmailContract extends Contractor {
         ContractConfig contractConfig = getConfig();
         HashMap<String, String> choices = new HashMap<>();
         choices.put("none", "-");
-        choices.put("document", "Each audience should upload a document");
-        choices.put("text", "Each audience should submit a text response");
+        choices.put("manual", "The animation team can validate the player reaction");
+        // choices.put("document", "Each audience should upload a document");
+        // choices.put("text", "Each audience should submit a text response");
         ContractSelect expectationSelect = ContractSelect
                 .selectFieldWithDefault("expectationType", "Expectation", choices, "none");
         expectationSelect.setExpectation(true);
-        ContractNumber expectationScore = numberField("expectationScore", "Expectation score", "0", List.of(expectationSelect), List.of("document", "text"));
+        ContractNumber expectationScore = numberField("expectationScore", "Expectation score", "0", List.of(expectationSelect), List.of("document", "text", "manual"));
         expectationScore.setExpectation(true);
         // Standard contract
         List<ContractElement> standardInstance = contractBuilder()

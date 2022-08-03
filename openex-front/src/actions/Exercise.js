@@ -10,6 +10,11 @@ export const fetchExercises = () => (dispatch) => getReferential(schema.arrayOfE
 
 export const fetchExercise = (exerciseId) => (dispatch) => getReferential(schema.exercise, `/api/exercises/${exerciseId}`)(dispatch);
 
+export const fetchExerciseInjectExpectations = (exerciseId) => (dispatch) => getReferential(
+  schema.arrayOfInjectexpectations,
+  `/api/exercises/${exerciseId}/expectations`,
+)(dispatch);
+
 export const addExercise = (data) => (dispatch) => postReferential(schema.exercise, '/api/exercises', data)(dispatch);
 
 export const updateExercise = (exerciseId, data) => (dispatch) => putReferential(

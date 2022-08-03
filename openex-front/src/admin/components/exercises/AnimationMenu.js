@@ -78,6 +78,7 @@ class AnimationMenu extends Component {
               === `/admin/exercises/${exerciseId}/animation/chat`
             }
             classes={{ root: classes.item }}
+            disabled={true}
           >
             <ListItemIcon>
               <ForumOutlined />
@@ -92,6 +93,7 @@ class AnimationMenu extends Component {
               === `/admin/exercises/${exerciseId}/animation/validations`
             }
             classes={{ root: classes.item }}
+            disabled={true}
           >
             <ListItemIcon>
               <FactCheckOutlined />

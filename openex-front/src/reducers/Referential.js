@@ -33,6 +33,7 @@ export const entitiesInitializer = Immutable({
     medias: Immutable({}),
     challenges: Immutable({}),
     articles: Immutable({}),
+    injectexpectations: Immutable({}),
   }),
 });
 

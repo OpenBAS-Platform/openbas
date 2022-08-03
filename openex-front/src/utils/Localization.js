@@ -447,6 +447,9 @@ const i18n = {
       'Exercise results': "Résultats de l'exercice",
       'Exercise has not started yet': "L'exercice n'a pas encore commencé",
       'Back to administration': "Retour à l'administration",
+      'Audiences scores over time': 'Score des audiences dans le temps',
+      'Inject types scores over time':
+        'Score des types de stimuli dans le temps',
     },
     en: {
       openex_email: 'Email',

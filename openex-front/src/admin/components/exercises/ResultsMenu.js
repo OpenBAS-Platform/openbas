@@ -81,6 +81,7 @@ class ResultsMenu extends Component {
             }
             dense={false}
             classes={{ root: classes.item }}
+            disabled={true}
           >
             <ListItemIcon style={{ minWidth: 35 }}>
               <ContentPasteOutlined />

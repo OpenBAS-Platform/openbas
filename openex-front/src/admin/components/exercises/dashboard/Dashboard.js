@@ -25,6 +25,7 @@ import {
 import Empty from '../../../../components/Empty';
 import { fetchInjects, fetchInjectTypes } from '../../../../actions/Inject';
 import { fetchExerciseChallenges } from '../../../../actions/Challenge';
+import { fetchExerciseInjectExpectations } from '../../../../actions/Exercise';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -85,12 +86,24 @@ const Dashboard = () => {
   const theme = useTheme();
   // Fetching data
   const { exerciseId } = useParams();
-  const { exercise, audiences, injects, challengesMap, injectTypesMap } = useHelper((helper) => {
+  const {
+    exercise,
+    audiences,
+    injects,
+    challengesMap,
+    injectTypesMap,
+    audiencesMap,
+    injectExpectations,
+    injectsMap,
+  } = useHelper((helper) => {
     return {
       exercise: helper.getExercise(exerciseId),
       audiences: helper.getExerciseAudiences(exerciseId),
+      audiencesMap: helper.getAudiencesMap(),
       injects: helper.getExerciseInjects(exerciseId),
-      challengesMap: helper.getExerciseChallengesMap(exerciseId),
+      injectsMap: helper.getInjectsMap(),
+      injectExpectations: helper.getExerciseInjectExpectations(exerciseId),
+      challengesMap: helper.getChallengesMap(),
       injectTypesMap: helper.getInjectTypesMapByType(),
     };
   });
@@ -99,6 +112,7 @@ const Dashboard = () => {
     dispatch(fetchInjectTypes());
     dispatch(fetchInjects(exerciseId));
     dispatch(fetchExerciseChallenges(exerciseId));
+    dispatch(fetchExerciseInjectExpectations(exerciseId));
   });
   const injectTypesWithScore = R.pipe(
     R.filter(
@@ -185,44 +199,35 @@ const Dashboard = () => {
       })),
     },
   ];
-  const audiencesScores = [
-    {
-      name: 'SOC Team',
-      data: [
-        { x: '2022-08-03 10:09:06.012204', y: 0 },
-        { x: '2022-08-03 10:12:06.012204', y: 200 },
-        { x: '2022-08-03 10:58:06.012204', y: 350 },
-        { x: '2022-08-03 11:09:06.012204', y: 450 },
-        { x: '2022-08-03 11:30:06.012204', y: 500 },
-        { x: '2022-08-03 11:40:06.012204', y: 700 },
-        { x: '2022-08-03 11:50:06.012204', y: 900 },
-      ],
-    },
-    {
-      name: 'CSIRT Team',
-      data: [
-        { x: '2022-08-03 10:05:06.012204', y: 0 },
-        { x: '2022-08-03 10:10:06.012204', y: 500 },
-        { x: '2022-08-03 10:30:06.012204', y: 700 },
-        { x: '2022-08-03 11:20:06.012204', y: 1200 },
-        { x: '2022-08-03 11:25:06.012204', y: 1500 },
-        { x: '2022-08-03 11:30:06.012204', y: 2000 },
-        { x: '2022-08-03 11:32:06.012204', y: 2500 },
-      ],
-    },
-    {
-      name: 'Test',
-      data: [
-        { x: '2022-08-03 10:05:06.012204', y: 10 },
-        { x: '2022-08-03 10:10:06.012204', y: 50 },
-        { x: '2022-08-03 10:30:06.012204', y: 100 },
-        { x: '2022-08-03 11:20:06.012204', y: 200 },
-        { x: '2022-08-03 11:25:06.012204', y: 250 },
-        { x: '2022-08-03 12:30:06.012204', y: 300 },
-        { x: '2022-08-03 13:32:06.012204', y: 350 },
-      ],
-    },
-  ];
+  const audiencesScores = R.pipe(
+    R.filter((n) => n.inject_expectation_result !== null),
+    R.groupBy(R.prop('inject_expectation_audience')),
+    R.toPairs,
+    R.map((n) => ({
+      name: audiencesMap[n[0]]?.audience_name,
+      data: n[1].map((i) => ({
+        x: i.inject_expectation_updated_at,
+        y: i.inject_expectation_score,
+      })),
+    })),
+  )(injectExpectations);
+  const injectsTypesScores = R.pipe(
+    R.filter((n) => n.inject_expectation_result !== null),
+    R.map((n) => R.assoc(
+      'inject_expectation_inject',
+      injectsMap[n.inject_expectation_inject] || {},
+      n,
+    )),
+    R.groupBy(R.path(['inject_expectation_inject', 'inject_type'])),
+    R.toPairs,
+    R.map((n) => ({
+      name: tPick(injectTypesMap && injectTypesMap[a.inject_type]?.label),
+      data: n[1].map((i) => ({
+        x: i.inject_expectation_updated_at,
+        y: i.inject_expectation_score,
+      })),
+    })),
+  )(injectExpectations);
   return (
     <div className={classes.container}>
       <ResultsMenu exerciseId={exerciseId} />
@@ -369,7 +374,7 @@ const Dashboard = () => {
             {t('Audiences scores over time')}
           </Typography>
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
-            {audiences.length > 0 ? (
+            {audiencesScores.length > 0 ? (
               <Chart
                 options={lineChartOptions(
                   theme,
@@ -385,7 +390,32 @@ const Dashboard = () => {
                 height={350}
               />
             ) : (
-              <Empty message={t('No audiences in this exercise.')} />
+              <Empty message={t('Exercise has not started yet')} />
+            )}
+          </Paper>
+        </Grid>
+        <Grid item={true} xs={6}>
+          <Typography variant="h4">
+            {t('Inject types scores over time')}
+          </Typography>
+          <Paper variant="outlined" classes={{ root: classes.paperChart }}>
+            {injectsTypesScores.length > 0 ? (
+              <Chart
+                options={lineChartOptions(
+                  theme,
+                  true,
+                  nsdt,
+                  null,
+                  undefined,
+                  true,
+                )}
+                series={injectsTypesScores}
+                type="line"
+                width="100%"
+                height={350}
+              />
+            ) : (
+              <Empty message={t('Exercise has not started yet')} />
             )}
           </Paper>
         </Grid>

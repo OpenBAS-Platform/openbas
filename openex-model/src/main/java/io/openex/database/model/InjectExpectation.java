@@ -21,6 +21,7 @@ public class InjectExpectation implements Base {
         DOCUMENT,
         ARTICLE,
         CHALLENGE,
+        MANUAL,
     }
 
     @Column(name = "inject_expectation_type")

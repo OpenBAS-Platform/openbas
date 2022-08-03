@@ -164,6 +164,12 @@ export const challengesReader = new schema.Entity(
   {},
   { idAttribute: 'exercise_id' },
 );
+export const injectexpectation = new schema.Entity(
+  'injectexpectations',
+  {},
+  { idAttribute: 'inject_expectation_id' },
+);
+export const arrayOfInjectexpectations = new schema.Array(injectexpectation);
 
 token.define({ token_user: user });
 user.define({ user_organization: organization });
@@ -244,12 +250,10 @@ export const storeHelper = (state) => ({
   getTagsMap: () => maps('tags', state),
   // injects
   getInject: (id) => entity(id, 'injects', state),
+  getInjectsMap: () => maps('injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),
-  getInjectTypesMapByType: () => R.indexBy(
-    R.path(['config', 'type']),
-    entities('inject_types', state),
-  ),
+  getInjectTypesMapByType: () => R.indexBy(R.path(['config', 'type']), entities('inject_types', state)),
   getInjectTypesWithNoAudiences: () => R.uniq(
     entities('inject_types', state)
       .map((t) => ({
@@ -270,6 +274,12 @@ export const storeHelper = (state) => ({
   getInjectCommunications: (id) => entities('communications', state).filter(
     (i) => i.communication_inject === id,
   ),
+  // injectexpectation
+  getInjectExpectations: () => entities('injectexpectations', state),
+  getExerciseInjectExpectations: (id) => entities('injectexpectations', state).filter(
+    (i) => i.inject_expectation_exercise === id,
+  ),
+  getInjectExpectationsMap: () => maps('injectexpectations', state),
   // documents
   getDocuments: () => entities('documents', state),
   getDocumentsMap: () => maps('documents', state),
@@ -299,10 +309,6 @@ export const storeHelper = (state) => ({
   // challenges
   getChallenges: () => entities('challenges', state),
   getExerciseChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_exercises.includes(id)),
-  getExerciseChallengesMap: (id) => R.indexBy(
-    R.prop('challenge_id'),
-    entities('challenges', state).filter((c) => c.challenge_exercises.includes(id)),
-  ),
   getChallengesMap: () => maps('challenges', state),
 });
 

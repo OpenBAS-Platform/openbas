@@ -62,6 +62,7 @@ public abstract class Injector {
             case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
+            case MANUAL -> expectationExecution.setType(EXPECTATION_TYPE.MANUAL);
             default -> throw new IllegalStateException("Unexpected value: " + expectation);
         }
         return expectationExecution;

@@ -80,6 +80,7 @@ public class ExerciseApi extends RestBehavior {
     private ComcheckRepository comcheckRepository;
     private ImportService importService;
     private InjectRepository injectRepository;
+    private InjectExpectationRepository injectExpectationRepository;
     // endregion
 
     // region services
@@ -167,6 +168,11 @@ public class ExerciseApi extends RestBehavior {
     @Autowired
     public void setExerciseRepository(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
+    }
+
+    @Autowired
+    public void setInjectExpectationRepository(InjectExpectationRepository injectExpectationRepository) {
+        this.injectExpectationRepository = injectExpectationRepository;
     }
     // endregion
 
@@ -419,6 +425,15 @@ public class ExerciseApi extends RestBehavior {
         List<Communication> communications = new ArrayList<>();
         exercise.getInjects().forEach(injectDoc -> communications.addAll(injectDoc.getCommunications()));
         return communications;
+    }
+    // endregion
+
+    // region expectation
+    @GetMapping("/api/exercises/{exerciseId}/expectations")
+    @PreAuthorize("isExerciseObserver(#exerciseId)")
+    public Iterable<InjectExpectation> exerciseInjectExpectations(@PathVariable String exerciseId) {
+        Exercise exercise = exerciseRepository.findById(exerciseId).orElseThrow();
+        return injectExpectationRepository.findAllForExercise(exercise.getId()).stream().toList();
     }
     // endregion
 

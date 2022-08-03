@@ -239,7 +239,8 @@ public class ChallengeApi extends RestBehavior {
             challengeExpectations.forEach(injectExpectationExecution -> {
                 injectExpectationExecution.setUser(user);
                 injectExpectationExecution.setResult(Instant.now().toString());
-                injectExpectationExecution.setScore(100);
+                injectExpectationExecution.setScore(injectExpectationExecution.getExpectedScore());
+                injectExpectationExecution.setUpdatedAt(Instant.now());
                 injectExpectationRepository.save(injectExpectationExecution);
             });
         }
