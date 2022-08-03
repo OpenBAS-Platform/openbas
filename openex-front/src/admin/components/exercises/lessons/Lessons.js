@@ -50,10 +50,12 @@ import ObjectiveEvaluations from './ObjectiveEvaluations';
 import CreatePoll from './CreatePoll';
 import PollPopover from './PollPopover';
 import { isExerciseUpdatable } from '../../../../utils/Exercise';
+import ResultsMenu from '../ResultsMenu';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
+  container: {
+    margin: '10px 0 50px 0',
+    padding: '0 200px 0 0',
   },
   metric: {
     position: 'relative',
@@ -151,7 +153,8 @@ const Lessons = () => {
     objectives,
   );
   return (
-    <div className={classes.root}>
+    <div className={classes.container}>
+      <ResultsMenu exerciseId={exerciseId} />
       <Grid container={true} spacing={3} style={{ marginTop: -14 }}>
         <Grid item={true} xs={3} style={{ marginTop: -14 }}>
           <Paper variant="outlined" classes={{ root: classes.metric }}>

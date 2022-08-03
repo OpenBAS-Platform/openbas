@@ -4,7 +4,9 @@ import io.openex.contract.Contract;
 import io.openex.contract.ContractConfig;
 import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractElement;
+import io.openex.contract.fields.ContractNumber;
 import io.openex.contract.fields.ContractSelect;
+import io.openex.contract.fields.ContractText;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
 import static io.openex.contract.fields.ContractText.textField;
+import static io.openex.contract.fields.ContractNumber.numberField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
 import static io.openex.helper.SupportedLanguage.fr;
@@ -49,11 +52,13 @@ public class EmailContract extends Contractor {
         ContractConfig contractConfig = getConfig();
         HashMap<String, String> choices = new HashMap<>();
         choices.put("none", "-");
-        choices.put("document", "Player must upload a document");
-        choices.put("text", "Animation team must validate");
+        choices.put("document", "Each audience should upload a document");
+        choices.put("text", "Each audience should submit a text response");
         ContractSelect expectationSelect = ContractSelect
-                .selectFieldWithDefault("expectationType", "Inject expectation", choices, "none");
+                .selectFieldWithDefault("expectationType", "Expectation", choices, "none");
         expectationSelect.setExpectation(true);
+        ContractNumber expectationScore = numberField("expectationScore", "Expectation score", "0", List.of(expectationSelect), List.of("document", "text"));
+        expectationScore.setExpectation(true);
         // Standard contract
         List<ContractElement> standardInstance = contractBuilder()
                 .mandatory(audienceField("audiences", "Audiences", Multiple))
@@ -63,6 +68,7 @@ public class EmailContract extends Contractor {
                 .optional(checkboxField("encrypted", "Encrypted", false))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(expectationSelect)
+                .optional(expectationScore)
                 .build();
         Contract standardEmail = executableContract(contractConfig, EMAIL_DEFAULT,
                 Map.of(en, "Send individual mails", fr, "Envoyer des mails individuels"), standardInstance);
@@ -74,6 +80,7 @@ public class EmailContract extends Contractor {
 //                .mandatory(textField("inReplyTo", "InReplyTo", "HIDDEN"))
                 .optional(attachmentField("attachments", "Attachments", Multiple))
                 .mandatory(expectationSelect)
+                .optional(expectationScore)
                 .build();
         Contract globalEmail = executableContract(contractConfig, EMAIL_GLOBAL,
                 Map.of(en, "Send multi-recipients mail", fr, "Envoyer un mail multi-destinataires"), globalInstance);

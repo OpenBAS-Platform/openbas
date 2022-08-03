@@ -19,7 +19,9 @@ import Chat from './chat/Chat';
 import Validations from './validations/Validations';
 import Dryrun from './controls/Dryrun';
 import Comcheck from './controls/Comcheck';
+import Dashboard from './dashboard/Dashboard';
 import Lessons from './lessons/Lessons';
+import Reports from './reports/Reports';
 import { errorWrapper } from '../../../components/Error';
 import useDataLoader from '../../../utils/ServerSideEvent';
 import { useHelper } from '../../../store';
@@ -45,6 +47,7 @@ const Index = () => {
     if (
       location.pathname.includes('/definition')
       || location.pathname.includes('/animation')
+      || location.pathname.includes('/results')
     ) {
       withPadding = true;
     }
@@ -116,8 +119,18 @@ const Index = () => {
           />
           <Route
             exact
-            path="/admin/exercises/:exerciseId/lessons"
+            path="/admin/exercises/:exerciseId/results/dashboard"
+            render={errorWrapper(Dashboard)}
+          />
+          <Route
+            exact
+            path="/admin/exercises/:exerciseId/results/lessons"
             render={errorWrapper(Lessons)}
+          />
+          <Route
+            exact
+            path="/admin/exercises/:exerciseId/results/reports"
+            render={errorWrapper(Reports)}
           />
         </Switch>
       </div>

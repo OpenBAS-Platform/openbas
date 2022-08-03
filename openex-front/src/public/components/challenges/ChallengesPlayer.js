@@ -263,6 +263,17 @@ const ChallengePlayer = () => {
             {t('Switch to preview mode')}
           </Button>
         )}
+        {permissions.isLoggedIn && permissions.canRead && (
+          <Button
+            color="primary"
+            variant="outlined"
+            component={Link}
+            to={`/admin/exercises/${exerciseId}/definition/challenges`}
+            style={{ position: 'absolute', top: 20, left: 20 }}
+          >
+            {t('Back to administration')}
+          </Button>
+        )}
         <div className={classes.container}>
           <div style={{ margin: '0 auto', textAlign: 'center' }}>
             <img src={`/${logo}`} alt="logo" className={classes.logo} />
@@ -302,6 +313,7 @@ const ChallengePlayer = () => {
                     return (
                       <Grid key={challenge.challenge_id} item={true} xs={4}>
                         <Card
+                          variant="outlined"
                           classes={{ root: classes.card }}
                           sx={{ width: '100%', height: '100%' }}
                         >
@@ -321,7 +333,7 @@ const ChallengePlayer = () => {
                                 <IconButton
                                   size="large"
                                   color={
-                                    expectation.inject_expectation_result
+                                    expectation?.inject_expectation_result
                                       ? 'success'
                                       : 'inherit'
                                   }

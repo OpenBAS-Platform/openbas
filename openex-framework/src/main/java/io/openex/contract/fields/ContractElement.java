@@ -18,6 +18,8 @@ public abstract class ContractElement {
 
     private List<LinkedFieldModel> linkedFields = new ArrayList<>();
 
+    private List<String> linkedValues = new ArrayList<>();
+
     public ContractElement(String key, String label) {
         this.key = key;
         this.label = label;
@@ -53,6 +55,14 @@ public abstract class ContractElement {
 
     public void setLinkedFields(List<ContractElement> linkedFields) {
         this.linkedFields = linkedFields.stream().map(LinkedFieldModel::fromField).toList();
+    }
+
+    public List<String> getLinkedValues() {
+        return linkedValues;
+    }
+
+    public void setLinkedValues(List<String> linkedValues) {
+        this.linkedValues = linkedValues;
     }
 
     public boolean isExpectation() {

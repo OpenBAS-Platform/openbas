@@ -23,7 +23,7 @@ import Button from '@mui/material/Button';
 import DefinitionMenu from '../DefinitionMenu';
 import { useHelper } from '../../../../store';
 import useDataLoader from '../../../../utils/ServerSideEvent';
-import { fetchChallenges } from '../../../../actions/Challenge';
+import { fetchExerciseChallenges } from '../../../../actions/Challenge';
 import useSearchAnFilter from '../../../../utils/SortingFiltering';
 import SearchFilter from '../../../../components/SearchFilter';
 import { fetchDocuments } from '../../../../actions/Document';
@@ -66,11 +66,11 @@ const Challenges = () => {
   const { challenges } = useHelper((helper) => ({
     exercise: helper.getExercise(exerciseId),
     documentsMap: helper.getDocumentsMap(),
-    challenges: helper.getChallenges(),
+    challenges: helper.getExerciseChallenges(exerciseId),
   }));
   useDataLoader(() => {
     // dispatch(fetchExerciseChallenges(exerciseId));
-    dispatch(fetchChallenges());
+    dispatch(fetchExerciseChallenges(exerciseId));
     dispatch(fetchDocuments());
   });
   // Filter and sort hook
@@ -121,6 +121,7 @@ const Challenges = () => {
                 return (
                   <Grid key={challenge.challenge_id} item={true} xs={4}>
                     <Card
+                      variant="outlined"
                       classes={{ root: classes.card }}
                       sx={{ width: '100%', height: '100%' }}
                     >

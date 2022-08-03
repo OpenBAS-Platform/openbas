@@ -8,7 +8,11 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { TheatersOutlined } from '@mui/icons-material';
+import {
+  InsertChartOutlinedOutlined,
+  SchoolOutlined,
+  ContentPasteOutlined,
+} from '@mui/icons-material';
 import inject18n from '../../../components/i18n';
 
 const styles = (theme) => ({
@@ -21,9 +25,13 @@ const styles = (theme) => ({
     backgroundColor: theme.palette.background.navLight,
   },
   toolbar: theme.mixins.toolbar,
+  item: {
+    paddingTop: 10,
+    paddingBottom: 10,
+  },
 });
 
-class LessonsMenu extends Component {
+class ResultsMenu extends Component {
   render() {
     const { t, location, classes, exerciseId } = this.props;
     return (
@@ -36,43 +44,46 @@ class LessonsMenu extends Component {
         <MenuList component="nav">
           <MenuItem
             component={Link}
-            to={`/admin/exercises/${exerciseId}/lessons/dashboard`}
+            to={`/admin/exercises/${exerciseId}/results/dashboard`}
             selected={
               location.pathname
-              === `/admin/exercises/${exerciseId}/lessons/dashboard`
+              === `/admin/exercises/${exerciseId}/results/dashboard`
             }
             dense={false}
+            classes={{ root: classes.item }}
           >
             <ListItemIcon style={{ minWidth: 35 }}>
-              <TheatersOutlined />
+              <InsertChartOutlinedOutlined />
             </ListItemIcon>
-            <ListItemText primary={t('Dashboard')} />
+            <ListItemText primary={t('Statistics')} />
           </MenuItem>
           <MenuItem
             component={Link}
-            to={`/admin/exercises/${exerciseId}/lessons/scores`}
+            to={`/admin/exercises/${exerciseId}/results/lessons`}
             selected={
               location.pathname
-              === `/admin/exercises/${exerciseId}/lessons/scores`
+              === `/admin/exercises/${exerciseId}/results/lessons`
             }
             dense={false}
+            classes={{ root: classes.item }}
           >
             <ListItemIcon style={{ minWidth: 35 }}>
-              <TheatersOutlined />
+              <SchoolOutlined />
             </ListItemIcon>
-            <ListItemText primary={t('Scores')} />
+            <ListItemText primary={t('Lessons learned')} />
           </MenuItem>
           <MenuItem
             component={Link}
-            to={`/admin/exercises/${exerciseId}/lessons/reports`}
+            to={`/admin/exercises/${exerciseId}/results/reports`}
             selected={
               location.pathname
-              === `/admin/exercises/${exerciseId}/lessons/reports`
+              === `/admin/exercises/${exerciseId}/results/reports`
             }
             dense={false}
+            classes={{ root: classes.item }}
           >
             <ListItemIcon style={{ minWidth: 35 }}>
-              <TheatersOutlined />
+              <ContentPasteOutlined />
             </ListItemIcon>
             <ListItemText primary={t('Reports')} />
           </MenuItem>
@@ -82,11 +93,11 @@ class LessonsMenu extends Component {
   }
 }
 
-LessonsMenu.propTypes = {
+ResultsMenu.propTypes = {
   classes: PropTypes.object,
   location: PropTypes.object,
   t: PropTypes.func,
   exerciseId: PropTypes.string,
 };
 
-export default compose(inject18n, withRouter, withStyles(styles))(LessonsMenu);
+export default compose(inject18n, withRouter, withStyles(styles))(ResultsMenu);

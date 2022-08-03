@@ -27,6 +27,9 @@ public class EmailContent {
     @JsonProperty("expectationType")
     private String expectationType;
 
+    @JsonProperty("expectationScore")
+    private Integer expectationScore;
+
     public EmailContent() {
         // For mapper
     }
@@ -93,6 +96,14 @@ public class EmailContent {
 
     public void setExpectationType(String expectationType) {
         this.expectationType = expectationType;
+    }
+
+    public Integer getExpectationScore() {
+        return expectationScore;
+    }
+
+    public void setExpectationScore(Integer expectationScore) {
+        this.expectationScore = expectationScore;
     }
 
     @Override

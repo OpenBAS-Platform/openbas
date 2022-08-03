@@ -149,21 +149,21 @@ class TopMenuExercise extends Component {
         </Button>
         <Button
           component={Link}
-          to={`/admin/exercises/${exerciseId}/lessons`}
+          to={`/admin/exercises/${exerciseId}/results/dashboard`}
           variant={
-            location.pathname.includes(`/admin/exercises/${exerciseId}/lessons`)
+            location.pathname.includes(`/admin/exercises/${exerciseId}/results`)
               ? 'contained'
               : 'text'
           }
           size="small"
           color={
-            location.pathname.includes(`/admin/exercises/${exerciseId}/lessons`)
+            location.pathname.includes(`/admin/exercises/${exerciseId}/results`)
               ? 'secondary'
               : 'primary'
           }
           classes={{ root: classes.button }}
         >
-          {t('Lessons learned')}
+          {t('Results')}
         </Button>
       </div>
     );

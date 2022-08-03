@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum ContractType {
     @JsonProperty("text")
     Text,
+    @JsonProperty("number")
+    Number,
     @JsonProperty("tuple")
     Tuple,
     @JsonProperty("checkbox")

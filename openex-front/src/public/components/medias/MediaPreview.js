@@ -54,6 +54,17 @@ const MediaPreview = () => {
             {t('Switch to player mode')}
           </Button>
         )}
+        {permissions.isLoggedIn && permissions.canRead && (
+          <Button
+            color="primary"
+            variant="outlined"
+            component={Link}
+            to={`/admin/exercises/${exerciseId}/definition/media`}
+            style={{ position: 'absolute', top: 20, left: 20 }}
+          >
+            {t('Back to administration')}
+          </Button>
+        )}
         {media.media_type === 'newspaper' && (
           <MediaNewspaper mediaReader={mediaReader} />
         )}

@@ -231,6 +231,11 @@ public class Exercise implements Base {
         return getPolls().stream().mapToLong(Poll::getAnswersNumber).sum();
     }
 
+    @JsonProperty("exercise_communications_number")
+    public long getCommunicationsNumber() {
+        return getInjects().stream().mapToLong(Inject::getCommunicationsNumber).sum();
+    }
+
     @JsonProperty("exercise_next_possible_status")
     public List<STATUS> nextPossibleStatus() {
         if (STATUS.CANCELED.equals(status)) {

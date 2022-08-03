@@ -117,6 +117,7 @@ const MediaMicroblogging = ({ mediaReader }) => {
         return (
           <Card
             key={article.article_id}
+            variant="outlined"
             classes={{ root: classes.card }}
             sx={{ width: '100%' }}
           >

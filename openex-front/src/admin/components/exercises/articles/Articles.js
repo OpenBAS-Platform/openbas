@@ -163,6 +163,7 @@ const Articles = () => {
           return (
             <Grid key={article.article_id} item={true} xs={4}>
               <Card
+                variant="outlined"
                 classes={{ root: classes.card }}
                 sx={{ width: '100%', height: '100%' }}
               >
@@ -197,7 +198,6 @@ const Articles = () => {
                         size="large"
                         component={Link}
                         to={`/medias/${exerciseId}/${article.article_fullmedia.media_id}?preview=true`}
-                        target="_blank"
                       >
                         <VisibilityOutlined />
                       </IconButton>

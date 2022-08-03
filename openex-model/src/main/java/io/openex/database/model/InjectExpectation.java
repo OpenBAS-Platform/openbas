@@ -51,6 +51,10 @@ public class InjectExpectation implements Base {
     @Column(name = "inject_expectation_score")
     @JsonProperty("inject_expectation_score")
     private Integer score;
+
+    @Column(name = "inject_expectation_expected_score")
+    @JsonProperty("inject_expectation_expected_score")
+    private Integer expectedScore;
     // endregion
 
     // region contextual relations
@@ -165,6 +169,14 @@ public class InjectExpectation implements Base {
 
     public Integer getScore() {
         return score;
+    }
+
+    public Integer getExpectedScore() {
+        return expectedScore;
+    }
+
+    public void setExpectedScore(Integer expectedScore) {
+        this.expectedScore = expectedScore;
     }
 
     public void setScore(Integer score) {

@@ -5,6 +5,7 @@ import io.openex.contract.ContractConfig;
 import io.openex.contract.Contractor;
 import io.openex.contract.fields.ContractCheckbox;
 import io.openex.contract.fields.ContractElement;
+import io.openex.contract.fields.ContractNumber;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import static io.openex.contract.fields.ContractArticle.articleField;
 import static io.openex.contract.fields.ContractAttachment.attachmentField;
 import static io.openex.contract.fields.ContractAudience.audienceField;
 import static io.openex.contract.fields.ContractCheckbox.checkboxField;
+import static io.openex.contract.fields.ContractNumber.numberField;
 import static io.openex.contract.fields.ContractText.textField;
 import static io.openex.contract.fields.ContractTextArea.richTextareaField;
 import static io.openex.helper.SupportedLanguage.en;
@@ -62,6 +64,8 @@ public class MediaContract extends Contractor {
         ContractCheckbox emailingField = checkboxField("emailing", "Send email", true);
         ContractCheckbox expectationField = checkboxField("expectation", "Expect audiences to read the article(s)", true);
         expectationField.setExpectation(true);
+        ContractNumber expectationScore = numberField("expectationScore", "Expectation score", "0", List.of(expectationField));
+        expectationScore.setExpectation(true);
         List<ContractElement> publishInstance = contractBuilder()
                 // built in
                 .optional(audienceField("audiences", "Audiences", Multiple))
@@ -69,6 +73,7 @@ public class MediaContract extends Contractor {
                 .mandatory(articleField("articles", "Articles", Multiple))
                 // Contract specific
                 .optional(expectationField)
+                .optional(expectationScore)
                 // Emailing zone
                 .optional(emailingField)
                 .mandatory(textField("subject", "Subject", "New media pressure entries published for you ${user.name}",

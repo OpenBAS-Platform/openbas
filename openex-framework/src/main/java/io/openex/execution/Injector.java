@@ -55,10 +55,11 @@ public abstract class Injector {
         expectationExecution.setExercise(executableInject.getInject().getExercise());
         expectationExecution.setInject(executableInject.getInject());
         expectationExecution.setAudience(audience);
+        expectationExecution.setExpectedScore(expectation.score());
         expectationExecution.setScore(0);
         switch (expectation.type()) {
-            case ARTICLE -> expectationExecution.setArticle(((MediaExpectation)expectation).article());
-            case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation)expectation).challenge());
+            case ARTICLE -> expectationExecution.setArticle(((MediaExpectation) expectation).getArticle());
+            case CHALLENGE -> expectationExecution.setChallenge(((ChallengeExpectation) expectation).getChallenge());
             case DOCUMENT -> expectationExecution.setType(EXPECTATION_TYPE.DOCUMENT);
             case TEXT -> expectationExecution.setType(EXPECTATION_TYPE.TEXT);
             default -> throw new IllegalStateException("Unexpected value: " + expectation);

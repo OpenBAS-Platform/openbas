@@ -573,7 +573,9 @@ class InjectDefinition extends Component {
         ),
       )
       .forEach((field) => {
-        if (
+        if (field.type === 'number') {
+          finalData[field.key] = parseInt(data[field.key], 10);
+        } else if (
           field.type === 'textarea'
           && field.richText
           && data[field.key]
@@ -679,6 +681,19 @@ class InjectDefinition extends Component {
                   fullWidth={true}
                   multiline={true}
                   rows={10}
+                  label={t(field.label)}
+                  style={{ marginTop: 20 }}
+                  disabled={isExerciseReadOnly(exercise)}
+                />
+              );
+            case 'number':
+              return (
+                <TextField
+                  variant="standard"
+                  key={field.key}
+                  name={field.key}
+                  fullWidth={true}
+                  type="number"
                   label={t(field.label)}
                   style={{ marginTop: 20 }}
                   disabled={isExerciseReadOnly(exercise)}
@@ -834,7 +849,9 @@ class InjectDefinition extends Component {
                     .sort((a, b) => a[1].localeCompare(b[1]))
                     .map(([k, v]) => (
                       <MenuItem key={k} value={k}>
-                        <ListItemText>{v}</ListItemText>
+                        <ListItemText>
+                          {field.expectation ? t(v) : v}
+                        </ListItemText>
                       </MenuItem>
                     ))}
                 </Select>
@@ -843,7 +860,8 @@ class InjectDefinition extends Component {
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
-                  renderValue={(v) => field.choices[v]}
+                  renderValue={(v) => (field.expectation ? t(field.choices[v]) : field.choices[v])
+                  }
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
@@ -852,7 +870,9 @@ class InjectDefinition extends Component {
                     .sort((a, b) => a[1].localeCompare(b[1]))
                     .map(([k, v]) => (
                       <MenuItem key={k} value={k}>
-                        <ListItemText>{v}</ListItemText>
+                        <ListItemText>
+                          {field.expectation ? t(v) : v}
+                        </ListItemText>
                       </MenuItem>
                     ))}
                 </Select>
@@ -886,7 +906,8 @@ class InjectDefinition extends Component {
                   variant="standard"
                   label={t(field.label)}
                   key={field.key}
-                  renderValue={(v) => choices[v]}
+                  renderValue={(v) => (field.expectation ? t(choices[v]) : choices[v])
+                  }
                   name={field.key}
                   fullWidth={true}
                   style={{ marginTop: 20 }}
@@ -895,7 +916,9 @@ class InjectDefinition extends Component {
                     .sort((a, b) => a[1].localeCompare(b[1]))
                     .map(([k, v]) => (
                       <MenuItem key={k} value={k}>
-                        <ListItemText>{v}</ListItemText>
+                        <ListItemText>
+                          {field.expectation ? t(v) : v}
+                        </ListItemText>
                       </MenuItem>
                     ))}
                 </Select>
@@ -1628,6 +1651,12 @@ class InjectDefinition extends Component {
                           ) {
                             return false;
                           }
+                          if (
+                            linkedField.type === 'select'
+                            && !f.linkedValues.includes(values[linkedField.key])
+                          ) {
+                            return false;
+                          }
                         }
                         return true;
                       }),
@@ -1666,6 +1695,12 @@ class InjectDefinition extends Component {
                             if (
                               linkedField.type === 'checkbox'
                               && values[linkedField.key] === false
+                            ) {
+                              return false;
+                            }
+                            if (
+                              linkedField.type === 'select'
+                              && !f.linkedValues.includes(values[linkedField.key])
                             ) {
                               return false;
                             }

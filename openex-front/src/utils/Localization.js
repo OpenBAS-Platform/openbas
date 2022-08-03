@@ -300,6 +300,8 @@ const i18n = {
       'Send a new comcheck': 'Envoyer une nouvelle vérification',
       'Launch a new dryrun': 'Démarrer une nouvelle simulation',
       Hello: 'Bonjour',
+      Statistics: 'Statistiques',
+      Reports: 'Rapports',
       '[${exercise.name}] Communication check':
         '[${exercise.name}] Vérification des moyens de communication',
       'This is a communication check before the beginning of the exercise. Please click on the following link in order to confirm you successfully received this message: ${comcheck.url}':
@@ -425,6 +427,26 @@ const i18n = {
       'No category': 'Aucune catégorie',
       'No challenge in this exercise yet.':
         'Encore aucun challenge dans cet exercice.',
+      'Distribution of expectations by audience':
+        'Distribution des attendus par audience',
+      'Distribution of expectations by inject type':
+        "Distribution des attendus par type d'inject",
+      'Distribution of expected total score by inject type':
+        "Distribution du score total attendu par type d'inject",
+      '-': 'Aucun',
+      'Each audience should upload a document':
+        'Chaque audience doit uploader un document',
+      'Each audience should submit a text response':
+        'Chaque audience doit soumettre une réponse texte',
+      Expectation: 'Attendu',
+      'Expectation score': "Score de l'attendu",
+      'Distribution of expected total score by audience':
+        'Distribution du score total attendu par audience',
+      'Exercise definition and scenario':
+        "Définition de l'exercice et scénario",
+      'Exercise results': "Résultats de l'exercice",
+      'Exercise has not started yet': "L'exercice n'a pas encore commencé",
+      'Back to administration': "Retour à l'administration",
     },
     en: {
       openex_email: 'Email',
@@ -459,6 +481,7 @@ const i18n = {
       VALUE: 'Text',
       VALUE_CASE: 'Text (case-sensitive)',
       REGEXP: 'Regular expression',
+      '-': 'None',
     },
   },
 };

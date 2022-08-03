@@ -108,7 +108,7 @@ public class MediaExecutor extends Injector {
                 if (content.isExpectation()) {
                     // Return expectations
                     List<Expectation> expectations = new ArrayList<>();
-                    articles.forEach(article -> expectations.add(new MediaExpectation(article)));
+                    articles.forEach(article -> expectations.add(new MediaExpectation(content.getExpectationScore(), article)));
                     return expectations;
                 }
             } else {

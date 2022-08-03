@@ -88,6 +88,26 @@ public class Audience implements Base {
         return getInjects().size();
     }
 
+    @OneToMany(mappedBy = "audience", fetch = FetchType.LAZY)
+    @JsonSerialize(using = MultiIdDeserializer.class)
+    @JsonProperty("audience_inject_expectations")
+    private List<InjectExpectation> injectExpectations = new ArrayList<>();
+
+    @JsonProperty("audience_injects_expectations_number")
+    public long getInjectExceptationsNumber() {
+        return getInjectExpectations().size();
+    }
+
+    @JsonProperty("audience_injects_expectations_total_score")
+    public long getInjectExceptationsTotalScore() {
+        return getInjectExpectations().stream().mapToLong(InjectExpectation::getScore).sum();
+    }
+
+    @JsonProperty("audience_injects_expectations_total_expected_score")
+    public long getInjectExceptationsTotalExpectedScore() {
+        return getInjectExpectations().stream().mapToLong(InjectExpectation::getExpectedScore).sum();
+    }
+
     @JsonIgnore
     @Override
     public boolean isUserHasAccess(User user) {
@@ -165,6 +185,14 @@ public class Audience implements Base {
 
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
+    }
+
+    public List<InjectExpectation> getInjectExpectations() {
+        return injectExpectations;
+    }
+
+    public void setInjectExpectations(List<InjectExpectation> injectExpectations) {
+        this.injectExpectations = injectExpectations;
     }
 
     @Override

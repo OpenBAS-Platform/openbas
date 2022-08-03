@@ -126,6 +126,7 @@ const MediaNewspaper = ({ mediaReader }) => {
         {firstArticle && (
           <Grid item={true} xs={headArticles.length > 0 ? 8 : 12}>
             <Card
+              variant="outlined"
               classes={{ root: classes.card }}
               sx={{ width: '100%', height: '100%' }}
             >
@@ -225,6 +226,7 @@ const MediaNewspaper = ({ mediaReader }) => {
               return (
                 <Card
                   key={article.article_id}
+                  variant="outlined"
                   classes={{ root: classes.card }}
                   sx={{ width: '100%' }}
                   style={{ marginTop: index > 0 ? 20 : 0 }}
@@ -319,6 +321,7 @@ const MediaNewspaper = ({ mediaReader }) => {
           return (
             <Grid key={article.article_id} item={true} xs={4}>
               <Card
+                variant="outlined"
                 classes={{ root: classes.card }}
                 sx={{ width: '100%', height: '100%' }}
               >

@@ -33,7 +33,7 @@ import { fetchOrganizations } from '../../actions/Organization';
 import { storeHelper } from '../../actions/Schema';
 import ItemNumberDifference from '../../components/ItemNumberDifference';
 import Empty from '../../components/Empty';
-import { distributionChartOptions } from '../../utils/Charts';
+import { horizontalBarsChartOptions } from '../../utils/Charts';
 import InjectIcon from './exercises/injects/InjectIcon';
 import ProgressBarCountdown from '../../components/ProgressBarCountdown';
 
@@ -374,7 +374,10 @@ const Dashboard = (props) => {
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {topOrganizations.length > 0 ? (
               <Chart
-                options={distributionChartOptions(theme, maxInjectsNumber < 2)}
+                options={horizontalBarsChartOptions(
+                  theme,
+                  maxInjectsNumber < 2,
+                )}
                 series={distributionChartData}
                 type="bar"
                 width="100%"

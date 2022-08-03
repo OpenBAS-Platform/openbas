@@ -94,8 +94,8 @@ public class EmailExecutor extends Injector {
                     sendSingle(execution, users, replyTo, inReplyTo, mustBeEncrypted, subject, message, attachments, storeInImap);
         }
         return switch (content.getExpectationType()) {
-            case "document" -> List.of(new DocumentExpectation());
-            case "text" -> List.of(new TextExpectation());
+            case "document" -> List.of(new DocumentExpectation(content.getExpectationScore()));
+            case "text" -> List.of(new TextExpectation(content.getExpectationScore()));
             default -> List.of();
         };
     }

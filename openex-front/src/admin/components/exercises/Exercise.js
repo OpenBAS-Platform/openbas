@@ -49,7 +49,7 @@ import useDataLoader from '../../../utils/ServerSideEvent';
 import { fetchAudiences } from '../../../actions/Audience';
 import Empty from '../../../components/Empty';
 import Countdown from '../../../components/Countdown';
-import { distributionChartOptions } from '../../../utils/Charts';
+import { horizontalBarsChartOptions } from '../../../utils/Charts';
 import { usePermissions } from '../../../utils/Exercise';
 import { Transition } from '../../../utils/Environment';
 import ExerciseDatePopover from './ExerciseDatePopover';
@@ -437,7 +437,10 @@ const Exercise = () => {
           <Paper variant="outlined" classes={{ root: classes.paperChart }}>
             {topAudiences.length > 0 ? (
               <Chart
-                options={distributionChartOptions(theme, maxInjectsNumber < 2)}
+                options={horizontalBarsChartOptions(
+                  theme,
+                  maxInjectsNumber < 2,
+                )}
                 series={distributionChartData}
                 type="bar"
                 width="100%"

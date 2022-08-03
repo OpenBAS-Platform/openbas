@@ -246,6 +246,10 @@ export const storeHelper = (state) => ({
   getInject: (id) => entity(id, 'injects', state),
   getInjectTypes: () => entities('inject_types', state),
   getInjectTypesMap: () => maps('inject_types', state),
+  getInjectTypesMapByType: () => R.indexBy(
+    R.path(['config', 'type']),
+    entities('inject_types', state),
+  ),
   getInjectTypesWithNoAudiences: () => R.uniq(
     entities('inject_types', state)
       .map((t) => ({
@@ -294,6 +298,11 @@ export const storeHelper = (state) => ({
   getArticlesMap: () => maps('articles', state),
   // challenges
   getChallenges: () => entities('challenges', state),
+  getExerciseChallenges: (id) => entities('challenges', state).filter((c) => c.challenge_exercises.includes(id)),
+  getExerciseChallengesMap: (id) => R.indexBy(
+    R.prop('challenge_id'),
+    entities('challenges', state).filter((c) => c.challenge_exercises.includes(id)),
+  ),
   getChallengesMap: () => maps('challenges', state),
 });
 

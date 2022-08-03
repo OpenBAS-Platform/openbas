@@ -38,7 +38,7 @@ const FileFieldInput = ({
     ).length === 0;
   const files = isErroredFile
     ? [
-        <FormHelperText error={true} focused={true}>
+        <FormHelperText key={1} error={true} focused={true}>
           {t('This file type is not accepted here.')}
         </FormHelperText>,
     ]
